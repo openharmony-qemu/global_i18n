@@ -1,8 +1,6 @@
 import re
 import pickle
 import png
-import numpy as np
-import json
 
 def read_data(filename):
     data_res = {}
@@ -33,7 +31,6 @@ def load_data(pickle_name):
     return data
 
 
-
 def classify_timezones(data):
     group_wn = set()
     group_en = set()
@@ -52,10 +49,6 @@ def classify_timezones(data):
         else:
             for tz in tzs:
                 group_es.add(tz)
-    print(len(group_wn))
-    print(len(group_en))
-    print(len(group_ws))
-    print(len(group_es))
     return [group_wn, group_en, group_ws, group_es]
 
 
@@ -83,20 +76,12 @@ def export_numerized_dicts(numerized_classes):
         num2name_dict_list.append(num2name)
     with open("num2name.txt", "w", encoding="utf-8") as f:
         f.write(str(num2name_dict_list))
-    for d in num2name_dict_list:
-        print("#################################################")
-        for num, name in d.items():
-            print(num, name)
 
 
 def generate_array_from_data(data, numerized_classes):
     total_nums_list = []
-    # array_one_point = [255, 255, 255]
-    # array_one_row = array_one_point * 3600
-    # array_map = [array_one_row] * 1800
     for key, val in data.items():
         original_keys = key
-        fixed_keys = (int(original_keys[0]*10+1800), int(original_keys[1]*10+900))
         if original_keys[0] < 0 and original_keys[1] >= 0:
             quater = 0
         elif original_keys[0] >= 0 and original_keys[1] >= 0:
@@ -112,8 +97,6 @@ def generate_array_from_data(data, numerized_classes):
         for i in range(len(names_l)):
             nums_l[i] = names_l[i]
         total_nums_list += nums_l
-    # print(total_nums_list)
-    print(len(total_nums_list))
     return total_nums_list
 
 
@@ -128,9 +111,7 @@ def group_in_total(total_list):
             map_array.append(col_array)
             col_array = []
             i = 0
-    print(len(map_array))
     return map_array
-
 
 
 def pack2png(map_array):
@@ -141,28 +122,15 @@ def save_png_test():
     array_one_point = [255, 0, 0]
     array_one_row = [array_one_point] * 3600
     array_map = [array_one_row] * 1800
-    # print(len(array_map[0]))
-    # print(array_map)
     png.from_array(array_map, "RGB").save("03.png")
-
-    # w = png.Writer(3600, 1800, greyscale=True)
-    # f = open("png.png", "wb")
-    # w.write(f, [range(256), range(256)])
-    # f.close()
-
-
 
 
 if __name__ == '__main__':
-    # data = read_data("location2tz.txt")
-
-
-    data = load_data("loc2tz.pickle")
+    read_data("data/location2tz.txt")
+    data = load_data("data/loc2tz.pickle")
     name_classes = classify_timezones(data)
-    numerized_classes = numerized_dictionary(name_classes)
-    export_numerized_dicts(numerized_classes)
-
-    # save_png_test()
-    total_list = generate_array_from_data(data, numerized_classes)
-    map_array = group_in_total(total_list)
+    nmrzd_classes = numerized_dictionary(name_classes)
+    export_numerized_dicts(nmrzd_classes)
+    t_list = generate_array_from_data(data, nmrzd_classes)
+    map_array = group_in_total(t_list)
     pack2png(map_array)
