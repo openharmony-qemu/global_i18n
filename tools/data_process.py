@@ -19,7 +19,7 @@ def read_data(filename):
         timezones = tz[1:-1].split(",")
         data_res[location] = timezones
     
-    with open("loc2tz.pickle", "wb") as f:
+    with open("data/loc2tz.pickle", "wb") as f:
         pickle.dump(data_res, f)
     
     return data_res
@@ -68,13 +68,13 @@ def numerized_dictionary(classes):
 
 
 def export_numerized_dicts(numerized_classes):
-    with open("name2num.txt", "w", encoding="utf-8") as f:
+    with open("data/name2num.txt", "w", encoding="utf-8") as f:
         f.write(str(numerized_classes))
     num2name_dict_list = []
     for d in numerized_classes:
         num2name = dict(zip(d.values(), d.keys()))
         num2name_dict_list.append(num2name)
-    with open("num2name.txt", "w", encoding="utf-8") as f:
+    with open("data/num2name.txt", "w", encoding="utf-8") as f:
         f.write(str(num2name_dict_list))
 
 
@@ -115,7 +115,7 @@ def group_in_total(total_list):
 
 
 def pack2png(map_array):
-    png.from_array(map_array, "RGB").save("loc2tz.png")
+    png.from_array(map_array, "RGB").save("data/loc2tz.dat")
 
 
 def save_png_test():
