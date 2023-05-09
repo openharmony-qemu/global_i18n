@@ -307,6 +307,11 @@ void GetOptionValue(napi_env env, napi_value options, const std::string &optionN
 void GetOptionMap(napi_env env, napi_value option, std::map<std::string, std::string> &map)
 {
     if (option != nullptr) {
+        napi_valuetype valueType = napi_valuetype::napi_undefined;
+        napi_typeof(env, option, &valueType);
+        if (valueType == napi_valuetype::napi_undefined || valueType == napi_valuetype::napi_null) {
+            return;
+        }
         size_t len;
         napi_get_value_string_utf8(env, option, nullptr, 0, &len);
         std::vector<char> styleBuf(len + 1);
@@ -1264,16 +1269,22 @@ napi_value I18nAddon::IsSuggestedImpl(napi_env env, napi_callback_info info, boo
         return nullptr;
     }
     bool isSuggested = false;
-    if (argv[1] != nullptr) {
-        napi_get_value_string_utf8(env, argv[1], nullptr, 0, &len);
-        std::vector<char> regionBuf(len + 1);
-        status = napi_get_value_string_utf8(env, argv[1], regionBuf.data(), len + 1, &len);
-        if (status != napi_ok) {
-            HiLog::Error(LABEL, "Failed to get string item");
-            ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
-            return nullptr;
+    if (argv[1] != nullptr ) {
+        napi_valuetype secondParamType = napi_valuetype::napi_undefined; 
+        napi_typeof(env, argv[1], &secondParamType);
+        if (secondParamType != napi_valuetype::napi_undefined && secondParamType != napi_valuetype::napi_null) {
+            napi_get_value_string_utf8(env, argv[1], nullptr, 0, &len);
+            std::vector<char> regionBuf(len + 1);
+            status = napi_get_value_string_utf8(env, argv[1], regionBuf.data(), len + 1, &len);
+            if (status != napi_ok) {
+                HiLog::Error(LABEL, "Failed to get string item");
+                ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
+                return nullptr;
+            }
+            isSuggested = LocaleConfig::IsSuggested(languageBuf.data(), regionBuf.data());
+        } else {
+            isSuggested = LocaleConfig::IsSuggested(languageBuf.data());
         }
-        isSuggested = LocaleConfig::IsSuggested(languageBuf.data(), regionBuf.data());
     } else {
         isSuggested = LocaleConfig::IsSuggested(languageBuf.data());
     }
@@ -1841,7 +1852,17 @@ napi_value I18nAddon::GetCalendar(napi_env env, napi_callback_info info)
         HiLog::Error(LABEL, "Failed to create reference at GetCalendar");
         return nullptr;
     }
+    bool secondParamIsNull = false;
     if (!argv[1]) {
+        secondParamIsNull = true;
+    }else {
+        napi_valuetype valueType = napi_valuetype::napi_undefined;
+        napi_typeof(env, argv[1], &valueType);
+        if (valueType == napi_valuetype::napi_undefined || valueType == napi_valuetype::napi_null) {
+            secondParamIsNull = true;
+        }
+    }
+    if (secondParamIsNull) { // second parameter is null, fill with empty string
         status = napi_create_string_utf8(env, "", NAPI_AUTO_LENGTH, argv + 1);
         if (status != napi_ok) {
             return nullptr;
@@ -1929,10 +1950,18 @@ napi_value I18nAddon::Set(napi_env env, napi_callback_info info)
         HiLog::Error(LABEL, "Get calendar object failed");
         return nullptr;
     }
+    bool argFlag[] = { true , true, true};// args 3-5 is undefined flag
+    for(int i = 3; i < 6 ;i++) {
+        if (argv[i]) {
+            valueType = napi_valuetype::napi_undefined;
+            napi_typeof(env, argv[i], &valueType);
+            argFlag[i-3] = (valueType == napi_valuetype::napi_undefined || valueType == napi_valuetype::napi_null);
+        }
+    }
     obj->calendar_->Set(times[0], times[1], times[2]); // 2 is the index of date
-    obj->SetField(env, argv[3], UCalendarDateFields::UCAL_HOUR_OF_DAY); // 3 is the index of hour
-    obj->SetField(env, argv[4], UCalendarDateFields::UCAL_MINUTE); // 4 is the index of minute
-    obj->SetField(env, argv[5], UCalendarDateFields::UCAL_SECOND); // 5 is the index of second
+    obj->SetField(env, argFlag[0] ? 0 : argv[3], UCalendarDateFields::UCAL_HOUR_OF_DAY); // 3 is the index of hour
+    obj->SetField(env, argFlag[1] ? 0 : argv[4], UCalendarDateFields::UCAL_MINUTE); // 4 is the index of minute
+    obj->SetField(env, argFlag[2] ? 0 : argv[5], UCalendarDateFields::UCAL_SECOND); // 5 is the index of second
     return nullptr;
 }
 
@@ -2524,14 +2553,12 @@ napi_value I18nAddon::Next(napi_env env, napi_callback_info info)
     if (argv[0] != nullptr) {
         napi_valuetype valueType = napi_valuetype::napi_undefined;
         napi_typeof(env, argv[0], &valueType);
-        if (valueType != napi_valuetype::napi_number) {
-            napi_throw_type_error(env, nullptr, "Parameter type does not match");
-            return nullptr;
-        }
-        status = napi_get_value_int32(env, argv[0], &value);
-        if (status != napi_ok) {
-            HiLog::Error(LABEL, "Retrieve next value failed");
-            return nullptr;
+        if (valueType == napi_valuetype::napi_number) {
+            status = napi_get_value_int32(env, argv[0], &value);
+            if (status != napi_ok) {
+                HiLog::Error(LABEL, "Retrieve next value failed");
+                return nullptr;
+            }
         }
     }
     value = obj->brkiter_->Next(value);
@@ -2759,7 +2786,13 @@ napi_value I18nAddon::GetIndexUtil(napi_env env, napi_callback_info info)
     if (!argv[0]) {
         status = napi_new_instance(env, constructor, 0, argv, &result);
     } else {
-        status = napi_new_instance(env, constructor, 1, argv, &result);
+        napi_valuetype valType = napi_valuetype::napi_undefined;
+        napi_typeof(env, argv[0], &valType);
+        if (valType == napi_valuetype::napi_undefined || valType == napi_valuetype::napi_null) {
+            status = napi_new_instance(env, constructor, 0, argv, &result);
+        } else {
+            status = napi_new_instance(env, constructor, 1, argv, &result);
+        }
     }
     if (status != napi_ok) {
         HiLog::Error(LABEL, "Get calendar create instance failed");
@@ -3001,7 +3034,11 @@ napi_value I18nAddon::AddPreferredLanguageImpl(napi_env env, napi_callback_info 
 
     int index = 1000000;
     if (argv[1] != nullptr) {
-        status = napi_get_value_int32(env, argv[1], &index);
+        napi_valuetype valueType = napi_valuetype::napi_undefined;
+        napi_typeof(env, argv[1], &valueType);
+        if (valueType != napi_valuetype::napi_undefined && valueType != napi_valuetype::napi_null) {
+            status = napi_get_value_int32(env, argv[1], &index);
+        }
     }
     if (status != napi_ok) {
         HiLog::Error(LABEL, "addPreferrdLanguage: get index failed");
@@ -3237,6 +3274,12 @@ napi_value I18nAddon::GetI18nTimeZone(napi_env env, napi_callback_info info)
     napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (argv[0] == nullptr) {
         napi_create_string_utf8(env, "", NAPI_AUTO_LENGTH, &argv[0]);
+    } else {
+        napi_valuetype valueType = napi_valuetype::napi_undefined;
+        napi_typeof(env, argv[0] , &valueType);
+        if (valueType == napi_valuetype::napi_undefined || valueType == napi_valuetype::napi_null) {
+            napi_create_string_utf8(env, "", NAPI_AUTO_LENGTH, &argv[0]);
+        }
     }
     return StaticGetTimeZone(env, argv, true);
 }
@@ -3284,45 +3327,45 @@ bool I18nAddon::GetStringFromJS(napi_env env, napi_value argv, std::string &jsSt
 
 int32_t I18nAddon::GetParameter(napi_env env, napi_value *argv, std::string &localeStr, bool &isDST)
 {
-    if (!argv[0]) {
-        return 0;  // 0 represents no parameter.
-    }
+    bool firstParamFlag = false;
+    bool secondParamFlag = false;
     napi_status status = napi_ok;
-    if (!argv[1]) {
-        napi_valuetype valueType = napi_valuetype::napi_undefined;
-        napi_typeof(env, argv[0], &valueType);
-        if (valueType == napi_valuetype::napi_string) {
+    if (argv[0]) {
+        napi_valuetype valueType0 = napi_valuetype::napi_undefined;
+        napi_typeof(env, argv[0], &valueType0);  // 0 represents first parameter
+        if (valueType0 == napi_valuetype::napi_string) {
             bool valid = GetStringFromJS(env, argv[0], localeStr);
-            if (!valid) {
-                return -1;  // -1 represents Invalid parameter.
+            if (valid) {
+                firstParamFlag = true;
             }
-            return 1;  // 1 represents one string parameter.
-        } else if (valueType == napi_valuetype::napi_boolean) {
+        } else if (valueType0 == napi_valuetype::napi_boolean) {
             status = napi_get_value_bool(env, argv[0], &isDST);
-            if (status != napi_ok) {
-                return -1;  // -1 represents Invalid parameter.
+            if (status == napi_ok) {
+                secondParamFlag = true;
             }
-            return 2;  // 2 represents one boolean parameter.
-        } else {
-            return -1;  // -1 represents Invalid parameter.
         }
     }
-    napi_valuetype valueType0 = napi_valuetype::napi_undefined;
-    napi_valuetype valueType1 = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv[0], &valueType0);  // 0 represents first parameter
-    napi_typeof(env, argv[1], &valueType1);  // 0 represents second parameter
-    if (valueType0 != napi_valuetype::napi_string || valueType1 != napi_valuetype::napi_boolean) {
-        return -1;  // -1 represents Invalid parameter.
+
+    if (argv[1]) {
+        napi_valuetype valueType1 = napi_valuetype::napi_undefined;
+        napi_typeof(env, argv[1], &valueType1);  // 1 represents second parameter
+        if(valueType1 == napi_valuetype::napi_boolean) {
+            status = napi_get_value_bool(env, argv[1], &isDST);
+            if (status == napi_ok) {
+                secondParamFlag = true;
+            }
+        }
     }
-    bool valid = GetStringFromJS(env, argv[0], localeStr);
-    if (!valid) {
-        return -1;  // -1 represents Invalid parameter.
+    if (firstParamFlag && secondParamFlag) {
+        return 3;// 3 represents one string parameter and one bool parameter.
+    } else if (firstParamFlag && !secondParamFlag) {
+        return 1;  // 1 represents one string parameter.
+    } else if (!firstParamFlag && secondParamFlag) {
+        return 2;  // 2 represents one boolean parameter.
+    } else if (!firstParamFlag && !secondParamFlag){
+        return 0;  // 0 represents no parameter.
     }
-    status = napi_get_value_bool(env, argv[1], &isDST);
-    if (status != napi_ok) {
-        return -1;  // -1 represents Invalid parameter.
-    }
-    return 3;  // 3 represents one string parameter and one bool parameter.
+    return -1;  // -1 represents Invalid parameter.
 }
 
 napi_value I18nAddon::GetTimeZoneDisplayName(napi_env env, napi_callback_info info)
@@ -3381,24 +3424,20 @@ napi_value I18nAddon::GetOffset(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    double date = 0;
+    auto time = std::chrono::system_clock::now();
+    auto since_epoch = time.time_since_epoch();
+    auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(since_epoch);
+    double date = (double)millis.count();
     if (argv[0]) {
         napi_valuetype valueType = napi_valuetype::napi_undefined;
         napi_typeof(env, argv[0], &valueType);
-        if (valueType != napi_valuetype::napi_number) {
-            HiLog::Error(LABEL, "Invalid parameter type");
-            return nullptr;
+        if (valueType == napi_valuetype::napi_number) {
+            status = napi_get_value_double(env, argv[0], &date);
+            if (status != napi_ok) {
+                HiLog::Error(LABEL, "Get parameter date failed");
+                return nullptr;
+            }
         }
-        status = napi_get_value_double(env, argv[0], &date);
-        if (status != napi_ok) {
-            HiLog::Error(LABEL, "Get parameter date failed");
-            return nullptr;
-        }
-    } else {
-        auto time = std::chrono::system_clock::now();
-        auto since_epoch = time.time_since_epoch();
-        auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(since_epoch);
-        date = (double)millis.count();
     }
 
     I18nAddon *obj = nullptr;
