@@ -1269,7 +1269,7 @@ napi_value I18nAddon::IsSuggestedImpl(napi_env env, napi_callback_info info, boo
         return nullptr;
     }
     bool isSuggested = false;
-    if (argv[1] != nullptr ) {
+    if (argv[1] != nullptr) {
         napi_valuetype secondParamType = napi_valuetype::napi_undefined; 
         napi_typeof(env, argv[1], &secondParamType);
         if (secondParamType != napi_valuetype::napi_undefined && secondParamType != napi_valuetype::napi_null) {
@@ -1950,8 +1950,8 @@ napi_value I18nAddon::Set(napi_env env, napi_callback_info info)
         HiLog::Error(LABEL, "Get calendar object failed");
         return nullptr;
     }
-    bool argFlag[] = { true , true, true};// args 3-5 is undefined flag
-    for(int i = 3; i < 6 ;i++) {
+    bool argFlag[] = {true, true, true};// args 3-5 is undefined flag
+    for(int i = 3; i < 6; i++) {
         if (argv[i]) {
             valueType = napi_valuetype::napi_undefined;
             napi_typeof(env, argv[i], &valueType);
@@ -1959,9 +1959,9 @@ napi_value I18nAddon::Set(napi_env env, napi_callback_info info)
         }
     }
     obj->calendar_->Set(times[0], times[1], times[2]); // 2 is the index of date
-    obj->SetField(env, argFlag[0] ? 0 : argv[3], UCalendarDateFields::UCAL_HOUR_OF_DAY); // 3 is the index of hour
-    obj->SetField(env, argFlag[1] ? 0 : argv[4], UCalendarDateFields::UCAL_MINUTE); // 4 is the index of minute
-    obj->SetField(env, argFlag[2] ? 0 : argv[5], UCalendarDateFields::UCAL_SECOND); // 5 is the index of second
+    obj->SetField(env, (argFlag[0] ? 0 : argv[3]), UCalendarDateFields::UCAL_HOUR_OF_DAY); // 3 is the index of hour
+    obj->SetField(env, (argFlag[1] ? 0 : argv[4]), UCalendarDateFields::UCAL_MINUTE); // 4 is the index of minute
+    obj->SetField(env, (argFlag[2] ? 0 : argv[5]), UCalendarDateFields::UCAL_SECOND); // 5 is the index of second
     return nullptr;
 }
 
@@ -3276,7 +3276,7 @@ napi_value I18nAddon::GetI18nTimeZone(napi_env env, napi_callback_info info)
         napi_create_string_utf8(env, "", NAPI_AUTO_LENGTH, &argv[0]);
     } else {
         napi_valuetype valueType = napi_valuetype::napi_undefined;
-        napi_typeof(env, argv[0] , &valueType);
+        napi_typeof(env, argv[0], &valueType);
         if (valueType == napi_valuetype::napi_undefined || valueType == napi_valuetype::napi_null) {
             napi_create_string_utf8(env, "", NAPI_AUTO_LENGTH, &argv[0]);
         }
@@ -3362,7 +3362,7 @@ int32_t I18nAddon::GetParameter(napi_env env, napi_value *argv, std::string &loc
         return 1;  // 1 represents one string parameter.
     } else if (!firstParamFlag && secondParamFlag) {
         return 2;  // 2 represents one boolean parameter.
-    } else if (!firstParamFlag && !secondParamFlag){
+    } else if (!firstParamFlag && !secondParamFlag) {
         return 0;  // 0 represents no parameter.
     }
     return -1;  // -1 represents Invalid parameter.
