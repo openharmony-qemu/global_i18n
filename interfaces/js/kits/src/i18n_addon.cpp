@@ -3245,14 +3245,8 @@ napi_value I18nAddon::GetI18nTimeZone(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
-    if (argv[0] == nullptr) {
+    if (argv[0] == nullptr || !CheckNapiValueType(env, argv[0])) {
         napi_create_string_utf8(env, "", NAPI_AUTO_LENGTH, &argv[0]);
-    } else {
-        napi_valuetype valueType = napi_valuetype::napi_undefined;
-        napi_typeof(env, argv[0] , &valueType);
-        if (valueType == napi_valuetype::napi_undefined || valueType == napi_valuetype::napi_null) {
-            napi_create_string_utf8(env, "", NAPI_AUTO_LENGTH, &argv[0]);
-        }
     }
     return StaticGetTimeZone(env, argv, true);
 }
