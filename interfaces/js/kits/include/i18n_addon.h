@@ -37,6 +37,7 @@ namespace I18n {
 void GetOptionMap(napi_env env, napi_value argv, std::map<std::string, std::string> &map);
 void GetOptionValue(napi_env env, napi_value options, const std::string &optionName,
     std::string &value);
+bool CheckNapiValueType(napi_env env, napi_value value);
 
 class I18nAddon {
 public:
