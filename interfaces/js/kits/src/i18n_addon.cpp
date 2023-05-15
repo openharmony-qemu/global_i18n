@@ -306,7 +306,7 @@ void GetOptionValue(napi_env env, napi_value options, const std::string &optionN
 
 void GetOptionMap(napi_env env, napi_value option, std::map<std::string, std::string> &map)
 {
-    if (option != nullptr && CheckNapiValueType(env, option)) {
+    if (CheckNapiValueType(env, option)) {
         size_t len;
         napi_get_value_string_utf8(env, option, nullptr, 0, &len);
         std::vector<char> styleBuf(len + 1);
@@ -321,10 +321,12 @@ void GetOptionMap(napi_env env, napi_value option, std::map<std::string, std::st
 
 bool CheckNapiValueType(napi_env env, napi_value value)
 {
-    napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, value, &valueType);
-    if (valueType != napi_valuetype::napi_undefined && valueType != napi_valuetype::napi_null) {
-        return true;
+    if (value) {
+        napi_valuetype valueType = napi_valuetype::napi_undefined;
+        napi_typeof(env, value, &valueType);
+        if (valueType != napi_valuetype::napi_undefined && valueType != napi_valuetype::napi_null) {
+            return true;
+        }
     }
     return false;
 }
@@ -1274,7 +1276,7 @@ napi_value I18nAddon::IsSuggestedImpl(napi_env env, napi_callback_info info, boo
         return nullptr;
     }
     bool isSuggested = false;
-    if (argv[1] != nullptr && CheckNapiValueType(env, argv[1])) {
+    if (CheckNapiValueType(env, argv[1])) {
         napi_get_value_string_utf8(env, argv[1], nullptr, 0, &len);
         std::vector<char> regionBuf(len + 1);
         status = napi_get_value_string_utf8(env, argv[1], regionBuf.data(), len + 1, &len);
@@ -1851,7 +1853,7 @@ napi_value I18nAddon::GetCalendar(napi_env env, napi_callback_info info)
         HiLog::Error(LABEL, "Failed to create reference at GetCalendar");
         return nullptr;
     }
-    if (!argv[1] && CheckNapiValueType(env, argv[1])) {
+    if (!CheckNapiValueType(env, argv[1])) {
         status = napi_create_string_utf8(env, "", NAPI_AUTO_LENGTH, argv + 1);
         if (status != napi_ok) {
             return nullptr;
@@ -1983,7 +1985,7 @@ napi_value I18nAddon::SetTime(napi_env env, napi_callback_info info)
 
 void I18nAddon::SetField(napi_env env, napi_value value, UCalendarDateFields field)
 {
-    if (!value || !CheckNapiValueType(env, value)) {
+    if (!CheckNapiValueType(env, value)) {
         return;
     }
     int32_t val = 0;
@@ -2531,7 +2533,7 @@ napi_value I18nAddon::Next(napi_env env, napi_callback_info info)
         return nullptr;
     }
     int value = 1;
-    if (argv[0] != nullptr && CheckNapiValueType(env, argv[0])) {
+    if (CheckNapiValueType(env, argv[0])) {
         napi_valuetype valueType = napi_valuetype::napi_undefined;
         napi_typeof(env, argv[0], &valueType);
         if (valueType != napi_valuetype::napi_number) {
@@ -2766,7 +2768,7 @@ napi_value I18nAddon::GetIndexUtil(napi_env env, napi_callback_info info)
         return nullptr;
     }
     napi_value result = nullptr;
-    if (!argv[0] || !CheckNapiValueType(env, argv[0])) {
+    if (!CheckNapiValueType(env, argv[0])) {
         status = napi_new_instance(env, constructor, 0, argv, &result);
     } else {
         status = napi_new_instance(env, constructor, 1, argv, &result);
@@ -3010,7 +3012,7 @@ napi_value I18nAddon::AddPreferredLanguageImpl(napi_env env, napi_callback_info 
     }
 
     int index = 1000000;
-    if (argv[1] != nullptr && CheckNapiValueType(env, argv[1])) {
+    if (CheckNapiValueType(env, argv[1])) {
         status = napi_get_value_int32(env, argv[1], &index);
     }
     if (status != napi_ok) {
@@ -3245,7 +3247,7 @@ napi_value I18nAddon::GetI18nTimeZone(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
-    if (argv[0] == nullptr || !CheckNapiValueType(env, argv[0])) {
+    if (!CheckNapiValueType(env, argv[0])) {
         napi_create_string_utf8(env, "", NAPI_AUTO_LENGTH, &argv[0]);
     }
     return StaticGetTimeZone(env, argv, true);
@@ -3294,45 +3296,64 @@ bool I18nAddon::GetStringFromJS(napi_env env, napi_value argv, std::string &jsSt
 
 int32_t I18nAddon::GetParameter(napi_env env, napi_value *argv, std::string &localeStr, bool &isDST)
 {
-    bool firstParamFlag = false;
-    bool secondParamFlag = false;
-    napi_status status = napi_ok;
-    if (argv[0]) {
-        napi_valuetype valueType0 = napi_valuetype::napi_undefined;
-        napi_typeof(env, argv[0], &valueType0);  // 0 represents first parameter
-        if (valueType0 == napi_valuetype::napi_string) {
-            bool valid = GetStringFromJS(env, argv[0], localeStr);
-            if (valid) {
-                firstParamFlag = true;
-            }
-        } else if (valueType0 == napi_valuetype::napi_boolean) {
-            status = napi_get_value_bool(env, argv[0], &isDST);
-            if (status == napi_ok) {
-                secondParamFlag = true;
-            }
-        }
-    }
-
-    if (argv[1]) {
-        napi_valuetype valueType1 = napi_valuetype::napi_undefined;
-        napi_typeof(env, argv[1], &valueType1);  // 1 represents second parameter
-        if(valueType1 == napi_valuetype::napi_boolean) {
-            status = napi_get_value_bool(env, argv[1], &isDST);
-            if (status == napi_ok) {
-                secondParamFlag = true;
-            }
-        }
-    }
-    if (firstParamFlag && secondParamFlag) {
-        return 3;// 3 represents one string parameter and one bool parameter.
-    } else if (firstParamFlag && !secondParamFlag) {
-        return 1;  // 1 represents one string parameter.
-    } else if (!firstParamFlag && secondParamFlag) {
-        return 2;  // 2 represents one boolean parameter.
-    } else if (!firstParamFlag && !secondParamFlag){
+    if (!argv[0]) {
         return 0;  // 0 represents no parameter.
     }
-    return -1;  // -1 represents Invalid parameter.
+    napi_status status = napi_ok;
+    if (argv[1]) {
+        napi_valuetype valueType0 = napi_valuetype::napi_undefined;
+        napi_valuetype valueType1 = napi_valuetype::napi_undefined;
+        napi_typeof(env, argv[0], &valueType0);  // 0 represents first parameter
+        napi_typeof(env, argv[1], &valueType1);  // 1 represents second parameter
+        if ((valueType0 == napi_valuetype::napi_undefined || valueType0 == napi_valuetype::napi_null) &&
+            (valueType1 == napi_valuetype::napi_null || valueType1 == napi_valuetype::napi_undefined)) {
+            return 0;  // 0 represents no parameter.
+        }
+        if (valueType0 != napi_valuetype::napi_string && valueType0 != napi_valuetype::napi_undefined &&
+            valueType0 != napi_valuetype::napi_null) {
+            return -1;  // -1 represents Invalid parameter.
+        }
+        if (valueType1 != napi_valuetype::napi_boolean && valueType1 != napi_valuetype::napi_undefined &&
+            valueType1 != napi_valuetype::napi_null) {
+            return -1;  // -1 represents Invalid parameter.
+        }
+        if (valueType0 == napi_valuetype::napi_string) {
+            bool valid = GetStringFromJS(env, argv[0], localeStr);
+            if (!valid) {
+                return -1;  // -1 represents Invalid parameter.
+            } else if (valueType1 == napi_valuetype::napi_undefined || valueType1 == napi_valuetype::napi_null) {
+                return 1;  // 1 represents one string parameter.
+            }
+        }
+        if (valueType1 == napi_valuetype::napi_boolean) {
+            status = napi_get_value_bool(env, argv[1], &isDST);
+            if (status != napi_ok) {
+                return -1;  // -1 represents Invalid parameter.
+            } else if (valueType0 == napi_valuetype::napi_undefined || valueType0 == napi_valuetype::napi_null) {
+                return 2;  // 2 represents one boolean parameter.
+            }
+        }
+        return 3;  // 3 represents one string parameter and one bool parameter.
+    }
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    napi_typeof(env, argv[0], &valueType);
+    if (valueType == napi_valuetype::napi_string) {
+        bool valid = GetStringFromJS(env, argv[0], localeStr);
+        if (!valid) {
+            return -1;  // -1 represents Invalid parameter.
+        }
+        return 1;  // 1 represents one string parameter.
+    } else if (valueType == napi_valuetype::napi_boolean) {
+        status = napi_get_value_bool(env, argv[0], &isDST);
+        if (status != napi_ok) {
+            return -1;  // -1 represents Invalid parameter.
+        }
+        return 2;  // 2 represents one boolean parameter.
+    } else if (valueType == napi_valuetype::napi_undefined || valueType == napi_valuetype::napi_null) {
+        return 0;
+    } else {
+        return -1;  // -1 represents Invalid parameter.
+    }
 }
 
 napi_value I18nAddon::GetTimeZoneDisplayName(napi_env env, napi_callback_info info)
@@ -3392,7 +3413,7 @@ napi_value I18nAddon::GetOffset(napi_env env, napi_callback_info info)
     }
 
     double date = 0;
-    if (argv[0] && CheckNapiValueType(env, argv[0])) {
+    if (CheckNapiValueType(env, argv[0])) {
         napi_valuetype valueType = napi_valuetype::napi_undefined;
         napi_typeof(env, argv[0], &valueType);
         if (valueType != napi_valuetype::napi_number) {
