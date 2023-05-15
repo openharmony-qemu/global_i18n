@@ -3327,6 +3327,7 @@ int32_t I18nAddon::GetParameter(napi_env env, napi_value *argv, std::string &loc
 
 int32_t I18nAddon::GetFirstParameter(napi_env env, napi_value value, std::string &localeStr, bool &isDST)
 {
+    napi_status status = napi_ok;
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, value, &valueType);
     if (valueType == napi_valuetype::napi_string) {
