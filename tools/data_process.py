@@ -1,3 +1,19 @@
+"""
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+"""
+# coding=utf-8 
+#!/usr/bin/env python
 import re
 import pickle
 import png
@@ -95,8 +111,6 @@ def generate_array_from_data(data_input, numerized_classes):
         for v in val:
             names_l.append(numerized_classes[quater][v])
         nums_l = [255, 255, 255]
-        # for i in range(len(names_l)):
-            # nums_l[i] = names_l[i]
         for i in enumerate(names_l):
             nums_l[i[0]] = names_l[i[0]]
         total_nums_list += nums_l
