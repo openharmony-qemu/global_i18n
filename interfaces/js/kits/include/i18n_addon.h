@@ -37,6 +37,7 @@ namespace I18n {
 void GetOptionMap(napi_env env, napi_value argv, std::map<std::string, std::string> &map);
 void GetOptionValue(napi_env env, napi_value options, const std::string &optionName,
     std::string &value);
+bool CheckNapiValueType(napi_env env, napi_value value);
 
 class I18nAddon {
 public:
@@ -158,6 +159,7 @@ private:
     static napi_value I18nTimeZoneConstructor(napi_env env, napi_callback_info info);
     static napi_value GetID(napi_env env, napi_callback_info info);
     static int32_t GetParameter(napi_env env, napi_value *argv, std::string &localeStr, bool &isDST);
+    static int32_t GetFirstParameter(napi_env env, napi_value value, std::string &localeStr, bool &isDST);
     static napi_value GetTimeZoneDisplayName(napi_env env, napi_callback_info info);
     static napi_value GetOffset(napi_env env, napi_callback_info info);
     static napi_value GetRawOffset(napi_env env, napi_callback_info info);
