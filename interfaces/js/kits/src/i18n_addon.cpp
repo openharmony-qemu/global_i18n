@@ -4174,7 +4174,8 @@ napi_value I18nAddon::CreateLocaleItem(napi_env env, const LocaleItem &localeIte
             return nullptr;
         }
     }
-    status = napi_set_named_property(env, result, "suggestionType", CreateSuggestionType(env, localeItem.suggestionType));
+    status = napi_set_named_property(env, result, "suggestionType", CreateSuggestionType(env,
+        localeItem.suggestionType));
     if (status != napi_ok) {
         HiLog::Error(LABEL, "Failed to set element suggestionType.");
         return nullptr;
@@ -4232,7 +4233,7 @@ napi_value I18nAddon::GetTimezonesByLocation(napi_env env, napi_callback_info in
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
         return nullptr;
     }
-    //-180 and 179.9 is the scope of longitude, -90 and 89.9 is the scope of latitude
+    // -180 and 179.9 is the scope of longitude, -90 and 89.9 is the scope of latitude
     if (x < -180 || x > 179.9 || y < -90 || y > 89.9) {
         HiLog::Error(LABEL, "GetTimezonesByLocation: Args x or y exceed it's scope.");
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
@@ -4245,14 +4246,12 @@ napi_value I18nAddon::GetTimezonesByLocation(napi_env env, napi_callback_info in
         napi_value timezoneId = nullptr;
         status = napi_create_string_utf8(env, tempList[i].c_str(), NAPI_AUTO_LENGTH, &timezoneId);
         if (status != napi_ok) {
-            HiLog::Error(LABEL, "GetTimezonesByLocation: Get timezone ID failed");
             return nullptr;
         }
         napi_value argTimeZoneId[1] = { timezoneId };
         napi_value timezone = StaticGetTimeZone(env, argTimeZoneId, true);
         status = napi_set_element(env, timezoneList, i, timezone);
         if (status != napi_ok) {
-            HiLog::Error(LABEL, "GetTimezonesByLocation: Set result timezone string failed");
             return nullptr;
         }
     }
