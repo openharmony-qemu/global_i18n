@@ -158,8 +158,10 @@ void Taboo::ParseTabooData(const std::string& path, DataFileType fileType, const
         switch (fileType) {
             case DataFileType::CONFIG_FILE:
                 ProcessTabooConfigData(nameStr, valueStr);
+                break;
             case DataFileType::DATA_FILE:
                 ProcessTabooLocaleData(locale, nameStr, valueStr);
+                break;
         }
         xmlFree(name);
         xmlFree(value);
