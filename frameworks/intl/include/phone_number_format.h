@@ -25,6 +25,7 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 using i18n::phonenumbers::PhoneNumberUtil;
+using ExposeLocationName = void (*)(const char*, const char*, char*);
 
 class PhoneNumberFormat {
 public:
@@ -34,13 +35,15 @@ public:
     std::string format(const std::string &number) const;
     static std::unique_ptr<PhoneNumberFormat> CreateInstance(const std::string &countryTag,
                                                              const std::map<std::string, std::string> &options);
-    std::string getLocationName(const std::string &number, const std::string &locale) const;
+    std::string getLocationName(const std::string &number, const std::string &locale);
 
 private:
     PhoneNumberUtil* GetPhoneNumberUtil();
     PhoneNumberUtil *util;
     std::string country;
     PhoneNumberUtil::PhoneNumberFormat phoneNumberFormat;
+    void* g_dynamicHandler = nullptr;
+    ExposeLocationName g_func = nullptr;
 };
 } // namespace I18n
 } // namespace Global
