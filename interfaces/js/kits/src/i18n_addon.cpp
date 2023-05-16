@@ -3332,18 +3332,16 @@ int32_t I18nAddon::GetFirstParameter(napi_env env, napi_value value, std::string
     napi_typeof(env, value, &valueType);
     if (valueType == napi_valuetype::napi_string) {
         bool valid = GetStringFromJS(env, value, localeStr);
-        if (!valid) {
-            return -1;  // -1 represents Invalid parameter.
-        }
-        return 1;  // 1 represents one string parameter.
+        // -1 represents Invalid parameter.
+        // 1 represents one string parameter.
+        return !valid ? -1 : 1;
     } else if (valueType == napi_valuetype::napi_boolean) {
         status = napi_get_value_bool(env, value, &isDST);
-        if (status != napi_ok) {
-            return -1;  // -1 represents Invalid parameter.
-        }
-        return 2;  // 2 represents one boolean parameter.
-    } else if (valueType == napi_valuetype::napi_undefined || valueType == napi_valuetype::napi_null) {
-        return 0;
+        // -1 represents Invalid parameter.
+        // 2 represents one boolean parameter.
+        return (status != napi_ok) ? -1 : 2;
+    } else if (!CheckNapiValueType(env, value)) {
+        return 0;  // 0 represents no parameter.
     } else {
         return -1;  // -1 represents Invalid parameter.
     }
