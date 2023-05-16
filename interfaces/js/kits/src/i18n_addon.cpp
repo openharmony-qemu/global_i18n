@@ -3296,53 +3296,49 @@ bool I18nAddon::GetStringFromJS(napi_env env, napi_value argv, std::string &jsSt
 
 int32_t I18nAddon::GetParameter(napi_env env, napi_value *argv, std::string &localeStr, bool &isDST)
 {
-    if (!argv[0]) {
-        return 0;  // 0 represents no parameter.
-    }
     napi_status status = napi_ok;
     if (CheckNapiValueType(env, argv[1])) {
         napi_valuetype valueType0 = napi_valuetype::napi_undefined;
         napi_valuetype valueType1 = napi_valuetype::napi_undefined;
         napi_typeof(env, argv[0], &valueType0);  // 0 represents first parameter
         napi_typeof(env, argv[1], &valueType1);  // 1 represents second parameter
+        bool firstParamFlag = CheckNapiValueType(env, argv[0]);
         if (valueType1 == napi_valuetype::napi_boolean) {
             status = napi_get_value_bool(env, argv[1], &isDST);
             if (status != napi_ok) {
                 return -1;  // -1 represents Invalid parameter.
-            } else if (!CheckNapiValueType(env, argv[0])) {
+            } else if (!firstParamFlag) {
                 return 2;  // 2 represents one boolean parameter.
             }
-            if (valueType0 == napi_valuetype::napi_string) {
-                bool valid = GetStringFromJS(env, argv[0], localeStr);
-                if (!valid) {
-                    return -1;  // -1 represents Invalid parameter.
-                }
+            if (valueType0 == napi_valuetype::napi_string &&
+                 GetStringFromJS(env, argv[0], localeStr)) {
+                return 3;  // 3 represents one string parameter and one bool parameter.
             }
-            return 3;  // 3 represents one string parameter and one bool parameter.
         }
-        return -1;
+        return -1;  // -1 represents Invalid parameter.
     }
     return GetFirstParameter(env, argv[0], localeStr, isDST);
 }
 
 int32_t I18nAddon::GetFirstParameter(napi_env env, napi_value value, std::string &localeStr, bool &isDST)
 {
-    napi_status status = napi_ok;
-    napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, value, &valueType);
-    if (valueType == napi_valuetype::napi_string) {
-        bool valid = GetStringFromJS(env, value, localeStr);
-        // -1 represents Invalid parameter.
-        // 1 represents one string parameter.
-        return !valid ? -1 : 1;
-    } else if (valueType == napi_valuetype::napi_boolean) {
-        status = napi_get_value_bool(env, value, &isDST);
-        // -1 represents Invalid parameter.
-        // 2 represents one boolean parameter.
-        return (status != napi_ok) ? -1 : 2;
-    } else if (!CheckNapiValueType(env, value)) {
+    if (!CheckNapiValueType(env, value)) {
         return 0;  // 0 represents no parameter.
     } else {
+        napi_status status = napi_ok;
+        napi_valuetype valueType = napi_valuetype::napi_undefined;
+        napi_typeof(env, value, &valueType);
+        if (valueType == napi_valuetype::napi_string) {
+            bool valid = GetStringFromJS(env, value, localeStr);
+            // -1 represents Invalid parameter.
+            // 1 represents one string parameter.
+            return !valid ? -1 : 1;
+        } else if (valueType == napi_valuetype::napi_boolean) {
+            status = napi_get_value_bool(env, value, &isDST);
+            // -1 represents Invalid parameter.
+            // 2 represents one boolean parameter.
+            return (status != napi_ok) ? -1 : 2;
+        }
         return -1;  // -1 represents Invalid parameter.
     }
 }
