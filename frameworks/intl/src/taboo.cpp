@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023. All rights reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -158,10 +158,8 @@ void Taboo::ParseTabooData(const std::string& path, DataFileType fileType, const
         switch (fileType) {
             case DataFileType::CONFIG_FILE:
                 ProcessTabooConfigData(nameStr, valueStr);
-                break;
             case DataFileType::DATA_FILE:
                 ProcessTabooLocaleData(locale, nameStr, valueStr);
-                break;
         }
         xmlFree(name);
         xmlFree(value);
