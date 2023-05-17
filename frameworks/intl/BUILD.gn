@@ -139,6 +139,7 @@ ohos_shared_library("intl_util") {
     "init:libbegetutil",
     "ipc:ipc_core",
   ]
+  defines = []
   if (i18n_support_ui) {
     include_dirs += [
       "//foundation/ability/ability_base/interfaces/kits/native/configuration/include",
@@ -150,7 +151,10 @@ ohos_shared_library("intl_util") {
       "ability_runtime:ability_manager",
       "ability_runtime:app_manager",
     ]
-    defines = [ "SUPPORT_GRAPHICS" ]
+    defines += [ "SUPPORT_GRAPHICS" ]
+  }
+  if (is_asan) {
+    defines += [ "SUPPORT_ASAN" ]
   }
   install_images = [ system_base_dir ]
   relative_install_dir = "platformsdk"

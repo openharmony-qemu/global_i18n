@@ -29,9 +29,6 @@ namespace Global {
 namespace I18n {
 const int RECV_CHAR_LEN = 100;
 using i18n::phonenumbers::PhoneNumberUtil;
-using ExposeLocationName = void (*)(const char*, const char*, char*);
-void* g_dynamicHandler;
-ExposeLocationName g_func;
 
 PhoneNumberFormat::PhoneNumberFormat(const std::string &countryTag,
                                      const std::map<std::string, std::string> &options)
@@ -105,18 +102,22 @@ std::string PhoneNumberFormat::format(const std::string &number) const
     return formatted_number;
 }
 
-std::string PhoneNumberFormat::getLocationName(const std::string &number, const std::string &locale) const
+std::string PhoneNumberFormat::getLocationName(const std::string &number, const std::string &locale)
 {
     const char* error = NULL;
     if (g_dynamicHandler == NULL) {
+#ifndef SUPPORT_ASAN
         const char* geocodingSO = "libgeocoding.z.so";
+#else
+        const char* geocodingSO = "system/asan/lib64/libgeocoding.z.so";
+#endif
         g_dynamicHandler = dlopen(geocodingSO, RTLD_NOW);
-        dlerror();
+        error = dlerror();
     }
-    if (!g_func) {
+    if (error == nullptr && !g_func) {
         g_func = reinterpret_cast<ExposeLocationName>(dlsym(g_dynamicHandler, "exposeLocationName"));
+        error = dlerror();
     }
-    error = dlerror();
     if (error != NULL) {
         i18n::phonenumbers::PhoneNumber phoneNumber;
         PhoneNumberUtil::ErrorType type = util->Parse(number, country, &phoneNumber);
