@@ -262,7 +262,6 @@ napi_value I18nAddon::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("setUsingLocalDigit", SetUsingLocalDigitAddon),
         DECLARE_NAPI_FUNCTION("getUsingLocalDigit", GetUsingLocalDigitAddon),
         DECLARE_NAPI_PROPERTY("TimeZone", CreateTimeZoneObject(env, initStatus)),
-        DECLARE_NAPI_FUNCTION("getAppPreferredLanguage", GetAppPreferredLanguage),
         DECLARE_NAPI_PROPERTY("System", CreateSystemObject(env, initStatus)),
         DECLARE_NAPI_PROPERTY("Normalizer", CreateI18nNormalizerObject(env, initStatus)),
         DECLARE_NAPI_PROPERTY("NormalizerMode", CreateI18NNormalizerModeEnum(env, initStatus))
