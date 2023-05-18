@@ -145,11 +145,11 @@ def save_png_test():
 
 
 if __name__ == '__main__':
-    # read_data("data/location2tz.txt")
+    read_data("data/location2tz.txt")
     data = load_data("data/loc2tz.pickle")
     name_classes = classify_timezones(data)
     nmrzd_classes = numerized_dictionary(name_classes)
     export_numerized_dicts(nmrzd_classes)
     t_list = generate_array_from_data(data, nmrzd_classes)
     map_array = group_in_total(t_list)
-    # pack2png(map_array)
+    pack2png(map_array)
