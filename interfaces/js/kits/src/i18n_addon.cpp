@@ -3296,53 +3296,49 @@ bool I18nAddon::GetStringFromJS(napi_env env, napi_value argv, std::string &jsSt
 
 int32_t I18nAddon::GetParameter(napi_env env, napi_value *argv, std::string &localeStr, bool &isDST)
 {
-    if (!argv[0]) {
-        return 0;  // 0 represents no parameter.
-    }
     napi_status status = napi_ok;
     if (CheckNapiValueType(env, argv[1])) {
         napi_valuetype valueType0 = napi_valuetype::napi_undefined;
         napi_valuetype valueType1 = napi_valuetype::napi_undefined;
         napi_typeof(env, argv[0], &valueType0);  // 0 represents first parameter
         napi_typeof(env, argv[1], &valueType1);  // 1 represents second parameter
+        bool firstParamFlag = CheckNapiValueType(env, argv[0]);
         if (valueType1 == napi_valuetype::napi_boolean) {
             status = napi_get_value_bool(env, argv[1], &isDST);
             if (status != napi_ok) {
                 return -1;  // -1 represents Invalid parameter.
-            } else if (!CheckNapiValueType(env, argv[0])) {
+            } else if (!firstParamFlag) {
                 return 2;  // 2 represents one boolean parameter.
             }
-            if (valueType0 == napi_valuetype::napi_string) {
-                bool valid = GetStringFromJS(env, argv[0], localeStr);
-                if (!valid) {
-                    return -1;  // -1 represents Invalid parameter.
-                }
+            if (valueType0 == napi_valuetype::napi_string &&
+                 GetStringFromJS(env, argv[0], localeStr)) {
+                return 3;  // 3 represents one string parameter and one bool parameter.
             }
-            return 3;  // 3 represents one string parameter and one bool parameter.
         }
-        return -1;
+        return -1;  // -1 represents Invalid parameter.
     }
     return GetFirstParameter(env, argv[0], localeStr, isDST);
 }
 
 int32_t I18nAddon::GetFirstParameter(napi_env env, napi_value value, std::string &localeStr, bool &isDST)
 {
-    napi_status status = napi_ok;
-    napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, value, &valueType);
-    if (valueType == napi_valuetype::napi_string) {
-        bool valid = GetStringFromJS(env, value, localeStr);
-        // -1 represents Invalid parameter.
-        // 1 represents one string parameter.
-        return !valid ? -1 : 1;
-    } else if (valueType == napi_valuetype::napi_boolean) {
-        status = napi_get_value_bool(env, value, &isDST);
-        // -1 represents Invalid parameter.
-        // 2 represents one boolean parameter.
-        return (status != napi_ok) ? -1 : 2;
-    } else if (!CheckNapiValueType(env, value)) {
+    if (!CheckNapiValueType(env, value)) {
         return 0;  // 0 represents no parameter.
     } else {
+        napi_status status = napi_ok;
+        napi_valuetype valueType = napi_valuetype::napi_undefined;
+        napi_typeof(env, value, &valueType);
+        if (valueType == napi_valuetype::napi_string) {
+            bool valid = GetStringFromJS(env, value, localeStr);
+            // -1 represents Invalid parameter.
+            // 1 represents one string parameter.
+            return !valid ? -1 : 1;
+        } else if (valueType == napi_valuetype::napi_boolean) {
+            status = napi_get_value_bool(env, value, &isDST);
+            // -1 represents Invalid parameter.
+            // 2 represents one boolean parameter.
+            return (status != napi_ok) ? -1 : 2;
+        }
         return -1;  // -1 represents Invalid parameter.
     }
 }
@@ -4174,7 +4170,8 @@ napi_value I18nAddon::CreateLocaleItem(napi_env env, const LocaleItem &localeIte
             return nullptr;
         }
     }
-    status = napi_set_named_property(env, result, "suggestionType", CreateSuggestionType(env, localeItem.suggestionType));
+    status = napi_set_named_property(env, result, "suggestionType", CreateSuggestionType(env,
+        localeItem.suggestionType));
     if (status != napi_ok) {
         HiLog::Error(LABEL, "Failed to set element suggestionType.");
         return nullptr;
@@ -4232,7 +4229,7 @@ napi_value I18nAddon::GetTimezonesByLocation(napi_env env, napi_callback_info in
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
         return nullptr;
     }
-    //-180 and 179.9 is the scope of longitude, -90 and 89.9 is the scope of latitude
+    // -180 and 179.9 is the scope of longitude, -90 and 89.9 is the scope of latitude
     if (x < -180 || x > 179.9 || y < -90 || y > 89.9) {
         HiLog::Error(LABEL, "GetTimezonesByLocation: Args x or y exceed it's scope.");
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
@@ -4245,14 +4242,12 @@ napi_value I18nAddon::GetTimezonesByLocation(napi_env env, napi_callback_info in
         napi_value timezoneId = nullptr;
         status = napi_create_string_utf8(env, tempList[i].c_str(), NAPI_AUTO_LENGTH, &timezoneId);
         if (status != napi_ok) {
-            HiLog::Error(LABEL, "GetTimezonesByLocation: Get timezone ID failed");
             return nullptr;
         }
         napi_value argTimeZoneId[1] = { timezoneId };
         napi_value timezone = StaticGetTimeZone(env, argTimeZoneId, true);
         status = napi_set_element(env, timezoneList, i, timezone);
         if (status != napi_ok) {
-            HiLog::Error(LABEL, "GetTimezonesByLocation: Set result timezone string failed");
             return nullptr;
         }
     }
