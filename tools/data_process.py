@@ -15,6 +15,8 @@
 # coding=utf-8 
 #!/usr/bin/env python
 import re
+import os
+import logging
 import pickle
 import png
 
@@ -36,7 +38,7 @@ def read_data(filename):
         timezones = tz[1:-1].split(",")
         data_res[location] = timezones
     
-    with open("data/loc2tz.pickle", "wb") as f:
+    with os.fdopen(os.open("data/loc2tz.pickle", os.O_RDWR | os.O_CREAT, 0o640), "wb") as f:
         pickle.dump(data_res, f)
     
     return data_res
@@ -79,19 +81,19 @@ def numerized_dictionary(classes):
             temp_group[name] = num
         numerized_classes.append(temp_group)
     for i, c in enumerate(numerized_classes):
-        print(i)
-        print(c)
+        logging.info(i)
+        logging.info(c)
     return numerized_classes
 
 
 def export_numerized_dicts(numerized_classes):
-    with open("data/name2num.txt", "w", encoding="utf-8") as f:
+    with os.fdopen(os.open("data/name2num.txt", os.O_RDWR | os.O_CREAT, 0o640), "w", encoding="utf-8") as f:
         f.write(str(numerized_classes))
     num2name_dict_list = []
     for d in numerized_classes:
         num2name = dict(zip(d.values(), d.keys()))
         num2name_dict_list.append(num2name)
-    with open("data/num2name.txt", "w", encoding="utf-8") as f:
+    with os.fdopen(os.open("data/num2name.txt", os.O_RDWR | os.O_CREAT, 0o640), "w", encoding="utf-8") as f:
         f.write(str(num2name_dict_list))
 
 
