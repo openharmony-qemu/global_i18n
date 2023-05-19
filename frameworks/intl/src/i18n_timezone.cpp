@@ -982,7 +982,7 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
     fixedY = (int)(x * 10 + 1800);
     std::vector<int> pixel = GetColorData(fixedX, fixedY);
     for (size_t i = 0; i < pixel.size(); i++) {
-        //255 is invalid pixel value required
+        // 255 is invalid pixel value required
         if (pixel[i] != 255 && categoryMap.find(pixel[i]) != categoryMap.end()){
             std::string zdId = categoryMap[pixel[i]];
             tzIdList.insert(tzIdList.end(), zdId);
