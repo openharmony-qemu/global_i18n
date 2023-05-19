@@ -17,6 +17,7 @@
 
 #include <cstdint>
 #include <map>
+#include <png.h>
 #include <set>
 #include <string>
 #include "i18n_types.h"
@@ -81,6 +82,7 @@ private:
     static void GetTimezoneIDFromZoneInfo(std::set<std::string> &availableIDs, std::string &parentPath,
         std::string &parentName);
     static std::vector<int> GetColorData(const int x, const int y);
+    static int InitPngptr(png_structp &png_ptr, png_infop &info_ptr, FILE **fp);
 };
 } // namespace I18n
 } // namespace Global

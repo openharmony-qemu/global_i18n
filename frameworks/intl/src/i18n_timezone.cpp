@@ -34,7 +34,6 @@
 #include "unicode/locid.h"
 #include "unicode/unistr.h"
 #include "utils.h"
-#include <png.h>
 #include <cstdio>
 
 namespace OHOS {
@@ -1002,25 +1001,11 @@ std::vector<int> I18nTimeZone::GetColorData(const int x, const int y)
         return result;
     }
     FILE *fp;
+    png_structp png_ptr;
     png_infop info_ptr;
     png_bytep row_pointers;
-    fp = fopen(TZ_PIXEL_PATH, "rb");
-    if (fp == NULL) {
-        HiLog::Error(LABEL, "timezone data resource file not exists.");
-        return result;
-    }
-    png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-    if (!png_ptr) {
-        fclose(fp);
-        png_destroy_read_struct(&png_ptr, &info_ptr, 0);
-        HiLog::Error(LABEL, "create read_struct failed.");
-        return result;
-    }
-    info_ptr = png_create_info_struct(png_ptr);
-    if (!info_ptr) {
-        fclose(fp);
-        png_destroy_read_struct(&png_ptr, &info_ptr, 0);
-        HiLog::Error(LABEL, "create info_struct failed.");
+    int code = InitPngptr(png_ptr, info_ptr, &fp);
+    if (code != 0) {
         return result;
     }
     try {
@@ -1029,7 +1014,7 @@ std::vector<int> I18nTimeZone::GetColorData(const int x, const int y)
         png_read_info(png_ptr, info_ptr);
         unsigned int rowbytes = png_get_rowbytes(png_ptr, info_ptr);
         row_pointers = (png_bytep)png_malloc(png_ptr, rowbytes);
-        if (row_pointers == NULL) {
+        if (row_pointers == nullptr) {
             fclose(fp);
             png_destroy_read_struct(&png_ptr, &info_ptr, 0);
             HiLog::Error(LABEL, "malloc rowbytes failed.");
@@ -1050,6 +1035,30 @@ std::vector<int> I18nTimeZone::GetColorData(const int x, const int y)
     png_free(png_ptr, row_pointers);
     fclose(fp);
     return result;
+}
+
+int I18nTimeZone::InitPngptr(png_structp &png_ptr, png_infop &info_ptr, FILE **fp)
+{
+    *fp = fopen(TZ_PIXEL_PATH, "rb");
+    if (*fp == NULL) {
+        HiLog::Error(LABEL, "timezone data resource file not exists.");
+        return 1;
+    }
+    png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    if (!png_ptr) {
+        fclose(*fp);
+        png_destroy_read_struct(&png_ptr, &info_ptr, 0);
+        HiLog::Error(LABEL, "create read_struct failed.");
+        return 1;
+    }
+    info_ptr = png_create_info_struct(png_ptr);
+    if (!info_ptr) {
+        fclose(*fp);
+        png_destroy_read_struct(&png_ptr, &info_ptr, 0);
+        HiLog::Error(LABEL, "create info_struct failed.");
+        return 1;
+    }
+    return 0;
 }
 }
 }
