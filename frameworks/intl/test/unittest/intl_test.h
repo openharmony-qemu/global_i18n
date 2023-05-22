@@ -65,6 +65,15 @@ int IntlFuncTest0043(void);
 int IntlFuncTest0044(void);
 int IntlFuncTest0045(void);
 int IntlFuncTest0046(void);
+int IntlFuncTest0047(void);
+int IntlFuncTest0048(void);
+int IntlFuncTest0049(void);
+int IntlFuncTest0050(void);
+int IntlFuncTest0051(void);
+int IntlFuncTest0052(void);
+int IntlFuncTest0053(void);
+int IntlFuncTest0054(void);
+int IntlFuncTest0055(void);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

@@ -19,14 +19,21 @@
 
 #include "collator.h"
 #include "date_time_format.h"
+#include "locale_compare.h"
 #include "locale_config.h"
 #include "locale_info.h"
 #include "number_format.h"
+#include "phone_number_format.h"
 #include "plural_rules.h"
+#include "preferred_language.h"
 #include "relative_time_format.h"
 #include "utils.h"
+#include "i18n_calendar.h"
 #include "i18n_timezone.h"
+#include "i18n_types.h"
+#include "index_util.h"
 #include "intl_test.h"
+#include "taboo_utils.h"
 
 using namespace OHOS::Global::I18n;
 using testing::ext::TestSize;
@@ -1816,6 +1823,147 @@ HWTEST_F(IntlTest, IntlFuncTest0046, TestSize.Level1)
         EXPECT_TRUE(containsUrumqi);
     }
 
+}
+
+/**
+ * @tc.name: IntlFuncTest0047
+ * @tc.desc: Test Intl LocaleConfig GetBlockedLanguages
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0047, TestSize.Level1)
+{
+    std::unordered_set<std::string> languageSet = LocaleConfig::GetBlockedLanguages();
+    EXPECT_TRUE(languageSet.size() == 1);
+}
+
+/**
+ * @tc.name: IntlFuncTest0048
+ * @tc.desc: Test Intl LocaleConfig GetBlockedRegions
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0048, TestSize.Level1)
+{
+    std::unordered_set<std::string> regionSet = LocaleConfig::GetBlockedRegions();
+    EXPECT_TRUE(regionSet.size() == 0);
+}
+
+/**
+ * @tc.name: IntlFuncTest0049
+ * @tc.desc: Test Intl LocaleConfig GetLanguageBlockedRegions
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0049, TestSize.Level1)
+{
+    std::unordered_set<std::string> blockedRegionSet = LocaleConfig::GetLanguageBlockedRegions();
+    EXPECT_TRUE(blockedRegionSet.size() == 0);
+}
+
+/**
+ * @tc.name: IntlFuncTest0050
+ * @tc.desc: Test Intl PreferredLanguage AddPreferredLanguageExist
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0050, TestSize.Level1)
+{
+    const std::string langugae = "zh-Hans";
+    const std::string langugaeEn = "en";
+    I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
+    PreferredLanguage::AddPreferredLanguage(langugaeEn.data(), 1, errorCode);
+    EXPECT_TRUE(errorCode != I18nErrorCode::SUCCESS);
+    PreferredLanguage::AddPreferredLanguage(langugae.data(), 1, errorCode);
+    EXPECT_TRUE(errorCode != I18nErrorCode::SUCCESS);
+    PreferredLanguage::AddPreferredLanguage(langugae.data(), 3, errorCode);
+    EXPECT_TRUE(errorCode != I18nErrorCode::SUCCESS);
+    std::vector<std::string> list = PreferredLanguage::GetPreferredLanguageList();
+    EXPECT_TRUE(list.size() == 1);
+    for (unsigned int i = 0; i < list.size(); i++) {
+        printf("......aa: %s.\n", list.at(i).c_str());
+    }
+    bool flag = PreferredLanguage::RemovePreferredLanguage(0);
+    EXPECT_TRUE(!flag);
+}
+
+/**
+ * @tc.name: IntlFuncTest0051
+ * @tc.desc: Test Intl I18nCalendar
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0051, TestSize.Level1)
+{
+    I18nCalendar *calendar = new I18nCalendar("zh-Hans-CN");
+    I18nCalendar *calendar2 = new I18nCalendar("zh-Hans-CN", CalendarType::CHINESE);
+    calendar->SetTime(1684742124645);
+    calendar->Set(1989, 5, 23);
+    std::string tzId = calendar2->GetTimeZone();
+    EXPECT_TRUE(tzId == "Central Standard Time");
+    calendar->SetTimeZone("Asia/Shanghai");
+    int32_t minimalDaysInFirstWeek = calendar->GetMinimalDaysInFirstWeek();
+    EXPECT_TRUE(minimalDaysInFirstWeek == 1);
+    int32_t firstDayOfWeek = calendar->GetFirstDayOfWeek();
+    EXPECT_TRUE(firstDayOfWeek == 1);
+    bool isWeekend = calendar2->IsWeekend();
+    EXPECT_TRUE(isWeekend);
+    delete calendar;
+    delete calendar2;
+}
+
+/**
+ * @tc.name: IntlFuncTest0052
+ * @tc.desc: Test Intl IndexUtil
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0052, TestSize.Level1)
+{
+    IndexUtil *indexUtil = new IndexUtil("zh-CN");
+    std::vector<std::string> indexList = indexUtil->GetIndexList();
+    EXPECT_TRUE(indexList.size() == 28);
+    indexUtil->AddLocale("en-US");
+    std::string indexStr = indexUtil->GetIndex("");
+    delete indexUtil;
+}
+
+/**
+ * @tc.name: IntlFuncTest0053
+ * @tc.desc: Test Intl PhoneNumberFormat
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0053, TestSize.Level1)
+{
+    map<string, string> options = {
+        { "type", "national" }
+    };
+    PhoneNumberFormat *phoneNumberFormat = new PhoneNumberFormat("zh-CN", options);
+    std::string location = phoneNumberFormat->getLocationName("18622350085", "zh-CN");
+    EXPECT_TRUE(location == "天津市");
+    bool flag = phoneNumberFormat->isValidPhoneNumber("18622350085");
+    EXPECT_TRUE(!flag);
+    delete phoneNumberFormat;
+}
+
+/**
+ * @tc.name: IntlFuncTest0054
+ * @tc.desc: Test Intl TabooUtils
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0054, TestSize.Level1)
+{
+    TabooUtils *tabooUtils = new TabooUtils();
+    std::string res1 = tabooUtils->ReplaceCountryName("CN", "en", "China");
+    EXPECT_TRUE(res1 == "China");
+    std::string res2 = tabooUtils->ReplaceLanguageName("zh", "en", "chinese");
+    EXPECT_TRUE(res2 == "chinese");
+    delete tabooUtils;
+}
+
+/**
+ * @tc.name: IntlFuncTest0055
+ * @tc.desc: Test Intl LocaleCompare
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0055, TestSize.Level1)
+{
+    int32_t result = LocaleCompare::Compare("zh-CN", "zh-Hans-CN");
+    EXPECT_TRUE(result == 9);
 }
 } // namespace I18n
 } // namespace Global
