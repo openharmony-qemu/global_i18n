@@ -42,7 +42,6 @@ ohos_shared_library("zone_util") {
     "//third_party/icu/icu4c:shared_icui18n",
     "//third_party/icu/icu4c:shared_icuuc",
     "//third_party/libphonenumber/cpp:phonenumber_standard",
-    "//third_party/libpng:libpng",
     "//third_party/libxml2:xml2",
   ]
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
