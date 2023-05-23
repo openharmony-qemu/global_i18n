@@ -75,7 +75,6 @@ ohos_shared_library("i18n") {
     "//base/global/i18n/frameworks/intl:preferred_language",
     "//third_party/icu/icu4c:shared_icui18n",
     "//third_party/icu/icu4c:shared_icuuc",
-    "//third_party/libpng:libpng",
   ]
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
