@@ -28,6 +28,5 @@ group("fuzztest") {
     "relativetimeformat_fuzzer:RelativeTimeFormatFuzzTest",
     "timezone_fuzzer:TimeZoneFuzzTest",
     "utils_fuzzer:UtilsFuzzTest",
-    "//third_party/libpng:libpng",
   ]
 }
