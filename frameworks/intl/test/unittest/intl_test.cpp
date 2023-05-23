@@ -1859,11 +1859,11 @@ HWTEST_F(IntlTest, IntlFuncTest0049, TestSize.Level1)
     std::unordered_set<std::string> blockedRegionSet = LocaleConfig::GetLanguageBlockedRegions();
     EXPECT_EQ(blockedRegionSet.size(), 0);
     std::string systemLanguage = LocaleConfig::GetSystemLanguage();
-    EXPECT_EQ(systemLanguage, "en");
+    EXPECT_EQ(systemLanguage, "en-Latn-US");
     std::string systemRegion = LocaleConfig::GetSystemRegion();
     EXPECT_EQ(systemRegion, "CN");
     std::string systemLocale = LocaleConfig::GetSystemLocale();
-    EXPECT_EQ(systemLocale, "en-CN");
+    EXPECT_EQ(systemLocale, "en-Latn-CN");
     const std::string locale = "zh-CN";
     bool isRTL = LocaleConfig::IsRTL(locale);
     EXPECT_TRUE(!isRTL);
