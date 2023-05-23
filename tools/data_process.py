@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# coding=utf-8 
 """
  * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 """
-# coding=utf-8 
-#!/usr/bin/env python
 import re
 import os
 import logging
@@ -37,10 +37,8 @@ def read_data(filename):
         location = eval(loc)
         timezones = tz[1:-1].split(",")
         data_res[location] = timezones
-    
     with os.fdopen(os.open("data/loc2tz.pickle", os.O_RDWR | os.O_CREAT, 0o640), "wb") as f:
         pickle.dump(data_res, f)
-    
     return data_res
 
 
