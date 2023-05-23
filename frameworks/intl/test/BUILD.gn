@@ -29,6 +29,7 @@ ohos_unittest("intl_test") {
     "//third_party/icu/icu4c/source/common",
     "//third_party/icu/icu4c/source/common/unicode",
     "//third_party/icu/icu4c/source/i18n",
+    "//third_party/libpng",
   ]
 
   external_deps = [ "init:libbegetutil" ]
@@ -37,7 +38,6 @@ ohos_unittest("intl_test") {
     "//third_party/googletest:gtest_main",
     "//third_party/icu/icu4c:shared_icui18n",
     "//third_party/icu/icu4c:shared_icuuc",
-    "//third_party/libpng:libpng",
   ]
 }
 

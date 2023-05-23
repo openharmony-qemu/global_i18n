@@ -15,6 +15,7 @@ group("fuzztest") {
   testonly = true
   deps = []
 
+  include_dirs = [ "//third_party/libpng" ]
   deps += [
     # deps file
     "breakiterator_fuzzer:BreakIteratorFuzzTest",
@@ -28,6 +29,5 @@ group("fuzztest") {
     "relativetimeformat_fuzzer:RelativeTimeFormatFuzzTest",
     "timezone_fuzzer:TimeZoneFuzzTest",
     "utils_fuzzer:UtilsFuzzTest",
-    "//third_party/libpng:libpng",
   ]
 }
