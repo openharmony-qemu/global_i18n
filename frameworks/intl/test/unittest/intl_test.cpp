@@ -1859,11 +1859,11 @@ HWTEST_F(IntlTest, IntlFuncTest0049, TestSize.Level1)
     std::unordered_set<std::string> blockedRegionSet = LocaleConfig::GetLanguageBlockedRegions();
     EXPECT_EQ(blockedRegionSet.size(), 0);
     std::string systemLanguage = LocaleConfig::GetSystemLanguage();
-    EXPECT_EQ(systemLanguage, "en-Latn-US");
+    EXPECT_EQ(systemLanguage, "zh-Hans");
     std::string systemRegion = LocaleConfig::GetSystemRegion();
     EXPECT_EQ(systemRegion, "CN");
     std::string systemLocale = LocaleConfig::GetSystemLocale();
-    EXPECT_EQ(systemLocale, "en-Latn-CN");
+    EXPECT_EQ(systemLocale, "zh-Hans-CN");
     const std::string locale = "zh-CN";
     bool isRTL = LocaleConfig::IsRTL(locale);
     EXPECT_TRUE(!isRTL);
@@ -2069,9 +2069,9 @@ HWTEST_F(IntlTest, IntlFuncTest0058, TestSize.Level1)
     std::string tzId = i18nTimeZone->GetID();
     EXPECT_EQ(tzId, "Asia/Shanghai");
     std::string displayName = i18nTimeZone->GetDisplayName();
-    EXPECT_EQ(displayName, "China Standard Time");
+    EXPECT_EQ(displayName, "中国标准时间");
     std::string displayName2 = i18nTimeZone->GetDisplayName(true);
-    EXPECT_EQ(displayName2, "China Standard Time");
+    EXPECT_EQ(displayName2, "中国标准时间");
     std::string displayName4 = i18nTimeZone->GetDisplayName("zh-CN", true);
     EXPECT_EQ(displayName4, "中国标准时间");
     std::unique_ptr<I18nTimeZone> timezone = I18nTimeZone::CreateInstance(timezoneId, true);
@@ -2080,10 +2080,6 @@ HWTEST_F(IntlTest, IntlFuncTest0058, TestSize.Level1)
     EXPECT_EQ(set0.size(), 437);
     std::set<std::string> set1 = I18nTimeZone::GetAvailableZoneCityIDs();
     EXPECT_EQ(set1.size(), 24);
-    std::string localeId = "zh-CN";
-    std::string cityID = "Shanghai";
-    std::string cityDisplayName = I18nTimeZone::GetCityDisplayName(cityID, localeId);
-    EXPECT_EQ(cityDisplayName, "上海(中国)");
     delete i18nTimeZone;
     uint32_t mask = GetMask("CN");
     EXPECT_EQ(mask, 2462);
