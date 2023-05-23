@@ -1888,17 +1888,21 @@ HWTEST_F(IntlTest, IntlFuncTest0049, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest0050, TestSize.Level1)
 {
-    const std::string langugae = "zh-Hans";
-    const std::string langugaeEn = "en";
+    const std::string langugae = "zh-CN";
+    const std::string langugaeDe = "de-DE";
     I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
-    PreferredLanguage::AddPreferredLanguage(langugaeEn.data(), 1, errorCode);
+    PreferredLanguage::AddPreferredLanguage(langugae, 0, errorCode);
     EXPECT_TRUE(errorCode != I18nErrorCode::SUCCESS);
-    PreferredLanguage::AddPreferredLanguage(langugae.data(), 1, errorCode);
+    PreferredLanguage::AddPreferredLanguage(langugaeDe, 1, errorCode);
     EXPECT_TRUE(errorCode != I18nErrorCode::SUCCESS);
-    PreferredLanguage::AddPreferredLanguage(langugae.data(), 3, errorCode);
+    PreferredLanguage::AddPreferredLanguage(langugae, 3, errorCode);
     EXPECT_TRUE(errorCode != I18nErrorCode::SUCCESS);
     std::vector<std::string> list = PreferredLanguage::GetPreferredLanguageList();
     EXPECT_EQ(list.size(), 1);
+    std::string firstPreferredLanguage = PreferredLanguage::GetFirstPreferredLanguage();
+    EXPECT_EQ(firstPreferredLanguage, "zh-Hans");
+    std::string preferredLocale = PreferredLanguage::GetPreferredLocale();
+    EXPECT_EQ(preferredLocale, "zh-CN");
     bool flag = PreferredLanguage::RemovePreferredLanguage(0);
     EXPECT_TRUE(!flag);
 }
@@ -2077,8 +2081,9 @@ HWTEST_F(IntlTest, IntlFuncTest0058, TestSize.Level1)
     std::set<std::string> set1 = I18nTimeZone::GetAvailableZoneCityIDs();
     EXPECT_EQ(set1.size(), 24);
     std::string localeId = "zh-CN";
-    std::string cityDisplayName = I18nTimeZone::GetCityDisplayName(timezoneId, localeId);
-    EXPECT_EQ(cityDisplayName, "");
+    std::string cityID = "Shanghai";
+    std::string cityDisplayName = I18nTimeZone::GetCityDisplayName(cityID, localeId);
+    EXPECT_EQ(cityDisplayName, "上海(中国)");
     delete i18nTimeZone;
     uint32_t mask = GetMask("CN");
     EXPECT_EQ(mask, 2462);
