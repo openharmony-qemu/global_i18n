@@ -1876,9 +1876,6 @@ HWTEST_F(IntlTest, IntlFuncTest0050, TestSize.Level1)
     EXPECT_TRUE(errorCode != I18nErrorCode::SUCCESS);
     std::vector<std::string> list = PreferredLanguage::GetPreferredLanguageList();
     EXPECT_TRUE(list.size() == 1);
-    for (unsigned int i = 0; i < list.size(); i++) {
-        printf("......aa: %s.\n", list.at(i).c_str());
-    }
     bool flag = PreferredLanguage::RemovePreferredLanguage(0);
     EXPECT_TRUE(!flag);
 }
