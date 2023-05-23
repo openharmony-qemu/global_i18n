@@ -18,22 +18,27 @@
 #include <vector>
 
 #include "collator.h"
+#include "character.h"
 #include "date_time_format.h"
 #include "locale_compare.h"
 #include "locale_config.h"
 #include "locale_info.h"
+#include "measure_data.h"
 #include "number_format.h"
 #include "phone_number_format.h"
 #include "plural_rules.h"
 #include "preferred_language.h"
 #include "relative_time_format.h"
 #include "utils.h"
+#include "i18n_break_iterator.h"
 #include "i18n_calendar.h"
 #include "i18n_timezone.h"
 #include "i18n_types.h"
 #include "index_util.h"
 #include "intl_test.h"
+#include "system_locale_manager.h"
 #include "taboo_utils.h"
+#include "utils.h"
 
 using namespace OHOS::Global::I18n;
 using testing::ext::TestSize;
@@ -1856,6 +1861,27 @@ HWTEST_F(IntlTest, IntlFuncTest0049, TestSize.Level1)
 {
     std::unordered_set<std::string> blockedRegionSet = LocaleConfig::GetLanguageBlockedRegions();
     EXPECT_TRUE(blockedRegionSet.size() == 0);
+    std::string systemLanguage = LocaleConfig::GetSystemLanguage();
+    EXPECT_TRUE(systemLanguage == "en");
+    std::string systemRegion = LocaleConfig::GetSystemRegion();
+    EXPECT_TRUE(systemRegion == "CN");
+    std::string systemLocale = LocaleConfig::GetSystemLocale();
+    EXPECT_TRUE(systemLocale == "en-CN");
+    const std::string locale = "zh-CN";
+    bool isRTL = LocaleConfig::IsRTL(locale);
+    EXPECT_TRUE(!isRTL);
+    std::string validLocale = LocaleConfig::GetValidLocale(locale);
+    EXPECT_TRUE(validLocale == "zh-CN");
+    bool is24HourClock = LocaleConfig::Is24HourClock();
+    EXPECT_TRUE(!is24HourClock);
+    bool set24HourClock = LocaleConfig::Set24HourClock(true);
+    EXPECT_TRUE(!set24HourClock);
+    bool permission = LocaleConfig::CheckPermission();
+    EXPECT_TRUE(!permission);
+    bool usingLocalDigit = LocaleConfig::SetUsingLocalDigit(true);
+    EXPECT_TRUE(!usingLocalDigit);
+    usingLocalDigit = LocaleConfig::GetUsingLocalDigit();
+    EXPECT_TRUE(!usingLocalDigit);
 }
 
 /**
@@ -1934,6 +1960,9 @@ HWTEST_F(IntlTest, IntlFuncTest0053, TestSize.Level1)
     EXPECT_TRUE(location == "天津市");
     bool flag = phoneNumberFormat->isValidPhoneNumber("18622350085");
     EXPECT_TRUE(!flag);
+    std::string number = "0755-8224-4593";
+    std::string formated = phoneNumberFormat->format(number);
+    EXPECT_TRUE(formated == "");
     delete phoneNumberFormat;
 }
 
@@ -1961,6 +1990,100 @@ HWTEST_F(IntlTest, IntlFuncTest0055, TestSize.Level1)
 {
     int32_t result = LocaleCompare::Compare("zh-CN", "zh-Hans-CN");
     EXPECT_TRUE(result == 9);
+    I18nBreakIterator *i18nBreakIterator = new I18nBreakIterator("zh-Hans-CN");
+    bool isBoundary = i18nBreakIterator->IsBoundary(6);
+    EXPECT_TRUE(!isBoundary);
+    int32_t current = i18nBreakIterator->Current();
+    EXPECT_TRUE(current == 0);
+    int32_t first = i18nBreakIterator->First();
+    EXPECT_TRUE(first == 0);
+    int32_t last = i18nBreakIterator->Last();
+    EXPECT_TRUE(last == 0);
+    int32_t previous = i18nBreakIterator->Previous();
+    EXPECT_TRUE(previous == -1);
+    int32_t next6 = i18nBreakIterator->Next(6);
+    EXPECT_TRUE(next6 == -1);
+    delete i18nBreakIterator;
+}
+
+/**
+ * @tc.name: IntlFuncTest0056
+ * @tc.desc: Test Intl SystemLocaleManager
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0056, TestSize.Level1)
+{
+    SystemLocaleManager *systemLocaleManager = new SystemLocaleManager();
+    std::vector<std::string> languages = {"en", "de", "es", "fr"};
+    SortOptions sortOptions = {"en-US", true, true};
+    std::vector<LocaleItem> languageInfos = systemLocaleManager->GetLanguageInfoArray(languages, sortOptions);
+    EXPECT_TRUE(languageInfos.size() == 4);
+    const std::vector<std::string> countries = {"US", "GB", "DE", "CA"};
+    std::vector<LocaleItem> countryInfos = systemLocaleManager->GetCountryInfoArray(countries, sortOptions);
+    EXPECT_TRUE(countryInfos.size() == 4);
+    delete systemLocaleManager;
+}
+
+/**
+ * @tc.name: IntlFuncTest0057
+ * @tc.desc: Test Intl Utils
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0057, TestSize.Level1)
+{
+    bool isDigit = IsDigit("55");
+    EXPECT_TRUE(isDigit);
+    bool isSpaceChar = IsSpaceChar(" ");
+    EXPECT_TRUE(isSpaceChar);
+    bool isWhiteSpace = IsWhiteSpace("  ");
+    EXPECT_TRUE(isWhiteSpace);
+    bool isRTLCharacter = IsRTLCharacter("^");
+    EXPECT_TRUE(!isRTLCharacter);
+    bool isIdeoGraphic = IsIdeoGraphic("&&*");
+    EXPECT_TRUE(!isIdeoGraphic);
+    bool isLetter = IsLetter("cccUt");
+    EXPECT_TRUE(isLetter);
+    bool isLowerCase = IsLowerCase("abc");
+    EXPECT_TRUE(isLowerCase);
+    bool isUpperCase = IsUpperCase("AbC");
+    EXPECT_TRUE(isUpperCase);
+    std::string getType = GetType("$$%");
+    EXPECT_TRUE(getType == "U_CURRENCY_SYMBOL");
+}
+
+/**
+ * @tc.name: IntlFuncTest0058
+ * @tc.desc: Test Intl MeasureData
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0058, TestSize.Level1)
+{
+    std::string timezoneId = "Asia/Shanghai";
+    I18nTimeZone *i18nTimeZone = new I18nTimeZone(timezoneId, true);
+    int32_t offset = i18nTimeZone->GetOffset(1684742124645);
+    EXPECT_TRUE(offset == 28800000);
+    int32_t rawOffset = i18nTimeZone->GetRawOffset();
+    EXPECT_TRUE(rawOffset == 28800000);
+    std::string tzId = i18nTimeZone->GetID();
+    EXPECT_TRUE(tzId == "Asia/Shanghai");
+    std::string displayName = i18nTimeZone->GetDisplayName();
+    EXPECT_TRUE(displayName == "China Standard Time");
+    std::string displayName2 = i18nTimeZone->GetDisplayName(true);
+    EXPECT_TRUE(displayName2 == "China Standard Time");
+    std::string displayName4 = i18nTimeZone->GetDisplayName("zh-CN", true);
+    EXPECT_TRUE(displayName4 == "中国标准时间");
+    std::unique_ptr<I18nTimeZone> timezone = I18nTimeZone::CreateInstance(timezoneId, true);
+    I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
+    std::set<std::string> set0 = I18nTimeZone::GetAvailableIDs(errorCode);
+    EXPECT_TRUE(set0.size() == 437);
+    std::set<std::string> set1 = I18nTimeZone::GetAvailableZoneCityIDs();
+    EXPECT_TRUE(set1.size() == 24);
+    std::string localeId = "zh-CN";
+    std::string cityDisplayName = I18nTimeZone::GetCityDisplayName(timezoneId, localeId);
+    EXPECT_TRUE(cityDisplayName == "");
+    delete i18nTimeZone;
+    uint32_t mask = GetMask("CN");
+    EXPECT_TRUE(mask == 2462);
 }
 } // namespace I18n
 } // namespace Global
