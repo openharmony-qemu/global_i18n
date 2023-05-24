@@ -81,8 +81,11 @@ private:
     static std::string GetFallBack(std::string &localeStr);
     static void GetTimezoneIDFromZoneInfo(std::set<std::string> &availableIDs, std::string &parentPath,
         std::string &parentName);
-    static std::vector<int> GetColorData(const int x, const int y);
-    static int InitPngptr(png_structp &png_ptr, png_infop &info_ptr, FILE **fp);
+    static std::vector<int> GetColorData(const int x, const int y, bool highPrecisionFlag);
+    static int InitPngptr(png_structp &png_ptr, png_infop &info_ptr, FILE **fp, std::string preferredPath);
+    static bool HasHighPrecisionData();
+    static bool ParamExceedScope(const int x, const int y, bool highPrecision);
+    static std::string GetPreferredPath(const int y, bool highPrecision);
 };
 } // namespace I18n
 } // namespace Global

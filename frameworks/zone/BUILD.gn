@@ -22,7 +22,6 @@ config("zone_util_public_configs") {
     "//third_party/icu/icu4c/source/common/unicode",
     "//third_party/icu/icu4c/source/i18n",
     "//third_party/libphonenumber/cpp/src",
-    "//third_party/libpng",
     "//third_party/libxml2/include",
     "//third_party/protobuf/src",
     "//third_party/protobuf/src/google",
