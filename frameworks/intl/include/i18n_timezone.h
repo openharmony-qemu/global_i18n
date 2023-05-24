@@ -61,6 +61,9 @@ private:
     static const char *CITY_DISPLAYNAME_SECOND_ROOT_TAG;
     static const char *ZONEINFO_PATH;
     static const uint32_t ELEMENT_NUM = 2;
+    static const uint32_t TZ_PIECE_LEN = 900;
+    static const uint32_t TZ_10X = 10;
+    static const uint32_t TZ_MAX_PIXEL_VALUE = 255;
     static std::set<std::string> availableIDs;
     static std::set<std::string> supportedLocales;
     static std::set<std::string> availableZoneCityIDs;
