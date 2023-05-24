@@ -979,13 +979,13 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
     }
     bool highPrecisionFlag = HasHighPrecisionData();
     // 10 is latitude expand 10x to match real pixel picture width, 900 is half of pixel picture width
-    fixedX = (int)(highPrecisionFlag ? (y * 20 + 1800) : (y * 10 + 900));
+    fixedX = (int)(highPrecisionFlag ? (y * TZ_10X * 2 + TZ_PIECE_LEN * 2) : (y * TZ_10X + TZ_PIECE_LEN));
     // 10 is longitude expand 10x to match real pixel picture height, 1800 is half of pixel picture height
-    fixedY = (int)(highPrecisionFlag ? (x * 20 + 3600) : (x * 10 + 1800));
+    fixedY = (int)(highPrecisionFlag ? (x * TZ_10X * 2 + TZ_PIECE_LEN * 4) : (x * TZ_10X + TZ_PIECE_LEN * 2));
     std::vector<int> pixel = GetColorData(fixedX, fixedY, highPrecisionFlag);
     for (size_t i = 0; i < pixel.size(); i++) {
         //255 is invalid pixel value required
-        if (pixel[i] != 255 && categoryMap.find(pixel[i]) != categoryMap.end()) {
+        if (pixel[i] != TZ_MAX_PIXEL_VALUE && categoryMap.find(pixel[i]) != categoryMap.end()) {
             std::string zdId = categoryMap[pixel[i]];
             tzIdList.insert(tzIdList.end(), zdId);
         }
@@ -1023,7 +1023,7 @@ std::vector<int> I18nTimeZone::GetColorData(const int x, const int y, bool highP
             return result;
         }
         png_start_read_image(png_ptr);
-        int actualHeight = highPrecision ? (y % 1800) : y; // 1800 is pre-data height
+        int actualHeight = highPrecision ? (y % (TZ_PIECE_LEN * 2)) : y; // 1800 is pre-data height
         for (int i = 0; i < (actualHeight + 1); i++) {
             png_read_row(png_ptr, row_pointers, NULL);
         }
@@ -1069,7 +1069,7 @@ std::string I18nTimeZone::GetPreferredPath(const int y, bool highPrecision)
 {
     std::string realPath = TZ_PIXEL_PATH;
     if (highPrecision) {
-        int index = y / 1800; // 1800 is pre-data height
+        int index = y / (TZ_PIECE_LEN * 2); // 1800 is pre-data height
         // 3 is variable length
         realPath = realPath.replace(realPath.find("{0}"), 3, std::to_string(index));
         return realPath;
@@ -1087,8 +1087,10 @@ bool I18nTimeZone::HasHighPrecisionData()
         realPath = tempPath.replace(tempPath.find("{0}"), 3, std::to_string(i));
         std::ifstream file(realPath.c_str());
         if (!file.good()) {
+            file.close();
             return false;
         }
+        file.close();
     }
     return true;
 }
@@ -1100,12 +1102,12 @@ bool I18nTimeZone::ParamExceedScope(const int x, const int y, bool highPrecision
     }
     if (highPrecision) {
         // 3599 is max width of high precision timezone data, 7199 is the same of height
-        if (x > 3599 || y > 7199) {
+        if (x > (TZ_PIECE_LEN * 4 - 1) || y > (TZ_PIECE_LEN * 8 - 1)) {
             return true;
         }
     } else {
         // 1799 is max width of timezone data, 3599 is the same of height
-        if (x > 1799 || y > 3599) {
+        if (x > (TZ_PIECE_LEN * 2 - 1) || y > (TZ_PIECE_LEN * 4 - 1)) {
             return true;
         }
     }
