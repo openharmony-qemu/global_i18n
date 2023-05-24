@@ -234,17 +234,11 @@ napi_value I18nAddon::Init(napi_env env, napi_value exports)
 {
     napi_status initStatus = napi_ok;
     napi_property_descriptor properties[] = {
-        DECLARE_NAPI_FUNCTION("getSystemLanguages", GetSystemLanguages),
-        DECLARE_NAPI_FUNCTION("getSystemCountries", GetSystemCountries),
-        DECLARE_NAPI_FUNCTION("isSuggested", IsSuggested),
         DECLARE_NAPI_FUNCTION("getDisplayLanguage", GetDisplayLanguage),
         DECLARE_NAPI_FUNCTION("getDisplayCountry", GetDisplayCountry),
         DECLARE_NAPI_FUNCTION("getSystemLanguage", GetSystemLanguage),
         DECLARE_NAPI_FUNCTION("getSystemRegion", GetSystemRegion),
         DECLARE_NAPI_FUNCTION("getSystemLocale", GetSystemLocale),
-        DECLARE_NAPI_FUNCTION("setSystemLanguage", SetSystemLanguage),
-        DECLARE_NAPI_FUNCTION("setSystemRegion", SetSystemRegion),
-        DECLARE_NAPI_FUNCTION("setSystemLocale", SetSystemLocale),
         DECLARE_NAPI_FUNCTION("getCalendar", GetCalendar),
         DECLARE_NAPI_FUNCTION("isRTL", IsRTL),
         DECLARE_NAPI_PROPERTY("I18NUtil", CreateI18nUtilObject(env, initStatus)),
@@ -259,8 +253,6 @@ napi_value I18nAddon::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("set24HourClock", Set24HourClock),
         DECLARE_NAPI_FUNCTION("getTimeZone", GetI18nTimeZone),
         DECLARE_NAPI_PROPERTY("Transliterator", CreateTransliteratorObject(env, initStatus)),
-        DECLARE_NAPI_FUNCTION("setUsingLocalDigit", SetUsingLocalDigitAddon),
-        DECLARE_NAPI_FUNCTION("getUsingLocalDigit", GetUsingLocalDigitAddon),
         DECLARE_NAPI_PROPERTY("TimeZone", CreateTimeZoneObject(env, initStatus)),
         DECLARE_NAPI_FUNCTION("getAppPreferredLanguage", GetAppPreferredLanguage),
         DECLARE_NAPI_PROPERTY("System", CreateSystemObject(env, initStatus)),
