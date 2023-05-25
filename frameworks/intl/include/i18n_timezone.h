@@ -61,8 +61,7 @@ private:
     static const char *CITY_DISPLAYNAME_SECOND_ROOT_TAG;
     static const char *ZONEINFO_PATH;
     static const uint32_t ELEMENT_NUM = 2;
-    static const uint32_t TZ_PIECE_LEN = 900;
-    static const uint32_t TZ_10X = 10;
+    static const uint32_t TZ_X_PLUS = 180;
     static const uint32_t TZ_MAX_PIXEL_VALUE = 255;
     static std::set<std::string> availableIDs;
     static std::set<std::string> supportedLocales;
@@ -84,11 +83,14 @@ private:
     static std::string GetFallBack(std::string &localeStr);
     static void GetTimezoneIDFromZoneInfo(std::set<std::string> &availableIDs, std::string &parentPath,
         std::string &parentName);
-    static std::vector<int> GetColorData(const int x, const int y, bool highPrecisionFlag);
+    static std::vector<int> GetColorData(const int x, const int y, int actualHeight, std::string preferredPath);
     static int InitPngptr(png_structp &png_ptr, png_infop &info_ptr, FILE **fp, std::string preferredPath);
-    static bool HasHighPrecisionData();
-    static bool ParamExceedScope(const int x, const int y, bool highPrecision);
-    static std::string GetPreferredPath(const int y, bool highPrecision);
+    static std::vector<std::string> HasHighPrecisionData();
+    static bool ParamExceedScope(const int x, const int y, int fixedX, int fixedY);
+    static std::string GetPreferredPath(const double x, std::vector<std::string> filePaths);
+    static void SetVersionPathMap(std::string verison, std::string path,
+            std::map<std::string, std::vector<std::string>> *pathMap);
+    static void GetTzDataWidth(std::vector<std::string> filePaths, int *width, int *height);
 };
 } // namespace I18n
 } // namespace Global
