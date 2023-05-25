@@ -40,6 +40,7 @@ ohos_unittest("intl_test") {
     "//third_party/googletest:gtest_main",
     "//third_party/icu/icu4c:shared_icui18n",
     "//third_party/icu/icu4c:shared_icuuc",
+    "//third_party/libphonenumber/cpp:phonenumber_standard",
     "//third_party/libpng:libpng",
   ]
 }
