@@ -17,6 +17,7 @@
 
 #include <cstdint>
 #include <map>
+#include <png.h>
 #include <set>
 #include <string>
 #include "i18n_types.h"
@@ -60,6 +61,9 @@ private:
     static const char *CITY_DISPLAYNAME_SECOND_ROOT_TAG;
     static const char *ZONEINFO_PATH;
     static const uint32_t ELEMENT_NUM = 2;
+    static const uint32_t TZ_PIECE_LEN = 900;
+    static const uint32_t TZ_10X = 10;
+    static const uint32_t TZ_MAX_PIXEL_VALUE = 255;
     static std::set<std::string> availableIDs;
     static std::set<std::string> supportedLocales;
     static std::set<std::string> availableZoneCityIDs;
@@ -80,7 +84,11 @@ private:
     static std::string GetFallBack(std::string &localeStr);
     static void GetTimezoneIDFromZoneInfo(std::set<std::string> &availableIDs, std::string &parentPath,
         std::string &parentName);
-    static std::vector<int> GetColorData(const int x, const int y);
+    static std::vector<int> GetColorData(const int x, const int y, bool highPrecisionFlag);
+    static int InitPngptr(png_structp &png_ptr, png_infop &info_ptr, FILE **fp, std::string preferredPath);
+    static bool HasHighPrecisionData();
+    static bool ParamExceedScope(const int x, const int y, bool highPrecision);
+    static std::string GetPreferredPath(const int y, bool highPrecision);
 };
 } // namespace I18n
 } // namespace Global

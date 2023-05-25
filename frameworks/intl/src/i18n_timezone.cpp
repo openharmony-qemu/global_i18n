@@ -15,6 +15,7 @@
 #include "i18n_timezone.h"
 
 #include <filesystem>
+#include <fstream>
 #include <sys/stat.h>
 #include "hilog/log.h"
 #include "libxml/globals.h"
@@ -34,7 +35,6 @@
 #include "unicode/locid.h"
 #include "unicode/unistr.h"
 #include "utils.h"
-#include <png.h>
 #include <cstdio>
 
 namespace OHOS {
@@ -48,7 +48,7 @@ const char *I18nTimeZone::DEFAULT_TIMEZONE = "GMT";
 
 const char *I18nTimeZone::CITY_TIMEZONE_DATA_PATH = "/system/usr/ohos_timezone/ohos_timezones.xml";
 const char *I18nTimeZone::DEVICE_CITY_TIMEZONE_DATA_PATH = "/system/usr/ohos_timezone/device_timezones.xml";
-const char *I18nTimeZone::TZ_PIXEL_PATH = "/system/usr/ohos_timezone/tz_pixel.dat";
+const char *I18nTimeZone::TZ_PIXEL_PATH = "/system/usr/ohos_timezone/tz_pixel{0}.dat";
 const char *I18nTimeZone::DEFAULT_LOCALE = "root";
 const char *I18nTimeZone::CITY_DISPLAYNAME_PATH = "/system/usr/ohos_timezone/ohos_city_dispname/";
 const char *I18nTimeZone::DEVICE_CITY_DISPLAYNAME_PATH = "/system/usr/ohos_timezone/device_city_dispname/";
@@ -977,14 +977,14 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
     } else {
         categoryMap = categoryNum2TimezoneES;
     }
-    // 10 is latitude expand 10x to match real pixel picture width, 900 is half of pixel picture width
-    fixedX = (int)(y * 10 + 900);
-    // 10 is longitude expand 10x to match real pixel picture height, 1800 is half of pixel picture height
-    fixedY = (int)(x * 10 + 1800);
-    std::vector<int> pixel = GetColorData(fixedX, fixedY);
+    bool highPrecisionFlag = HasHighPrecisionData();
+    // TZ_10X is latitude expand to match real pixel picture width, TZ_PIECE_LEN is half of pixel picture width
+    fixedX = (int)(highPrecisionFlag ? (y * TZ_10X * 2 + TZ_PIECE_LEN * 2) : (y * TZ_10X + TZ_PIECE_LEN));
+    // TZ_10X is longitude expand to match real pixel picture height, TZ_PIECE_LEN*2 is half of pixel picture height
+    fixedY = (int)(highPrecisionFlag ? (x * TZ_10X * 2 + TZ_PIECE_LEN * 4) : (x * TZ_10X + TZ_PIECE_LEN * 2));
+    std::vector<int> pixel = GetColorData(fixedX, fixedY, highPrecisionFlag);
     for (size_t i = 0; i < pixel.size(); i++) {
-        //255 is invalid pixel value required
-        if (pixel[i] != 255 && categoryMap.find(pixel[i]) != categoryMap.end()){
+        if (pixel[i] != TZ_MAX_PIXEL_VALUE && categoryMap.find(pixel[i]) != categoryMap.end()) {
             std::string zdId = categoryMap[pixel[i]];
             tzIdList.insert(tzIdList.end(), zdId);
         }
@@ -993,34 +993,20 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
     return tzIdList;
 }
 
-std::vector<int> I18nTimeZone::GetColorData(const int x, const int y)
+std::vector<int> I18nTimeZone::GetColorData(const int x, const int y, bool highPrecision)
 {
     std::vector<int> result;
-    // 1799 is max width of pixel picture, 3599 is the same of height
-    if (x < 0 || x > 1799 || y < 0 || y > 3599) {
+    if (ParamExceedScope(x, y, highPrecision)) {
         HiLog::Error(LABEL, "invalid width:%d or height: %d ", x, y);
         return result;
     }
     FILE *fp;
+    png_structp png_ptr;
     png_infop info_ptr;
     png_bytep row_pointers;
-    fp = fopen(TZ_PIXEL_PATH, "rb");
-    if (fp == NULL) {
-        HiLog::Error(LABEL, "timezone data resource file not exists.");
-        return result;
-    }
-    png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-    if (!png_ptr) {
-        fclose(fp);
-        png_destroy_read_struct(&png_ptr, &info_ptr, 0);
-        HiLog::Error(LABEL, "create read_struct failed.");
-        return result;
-    }
-    info_ptr = png_create_info_struct(png_ptr);
-    if (!info_ptr) {
-        fclose(fp);
-        png_destroy_read_struct(&png_ptr, &info_ptr, 0);
-        HiLog::Error(LABEL, "create info_struct failed.");
+    std::string preferredPath = GetPreferredPath(y, highPrecision);
+    int code = InitPngptr(png_ptr, info_ptr, &fp, preferredPath);
+    if (code != 0) {
         return result;
     }
     try {
@@ -1029,14 +1015,15 @@ std::vector<int> I18nTimeZone::GetColorData(const int x, const int y)
         png_read_info(png_ptr, info_ptr);
         unsigned int rowbytes = png_get_rowbytes(png_ptr, info_ptr);
         row_pointers = (png_bytep)png_malloc(png_ptr, rowbytes);
-        if (row_pointers == NULL) {
+        if (row_pointers == nullptr) {
             fclose(fp);
             png_destroy_read_struct(&png_ptr, &info_ptr, 0);
             HiLog::Error(LABEL, "malloc rowbytes failed.");
             return result;
         }
         png_start_read_image(png_ptr);
-        for (int i = 0; i < (y + 1); i++) {
+        int actualHeight = highPrecision ? (y % (TZ_PIECE_LEN * 2)) : y; // TZ_PIECE_LEN * 2 is pre-data height
+        for (int i = 0; i < (actualHeight + 1); i++) {
             png_read_row(png_ptr, row_pointers, NULL);
         }
         for (size_t i = 0; i < 3; i++) { // 3 is RGB color pixel length
@@ -1050,6 +1037,82 @@ std::vector<int> I18nTimeZone::GetColorData(const int x, const int y)
     png_free(png_ptr, row_pointers);
     fclose(fp);
     return result;
+}
+
+int I18nTimeZone::InitPngptr(png_structp &png_ptr, png_infop &info_ptr, FILE **fp,
+                             std::string preferredPath)
+{
+    *fp = fopen(preferredPath.c_str(), "rb");
+    if (*fp == NULL) {
+        HiLog::Error(LABEL, "timezone data resource file not exists.");
+        return 1;
+    }
+    png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    if (!png_ptr) {
+        fclose(*fp);
+        png_destroy_read_struct(&png_ptr, &info_ptr, 0);
+        HiLog::Error(LABEL, "create read_struct failed.");
+        return 1;
+    }
+    info_ptr = png_create_info_struct(png_ptr);
+    if (!info_ptr) {
+        fclose(*fp);
+        png_destroy_read_struct(&png_ptr, &info_ptr, 0);
+        HiLog::Error(LABEL, "create info_struct failed.");
+        return 1;
+    }
+    return 0;
+}
+
+std::string I18nTimeZone::GetPreferredPath(const int y, bool highPrecision)
+{
+    std::string realPath = TZ_PIXEL_PATH;
+    if (highPrecision) {
+        int index = y / (TZ_PIECE_LEN * 2); // TZ_PIECE_LEN * 2 is pre-data height
+        // 3 is variable length
+        realPath = realPath.replace(realPath.find("{0}"), 3, std::to_string(index));
+        return realPath;
+    } else {
+        return realPath.replace(realPath.find("{0}"), 3, "");
+    }
+}
+
+bool I18nTimeZone::HasHighPrecisionData()
+{
+    std::string realPath = "";
+    for (int i = 0; i < 4; i++) { // 4 is data parts count
+        std::string tempPath = TZ_PIXEL_PATH;
+        // 3 is variable length
+        realPath = tempPath.replace(tempPath.find("{0}"), 3, std::to_string(i));
+        std::ifstream file(realPath.c_str());
+        if (!file.good()) {
+            file.close();
+            return false;
+        }
+        file.close();
+    }
+    return true;
+}
+
+bool I18nTimeZone::ParamExceedScope(const int x, const int y, bool highPrecision)
+{
+    if (x < 0 || y < 0) {
+        return true;
+    }
+    if (highPrecision) {
+        // TZ_PIECE_LEN * 4 - 1 is max width of high precision timezone data
+        // TZ_PIECE_LEN * 8 - 1 is the same of height
+        if (x > (TZ_PIECE_LEN * 4 - 1) || y > (TZ_PIECE_LEN * 8 - 1)) {
+            return true;
+        }
+    } else {
+        // TZ_PIECE_LEN * 2 - 1 is max width of timezone data
+        // TZ_PIECE_LEN * 4 - 1 is the same of height
+        if (x > (TZ_PIECE_LEN * 2 - 1) || y > (TZ_PIECE_LEN * 4 - 1)) {
+            return true;
+        }
+    }
+    return false;
 }
 }
 }
