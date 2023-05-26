@@ -980,7 +980,7 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
     } else {
         categoryMap = categoryNum2TimezoneES;
     }
-    std::vector<std::string> filePaths = HasHighPrecisionData();
+    std::vector<std::string> filePaths = FindTzData();
     int pathLen = filePaths.size();
     if (pathLen < 1) {
         return tzIdList;
@@ -989,7 +989,7 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
     if (preferredPath == "") {
         return tzIdList;
     }
-    int width, height;
+    uint32_t width, height;
     GetTzDataWidth(filePaths, &width, &height);
     fixedX = (int)(y * (width / TZ_X_PLUS) + width / 2);
     fixedY = (int)(x * ((height * pathLen) / (TZ_X_PLUS * 2)) + (height * pathLen) / 2);
@@ -1027,8 +1027,8 @@ std::vector<int> I18nTimeZone::GetColorData(const int x, const int y, int actual
         unsigned int rowbytes = png_get_rowbytes(png_ptr, info_ptr);
         row_pointers = (png_bytep)png_malloc(png_ptr, rowbytes);
         if (row_pointers == nullptr) {
-            fclose(fp);
             png_destroy_read_struct(&png_ptr, &info_ptr, 0);
+            CloseFile(fp);
             HiLog::Error(LABEL, "malloc rowbytes failed.");
             return result;
         }
@@ -1040,16 +1040,16 @@ std::vector<int> I18nTimeZone::GetColorData(const int x, const int y, int actual
             std::string pixel = std::to_string(*(row_pointers + x * 3 + i)); // 3 is RGB color pixel length
             result.insert(result.begin(), atoi(pixel.c_str()));
         }
+        png_free(png_ptr, row_pointers);
+        CloseFile(fp);
     } catch (...) {
-        fclose(fp);
         png_destroy_read_struct(&png_ptr, &info_ptr, 0);
+        CloseFile(fp);
     }
-    png_free(png_ptr, row_pointers);
-    fclose(fp);
     return result;
 }
 
-void I18nTimeZone::GetTzDataWidth(std::vector<std::string> filePaths, int *width, int *height)
+void I18nTimeZone::GetTzDataWidth(std::vector<std::string> filePaths, uint32_t *width, uint32_t *height)
 {
     if (filePaths.size() == 0) {
         *width = 0;
@@ -1068,14 +1068,14 @@ void I18nTimeZone::GetTzDataWidth(std::vector<std::string> filePaths, int *width
             png_read_info(png_ptr, info_ptr);
             unsigned int w, h;
             png_get_IHDR(png_ptr, info_ptr, &w, &h, NULL, NULL, NULL, NULL, NULL);
-            *width  = w;
+            *width = w;
             *height = h;
+            png_destroy_read_struct(&png_ptr, &info_ptr, 0);
+            CloseFile(fp);
         } catch(...) {
             png_destroy_read_struct(&png_ptr, &info_ptr, 0);
-            fclose(fp);
+            CloseFile(fp);
         }
-        png_destroy_read_struct(&png_ptr, &info_ptr, 0);
-        fclose(fp);
     }
 }
 
@@ -1089,15 +1089,15 @@ int I18nTimeZone::InitPngptr(png_structp &png_ptr, png_infop &info_ptr, FILE **f
     }
     png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
     if (!png_ptr) {
-        fclose(*fp);
         png_destroy_read_struct(&png_ptr, &info_ptr, 0);
+        CloseFile(*fp);
         HiLog::Error(LABEL, "create read_struct failed.");
         return 1;
     }
     info_ptr = png_create_info_struct(png_ptr);
     if (!info_ptr) {
-        fclose(*fp);
         png_destroy_read_struct(&png_ptr, &info_ptr, 0);
+        CloseFile(*fp);
         HiLog::Error(LABEL, "create info_struct failed.");
         return 1;
     }
@@ -1113,8 +1113,8 @@ std::string I18nTimeZone::GetPreferredPath(const double x,
         int fixedX= (int)(x + TZ_X_PLUS);
         for (unsigned int i = 0; i < filePaths.size(); i++) {
             std::string path = filePaths.at(i);
-            std::string left = path.substr(path.find("-") + 4, 3);
-            std::string right = path.substr(path.find("-") + 7, 3);
+            std::string left = path.substr(path.find("-") + 1, 3);
+            std::string right = path.substr(path.find("-") + 4, 3);
             if (fixedX >= atoi(left.c_str()) && fixedX < atoi(right.c_str())) {
                 return path;
             }
@@ -1123,11 +1123,11 @@ std::string I18nTimeZone::GetPreferredPath(const double x,
     }
 }
 
-std::vector<std::string> I18nTimeZone::HasHighPrecisionData()
+std::vector<std::string> I18nTimeZone::FindTzData()
 {
     std::map<std::string, std::vector<std::string>> pathMap;
-    std::regex reg("tz_([0-9]{4}[a-z])-(\\d+)\\.dat");
-    std::regex regVersion("[0-9]{4}[a-z]");
+    std::regex reg("tz_[0-9]{7}-(\\d{6})\\.dat");
+    std::regex regVersion("_[0-9]{7}");
     for (auto& entry : recursive_directory_iterator(TZ_PIXEL_PATH)) {
         const std::string path = entry.path().string();
         std::smatch match;
@@ -1141,9 +1141,25 @@ std::vector<std::string> I18nTimeZone::HasHighPrecisionData()
         }
     }
     std::vector<std::string> filePaths;
-    std::map<std::string, std::vector<std::string>>::iterator iter = pathMap.end();
-    iter--;
-    return (pathMap.size() == 0) ? filePaths : iter->second;
+    std::map<std::string, std::vector<std::string>>::reverse_iterator iter;
+    for (iter = pathMap.rbegin(); iter != pathMap.rend(); iter++) {
+        if (ValidateDataIntegrity(iter->second)) {
+            return iter->second;
+        }
+    }
+    return filePaths;
+}
+
+bool I18nTimeZone::ValidateDataIntegrity(std::vector<std::string> pathList)
+{
+    size_t total = 0;
+    for (unsigned int i = 0; i < pathList.size(); i++) {
+        std::string path = pathList.at(i);
+        std::string left = path.substr(path.find("-") + 1, 3);
+        std::string right = path.substr(path.find("-") + 4, 3);
+        total += (atoi(right.c_str()) - atoi(left.c_str()));
+    }
+    return total == TZ_X_PLUS * 2;
 }
 
 void I18nTimeZone::SetVersionPathMap(std::string verison, std::string path,
@@ -1151,11 +1167,18 @@ void I18nTimeZone::SetVersionPathMap(std::string verison, std::string path,
 {
     if (pathMap->find(verison) != pathMap->end()) {
         std::vector<std::string> *list = &(pathMap->find(verison)->second);
-        list->insert(list->begin(), path);
+        list->push_back(path);
     } else {
         std::vector<std::string> list;
-        list.insert(list.begin(), path);
+        list.push_back(path);
         pathMap->insert(std::pair<std::string, std::vector<std::string>>(verison, list));
+    }
+}
+
+void I18nTimeZone::CloseFile(FILE *fp)
+{
+    if (fp != nullptr && fp != NULL) {
+        fclose(fp);
     }
 }
 

@@ -253,7 +253,7 @@ ohos_prebuilt_etc("timezones_xml") {
 
 ohos_prebuilt_etc("tz_pixel_dat") {
   source =
-      "//base/global/i18n/frameworks/intl/etc/timezone/tz_2023a-000000360.dat"
+      "//base/global/i18n/frameworks/intl/etc/timezone/tz_2023001-000360.dat"
   module_install_dir = "usr/ohos_timezone/"
   part_name = "i18n"
   subsystem_name = "global"

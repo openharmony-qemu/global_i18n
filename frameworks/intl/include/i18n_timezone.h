@@ -85,12 +85,14 @@ private:
         std::string &parentName);
     static std::vector<int> GetColorData(const int x, const int y, int actualHeight, std::string preferredPath);
     static int InitPngptr(png_structp &png_ptr, png_infop &info_ptr, FILE **fp, std::string preferredPath);
-    static std::vector<std::string> HasHighPrecisionData();
+    static std::vector<std::string> FindTzData();
     static bool ParamExceedScope(const int x, const int y, int fixedX, int fixedY);
     static std::string GetPreferredPath(const double x, std::vector<std::string> filePaths);
     static void SetVersionPathMap(std::string verison, std::string path,
             std::map<std::string, std::vector<std::string>> *pathMap);
-    static void GetTzDataWidth(std::vector<std::string> filePaths, int *width, int *height);
+    static void GetTzDataWidth(std::vector<std::string> filePaths, uint32_t *width, uint32_t *height);
+    static void CloseFile(FILE *fp);
+    static bool ValidateDataIntegrity(std::vector<std::string> pathList);
 };
 } // namespace I18n
 } // namespace Global
