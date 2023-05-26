@@ -233,13 +233,13 @@ bool ZoneUtil::Init()
 CountryResult ZoneUtil::LookupTimezoneByCountryAndNITZ(std::string &region, NITZData &nitzData)
 {
     std::vector<std::string> zones;
-    bool isBoosted = false;
     std::string defaultTimezone;
     std::string systemTimezone = ReadSystemParameter(TIMEZONE_KEY, SYS_PARAM_LEN);
     if (systemTimezone.length() == 0) {
         systemTimezone = DEFAULT_TIMEZONE;
     }
     if (CheckFileExist()) {
+        bool isBoosted = false;
         HiLog::Info(LABEL, "ZoneUtil::LookupTimezoneByCountryAndNITZ use tzlookup.xml");
         GetCountryZones(region, defaultTimezone, isBoosted, zones);
     } else {

@@ -141,11 +141,8 @@ void SystemLocaleManager::SortLocaleItemList(std::vector<LocaleItem> &localeItem
         }
         return false;
     };
-    if (options.isSuggestedFirst) {
-        std::sort(localeItemList.begin(), localeItemList.end(), compareFunc);
-    } else {
-        std::sort(localeItemList.begin(), localeItemList.end(), compareFunc);
-    }
+    
+    std::sort(localeItemList.begin(), localeItemList.end(), compareFunc);
     delete collator;
 }
 } // I18n
