@@ -31,6 +31,7 @@ ohos_unittest("intl_test") {
     "//third_party/icu/icu4c/source/i18n",
     "//third_party/libphonenumber/cpp/src",
     "//third_party/libphonenumber",
+    "//third_party/libpng",
     "//third_party/protobuf/src",
   ]
 
@@ -40,8 +41,6 @@ ohos_unittest("intl_test") {
     "//third_party/googletest:gtest_main",
     "//third_party/icu/icu4c:shared_icui18n",
     "//third_party/icu/icu4c:shared_icuuc",
-    "//third_party/libphonenumber/cpp:phonenumber_standard",
-    "//third_party/libpng:libpng",
   ]
 }
 
