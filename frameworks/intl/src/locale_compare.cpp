@@ -137,7 +137,7 @@ int32_t LocaleCompare::Compare(const std::string& localeTag1, const std::string&
     icu::Locale locale1 = icu::Locale::forLanguageTag(icu::StringPiece(localeTag1), status);
     icu::Locale locale2 = icu::Locale::forLanguageTag(icu::StringPiece(localeTag2), status);
     int32_t segmentScore = 3;
-    int32_t mapScore = 0;
+    const int32_t mapScore = 0;
     int32_t score = 0;
     std::string language1 = locale1.getLanguage();
     std::string language2 = locale2.getLanguage();
