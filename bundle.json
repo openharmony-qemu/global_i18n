@@ -73,8 +73,9 @@
             ],
             "third_party": [
                 "icu",
-                "libxml2",
-                "libphonenumber"
+                "libphonenumber",
+                "libpng",
+                "libxml2"
             ]
         },
         "build": {
