@@ -115,11 +115,13 @@ void SystemLocaleManager::SortLocaleItemList(std::vector<LocaleItem> &localeItem
     std::vector<std::string> collatorLocaleTags { options.localeTag };
     std::map<std::string, std::string> collatorOptions {};
     Collator *collator = new Collator(collatorLocaleTags, collatorOptions);
-    auto compareFunc = [collator](LocaleItem item1, LocaleItem item2) {
-        if (item1.suggestionType < item2.suggestionType) {
-            return false;
-        } else if (item1.suggestionType > item2.suggestionType) {
-            return true;
+    auto compareFunc = [collator, options](LocaleItem item1, LocaleItem item2) {
+        if (options.isSuggestedFirst) {
+            if (item1.suggestionType < item2.suggestionType) {
+                return false;
+            } else if (item1.suggestionType > item2.suggestionType) {
+                return true;
+            }
         }
         CompareResult result = CompareResult::INVALID;
         if (item1.localName.length() != 0) {
@@ -141,7 +143,6 @@ void SystemLocaleManager::SortLocaleItemList(std::vector<LocaleItem> &localeItem
         }
         return false;
     };
-    
     std::sort(localeItemList.begin(), localeItemList.end(), compareFunc);
     delete collator;
 }

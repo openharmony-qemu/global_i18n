@@ -396,33 +396,34 @@ std::map<int, std::string> I18nTimeZone::categoryNum2TimezoneEN {
     { 156, "Europe/Riga" },
     { 157, "Europe/Rome" },
     { 158, "Europe/Samara" },
-    { 159, "Europe/Sarajevo" },
-    { 160, "Europe/Saratov" },
-    { 161, "Europe/Simferopol" },
-    { 162, "Europe/Skopje" },
-    { 163, "Europe/Sofia" },
-    { 164, "Europe/Stockholm" },
-    { 165, "Europe/Tallinn" },
-    { 166, "Europe/Tirane" },
-    { 167, "Europe/Ulyanovsk" },
-    { 168, "Europe/Vaduz" },
-    { 169, "Europe/Vienna" },
-    { 170, "Europe/Vilnius" },
-    { 171, "Europe/Volgograd" },
-    { 172, "Europe/Warsaw" },
-    { 173, "Europe/Zagreb" },
-    { 174, "Europe/Zurich" },
-    { 175, "Indian/Maldives" },
-    { 176, "Pacific/Chuuk" },
-    { 177, "Pacific/Guam" },
-    { 178, "Pacific/Kosrae" },
-    { 179, "Pacific/Kwajalein" },
-    { 180, "Pacific/Majuro" },
-    { 181, "Pacific/Palau" },
-    { 182, "Pacific/Pohnpei" },
-    { 183, "Pacific/Saipan" },
-    { 184, "Pacific/Tarawa" },
-    { 185, "Pacific/Wake" },
+    { 159, "Europe/San_Marino" },
+    { 160, "Europe/Sarajevo" },
+    { 161, "Europe/Saratov" },
+    { 162, "Europe/Simferopol" },
+    { 163, "Europe/Skopje" },
+    { 164, "Europe/Sofia" },
+    { 165, "Europe/Stockholm" },
+    { 166, "Europe/Tallinn" },
+    { 167, "Europe/Tirane" },
+    { 168, "Europe/Ulyanovsk" },
+    { 169, "Europe/Vaduz" },
+    { 170, "Europe/Vienna" },
+    { 171, "Europe/Vilnius" },
+    { 172, "Europe/Volgograd" },
+    { 173, "Europe/Warsaw" },
+    { 174, "Europe/Zagreb" },
+    { 175, "Europe/Zurich" },
+    { 176, "Indian/Maldives" },
+    { 177, "Pacific/Chuuk" },
+    { 178, "Pacific/Guam" },
+    { 179, "Pacific/Kosrae" },
+    { 180, "Pacific/Kwajalein" },
+    { 181, "Pacific/Majuro" },
+    { 182, "Pacific/Palau" },
+    { 183, "Pacific/Pohnpei" },
+    { 184, "Pacific/Saipan" },
+    { 185, "Pacific/Tarawa" },
+    { 186, "Pacific/Wake" },
 };
 std::map<int, std::string> I18nTimeZone::categoryNum2TimezoneWS {
     { 0, "Africa/Johannesburg" },
@@ -892,10 +893,9 @@ std::string I18nTimeZone::GetFallBack(std::string &localeStr)
         return "";
     }
     size_t begin = 0;
-    size_t end = 0;
     std::vector<std::string> localeParts;
     while (true) {
-        end = localeStr.find('_', begin);
+        size_t end = localeStr.find('_', begin);
         localeParts.push_back(localeStr.substr(begin, end - begin));
         if (end == std::string::npos) {
             break;
@@ -991,8 +991,8 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
     }
     uint32_t width, height;
     GetTzDataWidth(filePaths, &width, &height);
-    fixedX = (int)(y * (width / TZ_X_PLUS) + width / 2);
-    fixedY = (int)(x * ((height * pathLen) / (TZ_X_PLUS * 2)) + (height * pathLen) / 2);
+    fixedX = (int)(y * (width / TZ_X_PLUS) + width / TZ_HALF_OF_SIZE);
+    fixedY = (int)(x * ((height * pathLen) / (TZ_X_PLUS * TZ_HALF_OF_SIZE)) + (height * pathLen) / TZ_HALF_OF_SIZE);
     if (ParamExceedScope(fixedX, fixedY, width, height * pathLen)) {
         HiLog::Error(LABEL, "invalid width:%{public}d or height: %{public}d ", fixedX, fixedY);
         return tzIdList;
@@ -1110,7 +1110,7 @@ std::string I18nTimeZone::GetPreferredPath(const double x,
     if (filePaths.size() == 1) {
         return filePaths.at(0);
     } else {
-        int fixedX= (int)(x + TZ_X_PLUS);
+        int fixedX = (int)(x + TZ_X_PLUS);
         for (unsigned int i = 0; i < filePaths.size(); i++) {
             std::string path = filePaths.at(i);
             std::string left = path.substr(path.find("-") + 1, 3);
@@ -1159,7 +1159,7 @@ bool I18nTimeZone::ValidateDataIntegrity(std::vector<std::string> pathList)
         std::string right = path.substr(path.find("-") + 4, 3);
         total += (atoi(right.c_str()) - atoi(left.c_str()));
     }
-    return total == TZ_X_PLUS * 2;
+    return total == TZ_X_PLUS * TZ_HALF_OF_SIZE;
 }
 
 void I18nTimeZone::SetVersionPathMap(std::string verison, std::string path,
