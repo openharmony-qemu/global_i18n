@@ -1161,6 +1161,7 @@ napi_value I18nAddon::GetDisplayLanguageImpl(napi_env env, napi_callback_info in
     std::string value = LocaleConfig::GetDisplayLanguage(localeBuf.data(), displayLocaleBuf.data(), sentenceCase);
     if (value.length() == 0) {
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
+        return nullptr;
     }
     napi_value result = nullptr;
     status = napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &result);
@@ -1222,6 +1223,7 @@ napi_value I18nAddon::GetDisplayCountryImpl(napi_env env, napi_callback_info inf
     std::string value = LocaleConfig::GetDisplayRegion(localeBuf.data(), displayLocaleBuf.data(), sentenceCase);
     if (value.length() == 0) {
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
+        return nullptr;
     }
     napi_value result = nullptr;
     status = napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &result);
@@ -3858,12 +3860,14 @@ napi_value I18nAddon::I18nNormalizerConstructor(napi_env env, napi_callback_info
     }
     if (argv[0] == nullptr) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     
     if (valueType != napi_valuetype::napi_number) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        return nullptr;
     }
     int32_t normalizerMode;
     status = napi_get_value_int32(env, argv[0], &normalizerMode);
@@ -3873,6 +3877,7 @@ napi_value I18nAddon::I18nNormalizerConstructor(napi_env env, napi_callback_info
     if (normalizerMode != NORMALIZER_MODE_NFC && normalizerMode != NORMALIZER_MODE_NFD &&
         normalizerMode != NORMALIZER_MODE_NFKC && normalizerMode != NORMALIZER_MODE_NFKD) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        return nullptr;
     }
 
     std::unique_ptr<I18nAddon> obj = std::make_unique<I18nAddon>();
@@ -3903,12 +3908,14 @@ napi_value I18nAddon::Normalize(napi_env env, napi_callback_info info)
     }
     if (argv[0] == nullptr) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_string) {
         HiLog::Error(LABEL, "Invalid parameter type");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        return nullptr;
     }
     int32_t code = 0;
     std::string text = GetString(env, argv[0], code);
@@ -4011,12 +4018,18 @@ napi_value I18nAddon::GetLanguageInfoArray(napi_env env, napi_callback_info info
     if (status != napi_ok) {
         HiLog::Error(LABEL, "can not obtain getLanguageInfoArray function param.");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        return nullptr;
     }
     std::vector<std::string> languageList;
-    GetStringArrayFromJsParam(env, argv[0], languageList);
+    bool isSuccess = GetStringArrayFromJsParam(env, argv[0], languageList);
+    if (!isSuccess) {
+        return nullptr;
+    }
     SortOptions options;
-    GetSortOptionsFromJsParam(env, argv[1], options);
-
+    isSuccess = GetSortOptionsFromJsParam(env, argv[1], options);
+    if (!isSuccess) {
+        return nullptr;
+    }
     I18nAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->systemLocaleManager_) {
@@ -4038,12 +4051,18 @@ napi_value I18nAddon::getCountryInfoArray(napi_env env, napi_callback_info info)
     if (status != napi_ok) {
         HiLog::Error(LABEL, "can not obtain getCountryInfoArray function param.");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        return nullptr;
     }
     std::vector<std::string> countryList;
-    GetStringArrayFromJsParam(env, argv[0], countryList);
+    bool isSuccess = GetStringArrayFromJsParam(env, argv[0], countryList);
+    if (!isSuccess) {
+        return nullptr;
+    }
     SortOptions options;
-    GetSortOptionsFromJsParam(env, argv[1], options);
-
+    isSuccess = GetSortOptionsFromJsParam(env, argv[1], options);
+    if (!isSuccess) {
+        return nullptr;
+    }
     I18nAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->systemLocaleManager_) {
@@ -4055,17 +4074,19 @@ napi_value I18nAddon::getCountryInfoArray(napi_env env, napi_callback_info info)
     return result;
 }
 
-void I18nAddon::GetStringArrayFromJsParam(napi_env env, napi_value &jsArray, std::vector<std::string> &strArray)
+bool I18nAddon::GetStringArrayFromJsParam(napi_env env, napi_value &jsArray, std::vector<std::string> &strArray)
 {
     if (jsArray == nullptr) {
         HiLog::Error(LABEL, "js string array param not found.");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        return false;
     }
     bool isArray = false;
     napi_status status = napi_is_array(env, jsArray, &isArray);
     if (status != napi_ok || !isArray) {
         HiLog::Error(LABEL, "js string array is not an Array.");
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+        return false;
     }
     uint32_t arrayLength = 0;
     napi_get_array_length(env, jsArray, &arrayLength);
@@ -4077,49 +4098,63 @@ void I18nAddon::GetStringArrayFromJsParam(napi_env env, napi_value &jsArray, std
         if (code != 0) {
             HiLog::Error(LABEL, "can't get string from js array param.");
             ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+            return false;
         }
         strArray.push_back(str);
     }
+    return true;
 }
 
-void I18nAddon::GetSortOptionsFromJsParam(napi_env env, napi_value &jsOptions, SortOptions &options)
+bool I18nAddon::GetSortOptionsFromJsParam(napi_env env, napi_value &jsOptions, SortOptions &options)
 {
     if (jsOptions == nullptr) {
         HiLog::Error(LABEL, "SortOptions js param not found.");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        return false;
     }
     std::string localeTag;
     GetOptionValue(env, jsOptions, "locale", localeTag);
     options.localeTag = localeTag;
     bool isUseLocalName;
-    GetBoolOptionValue(env, jsOptions, "isUseLocalName", isUseLocalName);
+    bool isSuccess = GetBoolOptionValue(env, jsOptions, "isUseLocalName", isUseLocalName);
+    if (!isSuccess) {
+        return false;
+    }
     options.isUseLocalName = isUseLocalName;
     bool isSuggestedFirst;
-    GetBoolOptionValue(env, jsOptions, "isSuggestedFirst", isSuggestedFirst);
+    isSuccess = GetBoolOptionValue(env, jsOptions, "isSuggestedFirst", isSuggestedFirst);
+    if (!isSuccess) {
+        return false;
+    }
     options.isSuggestedFirst = isSuggestedFirst;
+    return true;
 }
 
-void I18nAddon::GetBoolOptionValue(napi_env env, napi_value &options, const std::string &optionName, bool &boolVal)
+bool I18nAddon::GetBoolOptionValue(napi_env env, napi_value &options, const std::string &optionName, bool &boolVal)
 {
     napi_valuetype type = napi_undefined;
     napi_status status = napi_typeof(env, options, &type);
     if (status != napi_ok && type != napi_object) {
         HiLog::Error(LABEL, "option is not an object");
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+        return false;
     }
     bool hasProperty = false;
     status = napi_has_named_property(env, options, optionName.c_str(), &hasProperty);
     if (status != napi_ok || !hasProperty) {
         HiLog::Error(LABEL, "option don't have property %{public}s", optionName.c_str());
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+        return false;
     }
     napi_value optionValue = nullptr;
     status = napi_get_named_property(env, options, optionName.c_str(), &optionValue);
     if (status != napi_ok) {
         HiLog::Error(LABEL, "get option %{public}s failed", optionName.c_str());
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+        return false;
     }
     napi_get_value_bool(env, optionValue, &boolVal);
+    return true;
 }
 
 napi_value I18nAddon::CreateLocaleItemArray(napi_env env, const std::vector<LocaleItem> &localeItemList)
