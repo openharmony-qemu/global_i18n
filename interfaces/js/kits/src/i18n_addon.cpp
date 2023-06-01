@@ -1222,7 +1222,6 @@ napi_value I18nAddon::GetDisplayCountryImpl(napi_env env, napi_callback_info inf
     std::string value = LocaleConfig::GetDisplayRegion(localeBuf.data(), displayLocaleBuf.data(), sentenceCase);
     if (value.length() == 0) {
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
-        return nullptr;
     }
     napi_value result = nullptr;
     status = napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &result);
