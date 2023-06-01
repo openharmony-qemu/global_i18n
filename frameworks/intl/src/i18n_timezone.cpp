@@ -1114,11 +1114,11 @@ int I18nTimeZone::InitPngptr(png_structp &png_ptr, png_infop &info_ptr, FILE **f
 bool I18nTimeZone::CheckTzDataFilePath(std::string filePath)
 {
     char *realpathRes = NULL;
-    /**realpathRes = realpath(filePath.c_str(), nullptr);
+    realpathRes = realpath(filePath.c_str(), nullptr);
     if (realpathRes == NULL) {
         HiLog::Error(LABEL, "zdd:create %{public}s.", filePath.c_str());
         return false;
-    }*/
+    }
     std::ifstream file(filePath.c_str());
     if (!file.good()) {
         HiLog::Error(LABEL, "zdd: create3 %{public}s.", filePath.c_str());
