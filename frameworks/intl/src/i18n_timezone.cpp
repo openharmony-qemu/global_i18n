@@ -992,9 +992,8 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
     }
     uint32_t width, height;
     GetTzDataWidth(filePaths, &width, &height);
-    fixedX = (uint32_t)(y * (width / TZ_X_PLUS) + width / TZ_HALF_OF_SIZE);
-    fixedY = (uint32_t)(x * ((height * pathLen) / (TZ_X_PLUS * TZ_HALF_OF_SIZE)) + (height * pathLen) / TZ_HALF_OF_SIZE);
-    HiLog::Error(LABEL, "invalid width:%{public}d or height: %{public}d ", fixedX, fixedY);
+    fixedX = (uint32_t)(y * (width / (TZ_X_PLUS * 1.0)) + width / (TZ_HALF_OF_SIZE * 1.0));
+    fixedY = (uint32_t)(x * ((height * pathLen) / (TZ_X_PLUS * TZ_HALF_OF_SIZE * 1.0)) + (height * pathLen) / (TZ_HALF_OF_SIZE * 1.0));
     if (ParamExceedScope(fixedX, fixedY, width, height * pathLen)) {
         HiLog::Error(LABEL, "invalid width:%{public}d or height: %{public}d ", fixedX, fixedY);
         return tzIdList;
@@ -1004,7 +1003,7 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
     for (size_t i = 0; i < pixel.size(); i++) {
         if (pixel[i] != TZ_MAX_PIXEL_VALUE && categoryMap.find(pixel[i]) != categoryMap.end()) {
             std::string zdId = categoryMap[pixel[i]];
-            tzIdList.insert(tzIdList.end(), zdId);
+            tzIdList.push_back(zdId);
         }
     }
 #endif
@@ -1040,7 +1039,7 @@ std::vector<int> I18nTimeZone::GetColorData(const int x, const int y, int actual
         }
         for (size_t i = 0; i < 3; i++) { // 3 is RGB color pixel length
             std::string pixel = std::to_string(*(row_pointers + x * 3 + i)); // 3 is RGB color pixel length
-            result.insert(result.begin(), atoi(pixel.c_str()));
+            result.push_back(atoi(pixel.c_str()));
         }
         png_free(png_ptr, row_pointers);
         CloseFile(fp);
@@ -1114,18 +1113,16 @@ int I18nTimeZone::InitPngptr(png_structp &png_ptr, png_infop &info_ptr, FILE **f
 bool I18nTimeZone::CheckTzDataFilePath(std::string filePath)
 {
     char *realpathRes = NULL;
-    /**realpathRes = realpath(filePath.c_str(), nullptr);
+    realpathRes = realpath(filePath.c_str(), nullptr);
     if (realpathRes == NULL) {
-        HiLog::Error(LABEL, "zdd:create %{public}s.", filePath.c_str());
-        return false;
-    }*/
-    std::ifstream file(filePath.c_str());
-    if (!file.good()) {
-        HiLog::Error(LABEL, "zdd: create3 %{public}s.", filePath.c_str());
-        file.close();
         return false;
     }
-    HiLog::Error(LABEL, "zdd:create --------.");
+    std::ifstream file(filePath.c_str());
+    if (!file.good()) {
+        file.close();
+        free(realpathRes);
+        return false;
+    }
     file.close();
     free(realpathRes);
     realpathRes = NULL;
