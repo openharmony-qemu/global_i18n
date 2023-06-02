@@ -107,7 +107,7 @@ std::map<int, std::string> I18nTimeZone::categoryNum2TimezoneWN {
     { 34, "America/Cayman" },
     { 35, "America/Chicago" },
     { 36, "America/Chihuahua" },
-    { 37, "America/Mexico_City" },// old data is 'America/Ciudad_Juarez'
+    { 37, "America/Mexico_City" }, // old data is 'America/Ciudad_Juarez'
     { 38, "America/Costa_Rica" },
     { 39, "America/Creston" },
     { 40, "America/Curacao" },
