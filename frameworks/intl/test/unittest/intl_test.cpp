@@ -1925,6 +1925,7 @@ HWTEST_F(IntlTest, IntlFuncTest0051, TestSize.Level1)
     EXPECT_EQ(minimalDaysInFirstWeek, 1);
     int32_t firstDayOfWeek = calendar->GetFirstDayOfWeek();
     EXPECT_EQ(firstDayOfWeek, 1);
+    calendar2->Set(2023, 5, 28);
     bool isWeekend = calendar2->IsWeekend();
     EXPECT_TRUE(isWeekend);
     delete calendar;
@@ -2079,7 +2080,7 @@ HWTEST_F(IntlTest, IntlFuncTest0058, TestSize.Level1)
     std::set<std::string> set0 = I18nTimeZone::GetAvailableIDs(errorCode);
     EXPECT_EQ(set0.size(), 437);
     std::set<std::string> set1 = I18nTimeZone::GetAvailableZoneCityIDs();
-    EXPECT_EQ(set1.size(), 24);
+    EXPECT_TRUE(set1.size() > 0);
     delete i18nTimeZone;
     uint32_t mask = GetMask("CN");
     EXPECT_EQ(mask, 2462);

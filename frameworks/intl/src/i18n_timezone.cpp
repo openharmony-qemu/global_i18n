@@ -36,6 +36,7 @@
 #include "unicode/unistr.h"
 #include "utils.h"
 #include <cstdio>
+#include <cstdlib>
 #include <iostream>
 #include <regex>
 
@@ -106,7 +107,7 @@ std::map<int, std::string> I18nTimeZone::categoryNum2TimezoneWN {
     { 34, "America/Cayman" },
     { 35, "America/Chicago" },
     { 36, "America/Chihuahua" },
-    { 37, "America/Mexico_City" },// old data is 'America/Ciudad_Juarez'
+    { 37, "America/Mexico_City" }, // old data is 'America/Ciudad_Juarez'
     { 38, "America/Costa_Rica" },
     { 39, "America/Creston" },
     { 40, "America/Curacao" },
@@ -970,7 +971,7 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
     std::vector<std::string> tzIdList;
 #ifdef SUPPORT_GRAPHICS
     std::map<int, std::string> categoryMap;
-    int fixedX, fixedY;
+    uint32_t fixedX, fixedY;
     if (x < 0 && y >= 0) {
         categoryMap = categoryNum2TimezoneWN;
     } else if (x >= 0 && y >= 0) {
@@ -981,7 +982,7 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
         categoryMap = categoryNum2TimezoneES;
     }
     std::vector<std::string> filePaths = FindTzData();
-    int pathLen = filePaths.size();
+    uint32_t pathLen = filePaths.size();
     if (pathLen < 1) {
         return tzIdList;
     }
@@ -991,18 +992,18 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
     }
     uint32_t width, height;
     GetTzDataWidth(filePaths, &width, &height);
-    fixedX = (int)(y * (width / TZ_X_PLUS) + width / TZ_HALF_OF_SIZE);
-    fixedY = (int)(x * ((height * pathLen) / (TZ_X_PLUS * TZ_HALF_OF_SIZE)) + (height * pathLen) / TZ_HALF_OF_SIZE);
+    fixedX = (uint32_t)(y * (width / (TZ_X_PLUS * 1.0)) + width / (TZ_HALF_OF_SIZE * 1.0));
+    fixedY = (uint32_t)(x * ((height * pathLen) / (TZ_X_PLUS * TZ_HALF_OF_SIZE * 1.0)) + (height * pathLen) / (TZ_HALF_OF_SIZE * 1.0));
     if (ParamExceedScope(fixedX, fixedY, width, height * pathLen)) {
         HiLog::Error(LABEL, "invalid width:%{public}d or height: %{public}d ", fixedX, fixedY);
         return tzIdList;
     }
-    int actualHeight = pathLen > 1 ? (fixedY % height) : fixedY;
+    uint32_t actualHeight = pathLen > 1 ? (fixedY % height) : fixedY;
     std::vector<int> pixel = GetColorData(fixedX, fixedY, actualHeight, preferredPath);
     for (size_t i = 0; i < pixel.size(); i++) {
         if (pixel[i] != TZ_MAX_PIXEL_VALUE && categoryMap.find(pixel[i]) != categoryMap.end()) {
             std::string zdId = categoryMap[pixel[i]];
-            tzIdList.insert(tzIdList.end(), zdId);
+            tzIdList.push_back(zdId);
         }
     }
 #endif
@@ -1038,7 +1039,7 @@ std::vector<int> I18nTimeZone::GetColorData(const int x, const int y, int actual
         }
         for (size_t i = 0; i < 3; i++) { // 3 is RGB color pixel length
             std::string pixel = std::to_string(*(row_pointers + x * 3 + i)); // 3 is RGB color pixel length
-            result.insert(result.begin(), atoi(pixel.c_str()));
+            result.push_back(atoi(pixel.c_str()));
         }
         png_free(png_ptr, row_pointers);
         CloseFile(fp);
@@ -1051,7 +1052,8 @@ std::vector<int> I18nTimeZone::GetColorData(const int x, const int y, int actual
 
 void I18nTimeZone::GetTzDataWidth(std::vector<std::string> filePaths, uint32_t *width, uint32_t *height)
 {
-    if (filePaths.size() == 0) {
+    std::string path = filePaths.at(0);
+    if (filePaths.size() == 0 || !CheckTzDataFilePath(path)) {
         *width = 0;
         *height = 0;
     } else {
@@ -1059,7 +1061,6 @@ void I18nTimeZone::GetTzDataWidth(std::vector<std::string> filePaths, uint32_t *
         png_structp png_ptr;
         png_infop info_ptr;
         try {
-            std::string path = filePaths.at(0);
             fp = fopen(path.c_str(), "rb");
             png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
             info_ptr = png_create_info_struct(png_ptr);
@@ -1082,6 +1083,11 @@ void I18nTimeZone::GetTzDataWidth(std::vector<std::string> filePaths, uint32_t *
 int I18nTimeZone::InitPngptr(png_structp &png_ptr, png_infop &info_ptr, FILE **fp,
                              std::string preferredPath)
 {
+    bool validFilePath = CheckTzDataFilePath(preferredPath);
+    if (!validFilePath) {
+        HiLog::Error(LABEL, "timezone data filepath invalid.");
+        return 1;
+    }
     *fp = fopen(preferredPath.c_str(), "rb");
     if (*fp == NULL) {
         HiLog::Error(LABEL, "timezone data resource file not exists.");
@@ -1104,13 +1110,32 @@ int I18nTimeZone::InitPngptr(png_structp &png_ptr, png_infop &info_ptr, FILE **f
     return 0;
 }
 
+bool I18nTimeZone::CheckTzDataFilePath(std::string filePath)
+{
+    char *realpathRes = NULL;
+    realpathRes = realpath(filePath.c_str(), nullptr);
+    if (realpathRes == NULL) {
+        return false;
+    }
+    std::ifstream file(filePath.c_str());
+    if (!file.good()) {
+        file.close();
+        free(realpathRes);
+        return false;
+    }
+    file.close();
+    free(realpathRes);
+    realpathRes = NULL;
+    return true;
+}
+
 std::string I18nTimeZone::GetPreferredPath(const double x,
                                             std::vector<std::string> filePaths)
 {
     if (filePaths.size() == 1) {
         return filePaths.at(0);
     } else {
-        int fixedX = (int)(x + TZ_X_PLUS);
+        uint32_t fixedX = (uint32_t)(x + TZ_X_PLUS);
         for (unsigned int i = 0; i < filePaths.size(); i++) {
             std::string path = filePaths.at(i);
             std::string left = path.substr(path.find("-") + 1, 3);
@@ -1157,7 +1182,7 @@ bool I18nTimeZone::ValidateDataIntegrity(std::vector<std::string> pathList)
         std::string path = pathList.at(i);
         std::string left = path.substr(path.find("-") + 1, 3);
         std::string right = path.substr(path.find("-") + 4, 3);
-        total += (atoi(right.c_str()) - atoi(left.c_str()));
+        total += abs(atoi(right.c_str()) - atoi(left.c_str()));
     }
     return total == TZ_X_PLUS * TZ_HALF_OF_SIZE;
 }

@@ -94,6 +94,7 @@ private:
     static void GetTzDataWidth(std::vector<std::string> filePaths, uint32_t *width, uint32_t *height);
     static void CloseFile(FILE *fp);
     static bool ValidateDataIntegrity(std::vector<std::string> pathList);
+    static bool CheckTzDataFilePath(std::string filePath);
 };
 } // namespace I18n
 } // namespace Global
