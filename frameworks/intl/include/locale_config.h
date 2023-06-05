@@ -83,12 +83,24 @@ private:
     static const char *FORBIDDEN_LANGUAGES_PATH;
     static const char *FORBIDDEN_LANGUAGES_NAME;
     static const char *SUPPORT_LOCALES_PATH;
+    static const char *SUPPORT_LOCALES_NAME;
     static const char *DEFAULT_LOCALE;
     static const char *supportLocalesTag;
     static const char *LANG_PATH;
     static const char *rootTag;
     static const char *secondRootTag;
+    static const char *rootRegion;
+    static const char *secondRootRegion;
     static const uint32_t ELEMENT_NUM = 2;
+
+    static const char *SUPPORTED_LANGUAGE_EN_LATN_PATH;
+    static const char *SUPPORTED_LANGUAGE_EN_LATN_NAME;
+
+    static const char *OVERRIDE_SUPPORTED_REGIONS_NAME;
+    static const char *OVERRIDE_SUPPORTED_REGIONS_PATH;
+    static const char *DIALECT_LANGS_PATH;
+    static const char *DIALECT_LANGS_NAME;
+    static const char *REGION_PATH;
 
     static const std::unordered_set<std::string>& GetSupportedLocales();
     static const std::unordered_set<std::string>& GetForbiddenRegions();
@@ -101,11 +113,16 @@ private:
     static void Expunge(std::unordered_set<std::string> &src, const std::unordered_set<std::string> &another);
     static std::string GetMainLanguage(const std::string &language);
     static std::string GetDsiplayLanguageWithDialect(const std::string &language, const std::string &displayLocale);
+    static std::string GetDisplayOverrideRegion(const std::string &region, const std::string &displayLocale);
     static std::string ComputeLocale(const std::string &displayLocale);
     static void ReadLangData(const char *langDataPath);
+    static void ReadRegionData(const char *regionDataPath);
     static void ProcessForbiddenRegions(const std::unordered_set<std::string> &forbiddenRegions);
     static std::unordered_set<std::string> supportedLocales;
     static std::unordered_set<std::string> supportedRegions;
+    static std::unordered_set<std::string> supportLocales;
+    static std::unordered_set<std::string> dialectLang;
+    static std::unordered_set<std::string> overrideSupportedRegions;
     static std::unordered_set<std::string> blockedLanguages;
     static std::unordered_set<std::string> blockedRegions;
     static std::unordered_map<std::string, std::unordered_set<std::string>> blockedLanguageRegions;
@@ -114,14 +131,15 @@ private:
     static std::unordered_map<std::string, std::string> dialectMap;
     static std::unordered_map<std::string, std::string> localDigitMap;
     static std::map<std::string, std::string> locale2DisplayName;
+    static std::map<std::string, std::string> region2DisplayName;
     static std::string currentDialectLocale;
+    static std::string currentOverrideRegion;
     static std::set<std::string> validCaTag;
     static std::set<std::string> validCoTag;
     static std::set<std::string> validKnTag;
     static std::set<std::string> validKfTag;
     static std::set<std::string> validNuTag;
     static std::set<std::string> validHcTag;
-    static std::set<std::string> dialectLang;
     static bool listsInitialized;
     static bool InitializeLists();
 };
