@@ -200,11 +200,6 @@ set<std::string> LocaleConfig::validHcTag {
     "h11",
     "h24",
 };
-// set<std::string> LocaleConfig::dialectLang {
-//     "zh",
-//     "ro",
-//     "fa",
-// };
 
 static unordered_map<string, string> g_languageMap = {
     { "zh-Hans", "zh-Hans" },
@@ -640,9 +635,6 @@ void LocaleConfig::GetListFromFile(const char *path, const char *resourceName, u
         } else {
             break;
         }
-    }
-    for (auto it = ret.begin(); it != ret.end(); it++) {
-        HiLog::Info(LABEL, "dyh   ret: %{public}s", it->c_str());
     }
     xmlFreeDoc(doc);
 }
