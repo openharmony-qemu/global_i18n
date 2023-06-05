@@ -134,7 +134,6 @@ private:
     static std::map<std::string, std::string> region2DisplayName;
     static std::string currentDialectLocale;
     static std::string currentOverrideRegion;
-    // static std::string currentRegion;
     static std::set<std::string> validCaTag;
     static std::set<std::string> validCoTag;
     static std::set<std::string> validKnTag;
