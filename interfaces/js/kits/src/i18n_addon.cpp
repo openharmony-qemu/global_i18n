@@ -3943,7 +3943,7 @@ napi_value I18nAddon::InitSystemLocaleManager(napi_env env, napi_value exports)
     napi_status status = napi_ok;
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("getLanguageInfoArray", GetLanguageInfoArray),
-        DECLARE_NAPI_FUNCTION("getCountryInfoArray", getCountryInfoArray)
+        DECLARE_NAPI_FUNCTION("getRegionInfoArray", getCountryInfoArray)
     };
 
     napi_value constructor = nullptr;
