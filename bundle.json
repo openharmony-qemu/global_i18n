@@ -1,5 +1,5 @@
 {
-    "name": "@ohos/global_i18n",
+    "name": "@ohos/i18n",
     "version": "1.0.0",
     "description": "Provides internationalization APIS for implementing functions such date and time formatting.",
     "homePage": "https://gitee.com/openharmony/",
@@ -54,22 +54,14 @@
                 "ability_base",
                 "ability_runtime",
                 "access_token",
-                "ace_napi",
-                "base",
                 "bundle_framework",
-                "common",
                 "c_utils",
                 "hiviewdfx_hilog_native",
                 "init",
                 "ipc",
-                "ipc_core",
-                "libaccesstoken_sdk",
-                "libhilog",
                 "napi",
                 "resource_management",
-                "samgr",
-                "tel_core_service_api",
-                "utils"
+                "samgr"
             ],
             "third_party": [
                 "icu",
