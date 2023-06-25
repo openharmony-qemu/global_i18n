@@ -16,6 +16,7 @@
 #include "locale_config_test.h"
 #include <gtest/gtest.h>
 #include "locale_config.h"
+#include "locid.h"
 #include "parameter.h"
 
 using namespace OHOS::Global::I18n;
@@ -141,7 +142,56 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest007, TestSize.Level1)
  */
 HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest008, TestSize.Level1)
 {
-    EXPECT_EQ(LocaleConfig::GetDisplayLanguage("pt", "zh-Hans-CN", true), "葡萄牙语");
+    std::string languageTag = "pt";
+    std::string localeTag = "en-US";
+    std::string displayName = LocaleConfig::GetDisplayLanguage(languageTag, localeTag, true);
+    EXPECT_EQ(displayName, "Portuguese");
+
+    displayName = LocaleConfig::GetDisplayLanguage(languageTag, localeTag, false);
+    EXPECT_EQ(displayName, "Portuguese");
+
+    std::string fakeLocaleTag = "FakeLocaleTag";
+    displayName = LocaleConfig::GetDisplayLanguage(languageTag, fakeLocaleTag, true);
+    EXPECT_EQ(displayName, "");
+
+    std::string fakeLanguageTag = "FakeLanguageTag";
+    displayName = LocaleConfig::GetDisplayLanguage(fakeLanguageTag, localeTag, true);
+    EXPECT_EQ(displayName, "");
+
+    languageTag = "zh-Hans-CN";
+    localeTag = "en-US";
+    displayName = LocaleConfig::GetDisplayLanguage(languageTag, localeTag, false);
+    EXPECT_EQ(displayName, "Simplified Chinese");
+    
+    displayName = LocaleConfig::GetDisplayLanguage(languageTag, localeTag, true);
+    EXPECT_EQ(displayName, "Simplified Chinese");
+
+    displayName = LocaleConfig::GetDisplayLanguage(languageTag, fakeLocaleTag, false);
+    EXPECT_EQ(displayName, "");
+
+    languageTag = "pt-Latn-BR";
+    displayName = LocaleConfig::GetDisplayLanguage(languageTag, localeTag, false);
+    EXPECT_EQ(displayName, "Portuguese (Brazil)");
+
+    displayName = LocaleConfig::GetDisplayLanguage(languageTag, fakeLocaleTag, false);
+    EXPECT_EQ(displayName, "");
+
+    languageTag = "zh";
+    displayName = LocaleConfig::GetDisplayLanguage(languageTag, localeTag, true);
+    EXPECT_EQ(displayName, "Chinese");
+
+    localeTag = "en-Hans";
+    displayName = LocaleConfig::GetDisplayLanguage(languageTag, localeTag, true);
+    EXPECT_EQ(displayName, "Chinese");
+
+    languageTag = "zh-Hans";
+    localeTag = "en-US";
+    displayName = LocaleConfig::GetDisplayLanguage(languageTag, localeTag, true);
+    EXPECT_EQ(displayName, "Simplified Chinese");
+
+    languageTag = "ro-MD";
+    displayName = LocaleConfig::GetDisplayLanguage(languageTag, localeTag, true);
+    EXPECT_EQ(displayName, "Moldavian");
 }
 
 /**
@@ -151,7 +201,30 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest008, TestSize.Level1)
  */
 HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest009, TestSize.Level1)
 {
-    EXPECT_EQ(LocaleConfig::GetDisplayRegion("JP", "zh-Hans-CN", false), "日本");
+    std::string regionTag = "JP";
+    std::string localeTag = "zh-Hans-CN";
+    std::string displayName = LocaleConfig::GetDisplayRegion(regionTag, localeTag, false);
+    EXPECT_EQ(displayName, "日本");
+
+    std::string fakeRegionTag = "XX";
+    displayName = LocaleConfig::GetDisplayRegion(fakeRegionTag, localeTag, false);
+    EXPECT_EQ(displayName, "XX");
+
+    std::string fakeLocaleTag = "FakeLocaleTag";
+    displayName = LocaleConfig::GetDisplayRegion(regionTag, fakeLocaleTag, false);
+    EXPECT_EQ(displayName, "");
+
+    localeTag = "en-Latn-US";
+    displayName = LocaleConfig::GetDisplayRegion(regionTag, localeTag, false);
+    EXPECT_EQ(displayName, "Japan");
+
+    regionTag = "zh-Hans-CN";
+    displayName = LocaleConfig::GetDisplayRegion(regionTag, localeTag, false);
+    EXPECT_EQ(displayName, "China");
+
+    regionTag = "HK";
+    displayName = LocaleConfig::GetDisplayRegion(regionTag, localeTag, false);
+    EXPECT_EQ(displayName, "Hong Kong, China");
 }
 
 /**
@@ -256,6 +329,9 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest017, TestSize.Level1)
     string region = "CN";
     isSuggested = LocaleConfig::IsSuggested(language, region);
     EXPECT_TRUE(isSuggested);
+    std::string fakeLanguage = "FakeLanguage";
+    isSuggested = LocaleConfig::IsSuggested(fakeLanguage);
+    EXPECT_FALSE(isSuggested);
 }
 
 /**

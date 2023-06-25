@@ -56,7 +56,6 @@ public:
 
 private:
     static bool IsValidLanguage(const std::string &language);
-    static bool IsValidScript(const std::string &script);
     static bool IsValidRegion(const std::string &region);
     static bool IsValidTag(const std::string &tag);
     static void Split(const std::string &src, const std::string &sep, std::vector<std::string> &dest);
