@@ -43,7 +43,7 @@ ohos_shared_library("intl") {
     "//third_party/icu/icu4c:shared_icuuc",
   ]
   external_deps = [
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "napi:ace_napi",
   ]
   relative_install_dir = "module"
@@ -80,7 +80,7 @@ ohos_shared_library("i18n") {
     "//third_party/icu/icu4c:shared_icuuc",
   ]
   external_deps = [
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "napi:ace_napi",
   ]
   relative_install_dir = "module"
