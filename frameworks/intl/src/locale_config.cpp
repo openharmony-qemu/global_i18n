@@ -229,36 +229,6 @@ string Adjust(const string &origin)
     return origin;
 }
 
-int32_t GetDialectName(const char *localeName, char *name, size_t nameCapacity, UErrorCode &status)
-{
-    icu::Locale locale = icu::Locale::forLanguageTag(localeName, status);
-    if (status != U_ZERO_ERROR) {
-        return 0;
-    }
-    const char *lang = locale.getLanguage();
-    const char *script = locale.getScript();
-    const char *country = locale.getCountry();
-    bool hasScript = (script != nullptr) && strlen(script) > 0;
-    bool hasCountry = (country != nullptr) && strlen(country) > 0;
-    string temp = lang;
-    if (hasScript && hasCountry) {
-        temp.append("_");
-        temp.append(script);
-        temp.append("_");
-        temp.append(country);
-    } else if (hasScript) {
-        temp.append("_");
-        temp.append(script);
-    } else if (hasCountry) {
-        temp.append("_");
-        temp.append(country);
-    }
-    if (strcpy_s(name, nameCapacity, temp.data()) != EOK) {
-        return 0;
-    }
-    return temp.size();
-}
-
 string GetDisplayLanguageInner(const string &language, const string &displayLocaleTag, bool sentenceCase)
 {
     icu::UnicodeString unistr;
@@ -450,24 +420,6 @@ bool LocaleConfig::IsValidLanguage(const string &language)
     }
     for (size_t i = 0; i < size; ++i) {
         if ((language[i] > 'z') || (language[i] < 'a')) {
-            return false;
-        }
-    }
-    return true;
-}
-
-bool LocaleConfig::IsValidScript(const string &script)
-{
-    string::size_type size = script.size();
-    if (size != LocaleInfo::SCRIPT_LEN) {
-        return false;
-    }
-    char first = script[0];
-    if ((first < 'A') || (first > 'Z')) {
-        return false;
-    }
-    for (string::size_type i = 1; i < LocaleInfo::SCRIPT_LEN; ++i) {
-        if ((script[i] > 'z') || (script[i] < 'a')) {
             return false;
         }
     }
