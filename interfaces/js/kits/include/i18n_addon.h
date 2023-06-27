@@ -108,6 +108,7 @@ public:
     static napi_value InitI18nNormalizer(napi_env env, napi_value exports);
     static napi_value InitSystemLocaleManager(napi_env env, napi_value exports);
     static napi_value GetTimezonesByLocation(napi_env env, napi_callback_info info);
+    static napi_value GetTimeZoneCityInfoArray(napi_env env, napi_callback_info info);
 
 private:
     static napi_value PhoneNumberFormatConstructor(napi_env env, napi_callback_info info);
@@ -209,7 +210,10 @@ private:
     static bool GetBoolOptionValue(napi_env env, napi_value &options, const std::string &optionName, bool &boolVal);
     static napi_value CreateLocaleItemArray(napi_env env, const std::vector<LocaleItem> &localeItemList);
     static napi_value CreateLocaleItem(napi_env env, const LocaleItem &localeItem);
+    static napi_value CreateTimeZoneCityItemArray(napi_env env, const std::vector<TimeZoneCityItem> &timezoneCityItemList);
+    static napi_value CreateTimeZoneCityItem(napi_env env, const TimeZoneCityItem &timezoneCityItem);
     static napi_value CreateString(napi_env env, const std::string &str);
+    static napi_value CreateNumber(napi_env env, const int32_t &num);
     static napi_value CreateSuggestionType(napi_env env, SuggestionType suggestionType);
 
     static const int32_t NORMALIZER_MODE_NFC = 1;
