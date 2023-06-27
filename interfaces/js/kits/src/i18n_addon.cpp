@@ -4095,7 +4095,7 @@ napi_value I18nAddon::getCountryInfoArray(napi_env env, napi_callback_info info)
 
 napi_value I18nAddon::GetTimeZoneCityInfoArray(napi_env env, napi_callback_info info)
 {
-    std::vector<TimeZoneCityItem> timzoneCityItemList = SystemLocaleManager::GetTimezoneCityInfoArray();
+    std::vector<TimeZoneCityItem> timezoneCityItemList = SystemLocaleManager::GetTimezoneCityInfoArray();
     napi_value result = nullptr;
     napi_status status = napi_create_array_with_length(env, timezoneCityItemList.size(), &result);
     if (status != napi_ok) {
