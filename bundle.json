@@ -56,7 +56,7 @@
                 "access_token",
                 "bundle_framework",
                 "c_utils",
-                "hiviewdfx_hilog_native",
+                "hilog",
                 "init",
                 "ipc",
                 "napi",
