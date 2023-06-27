@@ -109,11 +109,11 @@ public:
      *
      * @return std::vector<TimeZoneCityItem> sort result.
      */
-    std::vector<TimeZoneCityItem> GetTimezoneCityInfoArray();
+    static std::vector<TimeZoneCityItem> GetTimezoneCityInfoArray();
 
 private:
     void SortLocaleItemList(std::vector<LocaleItem> &localeItemList, const SortOptions &options);
-    void SortTimezoneCityItemList(std::vector<TimeZoneCityItem> &timezoneCityItemList);
+    static void SortTimezoneCityItemList(std::vector<TimeZoneCityItem> &timezoneCityItemList);
     std::unique_ptr<TabooUtils> tabooUtils;
     static const char* SIM_COUNTRY_CODE_KEY;
     static constexpr int CONFIG_LEN = 128;
