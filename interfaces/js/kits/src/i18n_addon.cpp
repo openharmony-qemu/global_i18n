@@ -131,6 +131,30 @@ napi_value I18nAddon::CreateUnicodeObject(napi_env env, napi_status &initStatus)
     return character;
 }
 
+napi_value I18nAddon::CreateSystemLocaleManagerObject(napi_env env, napi_status &initStatus)
+{
+    napi_status status = napi_ok;
+    napi_value systemLocaleManager = nullptr;
+    status = napi_create_object(env, &systemLocaleManager);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "Failed to create SystemLocaleManager object at init");
+        initStatus = napi_generic_failure;
+        return nullptr;
+    }
+    napi_property_descriptor properties[] = {
+        DECLARE_NAPI_FUNCTION("getTimeZoneCityInfoArray", GetTimeZoneCityInfoArray)
+    };
+    status = napi_define_properties(env, systemLocaleManager,
+                                    sizeof(properties) / sizeof(napi_property_descriptor),
+                                    properties);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "Failed to set SystemLocaleManager of character at init");
+        initStatus = napi_generic_failure;
+        return nullptr;
+    }
+    return systemLocaleManager;
+}
+
 napi_value I18nAddon::CreateI18nUtilObject(napi_env env, napi_status &initStatus)
 {
     napi_value i18nUtil = nullptr;
@@ -256,7 +280,8 @@ napi_value I18nAddon::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("TimeZone", CreateTimeZoneObject(env, initStatus)),
         DECLARE_NAPI_PROPERTY("System", CreateSystemObject(env, initStatus)),
         DECLARE_NAPI_PROPERTY("Normalizer", CreateI18nNormalizerObject(env, initStatus)),
-        DECLARE_NAPI_PROPERTY("NormalizerMode", CreateI18NNormalizerModeEnum(env, initStatus))
+        DECLARE_NAPI_PROPERTY("NormalizerMode", CreateI18NNormalizerModeEnum(env, initStatus)),
+        DECLARE_NAPI_PROPERTY("SystemLocaleManager", CreateSystemLocaleManagerObject(env, initStatus))
     };
     initStatus = napi_define_properties(env, exports, sizeof(properties) / sizeof(napi_property_descriptor),
         properties);
@@ -4068,6 +4093,71 @@ napi_value I18nAddon::getCountryInfoArray(napi_env env, napi_callback_info info)
     return result;
 }
 
+napi_value I18nAddon::GetTimeZoneCityInfoArray(napi_env env, napi_callback_info info)
+{
+    std::vector<TimeZoneCityItem> timezoneCityItemList = SystemLocaleManager::GetTimezoneCityInfoArray();
+    napi_value result = nullptr;
+    napi_status status = napi_create_array_with_length(env, timezoneCityItemList.size(), &result);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "create TimeZoneCityItem array failed.");
+        return nullptr;
+    }
+    for (size_t i = 0; i < timezoneCityItemList.size(); ++i) {
+        napi_value item = CreateTimeZoneCityItem(env, timezoneCityItemList[i]);
+        status = napi_set_element(env, result, i, item);
+        if (status != napi_ok) {
+            HiLog::Error(LABEL, "Failed to set TimeZoneCityItem element.");
+            return nullptr;
+        }
+    }
+    return result;
+}
+
+napi_value I18nAddon::CreateTimeZoneCityItem(napi_env env, const TimeZoneCityItem &timezoneCityItem)
+{
+    napi_value result;
+    napi_status status = napi_create_object(env, &result);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "Create Locale Item object failed.");
+        return nullptr;
+    }
+    status = napi_set_named_property(env, result, "zoneId", CreateString(env, timezoneCityItem.zoneId));
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "Failed to set element zoneId.");
+        return nullptr;
+    }
+    status = napi_set_named_property(env, result, "cityId", CreateString(env, timezoneCityItem.cityId));
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "Failed to set element cityId.");
+        return nullptr;
+    }
+    if (timezoneCityItem.cityDisplayName.length() != 0) {
+        status = napi_set_named_property(env, result, "cityDisplayName", CreateString(env, timezoneCityItem.cityDisplayName));
+        if (status != napi_ok) {
+            HiLog::Error(LABEL, "Failed to set element cityDisplayName.");
+            return nullptr;
+        }
+    }
+    status = napi_set_named_property(env, result, "offset", CreateNumber(env, timezoneCityItem.offset));
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "Failed to set element offset.");
+        return nullptr;
+    }
+    status = napi_set_named_property(env, result, "zoneDisplayName", CreateString(env, timezoneCityItem.zoneDisplayName));
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "Failed to set element zoneDisplayName.");
+        return nullptr;
+    }
+    if (timezoneCityItem.rawOffset != 0) {
+        status = napi_set_named_property(env, result, "rawOffset", CreateNumber(env, timezoneCityItem.rawOffset));
+        if (status != napi_ok) {
+            HiLog::Error(LABEL, "Failed to set element rawOffset.");
+            return nullptr;
+        }
+    }
+    return result;
+}
+
 bool I18nAddon::GetStringArrayFromJsParam(napi_env env, napi_value &jsArray, std::vector<std::string> &strArray)
 {
     if (jsArray == nullptr) {
@@ -4210,6 +4300,17 @@ napi_value I18nAddon::CreateString(napi_env env, const std::string &str)
     napi_status status = napi_create_string_utf8(env, str.c_str(), NAPI_AUTO_LENGTH, &result);
     if (status != napi_ok) {
         HiLog::Error(LABEL, "create string js variable failed.");
+        return nullptr;
+    }
+    return result;
+}
+
+napi_value I18nAddon::CreateNumber(napi_env env, const int32_t &num)
+{
+    napi_value result;
+    napi_status status = napi_create_int32(env, num, &result);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "create number js variable failed.");
         return nullptr;
     }
     return result;

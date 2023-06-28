@@ -16,7 +16,10 @@
 #include "hilog/log.h"
 #include "locale_config.h"
 #include "system_locale_manager.h"
+#include "unicode/calendar.h"
+#include "unicode/timezone.h"
 #include "utils.h"
+#include "i18n_timezone.h"
 
 namespace OHOS {
 namespace Global {
@@ -144,6 +147,58 @@ void SystemLocaleManager::SortLocaleItemList(std::vector<LocaleItem> &localeItem
         return false;
     };
     std::sort(localeItemList.begin(), localeItemList.end(), compareFunc);
+    delete collator;
+}
+
+std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray()
+{
+    std::set<std::string> zoneCityIds = I18nTimeZone::GetAvailableZoneCityIDs();
+    std::string locale = LocaleConfig::GetSystemLocale();
+    std::vector<TimeZoneCityItem> result;
+    std::map<std::string, icu::TimeZone*> tzMap;
+    for (auto it = zoneCityIds.begin(); it != zoneCityIds.end(); ++it) {
+        std::string cityId = *it;
+        std::unique_ptr<I18nTimeZone> i18nTimezone = I18nTimeZone::CreateInstance(cityId, false);
+        std::string cityDisplayName = I18nTimeZone::GetCityDisplayName(cityId, locale);
+        int32_t rawOffset = 0;
+        int32_t dstOffset = 0;
+        bool local = false;
+        UErrorCode status = U_ZERO_ERROR;
+        UDate date = icu::Calendar::getNow();
+        std::string timezoneId = i18nTimezone->GetID();
+        if (tzMap.find(timezoneId) != tzMap.end()) {
+            icu::TimeZone *icuTimeZone = tzMap.find(timezoneId)->second;
+            icuTimeZone->getOffset(date, (UBool)local, rawOffset, dstOffset, status);
+        } else {
+            icu::UnicodeString unicodeString = icu::UnicodeString::fromUTF8(timezoneId);
+            icu::TimeZone *icuTimeZone = icu::TimeZone::createTimeZone(unicodeString);
+            icuTimeZone->getOffset(date, (UBool)local, rawOffset, dstOffset, status);
+            tzMap.insert({timezoneId, icuTimeZone});
+        }
+        struct TimeZoneCityItem tzCityItem = {timezoneId, cityId, cityDisplayName, dstOffset + rawOffset, "", rawOffset};
+        result.push_back(tzCityItem);
+    }
+    SortTimezoneCityItemList(result);
+    return result;
+}
+
+void SystemLocaleManager::SortTimezoneCityItemList(std::vector<TimeZoneCityItem> &timezoneCityItemList)
+{
+    std::vector<std::string> collatorLocaleTags {};
+    std::map<std::string, std::string> collatorOptions {};
+    Collator *collator = new Collator(collatorLocaleTags, collatorOptions);
+    auto sortFunc = [collator](TimeZoneCityItem item1, TimeZoneCityItem item2) {
+        CompareResult result = CompareResult::INVALID;
+        result = collator->Compare(item1.cityDisplayName, item2.cityDisplayName);
+        if (result == CompareResult::SMALLER) {
+            return true;
+        }
+        if (result == CompareResult::INVALID) {
+            HiLog::Error(LABEL, "SystemLocaleManager: invalid compare result for city display name.");
+        }
+        return false;
+    };
+    std::sort(timezoneCityItemList.begin(), timezoneCityItemList.end(), sortFunc);
     delete collator;
 }
 } // I18n

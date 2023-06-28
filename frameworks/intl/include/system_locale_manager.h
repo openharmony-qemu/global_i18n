@@ -60,6 +60,26 @@ struct SortOptions {
     bool isSuggestedFirst;
 };
 
+struct TimeZoneCityItem {
+    // time zone code
+    std::string zoneId;
+
+    //city code
+    std::string cityId;
+
+    //the display name of city
+    std::string cityDisplayName;
+
+    //the timezone offset for the city
+    int32_t offset;
+
+    //the display name of the timezone of the city
+    std::string zoneDisplayName;
+
+    //the timezone raw offset for the city
+    int32_t rawOffset;
+};
+
 class SystemLocaleManager {
 public:
     SystemLocaleManager();
@@ -84,8 +104,16 @@ public:
      */
     std::vector<LocaleItem> GetCountryInfoArray(const std::vector<std::string> &countries, const SortOptions &options);
 
+    /**
+     * @brief obtains sorted time zone city array.
+     *
+     * @return std::vector<TimeZoneCityItem> sort result.
+     */
+    static std::vector<TimeZoneCityItem> GetTimezoneCityInfoArray();
+
 private:
     void SortLocaleItemList(std::vector<LocaleItem> &localeItemList, const SortOptions &options);
+    static void SortTimezoneCityItemList(std::vector<TimeZoneCityItem> &timezoneCityItemList);
     std::unique_ptr<TabooUtils> tabooUtils;
     static const char* SIM_COUNTRY_CODE_KEY;
     static constexpr int CONFIG_LEN = 128;
