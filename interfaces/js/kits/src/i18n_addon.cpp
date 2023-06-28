@@ -4132,7 +4132,8 @@ napi_value I18nAddon::CreateTimeZoneCityItem(napi_env env, const TimeZoneCityIte
         return nullptr;
     }
     if (timezoneCityItem.cityDisplayName.length() != 0) {
-        status = napi_set_named_property(env, result, "cityDisplayName", CreateString(env, timezoneCityItem.cityDisplayName));
+        napi_value cityDisplayNameVal = CreateString(env, timezoneCityItem.cityDisplayName);
+        status = napi_set_named_property(env, result, "cityDisplayName", cityDisplayNameVal);
         if (status != napi_ok) {
             HiLog::Error(LABEL, "Failed to set element cityDisplayName.");
             return nullptr;
@@ -4143,7 +4144,8 @@ napi_value I18nAddon::CreateTimeZoneCityItem(napi_env env, const TimeZoneCityIte
         HiLog::Error(LABEL, "Failed to set element offset.");
         return nullptr;
     }
-    status = napi_set_named_property(env, result, "zoneDisplayName", CreateString(env, timezoneCityItem.zoneDisplayName));
+    napi_value zoneDisplayNameVal = CreateString(env, timezoneCityItem.zoneDisplayName);
+    status = napi_set_named_property(env, result, "zoneDisplayName", zoneDisplayNameVal);
     if (status != napi_ok) {
         HiLog::Error(LABEL, "Failed to set element zoneDisplayName.");
         return nullptr;

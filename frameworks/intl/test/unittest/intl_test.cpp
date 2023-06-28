@@ -158,6 +158,10 @@ HWTEST_F(IntlTest, IntlFuncTest003, TestSize.Level1)
     EXPECT_EQ(loc->GetScript(), script);
     EXPECT_EQ(loc->GetRegion(), region);
     EXPECT_EQ(loc->GetBaseName(), baseName);
+    locale = "ja-u-hc-h12-nu-Jpan-JP-kf-japanese-co-emoji-kn-true";
+    LocaleInfo *localeInfo = new (std::nothrow) LocaleInfo(locale);
+    EXPECT_EQ(localeInfo->GetBaseName(), "ja");
+    delete localeInfo;
     delete loc;
 }
 
@@ -537,7 +541,19 @@ HWTEST_F(IntlTest, IntlFuncTest0016, TestSize.Level1)
     if (it != options.end()) {
         EXPECT_EQ(it->second, "default");
     }
+    inputOptions = {
+        { "sensitivity", "base"},
+        { "caseFirst", "lower"}
+    };
+    Collator *collator2 = new Collator(locales, inputOptions);
+    inputOptions = {
+        { "sensitivity", "accent"},
+        { "caseFirst", "lower"}
+    };
+    Collator *collator3 = new Collator(locales, inputOptions);
     delete collator;
+    delete collator2;
+    delete collator3;
 }
 
 /**
@@ -770,6 +786,15 @@ HWTEST_F(IntlTest, IntlFuncTest0022, TestSize.Level1)
     EXPECT_EQ(res, "other");
     res = plurals->Select(12.34);
     EXPECT_EQ(res, "other");
+    options = {
+        { "localeMatcher", "best fit" },
+        { "type", "cardinal" },
+        { "minimumIntegerDigits", "1" },
+        { "minimumFractionDigits", "0" },
+        { "maximumFractionDigits", "21" },      
+    };
+    PluralRules *pluralRules = new PluralRules(locales, options);
+    delete pluralRules;
     delete plurals;
 }
 
@@ -1945,7 +1970,9 @@ HWTEST_F(IntlTest, IntlFuncTest0052, TestSize.Level1)
     indexUtil->AddLocale("en-US");
     std::string indexStr = indexUtil->GetIndex("A");
     EXPECT_EQ(indexStr, "A");
+    IndexUtil *indexUtil2 = new IndexUtil("");
     delete indexUtil;
+    delete indexUtil2;
 }
 
 /**
@@ -2006,6 +2033,14 @@ HWTEST_F(IntlTest, IntlFuncTest0055, TestSize.Level1)
     EXPECT_EQ(previous, -1);
     int32_t next6 = i18nBreakIterator->Next(6);
     EXPECT_EQ(next6, -1);
+    int32_t resultLatn = LocaleCompare::Compare("en-Latn-US", "en-Qaag-US");
+    EXPECT_EQ(resultLatn, 9);
+    int32_t resultTl = LocaleCompare::Compare("tl-PH", "fil-PH");
+    EXPECT_EQ(resultTl, 9);
+    int32_t resultFil = LocaleCompare::Compare("fil-PH", "tl-PH");
+    EXPECT_EQ(resultFil, 9);
+    int32_t resultQaag = LocaleCompare::Compare("en-Qaag-US", "en-Latn-US");
+    EXPECT_EQ(resultQaag, 9);
     delete i18nBreakIterator;
 }
 
