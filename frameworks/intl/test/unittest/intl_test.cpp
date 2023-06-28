@@ -344,6 +344,18 @@ HWTEST_F(IntlTest, IntlFuncTest009, TestSize.Level1)
     string out = numFmt->Format(123456.789);
     EXPECT_EQ(out, expects);
     EXPECT_EQ(numFmt->GetStyle(), style);
+    options = { { "style", "unit" },
+                { "unit", "meter" },
+                { "currency", "USD" },
+                { "currencyDisplay", "symbol" },
+                { "compactDisplay", "long" },
+                { "useGrouping", "true" },
+                { "unitUsage", "length-person" },
+                { "unitDisplay", "long" } };
+    NumberFormat *numFormat = new (std::nothrow) NumberFormat(locales, options);
+    map<string, string> res;
+    numFormat->GetResolvedOptions(res);
+    delete numFormat;
     delete numFmt;
 }
 
@@ -1953,6 +1965,10 @@ HWTEST_F(IntlTest, IntlFuncTest0051, TestSize.Level1)
     calendar2->Set(2023, 5, 28);
     bool isWeekend = calendar2->IsWeekend();
     EXPECT_TRUE(isWeekend);
+    I18nCalendar *calendarFake = new I18nCalendar("123");
+    I18nCalendar *calendarInvalid = new I18nCalendar("123", CalendarType::CHINESE);
+    delete calendarFake;
+    delete calendarInvalid;
     delete calendar;
     delete calendar2;
 }
@@ -2108,14 +2124,29 @@ HWTEST_F(IntlTest, IntlFuncTest0058, TestSize.Level1)
     EXPECT_EQ(displayName, "中国标准时间");
     std::string displayName2 = i18nTimeZone->GetDisplayName(true);
     EXPECT_EQ(displayName2, "中国标准时间");
+    std::string zhCn = "zh-CN";
+    std::string displayNameCn = i18nTimeZone->GetDisplayName(zhCn);
+    EXPECT_EQ(displayNameCn, "中国标准时间");
     std::string displayName4 = i18nTimeZone->GetDisplayName("zh-CN", true);
     EXPECT_EQ(displayName4, "中国标准时间");
+    std::string cityId = "Shanghai";
+    std::string localeId = "en-US";
+    std::string cityDisplayName = i18nTimeZone->GetCityDisplayName(cityId, localeId);
+    EXPECT_EQ(cityDisplayName, "Shanghai (China)");
     std::unique_ptr<I18nTimeZone> timezone = I18nTimeZone::CreateInstance(timezoneId, true);
     I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
     std::set<std::string> set0 = I18nTimeZone::GetAvailableIDs(errorCode);
     EXPECT_EQ(set0.size(), 437);
     std::set<std::string> set1 = I18nTimeZone::GetAvailableZoneCityIDs();
     EXPECT_TRUE(set1.size() > 0);
+    std::string empty = "";
+    std::string fakeCityId = "fake cityId";
+    I18nTimeZone *i18nTimeZoneEmpty = new I18nTimeZone(empty, true);
+    I18nTimeZone *i18nTimeZoneFake = new I18nTimeZone(fakeCityId, false);
+    I18nTimeZone *i18nTimeZoneCityId = new I18nTimeZone(cityId, false);
+    delete i18nTimeZoneEmpty;
+    delete i18nTimeZoneFake;
+    delete i18nTimeZoneCityId;
     delete i18nTimeZone;
     uint32_t mask = GetMask("CN");
     EXPECT_EQ(mask, 2462);
