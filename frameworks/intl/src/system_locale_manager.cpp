@@ -175,7 +175,9 @@ std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray()
             icuTimeZone->getOffset(date, (UBool)local, rawOffset, dstOffset, status);
             tzMap.insert({timezoneId, icuTimeZone});
         }
-        struct TimeZoneCityItem tzCityItem = {timezoneId, cityId, cityDisplayName, dstOffset + rawOffset, "", rawOffset};
+        struct TimeZoneCityItem tzCityItem = {
+            timezoneId, cityId, cityDisplayName, dstOffset + rawOffset, "", rawOffset
+        };
         result.push_back(tzCityItem);
     }
     SortTimezoneCityItemList(result);

@@ -158,6 +158,10 @@ HWTEST_F(IntlTest, IntlFuncTest003, TestSize.Level1)
     EXPECT_EQ(loc->GetScript(), script);
     EXPECT_EQ(loc->GetRegion(), region);
     EXPECT_EQ(loc->GetBaseName(), baseName);
+    locale = "ja-u-hc-h12-nu-Jpan-JP-kf-japanese-co-emoji-kn-true";
+    LocaleInfo *localeInfo = new (std::nothrow) LocaleInfo(locale);
+    EXPECT_EQ(localeInfo->GetBaseName(), "ja");
+    delete localeInfo;
     delete loc;
 }
 
@@ -340,6 +344,18 @@ HWTEST_F(IntlTest, IntlFuncTest009, TestSize.Level1)
     string out = numFmt->Format(123456.789);
     EXPECT_EQ(out, expects);
     EXPECT_EQ(numFmt->GetStyle(), style);
+    options = { { "style", "unit" },
+                { "unit", "meter" },
+                { "currency", "USD" },
+                { "currencyDisplay", "symbol" },
+                { "compactDisplay", "long" },
+                { "useGrouping", "true" },
+                { "unitUsage", "length-person" },
+                { "unitDisplay", "long" } };
+    NumberFormat *numFormat = new (std::nothrow) NumberFormat(locales, options);
+    map<string, string> res;
+    numFormat->GetResolvedOptions(res);
+    delete numFormat;
     delete numFmt;
 }
 
@@ -537,7 +553,19 @@ HWTEST_F(IntlTest, IntlFuncTest0016, TestSize.Level1)
     if (it != options.end()) {
         EXPECT_EQ(it->second, "default");
     }
+    inputOptions = {
+        { "sensitivity", "base"},
+        { "caseFirst", "lower"}
+    };
+    Collator *collator2 = new Collator(locales, inputOptions);
+    inputOptions = {
+        { "sensitivity", "accent"},
+        { "caseFirst", "lower"}
+    };
+    Collator *collator3 = new Collator(locales, inputOptions);
     delete collator;
+    delete collator2;
+    delete collator3;
 }
 
 /**
@@ -770,6 +798,15 @@ HWTEST_F(IntlTest, IntlFuncTest0022, TestSize.Level1)
     EXPECT_EQ(res, "other");
     res = plurals->Select(12.34);
     EXPECT_EQ(res, "other");
+    options = {
+        { "localeMatcher", "best fit" },
+        { "type", "cardinal" },
+        { "minimumIntegerDigits", "1" },
+        { "minimumFractionDigits", "0" },
+        { "maximumFractionDigits", "21" },      
+    };
+    PluralRules *pluralRules = new PluralRules(locales, options);
+    delete pluralRules;
     delete plurals;
 }
 
@@ -1928,6 +1965,10 @@ HWTEST_F(IntlTest, IntlFuncTest0051, TestSize.Level1)
     calendar2->Set(2023, 5, 28);
     bool isWeekend = calendar2->IsWeekend();
     EXPECT_TRUE(isWeekend);
+    I18nCalendar *calendarFake = new I18nCalendar("123");
+    I18nCalendar *calendarInvalid = new I18nCalendar("123", CalendarType::CHINESE);
+    delete calendarFake;
+    delete calendarInvalid;
     delete calendar;
     delete calendar2;
 }
@@ -1945,7 +1986,9 @@ HWTEST_F(IntlTest, IntlFuncTest0052, TestSize.Level1)
     indexUtil->AddLocale("en-US");
     std::string indexStr = indexUtil->GetIndex("A");
     EXPECT_EQ(indexStr, "A");
+    IndexUtil *indexUtil2 = new IndexUtil("");
     delete indexUtil;
+    delete indexUtil2;
 }
 
 /**
@@ -2006,6 +2049,14 @@ HWTEST_F(IntlTest, IntlFuncTest0055, TestSize.Level1)
     EXPECT_EQ(previous, -1);
     int32_t next6 = i18nBreakIterator->Next(6);
     EXPECT_EQ(next6, -1);
+    int32_t resultLatn = LocaleCompare::Compare("en-Latn-US", "en-Qaag-US");
+    EXPECT_EQ(resultLatn, 9);
+    int32_t resultTl = LocaleCompare::Compare("tl-PH", "fil-PH");
+    EXPECT_EQ(resultTl, 9);
+    int32_t resultFil = LocaleCompare::Compare("fil-PH", "tl-PH");
+    EXPECT_EQ(resultFil, 9);
+    int32_t resultQaag = LocaleCompare::Compare("en-Qaag-US", "en-Latn-US");
+    EXPECT_EQ(resultQaag, 9);
     delete i18nBreakIterator;
 }
 
@@ -2073,14 +2124,29 @@ HWTEST_F(IntlTest, IntlFuncTest0058, TestSize.Level1)
     EXPECT_EQ(displayName, "中国标准时间");
     std::string displayName2 = i18nTimeZone->GetDisplayName(true);
     EXPECT_EQ(displayName2, "中国标准时间");
+    std::string zhCn = "zh-CN";
+    std::string displayNameCn = i18nTimeZone->GetDisplayName(zhCn);
+    EXPECT_EQ(displayNameCn, "中国标准时间");
     std::string displayName4 = i18nTimeZone->GetDisplayName("zh-CN", true);
     EXPECT_EQ(displayName4, "中国标准时间");
+    std::string cityId = "Shanghai";
+    std::string localeId = "en-US";
+    std::string cityDisplayName = i18nTimeZone->GetCityDisplayName(cityId, localeId);
+    EXPECT_EQ(cityDisplayName, "Shanghai (China)");
     std::unique_ptr<I18nTimeZone> timezone = I18nTimeZone::CreateInstance(timezoneId, true);
     I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
     std::set<std::string> set0 = I18nTimeZone::GetAvailableIDs(errorCode);
     EXPECT_EQ(set0.size(), 437);
     std::set<std::string> set1 = I18nTimeZone::GetAvailableZoneCityIDs();
     EXPECT_TRUE(set1.size() > 0);
+    std::string empty = "";
+    std::string fakeCityId = "fake cityId";
+    I18nTimeZone *i18nTimeZoneEmpty = new I18nTimeZone(empty, true);
+    I18nTimeZone *i18nTimeZoneFake = new I18nTimeZone(fakeCityId, false);
+    I18nTimeZone *i18nTimeZoneCityId = new I18nTimeZone(cityId, false);
+    delete i18nTimeZoneEmpty;
+    delete i18nTimeZoneFake;
+    delete i18nTimeZoneCityId;
     delete i18nTimeZone;
     uint32_t mask = GetMask("CN");
     EXPECT_EQ(mask, 2462);
