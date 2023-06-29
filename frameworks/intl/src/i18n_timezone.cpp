@@ -1167,7 +1167,7 @@ std::vector<std::string> I18nTimeZone::FindTzData()
     }
     std::vector<std::string> filePaths;
     std::map<std::string, std::vector<std::string>>::reverse_iterator iter;
-    for (iter = pathMap.rbegin(); iter != pathMap.rend(); iter++) {
+    for (iter = pathMap.rbegin(); iter != pathMap.rend(); ++iter) {
         if (ValidateDataIntegrity(iter->second)) {
             return iter->second;
         }
