@@ -17,8 +17,10 @@
 #include "i18n_break_iterator.h"
 #include "i18n_calendar.h"
 #include "i18n_normalizer.h"
+#include "i18n_timezone.h"
 #include "locale_config.h"
 #include "measure_data.h"
+#include "phone_number_format.h"
 #include "preferred_language.h"
 
 using namespace OHOS::Global::I18n;
@@ -475,6 +477,63 @@ HWTEST_F(I18nTest, I18nFuncTest013, TestSize.Level1)
     factors = {0.0, 0.0};
     status = ComputeValue(unit, measSys, factors);
     EXPECT_EQ(status, 0);
+}
+
+/**
+ * @tc.name: I18nFuncTest014
+ * @tc.desc: Test I18n PhoneNumberFormat
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest014, TestSize.Level1)
+{
+    std::string countryTag = "";
+    std::map<std::string, std::string> options = {
+        {"type", "INTERNATIONAL"}
+    };
+    std::unique_ptr<PhoneNumberFormat> formatter = PhoneNumberFormat::CreateInstance(countryTag, options);
+    std::string fakePhoneNumber = "93827393872723482";
+    bool isValid = formatter->isValidPhoneNumber(fakePhoneNumber);
+    EXPECT_FALSE(isValid);
+    std::string formattedPhoneNumber = formatter->format(fakePhoneNumber);
+    EXPECT_EQ(formattedPhoneNumber, "");
+}
+
+/**
+ * @tc.name: I18nFuncTest015
+ * @tc.desc: Test I18n I18nTimeZone
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest015, TestSize.Level1)
+{
+    std::string id = "";
+    bool isZoneID = true;
+    I18nTimeZone timezone1(id, isZoneID);
+    std::string timezoneId = timezone1.GetID();
+    EXPECT_EQ(timezoneId, "Asia/Shanghai");
+
+    isZoneID = false;
+    I18nTimeZone timezone2(id, isZoneID);
+    timezoneId = timezone2.GetID();
+    EXPECT_EQ(timezoneId, "CST");
+
+    id = "Auckland";
+    I18nTimeZone timezone3(id, isZoneID);
+    timezoneId = timezone3.GetID();
+    EXPECT_EQ(timezoneId, "Pacific/Auckland");
+    std::string localeTag = "en-Latn-US";
+    std::string displayName = timezone3.GetDisplayName(localeTag);
+    EXPECT_EQ(timezoneId, "Pacific/Auckland");
+
+    std::string fakeId = "fake city id";
+    std::string cityDisplayName = I18nTimeZone::GetCityDisplayName(fakeId, localeTag);
+    EXPECT_EQ(cityDisplayName, "");
+
+    cityDisplayName = I18nTimeZone::GetCityDisplayName(id, localeTag);
+    EXPECT_EQ(cityDisplayName, "Auckland (New Zealand)");
+
+    std::string fakeLocale = "fake locale tag";
+    cityDisplayName = I18nTimeZone::GetCityDisplayName(id, fakeLocale);
+    EXPECT_EQ(cityDisplayName, "");
 }
 } // namespace I18n
 } // namespace Global
