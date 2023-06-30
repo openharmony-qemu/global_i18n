@@ -39,7 +39,8 @@ void IntlAddon::Destructor(napi_env env, void *nativeObject, void *hint)
     if (!nativeObject) {
         return;
     }
-    reinterpret_cast<IntlAddon *>(nativeObject)->~IntlAddon();
+    delete reinterpret_cast<IntlAddon *>(nativeObject);
+    nativeObject = nullptr;
 }
 
 napi_value IntlAddon::InitLocale(napi_env env, napi_value exports)
