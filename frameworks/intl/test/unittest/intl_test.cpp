@@ -1989,6 +1989,11 @@ HWTEST_F(IntlTest, IntlFuncTest0052, TestSize.Level1)
     IndexUtil *indexUtil2 = new IndexUtil("");
     delete indexUtil;
     delete indexUtil2;
+
+	IndexUtil indexUtil3("");
+    indexUtil3.AddLocale("en-US");
+    indexStr = indexUtil3.GetIndex("A");
+    EXPECT_EQ(indexStr, "A");
 }
 
 /**
@@ -2093,6 +2098,8 @@ HWTEST_F(IntlTest, IntlFuncTest0057, TestSize.Level1)
     EXPECT_TRUE(isWhiteSpace);
     bool isRTLCharacter = IsRTLCharacter("^");
     EXPECT_TRUE(!isRTLCharacter);
+    isRTLCharacter = IsRTLCharacter("\u0645");
+    EXPECT_TRUE(isRTLCharacter);
     bool isIdeoGraphic = IsIdeoGraphic("&&*");
     EXPECT_TRUE(!isIdeoGraphic);
     bool isLetter = IsLetter("cccUt");
@@ -2150,6 +2157,22 @@ HWTEST_F(IntlTest, IntlFuncTest0058, TestSize.Level1)
     delete i18nTimeZone;
     uint32_t mask = GetMask("CN");
     EXPECT_EQ(mask, 2462);
+}
+
+/**
+ * @tc.name: IntlFuncTest0059
+ * @tc.desc: Test Intl NumberFormat
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0059, TestSize.Level1)
+{
+    std::vector<std::string> localeTags = { "fake locale tag"};
+    std::map<std::string, std::string> configs = {
+        {"style", "unit"}, {"unit", "fake unit"}
+    };
+    NumberFormat formatter(localeTags, configs);
+    std::string res = formatter.Format(12);
+    EXPECT_EQ(res, "");
 }
 } // namespace I18n
 } // namespace Global

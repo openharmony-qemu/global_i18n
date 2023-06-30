@@ -51,8 +51,8 @@ void ZoneUtilTest::TearDown(void)
  */
 HWTEST_F(ZoneUtilTest,  ZoneUtilFuncTest001, TestSize.Level1)
 {
-    string expects[] = { "Asia/Shanghai", "America/New_York", "Asia/Shanghai", "America/New_York" };
-    string countries[] = { "CN", "US", "cn", "us" };
+    string expects[] = { "Asia/Shanghai", "America/New_York", "Asia/Shanghai", "America/New_York", "", "" };
+    string countries[] = { "CN", "US", "cn", "us", "fake", "GB" };
     ZoneUtil util;
     int count = 4;
     for (int i = 0; i < count; ++i) {
@@ -68,9 +68,9 @@ HWTEST_F(ZoneUtilTest,  ZoneUtilFuncTest001, TestSize.Level1)
  */
 HWTEST_F(ZoneUtilTest,  ZoneUtilFuncTest002, TestSize.Level1)
 {
-    string expects[] = { "Asia/Shanghai", "America/Detroit" };
-    int32_t offsets[] = { 3600 * 1000 * 8, -3600 * 1000 * 5 };
-    string countries[] = { "CN", "US" };
+    string expects[] = { "Asia/Shanghai", "America/Detroit", "" };
+    int32_t offsets[] = { 3600 * 1000 * 8, -3600 * 1000 * 5, 1234 * 789 * 7 };
+    string countries[] = { "CN", "US", "fake" };
     int count = 2;
     ZoneUtil util;
     for (int i = 0; i < count; ++i) {
@@ -97,6 +97,11 @@ HWTEST_F(ZoneUtilTest,  ZoneUtilFuncTest003, TestSize.Level1)
             EXPECT_EQ(expects[i], out[i]);
         }
     }
+
+    country = "fake";
+    out.clear();
+    util.GetZoneList(country, out);
+    EXPECT_EQ(out.size(), 0);
 }
 
 /**
@@ -157,6 +162,11 @@ HWTEST_F(ZoneUtilTest,  ZoneUtilFuncTest006, TestSize.Level1)
             EXPECT_EQ(expects[i], out[i]);
         }
     }
+
+    country = "fake";
+    out.clear();
+    util.GetZoneList(country, 1234 * 789 * 9, out);
+    EXPECT_EQ(out.size(), 0);
 }
 
 /**
@@ -229,6 +239,16 @@ HWTEST_F(ZoneUtilTest, ZoneUtilFuncTest010, TestSize.Level1)
     CountryResult result3 = util.LookupTimezoneByNITZ(nitzData3);
     EXPECT_FALSE(result3.isOnlyMatch);
     EXPECT_EQ(result3.timezoneId, "Australia/Adelaide");
+
+    NITZData nitzData4 = { 0, 12345678, 1679969021999 };
+    CountryResult result4 = util.LookupTimezoneByNITZ(nitzData4);
+    EXPECT_TRUE(result4.isOnlyMatch);
+    EXPECT_EQ(result4.timezoneId, "");
+
+    NITZData nitzData5 = { -1, 12345678, 1679969021999 };
+    CountryResult result5 = util.LookupTimezoneByNITZ(nitzData5);
+    EXPECT_TRUE(result5.isOnlyMatch);
+    EXPECT_EQ(result5.timezoneId, "");
 }
 
 /**
@@ -244,6 +264,26 @@ HWTEST_F(ZoneUtilTest, ZoneUtilFuncTest011, TestSize.Level1)
     CountryResult result = util.LookupTimezoneByCountry(region, currentMillis);
     EXPECT_EQ(result.timezoneId, "Antarctica/McMurdo");
     EXPECT_EQ(result.quality, MatchQuality::MULTIPLE_ZONES_DIFFERENT_OFFSET);
+
+    region = "fake Region";
+    CountryResult result2 = util.LookupTimezoneByCountry(region, currentMillis);
+    EXPECT_EQ(result2.timezoneId, "");
+    EXPECT_EQ(result2.quality, 3);
+
+    region = "AR";
+    CountryResult result3 = util.LookupTimezoneByCountry(region, currentMillis);
+    EXPECT_EQ(result3.timezoneId, "America/Argentina/Buenos_Aires");
+	EXPECT_TRUE(result3.quality == 0 || result3.quality == 2);
+
+    region = "AM";
+    CountryResult result4 = util.LookupTimezoneByCountry(region, currentMillis);
+    EXPECT_EQ(result4.timezoneId, "Asia/Yerevan");
+    EXPECT_EQ(result4.quality, 1);
+
+    region = "CY";
+    CountryResult result5 = util.LookupTimezoneByCountry(region, currentMillis);
+    EXPECT_EQ(result5.timezoneId, "Asia/Nicosia");
+    EXPECT_EQ(result5.quality, 2);
 }
 } // namespace I18n
 } // namespace Global
