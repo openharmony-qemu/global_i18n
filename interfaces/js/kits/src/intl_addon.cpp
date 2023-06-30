@@ -39,7 +39,8 @@ void IntlAddon::Destructor(napi_env env, void *nativeObject, void *hint)
     if (!nativeObject) {
         return;
     }
-    reinterpret_cast<IntlAddon *>(nativeObject)->~IntlAddon();
+    delete reinterpret_cast<IntlAddon *>(nativeObject);
+    nativeObject = nullptr;
 }
 
 napi_value IntlAddon::SetProperty(napi_env env, napi_callback_info info)
