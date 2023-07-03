@@ -143,7 +143,7 @@ napi_value I18nAddon::CreateSystemLocaleManagerObject(napi_env env, napi_status 
         return nullptr;
     }
     napi_property_descriptor properties[] = {
-        DECLARE_NAPI_FUNCTION("getTimeZoneCityInfoArray", GetTimeZoneCityInfoArray)
+        DECLARE_NAPI_FUNCTION("getTimeZoneCityItemArray", GetTimeZoneCityInfoArray)
     };
     status = napi_define_properties(env, systemLocaleManager,
                                     sizeof(properties) / sizeof(napi_property_descriptor),
