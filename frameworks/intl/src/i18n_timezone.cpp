@@ -976,10 +976,10 @@ std::string I18nTimeZone::GetCityDisplayName(std::string &cityID, std::string &l
     }
     std::string requestLocaleStr = GetLocaleBaseName(localeStr);
     if (requestLocaleStr.length() != 0) {
-            std::string displayName = FindCityDisplayNameFromXml(cityID, requestLocaleStr);
-            if (displayName.length() != 0) {
-                return displayName;
-            }
+        std::string displayName = FindCityDisplayNameFromXml(cityID, requestLocaleStr);
+        if (displayName.length() != 0) {
+            return displayName;
+        }
     }
     return "";
 }
