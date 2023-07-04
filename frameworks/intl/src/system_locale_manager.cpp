@@ -170,6 +170,9 @@ std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray()
         UErrorCode status = U_ZERO_ERROR;
         UDate date = icu::Calendar::getNow();
         std::string timezoneId = I18nTimeZone::GetTimezoneIdByCityId(cityId);
+        if (timezoneId.length() == 0) {
+            continue;
+        }
         if (tzMap.find(timezoneId) != tzMap.end()) {
             icu::TimeZone *icuTimeZone = tzMap.find(timezoneId)->second;
             icuTimeZone->getOffset(date, (UBool)local, rawOffset, dstOffset, status);
