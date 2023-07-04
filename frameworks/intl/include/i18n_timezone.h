@@ -44,8 +44,9 @@ public:
     static std::set<std::string> GetAvailableZoneCityIDs();
     static std::string GetCityDisplayName(std::string &cityID, std::string &locale);
     static std::vector<std::string> GetTimezoneIdByLocation(const double x, const double y);
-    static std::map<std::string, std::string> FindCityDisplayNameFromXml(std::string &locale);
+    static std::map<std::string, std::string> FindCityDisplayNameMap(std::string &locale);
     static std::string GetLocaleBaseName(std::string &locale);
+    static std::string GetTimezoneIdByCityId(const std::string &cityId);
 
 private:
     static const char *TIMEZONE_KEY;
@@ -81,6 +82,7 @@ private:
     static bool ReadTimeZoneData(const char *xmlPath);
     static std::string ComputeLocale(std::string &locale);
     icu::TimeZone* GetTimeZone();
+    static std::string FindCityDisplayNameFromXml(std::string &cityID, std::string &locale);
     static bool GetSupportedLocales();
     static std::string GetFallBack(std::string &localeStr);
     static void GetTimezoneIDFromZoneInfo(std::set<std::string> &availableIDs, std::string &parentPath,
