@@ -1026,16 +1026,7 @@ std::string I18nTimeZone::GetTimezoneIdByCityId(const std::string &cityId)
         GetAvailableZoneCityIDs();
     }
     if (city2TimeZoneID.find(cityId) == city2TimeZoneID.end()) {
-        icu::TimeZone *defTimezone = icu::TimeZone::createDefault();
-        if (defTimezone == nullptr) {
-            return "";
-        }
-        icu::UnicodeString zoneID;
-        defTimezone->getID(zoneID);
-        std::string result;
-        zoneID.toUTF8String(result);
-        delete(defTimezone);
-        return result;
+        return "";
     } else {
         return city2TimeZoneID.at(cityId);
     }
