@@ -227,7 +227,7 @@ HWTEST_F(IntlTest, IntlFuncTest005, TestSize.Level1)
 
 /**
  * @tc.name: IntlFuncTest006
- * @tc.desc: Test Intl DateTimeFormat.format
+ * @tc.desc: Test Intl NumberFormat.format
  * @tc.type: FUNC
  */
 HWTEST_F(IntlTest, IntlFuncTest006, TestSize.Level1)
@@ -262,7 +262,7 @@ HWTEST_F(IntlTest, IntlFuncTest006, TestSize.Level1)
 
 /**
  * @tc.name: IntlFuncTest007
- * @tc.desc: Test Intl DateTimeFormat.format
+ * @tc.desc: Test Intl NumberFormat.format
  * @tc.type: FUNC
  */
 HWTEST_F(IntlTest, IntlFuncTest007, TestSize.Level1)
@@ -293,7 +293,7 @@ HWTEST_F(IntlTest, IntlFuncTest007, TestSize.Level1)
 
 /**
  * @tc.name: IntlFuncTest008
- * @tc.desc: Test Intl DateTimeFormat.format
+ * @tc.desc: Test Intl NumberFormat.format
  * @tc.type: FUNC
  */
 HWTEST_F(IntlTest, IntlFuncTest008, TestSize.Level1)
@@ -321,7 +321,7 @@ HWTEST_F(IntlTest, IntlFuncTest008, TestSize.Level1)
 
 /**
  * @tc.name: IntlFuncTest009
- * @tc.desc: Test Intl DateTimeFormat.format
+ * @tc.desc: Test Intl NumberFormat.format
  * @tc.type: FUNC
  */
 HWTEST_F(IntlTest, IntlFuncTest009, TestSize.Level1)
@@ -361,7 +361,7 @@ HWTEST_F(IntlTest, IntlFuncTest009, TestSize.Level1)
 
 /**
  * @tc.name: IntlFuncTest0010
- * @tc.desc: Test Intl DateTimeFormat.format
+ * @tc.desc: Test Intl NumberFormat.format
  * @tc.type: FUNC
  */
 HWTEST_F(IntlTest, IntlFuncTest010, TestSize.Level1)
@@ -386,7 +386,7 @@ HWTEST_F(IntlTest, IntlFuncTest010, TestSize.Level1)
 
 /**
  * @tc.name: IntlFuncTest0011
- * @tc.desc: Test Intl DateTimeFormat.format
+ * @tc.desc: Test Intl NumberFormat.format
  * @tc.type: FUNC
  */
 HWTEST_F(IntlTest, IntlFuncTest011, TestSize.Level1)
@@ -412,7 +412,7 @@ HWTEST_F(IntlTest, IntlFuncTest011, TestSize.Level1)
 
 /**
  * @tc.name: IntlFuncTest0012
- * @tc.desc: Test Intl LocaleInfo
+ * @tc.desc: Test Intl DateTimeFormat
  * @tc.type: FUNC
  */
 HWTEST_F(IntlTest, IntlFuncTest0012, TestSize.Level1)
@@ -430,6 +430,31 @@ HWTEST_F(IntlTest, IntlFuncTest0012, TestSize.Level1)
     int64_t milliseconds = 123456789123456;
     string out = dateFormat->Format(milliseconds);
     EXPECT_EQ(out, expects);
+    options = {
+        { "dateStyle", "long" },
+        { "hourCycle", "h11" }
+    };
+    DateTimeFormat *dateFormatH11 = new (std::nothrow) DateTimeFormat(locales, options);
+    options.insert({ "hourCycle", "h12" });
+    DateTimeFormat *dateFormatH12 = new (std::nothrow) DateTimeFormat(locales, options);
+    options.insert({ "hourCycle", "h23" });
+    DateTimeFormat *dateFormatH23 = new (std::nothrow) DateTimeFormat(locales, options);
+    options.insert({ "hourCycle", "h24" });
+    DateTimeFormat *dateFormatH24 = new (std::nothrow) DateTimeFormat(locales, options);
+    delete dateFormatH11;
+    delete dateFormatH12;
+    delete dateFormatH23;
+    delete dateFormatH24;
+    locales.clear();
+    DateTimeFormat *dateFormatEmpty = new (std::nothrow) DateTimeFormat(locales, options);
+    locales.push_back("fake locale");
+    options = {};
+    DateTimeFormat *dateFormatFake = new (std::nothrow) DateTimeFormat(locales, options);
+    options.insert({ "dateStyle", "long" });
+    DateTimeFormat *dateFormatFake2 = new (std::nothrow) DateTimeFormat(locales, options);
+    delete dateFormatEmpty;
+    delete dateFormatFake;
+    delete dateFormatFake2;
     delete dateFormat;
 }
 
@@ -553,19 +578,7 @@ HWTEST_F(IntlTest, IntlFuncTest0016, TestSize.Level1)
     if (it != options.end()) {
         EXPECT_EQ(it->second, "default");
     }
-    inputOptions = {
-        { "sensitivity", "base"},
-        { "caseFirst", "lower"}
-    };
-    Collator *collator2 = new Collator(locales, inputOptions);
-    inputOptions = {
-        { "sensitivity", "accent"},
-        { "caseFirst", "lower"}
-    };
-    Collator *collator3 = new Collator(locales, inputOptions);
     delete collator;
-    delete collator2;
-    delete collator3;
 }
 
 /**
@@ -652,7 +665,19 @@ HWTEST_F(IntlTest, IntlFuncTest0018, TestSize.Level1)
     if (it != options.end()) {
         EXPECT_EQ(it->second, "pinyin");
     }
+    inputOptions = {
+        { "sensitivity", "base"},
+        { "caseFirst", "lower"}
+    };
+    Collator *collator2 = new Collator(locales, inputOptions);
+    inputOptions = {
+        { "sensitivity", "accent"},
+        { "caseFirst", "lower"}
+    };
+    Collator *collator3 = new Collator(locales, inputOptions);
     delete collator;
+    delete collator2;
+    delete collator3;
 }
 
 /**
@@ -803,7 +828,7 @@ HWTEST_F(IntlTest, IntlFuncTest0022, TestSize.Level1)
         { "type", "cardinal" },
         { "minimumIntegerDigits", "1" },
         { "minimumFractionDigits", "0" },
-        { "maximumFractionDigits", "21" },      
+        { "maximumFractionDigits", "21" },
     };
     PluralRules *pluralRules = new PluralRules(locales, options);
     delete pluralRules;
@@ -2062,6 +2087,16 @@ HWTEST_F(IntlTest, IntlFuncTest0055, TestSize.Level1)
     EXPECT_EQ(resultFil, 9);
     int32_t resultQaag = LocaleCompare::Compare("en-Qaag-US", "en-Latn-US");
     EXPECT_EQ(resultQaag, 9);
+    I18nBreakIterator *breakIterator = new I18nBreakIterator("fake locale");
+    breakIterator->Current();
+    breakIterator->First();
+    breakIterator->Last();
+    breakIterator->Previous();
+    breakIterator->Next(6);
+    breakIterator->Next();
+    breakIterator->Following(0);
+    breakIterator->IsBoundary(6);
+    delete breakIterator;
     delete i18nBreakIterator;
 }
 

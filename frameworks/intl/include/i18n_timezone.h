@@ -44,6 +44,9 @@ public:
     static std::set<std::string> GetAvailableZoneCityIDs();
     static std::string GetCityDisplayName(std::string &cityID, std::string &locale);
     static std::vector<std::string> GetTimezoneIdByLocation(const double x, const double y);
+    static std::map<std::string, std::string> FindCityDisplayNameMap(std::string &locale);
+    static std::string GetLocaleBaseName(std::string &locale);
+    static std::string GetTimezoneIdByCityId(const std::string &cityId);
 
 private:
     static const char *TIMEZONE_KEY;
@@ -88,13 +91,13 @@ private:
     static int InitPngptr(png_structp &png_ptr, png_infop &info_ptr, FILE **fp, std::string preferredPath);
     static std::vector<std::string> FindTzData();
     static bool ParamExceedScope(const int x, const int y, int fixedX, int fixedY);
-    static std::string GetPreferredPath(const double x, std::vector<std::string> filePaths);
+    static std::string GetPreferredPath(const double x, const std::vector<std::string> &filePaths);
     static void SetVersionPathMap(std::string verison, std::string path,
             std::map<std::string, std::vector<std::string>> *pathMap);
     static void GetTzDataWidth(std::vector<std::string> filePaths, uint32_t *width, uint32_t *height);
     static void CloseFile(FILE *fp);
-    static bool ValidateDataIntegrity(std::vector<std::string> pathList);
-    static bool CheckTzDataFilePath(std::string filePath);
+    static bool ValidateDataIntegrity(const std::vector<std::string> &pathList);
+    static bool CheckTzDataFilePath(const std::string &filePath);
 };
 } // namespace I18n
 } // namespace Global

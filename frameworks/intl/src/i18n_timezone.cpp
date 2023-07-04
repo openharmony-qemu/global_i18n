@@ -862,6 +862,54 @@ std::string I18nTimeZone::FindCityDisplayNameFromXml(std::string &cityID, std::s
     return displayName;
 }
 
+std::map<std::string, std::string> I18nTimeZone::FindCityDisplayNameMap(std::string &locale)
+{
+    xmlKeepBlanksDefault(0);
+    std::map<std::string, std::string> resultMap;
+    std::string xmlPath;
+    if (useDeviceCityDispName) {
+        xmlPath = DEVICE_CITY_DISPLAYNAME_PATH + locale + ".xml";
+    } else {
+        xmlPath = CITY_DISPLAYNAME_PATH + locale + ".xml";
+    }
+    xmlDocPtr doc = xmlParseFile(xmlPath.c_str());
+    if (!doc) {
+        HiLog::Error(LABEL, "can't parse city displayname file %{public}s", xmlPath.c_str());
+        return resultMap;
+    }
+    xmlNodePtr cur = xmlDocGetRootElement(doc);
+    if (!cur || xmlStrcmp(cur->name, reinterpret_cast<const xmlChar *>(CITY_DISPLAYNAME_ROOT_TAG))) {
+        xmlFreeDoc(doc);
+        HiLog::Error(LABEL, "city displayname file %{public}s has wrong root tag.", xmlPath.c_str());
+        return resultMap;
+    }
+    cur = cur->xmlChildrenNode;
+    while (cur != nullptr && !xmlStrcmp(cur->name,
+        reinterpret_cast<const xmlChar *>(CITY_DISPLAYNAME_SECOND_ROOT_TAG))) {
+        xmlNodePtr value = cur->xmlChildrenNode;
+        xmlChar *contents[ELEMENT_NUM] = { 0 }; // 2 represent cityid, displayName;
+        for (size_t i = 0; i < ELEMENT_NUM; i++) {
+            if (value != nullptr) {
+                contents[i] = xmlNodeGetContent(value);
+                value = value->next;
+            } else {
+                break;
+            }
+        }
+        resultMap.insert(
+            std::make_pair<std::string, std::string>(reinterpret_cast<const char *>(contents[0]),
+                                                     reinterpret_cast<const char *>(contents[1])));
+        for (size_t i = 0; i < ELEMENT_NUM; i++) {
+            if (contents[i] != nullptr) {
+                xmlFree(contents[i]);
+            }
+        }
+        cur = cur->next;
+    }
+    xmlFreeDoc(doc);
+    return resultMap;
+}
+
 bool I18nTimeZone::GetSupportedLocales()
 {
     using std::filesystem::directory_iterator;
@@ -926,6 +974,18 @@ std::string I18nTimeZone::GetCityDisplayName(std::string &cityID, std::string &l
         HiLog::Error(LABEL, "%{public}s is not supported cityID.", cityID.c_str());
         return "";
     }
+    std::string requestLocaleStr = GetLocaleBaseName(localeStr);
+    if (requestLocaleStr.length() != 0) {
+        std::string displayName = FindCityDisplayNameFromXml(cityID, requestLocaleStr);
+        if (displayName.length() != 0) {
+            return displayName;
+        }
+    }
+    return "";
+}
+
+std::string I18nTimeZone::GetLocaleBaseName(std::string &localeStr)
+{
     if (supportedLocales.size() == 0) {
         bool status = GetSupportedLocales();
         if (!status) {
@@ -942,10 +1002,7 @@ std::string I18nTimeZone::GetCityDisplayName(std::string &cityID, std::string &l
     std::string requestLocaleStr = locale.getBaseName();
     std::string displayName;
     if (supportedLocales.find(requestLocaleStr) != supportedLocales.end()) {
-        displayName = FindCityDisplayNameFromXml(cityID, requestLocaleStr);
-        if (displayName.length() != 0) {
-            return displayName;
-        }
+        return requestLocaleStr;
     }
     locale.addLikelySubtags(errorCode);
     if (U_FAILURE(errorCode)) {
@@ -956,14 +1013,23 @@ std::string I18nTimeZone::GetCityDisplayName(std::string &cityID, std::string &l
     while (requestLocaleStr.length() != 0) {
         if (supportedLocales.find(requestLocaleStr) != supportedLocales.end() || strcmp(requestLocaleStr.c_str(),
             DEFAULT_LOCALE) == 0) {
-            displayName = FindCityDisplayNameFromXml(cityID, requestLocaleStr);
-            if (displayName.length() != 0) {
-                return displayName;
-            }
+            return requestLocaleStr;
         }
         requestLocaleStr = GetFallBack(requestLocaleStr);
     }
     return displayName;
+}
+
+std::string I18nTimeZone::GetTimezoneIdByCityId(const std::string &cityId)
+{
+    if (city2TimeZoneID.size() == 0) {
+        GetAvailableZoneCityIDs();
+    }
+    if (city2TimeZoneID.find(cityId) == city2TimeZoneID.end()) {
+        return "";
+    } else {
+        return city2TimeZoneID.at(cityId);
+    }
 }
 
 std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, const double y)
@@ -971,7 +1037,7 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
     std::vector<std::string> tzIdList;
 #ifdef SUPPORT_GRAPHICS
     std::map<int, std::string> categoryMap;
-    uint32_t fixedX, fixedY;
+    int fixedX, fixedY;
     if (x < 0 && y >= 0) {
         categoryMap = categoryNum2TimezoneWN;
     } else if (x >= 0 && y >= 0) {
@@ -982,7 +1048,7 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
         categoryMap = categoryNum2TimezoneES;
     }
     std::vector<std::string> filePaths = FindTzData();
-    uint32_t pathLen = filePaths.size();
+    int pathLen = filePaths.size();
     if (pathLen < 1) {
         return tzIdList;
     }
@@ -992,15 +1058,16 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
     }
     uint32_t width, height;
     GetTzDataWidth(filePaths, &width, &height);
-    fixedX = (uint32_t)(y * (width / (TZ_X_PLUS * 1.0)) + width / (TZ_HALF_OF_SIZE * 1.0));
-    fixedY = (uint32_t)(x * ((height * pathLen) / (TZ_X_PLUS * TZ_HALF_OF_SIZE * 1.0)) + (height * pathLen) / (TZ_HALF_OF_SIZE * 1.0));
+    fixedX = (int)(y * (width / TZ_X_PLUS) + width / TZ_HALF_OF_SIZE);
+    fixedY = (int)(x * ((height * pathLen) / (TZ_X_PLUS * TZ_HALF_OF_SIZE)) + (height * pathLen) / TZ_HALF_OF_SIZE);
     if (ParamExceedScope(fixedX, fixedY, width, height * pathLen)) {
         HiLog::Error(LABEL, "invalid width:%{public}d or height: %{public}d ", fixedX, fixedY);
         return tzIdList;
     }
-    uint32_t actualHeight = pathLen > 1 ? (fixedY % height) : fixedY;
+    int actualHeight = pathLen > 1 ? (fixedY % height) : fixedY;
     std::vector<int> pixel = GetColorData(fixedX, fixedY, actualHeight, preferredPath);
     for (size_t i = 0; i < pixel.size(); i++) {
+        //255 is invalid pixel value required
         if (pixel[i] != TZ_MAX_PIXEL_VALUE && categoryMap.find(pixel[i]) != categoryMap.end()) {
             std::string zdId = categoryMap[pixel[i]];
             tzIdList.push_back(zdId);
@@ -1052,8 +1119,7 @@ std::vector<int> I18nTimeZone::GetColorData(const int x, const int y, int actual
 
 void I18nTimeZone::GetTzDataWidth(std::vector<std::string> filePaths, uint32_t *width, uint32_t *height)
 {
-    std::string path = filePaths.at(0);
-    if (filePaths.size() == 0 || !CheckTzDataFilePath(path)) {
+    if (filePaths.size() == 0 || !CheckTzDataFilePath(filePaths.at(0))) {
         *width = 0;
         *height = 0;
     } else {
@@ -1061,6 +1127,7 @@ void I18nTimeZone::GetTzDataWidth(std::vector<std::string> filePaths, uint32_t *
         png_structp png_ptr;
         png_infop info_ptr;
         try {
+            std::string path = filePaths.at(0);
             fp = fopen(path.c_str(), "rb");
             png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
             info_ptr = png_create_info_struct(png_ptr);
@@ -1110,7 +1177,7 @@ int I18nTimeZone::InitPngptr(png_structp &png_ptr, png_infop &info_ptr, FILE **f
     return 0;
 }
 
-bool I18nTimeZone::CheckTzDataFilePath(std::string filePath)
+bool I18nTimeZone::CheckTzDataFilePath(const std::string &filePath)
 {
     char *realpathRes = NULL;
     realpathRes = realpath(filePath.c_str(), nullptr);
@@ -1130,12 +1197,12 @@ bool I18nTimeZone::CheckTzDataFilePath(std::string filePath)
 }
 
 std::string I18nTimeZone::GetPreferredPath(const double x,
-                                            std::vector<std::string> filePaths)
+                                           const std::vector<std::string> &filePaths)
 {
     if (filePaths.size() == 1) {
         return filePaths.at(0);
     } else {
-        uint32_t fixedX = (uint32_t)(x + TZ_X_PLUS);
+        int fixedX = (int)(x + TZ_X_PLUS);
         for (unsigned int i = 0; i < filePaths.size(); i++) {
             std::string path = filePaths.at(i);
             std::string left = path.substr(path.find("-") + 1, 3);
@@ -1175,7 +1242,7 @@ std::vector<std::string> I18nTimeZone::FindTzData()
     return filePaths;
 }
 
-bool I18nTimeZone::ValidateDataIntegrity(std::vector<std::string> pathList)
+bool I18nTimeZone::ValidateDataIntegrity(const std::vector<std::string> &pathList)
 {
     size_t total = 0;
     for (unsigned int i = 0; i < pathList.size(); i++) {
@@ -1188,7 +1255,7 @@ bool I18nTimeZone::ValidateDataIntegrity(std::vector<std::string> pathList)
 }
 
 void I18nTimeZone::SetVersionPathMap(std::string verison, std::string path,
-            std::map<std::string, std::vector<std::string>> *pathMap)
+                                     std::map<std::string, std::vector<std::string>> *pathMap)
 {
     if (pathMap->find(verison) != pathMap->end()) {
         std::vector<std::string> *list = &(pathMap->find(verison)->second);
