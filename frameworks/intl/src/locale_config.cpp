@@ -18,6 +18,10 @@
 #include "app_mgr_client.h"
 #include "ability_manager_client.h"
 #include "configuration.h"
+#include <common_event_data.h>
+#include <common_event_manager.h>
+#include <common_event_publish_info.h>
+#include <common_event_support.h>
 #endif
 #include <cctype>
 #include "hilog/log.h"
@@ -359,6 +363,14 @@ bool LocaleConfig::SetSystemLanguage(const string &language)
         AppExecFwk::Configuration configuration;
         configuration.AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE, language);
         appMgrClient->UpdateConfiguration(configuration);
+
+        OHOS::AAFwk::Want localeChangeWant;
+        localeChangeWant.SetAction(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED);
+        OHOS::EventFwk::CommonEventData event(localeChangeWant);
+        if (!OHOS::EventFwk::CommonEventManager::PublishCommonEvent(event)) {
+                HiLog::Info(LABEL, "Failed to Publish event %{public}s", localeChangeWant.GetAction().c_str());
+            return false;
+        }
 #endif
             return true;
         } else {
