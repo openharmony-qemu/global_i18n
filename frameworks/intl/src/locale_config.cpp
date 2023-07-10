@@ -368,7 +368,7 @@ bool LocaleConfig::SetSystemLanguage(const string &language)
         localeChangeWant.SetAction(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED);
         OHOS::EventFwk::CommonEventData event(localeChangeWant);
         if (!OHOS::EventFwk::CommonEventManager::PublishCommonEvent(event)) {
-                HiLog::Info(LABEL, "Failed to Publish event %{public}s", localeChangeWant.GetAction().c_str());
+            HiLog::Info(LABEL, "Failed to Publish event %{public}s", localeChangeWant.GetAction().c_str());
             return false;
         }
 #endif
