@@ -89,7 +89,8 @@ void I18nAddon::Destructor(napi_env env, void *nativeObject, void *hint)
     if (!nativeObject) {
         return;
     }
-    reinterpret_cast<I18nAddon *>(nativeObject)->~I18nAddon();
+    delete reinterpret_cast<I18nAddon *>(nativeObject);
+    nativeObject = nullptr;
 }
 
 napi_value I18nAddon::CreateUnicodeObject(napi_env env)
