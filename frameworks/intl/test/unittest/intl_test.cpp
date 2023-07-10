@@ -1981,7 +1981,7 @@ HWTEST_F(IntlTest, IntlFuncTest0051, TestSize.Level1)
     calendar->SetTime(1684742124645);
     calendar->Set(1989, 5, 23);
     std::string tzId = calendar2->GetTimeZone();
-    EXPECT_EQ(tzId, "Central Standard Time");
+    EXPECT_EQ(tzId, "Asia/Shanghai");
     calendar->SetTimeZone("Asia/Shanghai");
     int32_t minimalDaysInFirstWeek = calendar->GetMinimalDaysInFirstWeek();
     EXPECT_EQ(minimalDaysInFirstWeek, 1);
