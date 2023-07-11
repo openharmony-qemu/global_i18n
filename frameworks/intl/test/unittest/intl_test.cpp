@@ -2115,6 +2115,8 @@ HWTEST_F(IntlTest, IntlFuncTest0056, TestSize.Level1)
     const std::vector<std::string> countries = {"US", "GB", "DE", "CA"};
     std::vector<LocaleItem> countryInfos = systemLocaleManager->GetCountryInfoArray(countries, sortOptions);
     EXPECT_EQ(countryInfos.size(), 4);
+    std::vector<TimeZoneCityItem> timezoneCityItemList = SystemLocaleManager::GetTimezoneCityInfoArray();
+    EXPECT_TRUE(timezoneCityItemList.size() > 0);
     delete systemLocaleManager;
 }
 
