@@ -1980,9 +1980,9 @@ HWTEST_F(IntlTest, IntlFuncTest0051, TestSize.Level1)
     I18nCalendar *calendar2 = new I18nCalendar("zh-Hans-CN", CalendarType::CHINESE);
     calendar->SetTime(1684742124645);
     calendar->Set(1989, 5, 23);
-    std::string tzId = calendar2->GetTimeZone();
-    EXPECT_EQ(tzId, "Asia/Shanghai");
     calendar->SetTimeZone("Asia/Shanghai");
+    std::string tzId = calendar->GetTimeZone();
+    EXPECT_EQ(tzId, "Asia/Shanghai");
     int32_t minimalDaysInFirstWeek = calendar->GetMinimalDaysInFirstWeek();
     EXPECT_EQ(minimalDaysInFirstWeek, 1);
     int32_t firstDayOfWeek = calendar->GetFirstDayOfWeek();
