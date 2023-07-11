@@ -1981,7 +1981,7 @@ HWTEST_F(IntlTest, IntlFuncTest0051, TestSize.Level1)
     calendar->SetTime(1684742124645);
     calendar->Set(1989, 5, 23);
     std::string tzId = calendar2->GetTimeZone();
-    EXPECT_EQ(tzId, "Central Standard Time");
+    EXPECT_EQ(tzId, "Asia/Shanghai");
     calendar->SetTimeZone("Asia/Shanghai");
     int32_t minimalDaysInFirstWeek = calendar->GetMinimalDaysInFirstWeek();
     EXPECT_EQ(minimalDaysInFirstWeek, 1);
@@ -2115,6 +2115,8 @@ HWTEST_F(IntlTest, IntlFuncTest0056, TestSize.Level1)
     const std::vector<std::string> countries = {"US", "GB", "DE", "CA"};
     std::vector<LocaleItem> countryInfos = systemLocaleManager->GetCountryInfoArray(countries, sortOptions);
     EXPECT_EQ(countryInfos.size(), 4);
+    std::vector<TimeZoneCityItem> timezoneCityItemList = SystemLocaleManager::GetTimezoneCityInfoArray();
+    EXPECT_TRUE(timezoneCityItemList.size() > 0);
     delete systemLocaleManager;
 }
 
