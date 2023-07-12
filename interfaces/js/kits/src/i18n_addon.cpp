@@ -4108,13 +4108,11 @@ napi_value I18nAddon::CreateTimeZoneCityItem(napi_env env, const TimeZoneCityIte
         HiLog::Error(LABEL, "Failed to set element cityId.");
         return nullptr;
     }
-    if (timezoneCityItem.cityDisplayName.length() != 0) {
-        napi_value cityDisplayNameVal = CreateString(env, timezoneCityItem.cityDisplayName);
-        status = napi_set_named_property(env, result, "cityDisplayName", cityDisplayNameVal);
-        if (status != napi_ok) {
-            HiLog::Error(LABEL, "Failed to set element cityDisplayName.");
-            return nullptr;
-        }
+    napi_value cityDisplayNameVal = CreateString(env, timezoneCityItem.cityDisplayName);
+    status = napi_set_named_property(env, result, "cityDisplayName", cityDisplayNameVal);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "Failed to set element cityDisplayName.");
+        return nullptr;
     }
     status = napi_set_named_property(env, result, "offset", CreateNumber(env, timezoneCityItem.offset));
     if (status != napi_ok) {
