@@ -187,13 +187,14 @@ std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray()
         };
         result.push_back(tzCityItem);
     }
-    SortTimezoneCityItemList(result);
+    SortTimezoneCityItemList(locale, result);
     return result;
 }
 
-void SystemLocaleManager::SortTimezoneCityItemList(std::vector<TimeZoneCityItem> &timezoneCityItemList)
+void SystemLocaleManager::SortTimezoneCityItemList(const std::string &locale,
+                                                   std::vector<TimeZoneCityItem> &timezoneCityItemList)
 {
-    std::vector<std::string> collatorLocaleTags {};
+    std::vector<std::string> collatorLocaleTags { locale };
     std::map<std::string, std::string> collatorOptions {};
     Collator *collator = new Collator(collatorLocaleTags, collatorOptions);
     auto sortFunc = [collator](TimeZoneCityItem item1, TimeZoneCityItem item2) {
