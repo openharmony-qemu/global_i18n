@@ -132,30 +132,6 @@ napi_value I18nAddon::CreateUnicodeObject(napi_env env, napi_status &initStatus)
     return character;
 }
 
-napi_value I18nAddon::CreateSystemLocaleManagerObject(napi_env env, napi_status &initStatus)
-{
-    napi_status status = napi_ok;
-    napi_value systemLocaleManager = nullptr;
-    status = napi_create_object(env, &systemLocaleManager);
-    if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to create SystemLocaleManager object at init");
-        initStatus = napi_generic_failure;
-        return nullptr;
-    }
-    napi_property_descriptor properties[] = {
-        DECLARE_NAPI_FUNCTION("getTimeZoneCityItemArray", GetTimeZoneCityInfoArray)
-    };
-    status = napi_define_properties(env, systemLocaleManager,
-                                    sizeof(properties) / sizeof(napi_property_descriptor),
-                                    properties);
-    if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to set SystemLocaleManager of character at init");
-        initStatus = napi_generic_failure;
-        return nullptr;
-    }
-    return systemLocaleManager;
-}
-
 napi_value I18nAddon::CreateI18nUtilObject(napi_env env, napi_status &initStatus)
 {
     napi_value i18nUtil = nullptr;
@@ -281,8 +257,7 @@ napi_value I18nAddon::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("TimeZone", CreateTimeZoneObject(env, initStatus)),
         DECLARE_NAPI_PROPERTY("System", CreateSystemObject(env, initStatus)),
         DECLARE_NAPI_PROPERTY("Normalizer", CreateI18nNormalizerObject(env, initStatus)),
-        DECLARE_NAPI_PROPERTY("NormalizerMode", CreateI18NNormalizerModeEnum(env, initStatus)),
-        DECLARE_NAPI_PROPERTY("SystemLocaleManager", CreateSystemLocaleManagerObject(env, initStatus))
+        DECLARE_NAPI_PROPERTY("NormalizerMode", CreateI18NNormalizerModeEnum(env, initStatus))
     };
     initStatus = napi_define_properties(env, exports, sizeof(properties) / sizeof(napi_property_descriptor),
         properties);
@@ -3969,7 +3944,8 @@ napi_value I18nAddon::InitSystemLocaleManager(napi_env env, napi_value exports)
     napi_status status = napi_ok;
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("getLanguageInfoArray", GetLanguageInfoArray),
-        DECLARE_NAPI_FUNCTION("getRegionInfoArray", getCountryInfoArray)
+        DECLARE_NAPI_FUNCTION("getRegionInfoArray", getCountryInfoArray),
+        DECLARE_NAPI_STATIC_FUNCTION("getTimeZoneCityItemArray", GetTimeZoneCityInfoArray)
     };
 
     napi_value constructor = nullptr;

@@ -156,7 +156,6 @@ private:
     static napi_value GetIndex(napi_env env, napi_callback_info info);
     bool InitIndexUtilContext(napi_env env, napi_callback_info info, const std::string &localeTag);
     static napi_value CreateUnicodeObject(napi_env env, napi_status &initStatus);
-    static napi_value CreateSystemLocaleManagerObject(napi_env env, napi_status &initStatus);
 
     static napi_value I18nTimeZoneConstructor(napi_env env, napi_callback_info info);
     static napi_value GetID(napi_env env, napi_callback_info info);
