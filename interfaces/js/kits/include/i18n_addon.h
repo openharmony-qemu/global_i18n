@@ -206,7 +206,7 @@ private:
     static napi_value GetLanguageInfoArray(napi_env env, napi_callback_info info);
     static napi_value getCountryInfoArray(napi_env env, napi_callback_info info);
     static bool GetStringArrayFromJsParam(napi_env env, napi_value &jsArray, std::vector<std::string> &strArray);
-    static bool GetSortOptionsFromJsParam(napi_env env, napi_value &jsOptions, SortOptions &options);
+    static void GetSortOptionsFromJsParam(napi_env env, napi_value &jsOptions, SortOptions &options, bool isRegion);
     static bool GetBoolOptionValue(napi_env env, napi_value &options, const std::string &optionName, bool &boolVal);
     static napi_value CreateLocaleItemArray(napi_env env, const std::vector<LocaleItem> &localeItemList);
     static napi_value CreateLocaleItem(napi_env env, const LocaleItem &localeItem);

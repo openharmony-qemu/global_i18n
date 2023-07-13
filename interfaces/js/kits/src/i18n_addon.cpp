@@ -4022,10 +4022,7 @@ napi_value I18nAddon::GetLanguageInfoArray(napi_env env, napi_callback_info info
         return nullptr;
     }
     SortOptions options;
-    isSuccess = GetSortOptionsFromJsParam(env, argv[1], options);
-    if (!isSuccess) {
-        return nullptr;
-    }
+    GetSortOptionsFromJsParam(env, argv[1], options, false);
     I18nAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->systemLocaleManager_) {
@@ -4055,10 +4052,7 @@ napi_value I18nAddon::getCountryInfoArray(napi_env env, napi_callback_info info)
         return nullptr;
     }
     SortOptions options;
-    isSuccess = GetSortOptionsFromJsParam(env, argv[1], options);
-    if (!isSuccess) {
-        return nullptr;
-    }
+    GetSortOptionsFromJsParam(env, argv[1], options, true);
     I18nAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->systemLocaleManager_) {
@@ -4166,29 +4160,30 @@ bool I18nAddon::GetStringArrayFromJsParam(napi_env env, napi_value &jsArray, std
     return true;
 }
 
-bool I18nAddon::GetSortOptionsFromJsParam(napi_env env, napi_value &jsOptions, SortOptions &options)
+void I18nAddon::GetSortOptionsFromJsParam(napi_env env, napi_value &jsOptions, SortOptions &options, bool isRegion)
 {
-    if (jsOptions == nullptr) {
-        HiLog::Error(LABEL, "SortOptions js param not found.");
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
-        return false;
-    }
     std::string localeTag;
-    GetOptionValue(env, jsOptions, "locale", localeTag);
+    bool isUseLocalName = true;
+    bool isSuggestedFirst = true;
+    if (jsOptions == nullptr) {
+        localeTag = LocaleConfig::GetSystemLocale();
+        if (isRegion) {
+            isUseLocalName = false;
+        }
+    } else {
+        GetOptionValue(env, jsOptions, "locale", localeTag);
+        if (localeTag.length() == 0) {
+            localeTag = LocaleConfig::GetSystemLocale();
+        }
+        bool isSuccess = GetBoolOptionValue(env, jsOptions, "isUseLocalName", isUseLocalName);
+        if (!isSuccess && isRegion) {
+            isUseLocalName = false;
+        }
+        GetBoolOptionValue(env, jsOptions, "isSuggestedFirst", isSuggestedFirst);
+    }
     options.localeTag = localeTag;
-    bool isUseLocalName;
-    bool isSuccess = GetBoolOptionValue(env, jsOptions, "isUseLocalName", isUseLocalName);
-    if (!isSuccess) {
-        return false;
-    }
     options.isUseLocalName = isUseLocalName;
-    bool isSuggestedFirst;
-    isSuccess = GetBoolOptionValue(env, jsOptions, "isSuggestedFirst", isSuggestedFirst);
-    if (!isSuccess) {
-        return false;
-    }
     options.isSuggestedFirst = isSuggestedFirst;
-    return true;
 }
 
 bool I18nAddon::GetBoolOptionValue(napi_env env, napi_value &options, const std::string &optionName, bool &boolVal)
@@ -4203,15 +4198,13 @@ bool I18nAddon::GetBoolOptionValue(napi_env env, napi_value &options, const std:
     bool hasProperty = false;
     status = napi_has_named_property(env, options, optionName.c_str(), &hasProperty);
     if (status != napi_ok || !hasProperty) {
-        HiLog::Error(LABEL, "option don't have property %{public}s", optionName.c_str());
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+        HiLog::Info(LABEL, "option don't have property %{public}s", optionName.c_str());
         return false;
     }
     napi_value optionValue = nullptr;
     status = napi_get_named_property(env, options, optionName.c_str(), &optionValue);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "get option %{public}s failed", optionName.c_str());
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+        HiLog::Info(LABEL, "get option %{public}s failed", optionName.c_str());
         return false;
     }
     napi_get_value_bool(env, optionValue, &boolVal);
