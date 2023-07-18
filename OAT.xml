@@ -28,6 +28,8 @@
         <filefilterlist>
             <filefilter name="defaultFilter" desc="Files not to check">
                 <filteritem type="filepath" name="frameworks/intl/etc/timezone/.*.dat" desc="资源二进制文件"/>
+                <filteritem type="filepath" name="figures/i18n.png" desc="图片二进制文件"/>
+                <filteritem type="filepath" name="tools/data/location2tz.zip" desc="压缩文件，不参与编译运行"/>
             </filefilter>
         </filefilterlist>
     </oatconfig>
