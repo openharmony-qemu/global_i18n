@@ -1118,6 +1118,14 @@ bool LocaleConfig::Set24HourClock(bool option)
         AppExecFwk::Configuration configuration;
         configuration.AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_HOUR, optionStr);
         appMgrClient->UpdateConfiguration(configuration);
+
+        OHOS::AAFwk::Want timeChangeWant;
+        timeChangeWant.SetAction(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_TIME_CHANGED);
+        OHOS::EventFwk::CommonEventData event(timeChangeWant);
+        if (!OHOS::EventFwk::CommonEventManager::PublishCommonEvent(event)) {
+            HiLog::Info(LABEL, "Failed to Publish event %{public}s", timeChangeWant.GetAction().c_str());
+            return false;
+        }
 #endif
         return true;
     }
