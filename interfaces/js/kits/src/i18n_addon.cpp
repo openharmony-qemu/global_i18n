@@ -423,47 +423,31 @@ std::string I18nAddon::ModifyOrder(std::string &pattern)
 {
     int order[3] = { 0 }; // total 3 elements 'y', 'M'/'L', 'd'
     int lengths[4] = { 0 }; // first elements is the currently found elememnts, thus 4 elements totally.
-    size_t len = pattern.length();
-    for (size_t i = 0; i < len; ++i) {
+    bool flag = true;
+    for (size_t i = 0; i < pattern.length(); ++i) {
         char ch = pattern[i];
-        if (((ch >= 'a') && (ch <= 'z')) || ((ch >= 'A') && (ch <= 'Z'))) {
+        if (flag && std::isalpha(ch)) {
             ProcessNormal(ch, order, 3, lengths, 4); // 3, 4 are lengths of these arrays
         } else if (ch == '\'') {
-            ++i;
-            while ((i < len) && pattern[i] != '\'') {
-                ++i;
-            }
+            flag = !flag;
         }
     }
+    std::unordered_map<char, int> pattern2index = {
+        { 'y', 1 },
+        { 'L', 2 },
+        { 'd', 3}
+    };
     std::string ret;
     for (int i = 0; i < 3; ++i) { // 3 is the size of orders
-        switch (order[i]) {
-            case 'y': {
-                if ((lengths[1] <= 0) || (lengths[1] > 6)) { // 6 is the max length of a filed
-                    break;
-                }
-                ret.append(lengths[1], order[i]);
-                break;
-            }
-            case 'L': {
-                if ((lengths[2] <= 0) || (lengths[2] > 6)) { // 6 is the max length of a filed, 2 is the index
-                    break;
-                }
-                ret.append(lengths[2], order[i]); // 2 is the index of 'L'
-                break;
-            }
-            case 'd': {
-                if ((lengths[3] <= 0) || (lengths[3] > 6)) { // 6 is the max length of a filed, 3 is the index
-                    break;
-                }
-                ret.append(lengths[3], order[i]); // 3 is the index of 'y'
-                break;
-            }
-            default: {
-                break;
-            }
+        auto it = pattern2index.find(order[i]);
+        if (it == pattern2index.end()) {
+            continue;
         }
-        if ((i < 2) && (order[i] != 0)) { // 2 is the index of 'L'
+        int index = it->second;
+        if ((lengths[index] > 0) && (lengths[index] <= 6)) {
+            ret.append(lengths[index], order[i]);
+        }
+        if (i < 2) {
             ret.append(1, '-');
         }
     }
