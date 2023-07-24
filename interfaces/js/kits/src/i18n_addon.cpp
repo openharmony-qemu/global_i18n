@@ -435,7 +435,7 @@ std::string I18nAddon::ModifyOrder(std::string &pattern)
     std::unordered_map<char, int> pattern2index = {
         { 'y', 1 },
         { 'L', 2 },
-        { 'd', 3}
+        { 'd', 3},
     };
     std::string ret;
     for (int i = 0; i < 3; ++i) { // 3 is the size of orders
@@ -444,7 +444,7 @@ std::string I18nAddon::ModifyOrder(std::string &pattern)
             continue;
         }
         int index = it->second;
-        if ((lengths[index] > 0) && (lengths[index] <= 6)) {
+        if ((lengths[index] > 0) && (lengths[index] <= 6)) { // 6 is the max length of a filed
             ret.append(lengths[index], order[i]);
         }
         if (i < 2) {
