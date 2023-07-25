@@ -2087,6 +2087,8 @@ HWTEST_F(IntlTest, IntlFuncTest0055, TestSize.Level1)
     EXPECT_EQ(resultFil, 9);
     int32_t resultQaag = LocaleCompare::Compare("en-Qaag-US", "en-Latn-US");
     EXPECT_EQ(resultQaag, 9);
+    int32_t resultHashMapZh = LocaleCompare::Compare("zh-MO", "zh-Hant-HK");
+    EXPECT_EQ(resultHashMapZh, 8);
     I18nBreakIterator *breakIterator = new I18nBreakIterator("fake locale");
     breakIterator->Current();
     breakIterator->First();
