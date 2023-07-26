@@ -137,7 +137,7 @@ int32_t LocaleCompare::Compare(const std::string& localeTag1, const std::string&
     icu::Locale locale1 = icu::Locale::forLanguageTag(icu::StringPiece(localeTag1), status);
     icu::Locale locale2 = icu::Locale::forLanguageTag(icu::StringPiece(localeTag2), status);
     int32_t segmentScore = 3;
-    const int32_t mapScore = 0;
+    const int32_t mapScore = 8;
     int32_t score = 0;
     std::string language1 = locale1.getLanguage();
     std::string language2 = locale2.getLanguage();
@@ -148,6 +148,8 @@ int32_t LocaleCompare::Compare(const std::string& localeTag1, const std::string&
     }
     std::string localeBaseName1 = locale1.getBaseName();
     std::string localeBaseName2 = locale2.getBaseName();
+    std::replace(localeBaseName1.begin(), localeBaseName1.end(), '_', '-');
+    std::replace(localeBaseName2.begin(), localeBaseName2.end(), '_', '-');
     if (HasMapRelation(language1, localeBaseName1, localeBaseName2)) {
         return mapScore;
     }
@@ -212,7 +214,7 @@ bool LocaleCompare::HasMapRelation(const std::string& languageTag, const std::st
         }
     }
     if (latnParent.find(localeTag1) != latnParent.end()) {
-        if (localeTag2.compare(hantParent[localeTag1]) == 0) {
+        if (localeTag2.compare(latnParent[localeTag1]) == 0) {
             return true;
         }
     }
@@ -236,7 +238,7 @@ bool LocaleCompare::HasMapRelation(const std::string& languageTag, const std::st
             size_t languageLength = key.find("-");
             std::string language = key.substr(0, languageLength);
             std::string region = key.substr(languageLength + 1);
-            extendedHantParent[language + latnSegment + region] = it->second;
+            extendedLatnParent[language + latnSegment + region] = it->second;
             if (language.compare("en") == 0) {
                 extendedLatnParent[language + qaagSegment + region] = it->second;
             }
