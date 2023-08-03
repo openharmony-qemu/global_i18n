@@ -259,6 +259,34 @@ HWTEST_F(I18nTest, I18nFuncTest007, TestSize.Level1)
     defaultCalendar.Set(UCalendarDateFields::UCAL_HOUR, 12);
     int32_t hour = defaultCalendar.Get(UCalendarDateFields::UCAL_HOUR);
     EXPECT_EQ(hour, 0);
+    defaultCalendar.Set(UCalendarDateFields::UCAL_YEAR, 100);
+    defaultCalendar.Add(UCalendarDateFields::UCAL_YEAR, 100);
+    EXPECT_EQ(defaultCalendar.Get(UCalendarDateFields::UCAL_YEAR), 200);
+    defaultCalendar.Set(UCalendarDateFields::UCAL_MONTH, 10);
+    defaultCalendar.Add(UCalendarDateFields::UCAL_MONTH, 2);
+    EXPECT_EQ(defaultCalendar.Get(UCalendarDateFields::UCAL_MONTH), 0);
+    defaultCalendar.Set(UCalendarDateFields::UCAL_DATE, 20);
+    defaultCalendar.Add(UCalendarDateFields::UCAL_DATE, 15);
+    EXPECT_EQ(defaultCalendar.Get(UCalendarDateFields::UCAL_DATE), 4);
+    defaultCalendar.Set(UCalendarDateFields::UCAL_HOUR, 10);
+    defaultCalendar.Add(UCalendarDateFields::UCAL_HOUR, 11);
+    EXPECT_EQ(defaultCalendar.Get(UCalendarDateFields::UCAL_HOUR), 9);
+    defaultCalendar.Set(UCalendarDateFields::UCAL_MINUTE, 31);
+    defaultCalendar.Add(UCalendarDateFields::UCAL_MINUTE, 31);
+    EXPECT_EQ(defaultCalendar.Get(UCalendarDateFields::UCAL_MINUTE), 2);
+    defaultCalendar.Set(UCalendarDateFields::UCAL_SECOND, 21);
+    defaultCalendar.Add(UCalendarDateFields::UCAL_SECOND, 51);
+    EXPECT_EQ(defaultCalendar.Get(UCalendarDateFields::UCAL_SECOND), 12);
+    defaultCalendar.Set(UCalendarDateFields::UCAL_MILLISECOND, 1000);
+    defaultCalendar.Add(UCalendarDateFields::UCAL_MILLISECOND, 165);
+    EXPECT_EQ(defaultCalendar.Get(UCalendarDateFields::UCAL_MILLISECOND), 165);
+    defaultCalendar.Set(2023, 8, 2);
+    UDate millis = defaultCalendar.GetTimeInMillis();
+    I18nCalendar checkCalendar("zh-Hans", CalendarType::UNDEFINED);
+    checkCalendar.SetTime(millis);
+    EXPECT_EQ(checkCalendar.Get(UCalendarDateFields::UCAL_YEAR), 2023);
+    EXPECT_EQ(checkCalendar.Get(UCalendarDateFields::UCAL_MONTH), 8);
+    EXPECT_EQ(checkCalendar.Get(UCalendarDateFields::UCAL_DATE), 2);
 }
 
 /**

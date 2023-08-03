@@ -65,6 +65,11 @@ static std::unordered_map<std::string, UCalendarDateFields> g_fieldsMap {
     { "milliseconds_in_day", UCAL_MILLISECONDS_IN_DAY },
     { "is_leap_month", UCAL_IS_LEAP_MONTH },
 };
+static std::unordered_set<std::string> g_fieldsInFunctionAdd {
+    "year", "month", "date", "hour", "minute", "second", "millisecond",
+    "week_of_year", "week_of_month", "day_of_year", "day_of_week", "day_of_week_in_month",
+    "hour_of_day", "milliseconds_in_day",
+};
 static std::unordered_map<std::string, CalendarType> g_typeMap {
     { "buddhist", CalendarType::BUDDHIST },
     { "chinese", CalendarType::CHINESE },
@@ -1711,6 +1716,22 @@ std::string I18nAddon::GetString(napi_env &env, napi_value &value, int32_t &code
     return buf.data();
 }
 
+std::string I18nAddon::GetAddFilds(napi_env &env, napi_value &value, int32_t &code) {
+    std::string field = GetString(env, value, code);
+    if (code != 0) {
+        HiLog::Error(LABEL, "can't get string from js array param.");
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+        return field;
+    }
+    if (g_fieldsInFunctionAdd.find(field) == g_fieldsInFunctionAdd.end()) {
+        code = 1;
+        HiLog::Error(LABEL, "Parameter rangs do not match");
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+        return field;
+    }
+    return field;
+}
+
 napi_value I18nAddon::InitI18nCalendar(napi_env env, napi_value exports)
 {
     napi_status status = napi_ok;
@@ -1724,6 +1745,8 @@ napi_value I18nAddon::InitI18nCalendar(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getMinimalDaysInFirstWeek", GetMinimalDaysInFirstWeek),
         DECLARE_NAPI_FUNCTION("setMinimalDaysInFirstWeek", SetMinimalDaysInFirstWeek),
         DECLARE_NAPI_FUNCTION("get", Get),
+        DECLARE_NAPI_FUNCTION("add", Add),
+        DECLARE_NAPI_FUNCTION("getTimeInMillis", GetTimeInMillis),
         DECLARE_NAPI_FUNCTION("getDisplayName", GetDisplayName),
         DECLARE_NAPI_FUNCTION("isWeekend", IsWeekend)
     };
@@ -2188,6 +2211,74 @@ napi_value I18nAddon::Get(napi_env env, napi_callback_info info)
     int32_t value = obj->calendar_->Get(g_fieldsMap[field]);
     napi_value result = nullptr;
     status = napi_create_int32(env, value, &result);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "Create int32 failed");
+        return nullptr;
+    }
+    return result;
+}
+
+napi_value I18nAddon::Add(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value argv[2] = { 0 };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "can not obtain add function param.");
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        return nullptr;
+    }
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    napi_typeof(env, argv[0], &valueType);
+    if (valueType != napi_valuetype::napi_string) {
+        HiLog::Error(LABEL, "Parameter type does not match");
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        return nullptr;
+    }
+    int32_t code = 0;
+    std::string field = GetAddFilds(env, argv[0], code);
+    if (code) {
+        return nullptr;
+    }
+    napi_typeof(env, argv[1], &valueType);
+    if (valueType != napi_valuetype::napi_number) {
+        HiLog::Error(LABEL, "Parameter type does not match");
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        return nullptr;
+    }
+    int32_t amount;
+    status = napi_get_value_int32(env, argv[1], &amount);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "can not obtain add function param.");
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+        return nullptr;
+    }
+    I18nAddon *obj = nullptr;
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    if (status != napi_ok || !obj || !obj->calendar_) {
+        HiLog::Error(LABEL, "Get calendar object failed");
+        return nullptr;
+    }
+    obj->calendar_->Add(g_fieldsMap[field], amount);
+    return nullptr;
+}
+
+napi_value I18nAddon::GetTimeInMillis(napi_env env, napi_callback_info info) {
+    size_t argc = 0;
+    napi_value *argv = nullptr;
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    I18nAddon *obj = nullptr;
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    if (status != napi_ok || !obj || !obj->calendar_) {
+        HiLog::Error(LABEL, "Get calendar object failed");
+        return nullptr;
+    }
+    UDate temp = obj->calendar_->GetTimeInMillis();
+    napi_value result = nullptr;
+    status = napi_create_double(env, temp, &result);
     if (status != napi_ok) {
         HiLog::Error(LABEL, "Create int32 failed");
         return nullptr;
