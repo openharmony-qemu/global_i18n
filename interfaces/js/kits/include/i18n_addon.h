@@ -125,6 +125,7 @@ private:
     void SetField(napi_env env, napi_value value, UCalendarDateFields field);
     static napi_value SetTime(napi_env env, napi_callback_info info);
     static std::string GetString(napi_env &env, napi_value &value, int32_t &code);
+    static std::string GetAddField(napi_env &env, napi_value &value, int32_t &code);
     static napi_value SetTimeZone(napi_env env, napi_callback_info info);
     static napi_value GetTimeZone(napi_env env, napi_callback_info info);
     static napi_value SetFirstDayOfWeek(napi_env env, napi_callback_info info);
@@ -132,6 +133,8 @@ private:
     static napi_value SetMinimalDaysInFirstWeek(napi_env env, napi_callback_info info);
     static napi_value GetMinimalDaysInFirstWeek(napi_env env, napi_callback_info info);
     static napi_value Get(napi_env env, napi_callback_info info);
+    static napi_value Add(napi_env env, napi_callback_info info);
+    static napi_value GetTimeInMillis(napi_env env, napi_callback_info info);
     static napi_value GetDisplayName(napi_env env, napi_callback_info info);
     static napi_value IsWeekend(napi_env env, napi_callback_info info);
     static CalendarType GetCalendarType(napi_env env, napi_value value);

@@ -216,6 +216,14 @@ int32_t I18nCalendar::Get(UCalendarDateFields field) const
     return 0;
 }
 
+void I18nCalendar::Add(UCalendarDateFields field, int32_t amount)
+{
+    if (calendar_ != nullptr) {
+        UErrorCode status = U_ZERO_ERROR;
+        calendar_->add(field, amount, status);
+    }
+}
+
 void I18nCalendar::SetMinimalDaysInFirstWeek(int32_t value)
 {
     if (calendar_ != nullptr) {
@@ -233,6 +241,15 @@ void I18nCalendar::SetFirstDayOfWeek(int32_t value)
         calendar_->setFirstDayOfWeek(UCalendarDaysOfWeek(value));
         return;
     }
+}
+
+UDate I18nCalendar::GetTimeInMillis(void)
+{
+    if (calendar_ != nullptr) {
+        UErrorCode status = U_ZERO_ERROR;
+        return calendar_->getTime(status);
+    }
+    return 0;
 }
 
 int32_t I18nCalendar::GetMinimalDaysInFirstWeek(void)
