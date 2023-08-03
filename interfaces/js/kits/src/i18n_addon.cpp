@@ -2285,7 +2285,7 @@ napi_value I18nAddon::GetTimeInMillis(napi_env env, napi_callback_info info) {
     status = napi_create_double(env, temp, &result);
     if (status != napi_ok) {
         HiLog::Error(LABEL, "Create UDate failed");
-        return nullptr;
+        napi_create_double(env, 0, &result)
     }
     return result;
 }
