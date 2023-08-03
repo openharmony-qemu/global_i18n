@@ -1716,7 +1716,7 @@ std::string I18nAddon::GetString(napi_env &env, napi_value &value, int32_t &code
     return buf.data();
 }
 
-std::string I18nAddon::GetAddFilds(napi_env &env, napi_value &value, int32_t &code) {
+std::string I18nAddon::GetAddField(napi_env &env, napi_value &value, int32_t &code) {
     std::string field = GetString(env, value, code);
     if (code != 0) {
         HiLog::Error(LABEL, "can't get string from js array param.");
@@ -2237,7 +2237,7 @@ napi_value I18nAddon::Add(napi_env env, napi_callback_info info) {
         return nullptr;
     }
     int32_t code = 0;
-    std::string field = GetAddFilds(env, argv[0], code);
+    std::string field = GetAddField(env, argv[0], code);
     if (code) {
         return nullptr;
     }
@@ -2265,6 +2265,7 @@ napi_value I18nAddon::Add(napi_env env, napi_callback_info info) {
 }
 
 napi_value I18nAddon::GetTimeInMillis(napi_env env, napi_callback_info info) {
+    bool flag = true;
     size_t argc = 0;
     napi_value *argv = nullptr;
     napi_value thisVar = nullptr;
@@ -2274,13 +2275,16 @@ napi_value I18nAddon::GetTimeInMillis(napi_env env, napi_callback_info info) {
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->calendar_) {
         HiLog::Error(LABEL, "Get calendar object failed");
-        return nullptr;
+        flag = false;
     }
-    UDate temp = obj->calendar_->GetTimeInMillis();
+    UDate temp = 0;
+    if (flag) {
+        temp = obj->calendar_->GetTimeInMillis();
+    }
     napi_value result = nullptr;
     status = napi_create_double(env, temp, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Create int32 failed");
+        HiLog::Error(LABEL, "Create UDate failed");
         return nullptr;
     }
     return result;
