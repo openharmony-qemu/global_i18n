@@ -72,6 +72,8 @@ ohos_shared_library("i18n") {
   sources = [
     "src/error_util.cpp",
     "src/i18n_addon.cpp",
+    "src/system_locale_manager_addon.cpp",
+    "src/variable_convertor.cpp",
   ]
   deps = [
     "//base/global/i18n/frameworks/intl:intl_util",
