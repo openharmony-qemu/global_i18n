@@ -2225,7 +2225,7 @@ HWTEST_F(IntlTest, IntlFuncTest0059, TestSize.Level1)
 
 /**
  * @tc.name: IntlFuncTest0060
- * @tc.desc: Test Intl NumberFormat
+ * @tc.desc: Test Intl HolidayManager
  * @tc.type: FUNC
  */
 HWTEST_F(IntlTest, IntlFuncTest0060, TestSize.Level1)
