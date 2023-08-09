@@ -20,6 +20,7 @@
 #include "hilog/log.h"
 #include "i18n_calendar.h"
 #include "system_locale_manager_addon.h"
+#include "holiday_manager_addon.h"
 #include "unicode/locid.h"
 #include "unicode/datefmt.h"
 #include "unicode/smpdtfmt.h"
@@ -4086,6 +4087,7 @@ napi_value Init(napi_env env, napi_value exports)
     val = I18nAddon::InitUtil(env, val);
     val = I18nAddon::InitI18nNormalizer(env, val);
     val = SystemLocaleManagerAddon::InitSystemLocaleManager(env, val);
+    val = HolidayManagerAddon::InitHolidayManager(env, val);
     return val;
 }
 
