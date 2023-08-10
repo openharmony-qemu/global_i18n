@@ -147,12 +147,6 @@ napi_value I18nCalendarAddon::GetCalendar(napi_env env, napi_callback_info info)
             return nullptr;
         }
     }
-    /* if (!CheckNapiValueType(env, argv[1])) {
-        status = napi_create_string_utf8(env, "", NAPI_AUTO_LENGTH, argv + 1);
-        if (status != napi_ok) {
-            return nullptr;
-        }
-    } */
     napi_value result = nullptr;
     status = napi_new_instance(env, constructor, 2, argv, &result); // 2 arguments
     if (status != napi_ok) {
@@ -680,9 +674,9 @@ CalendarType I18nCalendarAddon::GetCalendarType(napi_env env, napi_value value)
 
 void I18nCalendarAddon::SetField(napi_env env, napi_value value, UCalendarDateFields field)
 {
-    /* if (!CheckNapiValueType(env, value)) {
+    if (!CheckNapiValueType(env, value)) {
         return;
-    } */
+    }
     int32_t val = 0;
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, value, &valueType);
