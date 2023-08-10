@@ -19,7 +19,6 @@
 #include <unordered_map>
 #include "napi/native_api.h"
 #include "i18n_break_iterator.h"
-#include "i18n_calendar.h"
 #include "i18n_normalizer.h"
 #include "i18n_timezone.h"
 #include "index_util.h"
@@ -65,7 +64,6 @@ public:
     static napi_value IsRTL(napi_env env, napi_callback_info info);
     static napi_value IsRTLWihtError(napi_env env, napi_callback_info info);
     static napi_value InitPhoneNumberFormat(napi_env env, napi_value exports);
-    static napi_value InitI18nCalendar(napi_env env, napi_value exports);
     static napi_value UnitConvert(napi_env env, napi_callback_info info);
     static napi_value InitBreakIterator(napi_env env, napi_value exports);
     static napi_value InitIndexUtil(napi_env env, napi_value exports);
@@ -114,30 +112,7 @@ private:
     static napi_value GetLocationName(napi_env env, napi_callback_info info);
     bool InitPhoneNumberFormatContext(napi_env env, napi_callback_info info, const std::string &country,
                                       const std::map<std::string, std::string> &options);
-
-    static napi_value CalendarConstructor(napi_env env, napi_callback_info info);
     static napi_value BreakIteratorConstructor(napi_env env, napi_callback_info info);
-    bool InitCalendarContext(napi_env env, napi_callback_info info, const std::string &localeTag, CalendarType type);
-    static napi_value GetCalendar(napi_env env, napi_callback_info info);
-    static napi_value Set(napi_env env, napi_callback_info info);
-    static napi_value GetDate(napi_env env, napi_value value);
-    void SetMilliseconds(napi_env env, napi_value value);
-    void SetField(napi_env env, napi_value value, UCalendarDateFields field);
-    static napi_value SetTime(napi_env env, napi_callback_info info);
-    static std::string GetString(napi_env &env, napi_value &value, int32_t &code);
-    static std::string GetAddField(napi_env &env, napi_value &value, int32_t &code);
-    static napi_value SetTimeZone(napi_env env, napi_callback_info info);
-    static napi_value GetTimeZone(napi_env env, napi_callback_info info);
-    static napi_value SetFirstDayOfWeek(napi_env env, napi_callback_info info);
-    static napi_value GetFirstDayOfWeek(napi_env env, napi_callback_info info);
-    static napi_value SetMinimalDaysInFirstWeek(napi_env env, napi_callback_info info);
-    static napi_value GetMinimalDaysInFirstWeek(napi_env env, napi_callback_info info);
-    static napi_value Get(napi_env env, napi_callback_info info);
-    static napi_value Add(napi_env env, napi_callback_info info);
-    static napi_value GetTimeInMillis(napi_env env, napi_callback_info info);
-    static napi_value GetDisplayName(napi_env env, napi_callback_info info);
-    static napi_value IsWeekend(napi_env env, napi_callback_info info);
-    static CalendarType GetCalendarType(napi_env env, napi_value value);
     static napi_value GetLineInstance(napi_env env, napi_callback_info info);
     static napi_value Current(napi_env env, napi_callback_info info);
     static napi_value First(napi_env env, napi_callback_info info);
@@ -212,7 +187,6 @@ private:
 
     napi_env env_;
     std::unique_ptr<PhoneNumberFormat> phonenumberfmt_ = nullptr;
-    std::unique_ptr<I18nCalendar> calendar_ = nullptr;
     std::unique_ptr<icu::Transliterator> transliterator_ = nullptr;
     std::unique_ptr<I18nBreakIterator> brkiter_ = nullptr;
     std::unique_ptr<IndexUtil> indexUtil_ = nullptr;
