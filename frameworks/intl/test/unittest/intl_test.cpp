@@ -2230,14 +2230,14 @@ HWTEST_F(IntlTest, IntlFuncTest0059, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest0060, TestSize.Level1)
 {
-    std::string path = "/system/lib/US.ics";
+    std::string path = "/system/lib/TR.ics";
     HolidayManager *holiday_manager = new HolidayManager(path.c_str());
     std::map<std::string, std::vector<HolidayInfoItem>> holidayDataMap;
     std::vector<HolidayInfoItem> infoList;
     std::vector<HolidayLocaleName> localNameList1;
-    localNameList1.push_back({"ar", "Kurban Bayrami Tatili"});
+    localNameList1.push_back({"tr", "Kurban Bayrami Tatili"});
     std::vector<HolidayLocaleName> localNameList2;
-    localNameList2.push_back({"ar", "Kurban Bayrami 2. Günü"});
+    localNameList2.push_back({"tr", "Kurban Bayrami 2. Günü"});
     HolidayInfoItem item1 = {"Sacrifice Feast Holiday", 2023, 6, 25, localNameList1};
     HolidayInfoItem item2 = {"The Second Day of Sacrifice Feast", 2023, 6, 25, localNameList2};
     infoList.push_back(item1);
