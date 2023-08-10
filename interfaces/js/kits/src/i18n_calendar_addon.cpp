@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#include <unordered_map>
+#include <unordered_set>
+
 #include "error_util.h"
 #include "hilog/log.h"
 #include "i18n_calendar_addon.h"
