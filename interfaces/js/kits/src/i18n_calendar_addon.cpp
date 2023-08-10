@@ -674,7 +674,7 @@ CalendarType I18nCalendarAddon::GetCalendarType(napi_env env, napi_value value)
 
 void I18nCalendarAddon::SetField(napi_env env, napi_value value, UCalendarDateFields field)
 {
-    if (!CheckNapiValueType(env, value)) {
+    if (!VariableConvertor::CheckNapiValueType(env, value)) {
         return;
     }
     int32_t val = 0;
