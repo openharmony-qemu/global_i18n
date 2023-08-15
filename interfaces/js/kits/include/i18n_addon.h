@@ -91,6 +91,7 @@ public:
     static napi_value InitI18nTimeZone(napi_env env, napi_value exports);
     static napi_value GetI18nTimeZone(napi_env env, napi_callback_info info);
     static napi_value GetDateOrder(napi_env env, napi_callback_info info);
+    static napi_value GetTimePeriodName(napi_env env, napi_callback_info info);
     static napi_value InitTransliterator(napi_env env, napi_value exports);
     static napi_value GetTransliteratorInstance(napi_env env, napi_callback_info info);
     static napi_value GetAvailableIDs(napi_env env, napi_callback_info info);
@@ -188,12 +189,16 @@ private:
     static napi_value RemovePreferredLanguageImpl(napi_env env, napi_callback_info info, bool throwError);
     static napi_value SetUsingLocalDigitAddonImpl(napi_env env, napi_callback_info info, bool throwError);
 
+    static int GetParamOfGetTimePeriodName(napi_env env, napi_callback_info info, std::string &tag, int32_t &hour);
+    static bool IsValidLocaleTag(icu::Locale &locale);
+    static void GetAllValidLocalesTag();
+
     static napi_value ObjectConstructor(napi_env env, napi_callback_info info);
 
     static bool ParseStringParam(napi_env env, napi_value argv, bool throwError, std::string &strParam);
 
     static napi_value CreateI18nUtilObject(napi_env env, napi_status &initStatus);
-    
+
     napi_env env_;
     std::unique_ptr<PhoneNumberFormat> phonenumberfmt_ = nullptr;
     std::unique_ptr<I18nCalendar> calendar_ = nullptr;
