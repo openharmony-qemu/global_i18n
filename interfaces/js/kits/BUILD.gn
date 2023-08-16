@@ -73,6 +73,7 @@ ohos_shared_library("i18n") {
     "src/error_util.cpp",
     "src/i18n_addon.cpp",
     "src/i18n_calendar_addon.cpp",
+    "src/i18n_normalizer_addon.cpp",
     "src/system_locale_manager_addon.cpp",
     "src/variable_convertor.cpp",
   ]
