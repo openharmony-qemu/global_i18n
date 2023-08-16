@@ -42,6 +42,8 @@ static thread_local napi_ref* g_timezoneConstructor = nullptr;
 static thread_local napi_ref g_indexUtilConstructor = nullptr;
 static thread_local napi_ref* g_transConstructor = nullptr;
 
+static std::unordered_set<std::string> allValidLocalesLanguageTag;
+
 I18nAddon::I18nAddon() : env_(nullptr) {}
 
 I18nAddon::~I18nAddon()
