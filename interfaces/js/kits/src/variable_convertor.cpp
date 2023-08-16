@@ -23,6 +23,18 @@ namespace I18n {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "VariableConvertor" };
 using namespace OHOS::HiviewDFX;
 
+bool VariableConvertor::CheckNapiValueType(napi_env env, napi_value value)
+{
+    if (value) {
+        napi_valuetype valueType = napi_valuetype::napi_undefined;
+        napi_typeof(env, value, &valueType);
+        if (valueType != napi_valuetype::napi_undefined && valueType != napi_valuetype::napi_null) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void VariableConvertor::GetOptionValue(napi_env env, napi_value options, const std::string &optionName,
     std::string &value)
 {
