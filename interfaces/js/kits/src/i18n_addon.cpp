@@ -42,6 +42,8 @@ static thread_local napi_ref* g_timezoneConstructor = nullptr;
 static thread_local napi_ref g_indexUtilConstructor = nullptr;
 static thread_local napi_ref* g_transConstructor = nullptr;
 
+static std::unordered_set<std::string> allValidLocalesLanguageTag;
+
 I18nAddon::I18nAddon() : env_(nullptr) {}
 
 I18nAddon::~I18nAddon()
@@ -100,7 +102,8 @@ napi_value I18nAddon::CreateI18nUtilObject(napi_env env, napi_status &initStatus
     }
     napi_property_descriptor i18nUtilProperties[] = {
         DECLARE_NAPI_FUNCTION("unitConvert", UnitConvert),
-        DECLARE_NAPI_FUNCTION("getDateOrder", GetDateOrder)
+        DECLARE_NAPI_FUNCTION("getDateOrder", GetDateOrder),
+        DECLARE_NAPI_FUNCTION("getTimePeriodName", GetTimePeriodName),
     };
     status = napi_define_properties(env, i18nUtil, sizeof(i18nUtilProperties) / sizeof(napi_property_descriptor),
         i18nUtilProperties);
@@ -276,6 +279,7 @@ napi_value I18nAddon::GetDateOrder(napi_env env, napi_callback_info info)
     std::string tempValue;
     icu::UnicodeString unistr;
     formatter->toPattern(unistr);
+    delete formatter;
     unistr.toUTF8String<std::string>(tempValue);
     std::string value = ModifyOrder(tempValue);
     napi_value result;
@@ -320,6 +324,110 @@ std::string I18nAddon::ModifyOrder(std::string &pattern)
         }
     }
     return ret;
+}
+
+napi_value I18nAddon::GetTimePeriodName(napi_env env, napi_callback_info info)
+{
+    napi_value result;
+    int32_t hour;
+    std::string localeTag;
+    if (GetParamOfGetTimePeriodName(env, info, localeTag, hour) == -1) {
+        HiLog::Error(LABEL, "GetTimePeriodName param error");
+        napi_create_string_utf8(env, "", NAPI_AUTO_LENGTH, &result);
+        return result;
+    }
+
+    UErrorCode icuStatus = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(localeTag.data(), icuStatus);
+    if (U_FAILURE(icuStatus) || !IsValidLocaleTag(locale)) {
+        HiLog::Error(LABEL, "GetTimePeriodName does not support this locale");
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+    }
+    icu::SimpleDateFormat* formatter = dynamic_cast<icu::SimpleDateFormat*>
+        (icu::DateFormat::createDateInstance(icu::DateFormat::EStyle::kDefault, locale));
+    if (!formatter) {
+        HiLog::Error(LABEL, "GetTimePeriodName Failed to create SimpleDateFormat");
+        napi_create_string_utf8(env, "", NAPI_AUTO_LENGTH, &result);
+        return result;
+    }
+    formatter->applyPattern("B");
+
+    std::string temp;
+    icu::UnicodeString name;
+    icu::Calendar *calendar = icu::Calendar::createInstance(locale, icuStatus);
+    calendar->set(UCalendarDateFields::UCAL_HOUR_OF_DAY, hour);
+    formatter->format(calendar->getTime(icuStatus), name);
+    name.toUTF8String(temp);
+    napi_create_string_utf8(env, temp.c_str(), NAPI_AUTO_LENGTH, &result);
+    delete formatter;
+    delete calendar;
+    return result;
+}
+
+int I18nAddon::GetParamOfGetTimePeriodName(napi_env env, napi_callback_info info, std::string &tag, int32_t &hour)
+{
+    size_t argc = 2;
+    napi_value argv[2] = { 0 };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "GetTimePeriodName can't get parameters from getTimePerioudName.");
+        return -1;
+    }
+
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    napi_typeof(env, argv[0], &valueType);
+    if (valueType != napi_valuetype::napi_number) {
+        HiLog::Error(LABEL, "GetTimePeriodName Parameter type does not match");
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+    }
+    status = napi_get_value_int32(env, argv[0], &hour);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "GetTimePeriodName can't get number from js param");
+        return -1;
+    }
+
+    valueType = napi_valuetype::napi_undefined;
+    napi_typeof(env, argv[1], &valueType);
+    if (valueType == napi_valuetype::napi_null || valueType == napi_valuetype::napi_undefined) {
+        tag = LocaleConfig::GetSystemLocale();
+    } else if (valueType == napi_valuetype::napi_string) {
+        int code = 0;
+        tag = VariableConvertor::GetString(env, argv[1], code);
+        if (code) {
+            HiLog::Error(LABEL, "GetTimePeriodName can't get string from js param");
+            return -1;
+        }
+    } else {
+        HiLog::Error(LABEL, "GetTimePeriodName Parameter type does not match");
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+    }
+    return 0;
+}
+
+bool I18nAddon::IsValidLocaleTag(icu::Locale &locale)
+{
+    GetAllValidLocalesTag();
+    std::string languageTag = locale.getLanguage();
+    if (allValidLocalesLanguageTag.find(languageTag) == allValidLocalesLanguageTag.end()) {
+        HiLog::Error(LABEL, "GetTimePeriodName does not support this languageTag: %{public}s", languageTag.c_str());
+        return false;
+    }
+    return true;
+}
+
+void I18nAddon::GetAllValidLocalesTag() {
+    static bool init = false;
+    if (init) {
+        return;
+    }
+    int32_t validCount = 1;
+    const icu::Locale *validLocales = icu::Locale::getAvailableLocales(validCount);
+    for (int i = 0; i < validCount; i++) {
+        allValidLocalesLanguageTag.insert(validLocales[i].getLanguage());
+    }
+    init = true;
 }
 
 void I18nAddon::ProcessNormal(char ch, int *order, size_t orderSize, int *lengths, size_t lengsSize)
