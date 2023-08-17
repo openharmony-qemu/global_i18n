@@ -71,6 +71,7 @@ ohos_shared_library("i18n") {
   remove_configs = [ "//build/config/compiler:no_rtti" ]
   sources = [
     "src/error_util.cpp",
+    "src/holiday_manager_addon.cpp",
     "src/i18n_addon.cpp",
     "src/i18n_calendar_addon.cpp",
     "src/i18n_normalizer_addon.cpp",

@@ -39,6 +39,7 @@
 #include "system_locale_manager.h"
 #include "taboo_utils.h"
 #include "utils.h"
+#include "holiday_manager.h"
 
 using namespace OHOS::Global::I18n;
 using testing::ext::TestSize;
@@ -2220,6 +2221,38 @@ HWTEST_F(IntlTest, IntlFuncTest0059, TestSize.Level1)
     NumberFormat formatter(localeTags, configs);
     std::string res = formatter.Format(12);
     EXPECT_EQ(res, "");
+}
+
+/**
+ * @tc.name: IntlFuncTest0060
+ * @tc.desc: Test Intl HolidayManager
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0060, TestSize.Level1)
+{
+    std::string path = "/system/lib/TR.ics";
+    HolidayManager *holiday_manager = new HolidayManager(path.c_str());
+    std::map<std::string, std::vector<HolidayInfoItem>> holidayDataMap;
+    std::vector<HolidayInfoItem> infoList;
+    std::vector<HolidayLocaleName> localNameList1;
+    localNameList1.push_back({"tr", "Kurban Bayrami Tatili"});
+    std::vector<HolidayLocaleName> localNameList2;
+    localNameList2.push_back({"tr", "Kurban Bayrami 2. Günü"});
+    HolidayInfoItem item1 = {"Sacrifice Feast Holiday", 2023, 6, 25, localNameList1};
+    HolidayInfoItem item2 = {"The Second Day of Sacrifice Feast", 2023, 6, 25, localNameList2};
+    infoList.push_back(item1);
+    infoList.push_back(item2);
+    holidayDataMap.insert({"20230625", infoList});
+    holiday_manager->SetHolidayData(holidayDataMap);
+    std::vector<HolidayInfoItem> list = holiday_manager->GetHolidayInfoItemArray(2023);
+    EXPECT_EQ(2, list.size());
+    list = holiday_manager->GetHolidayInfoItemArray(2022);
+    EXPECT_EQ(0, list.size());
+    bool flag = holiday_manager->IsHoliday(2023, 6, 25);
+    EXPECT_TRUE(flag);
+    flag = holiday_manager->IsHoliday();
+    EXPECT_TRUE(!flag);
+    delete holiday_manager;
 }
 } // namespace I18n
 } // namespace Global
