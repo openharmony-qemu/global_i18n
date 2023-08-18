@@ -42,24 +42,6 @@ public:
     static void Destructor(napi_env env, void *nativeObject, void *finalize_hint);
     I18nAddon();
     virtual ~I18nAddon();
-    static napi_value GetSystemLanguages(napi_env env, napi_callback_info info);
-    static napi_value GetSystemCountries(napi_env env, napi_callback_info info);
-    static napi_value GetSystemCountriesWithError(napi_env env, napi_callback_info info);
-    static napi_value IsSuggested(napi_env env, napi_callback_info info);
-    static napi_value IsSuggestedWithError(napi_env env, napi_callback_info info);
-    static napi_value GetDisplayLanguage(napi_env env, napi_callback_info info);
-    static napi_value GetDisplayLanguageWithError(napi_env env, napi_callback_info info);
-    static napi_value GetDisplayCountry(napi_env env, napi_callback_info info);
-    static napi_value GetDisplayCountryWithError(napi_env env, napi_callback_info info);
-    static napi_value GetSystemLanguage(napi_env env, napi_callback_info info);
-    static napi_value GetSystemRegion(napi_env env, napi_callback_info info);
-    static napi_value GetSystemLocale(napi_env env, napi_callback_info info);
-    static napi_value SetSystemLanguage(napi_env env, napi_callback_info info);
-    static napi_value SetSystemLanguageWithError(napi_env env, napi_callback_info info);
-    static napi_value SetSystemRegion(napi_env env, napi_callback_info info);
-    static napi_value SetSystemRegionWithError(napi_env env, napi_callback_info info);
-    static napi_value SetSystemLocale(napi_env env, napi_callback_info info);
-    static napi_value SetSystemLocaleWithError(napi_env env, napi_callback_info info);
     static napi_value IsRTL(napi_env env, napi_callback_info info);
     static napi_value IsRTLWihtError(napi_env env, napi_callback_info info);
     static napi_value InitPhoneNumberFormat(napi_env env, napi_value exports);
@@ -75,16 +57,6 @@ public:
     static napi_value IsLowerCaseAddon(napi_env env, napi_callback_info info);
     static napi_value IsUpperCaseAddon(napi_env env, napi_callback_info info);
     static napi_value GetTypeAddon(napi_env env, napi_callback_info info);
-    static napi_value Is24HourClock(napi_env env, napi_callback_info info);
-    static napi_value Set24HourClock(napi_env env, napi_callback_info info);
-    static napi_value Set24HourClockWithError(napi_env env, napi_callback_info info);
-    static napi_value AddPreferredLanguage(napi_env env, napi_callback_info info);
-    static napi_value AddPreferredLanguageWithError(napi_env env, napi_callback_info info);
-    static napi_value RemovePreferredLanguage(napi_env env, napi_callback_info info);
-    static napi_value RemovePreferredLanguageWithError(napi_env env, napi_callback_info info);
-    static napi_value GetPreferredLanguageList(napi_env env, napi_callback_info info);
-    static napi_value GetFirstPreferredLanguage(napi_env env, napi_callback_info info);
-    static napi_value GetAppPreferredLanguage(napi_env env, napi_callback_info info);
     static napi_value InitI18nTimeZone(napi_env env, napi_value exports);
     static napi_value GetI18nTimeZone(napi_env env, napi_callback_info info);
     static napi_value GetDateOrder(napi_env env, napi_callback_info info);
@@ -92,9 +64,6 @@ public:
     static napi_value InitTransliterator(napi_env env, napi_value exports);
     static napi_value GetTransliteratorInstance(napi_env env, napi_callback_info info);
     static napi_value GetAvailableIDs(napi_env env, napi_callback_info info);
-    static napi_value SetUsingLocalDigitAddon(napi_env env, napi_callback_info info);
-    static napi_value SetUsingLocalDigitAddonWithError(napi_env env, napi_callback_info info);
-    static napi_value GetUsingLocalDigitAddon(napi_env env, napi_callback_info info);
     static napi_value GetAvailableTimezoneIDs(napi_env env, napi_callback_info info);
     static napi_value GetAvailableZoneCityIDs(napi_env env, napi_callback_info info);
     static napi_value GetCityDisplayName(napi_env env, napi_callback_info info);
@@ -150,26 +119,11 @@ private:
     static napi_value StaticGetTimeZone(napi_env, napi_value *argv, bool isZoneID);
     static napi_value CreateTimeZoneObject(napi_env env, napi_status &initStatus);
 
-    static napi_value CreateSystemObject(napi_env env, napi_status &initStatus);
-    static napi_value GetSystemCountriesImpl(napi_env env, napi_callback_info info, bool throwError);
-    static napi_value IsSuggestedImpl(napi_env env, napi_callback_info info, bool throwError);
-    static napi_value GetDisplayLanguageImpl(napi_env env, napi_callback_info info, bool throwError);
-    static napi_value GetDisplayCountryImpl(napi_env env, napi_callback_info info, bool throwError);
-    static napi_value SetSystemLanguageImpl(napi_env env, napi_callback_info info, bool throwError);
-    static napi_value SetSystemRegionImpl(napi_env env, napi_callback_info info, bool throwError);
-    static napi_value SetSystemLocaleImpl(napi_env env, napi_callback_info info, bool throwError);
-    static napi_value Set24HourClockImpl(napi_env env, napi_callback_info info, bool throwError);
-    static napi_value AddPreferredLanguageImpl(napi_env env, napi_callback_info info, bool throwError);
-    static napi_value RemovePreferredLanguageImpl(napi_env env, napi_callback_info info, bool throwError);
-    static napi_value SetUsingLocalDigitAddonImpl(napi_env env, napi_callback_info info, bool throwError);
-
     static int GetParamOfGetTimePeriodName(napi_env env, napi_callback_info info, std::string &tag, int32_t &hour);
     static bool IsValidLocaleTag(icu::Locale &locale);
     static void GetAllValidLocalesTag();
 
     static napi_value ObjectConstructor(napi_env env, napi_callback_info info);
-
-    static bool ParseStringParam(napi_env env, napi_value argv, bool throwError, std::string &strParam);
 
     static napi_value CreateI18nUtilObject(napi_env env, napi_status &initStatus);
 
