@@ -43,6 +43,7 @@ public:
     I18nAddon();
     virtual ~I18nAddon();
     static napi_value IsRTL(napi_env env, napi_callback_info info);
+    static napi_value IsRTLWihtError(napi_env env, napi_callback_info info);
     static napi_value InitPhoneNumberFormat(napi_env env, napi_value exports);
     static napi_value UnitConvert(napi_env env, napi_callback_info info);
     static napi_value InitBreakIterator(napi_env env, napi_value exports);

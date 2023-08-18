@@ -128,9 +128,19 @@ napi_value I18nSystemAddon::GetSystemLanguages(napi_env env, napi_callback_info 
     return result;
 }
 
+napi_value I18nSystemAddon::GetSystemCountries(napi_env env, napi_callback_info info)
+{
+    return I18nSystemAddon::GetSystemCountriesImpl(env, info, false);
+}
+
 napi_value I18nSystemAddon::GetSystemCountriesWithError(napi_env env, napi_callback_info info)
 {
     return I18nSystemAddon::GetSystemCountriesImpl(env, info, true);
+}
+
+napi_value I18nSystemAddon::IsSuggested(napi_env env, napi_callback_info info)
+{
+    return I18nSystemAddon::IsSuggestedImpl(env, info, false);
 }
 
 napi_value I18nSystemAddon::IsSuggestedWithError(napi_env env, napi_callback_info info)
@@ -150,6 +160,11 @@ napi_value I18nSystemAddon::GetSystemLanguage(napi_env env, napi_callback_info i
     return result;
 }
 
+napi_value I18nSystemAddon::SetSystemLanguage(napi_env env, napi_callback_info info)
+{
+    return I18nSystemAddon::SetSystemLanguageImpl(env, info, false);
+}
+
 napi_value I18nSystemAddon::SetSystemLanguageWithError(napi_env env, napi_callback_info info)
 {
     return I18nSystemAddon::SetSystemLanguageImpl(env, info, true);
@@ -167,6 +182,10 @@ napi_value I18nSystemAddon::GetSystemRegion(napi_env env, napi_callback_info inf
     return result;
 }
 
+napi_value I18nSystemAddon::SetSystemRegion(napi_env env, napi_callback_info info)
+{
+    return I18nSystemAddon::SetSystemRegionImpl(env, info, false);
+}
 
 napi_value I18nSystemAddon::SetSystemRegionWithError(napi_env env, napi_callback_info info)
 {
@@ -183,6 +202,11 @@ napi_value I18nSystemAddon::GetSystemLocale(napi_env env, napi_callback_info inf
         return nullptr;
     }
     return result;
+}
+
+napi_value I18nSystemAddon::SetSystemLocale(napi_env env, napi_callback_info info)
+{
+    return I18nSystemAddon::SetSystemLocaleImpl(env, info, false);
 }
 
 napi_value I18nSystemAddon::SetSystemLocaleWithError(napi_env env, napi_callback_info info)
@@ -286,6 +310,11 @@ napi_value I18nSystemAddon::GetAppPreferredLanguage(napi_env env, napi_callback_
         return nullptr;
     }
     return result;
+}
+
+napi_value I18nSystemAddon::SetUsingLocalDigitAddon(napi_env env, napi_callback_info info)
+{
+    return I18nSystemAddon::SetUsingLocalDigitAddonImpl(env, info, false);
 }
 
 napi_value I18nSystemAddon::SetUsingLocalDigitAddonWithError(napi_env env, napi_callback_info info)

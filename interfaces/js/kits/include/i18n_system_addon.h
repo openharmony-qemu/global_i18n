@@ -44,17 +44,23 @@ public:
     static napi_value GetDisplayCountry(napi_env env, napi_callback_info info);
 
 private:
+    static napi_value GetSystemCountries(napi_env env, napi_callback_info info);
+    static napi_value IsSuggested(napi_env env, napi_callback_info info);
+    static napi_value SetSystemLanguage(napi_env env, napi_callback_info info);
     static napi_value GetDisplayCountryWithError(napi_env env, napi_callback_info info);
     static napi_value GetDisplayLanguageWithError(napi_env env, napi_callback_info info);
     static napi_value GetSystemLanguages(napi_env env, napi_callback_info info);
     static napi_value IsSuggestedWithError(napi_env env, napi_callback_info info);
     static napi_value SetSystemLanguageWithError(napi_env env, napi_callback_info info);
+    static napi_value SetSystemRegion(napi_env env, napi_callback_info info);
     static napi_value SetSystemRegionWithError(napi_env env, napi_callback_info info);
+    static napi_value SetSystemLocale(napi_env env, napi_callback_info info);
     static napi_value SetSystemLocaleWithError(napi_env env, napi_callback_info info);
     static napi_value Set24HourClockWithError(napi_env env, napi_callback_info info);
     static napi_value AddPreferredLanguageWithError(napi_env env, napi_callback_info info);
     static napi_value RemovePreferredLanguageWithError(napi_env env, napi_callback_info info);
     static napi_value GetAppPreferredLanguage(napi_env env, napi_callback_info info);
+    static napi_value SetUsingLocalDigitAddon(napi_env env, napi_callback_info info);
     static napi_value SetUsingLocalDigitAddonWithError(napi_env env, napi_callback_info info);
     static napi_value GetUsingLocalDigitAddon(napi_env env, napi_callback_info info);
 
