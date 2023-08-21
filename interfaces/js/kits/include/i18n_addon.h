@@ -20,7 +20,6 @@
 #include "napi/native_api.h"
 #include "i18n_break_iterator.h"
 #include "i18n_normalizer.h"
-#include "i18n_timezone.h"
 #include "index_util.h"
 #include "napi/native_node_api.h"
 #include "locale_config.h"
@@ -48,30 +47,13 @@ public:
     static napi_value UnitConvert(napi_env env, napi_callback_info info);
     static napi_value InitBreakIterator(napi_env env, napi_value exports);
     static napi_value InitIndexUtil(napi_env env, napi_value exports);
-    static napi_value IsDigitAddon(napi_env env, napi_callback_info info);
-    static napi_value IsSpaceCharAddon(napi_env env, napi_callback_info info);
-    static napi_value IsWhiteSpaceAddon(napi_env env, napi_callback_info info);
-    static napi_value IsRTLCharacterAddon(napi_env env, napi_callback_info info);
-    static napi_value IsIdeoGraphicAddon(napi_env env, napi_callback_info info);
-    static napi_value IsLetterAddon(napi_env env, napi_callback_info info);
-    static napi_value IsLowerCaseAddon(napi_env env, napi_callback_info info);
-    static napi_value IsUpperCaseAddon(napi_env env, napi_callback_info info);
-    static napi_value GetTypeAddon(napi_env env, napi_callback_info info);
-    static napi_value InitI18nTimeZone(napi_env env, napi_value exports);
-    static napi_value GetI18nTimeZone(napi_env env, napi_callback_info info);
     static napi_value GetDateOrder(napi_env env, napi_callback_info info);
     static napi_value GetTimePeriodName(napi_env env, napi_callback_info info);
     static napi_value InitTransliterator(napi_env env, napi_value exports);
     static napi_value GetTransliteratorInstance(napi_env env, napi_callback_info info);
     static napi_value GetAvailableIDs(napi_env env, napi_callback_info info);
-    static napi_value GetAvailableTimezoneIDs(napi_env env, napi_callback_info info);
-    static napi_value GetAvailableZoneCityIDs(napi_env env, napi_callback_info info);
-    static napi_value GetCityDisplayName(napi_env env, napi_callback_info info);
-    static napi_value GetTimezoneFromCity(napi_env env, napi_callback_info info);
-    static napi_value InitCharacter(napi_env env, napi_value exports);
     static napi_value InitUtil(napi_env env, napi_value exports);
     static napi_value System(napi_env env, napi_value exports);
-    static napi_value GetTimezonesByLocation(napi_env env, napi_callback_info info);
 
 private:
     static napi_value PhoneNumberFormatConstructor(napi_env env, napi_callback_info info);
@@ -98,15 +80,6 @@ private:
     static napi_value AddLocale(napi_env env, napi_callback_info info);
     static napi_value GetIndex(napi_env env, napi_callback_info info);
     bool InitIndexUtilContext(napi_env env, napi_callback_info info, const std::string &localeTag);
-    static napi_value CreateUnicodeObject(napi_env env, napi_status &initStatus);
-
-    static napi_value I18nTimeZoneConstructor(napi_env env, napi_callback_info info);
-    static napi_value GetID(napi_env env, napi_callback_info info);
-    static int32_t GetParameter(napi_env env, napi_value *argv, std::string &localeStr, bool &isDST);
-    static int32_t GetFirstParameter(napi_env env, napi_value value, std::string &localeStr, bool &isDST);
-    static napi_value GetTimeZoneDisplayName(napi_env env, napi_callback_info info);
-    static napi_value GetOffset(napi_env env, napi_callback_info info);
-    static napi_value GetRawOffset(napi_env env, napi_callback_info info);
 
     static napi_value Transform(napi_env env, napi_callback_info info);
     static napi_value CreateTransliteratorObject(napi_env env, napi_status &initStatus);
@@ -114,10 +87,6 @@ private:
     static napi_value TransliteratorConstructor(napi_env env, napi_callback_info info);
     static std::string ModifyOrder(std::string &pattern);
     static void ProcessNormal(char ch, int *order, size_t orderSize, int *lengths, size_t lengsSize);
-    static bool GetStringFromJS(napi_env env, napi_value argv, std::string &jsString);
-
-    static napi_value StaticGetTimeZone(napi_env, napi_value *argv, bool isZoneID);
-    static napi_value CreateTimeZoneObject(napi_env env, napi_status &initStatus);
 
     static int GetParamOfGetTimePeriodName(napi_env env, napi_callback_info info, std::string &tag, int32_t &hour);
     static bool IsValidLocaleTag(icu::Locale &locale);
@@ -132,7 +101,6 @@ private:
     std::unique_ptr<icu::Transliterator> transliterator_ = nullptr;
     std::unique_ptr<I18nBreakIterator> brkiter_ = nullptr;
     std::unique_ptr<IndexUtil> indexUtil_ = nullptr;
-    std::unique_ptr<I18nTimeZone> timezone_ = nullptr;
 };
 } // namespace I18n
 } // namespace Global
