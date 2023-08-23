@@ -153,7 +153,8 @@ napi_value HolidayManagerAddon::IsHoliday(napi_env env, napi_callback_info info)
     bool res = false;
     if (flag) {
         std::vector<int> list = ValidateParamDate(env, argv[0]);
-        if (list.size() == 3) {
+        if (list.size() == 3) { // 3 is the number of parameters
+            // 0, 1, and 2 indicate that the first, second, and third parameters of the list are read
             res = obj->holidayManager_->IsHoliday(list.at(0), list.at(1), list.at(2));
         }
     } else {
@@ -288,7 +289,8 @@ napi_value HolidayManagerAddon::CreateHolidayItem(napi_env env, const HolidayInf
         HiLog::Error(LABEL, "Create Holiday Item object failed.");
         return nullptr;
     }
-    status = napi_set_named_property(env, result, "baseName", VariableConvertor::CreateString(env, holidayItem.baseName));
+    status = napi_set_named_property(env, result, "baseName",
+        VariableConvertor::CreateString(env, holidayItem.baseName));
     if (status != napi_ok) {
         HiLog::Error(LABEL, "Failed to set element baseName.");
         return nullptr;
@@ -305,8 +307,8 @@ napi_value HolidayManagerAddon::CreateHolidayItem(napi_env env, const HolidayInf
         HiLog::Error(LABEL, "Failed to set element month.");
         return nullptr;
     }
-    status = napi_set_named_property(env, result, "day", 
-                                    VariableConvertor::CreateNumber(env, holidayItem.day));
+    status = napi_set_named_property(env, result, "day",
+                                     VariableConvertor::CreateNumber(env, holidayItem.day));
     if (status != napi_ok) {
         HiLog::Error(LABEL, "Failed to set element day.");
         return nullptr;
@@ -337,18 +339,18 @@ napi_value HolidayManagerAddon::HolidayLocaleNameItem(napi_env env, const std::v
             HiLog::Error(LABEL, "Create HolidayLocaleName Item object failed.");
             return nullptr;
         }
-        status = napi_set_named_property(env, localNameItem, "language", 
-                                    VariableConvertor::CreateString(env, localNames[i].language));
+        status = napi_set_named_property(env, localNameItem, "language",
+                                         VariableConvertor::CreateString(env, localNames[i].language));
         if (status != napi_ok) {
             HiLog::Error(LABEL, "Create HolidayLocaleName.language Item object failed.");
             return nullptr;
-        }                            
-        status = napi_set_named_property(env, localNameItem, "name", 
-                                    VariableConvertor::CreateString(env, localNames[i].name));
+        }
+        status = napi_set_named_property(env, localNameItem, "name",
+                                         VariableConvertor::CreateString(env, localNames[i].name));
         if (status != napi_ok) {
             HiLog::Error(LABEL, "Create HolidayLocaleName.name Item object failed.");
             return nullptr;
-        }  
+        }
         status = napi_set_element(env, result, i, localNameItem);
         if (status != napi_ok) {
             HiLog::Error(LABEL, "Failed to set HolidayLocaleName element.");

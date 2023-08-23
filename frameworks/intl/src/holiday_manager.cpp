@@ -15,8 +15,8 @@
 #include "holiday_manager.h"
 #include "hilog/log.h"
 #include <algorithm>
+#include <climits>
 #include <ctime>
-#include <limits.h>
 #include <filesystem>
 #include <format>
 #include <fstream>
@@ -65,7 +65,6 @@ HolidayManager::HolidayManager(const char* path)
 
 HolidayManager::~HolidayManager()
 {
-
 }
 
 void HolidayManager::SetHolidayData(std::map<std::string, std::vector<HolidayInfoItem>> holidayDataMap)
@@ -96,7 +95,9 @@ std::string HolidayManager::Format(int32_t year, int32_t month, int32_t day)
 {
     std::string formated;
     formated += std::to_string(year);
+    // Numbers less than 10 are one digit
     formated += month < 10 ? ("0" + std::to_string(month)) : std::to_string(month);
+    // Numbers less than 10 are one digit
     formated += day < 10 ? ("0" + std::to_string(day)) : std::to_string(day);
     return formated;
 }
@@ -152,15 +153,16 @@ std::vector<HolidayInfoItem> HolidayManager::ReadHolidayFile(const char* path)
     std::vector<HolidayInfoItem> items;
     while (getline(fin, line)) {
         line = Trim(line);
-        if (line.compare(ITEM_BEGIN_TAG) == 0) {
-            struct HolidayInfoItem holidayItem;
-            while (getline(fin, line)) {
-                line = Trim(line);
-                ParseFileLine(line, &(holidayItem));
-                if (line.compare(ITEM_END_TAG) == 0) {
-                    items.push_back(holidayItem);
-                    break;
-                }
+        if (line.compare(ITEM_BEGIN_TAG) != 0) {
+            continue;
+        }
+        struct HolidayInfoItem holidayItem;
+        while (getline(fin, line)) {
+            line = Trim(line);
+            ParseFileLine(line, &(holidayItem));
+            if (line.compare(ITEM_END_TAG) == 0) {
+                items.push_back(holidayItem);
+                break;
             }
         }
     }

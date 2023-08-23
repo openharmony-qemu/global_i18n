@@ -15,22 +15,21 @@
 #include <unordered_map>
 #include <vector>
 
+#include "error_util.h"
 #include "hilog/log.h"
+#include "holiday_manager_addon.h"
 #include "i18n_calendar_addon.h"
 #include "i18n_normalizer_addon.h"
 #include "i18n_system_addon.h"
 #include "i18n_timezone_addon.h"
 #include "i18n_unicode_addon.h"
+#include "node_api.h"
 #include "system_locale_manager_addon.h"
-#include "holiday_manager_addon.h"
-#include "unicode/locid.h"
 #include "unicode/datefmt.h"
+#include "unicode/locid.h"
 #include "unicode/smpdtfmt.h"
 #include "unicode/translit.h"
-#include "node_api.h"
 #include "variable_convertor.h"
-
-#include "error_util.h"
 #include "i18n_addon.h"
 
 namespace OHOS {
@@ -386,7 +385,8 @@ bool I18nAddon::IsValidLocaleTag(icu::Locale &locale)
     return true;
 }
 
-void I18nAddon::GetAllValidLocalesTag() {
+void I18nAddon::GetAllValidLocalesTag()
+{
     static bool init = false;
     if (init) {
         return;

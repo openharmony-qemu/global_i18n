@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
+#include <cstring>
 #include <filesystem>
 #include <sys/stat.h>
-#include <string.h>
 #include "hilog/log.h"
 #include "libxml/globals.h"
 #include "libxml/tree.h"
@@ -252,12 +252,12 @@ void Taboo::ReadResourceList()
 
 std::string Taboo::GetLanguageFromFileName(const std::string& fileName)
 {
-    if (fileName.length() == 3) {
+    if (fileName.length() == 3) { // 3 is the length of file 'xml'
         return "en";
     }
     std::string language = fileName.substr(4);
     if (language[0] == 'b' && language[1] == '+') {
-        language = language.substr(2);
+        language = language.substr(2); // 2 is the length of "b+"
     }
     size_t pos = language.find("+");
     if (pos != std::string::npos) {
@@ -265,7 +265,7 @@ std::string Taboo::GetLanguageFromFileName(const std::string& fileName)
     }
     pos = language.find("-r");
     if (pos != std::string::npos) {
-        language = language.replace(pos, 2, "-");
+        language = language.replace(pos, 2, "-"); // 2 is the length of "-r"
     }
     return language;
 }
