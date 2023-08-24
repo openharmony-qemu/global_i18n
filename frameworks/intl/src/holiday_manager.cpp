@@ -46,7 +46,7 @@ HolidayManager::HolidayManager(const char* path)
     }
     std::vector<HolidayInfoItem> items = ReadHolidayFile(path);
     for (size_t i = 0; i < items.size(); i++) {
-        struct tm tmObj = {.tm_year = items[i].year, .tm_mon = items[i].month, .tm_mday = items[i].day};
+        struct tm tmObj = {.tm_mday = items[i].day, .tm_mon = items[i].month, .tm_year = items[i].year};
         char strDate[10];
         strftime(strDate, sizeof(strDate), "%Y%m%d", &tmObj);
         std::string startDate(strDate);
