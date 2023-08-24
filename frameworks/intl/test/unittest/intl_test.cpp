@@ -17,9 +17,15 @@
 #include <map>
 #include <vector>
 
-#include "collator.h"
 #include "character.h"
+#include "collator.h"
 #include "date_time_format.h"
+#include "holiday_manager.h"
+#include "i18n_break_iterator.h"
+#include "i18n_calendar.h"
+#include "i18n_timezone.h"
+#include "i18n_types.h"
+#include "index_util.h"
 #include "locale_compare.h"
 #include "locale_config.h"
 #include "locale_info.h"
@@ -29,17 +35,10 @@
 #include "plural_rules.h"
 #include "preferred_language.h"
 #include "relative_time_format.h"
-#include "utils.h"
-#include "i18n_break_iterator.h"
-#include "i18n_calendar.h"
-#include "i18n_timezone.h"
-#include "i18n_types.h"
-#include "index_util.h"
-#include "intl_test.h"
 #include "system_locale_manager.h"
 #include "taboo_utils.h"
 #include "utils.h"
-#include "holiday_manager.h"
+#include "intl_test.h"
 
 using namespace OHOS::Global::I18n;
 using testing::ext::TestSize;
@@ -607,7 +606,6 @@ HWTEST_F(IntlTest, IntlFuncTest0017, TestSize.Level1)
     const string param2 = "播";
     CompareResult result = collator->Compare(param1, param2);
     EXPECT_EQ(result, CompareResult::SMALLER);
-    
     map<string, string> options;
     collator->ResolvedOptions(options);
     EXPECT_EQ(options.size(), 8);
@@ -1878,11 +1876,11 @@ HWTEST_F(IntlTest, IntlFuncTest0046, TestSize.Level1)
     EXPECT_TRUE(Urumqi.size() == 2);
     bool containsShanghai = false;
     bool containsUrumqi = false;
-    for(unsigned int i = 0; i < Urumqi.size(); i++){
-        if(Urumqi[i] == "Asia/Shanghai"){
+    for (unsigned int i = 0; i < Urumqi.size(); i++) {
+        if (Urumqi[i] == "Asia/Shanghai") {
             containsShanghai = true;
         }
-        if(Urumqi[i] == "Asia/Urumqi"){
+        if (Urumqi[i] == "Asia/Urumqi") {
             containsUrumqi = true;
         }
     }
@@ -2016,7 +2014,7 @@ HWTEST_F(IntlTest, IntlFuncTest0052, TestSize.Level1)
     delete indexUtil;
     delete indexUtil2;
 
-	IndexUtil indexUtil3("");
+    IndexUtil indexUtil3("");
     indexUtil3.AddLocale("en-US");
     indexStr = indexUtil3.GetIndex("A");
     EXPECT_EQ(indexStr, "A");

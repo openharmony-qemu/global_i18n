@@ -117,6 +117,7 @@ void NumberFormat::InitProperties()
         }
     }
     if (!styleString.empty() && styleString == "percent") {
+    // 2 is the power of ten
         numberFormat = numberFormat.unit(icu::NoUnit::percent()).scale(icu::number::Scale::powerOfTen(2)).precision(
             icu::number::Precision::fixedFraction(0));
     }

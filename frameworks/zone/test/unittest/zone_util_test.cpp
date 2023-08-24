@@ -273,7 +273,7 @@ HWTEST_F(ZoneUtilTest, ZoneUtilFuncTest011, TestSize.Level1)
     region = "AR";
     CountryResult result3 = util.LookupTimezoneByCountry(region, currentMillis);
     EXPECT_EQ(result3.timezoneId, "America/Argentina/Buenos_Aires");
-	EXPECT_TRUE(result3.quality == 0 || result3.quality == 2);
+    EXPECT_TRUE(result3.quality == 0 || result3.quality == 2);
 
     region = "AM";
     CountryResult result4 = util.LookupTimezoneByCountry(region, currentMillis);

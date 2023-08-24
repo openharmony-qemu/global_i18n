@@ -77,7 +77,6 @@ private:
     static napi_value SetUsingLocalDigitAddonImpl(napi_env env, napi_callback_info info, bool throwError);
 
     static bool ParseStringParam(napi_env env, napi_value argv, bool throwError, std::string &strParam);
-
 };
 } // namespace I18n
 } // namespace Global

@@ -76,8 +76,8 @@ napi_value SystemLocaleManagerAddon::SystemLocaleManagerConstructor(napi_env env
         return nullptr;
     }
     std::unique_ptr<SystemLocaleManagerAddon> obj = std::make_unique<SystemLocaleManagerAddon>();
-    status =
-        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), SystemLocaleManagerAddon::Destructor, nullptr, nullptr);
+    status = napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), SystemLocaleManagerAddon::Destructor,
+        nullptr, nullptr);
     if (status != napi_ok) {
         HiLog::Error(LABEL, "Wrap SystemLocaleManagerAddon failed");
         return nullptr;

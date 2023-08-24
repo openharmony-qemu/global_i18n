@@ -203,7 +203,7 @@ bool LocaleCompare::IsSameEnglishScript(const std::string& scriptTag1, const std
 }
 
 bool LocaleCompare::HasMapRelation(const std::string& languageTag, const std::string& localeTag1,
-        const std::string& localeTag2)
+    const std::string& localeTag2)
 {
     if (scriptLocales.find(languageTag) == scriptLocales.end()) {
         return false;
