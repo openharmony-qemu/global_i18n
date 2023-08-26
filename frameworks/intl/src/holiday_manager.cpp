@@ -194,11 +194,9 @@ void HolidayManager::ParseFileLine(const std::string &line, HolidayInfoItem *hol
             std::string displayName = line.substr(line.find_last_of("=") + 1, line.length());
             std::string language = displayName.substr(0, displayName.find_first_of(":"));
             std::string localName = displayName.substr(displayName.find_first_of(":") + 1, displayName.length());
-            std::vector<HolidayLocaleName> localNames;
             transform(language.begin(), language.end(), language.begin(), ::tolower);
             HolidayLocaleName localeName = {language, localName};
-            localNames.push_back(localeName);
-            holidayItem->localNames = localNames;
+            holidayItem->localNames.push_back(localeName);
         }
     }
 }
