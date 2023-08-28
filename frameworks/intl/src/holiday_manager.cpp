@@ -172,13 +172,12 @@ std::vector<HolidayInfoItem> HolidayManager::ReadHolidayFile(const char* path)
 
 void HolidayManager::ParseFileLine(const std::string &line, HolidayInfoItem *holidayItem)
 {
-    std::regex reg("([A-Z]+)[:;](.+)");
+    std::regex reg("([A-Z]+)[:;](.+:)?(.+)");
     std::smatch match;
     bool found = std::regex_search(line, match, reg);
     if (found) {
-        std::string suffix = line.substr(line.find_last_of(":") + 1, line.length());
         std::string tag = match[1].str();
-        std::string value = match[2].str();
+        std::string value = match[3].str();
         if (tag.compare(ITEM_DTSTART_TAG) == 0) {
             std::string startDate = value.size() >= 8 ? value.substr(0, 8) : ""; // 8 is date formarted string length
             if (startDate.size() == 8) {
