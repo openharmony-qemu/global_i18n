@@ -67,6 +67,32 @@ int32_t ConvertString2Int(const string &numberStr, int32_t& status)
         return -1;
     }
 }
+
+bool IsValidLocaleTag(icu::Locale &locale)
+{
+    static std::unordered_set<std::string> allValidLocalesLanguageTag;
+    GetAllValidLocalesTag(allValidLocalesLanguageTag);
+    std::string languageTag = locale.getLanguage();
+    if (allValidLocalesLanguageTag.find(languageTag) == allValidLocalesLanguageTag.end()) {
+        HiLog::Error(LABEL, "GetTimePeriodName does not support this languageTag: %{public}s", languageTag.c_str());
+        return false;
+    }
+    return true;
+}
+
+void GetAllValidLocalesTag(std::unordered_set<std::string>& allValidLocalesLanguageTag)
+{
+    static bool init = false;
+    if (init) {
+        return;
+    }
+    int32_t validCount = 1;
+    const icu::Locale *validLocales = icu::Locale::getAvailableLocales(validCount);
+    for (int i = 0; i < validCount; i++) {
+        allValidLocalesLanguageTag.insert(validLocales[i].getLanguage());
+    }
+    init = true;
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

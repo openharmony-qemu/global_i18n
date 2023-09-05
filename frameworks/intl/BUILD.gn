@@ -86,6 +86,7 @@ ohos_shared_library("intl_util") {
     "src/character.cpp",
     "src/collator.cpp",
     "src/date_time_format.cpp",
+    "src/entity_recognizer.cpp",
     "src/holiday_manager.cpp",
     "src/i18n_break_iterator.cpp",
     "src/i18n_calendar.cpp",
@@ -98,7 +99,10 @@ ohos_shared_library("intl_util") {
     "src/measure_data.cpp",
     "src/number_format.cpp",
     "src/phone_number_format.cpp",
+    "src/phone_number_matched.cpp",
+    "src/phone_number_rule.cpp",
     "src/plural_rules.cpp",
+    "src/regex_rule.cpp",
     "src/relative_time_format.cpp",
     "src/system_locale_manager.cpp",
     "src/taboo.cpp",
@@ -111,6 +115,9 @@ ohos_shared_library("intl_util") {
     "-fPIC",
   ]
   deps = [
+    ":CN_xml",
+    ":GB_xml",
+    ":common_xml",
     ":config_locales_xml",
     ":config_regions_xml",
     ":dialect_languages_xml",
@@ -208,6 +215,27 @@ ohos_prebuilt_etc("white_languages_xml") {
 ohos_prebuilt_etc("forbidden_languages_xml") {
   source = "//base/global/i18n/frameworks/intl/etc/forbidden_languages.xml"
   module_install_dir = "usr/ohos_locale_config/"
+  part_name = "i18n"
+  subsystem_name = "global"
+}
+
+ohos_prebuilt_etc("CN_xml") {
+  source = "//base/global/i18n/frameworks/intl/etc/phonenumber/CN.xml"
+  module_install_dir = "usr/ohos_locale_config/phonenumber/"
+  part_name = "i18n"
+  subsystem_name = "global"
+}
+
+ohos_prebuilt_etc("GB_xml") {
+  source = "//base/global/i18n/frameworks/intl/etc/phonenumber/GB.xml"
+  module_install_dir = "usr/ohos_locale_config/phonenumber/"
+  part_name = "i18n"
+  subsystem_name = "global"
+}
+
+ohos_prebuilt_etc("common_xml") {
+  source = "//base/global/i18n/frameworks/intl/etc/phonenumber/common.xml"
+  module_install_dir = "usr/ohos_locale_config/phonenumber/"
   part_name = "i18n"
   subsystem_name = "global"
 }

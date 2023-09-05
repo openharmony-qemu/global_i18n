@@ -22,6 +22,7 @@
 #include "measure_data.h"
 #include "phone_number_format.h"
 #include "preferred_language.h"
+#include "entity_recognizer.h"
 
 using namespace OHOS::Global::I18n;
 using testing::ext::TestSize;
@@ -562,6 +563,236 @@ HWTEST_F(I18nTest, I18nFuncTest015, TestSize.Level1)
     std::string fakeLocale = "fake locale tag";
     cityDisplayName = I18nTimeZone::GetCityDisplayName(id, fakeLocale);
     EXPECT_EQ(cityDisplayName, "");
+}
+
+/**
+ * @tc.name: I18nFuncTest016
+ * @tc.desc: Test I18n EntityRecognizer
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest016, TestSize.Level1)
+{
+    std::string localeStr = "zh-CN";
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
+    std::string message = "您好，您的包裹已送至指定地点，请尽快签收：快递员：刘某某，手机：15912345678，QQ：123456789。";
+    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::vector<std::vector<int>> res = m->FindEntityInfo(message);
+    EXPECT_EQ(res[0][0], 1);
+    EXPECT_EQ(res[0][1], 32);
+    EXPECT_EQ(res[0][2], 43);
+    EXPECT_EQ(res[1][0], 0);
+}
+
+/**
+ * @tc.name: I18nFuncTest017
+ * @tc.desc: Test I18n EntityRecognizer
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest017, TestSize.Level1)
+{
+    std::string localeStr = "zh-CN";
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
+    std::string message = "您好，您的包裹已送至指定地点，请尽快签收：快递员：刘某某，手机：15912345678 15512345678。";
+    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::vector<std::vector<int>> res = m->FindEntityInfo(message);
+    EXPECT_EQ(res[0][0], 2);
+    EXPECT_EQ(res[0][1], 32);
+    EXPECT_EQ(res[0][2], 43);
+    EXPECT_EQ(res[0][3], 44);
+    EXPECT_EQ(res[0][4], 55);
+    EXPECT_EQ(res[1][0], 0);
+}
+
+/**
+ * @tc.name: I18nFuncTest018
+ * @tc.desc: Test I18n EntityRecognizer
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest018, TestSize.Level1)
+{
+    std::string localeStr = "en-GB";
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
+    std::string message = "The stunning xxxxxx xxxxxxx in Verbier is availble for Christmas - call +44 (0)20 1234 5678.";
+    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::vector<std::vector<int>> res = m->FindEntityInfo(message);
+    EXPECT_EQ(res[0][0], 1);
+    EXPECT_EQ(res[0][1], 72);
+    EXPECT_EQ(res[0][2], 91);
+    EXPECT_EQ(res[1][0], 0);
+}
+
+/**
+ * @tc.name: I18nFuncTest019
+ * @tc.desc: Test I18n EntityRecognizer
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest019, TestSize.Level1)
+{
+    std::string localeStr = "en-GB";
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
+    std::string message = "RT @missingpeople: RT 32 yo xx missing since 26/09/2013 from Newry, NI. Seen him? Call 116000.";
+    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::vector<std::vector<int>> res = m->FindEntityInfo(message);
+    EXPECT_EQ(res[0][0], 1);
+    EXPECT_EQ(res[0][1], 87);
+    EXPECT_EQ(res[0][2], 93);
+    EXPECT_EQ(res[1][0], 0);
+}
+
+/**
+ * @tc.name: I18nFuncTest020
+ * @tc.desc: Test I18n EntityRecognizer
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest020, TestSize.Level1)
+{
+    std::string localeStr = "zh-CN";
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
+    std::string message = "xxxx海滩 xxxxx xxxxxx街上的饰品店，皮革花朵戒指10000印尼盾，不到10块人民币。";
+    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::vector<std::vector<int>> res = m->FindEntityInfo(message);
+    EXPECT_EQ(res[0][0], 0);
+    EXPECT_EQ(res[1][0], 0);
+}
+
+/**
+ * @tc.name: I18nFuncTest021
+ * @tc.desc: Test I18n EntityRecognizer
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest021, TestSize.Level1)
+{
+    std::string localeStr = "en-GB";
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
+    std::string message = "New Job: Java Developer, Dublin, Republic of Ireland, $350000.00 - $45000 per annum.";
+    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::vector<std::vector<int>> res = m->FindEntityInfo(message);
+    EXPECT_EQ(res[0][0], 0);
+    EXPECT_EQ(res[1][0], 0);
+}
+
+/**
+ * @tc.name: I18nFuncTest022
+ * @tc.desc: Test I18n EntityRecognizer
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest022, TestSize.Level1)
+{
+    std::string localeStr = "zh-CN";
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
+    std::string message = "您好，关于您的问题，可以拨打(0511) 8812 1234咨询，如果还有其他疑问，可联系刘某某（15512345678）";
+    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::vector<std::vector<int>> res = m->FindEntityInfo(message);
+    EXPECT_EQ(res[0][0], 2);
+    EXPECT_EQ(res[0][1], 14);
+    EXPECT_EQ(res[0][2], 30);
+    EXPECT_EQ(res[0][3], 49);
+    EXPECT_EQ(res[0][4], 60);
+    EXPECT_EQ(res[1][0], 0);
+}
+
+/**
+ * @tc.name: I18nFuncTest023
+ * @tc.desc: Test I18n EntityRecognizer
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest023, TestSize.Level1)
+{
+    std::string localeStr = "zh-CN";
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
+    std::string message = "给10086/10010发了一条短信：“我爱你”，收到了回复：尊敬的用户，我也爱您。";
+    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::vector<std::vector<int>> res = m->FindEntityInfo(message);
+    EXPECT_EQ(res[0][0], 2);
+    EXPECT_EQ(res[0][1], 1);
+    EXPECT_EQ(res[0][2], 6);
+    EXPECT_EQ(res[0][3], 7);
+    EXPECT_EQ(res[0][4], 12);
+    EXPECT_EQ(res[1][0], 0);
+}
+
+/**
+ * @tc.name: I18nFuncTest024
+ * @tc.desc: Test I18n EntityRecognizer
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest024, TestSize.Level1)
+{
+    std::string localeStr = "zh-CN";
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
+    std::string message = "您好，您的包裹已送至指定地点，请尽快签收：快递员：刘某某，手机：159/1234/5678，QQ：123456789。";
+    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::vector<std::vector<int>> res = m->FindEntityInfo(message);
+    EXPECT_EQ(res[0][0], 1);
+    EXPECT_EQ(res[0][1], 32);
+    EXPECT_EQ(res[0][2], 45);
+    EXPECT_EQ(res[1][0], 0);
+}
+
+/**
+ * @tc.name: I18nFuncTest025
+ * @tc.desc: Test I18n EntityRecognizer
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest025, TestSize.Level1)
+{
+    std::string localeStr = "zh-CN";
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
+    std::string message = "您好，您的包裹已送至指定地点，请尽快签收：快递员：刘某某，手机：15912345678/15512345678。";
+    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::vector<std::vector<int>> res = m->FindEntityInfo(message);
+    EXPECT_EQ(res[0][0], 2);
+    EXPECT_EQ(res[0][1], 32);
+    EXPECT_EQ(res[0][2], 43);
+    EXPECT_EQ(res[0][3], 44);
+    EXPECT_EQ(res[0][4], 55);
+    EXPECT_EQ(res[1][0], 0);
+}
+
+/**
+ * @tc.name: I18nFuncTest026
+ * @tc.desc: Test I18n EntityRecognizer
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest026, TestSize.Level1)
+{
+    std::string localeStr = "zh-CN";
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
+    std::string message = "今天一起去看的那个电影太搞笑了，2333333";
+    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::vector<std::vector<int>> res = m->FindEntityInfo(message);
+    EXPECT_EQ(res[0][0], 0);
+    EXPECT_EQ(res[1][0], 0);
+}
+
+/**
+ * @tc.name: I18nFuncTest027
+ * @tc.desc: Test I18n EntityRecognizer
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest027, TestSize.Level1)
+{
+    std::string localeStr = "pt-PT";
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
+    std::string message = "Se você tiver alguma dúvida, ligue para 912345678 para consulta";
+    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::vector<std::vector<int>> res = m->FindEntityInfo(message);
+    EXPECT_EQ(res[0][0], 1);
+    EXPECT_EQ(res[0][1], 40);
+    EXPECT_EQ(res[0][2], 49);
+    EXPECT_EQ(res[1][0], 0);
 }
 } // namespace I18n
 } // namespace Global

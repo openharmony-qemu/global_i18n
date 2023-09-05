@@ -70,6 +70,7 @@ ohos_shared_library("i18n") {
   cflags_cc = [ "-frtti" ]
   remove_configs = [ "//build/config/compiler:no_rtti" ]
   sources = [
+    "src/entity_recognizer_addon.cpp",
     "src/error_util.cpp",
     "src/holiday_manager_addon.cpp",
     "src/i18n_addon.cpp",

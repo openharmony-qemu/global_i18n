@@ -89,8 +89,6 @@ private:
     static void ProcessNormal(char ch, int *order, size_t orderSize, int *lengths, size_t lengsSize);
 
     static int GetParamOfGetTimePeriodName(napi_env env, napi_callback_info info, std::string &tag, int32_t &hour);
-    static bool IsValidLocaleTag(icu::Locale &locale);
-    static void GetAllValidLocalesTag();
 
     static napi_value ObjectConstructor(napi_env env, napi_callback_info info);
 
