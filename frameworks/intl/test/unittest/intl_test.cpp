@@ -2232,9 +2232,9 @@ HWTEST_F(IntlTest, IntlFuncTest0060, TestSize.Level1)
     HolidayManager *holiday_manager = new HolidayManager(path.c_str());
     std::map<std::string, std::vector<HolidayInfoItem>> holidayDataMap;
     std::vector<HolidayInfoItem> infoList;
-    std::vector<HolidayLocaleName> localNameList1;
+    std::vector<HolidayLocalName> localNameList1;
     localNameList1.push_back({"tr", "Kurban Bayrami Tatili"});
-    std::vector<HolidayLocaleName> localNameList2;
+    std::vector<HolidayLocalName> localNameList2;
     localNameList2.push_back({"tr", "Kurban Bayrami 2. Günü"});
     HolidayInfoItem item1 = {"Sacrifice Feast Holiday", 2023, 6, 25, localNameList1};
     HolidayInfoItem item2 = {"The Second Day of Sacrifice Feast", 2023, 6, 25, localNameList2};

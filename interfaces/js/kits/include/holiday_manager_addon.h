@@ -42,7 +42,7 @@ private:
     static int32_t ValidateParamNumber(napi_env &env, napi_value &argv);
     static std::vector<int> ValidateParamDate(napi_env &env, napi_value &argv);
     static napi_value CreateHolidayItem(napi_env env, const HolidayInfoItem &holidayItem);
-    static napi_value HolidayLocaleNameItem(napi_env env, const std::vector<HolidayLocaleName> localNames);
+    static napi_value HolidayLocalNameItem(napi_env env, const std::vector<HolidayLocalName> localNames);
     static napi_value GetHolidayInfoItemResult(napi_env env, std::vector<HolidayInfoItem> itemList);
     static int GetDateValue(napi_env env, napi_value value, const std::string method);
 
