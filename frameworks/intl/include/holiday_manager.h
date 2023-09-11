@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-struct HolidayLocaleName {
+struct HolidayLocalName {
     // Holiday locale name language id
     std::string language = "";
 
@@ -45,7 +45,7 @@ struct HolidayInfoItem {
     int32_t day = 0;
 
     // Holiday local name array
-    std::vector<HolidayLocaleName> localNames;
+    std::vector<HolidayLocalName> localNames;
 };
 
 class HolidayManager {

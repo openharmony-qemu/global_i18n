@@ -324,36 +324,36 @@ napi_value HolidayManagerAddon::CreateHolidayItem(napi_env env, const HolidayInf
     return result;
 }
 
-napi_value HolidayManagerAddon::HolidayLocaleNameItem(napi_env env, const std::vector<HolidayLocaleName> localNames)
+napi_value HolidayManagerAddon::HolidayLocaleNameItem(napi_env env, const std::vector<HolidayLocalName> localNames)
 {
     napi_value result = nullptr;
     napi_status status = napi_create_array_with_length(env, localNames.size(), &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "create HolidayLocaleName array failed.");
+        HiLog::Error(LABEL, "create HolidayLocalName array failed.");
         return nullptr;
     }
     for (size_t i = 0; i < localNames.size(); i++) {
         napi_value localNameItem;
         status = napi_create_object(env, &localNameItem);
         if (status != napi_ok) {
-            HiLog::Error(LABEL, "Create HolidayLocaleName Item object failed.");
+            HiLog::Error(LABEL, "Create HolidayLocalName Item object failed.");
             return nullptr;
         }
         status = napi_set_named_property(env, localNameItem, "language",
                                          VariableConvertor::CreateString(env, localNames[i].language));
         if (status != napi_ok) {
-            HiLog::Error(LABEL, "Create HolidayLocaleName.language Item object failed.");
+            HiLog::Error(LABEL, "Create HolidayLocalName.language Item object failed.");
             return nullptr;
         }
         status = napi_set_named_property(env, localNameItem, "name",
                                          VariableConvertor::CreateString(env, localNames[i].name));
         if (status != napi_ok) {
-            HiLog::Error(LABEL, "Create HolidayLocaleName.name Item object failed.");
+            HiLog::Error(LABEL, "Create HolidayLocalName.name Item object failed.");
             return nullptr;
         }
         status = napi_set_element(env, result, i, localNameItem);
         if (status != napi_ok) {
-            HiLog::Error(LABEL, "Failed to set HolidayLocaleName element.");
+            HiLog::Error(LABEL, "Failed to set HolidayLocalName element.");
             return nullptr;
         }
     }
