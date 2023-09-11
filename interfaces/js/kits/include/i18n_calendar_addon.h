@@ -48,6 +48,7 @@ private:
     static napi_value GetDisplayName(napi_env env, napi_callback_info info);
     static napi_value GetTimeInMillis(napi_env env, napi_callback_info info);
     static napi_value IsWeekend(napi_env env, napi_callback_info info);
+    static napi_value CompareDays(napi_env env, napi_callback_info info);
 
     // auxiliary functions
     static CalendarType GetCalendarType(napi_env env, napi_value value);

@@ -15,6 +15,7 @@
 #ifndef OHOS_GLOBAL_I18N_CALENDAR_H
 #define OHOS_GLOBAL_I18N_CALENDAR_H
 
+#include <cmath>
 #include <cstdint>
 
 #include "iosfwd"
@@ -62,6 +63,8 @@ public:
     bool IsWeekend(int64_t date, UErrorCode &status);
     bool IsWeekend(void);
     std::string GetDisplayName(std::string &displayLocaleTag);
+    int32_t CompareDays(UDate date);
+    
 private:
     icu::Calendar *calendar_;
     void InitCalendar(const icu::Locale &locale, CalendarType type);
