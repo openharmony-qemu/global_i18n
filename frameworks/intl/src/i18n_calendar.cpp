@@ -306,6 +306,17 @@ std::string I18nCalendar::GetDisplayName(std::string &displayLocaleTag)
     unistr.toUTF8String<std::string>(ret);
     return ret;
 }
+
+int32_t I18nCalendar::CompareDays(UDate date)
+{
+    if (calendar_ != nullptr) {
+        UErrorCode status = U_ZERO_ERROR;
+        UDate nowMs = calendar_->getTime(status);
+        double ret = (date - nowMs) / (24 * 60 * 60 * 1000); // Convert 24 hours into milliseconds
+        return ret > 0 ? std::ceil(ret) : std::floor(ret);
+    }
+    return 0;
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

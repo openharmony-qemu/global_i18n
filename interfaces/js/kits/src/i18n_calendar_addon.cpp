@@ -102,7 +102,8 @@ napi_value I18nCalendarAddon::InitI18nCalendar(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("add", Add),
         DECLARE_NAPI_FUNCTION("getDisplayName", GetDisplayName),
         DECLARE_NAPI_FUNCTION("getTimeInMillis", GetTimeInMillis),
-        DECLARE_NAPI_FUNCTION("isWeekend", IsWeekend)
+        DECLARE_NAPI_FUNCTION("isWeekend", IsWeekend),
+        DECLARE_NAPI_FUNCTION("compareDays", CompareDays)
     };
     napi_value constructor = nullptr;
     status = napi_define_class(env, "I18nCalendar", NAPI_AUTO_LENGTH, CalendarConstructor, nullptr,
@@ -640,6 +641,35 @@ napi_value I18nCalendarAddon::IsWeekend(napi_env env, napi_callback_info info)
         HiLog::Error(LABEL, "Create boolean failed");
         return nullptr;
     }
+    return result;
+}
+
+napi_value I18nCalendarAddon::CompareDays(napi_env env, napi_callback_info info)
+{
+    size_t argc = 1;
+    napi_value argv[1] = { 0 };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_value result = nullptr;
+    UDate milliseconds = 0;
+    napi_status status = napi_get_date_value(env, argv[0], &milliseconds);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "compareDays function param is not Date");
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        return nullptr;
+    }
+
+    I18nCalendarAddon *obj = nullptr;
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    if (status != napi_ok || !obj || !obj->calendar_) {
+        HiLog::Error(LABEL, "Get calendar object failed");
+        status = napi_create_int32(env, 0, &result); // if error return 0
+        return result;
+    }
+    
+    int32_t diff_date = obj->calendar_->CompareDays(milliseconds);
+    status = napi_create_int32(env, diff_date, &result);
     return result;
 }
 
