@@ -313,7 +313,7 @@ napi_value HolidayManagerAddon::CreateHolidayItem(napi_env env, const HolidayInf
         HiLog::Error(LABEL, "Failed to set element day.");
         return nullptr;
     }
-    napi_value localNames = HolidayLocaleNameItem(env, holidayItem.localNames);
+    napi_value localNames = HolidayLocalNameItem(env, holidayItem.localNames);
     if (localNames != nullptr) {
         status = napi_set_named_property(env, result, "localNames", localNames);
         if (status != napi_ok) {
@@ -324,7 +324,7 @@ napi_value HolidayManagerAddon::CreateHolidayItem(napi_env env, const HolidayInf
     return result;
 }
 
-napi_value HolidayManagerAddon::HolidayLocaleNameItem(napi_env env, const std::vector<HolidayLocalName> localNames)
+napi_value HolidayManagerAddon::HolidayLocalNameItem(napi_env env, const std::vector<HolidayLocalName> localNames)
 {
     napi_value result = nullptr;
     napi_status status = napi_create_array_with_length(env, localNames.size(), &result);
