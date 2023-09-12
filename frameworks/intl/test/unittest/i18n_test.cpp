@@ -615,12 +615,12 @@ HWTEST_F(I18nTest, I18nFuncTest018, TestSize.Level1)
     std::string localeStr = "en-GB";
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
-    std::string message = "The stunning xxxxxx xxxxxxx in Verbier is availble for Christmas - call +44 (0)20 1234 5678.";
+    std::string message = "The stunning xxxxxx xxx in Verbier is availble for Christmas - call +44 (0)20 1234 5678.";
     EntityRecognizer* m = new EntityRecognizer(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[0][0], 1);
-    EXPECT_EQ(res[0][1], 72);
-    EXPECT_EQ(res[0][2], 91);
+    EXPECT_EQ(res[0][1], 68);
+    EXPECT_EQ(res[0][2], 87);
     EXPECT_EQ(res[1][0], 0);
 }
 
@@ -634,12 +634,12 @@ HWTEST_F(I18nTest, I18nFuncTest019, TestSize.Level1)
     std::string localeStr = "en-GB";
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
-    std::string message = "RT @missingpeople: RT 32 yo xx missing since 26/09/2013 from Newry, NI. Seen him? Call 116000.";
+    std::string message = "RT @missingpeople: RT 32 yo missing since 26/09/2013 from Newry, NI. Seen him? Call 116000.";
     EntityRecognizer* m = new EntityRecognizer(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[0][0], 1);
-    EXPECT_EQ(res[0][1], 87);
-    EXPECT_EQ(res[0][2], 93);
+    EXPECT_EQ(res[0][1], 84);
+    EXPECT_EQ(res[0][2], 90);
     EXPECT_EQ(res[1][0], 0);
 }
 

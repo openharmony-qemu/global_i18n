@@ -237,7 +237,7 @@ bool RegexRule::PrefixValid(icu::UnicodeString& number, int length)
     } else if (length == 5) {
         if (preNumber == "11808" || preNumber == "17909" || preNumber == "12593" ||
             preNumber == "17951" || preNumber == "17911") {
-            return true;    
+            return true;
         }
     }
     return false;
@@ -436,7 +436,8 @@ std::vector<MatchedNumberInfo> RegexRule::HandleStartWithMobile(PhoneNumberMatch
     return HandlePossibleNumberWithPattern(pattern, possibleNumber, message, false);
 }
 
-std::vector<MatchedNumberInfo> RegexRule::HandleEndWithMobile(PhoneNumberMatch* possibleNumber, icu::UnicodeString& message)
+std::vector<MatchedNumberInfo> RegexRule::HandleEndWithMobile(PhoneNumberMatch* possibleNumber,
+    icu::UnicodeString& message)
 {
     icu::RegexPattern* pattern = this->GetPattern();
     return HandlePossibleNumberWithPattern(pattern, possibleNumber, message, true);
