@@ -255,6 +255,6 @@ napi_value I18nNormalizerAddon::GetI18nNormalizerInstance(napi_env env, napi_cal
     }
     return result;
 }
-} //namespace I18n
-} //namespace Global
-} //namespace OHOS
+} // namespace I18n
+} // namespace Global
+} // namespace OHOS

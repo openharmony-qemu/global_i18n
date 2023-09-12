@@ -62,7 +62,8 @@ private:
     static icu::UnicodeString HandleNegativeRule(icu::UnicodeString& src, PhoneNumberRule* phoneNumberRule);
     static std::vector<MatchedNumberInfo> HandlePositiveRule(PhoneNumberMatch* match, icu::UnicodeString& message,
         PhoneNumberRule* phoneNumberRule);
-    static bool HandleBorderRule(PhoneNumberMatch* match, icu::UnicodeString& message, PhoneNumberRule* phoneNumberRule);
+    static bool HandleBorderRule(PhoneNumberMatch* match, icu::UnicodeString& message,
+        PhoneNumberRule* phoneNumberRule);
     static void ReplaceSpecifiedPos(icu::UnicodeString& chs, int start, int end);
 
     static const UChar32 REPLACE_CHAR;

@@ -102,7 +102,7 @@ icu::UnicodeString PhoneNumberMatched::ConvertQanChar(icu::UnicodeString& instr)
     return result;
 }
 
-std::vector<int> PhoneNumberMatched:: DealWithoutFixed(icu::UnicodeString& message, std::string& country,
+std::vector<int> PhoneNumberMatched::DealWithoutFixed(icu::UnicodeString& message, std::string& country,
     PhoneNumberUtil* util)
 {
     std::vector<PhoneNumberMatch*> matchList = FindNumbers(country, util, message);
@@ -402,7 +402,7 @@ std::vector<int> PhoneNumberMatched::DealResult(std::vector<MatchedNumberInfo>& 
         result[0] = length;
         for (int i = 0; i < length; i++) {
             result[posNumber * i + posStart] = matchedNumberInfoList[i].GetBegin();
-            result[posNumber * i + posEnd] = matchedNumberInfoList[i].GetEnd(); 
+            result[posNumber * i + posEnd] = matchedNumberInfoList[i].GetEnd();
         }
     }
     return result;
@@ -472,8 +472,8 @@ PhoneNumberMatch* PhoneNumberMatched::HandleCodesRule(PhoneNumberMatch* phoneNum
 }
 
 // Add phone numbers that meet the positive rule to the result
-std::vector<MatchedNumberInfo> PhoneNumberMatched::HandlePositiveRule(PhoneNumberMatch* match, icu::UnicodeString& message,
-    PhoneNumberRule* phoneNumberRule)
+std::vector<MatchedNumberInfo> PhoneNumberMatched::HandlePositiveRule(PhoneNumberMatch* match,
+    icu::UnicodeString& message, PhoneNumberRule* phoneNumberRule)
 {
     std::vector<RegexRule*> rules = phoneNumberRule->GetPositiveRules();
     if (rules.size() == 0) {

@@ -128,7 +128,8 @@ std::vector<RegexRule*> PhoneNumberRule::GetNegativeRules()
 }
 
 // Short numbers identification
-std::vector<MatchedNumberInfo> PhoneNumberRule::HandleShortPhoneNumbers(icu::UnicodeString& message, std::string& country)
+std::vector<MatchedNumberInfo> PhoneNumberRule::HandleShortPhoneNumbers(icu::UnicodeString& message,
+    std::string& country)
 {
     PhoneNumber phoneNumber;
     PhoneNumberUtil* phoneNumberUtil = PhoneNumberUtil::GetInstance();

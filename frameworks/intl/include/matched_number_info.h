@@ -56,7 +56,8 @@ public:
         return content;
     }
     
-    bool operator<(const MatchedNumberInfo& info) const {
+    bool operator<(const MatchedNumberInfo& info) const
+    {
         if (_begin < info._begin) {
             return true;
         } else if (_begin == info._begin && _end < info._end) {
