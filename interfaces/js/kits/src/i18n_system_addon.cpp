@@ -18,6 +18,7 @@
 #include "i18n_system_addon.h"
 #include "locale_config.h"
 #include "preferred_language.h"
+#include "utils.h"
 #include "variable_convertor.h"
 
 namespace OHOS {
@@ -66,6 +67,7 @@ napi_value I18nSystemAddon::CreateSystemObject(napi_env env, napi_status &initSt
         DECLARE_NAPI_FUNCTION("addPreferredLanguage", AddPreferredLanguageWithError),
         DECLARE_NAPI_FUNCTION("removePreferredLanguage", RemovePreferredLanguageWithError),
         DECLARE_NAPI_FUNCTION("getPreferredLanguageList", GetPreferredLanguageList),
+        DECLARE_NAPI_FUNCTION("setAppPreferredLanguage", SetAppPreferredLanguage),
         DECLARE_NAPI_FUNCTION("getFirstPreferredLanguage", GetFirstPreferredLanguage),
         DECLARE_NAPI_FUNCTION("getAppPreferredLanguage", GetAppPreferredLanguage),
         DECLARE_NAPI_FUNCTION("setUsingLocalDigit", SetUsingLocalDigitAddonWithError),
@@ -293,6 +295,37 @@ napi_value I18nSystemAddon::GetFirstPreferredLanguage(napi_env env, napi_callbac
         return nullptr;
     }
     return result;
+}
+
+napi_value I18nSystemAddon::SetAppPreferredLanguage(napi_env env, napi_callback_info info)
+{
+    size_t argc = 1;
+    napi_value argv[1] = { 0 };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    napi_typeof(env, argv[0], &valueType);
+    if (valueType != napi_valuetype::napi_string) {
+        HiLog::Error(LABEL, "SetAppPreferredLanguage Parameter type is not string");
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        return nullptr;
+    }
+    int code = 0;
+    std::string localeTag = VariableConvertor::GetString(env, argv[0], code);
+    if (code) {
+        HiLog::Error(LABEL, "SetAppPreferredLanguage can't get string from js param");
+        return nullptr;
+    }
+    UErrorCode icuStatus = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(localeTag.data(), icuStatus);
+    if (U_FAILURE(icuStatus) || !IsValidLocaleTag(locale)) {
+        HiLog::Error(LABEL, "GetTimePeriodName does not support this locale");
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+        return nullptr;
+    }
+    // Do something next
+    return nullptr;
 }
 
 napi_value I18nSystemAddon::GetAppPreferredLanguage(napi_env env, napi_callback_info info)

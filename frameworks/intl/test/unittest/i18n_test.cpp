@@ -288,6 +288,9 @@ HWTEST_F(I18nTest, I18nFuncTest007, TestSize.Level1)
     EXPECT_EQ(checkCalendar.Get(UCalendarDateFields::UCAL_YEAR), 2023);
     EXPECT_EQ(checkCalendar.Get(UCalendarDateFields::UCAL_MONTH), 8);
     EXPECT_EQ(checkCalendar.Get(UCalendarDateFields::UCAL_DATE), 2);
+    defaultCalendar.SetTime(1684742124645);
+    int32_t compareDays = defaultCalendar.CompareDays(1684742124650);
+    EXPECT_EQ(compareDays, 1);
 }
 
 /**

@@ -59,6 +59,7 @@ private:
     static napi_value Set24HourClockWithError(napi_env env, napi_callback_info info);
     static napi_value AddPreferredLanguageWithError(napi_env env, napi_callback_info info);
     static napi_value RemovePreferredLanguageWithError(napi_env env, napi_callback_info info);
+    static napi_value SetAppPreferredLanguage(napi_env env, napi_callback_info info);
     static napi_value GetAppPreferredLanguage(napi_env env, napi_callback_info info);
     static napi_value SetUsingLocalDigitAddon(napi_env env, napi_callback_info info);
     static napi_value SetUsingLocalDigitAddonWithError(napi_env env, napi_callback_info info);
