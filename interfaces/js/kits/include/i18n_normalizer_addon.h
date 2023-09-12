@@ -19,7 +19,6 @@
 #include "i18n_normalizer.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
-#include "i18n_normalizer.h"
 
 namespace OHOS {
 namespace Global {
@@ -52,7 +51,7 @@ private:
 
     std::unique_ptr<I18nNormalizer> normalizer_ = nullptr;
 };
-} //namespace I18n
-} //namespace Global
-} //namespace OHOS
+} // namespace I18n
+} // namespace Global
+} // namespace OHOS
 #endif

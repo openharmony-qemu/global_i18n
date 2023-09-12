@@ -18,6 +18,7 @@
 #include "error_util.h"
 #include "hilog/log.h"
 #include "holiday_manager_addon.h"
+#include "entity_recognizer_addon.h"
 #include "i18n_calendar_addon.h"
 #include "i18n_normalizer_addon.h"
 #include "i18n_system_addon.h"
@@ -29,6 +30,7 @@
 #include "unicode/locid.h"
 #include "unicode/smpdtfmt.h"
 #include "unicode/translit.h"
+#include "utils.h"
 #include "variable_convertor.h"
 #include "i18n_addon.h"
 
@@ -41,8 +43,6 @@ using namespace OHOS::HiviewDFX;
 static thread_local napi_ref* g_brkConstructor = nullptr;
 static thread_local napi_ref g_indexUtilConstructor = nullptr;
 static thread_local napi_ref* g_transConstructor = nullptr;
-
-static std::unordered_set<std::string> allValidLocalesLanguageTag;
 
 I18nAddon::I18nAddon() : env_(nullptr) {}
 
@@ -372,31 +372,6 @@ int I18nAddon::GetParamOfGetTimePeriodName(napi_env env, napi_callback_info info
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
     }
     return 0;
-}
-
-bool I18nAddon::IsValidLocaleTag(icu::Locale &locale)
-{
-    GetAllValidLocalesTag();
-    std::string languageTag = locale.getLanguage();
-    if (allValidLocalesLanguageTag.find(languageTag) == allValidLocalesLanguageTag.end()) {
-        HiLog::Error(LABEL, "GetTimePeriodName does not support this languageTag: %{public}s", languageTag.c_str());
-        return false;
-    }
-    return true;
-}
-
-void I18nAddon::GetAllValidLocalesTag()
-{
-    static bool init = false;
-    if (init) {
-        return;
-    }
-    int32_t validCount = 1;
-    const icu::Locale *validLocales = icu::Locale::getAvailableLocales(validCount);
-    for (int i = 0; i < validCount; i++) {
-        allValidLocalesLanguageTag.insert(validLocales[i].getLanguage());
-    }
-    init = true;
 }
 
 void I18nAddon::ProcessNormal(char ch, int *order, size_t orderSize, int *lengths, size_t lengsSize)
@@ -1553,6 +1528,7 @@ napi_value Init(napi_env env, napi_value exports)
     val = I18nNormalizerAddon::InitI18nNormalizer(env, val);
     val = SystemLocaleManagerAddon::InitSystemLocaleManager(env, val);
     val = HolidayManagerAddon::InitHolidayManager(env, val);
+    val = EntityRecognizerAddon::InitEntityRecognizer(env, val);
     return val;
 }
 

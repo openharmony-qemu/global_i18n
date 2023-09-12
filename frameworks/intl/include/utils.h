@@ -17,6 +17,8 @@
 
 #include <string>
 #include <vector>
+#include <unordered_set>
+#include <locid.h>
 
 namespace OHOS {
 namespace Global {
@@ -24,6 +26,8 @@ namespace I18n {
 void Split(const std::string &src, const std::string &sep, std::vector<std::string> &dest);
 std::string ReadSystemParameter(const char *paramKey, const int paramLength);
 int32_t ConvertString2Int(const std::string &numberStr, int32_t& status);
+bool IsValidLocaleTag(icu::Locale &locale);
+void GetAllValidLocalesTag(std::unordered_set<std::string>& allValidLocalesLanguageTag);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
