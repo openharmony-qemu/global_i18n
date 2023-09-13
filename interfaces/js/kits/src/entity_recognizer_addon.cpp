@@ -146,9 +146,9 @@ napi_value EntityRecognizerAddon::FindEntityInfo(napi_env env, napi_callback_inf
     }
     std::string type = "phone_number";
     for (int i = 0; i < entityInfo[0][0]; i++) {
-        int start = entityInfo[0][2 * i + 1];
+        int begin = entityInfo[0][2 * i + 1];
         int end = entityInfo[0][2 * i + 2];
-        napi_value item = CreateEntityInfoItem(env, start, end, type);
+        napi_value item = CreateEntityInfoItem(env, begin, end, type);
         status = napi_set_element(env, result, i, item);
         if (status != napi_ok) {
             HiLog::Error(LABEL, "Failed to set PhoneNumberItem element.");
@@ -158,7 +158,7 @@ napi_value EntityRecognizerAddon::FindEntityInfo(napi_env env, napi_callback_inf
     return result;
 }
 
-napi_value EntityRecognizerAddon::CreateEntityInfoItem(napi_env env, const int start,
+napi_value EntityRecognizerAddon::CreateEntityInfoItem(napi_env env, const int begin,
     const int end, const std::string& type)
 {
     napi_value result;
@@ -167,10 +167,10 @@ napi_value EntityRecognizerAddon::CreateEntityInfoItem(napi_env env, const int s
         HiLog::Error(LABEL, "Create EntityInfoItem object failed.");
         return nullptr;
     }
-    status = napi_set_named_property(env, result, "start",
-        VariableConvertor::CreateNumber(env, start));
+    status = napi_set_named_property(env, result, "begin",
+        VariableConvertor::CreateNumber(env, begin));
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to set element start.");
+        HiLog::Error(LABEL, "Failed to set element begin.");
         return nullptr;
     }
     status = napi_set_named_property(env, result, "end",
