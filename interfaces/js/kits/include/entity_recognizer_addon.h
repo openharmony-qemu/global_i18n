@@ -33,7 +33,7 @@ public:
 private:
     static napi_value constructor(napi_env env, napi_callback_info info);
     static napi_value FindEntityInfo(napi_env env, napi_callback_info info);
-    static napi_value CreateEntityInfoItem(napi_env env, const int start, const int end, const std::string& type);
+    static napi_value CreateEntityInfoItem(napi_env env, const int begin, const int end, const std::string& type);
     std::unique_ptr<EntityRecognizer> entityRecognizer_ = nullptr;
 };
 } // namespace I18n
