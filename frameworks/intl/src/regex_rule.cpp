@@ -248,10 +248,10 @@ bool RegexRule::NumberValid(icu::UnicodeString& number)
     int lengthOne = 1;
     // 3 indicates the first three digits of a phone number.
     int lengthThree = 3;
-    // 5 indicates the first five digits of a phone number.
-    int lengthFive = 5;
     // 11 is the number of digits in the phone number.
     if (number[0] == '1' && CountDigits(number) > 11) {
+        // 5 indicates the first five digits of a phone number.
+        int lengthFive = 5;
         if (!PrefixValid(number, lengthFive)) {
             return false;
         }
@@ -278,7 +278,7 @@ PhoneNumberMatch* RegexRule::IsValidCode(PhoneNumberMatch* possibleNumber, icu::
     bool isValid = true;
     icu::UnicodeString number = possibleNumber->raw_string().c_str();
     // Processes the ;ext= extention number format
-    uint32_t ind = number.trim().indexOf(";ext=");
+    int32_t ind = number.trim().indexOf(";ext=");
     if (ind != -1) {
         number = number.trim().tempSubString(0, ind);
     }
@@ -298,7 +298,7 @@ PhoneNumberMatch* RegexRule::IsValidRawstr(PhoneNumberMatch* possibleNumber, icu
     bool isValid = true;
     icu::UnicodeString number = possibleNumber->raw_string().c_str();
     // Processes the ;ext= extention number format
-    uint32_t ind = number.trim().indexOf(";ext=");
+    int32_t ind = number.trim().indexOf(";ext=");
     if (ind != -1) {
         number = number.trim().tempSubString(0, ind);
     }
@@ -476,6 +476,10 @@ std::vector<MatchedNumberInfo> RegexRule::GetNumbersWithSlant(icu::UnicodeString
     std::vector<MatchedNumberInfo> shortList;
     PhoneNumberUtil* pnu = PhoneNumberUtil::GetInstance();
     ShortNumberInfo* shortInfo = new ShortNumberInfo();
+    if (shortInfo == nullptr) {
+        HiLog::Error(LABEL, "ShortNumberInfo construct failed.");
+        return shortList;
+    }
     std::string numberFisrt = "";
     std::string numberEnd = "";
     int slantIndex = 0;
@@ -506,9 +510,7 @@ std::vector<MatchedNumberInfo> RegexRule::GetNumbersWithSlant(icu::UnicodeString
         matchedNumberInfoEnd.SetContent(contentEnd);
         shortList.push_back(matchedNumberInfoEnd);
     }
-    if (shortInfo != nullptr) {
-        delete shortInfo;
-    }
+    delete shortInfo;
     return shortList;
 }
 

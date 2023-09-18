@@ -66,7 +66,7 @@ std::vector<int> PhoneNumberMatched::GetMatchedPhoneNumber(std::string& messageS
     std::vector<MatchedNumberInfo> matchedNumberInfoList = GetPossibleNumberInfos(country,
         phoneNumberUtil, convertQanStr, filteredString);
     // Mark the searched area
-    for (int i = 0; i < searchedRegion.size(); i++) {
+    for (size_t i = 0; i < searchedRegion.size(); i++) {
         ReplaceSpecifiedPos(filteredString, searchedRegion[i].first, searchedRegion[i].second);
     }
     std::vector<MatchedNumberInfo> shortList = phoneNumberRule->HandleShortPhoneNumbers(filteredString, country);
@@ -122,7 +122,7 @@ std::vector<int> PhoneNumberMatched::DealWithoutFixed(icu::UnicodeString& messag
         }
     }
     // Mark the searched area
-    for (int i = 0; i < searchedRegion.size(); i++) {
+    for (size_t i = 0; i < searchedRegion.size(); i++) {
         ReplaceSpecifiedPos(message, searchedRegion[i].first, searchedRegion[i].second);
     }
     std::vector<MatchedNumberInfo> shortResult = FindShortNumbers(country, util, message);
@@ -176,8 +176,20 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::FindShortNumbers(std::string&
     UErrorCode status = U_ZERO_ERROR;
     icu::UnicodeString regex = "(?<!(\\d|\\*|-))\\d{2,6}(?!(\\d|\\*|-|%))";
     ShortNumberInfo* shortNumberInfo = new ShortNumberInfo();
+    if (shortNumberInfo == nullptr) {
+        HiLog::Error(LABEL, "shortNumberInfo construct failed.");
+        return matchedNumberInfoList;
+    }
     icu::RegexPattern* shortPattern = icu::RegexPattern::compile(regex, 0, status);
+    if (shortPattern == nullptr) {
+        HiLog::Error(LABEL, "shortPattern construct failed.");
+        return matchedNumberInfoList;
+    }
     icu::RegexMatcher* shortMatch = shortPattern->matcher(message, status);
+    if (shortMatch == nullptr) {
+        HiLog::Error(LABEL, "shortPattern  matcher failed.");
+        return matchedNumberInfoList;
+    }
     while (shortMatch->find(status)) {
         icu::UnicodeString numberToParse = shortMatch->group(status);
         std::string stringParse;
@@ -198,15 +210,9 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::FindShortNumbers(std::string&
             matchedNumberInfoList.push_back(matcher);
         }
     }
-    if (shortNumberInfo != nullptr) {
-        delete shortNumberInfo;
-    }
-    if (shortPattern != nullptr) {
-        delete shortPattern;
-    }
-    if (shortMatch != nullptr) {
-        delete shortMatch;
-    }
+    delete shortNumberInfo;
+    delete shortPattern;
+    delete shortMatch;
     return matchedNumberInfoList;
 }
 
@@ -220,8 +226,7 @@ bool PhoneNumberMatched::AddPhoneNumber(std::string& number, int start, std::vec
     if (RegexRule::CountDigits(uNumber) < lenNumber) {
         return false;
     }
-    PhoneNumberUtil::ErrorType parseStatus = PhoneNumberUtil::NO_PARSING_ERROR;
-    parseStatus = util->Parse(number, country, &phoneNumber);
+    PhoneNumberUtil::ErrorType parseStatus = util->Parse(number, country, &phoneNumber);
     if (parseStatus != PhoneNumberUtil::NO_PARSING_ERROR) {
         return false;
     }
@@ -254,18 +259,16 @@ std::vector<PhoneNumberMatch*> PhoneNumberMatched::FindNumbers(std::string& coun
         // if the entire phone number is invalid, identify each segment that is separated
         if (!AddPhoneNumber(number, start, matchList, country, util)) {
             int searchStart = 0;
-            int phoneStart = 0;
-            int phoneEnd = 0;
             UChar32 space = ' ';
             UChar32 slash = '/';
             if (uNumber.indexOf(space, searchStart) == -1 && uNumber.indexOf(slash, searchStart) == -1) {
                 continue;
             }
             while (uNumber.indexOf(space, searchStart) != -1 || uNumber.indexOf(slash, searchStart) != -1) {
-                phoneStart = searchStart;
+                int phoneStart = searchStart;
                 int indexSpace = uNumber.indexOf(space, searchStart);
                 int indexSlash = uNumber.indexOf(slash, searchStart);
-                phoneEnd =
+                int phoneEnd =
                     (indexSpace == -1 || (indexSlash != -1 && indexSlash < indexSpace)) ? indexSlash : indexSpace;
                 searchStart = phoneEnd + 1;
                 std::string tempNumber = number.substr(phoneStart, phoneEnd - phoneStart);
@@ -348,9 +351,9 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::DeleteRepeatedInfo(std::vecto
     std::vector<MatchedNumberInfo> ret;
     for (auto info : list) {
         if (set.find(info) == set.end()) {
-            set.insert(info);
             ret.push_back(info);
         }
+        set.insert(info);
     }
     return ret;
 }
@@ -391,13 +394,13 @@ bool PhoneNumberMatched::IsNumberWithOneBracket(icu::UnicodeString& message)
 std::vector<int> PhoneNumberMatched::DealResult(std::vector<MatchedNumberInfo>& matchedNumberInfoList)
 {
     std::vector<int> result;
-    int posNumber = 2;
-    int posStart = 1;
-    int posEnd = 2;
     int length = matchedNumberInfoList.size();
     if (length == 0) {
         result.push_back(0);
     } else {
+        int posNumber = 2;
+        int posStart = 1;
+        int posEnd = 2;
         result.resize(posNumber * length + 1);
         result[0] = length;
         for (int i = 0; i < length; i++) {
