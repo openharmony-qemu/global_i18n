@@ -234,8 +234,10 @@ void NumberFormat::ParseDigitsConfigs(std::map<std::string, std::string> &config
         } else if (notationString == "engineering") {
             notation = icu::number::Notation::engineering();
         }
-        if (notationString == "compact" && configs.count("compactDisplay") > 0) {
-            compactDisplay = configs["compactDisplay"];
+        if (notationString == "compact") {
+            if (configs.count("compactDisplay") > 0) {
+                compactDisplay = configs["compactDisplay"];
+            }
             if (compactDisplay == "long") {
                 notation = icu::number::Notation::compactLong();
             } else {
