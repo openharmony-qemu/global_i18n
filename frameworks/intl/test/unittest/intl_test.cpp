@@ -2252,6 +2252,32 @@ HWTEST_F(IntlTest, IntlFuncTest0060, TestSize.Level1)
     EXPECT_TRUE(!flag);
     delete holiday_manager;
 }
+
+/**
+ * @tc.name: IntlFuncTest0061
+ * @tc.desc: Test Intl NumberFormat.format
+ * @tc.type: FUNC
+ */
+
+HWTEST_F(IntlTest, IntlFuncTest061, TestSize.Level1)
+{
+    string locale = "en-CN";
+    string expects = "123K";
+    vector<string> locales;
+    locales.push_back(locale);
+    string style = "decimal";
+    map<string, string> options = { { "style", style },
+                                    { "notation", "compact" } };
+    NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
+    if (!numFmt) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    string out = numFmt->Format(123456.789);
+    EXPECT_EQ(out, expects);
+    EXPECT_EQ(numFmt->GetStyle(), style);
+    delete numFmt;
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
