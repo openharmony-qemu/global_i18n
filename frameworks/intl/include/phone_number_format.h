@@ -27,9 +27,9 @@ namespace Global {
 namespace I18n {
 using i18n::phonenumbers::PhoneNumberUtil;
 using ExposeLocationName = void (*)(const char*, const char*, char*);
-using GetBlockedRegionName = std::set<std::string> (*)(const std::string&);
-using GetBlockedPhoneLocationName = std::string (*)(const std::string&, const std::string, const std::string);
-using GetReplacedPhoneLocationName = std::string (*)(const std::string&, const std::string, const std::string);
+using GetBlockedRegionName = bool (*)(const char*, const char*);
+using GetBlockedPhoneLocationName = void (*)(const char*, const char*, char*);
+using GetReplacedPhoneLocationName = void (*)(const char*, const char*, char*);
 
 class PhoneNumberFormat {
 public:

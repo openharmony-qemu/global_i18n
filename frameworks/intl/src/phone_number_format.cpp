@@ -35,7 +35,7 @@ namespace I18n {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "WJTest" };
 using namespace OHOS::HiviewDFX;
 
-const int RECV_CHAR_LEN = 100;
+const int RECV_CHAR_LEN = 128;
 using i18n::phonenumbers::PhoneNumberUtil;
 
 PhoneNumberFormat::PhoneNumberFormat(const std::string &countryTag,
@@ -211,14 +211,7 @@ bool PhoneNumberFormat::getBlockedCountryName(const std::string& regionCode, con
         return false;
     }
     GetBlockedRegionName getBlockedRegionName = (GetBlockedRegionName)dlsym(i18nUtilHandle, "GetBlockedRegionName");
-    std::set<std::string> blockReginons;
-    if (getBlockedRegionName) {
-        blockReginons = getBlockedRegionName(language);
-    }
-    if (blockReginons.find(regionCode) != blockReginons.end()) {
-        return true;
-    }
-    return false;
+    return getBlockedRegionName(language.c_str(), regionCode.c_str());
 }
 
 std::string PhoneNumberFormat::getCityName(const std::string& language, const std::string& phonenumber,
@@ -232,17 +225,20 @@ std::string PhoneNumberFormat::getCityName(const std::string& language, const st
     }
     GetBlockedPhoneLocationName getBlockedPhoneLocationName =
         (GetBlockedPhoneLocationName)dlsym(i18nUtilHandle, "GetBlockedPhoneLocationName");
-    std::string ret = getBlockedPhoneLocationName(language, phonenumber, locationName);
-    if (ret.empty()) {
+    char recvArr[RECV_CHAR_LEN];
+    std::strcpy(recvArr, locationName.c_str());
+    getBlockedPhoneLocationName(language.c_str(), phonenumber.c_str(), recvArr);
+    if (locationName.compare(recvArr) != 0) {
         HiLog::Error(LABEL, "City name blocked, phone number is %{public}s, location name is %{public}s.",
             phonenumber.c_str(), locationName.c_str());
         return "";
     }
     GetReplacedPhoneLocationName getReplacedPhoneLocationName =
         (GetReplacedPhoneLocationName)dlsym(i18nUtilHandle, "GetReplacedPhoneLocationName");
-    ret = getReplacedPhoneLocationName(language, phonenumber, locationName);
+    getReplacedPhoneLocationName(language.c_str(), phonenumber.c_str(), recvArr);
     HiLog::Error(LABEL, "City name returned, phone number is %{public}s, befor replaced location name is %{public}s, now location name is %{public}s.",
-        phonenumber.c_str(), locationName.c_str(), ret.c_str());
+        phonenumber.c_str(), locationName.c_str(), recvArr);
+    std::string ret(recvArr);
     return ret;
 }
 } // namespace I18n
