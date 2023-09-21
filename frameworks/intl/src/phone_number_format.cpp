@@ -200,8 +200,7 @@ std::string PhoneNumberFormat::getPhoneLocationName(const std::string& number, c
         char recvArr[RECV_CHAR_LEN];
         g_func(number.c_str(), phoneLocale.c_str(), recvArr);
         locName = recvArr;
-    }
-    if (!g_func || locName.empty()) {
+    } else {
         HiLog::Error(LABEL, "Get location name from LocaleConfig.");
         locName = LocaleConfig::GetDisplayRegion(regionCode, displayLocale, false);
     }
