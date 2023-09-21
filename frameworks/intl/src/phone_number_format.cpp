@@ -121,6 +121,7 @@ std::string PhoneNumberFormat::getLocationName(const std::string &number, const 
     // Stitch locale and local country
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale displayLocale = icu::Locale::createFromName(locale.c_str());
+    displayLocale.addLikelySubtags(status);
     icu::LocaleBuilder builder = icu::LocaleBuilder().setRegion(country);
     builder.setLanguage(displayLocale.getLanguage());
     builder.setScript(displayLocale.getScript());
@@ -147,11 +148,11 @@ std::string PhoneNumberFormat::getLocationName(const std::string &number, const 
     icu::Locale regionLocale = builder.build(status);
     icu::UnicodeString displayRegion;
     regionLocale.getDisplayCountry(displayLocale, displayRegion);
-    std::string countryName;
-    displayRegion.toUTF8String(countryName);
-    HiLog::Error(LABEL, "LocName is %{public}s, country name is %{public}s.", locName.c_str(), countryName.c_str());
+    std::string displayCountryName;
+    displayRegion.toUTF8String(displayCountryName);
+    HiLog::Error(LABEL, "LocName is %{public}s, displaycountry name is %{public}s.", locName.c_str(), displayCountryName.c_str());
     // Check if the country name
-    if (locName.compare(countryName) == 0) {
+    if (locName.compare(displayCountryName) == 0) {
         HiLog::Error(LABEL, "Get country name.");
         // Check black country code (region code)
         if (getBlockedCountryName(regionCode, displayLocale.getLanguage())) {
@@ -194,6 +195,7 @@ std::string PhoneNumberFormat::getPhoneLocationName(const std::string& number, c
     }
     std::string locName;
     if (g_func) {
+        // It need to be careful about exposeLocationName function, it use the same locale as phone and display.
         HiLog::Error(LABEL, "Get location name from libgeocoding.");
         char recvArr[RECV_CHAR_LEN];
         g_func(number.c_str(), phoneLocale.c_str(), recvArr);
@@ -218,19 +220,20 @@ bool PhoneNumberFormat::getBlockedCountryName(const std::string& regionCode, con
 std::string PhoneNumberFormat::getCityName(const std::string& language, const std::string& phonenumber,
     const std::string& locationName)
 {
-    void *i18nUtilHandle = dlopen("libi18n_util.z.so", RTLD_NOW);
-    if (i18nUtilHandle == nullptr) {
-        HiLog::Error(LABEL, "Find dynamic library failed, phone number is %{public}s, location name is %{public}s.",
-            phonenumber.c_str(), locationName.c_str());
-        return locationName;
-    }
-    GetBlockedPhoneLocationName getBlockedPhoneLocationName =
-        (GetBlockedPhoneLocationName)dlsym(i18nUtilHandle, "GetBlockedPhoneLocationName");
     char recvArr[RECV_CHAR_LEN];
     int err = strcpy_s(recvArr, RECV_CHAR_LEN, locationName.c_str());
     if (err != 0) {
         return locationName;
     }
+    void *i18nUtilHandle = dlopen("libi18n_util.z.so", RTLD_NOW);
+    if (i18nUtilHandle == nullptr) {
+        HiLog::Error(LABEL, "Find dynamic library failed, phone number is %{public}s, location name is %{public}s, recvArr is %{public}s.",
+            phonenumber.c_str(), locationName.c_str(), recvArr);
+        return locationName;
+    }
+    GetBlockedPhoneLocationName getBlockedPhoneLocationName =
+        (GetBlockedPhoneLocationName)dlsym(i18nUtilHandle, "GetBlockedPhoneLocationName");
+
     getBlockedPhoneLocationName(language.c_str(), phonenumber.c_str(), recvArr);
     if (locationName.compare(recvArr) != 0) {
         HiLog::Error(LABEL, "City name blocked, phone number is %{public}s, location name is %{public}s.",
