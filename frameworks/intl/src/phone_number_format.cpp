@@ -22,6 +22,7 @@
 #include "map"
 #include "new"
 #include "set"
+#include "securec.h"
 #include "string"
 #include "taboo_utils.h"
 #include "utility"
@@ -226,13 +227,17 @@ std::string PhoneNumberFormat::getCityName(const std::string& language, const st
     GetBlockedPhoneLocationName getBlockedPhoneLocationName =
         (GetBlockedPhoneLocationName)dlsym(i18nUtilHandle, "GetBlockedPhoneLocationName");
     char recvArr[RECV_CHAR_LEN];
-    std::strcpy(recvArr, locationName.c_str());
+    int err = strcpy_s(recvArr, RECV_CHAR_LEN, locationName.c_str());
+    if (err != 0) {
+        return locationName;
+    }
     getBlockedPhoneLocationName(language.c_str(), phonenumber.c_str(), recvArr);
     if (locationName.compare(recvArr) != 0) {
         HiLog::Error(LABEL, "City name blocked, phone number is %{public}s, location name is %{public}s.",
             phonenumber.c_str(), locationName.c_str());
         return "";
     }
+
     GetReplacedPhoneLocationName getReplacedPhoneLocationName =
         (GetReplacedPhoneLocationName)dlsym(i18nUtilHandle, "GetReplacedPhoneLocationName");
     getReplacedPhoneLocationName(language.c_str(), phonenumber.c_str(), recvArr);
