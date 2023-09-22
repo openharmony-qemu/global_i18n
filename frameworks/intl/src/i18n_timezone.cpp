@@ -14,6 +14,7 @@
  */
 #include "i18n_timezone.h"
 
+#include <dlfcn.h>
 #include <filesystem>
 #include <fstream>
 #include <sys/stat.h>
@@ -24,6 +25,7 @@
 #include "locale_config.h"
 #include "locale_info.h"
 #include "map"
+#include "securec.h"
 #include "set"
 #include "string"
 #include "type_traits"
@@ -68,6 +70,8 @@ std::set<std::string> I18nTimeZone::supportedLocales {};
 std::set<std::string> I18nTimeZone::availableZoneCityIDs {};
 std::map<std::string, std::string> I18nTimeZone::city2TimeZoneID {};
 bool I18nTimeZone::useDeviceCityDispName = false;
+
+const int RECV_CHAR_LEN = 128;
 
 std::map<int, std::string> I18nTimeZone::categoryNum2TimezoneWN {
     { 0, "Africa/Abidjan" },
@@ -704,6 +708,25 @@ std::string I18nTimeZone::GetDisplayName(std::string localeStr, bool isDST)
     timezone->getDisplayName((UBool)isDST, style, locale, name);
     std::string result;
     name.toUTF8String(result);
+
+    void *i18nUtilHandle = dlopen("libi18n_util.z.so", RTLD_NOW);
+    if (i18nUtilHandle == nullptr) {
+        HiLog::Error(LABEL, "WJTest: Find dynamic library failed.");
+        return result;
+    }
+    GetReplacedTimezoneDisplayName getReplacedTimezoneDisplayName =
+        (GetReplacedTimezoneDisplayName)dlsym(i18nUtilHandle, "GetReplacedTimezoneDisplayName");
+
+    char recvArr[RECV_CHAR_LEN];
+    int err = strcpy_s(recvArr, RECV_CHAR_LEN, result.c_str());
+    if (err != 0) {
+        return result;
+    }
+    if (getReplacedTimezoneDisplayName) {
+        HiLog::Error(LABEL, "WJTest: Find function GetReplacedTimezoneDisplayName success.");
+        getReplacedTimezoneDisplayName(localeStr.c_str(), GetID().c_str(), recvArr);
+    }
+    result = recvArr;
     return result;
 }
 

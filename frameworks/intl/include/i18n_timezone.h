@@ -28,6 +28,8 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
+using GetReplacedTimezoneDisplayName = void (*)(const char*, const char*, char*);
+
 class I18nTimeZone {
 public:
     I18nTimeZone(std::string &id, bool isZoneID);
