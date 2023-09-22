@@ -113,7 +113,7 @@ std::string PhoneNumberFormat::format(const std::string &number) const
 
 std::string PhoneNumberFormat::getLocationName(const std::string &number, const std::string &locale)
 {
-    // Stitch locale and local country
+    // Combine country and locale parameters
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale displayLocale = icu::Locale::createFromName(locale.c_str());
     displayLocale.addLikelySubtags(status);
@@ -122,7 +122,6 @@ std::string PhoneNumberFormat::getLocationName(const std::string &number, const 
     builder.setScript(displayLocale.getScript());
     icu::Locale phoneLocale = builder.build(status);
 
-    // Get region code
     i18n::phonenumbers::PhoneNumber phoneNumber;
     PhoneNumberUtil::ErrorType type = util->Parse(number, phoneLocale.getCountry(), &phoneNumber);
     if (type != PhoneNumberUtil::ErrorType::NO_PARSING_ERROR) {
@@ -131,24 +130,21 @@ std::string PhoneNumberFormat::getLocationName(const std::string &number, const 
     std::string regionCode;
     util->GetRegionCodeForNumber(phoneNumber, &regionCode);
 
-    // Get region name by libegocoding and LocaleConfig. (Maybe country name or city name)
     std::string locName = getPhoneLocationName(number, phoneLocale.getName(), locale, regionCode);
 
-    // Get the country name by ICU
     icu::LocaleBuilder regionbuilder = icu::LocaleBuilder().setRegion(regionCode);
     icu::Locale regionLocale = builder.build(status);
     icu::UnicodeString displayRegion;
     regionLocale.getDisplayCountry(displayLocale, displayRegion);
     std::string displayCountryName;
     displayRegion.toUTF8String(displayCountryName);
-    // Check if the country name
+
+    // Check if region name is a country name
     if (locName.compare(displayCountryName) == 0) {
-        // Check black country code (region code)
         if (getBlockedCountryName(regionCode, displayLocale.getLanguage())) {
             return "";
         }
 
-        // Check replace country code
         TabooUtils taboo;
         std::string replacyCountryName = taboo.ReplaceCountryName(regionCode, locale, regionCode);
         if (replacyCountryName.compare(regionCode) != 0) {
@@ -158,10 +154,9 @@ std::string PhoneNumberFormat::getLocationName(const std::string &number, const 
         return displayCountryName;
     }
 
+    // Process the city name
     std::string formatted_number;
     util->Format(phoneNumber, PhoneNumberUtil::PhoneNumberFormat::E164, &formatted_number);
-
-    // Get the city name by libi18n_util.z.so
     return getCityName(locale, formatted_number.substr(1), locName);
 }
 
@@ -181,7 +176,7 @@ std::string PhoneNumberFormat::getPhoneLocationName(const std::string& number, c
     }
     std::string locName;
     if (g_func) {
-        // The function uses the same locale as phone and display.
+        // The function uses the same locale for phone and display.
         char recvArr[RECV_CHAR_LEN];
         g_func(number.c_str(), phoneLocale.c_str(), recvArr);
         locName = recvArr;
