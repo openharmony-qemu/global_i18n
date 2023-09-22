@@ -711,7 +711,6 @@ std::string I18nTimeZone::GetDisplayName(std::string localeStr, bool isDST)
 
     void *i18nUtilHandle = dlopen("libi18n_util.z.so", RTLD_NOW);
     if (i18nUtilHandle == nullptr) {
-        HiLog::Error(LABEL, "WJTest: Find dynamic library failed.");
         return result;
     }
     GetReplacedTimezoneDisplayName getReplacedTimezoneDisplayName =
@@ -723,7 +722,6 @@ std::string I18nTimeZone::GetDisplayName(std::string localeStr, bool isDST)
         return result;
     }
     if (getReplacedTimezoneDisplayName) {
-        HiLog::Error(LABEL, "WJTest: Find function GetReplacedTimezoneDisplayName success.");
         getReplacedTimezoneDisplayName(localeStr.c_str(), GetID().c_str(), recvArr);
     }
     result = recvArr;
