@@ -17,9 +17,15 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
+PhoneNumberFormatMock::PhoneNumberFormatMock(const std::string &countryTag,
+    const std::map<std::string, std::string> &options)
+    : PhoneNumberFormat(countryTag, options)
+{
+}
+
 bool PhoneNumberFormatMock::getBlockedRegionName(const std::string& regionCode, const std::string& language)
 {
-    if (regionCode.compare("XK")) {
+    if (!regionCode.compare("XK")) {
         return true;
     } else {
         return false;
@@ -29,10 +35,10 @@ bool PhoneNumberFormatMock::getBlockedRegionName(const std::string& regionCode, 
 std::string PhoneNumberFormatMock::getCityName(const std::string& language, const std::string& phonenumber,
     const std::string& locationName)
 {
-    if (!phonenumber.compare("861373193", 9) && !language.compar("zh", 2)) {
+    if (!phonenumber.compare(0, 9, "861373193") && !language.compare(0, 2, "zh")) {
         return "安徽省宣城市2";
     }
-    if (!phonenumber.compare("861373163", 9) && !language.compar("zh", 2)) {
+    if (!phonenumber.compare(0, 9, "861373163") && !language.compare(0, 2, "zh")) {
         return "";
     }
     return locationName;

@@ -708,7 +708,11 @@ std::string I18nTimeZone::GetDisplayName(std::string localeStr, bool isDST)
     timezone->getDisplayName((UBool)isDST, style, locale, name);
     std::string result;
     name.toUTF8String(result);
+    return GetDisplayNameByTaboo(localeStr, result);
+}
 
+std::string I18nTimeZone::GetDisplayNameByTaboo(const std::string& localeStr, std::string result)
+{
     void *i18nUtilHandle = dlopen("libi18n_util.z.so", RTLD_NOW);
     if (i18nUtilHandle == nullptr) {
         return result;
