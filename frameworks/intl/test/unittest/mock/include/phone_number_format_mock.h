@@ -22,6 +22,7 @@ namespace Global {
 namespace I18n {
 class PhoneNumberFormatMock : public PhoneNumberFormat {
 public:
+    PhoneNumberFormatMock(const std::string &countryTag, const std::map<std::string, std::string> &options);
     virtual bool getBlockedRegionName(const std::string& regionCode, const std::string& language) override;
     virtual std::string getCityName(const std::string& language, const std::string& phonenumber,
         const std::string& locationName) override;
