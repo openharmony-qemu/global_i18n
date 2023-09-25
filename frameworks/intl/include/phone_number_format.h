@@ -16,6 +16,7 @@
 #define OHOS_GLOBAL_I18N_PHONE_NUMBER_FORMAT_H
 
 #include <map>
+#include <set>
 #include <string>
 
 #include "memory"
@@ -26,6 +27,9 @@ namespace Global {
 namespace I18n {
 using i18n::phonenumbers::PhoneNumberUtil;
 using ExposeLocationName = void (*)(const char*, const char*, char*);
+using GetBlockedRegionName = bool (*)(const char*, const char*);
+using GetBlockedPhoneLocationName = void (*)(const char*, const char*, char*);
+using GetReplacedPhoneLocationName = void (*)(const char*, const char*, char*);
 
 class PhoneNumberFormat {
 public:
@@ -36,6 +40,11 @@ public:
     static std::unique_ptr<PhoneNumberFormat> CreateInstance(const std::string &countryTag,
                                                              const std::map<std::string, std::string> &options);
     std::string getLocationName(const std::string &number, const std::string &locale);
+    std::string getPhoneLocationName(const std::string& number, const std::string& phoneLocale,
+        const std::string& displayLocale, const std::string& regionCode);
+    virtual bool getBlockedRegionName(const std::string& regionCode, const std::string& language);
+    virtual std::string getCityName(const std::string& language, const std::string& phonenumber,
+        const std::string& locationName);
 
 private:
     PhoneNumberUtil* GetPhoneNumberUtil();

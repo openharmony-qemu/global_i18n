@@ -17,10 +17,10 @@
 #include "i18n_break_iterator.h"
 #include "i18n_calendar.h"
 #include "i18n_normalizer.h"
-#include "i18n_timezone.h"
+#include "i18n_timezone_mock.h"
 #include "locale_config.h"
 #include "measure_data.h"
-#include "phone_number_format.h"
+#include "phone_number_format_mock.h"
 #include "preferred_language.h"
 #include "entity_recognizer.h"
 
@@ -528,6 +528,14 @@ HWTEST_F(I18nTest, I18nFuncTest014, TestSize.Level1)
     EXPECT_FALSE(isValid);
     std::string formattedPhoneNumber = formatter->format(fakePhoneNumber);
     EXPECT_EQ(formattedPhoneNumber, "");
+    std::unique_ptr<PhoneNumberFormat> formatter1 = std::make_unique<PhoneNumberFormatMock>("XK", options);
+    std::string blocklRegion = formatter1->getLocationName("0038312345678", "zh-CN");
+    EXPECT_EQ(blocklRegion, "");
+    std::unique_ptr<PhoneNumberFormat> formatter2 = std::make_unique<PhoneNumberFormatMock>("CN", options);
+    std::string blocklCity = formatter2->getLocationName("13731630016", "zh-CN");
+    EXPECT_EQ(blocklCity, "");
+    std::string replaceCity = formatter2->getLocationName("13731930016", "zh-CN");
+    EXPECT_EQ(replaceCity, "安徽省宣城市2");
 }
 
 /**
@@ -566,6 +574,11 @@ HWTEST_F(I18nTest, I18nFuncTest015, TestSize.Level1)
     std::string fakeLocale = "fake locale tag";
     cityDisplayName = I18nTimeZone::GetCityDisplayName(id, fakeLocale);
     EXPECT_EQ(cityDisplayName, "");
+
+    id = "Pacific/Enderbury";
+    std::unique_ptr<I18nTimeZone> timezone4 = std::make_unique<I18nTimeZoneMock>(id, true);
+    std::string cityName = timezone4->GetDisplayName("zh-CN", false);
+    EXPECT_EQ(cityName, "菲尼克斯群岛标准时间");
 }
 
 /**
