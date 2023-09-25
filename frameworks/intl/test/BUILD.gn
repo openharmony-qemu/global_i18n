@@ -22,6 +22,7 @@ ohos_unittest("intl_test") {
     "unittest/i18n_test.cpp",
     "unittest/intl_test.cpp",
     "unittest/locale_config_test.cpp",
+    "unittest/mock/src/phone_number_format_mock.cpp",
   ]
   include_dirs = [
     "//base/global/i18n/frameworks/intl/include",
@@ -32,6 +33,7 @@ ohos_unittest("intl_test") {
     "//third_party/libphonenumber/cpp/src",
     "//third_party/libphonenumber",
     "//third_party/protobuf/src",
+    "//base/global/i18n/intl/test/unittest/mock/include",
   ]
 
   external_deps = [ "init:libbegetutil" ]

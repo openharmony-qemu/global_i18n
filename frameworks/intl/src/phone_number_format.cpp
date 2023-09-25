@@ -141,7 +141,7 @@ std::string PhoneNumberFormat::getLocationName(const std::string &number, const 
 
     // Check if region name is a country name
     if (locName.compare(displayCountryName) == 0) {
-        if (getBlockedCountryName(regionCode, displayLocale.getLanguage())) {
+        if (getBlockedRegionName(regionCode, displayLocale.getLanguage())) {
             return "";
         }
 
@@ -187,7 +187,7 @@ std::string PhoneNumberFormat::getPhoneLocationName(const std::string& number, c
     return locName;
 }
 
-bool PhoneNumberFormat::getBlockedCountryName(const std::string& regionCode, const std::string& language)
+bool PhoneNumberFormat::getBlockedRegionName(const std::string& regionCode, const std::string& language)
 {
     void *i18nUtilHandle = dlopen("libi18n_util.z.so", RTLD_NOW);
     if (i18nUtilHandle == nullptr) {

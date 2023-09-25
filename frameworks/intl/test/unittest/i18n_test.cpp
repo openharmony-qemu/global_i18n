@@ -20,7 +20,7 @@
 #include "i18n_timezone.h"
 #include "locale_config.h"
 #include "measure_data.h"
-#include "phone_number_format.h"
+#include "phone_number_format_mock.h"
 #include "preferred_language.h"
 #include "entity_recognizer.h"
 
@@ -528,6 +528,14 @@ HWTEST_F(I18nTest, I18nFuncTest014, TestSize.Level1)
     EXPECT_FALSE(isValid);
     std::string formattedPhoneNumber = formatter->format(fakePhoneNumber);
     EXPECT_EQ(formattedPhoneNumber, "");
+    std::unique_ptr<PhoneNumberFormat> formatter1 = std::make_unique<PhoneNumberFormatMock>("XK", options);
+    std::string blocklRegion = formatter1->getLocationName("0038312345678", "zh-CN");
+    EXPECT_EQ(blocklRegion, "");
+    std::unique_ptr<PhoneNumberFormat> formatter2 = std::make_unique<PhoneNumberFormatMock>("CN", options);
+    std::string blocklCity = formatter2->getLocationName("13731630016", "zh-CN");
+    EXPECT_EQ(blocklCity, "");
+    std::string replaceCity = formatter2->getLocationName("13731930016", "zh-CN");
+    EXPECT_EQ(replaceCity, "安徽省宣城市2");
 }
 
 /**
