@@ -146,12 +146,7 @@ std::string PhoneNumberFormat::getLocationName(const std::string &number, const 
         }
 
         TabooUtils taboo;
-        std::string replacyCountryName = taboo.ReplaceCountryName(regionCode, locale, regionCode);
-        if (replacyCountryName.compare(regionCode) != 0) {
-            return replacyCountryName;
-        }
-
-        return displayCountryName;
+        return taboo.ReplaceCountryName(regionCode, locale, displayCountryName);
     }
 
     // Process the city name
