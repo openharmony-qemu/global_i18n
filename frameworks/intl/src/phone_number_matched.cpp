@@ -372,9 +372,9 @@ void PhoneNumberMatched::DealNumberWithOneBracket(MatchedNumberInfo& info)
 // check whether the bracket at the start position are redundant
 bool PhoneNumberMatched::IsNumberWithOneBracket(icu::UnicodeString& message)
 {
-    int numLeft = 0;
-    int numRight = 0;
     if (message != "") {
+        int numLeft = 0;
+        int numRight = 0;
         int len = message.length();
         for (int i = 0; i < len; i++) {
             if (message[i] == '(' || message[i] == '[') {
