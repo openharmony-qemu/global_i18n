@@ -24,7 +24,9 @@ I18nTimeZoneMock::I18nTimeZoneMock(std::string &id, bool isZoneID)
 
 std::string I18nTimeZoneMock::GetDisplayNameByTaboo(const std::string& localeStr, std::string result)
 {
-    if (!localeStr.compare(0, 2, "zh") && !GetID().compare("Pacific/Enderbury")) {
+    std::string zhLocaleStr = "zh";
+    size_t len = zhLocaleStr.size();
+    if (!localeStr.compare(0, len, "zh") && !GetID().compare("Pacific/Enderbury")) {
         return "菲尼克斯群岛标准时间";
     }
     return result;

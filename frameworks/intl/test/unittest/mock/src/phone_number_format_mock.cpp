@@ -35,10 +35,14 @@ bool PhoneNumberFormatMock::getBlockedRegionName(const std::string& regionCode, 
 std::string PhoneNumberFormatMock::getCityName(const std::string& language, const std::string& phonenumber,
     const std::string& locationName)
 {
-    if (!phonenumber.compare(0, 9, "861373193") && !language.compare(0, 2, "zh")) {
+    std::string zhLocaleStr = "zh";
+    size_t len = zhLocaleStr.size();
+    std::string phoneNumberPrefix = "861373193";
+    size_t prefixLen = phoneNumberPrefix.size();
+    if (!phonenumber.compare(0, prefixLen, "861373193") && !language.compare(0, len, "zh")) {
         return "安徽省宣城市2";
     }
-    if (!phonenumber.compare(0, 9, "861373163") && !language.compare(0, 2, "zh")) {
+    if (!phonenumber.compare(0, prefixLen, "861373163") && !language.compare(0, len, "zh")) {
         return "";
     }
     return locationName;
