@@ -46,7 +46,7 @@ private:
     std::vector<int> DealResult(std::vector<MatchedNumberInfo>& matchedNumberInfoList);
     std::vector<int> DealWithoutFixed(icu::UnicodeString& message, std::string& country, PhoneNumberUtil* util);
     bool HandleWithShortAndShort(std::vector<MatchedNumberInfo>& result, std::string& country,
-        MatchedNumberInfo& info, int contentStart, int contentEnd);
+        MatchedNumberInfo& info, std::pair<int, int>& pos, icu::UnicodeString& filteredString);
     std::vector<MatchedNumberInfo> GetPossibleNumberInfos(std::string& country, PhoneNumberUtil* util,
         icu::UnicodeString& src, icu::UnicodeString& filteredString);
     std::vector<PhoneNumberMatch*> FindNumbers(std::string& country, PhoneNumberUtil* util,
@@ -67,7 +67,6 @@ private:
     static void ReplaceSpecifiedPos(icu::UnicodeString& chs, int start, int end);
 
     static const UChar32 REPLACE_CHAR;
-    std::vector<std::pair<int, int>> searchedRegion;
     PhoneNumberRule* phoneNumberRule;
     std::string country;
 };

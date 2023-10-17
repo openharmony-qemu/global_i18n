@@ -65,10 +65,6 @@ std::vector<int> PhoneNumberMatched::GetMatchedPhoneNumber(std::string& messageS
     icu::UnicodeString filteredString = HandleNegativeRule(convertQanStr, phoneNumberRule);
     std::vector<MatchedNumberInfo> matchedNumberInfoList = GetPossibleNumberInfos(country,
         phoneNumberUtil, convertQanStr, filteredString);
-    // Mark the searched area
-    for (size_t i = 0; i < searchedRegion.size(); i++) {
-        ReplaceSpecifiedPos(filteredString, searchedRegion[i].first, searchedRegion[i].second);
-    }
     std::vector<MatchedNumberInfo> shortList = phoneNumberRule->HandleShortPhoneNumbers(filteredString, country);
     if (shortList.size() != 0) {
         matchedNumberInfoList.insert(matchedNumberInfoList.end(), shortList.begin(), shortList.end());
@@ -121,10 +117,6 @@ std::vector<int> PhoneNumberMatched::DealWithoutFixed(icu::UnicodeString& messag
             delete match;
         }
     }
-    // Mark the searched area
-    for (size_t i = 0; i < searchedRegion.size(); i++) {
-        ReplaceSpecifiedPos(message, searchedRegion[i].first, searchedRegion[i].second);
-    }
     std::vector<MatchedNumberInfo> shortResult = FindShortNumbers(country, util, message);
     // Merge result
     if (shortResult.size() != 0) {
@@ -145,8 +137,8 @@ icu::UnicodeString PhoneNumberMatched::HandleNegativeRule(icu::UnicodeString& sr
     for (RegexRule* rule : rules) {
         icu::RegexPattern* pattern = rule->GetPattern();
         UErrorCode status = U_ZERO_ERROR;
-        icu::RegexMatcher* matcher = pattern->matcher(src, status);
-        while (matcher->find()) {
+        icu::RegexMatcher* matcher = pattern->matcher(ret, status);
+        while (matcher->find(status)) {
             int start = matcher->start(status);
             int end = matcher->end(status);
             ReplaceSpecifiedPos(ret, start, end);
@@ -221,7 +213,7 @@ bool PhoneNumberMatched::AddPhoneNumber(std::string& number, int start, std::vec
     std::string& country, PhoneNumberUtil* util)
 {
     PhoneNumber phoneNumber;
-    int lenNumber = 7;
+    int lenNumber = 5;
     icu::UnicodeString uNumber = number.c_str();
     if (RegexRule::CountDigits(uNumber) < lenNumber) {
         return false;
@@ -247,7 +239,7 @@ std::vector<PhoneNumberMatch*> PhoneNumberMatched::FindNumbers(std::string& coun
 {
     std::vector<PhoneNumberMatch*> matchList;
     UErrorCode status = U_ZERO_ERROR;
-    icu::UnicodeString regex = "[\\+\\(\\d][\\d \\(\\)./-]{5,}[\\d]";
+    icu::UnicodeString regex = "[\\+\\(\\d][\\d \\(\\)\\./-]{3,}[\\d]";
     icu::RegexPattern* numberPattern = icu::RegexPattern::compile(regex, 0, status);
     icu::RegexMatcher* numberMatcher = numberPattern->matcher(filteredString, status);
     while (numberMatcher->find(status)) {
@@ -284,12 +276,12 @@ std::vector<PhoneNumberMatch*> PhoneNumberMatched::FindNumbers(std::string& coun
 
 // Handing the situation of shortnumber/shortnumber.
 bool PhoneNumberMatched::HandleWithShortAndShort(std::vector<MatchedNumberInfo>& result, std::string& country,
-    MatchedNumberInfo& info, int contentStart, int contentEnd)
+    MatchedNumberInfo& info, std::pair<int, int>& pos, icu::UnicodeString& filteredString)
 {
     if (country == "CN") {
         UErrorCode status = U_ZERO_ERROR;
         icu::RegexMatcher* pattern =
-            new icu::RegexMatcher("(?<![-\\d])\\d{5,6}[/|]\\d{5,6}(?![-\\d])", 0, status);
+            new icu::RegexMatcher("(?<![-\\d])\\d{5,6}[/\\|]\\d{5,6}(?![-\\d])", 0, status);
         icu::UnicodeString str = "";
         if (info.GetContent()[0] == '(' || info.GetContent()[0] == '[') {
             str = info.GetContent().tempSubString(1);
@@ -299,12 +291,12 @@ bool PhoneNumberMatched::HandleWithShortAndShort(std::vector<MatchedNumberInfo>&
         pattern->reset(str);
         if (!pattern->find()) {
             result.push_back(info);
-            searchedRegion.push_back({contentStart, contentEnd});
+            ReplaceSpecifiedPos(filteredString, pos.first, pos.second);
             return true;
         }
     } else {
         result.push_back(info);
-        searchedRegion.push_back({contentStart, contentEnd});
+        ReplaceSpecifiedPos(filteredString, pos.first, pos.second);
     }
     return false;
 }
@@ -326,18 +318,22 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::GetPossibleNumberInfos(std::s
         icu::UnicodeString content = delMatch->raw_string().c_str();
         int contentStart = delMatch->start();
         int contentEnd = delMatch->end();
+        std::pair<int, int> pos{contentStart, contentEnd};
         if (util->IsValidNumber(delMatch->number())) {
             MatchedNumberInfo info;
             info.SetBegin(contentStart);
             info.SetEnd(contentEnd);
             info.SetContent(content);
-            bool flag = HandleWithShortAndShort(result, country, info, contentStart, contentEnd);
+            bool flag = HandleWithShortAndShort(result, country, info, pos, filteredString);
             if (flag) {
                 continue;
             }
         }
         std::vector<MatchedNumberInfo> posList = HandlePositiveRule(delMatch, filteredString, phoneNumberRule);
         if (posList.size() != 0) {
+            for (auto& matchInfo : posList) {
+                ReplaceSpecifiedPos(filteredString, matchInfo.GetBegin(), matchInfo.GetEnd());
+            }
             result.insert(result.end(), posList.begin(), posList.end());
         }
     }

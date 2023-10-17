@@ -387,7 +387,7 @@ std::vector<MatchedNumberInfo> RegexRule::HandleBlank(PhoneNumberMatch* possible
         } else {
             matchedNumberInfo.SetBegin(possibleNumber->start());
         }
-        matchedNumberInfo.SetEnd(matcher->end(status) + possibleNumber->end());
+        matchedNumberInfo.SetEnd(matcher->end(status) + possibleNumber->start());
         matchedNumberInfo.SetContent(number);
         matchedNumberInfoList.push_back(matchedNumberInfo);
     }

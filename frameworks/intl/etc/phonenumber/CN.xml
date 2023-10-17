@@ -19,10 +19,10 @@
             <type>ZERO</type>
             <valid>Default</valid>
             <handle>Default</handle>
-            <content>(?&lt;![a-zA-Z_0-9.@])((https?|ftp)://)?([a-zA-Z_0-9][a-zA-Z0-9_-]*(\.[a-zA-Z0-9_-]{1,20})</content>
-            <content>*\.(org|com|edu|net|[z-z]{2})|(?!0)[1-2]?[0-9]{1,2}\.(?!0)[1-2]?[0-9]{1,2}\.(?!0)[1,2]?</content>
-            <content>[0-9]{1,2}\.(?!0)[1-2]?[0-9]{1,2})(?![a-zA-Z0-9_.])(:[1-9][0-9]{0,4})?(/([a-zA-Z0-9/_.</content>
-            <content>\{Punct}]*(\?\S+)?)?)?(?![a-zA-Z_0-9])</content>
+            <content>(?&lt;![a-zA-Z_0-9\.@])((https?|ftp)://)?([a-zA-Z_0-9][a-zA-Z0-9_\-]*(\.[a-zA-Z0-9_\-]{1,20})</content>
+            <content>*\.(org|com|edu|net|[a-z]{2})|(?!0)[1-2]?[0-9]{1,2}\.(?!0)[1-2]?[0-9]{1,2}\.(?!0)[1-2]?</content>
+            <content>[0-9]{1,2}\.(?!0)[1-2]?[0-9]{1,2})(?![a-zA-Z0-9_\.])(:[1-9][0-9]{0,4})?(/([a-zA-Z0-9/_\.</content>
+            <content>\p{Punct}]*(\?\S+)?)?)?(?![a-zA-Z_0-9])</content>
         </rule>
         <rule>
             <insensitive>True</insensitive>
@@ -44,7 +44,7 @@
             <type>ZERO</type>
             <valid>Default</valid>
             <handle>Default</handle>
-            <content>(\d{1,16}\p{Blank}*[.．~～]\p{Blank}*)+\d{1,16}</content>
+            <content>(\d{1,16}\p{Blank}*[\.．~～]\p{Blank}*)+\d{1,16}</content>
         </rule>
         <rule>
             <insensitive>False</insensitive>
@@ -65,8 +65,8 @@
             <type>ZERO</type>
             <valid>Default</valid>
             <handle>Default</handle>
-            <content>(代金券|(账|帐)户号？|ID|id|验证码|校验码|动态码|密码|卡号|票号|单号|订单号？|证号|身份证(号码?)?|学号</content>
-            <content>|邮编|代号|编号|昵称|(账|帐)号名)(是|为|\()?\p{Blank}*[:：]?\p{Blank}*[A-Za-z0-9_-]{1,30}</content>
+            <content>(代金券|(账|帐)户号?|ID|id|验证码|校验码|动态码|取件码|密码|工号|卡号|票号|单号|订单号?|证号|身份证(号码?)?|学号</content>
+            <content>|邮编|序列号|代号|编号|昵称|(账|帐)号名)(是|为|\()?\p{Blank}*[:：]?\p{Blank}*[A-Za-z0-9_-]{1,30}</content>
         </rule>
         <rule>
             <insensitive>False</insensitive>
@@ -87,14 +87,14 @@
             <type>ZERO</type>
             <valid>Default</valid>
             <handle>Default</handle>
-            <content>(\d{1,16}[*.]{2,8})+(\d{1,8})?</content>
+            <content>(\d{1,16}[\*\.]{2,8})+(\d{1,8})?</content>
         </rule>
         <rule>
             <insensitive>False</insensitive>
             <type>ZERO</type>
             <valid>Default</valid>
             <handle>Default</handle>
-            <content>((\d{1,16}(\.)?\d{1,10})(\p{Sc}|印尼盾|美元|亿元|十万元?|百万元?|千万元?|万元?|((港|澳|新?台|日)</content>
+            <content>((\d{1,16}(\.)?\d{1,10})(\p{Sc}|印尼盾|美元|亿元|十万元?|百万元?|千万元?|万元|((港|澳|新?台|日)</content>
             <content>(币|元))|人民币|元))|((((港|澳|新?台|日)(币|元))|人民币|\p{Sc}|标价为?|售价为?|价格为?)[:：]?</content>
             <content>(\d{1,16}(\.)?\d{1,16}))</content>
         </rule>
