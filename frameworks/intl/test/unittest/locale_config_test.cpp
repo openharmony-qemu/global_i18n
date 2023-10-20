@@ -368,7 +368,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest019, TestSize.Level1)
 
 /**
  * @tc.name: LocaleConfigFuncTest020
- * @tc.desc: Test LocaleCOnfig systemLanguages
+ * @tc.desc: Test LocaleConfig systemLanguages
  * @tc.type: FUNC
  */
 HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest020, TestSize.Level1)
@@ -376,6 +376,27 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest020, TestSize.Level1)
     vector<string> languages;
     LocaleConfig::GetSystemLanguages(languages);
     EXPECT_EQ(languages.size(), 2);
+}
+
+/**
+ * @tc.name: LocaleConfigFuncTest021
+ * @tc.desc: Test LocaleConfig IsValidLanguage
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest021, TestSize.Level1)
+{
+    const string language = "zh";
+    const string fakeLanguage = "010";
+    const string tag = "zh-Hans";
+    const string fakeTag = "13-Hans";
+    bool flag = LocaleConfig::IsValidLanguage(language);
+    EXPECT_TRUE(flag);
+    flag = LocaleConfig::IsValidLanguage(fakeLanguage);
+    EXPECT_TRUE(!flag);
+    flag = LocaleConfig::IsValidTag(tag);
+    EXPECT_TRUE(flag);
+    flag = LocaleConfig::IsValidTag(fakeTag);
+    EXPECT_TRUE(!flag);
 }
 } // namespace I18n
 } // namespace Global

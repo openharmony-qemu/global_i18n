@@ -2280,27 +2280,6 @@ HWTEST_F(IntlTest, IntlFuncTest061, TestSize.Level1)
     EXPECT_EQ(numFmt->GetStyle(), style);
     delete numFmt;
 }
-
-/**
- * @tc.name: IntlFuncTest0062
- * @tc.desc: Test Intl LocaleConfig.IsValidLanguage
- * @tc.type: FUNC
- */
-HWTEST_F(IntlTest, IntlFuncTest062, TestSize.Level1)
-{
-    const string language = "zh";
-    const string fakeLanguage = "010";
-    const string tag = "zh-Hans";
-    const string fakeTag = "13-Hans";
-    bool flag = LocaleConfig::IsValidLanguage(language);
-    EXPECT_TRUE(flag);
-    flag = LocaleConfig::IsValidLanguage(fakeLanguage);
-    EXPECT_TRUE(!flag);
-    flag = LocaleConfig::IsValidTag(tag);
-    EXPECT_TRUE(flag);
-    flag = LocaleConfig::IsValidTag(fakeTag);
-    EXPECT_TRUE(!flag);
-}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
