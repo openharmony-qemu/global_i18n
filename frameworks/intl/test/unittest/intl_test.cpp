@@ -1951,6 +1951,7 @@ HWTEST_F(IntlTest, IntlFuncTest0050, TestSize.Level1)
 {
     const std::string langugae = "zh-CN";
     const std::string langugaeDe = "de-DE";
+    const std::string fakeLangugae = "fake-language";
     I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
     PreferredLanguage::AddPreferredLanguage(langugae, 0, errorCode);
     EXPECT_TRUE(errorCode != I18nErrorCode::SUCCESS);
@@ -1958,6 +1959,8 @@ HWTEST_F(IntlTest, IntlFuncTest0050, TestSize.Level1)
     EXPECT_TRUE(errorCode != I18nErrorCode::SUCCESS);
     PreferredLanguage::AddPreferredLanguage(langugae, 3, errorCode);
     EXPECT_TRUE(errorCode != I18nErrorCode::SUCCESS);
+    PreferredLanguage::AddPreferredLanguage(fakeLangugae, -1, errorCode);
+    PreferredLanguage::AddPreferredLanguage(langugae, -1, errorCode);
     std::vector<std::string> list = PreferredLanguage::GetPreferredLanguageList();
     EXPECT_EQ(list.size(), 1);
     std::string firstPreferredLanguage = PreferredLanguage::GetFirstPreferredLanguage();
@@ -2236,17 +2239,17 @@ HWTEST_F(IntlTest, IntlFuncTest0060, TestSize.Level1)
     localNameList1.push_back({"tr", "Kurban Bayrami Tatili"});
     std::vector<HolidayLocalName> localNameList2;
     localNameList2.push_back({"tr", "Kurban Bayrami 2. Günü"});
-    HolidayInfoItem item1 = {"Sacrifice Feast Holiday", 2023, 6, 25, localNameList1};
-    HolidayInfoItem item2 = {"The Second Day of Sacrifice Feast", 2023, 6, 25, localNameList2};
+    HolidayInfoItem item1 = {"Sacrifice Feast Holiday", 2022, 6, 25, localNameList1};
+    HolidayInfoItem item2 = {"The Second Day of Sacrifice Feast", 2022, 6, 25, localNameList2};
     infoList.push_back(item1);
     infoList.push_back(item2);
-    holidayDataMap.insert({"20230625", infoList});
+    holidayDataMap.insert({"20220625", infoList});
     holiday_manager->SetHolidayData(holidayDataMap);
-    std::vector<HolidayInfoItem> list = holiday_manager->GetHolidayInfoItemArray(2023);
+    std::vector<HolidayInfoItem> list = holiday_manager->GetHolidayInfoItemArray(2022);
     EXPECT_EQ(2, list.size());
-    list = holiday_manager->GetHolidayInfoItemArray(2022);
+    list = holiday_manager->GetHolidayInfoItemArray();
     EXPECT_EQ(0, list.size());
-    bool flag = holiday_manager->IsHoliday(2023, 6, 25);
+    bool flag = holiday_manager->IsHoliday(2022, 6, 25);
     EXPECT_TRUE(flag);
     flag = holiday_manager->IsHoliday();
     EXPECT_TRUE(!flag);
@@ -2258,7 +2261,6 @@ HWTEST_F(IntlTest, IntlFuncTest0060, TestSize.Level1)
  * @tc.desc: Test Intl NumberFormat.format
  * @tc.type: FUNC
  */
-
 HWTEST_F(IntlTest, IntlFuncTest061, TestSize.Level1)
 {
     string locale = "en-CN";
