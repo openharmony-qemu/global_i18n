@@ -258,7 +258,7 @@ bool LocaleCompare::IsBaseNameRelation(const char* baseName1, const char* baseNa
         std::string localeBaseName2(baseName2);
         std::replace(localeBaseName1.begin(), localeBaseName1.end(), '_', '-');
         std::replace(localeBaseName2.begin(), localeBaseName2.end(), '_', '-');
-        if (HasMapRelation(language1, localeBaseName1, localeBaseName2)) {
+        if (HasMapRelation(languageTag, localeBaseName1, localeBaseName2)) {
             return true;
         }
     }
