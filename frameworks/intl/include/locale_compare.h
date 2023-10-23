@@ -31,6 +31,8 @@ private:
     static bool IsSameEnglishScript(const std::string& scriptTag1, const std::string& scriptTag2);
     static bool HasMapRelation(const std::string& languageTag, const std::string& localeTag1,
         const std::string& localeTag2);
+    static bool IsBaseNameRelation(const char* baseName1, const char* baseName2,
+        const std::string& languageTag);
     static std::string hantSegment;
     static std::string latnSegment;
     static std::string qaagSegment;
