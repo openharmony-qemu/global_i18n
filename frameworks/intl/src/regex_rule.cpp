@@ -78,34 +78,14 @@ int RegexRule::CountDigits(icu::UnicodeString& str)
     return count;
 }
 
-icu::UnicodeString RegexRule::GetRegex()
-{
-    return regex;
-}
-
-void RegexRule::SetRegex(icu::UnicodeString& regex)
-{
-    this->regex = regex;
-}
-
 int RegexRule::GetType()
 {
     return type;
 }
 
-void RegexRule::SetType(int type)
-{
-    this->type = type;
-}
-
 icu::RegexPattern* RegexRule::GetPattern()
 {
     return this->pattern;
-}
-
-void RegexRule::SetPattern(icu::RegexPattern* pattern)
-{
-    this->pattern = pattern;
 }
 
 PhoneNumberMatch* RegexRule::IsValid(PhoneNumberMatch* possibleNumber, icu::UnicodeString& message)
@@ -484,7 +464,7 @@ std::vector<MatchedNumberInfo> RegexRule::GetNumbersWithSlant(icu::UnicodeString
     std::string numberEnd = "";
     int slantIndex = 0;
     for (int i = 0; i < testStr.length(); i++) {
-        if (testStr[i] == '/') {
+        if (testStr[i] == '/' || testStr[i] == '|') {
             slantIndex = i;
             testStr.tempSubString(0, i).toUTF8String(numberFisrt);
             testStr.tempSubString(i + 1).toUTF8String(numberEnd);

@@ -34,8 +34,6 @@ public:
     PhoneNumberMatched(std::string& country);
     ~PhoneNumberMatched();
     std::vector<int> GetMatchedPhoneNumber(std::string& message);
-    std::string GetCountry();
-
     static const int CONTAIN;
     static const int CONTAIN_OR_INTERSECT;
 
