@@ -31,12 +31,8 @@ public:
         std::string& insensitive, std::string& type);
     ~RegexRule();
 
-    icu::UnicodeString GetRegex();
-    void SetRegex(icu::UnicodeString& regex);
     int GetType();
-    void SetType(int type);
     icu::RegexPattern* GetPattern();
-    void SetPattern(icu::RegexPattern* pattern);
 
     std::vector<MatchedNumberInfo> Handle(PhoneNumberMatch* possibleNumber, icu::UnicodeString& message);
     PhoneNumberMatch* IsValid(PhoneNumberMatch* possibleNumber, icu::UnicodeString& message);

@@ -49,11 +49,6 @@ PhoneNumberMatched::~PhoneNumberMatched()
     phoneNumberRule = nullptr;
 }
 
-std::string PhoneNumberMatched::GetCountry()
-{
-    return country;
-}
-
 std::vector<int> PhoneNumberMatched::GetMatchedPhoneNumber(std::string& messageStr)
 {
     icu::UnicodeString message = messageStr.c_str();

@@ -89,5 +89,12 @@
             <content>\.(org|com|edu|net|[a-z]{2})|(?!0)[1-2]?[0-9]{1,2}\.(?!0)[1-2]?[0-9]{1,2}\.(?!0)[1-2]?[0-9]{1,2}\.(?!0)[1-2]?[0-9]</content>
             <content>{1,2})(?![a-zA-Z0-9_.])(:[1-9][0-9]{0,4})?(/([a-zA-Z0-9/_.\p{Punct}]*(\?\S+)?)?)?(?![a-zA-Z_0-9])</content>
         </rule>
+        <rule>
+            <insensitive>False</insensitive>
+            <type>ZERO</type>
+            <valid>Default</valid>
+            <handle>Default</handle>
+            <content>(;ext=)\d*(?!\d)</content>
+        </rule>
     </common>
 </phone_number_rule>
