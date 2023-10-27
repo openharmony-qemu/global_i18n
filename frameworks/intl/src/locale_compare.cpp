@@ -146,11 +146,9 @@ int32_t LocaleCompare::Compare(const std::string& localeTag1, const std::string&
     } else {
         return -1;
     }
-    std::string localeBaseName1 = locale1.getBaseName();
-    std::string localeBaseName2 = locale2.getBaseName();
-    std::replace(localeBaseName1.begin(), localeBaseName1.end(), '_', '-');
-    std::replace(localeBaseName2.begin(), localeBaseName2.end(), '_', '-');
-    if (HasMapRelation(language1, localeBaseName1, localeBaseName2)) {
+    const char* baseName1 = locale1.getBaseName();
+    const char* baseName2 = locale2.getBaseName();
+    if (IsBaseNameRelation(baseName1, baseName2, language1)) {
         return mapScore;
     }
     std::string region1 = locale1.getCountry();
@@ -246,6 +244,21 @@ bool LocaleCompare::HasMapRelation(const std::string& languageTag, const std::st
     }
     if (extendedLatnParent.find(localeTag1) != extendedLatnParent.end()) {
         if (localeTag2.compare(extendedLatnParent[localeTag1]) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool LocaleCompare::IsBaseNameRelation(const char* baseName1, const char* baseName2,
+    const std::string& languageTag)
+{
+    if (baseName1 != nullptr && baseName2 != nullptr) {
+        std::string localeBaseName1(baseName1);
+        std::string localeBaseName2(baseName2);
+        std::replace(localeBaseName1.begin(), localeBaseName1.end(), '_', '-');
+        std::replace(localeBaseName2.begin(), localeBaseName2.end(), '_', '-');
+        if (HasMapRelation(languageTag, localeBaseName1, localeBaseName2)) {
             return true;
         }
     }
