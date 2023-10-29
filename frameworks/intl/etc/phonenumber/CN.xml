@@ -173,7 +173,16 @@
     </codes>
     <common_exit>
         <rule>
-            <exit>False</exit>
+            <content>False</content>
         </rule>
     </common_exit>
+    <find_number>
+        <rule>
+            <insensitive>False</insensitive>
+            <type>ZERO</type>
+            <valid>Default</valid>
+            <handle>Default</handle>
+            <content>(?&lt;![-\d])\d{5,6}[/\|]\d{5,6}(?![-\d])</content>
+        </rule>
+    </find_number>
 </phone_number_rule>

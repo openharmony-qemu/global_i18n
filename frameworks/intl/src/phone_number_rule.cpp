@@ -17,7 +17,6 @@
 #include "cpp/src/phonenumbers/phonenumber.h"
 #include "cpp/src/phonenumbers/shortnumberinfo.h"
 #include "cpp/src/phonenumbers/phonenumberutil.h"
-#include "hilog/log.h"
 #include "libxml/globals.h"
 #include "libxml/tree.h"
 #include "libxml/xmlstring.h"
@@ -30,8 +29,6 @@ namespace I18n {
 using i18n::phonenumbers::PhoneNumber;
 using i18n::phonenumbers::PhoneNumberUtil;
 using i18n::phonenumbers::ShortNumberInfo;
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "PhoneNumberRule" };
-using namespace OHOS::HiviewDFX;
 
 std::string PhoneNumberRule::xmlCommonPath = "/system/usr/ohos_locale_config/phonenumber/common.xml";
 
@@ -55,9 +52,7 @@ void PhoneNumberRule::Init()
     if (isFixed) {
         InitRule(xmlPath);
     }
-    if (commonExit) {
-        InitRule(xmlCommonPath);
-    }
+    InitRule(xmlCommonPath);
 }
 
 // Load the rules of the corresponding country
@@ -91,7 +86,7 @@ void PhoneNumberRule::InitRule(std::string& xmlPath)
                 content += tempContent;
                 xmlFree(contentPtr);
             }
-            if (category == "negative" || category == "common") {
+            if (category == "negative" || (category == "common" && commonExit)) {
                 negativeRules.push_back(new RegexRule(content, valid, handle, insensitive, type));
             } else if (category == "positive") {
                 positiveRules.push_back(new RegexRule(content, valid, handle, insensitive, type));
@@ -99,6 +94,8 @@ void PhoneNumberRule::InitRule(std::string& xmlPath)
                 borderRules.push_back(new RegexRule(content, valid, handle, insensitive, type));
             } else if (category == "codes") {
                 codesRules.push_back(new RegexRule(content, valid, handle, insensitive, type));
+            } else if (category == "find_number") {
+                findRules.push_back(new RegexRule(content, valid, handle, insensitive, type));
             }
             rule = rule->next;
         }
@@ -127,42 +124,9 @@ std::vector<RegexRule*> PhoneNumberRule::GetNegativeRules()
     return negativeRules;
 }
 
-// Short numbers identification
-std::vector<MatchedNumberInfo> PhoneNumberRule::HandleShortPhoneNumbers(icu::UnicodeString& message,
-    std::string& country)
+std::vector<RegexRule*> PhoneNumberRule::GetFindRules()
 {
-    PhoneNumber phoneNumber;
-    PhoneNumberUtil* phoneNumberUtil = PhoneNumberUtil::GetInstance();
-    ShortNumberInfo* shortNumberInfo = new ShortNumberInfo();
-    std::vector<MatchedNumberInfo> matchedNumberInfoList;
-    UErrorCode shortPatternStatus = U_ZERO_ERROR;
-    icu::UnicodeString shortRegex = "(?<!(\\d|\\*|-))\\d{2,6}(?!(\\d|\\*|-|%|分钟|版本))";
-    icu::RegexMatcher shortMatch = icu::RegexMatcher(shortRegex, 0, shortPatternStatus);
-    shortMatch.reset(message);
-    PhoneNumberUtil::ErrorType status = PhoneNumberUtil::NO_PARSING_ERROR;
-    while (shortMatch.find(shortPatternStatus)) {
-        icu::UnicodeString numberToParse = shortMatch.group(shortPatternStatus);
-        std::string stringParse;
-        numberToParse.toUTF8String(stringParse);
-        status = phoneNumberUtil->ParseAndKeepRawInput(stringParse, country, &phoneNumber);
-        if (status != PhoneNumberUtil::NO_PARSING_ERROR) {
-            HiLog::Error(LABEL, "PhoneNumberRule: failed to call the ParseAndKeepRawInput.");
-            continue;
-        }
-        // Add the valid short number to the result
-        if (shortNumberInfo->IsPossibleShortNumberForRegion(phoneNumber, country)) {
-            MatchedNumberInfo matcher;
-            matcher.SetBegin(shortMatch.start(shortPatternStatus));
-            matcher.SetEnd(shortMatch.end(shortPatternStatus));
-            icu::UnicodeString stringShort = shortMatch.group(shortPatternStatus);
-            matcher.SetContent(stringShort);
-            matchedNumberInfoList.push_back(matcher);
-        }
-    }
-    if (shortNumberInfo != nullptr) {
-        delete shortNumberInfo;
-    }
-    return matchedNumberInfoList;
+    return findRules;
 }
 } // namespace I18n
 } // namespace Global

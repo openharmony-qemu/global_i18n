@@ -97,4 +97,20 @@
             <content>(;ext=)\d*(?!\d)</content>
         </rule>
     </common>
+    <find_number>
+        <rule>
+            <insensitive>False</insensitive>
+            <type>ZERO</type>
+            <valid>Default</valid>
+            <handle>Default</handle>
+            <content>[\+\(\d][\d\p{Blank}\(\)\./-]{3,}[\d]</content>
+        </rule>
+        <rule>
+            <insensitive>False</insensitive>
+            <type>ZERO</type>
+            <valid>Default</valid>
+            <handle>Default</handle>
+            <content>(?&lt;!(\d|\*|-))\d{2,6}(?!(\d|\*|-|%|分钟|版本))</content>
+        </rule>
+    </find_number>
 </phone_number_rule>
