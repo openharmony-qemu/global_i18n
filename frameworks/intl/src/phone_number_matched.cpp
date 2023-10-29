@@ -15,7 +15,6 @@
 
 #include <climits>
 #include <set>
-#include "cpp/src/phonenumbers/shortnumberinfo.h"
 #include "hilog/log.h"
 #include "regex_rule.h"
 #include "phone_number_matched.h"
@@ -24,7 +23,6 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 using i18n::phonenumbers::PhoneNumber;
-using i18n::phonenumbers::ShortNumberInfo;
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "PhoneNumberMatched" };
 using namespace OHOS::HiviewDFX;
 
@@ -35,6 +33,8 @@ const UChar32 PhoneNumberMatched::REPLACE_CHAR = 'A';
 PhoneNumberMatched::PhoneNumberMatched(std::string& country)
 {
     phoneNumberRule = new PhoneNumberRule(country);
+    phoneNumberUtil = PhoneNumberUtil::GetInstance();
+    shortNumberInfo = new ShortNumberInfo();
     this->country = country;
     if (phoneNumberRule != nullptr) {
         phoneNumberRule->Init();
@@ -52,15 +52,14 @@ PhoneNumberMatched::~PhoneNumberMatched()
 std::vector<int> PhoneNumberMatched::GetMatchedPhoneNumber(std::string& messageStr)
 {
     icu::UnicodeString message = messageStr.c_str();
-    PhoneNumberUtil* phoneNumberUtil = PhoneNumberUtil::GetInstance();
     icu::UnicodeString convertQanStr = ConvertQanChar(message);
     if (!phoneNumberRule->isFixed) {
-        return DealWithoutFixed(convertQanStr, country, phoneNumberUtil);
+        return DealWithoutFixed(convertQanStr, country);
     }
-    icu::UnicodeString filteredString = HandleNegativeRule(convertQanStr, phoneNumberRule);
+    icu::UnicodeString filteredString = HandleNegativeRule(convertQanStr);
     std::vector<MatchedNumberInfo> matchedNumberInfoList = GetPossibleNumberInfos(country,
-        phoneNumberUtil, convertQanStr, filteredString);
-    std::vector<MatchedNumberInfo> shortList = phoneNumberRule->HandleShortPhoneNumbers(filteredString, country);
+        convertQanStr, filteredString);
+    std::vector<MatchedNumberInfo> shortList = FindShortNumbers(country, filteredString);
     if (shortList.size() != 0) {
         matchedNumberInfoList.insert(matchedNumberInfoList.end(), shortList.begin(), shortList.end());
     }
@@ -93,16 +92,15 @@ icu::UnicodeString PhoneNumberMatched::ConvertQanChar(icu::UnicodeString& instr)
     return result;
 }
 
-std::vector<int> PhoneNumberMatched::DealWithoutFixed(icu::UnicodeString& message, std::string& country,
-    PhoneNumberUtil* util)
+std::vector<int> PhoneNumberMatched::DealWithoutFixed(icu::UnicodeString& message, std::string& country)
 {
-    std::vector<PhoneNumberMatch*> matchList = FindNumbers(country, util, message);
+    std::vector<PhoneNumberMatch*> matchList = FindNumbers(country, message);
     std::vector<MatchedNumberInfo> result;
     for (auto& match : matchList) {
         MatchedNumberInfo info;
         icu::UnicodeString content = match->raw_string().c_str();
         PhoneNumber phoneNumber = match->number();
-        if (util->IsValidNumber(phoneNumber)) {
+        if (phoneNumberUtil->IsValidNumber(phoneNumber)) {
             info.SetBegin(match->start());
             info.SetEnd(match->end());
             info.SetContent(content);
@@ -112,7 +110,7 @@ std::vector<int> PhoneNumberMatched::DealWithoutFixed(icu::UnicodeString& messag
             delete match;
         }
     }
-    std::vector<MatchedNumberInfo> shortResult = FindShortNumbers(country, util, message);
+    std::vector<MatchedNumberInfo> shortResult = FindShortNumbers(country, message);
     // Merge result
     if (shortResult.size() != 0) {
         result.insert(result.end(), shortResult.begin(), shortResult.end());
@@ -125,7 +123,7 @@ std::vector<int> PhoneNumberMatched::DealWithoutFixed(icu::UnicodeString& messag
 }
 
 // Filtering text using negative rules
-icu::UnicodeString PhoneNumberMatched::HandleNegativeRule(icu::UnicodeString& src, PhoneNumberRule* phoneNumberRule)
+icu::UnicodeString PhoneNumberMatched::HandleNegativeRule(icu::UnicodeString& src)
 {
     std::vector<RegexRule*> rules = phoneNumberRule->GetNegativeRules();
     icu::UnicodeString ret = src;
@@ -156,22 +154,15 @@ void PhoneNumberMatched::ReplaceSpecifiedPos(icu::UnicodeString& chs, int start,
 }
 
 // Short numbers identification
-std::vector<MatchedNumberInfo> PhoneNumberMatched::FindShortNumbers(std::string& country, PhoneNumberUtil* util,
+std::vector<MatchedNumberInfo> PhoneNumberMatched::FindShortNumbers(std::string& country,
     icu::UnicodeString& message)
 {
     std::vector<MatchedNumberInfo> matchedNumberInfoList;
     UErrorCode status = U_ZERO_ERROR;
-    icu::UnicodeString regex = "(?<!(\\d|\\*|-))\\d{2,6}(?!(\\d|\\*|-|%))";
-    ShortNumberInfo* shortNumberInfo = new ShortNumberInfo();
-    if (shortNumberInfo == nullptr) {
-        HiLog::Error(LABEL, "shortNumberInfo construct failed.");
-        return matchedNumberInfoList;
-    }
-    icu::RegexPattern* shortPattern = icu::RegexPattern::compile(regex, 0, status);
-    if (shortPattern == nullptr) {
-        HiLog::Error(LABEL, "shortPattern construct failed.");
-        return matchedNumberInfoList;
-    }
+    size_t pos = phoneNumberRule->GetFindRules().size();
+    // 1 indicates the last position.
+    RegexRule* shortRegexRule = phoneNumberRule->GetFindRules()[pos - 1];
+    icu::RegexPattern* shortPattern = shortRegexRule->GetPattern();
     icu::RegexMatcher* shortMatch = shortPattern->matcher(message, status);
     if (shortMatch == nullptr) {
         HiLog::Error(LABEL, "shortPattern  matcher failed.");
@@ -182,7 +173,8 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::FindShortNumbers(std::string&
         std::string stringParse;
         numberToParse.toUTF8String(stringParse);
         PhoneNumber phoneNumber;
-        PhoneNumberUtil::ErrorType errorType = util->ParseAndKeepRawInput(stringParse, country, &phoneNumber);
+        PhoneNumberUtil::ErrorType errorType =
+            phoneNumberUtil->ParseAndKeepRawInput(stringParse, country, &phoneNumber);
         if (errorType != PhoneNumberUtil::NO_PARSING_ERROR) {
             HiLog::Error(LABEL, "PhoneNumberRule: failed to call the ParseAndKeepRawInput.");
             continue;
@@ -197,15 +189,13 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::FindShortNumbers(std::string&
             matchedNumberInfoList.push_back(matcher);
         }
     }
-    delete shortNumberInfo;
-    delete shortPattern;
     delete shortMatch;
     return matchedNumberInfoList;
 }
 
 // Add the phone number that may be correct, and return true if successful
 bool PhoneNumberMatched::AddPhoneNumber(std::string& number, int start, std::vector<PhoneNumberMatch*>& matchList,
-    std::string& country, PhoneNumberUtil* util)
+    std::string& country)
 {
     PhoneNumber phoneNumber;
     int lenNumber = 5;
@@ -213,14 +203,15 @@ bool PhoneNumberMatched::AddPhoneNumber(std::string& number, int start, std::vec
     if (RegexRule::CountDigits(uNumber) < lenNumber) {
         return false;
     }
-    PhoneNumberUtil::ErrorType parseStatus = util->Parse(number, country, &phoneNumber);
+    PhoneNumberUtil::ErrorType parseStatus = phoneNumberUtil->Parse(number, country, &phoneNumber);
     if (parseStatus != PhoneNumberUtil::NO_PARSING_ERROR) {
         return false;
     }
     UChar32 space = ' ';
     UChar32 slash = '/';
     // Add to matchList if phone number is not delimited, or valid
-    if ((uNumber.indexOf(space) == -1 && uNumber.indexOf(slash) == -1) || util->IsValidNumber(phoneNumber)) {
+    if ((uNumber.indexOf(space) == -1 && uNumber.indexOf(slash) == -1) ||
+        phoneNumberUtil->IsValidNumber(phoneNumber)) {
         PhoneNumberMatch* match = new PhoneNumberMatch(start, number, phoneNumber);
         matchList.push_back(match);
         return true;
@@ -229,13 +220,15 @@ bool PhoneNumberMatched::AddPhoneNumber(std::string& number, int start, std::vec
 }
 
 // Add the valid phone number
-std::vector<PhoneNumberMatch*> PhoneNumberMatched::FindNumbers(std::string& country, PhoneNumberUtil* util,
+std::vector<PhoneNumberMatch*> PhoneNumberMatched::FindNumbers(std::string& country,
     icu::UnicodeString& filteredString)
 {
     std::vector<PhoneNumberMatch*> matchList;
     UErrorCode status = U_ZERO_ERROR;
-    icu::UnicodeString regex = "[\\+\\(\\d][\\d \\(\\)\\./-]{3,}[\\d]";
-    icu::RegexPattern* numberPattern = icu::RegexPattern::compile(regex, 0, status);
+    size_t pos = phoneNumberRule->GetFindRules().size();
+    // 2 indicates the penultimate position.
+    RegexRule* numberRegexRule = phoneNumberRule->GetFindRules()[pos - 2];
+    icu::RegexPattern* numberPattern = numberRegexRule->GetPattern();
     icu::RegexMatcher* numberMatcher = numberPattern->matcher(filteredString, status);
     while (numberMatcher->find(status)) {
         int32_t start = numberMatcher->start(status);
@@ -244,7 +237,7 @@ std::vector<PhoneNumberMatch*> PhoneNumberMatched::FindNumbers(std::string& coun
         std::string number;
         uNumber.toUTF8String(number);
         // if the entire phone number is invalid, identify each segment that is separated
-        if (!AddPhoneNumber(number, start, matchList, country, util)) {
+        if (!AddPhoneNumber(number, start, matchList, country)) {
             int searchStart = 0;
             UChar32 space = ' ';
             UChar32 slash = '/';
@@ -259,11 +252,11 @@ std::vector<PhoneNumberMatch*> PhoneNumberMatched::FindNumbers(std::string& coun
                     (indexSpace == -1 || (indexSlash != -1 && indexSlash < indexSpace)) ? indexSlash : indexSpace;
                 searchStart = phoneEnd + 1;
                 std::string tempNumber = number.substr(phoneStart, phoneEnd - phoneStart);
-                AddPhoneNumber(tempNumber, phoneStart + start, matchList, country, util);
+                AddPhoneNumber(tempNumber, phoneStart + start, matchList, country);
             }
             // identify the last segment
             std::string lastStr = number.substr(searchStart);
-            AddPhoneNumber(lastStr, searchStart + start, matchList, country, util);
+            AddPhoneNumber(lastStr, searchStart + start, matchList, country);
         }
     }
     return matchList;
@@ -273,40 +266,44 @@ std::vector<PhoneNumberMatch*> PhoneNumberMatched::FindNumbers(std::string& coun
 bool PhoneNumberMatched::HandleWithShortAndShort(std::vector<MatchedNumberInfo>& result, std::string& country,
     MatchedNumberInfo& info, std::pair<int, int>& pos, icu::UnicodeString& filteredString)
 {
-    if (country == "CN") {
+    bool flag = false;
+    // 3 is the length of findRules.
+    size_t length = 3;
+    if (phoneNumberRule->GetFindRules().size() == length) {
         UErrorCode status = U_ZERO_ERROR;
-        icu::RegexMatcher* pattern =
-            new icu::RegexMatcher("(?<![-\\d])\\d{5,6}[/\\|]\\d{5,6}(?![-\\d])", 0, status);
+        RegexRule* regexRule = phoneNumberRule->GetFindRules()[0];
+        icu::RegexPattern* pattern = regexRule->GetPattern();
         icu::UnicodeString str = "";
         if (info.GetContent()[0] == '(' || info.GetContent()[0] == '[') {
             str = info.GetContent().tempSubString(1);
         } else {
             str = info.GetContent();
         }
-        pattern->reset(str);
-        if (!pattern->find()) {
+        icu::RegexMatcher* matcher = pattern->matcher(str, status);
+        if (!matcher->find(status)) {
             result.push_back(info);
             ReplaceSpecifiedPos(filteredString, pos.first, pos.second);
-            return true;
+            flag = true;
         }
+        delete matcher;
     } else {
         result.push_back(info);
         ReplaceSpecifiedPos(filteredString, pos.first, pos.second);
     }
-    return false;
+    return flag;
 }
 
 // Get possible phone number
-std::vector<MatchedNumberInfo> PhoneNumberMatched::GetPossibleNumberInfos(std::string& country, PhoneNumberUtil* util,
+std::vector<MatchedNumberInfo> PhoneNumberMatched::GetPossibleNumberInfos(std::string& country,
     icu::UnicodeString& src, icu::UnicodeString& filteredString)
 {
     std::vector<MatchedNumberInfo> result;
-    std::vector<PhoneNumberMatch*> matchList = FindNumbers(country, util, filteredString);
+    std::vector<PhoneNumberMatch*> matchList = FindNumbers(country, filteredString);
     for (auto match : matchList) {
-        if (!HandleBorderRule(match, filteredString, phoneNumberRule)) {
+        if (!HandleBorderRule(match, filteredString)) {
             continue;
         }
-        PhoneNumberMatch* delMatch = HandleCodesRule(match, src, phoneNumberRule);
+        PhoneNumberMatch* delMatch = HandleCodesRule(match, src);
         if (delMatch == nullptr) {
             continue;
         }
@@ -314,7 +311,7 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::GetPossibleNumberInfos(std::s
         int contentStart = delMatch->start();
         int contentEnd = delMatch->end();
         std::pair<int, int> pos{contentStart, contentEnd};
-        if (util->IsValidNumber(delMatch->number())) {
+        if (phoneNumberUtil->IsValidNumber(delMatch->number())) {
             MatchedNumberInfo info;
             info.SetBegin(contentStart);
             info.SetEnd(contentEnd);
@@ -324,7 +321,7 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::GetPossibleNumberInfos(std::s
                 continue;
             }
         }
-        std::vector<MatchedNumberInfo> posList = HandlePositiveRule(delMatch, filteredString, phoneNumberRule);
+        std::vector<MatchedNumberInfo> posList = HandlePositiveRule(delMatch, filteredString);
         if (posList.size() != 0) {
             for (auto& matchInfo : posList) {
                 ReplaceSpecifiedPos(filteredString, matchInfo.GetBegin(), matchInfo.GetEnd());
@@ -403,8 +400,7 @@ std::vector<int> PhoneNumberMatched::DealResult(std::vector<MatchedNumberInfo>& 
 }
 
 // Filter result based on Border rule
-bool PhoneNumberMatched::HandleBorderRule(PhoneNumberMatch* match, icu::UnicodeString& message,
-    PhoneNumberRule* phoneNumberRule)
+bool PhoneNumberMatched::HandleBorderRule(PhoneNumberMatch* match, icu::UnicodeString& message)
 {
     std::vector<RegexRule*> rules = phoneNumberRule->GetBorderRules();
     if (rules.size() == 0) {
@@ -441,8 +437,7 @@ bool PhoneNumberMatched::HandleBorderRule(PhoneNumberMatch* match, icu::UnicodeS
 }
 
 // Filter result based on Codes rule
-PhoneNumberMatch* PhoneNumberMatched::HandleCodesRule(PhoneNumberMatch* phoneNumberMatch, icu::UnicodeString& message,
-    PhoneNumberRule* phoneNumberRule)
+PhoneNumberMatch* PhoneNumberMatched::HandleCodesRule(PhoneNumberMatch* phoneNumberMatch, icu::UnicodeString& message)
 {
     PhoneNumberMatch* match = phoneNumberMatch;
     std::vector<RegexRule*> rules = phoneNumberRule->GetCodesRules();
@@ -467,7 +462,7 @@ PhoneNumberMatch* PhoneNumberMatched::HandleCodesRule(PhoneNumberMatch* phoneNum
 
 // Add phone numbers that meet the positive rule to the result
 std::vector<MatchedNumberInfo> PhoneNumberMatched::HandlePositiveRule(PhoneNumberMatch* match,
-    icu::UnicodeString& message, PhoneNumberRule* phoneNumberRule)
+    icu::UnicodeString& message)
 {
     std::vector<RegexRule*> rules = phoneNumberRule->GetPositiveRules();
     if (rules.size() == 0) {

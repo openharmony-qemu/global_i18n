@@ -160,7 +160,7 @@
     </codes>
     <common_exit>
         <rule>
-            <exit>True</exit>
+            <content>True</content>
         </rule>
     </common_exit>
 </phone_number_rule>

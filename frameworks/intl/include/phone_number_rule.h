@@ -33,7 +33,7 @@ public:
     std::vector<RegexRule*> GetCodesRules();
     std::vector<RegexRule*> GetPositiveRules();
     std::vector<RegexRule*> GetNegativeRules();
-    std::vector<MatchedNumberInfo> HandleShortPhoneNumbers(icu::UnicodeString& message, std::string& country);
+    std::vector<RegexRule*> GetFindRules();
     // Indicates whether the rules of the country are optimized
     bool isFixed;
 
@@ -44,6 +44,7 @@ private:
     std::vector<RegexRule*> positiveRules;
     std::vector<RegexRule*> borderRules;
     std::vector<RegexRule*> codesRules;
+    std::vector<RegexRule*> findRules;
     std::string country;
     std::string xmlPath;
     bool commonExit;

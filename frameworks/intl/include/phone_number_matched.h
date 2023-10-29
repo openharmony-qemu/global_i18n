@@ -21,6 +21,7 @@
 #include <vector>
 #include "cpp/src/phonenumbers/phonenumbermatch.h"
 #include "cpp/src/phonenumbers/phonenumberutil.h"
+#include "cpp/src/phonenumbers/shortnumberinfo.h"
 #include "matched_number_info.h"
 #include "phone_number_rule.h"
 
@@ -29,6 +30,7 @@ namespace Global {
 namespace I18n {
 using i18n::phonenumbers::PhoneNumberUtil;
 using i18n::phonenumbers::PhoneNumberMatch;
+using i18n::phonenumbers::ShortNumberInfo;
 class PhoneNumberMatched {
 public:
     PhoneNumberMatched(std::string& country);
@@ -39,33 +41,30 @@ public:
 
 private:
     bool AddPhoneNumber(std::string& number, int start, std::vector<PhoneNumberMatch*>& matchList,
-        std::string& country, PhoneNumberUtil* util);
+        std::string& country);
     std::vector<MatchedNumberInfo> DeleteRepeatedInfo(std::vector<MatchedNumberInfo>& list);
     std::vector<int> DealResult(std::vector<MatchedNumberInfo>& matchedNumberInfoList);
-    std::vector<int> DealWithoutFixed(icu::UnicodeString& message, std::string& country, PhoneNumberUtil* util);
+    std::vector<int> DealWithoutFixed(icu::UnicodeString& message, std::string& country);
     bool HandleWithShortAndShort(std::vector<MatchedNumberInfo>& result, std::string& country,
         MatchedNumberInfo& info, std::pair<int, int>& pos, icu::UnicodeString& filteredString);
-    std::vector<MatchedNumberInfo> GetPossibleNumberInfos(std::string& country, PhoneNumberUtil* util,
+    std::vector<MatchedNumberInfo> GetPossibleNumberInfos(std::string& country,
         icu::UnicodeString& src, icu::UnicodeString& filteredString);
-    std::vector<PhoneNumberMatch*> FindNumbers(std::string& country, PhoneNumberUtil* util,
-        icu::UnicodeString& filteredString);
-    std::vector<MatchedNumberInfo> FindShortNumbers(std::string& country, PhoneNumberUtil* util,
-        icu::UnicodeString& message);
-    PhoneNumberMatch* HandleCodesRule(PhoneNumberMatch* phoneNumberMatch, icu::UnicodeString& message,
-        PhoneNumberRule* phoneNumberRule);
-    static bool IsNumberWithOneBracket(icu::UnicodeString& message);
-    static void DealNumberWithOneBracket(MatchedNumberInfo& info);
-    static icu::UnicodeString DealStringWithOneBracket(icu::UnicodeString& message);
-    static icu::UnicodeString ConvertQanChar(icu::UnicodeString& instr);
-    static icu::UnicodeString HandleNegativeRule(icu::UnicodeString& src, PhoneNumberRule* phoneNumberRule);
-    static std::vector<MatchedNumberInfo> HandlePositiveRule(PhoneNumberMatch* match, icu::UnicodeString& message,
-        PhoneNumberRule* phoneNumberRule);
-    static bool HandleBorderRule(PhoneNumberMatch* match, icu::UnicodeString& message,
-        PhoneNumberRule* phoneNumberRule);
-    static void ReplaceSpecifiedPos(icu::UnicodeString& chs, int start, int end);
+    std::vector<PhoneNumberMatch*> FindNumbers(std::string& country, icu::UnicodeString& filteredString);
+    std::vector<MatchedNumberInfo> FindShortNumbers(std::string& country, icu::UnicodeString& message);
+    PhoneNumberMatch* HandleCodesRule(PhoneNumberMatch* phoneNumberMatch, icu::UnicodeString& message);
+    bool IsNumberWithOneBracket(icu::UnicodeString& message);
+    void DealNumberWithOneBracket(MatchedNumberInfo& info);
+    icu::UnicodeString DealStringWithOneBracket(icu::UnicodeString& message);
+    icu::UnicodeString ConvertQanChar(icu::UnicodeString& instr);
+    icu::UnicodeString HandleNegativeRule(icu::UnicodeString& src);
+    std::vector<MatchedNumberInfo> HandlePositiveRule(PhoneNumberMatch* match, icu::UnicodeString& message);
+    bool HandleBorderRule(PhoneNumberMatch* match, icu::UnicodeString& message);
+    void ReplaceSpecifiedPos(icu::UnicodeString& chs, int start, int end);
 
     static const UChar32 REPLACE_CHAR;
     PhoneNumberRule* phoneNumberRule;
+    PhoneNumberUtil* phoneNumberUtil;
+    ShortNumberInfo* shortNumberInfo;
     std::string country;
 };
 } // namespace I18n
