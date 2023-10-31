@@ -18,6 +18,7 @@
 #include <locid.h>
 #include <string>
 #include <vector>
+#include "date_time_matched.h"
 #include "phone_number_matched.h"
 
 namespace OHOS {
@@ -30,7 +31,9 @@ public:
     std::vector<std::vector<int>> FindEntityInfo(std::string& message);
 
 private:
+    icu::UnicodeString ConvertQanChar(icu::UnicodeString& instr);
     PhoneNumberMatched* phoneNumberMatched;
+    DateTimeMatched* dateTimeMatched;
     std::string locale;
 };
 } // namespace I18n

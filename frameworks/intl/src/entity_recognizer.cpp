@@ -13,32 +13,73 @@
  * limitations under the License.
  */
 #include "entity_recognizer.h"
+#include "hilog/log.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
+static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "EntityRecognizer" };
+using namespace OHOS::HiviewDFX;
 EntityRecognizer::EntityRecognizer(icu::Locale& locale)
 {
     std::string region = locale.getCountry();
+    std::string language = locale.getLanguage();
     phoneNumberMatched = new PhoneNumberMatched(region);
+    if (phoneNumberMatched == nullptr) {
+        HiLog::Error(LABEL, "PhoneNumberMatched construct failed.");
+    }
+    dateTimeMatched = new DateTimeMatched(language);
+    if (dateTimeMatched == nullptr) {
+        HiLog::Error(LABEL, "DateTimeMatched construct failed.");
+    }
 }
 
 EntityRecognizer::~EntityRecognizer()
 {
-    if (phoneNumberMatched != nullptr) {
-        delete phoneNumberMatched;
-    }
-    phoneNumberMatched = nullptr;
+    delete phoneNumberMatched;
+    delete dateTimeMatched;
 }
 
 std::vector<std::vector<int>> EntityRecognizer::FindEntityInfo(std::string& message)
 {
+    icu::UnicodeString messageStr = message.c_str();
+    messageStr = ConvertQanChar(messageStr);
     std::vector<std::vector<int>> EntityInfo;
-    std::vector<int> phoneNumberInfo = phoneNumberMatched->GetMatchedPhoneNumber(message);
+    if (phoneNumberMatched == nullptr) {
+        HiLog::Error(LABEL, "FindEntityInfo failed because phoneNumberMatched is nullptr.");
+        return EntityInfo;
+    }
+    std::vector<int> phoneNumberInfo = phoneNumberMatched->GetMatchedPhoneNumber(messageStr);
     EntityInfo.push_back(phoneNumberInfo);
-    std::vector<int> dataInfo{0};
-    EntityInfo.push_back(dataInfo);
+    if (dateTimeMatched == nullptr) {
+        HiLog::Error(LABEL, "FindEntityInfo failed because dateTimeMatched is nullptr.");
+        return EntityInfo;
+    }
+    std::vector<int> dateTimeInfo = dateTimeMatched->GetMatchedDateTime(messageStr);
+    EntityInfo.push_back(dateTimeInfo);
     return EntityInfo;
+}
+
+// replace full-width symbols with half-width symbols
+icu::UnicodeString EntityRecognizer::ConvertQanChar(icu::UnicodeString& instr)
+{
+    icu::UnicodeString result = "";
+    icu::UnicodeString fwchstrFirst = "：／．＼∕，！（）？﹡；：﹣—－【】－＋＝｛％｝１２３４５６７８９０ａｂｃｄｅｆｇｈｉ";
+    icu::UnicodeString fwchstrSecond = "ｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ";
+    icu::UnicodeString fwchstr = fwchstrFirst + fwchstrSecond;
+    icu::UnicodeString hwchstrFirst = ":/.\\/,!()?*;:---[]-+={%}1234567890abcdefghi";
+    icu::UnicodeString hwchstrSecond = "jklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    icu::UnicodeString hwchstr = hwchstrFirst + hwchstrSecond;
+    int len = instr.length();
+    for (int i = 0; i < len; i++) {
+        int index = fwchstr.indexOf(instr[i]);
+        if (index == -1) {
+            result += instr[i];
+        } else {
+            result += hwchstr[index];
+        }
+    }
+    return result;
 }
 } // namespace I18n
 } // namespace Global

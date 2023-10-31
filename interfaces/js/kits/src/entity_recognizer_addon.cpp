@@ -138,21 +138,32 @@ napi_value EntityRecognizerAddon::FindEntityInfo(napi_env env, napi_callback_inf
         return nullptr;
     }
     std::vector<std::vector<int>> entityInfo = obj->entityRecognizer_->FindEntityInfo(message);
+    napi_value result = GetEntityInfoItem(env, entityInfo);
+    return result;
+}
+
+napi_value EntityRecognizerAddon::GetEntityInfoItem(napi_env env, std::vector<std::vector<int>>& entityInfo)
+{
     napi_value result = nullptr;
-    status = napi_create_array_with_length(env, entityInfo[0][0] + entityInfo[1][0], &result);
+    napi_status status = napi_create_array_with_length(env, entityInfo[0][0] + entityInfo[1][0], &result);
     if (status != napi_ok) {
         HiLog::Error(LABEL, "create EntityInfo array failed.");
         return nullptr;
     }
-    std::string type = "phone_number";
-    for (int i = 0; i < entityInfo[0][0]; i++) {
-        int begin = entityInfo[0][2 * i + 1];
-        int end = entityInfo[0][2 * i + 2];
-        napi_value item = CreateEntityInfoItem(env, begin, end, type);
-        status = napi_set_element(env, result, i, item);
-        if (status != napi_ok) {
-            HiLog::Error(LABEL, "Failed to set PhoneNumberItem element.");
-            return nullptr;
+    std::vector<std::string> types = {"phone_number", "date"};
+    int index = 0;
+    for (std::string::size_type t = 0; t < types.size(); t++) {
+        for (int i = 0; i < entityInfo[t][0]; i++) {
+            int begin = entityInfo[t][2 * i + 1];
+            int end = entityInfo[t][2 * i + 2];
+            std::string type = types[t];
+            napi_value item = CreateEntityInfoItem(env, begin, end, type);
+            status = napi_set_element(env, result, index, item);
+            index++;
+            if (status != napi_ok) {
+                HiLog::Error(LABEL, "Failed to set item element.");
+                return nullptr;
+            }
         }
     }
     return result;
