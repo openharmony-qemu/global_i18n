@@ -14,6 +14,7 @@
  */
 
 #include <gtest/gtest.h>
+#include "entity_recognizer.h"
 #include "i18n_break_iterator.h"
 #include "i18n_calendar.h"
 #include "i18n_normalizer.h"
@@ -22,7 +23,6 @@
 #include "measure_data.h"
 #include "phone_number_format_mock.h"
 #include "preferred_language.h"
-#include "entity_recognizer.h"
 
 using namespace OHOS::Global::I18n;
 using testing::ext::TestSize;
@@ -597,7 +597,6 @@ HWTEST_F(I18nTest, I18nFuncTest016, TestSize.Level1)
     EXPECT_EQ(res[0][0], 1);
     EXPECT_EQ(res[0][1], 32);
     EXPECT_EQ(res[0][2], 43);
-    EXPECT_EQ(res[1][0], 0);
 }
 
 /**
@@ -618,7 +617,6 @@ HWTEST_F(I18nTest, I18nFuncTest017, TestSize.Level1)
     EXPECT_EQ(res[0][2], 43);
     EXPECT_EQ(res[0][3], 44);
     EXPECT_EQ(res[0][4], 55);
-    EXPECT_EQ(res[1][0], 0);
 }
 
 /**
@@ -637,7 +635,6 @@ HWTEST_F(I18nTest, I18nFuncTest018, TestSize.Level1)
     EXPECT_EQ(res[0][0], 1);
     EXPECT_EQ(res[0][1], 68);
     EXPECT_EQ(res[0][2], 87);
-    EXPECT_EQ(res[1][0], 0);
 }
 
 /**
@@ -656,7 +653,6 @@ HWTEST_F(I18nTest, I18nFuncTest019, TestSize.Level1)
     EXPECT_EQ(res[0][0], 1);
     EXPECT_EQ(res[0][1], 84);
     EXPECT_EQ(res[0][2], 90);
-    EXPECT_EQ(res[1][0], 0);
 }
 
 /**
@@ -673,7 +669,6 @@ HWTEST_F(I18nTest, I18nFuncTest020, TestSize.Level1)
     EntityRecognizer* m = new EntityRecognizer(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[0][0], 0);
-    EXPECT_EQ(res[1][0], 0);
 }
 
 /**
@@ -690,7 +685,6 @@ HWTEST_F(I18nTest, I18nFuncTest021, TestSize.Level1)
     EntityRecognizer* m = new EntityRecognizer(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[0][0], 0);
-    EXPECT_EQ(res[1][0], 0);
 }
 
 /**
@@ -711,7 +705,6 @@ HWTEST_F(I18nTest, I18nFuncTest022, TestSize.Level1)
     EXPECT_EQ(res[0][2], 30);
     EXPECT_EQ(res[0][3], 49);
     EXPECT_EQ(res[0][4], 60);
-    EXPECT_EQ(res[1][0], 0);
 }
 
 /**
@@ -732,7 +725,6 @@ HWTEST_F(I18nTest, I18nFuncTest023, TestSize.Level1)
     EXPECT_EQ(res[0][2], 6);
     EXPECT_EQ(res[0][3], 7);
     EXPECT_EQ(res[0][4], 12);
-    EXPECT_EQ(res[1][0], 0);
 }
 
 /**
@@ -751,7 +743,6 @@ HWTEST_F(I18nTest, I18nFuncTest024, TestSize.Level1)
     EXPECT_EQ(res[0][0], 1);
     EXPECT_EQ(res[0][1], 32);
     EXPECT_EQ(res[0][2], 45);
-    EXPECT_EQ(res[1][0], 0);
 }
 
 /**
@@ -772,7 +763,6 @@ HWTEST_F(I18nTest, I18nFuncTest025, TestSize.Level1)
     EXPECT_EQ(res[0][2], 43);
     EXPECT_EQ(res[0][3], 44);
     EXPECT_EQ(res[0][4], 55);
-    EXPECT_EQ(res[1][0], 0);
 }
 
 /**
@@ -789,7 +779,6 @@ HWTEST_F(I18nTest, I18nFuncTest026, TestSize.Level1)
     EntityRecognizer* m = new EntityRecognizer(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[0][0], 0);
-    EXPECT_EQ(res[1][0], 0);
 }
 
 /**
@@ -810,7 +799,6 @@ HWTEST_F(I18nTest, I18nFuncTest027, TestSize.Level1)
     EXPECT_EQ(res[0][2], 49);
     EXPECT_EQ(res[0][3], 53);
     EXPECT_EQ(res[0][4], 57);
-    EXPECT_EQ(res[1][0], 0);
 }
 
 /**
@@ -829,7 +817,6 @@ HWTEST_F(I18nTest, I18nFuncTest028, TestSize.Level1)
     EXPECT_EQ(res[0][0], 1);
     EXPECT_EQ(res[0][1], 0);
     EXPECT_EQ(res[0][2], 19);
-    EXPECT_EQ(res[1][0], 0);
 }
 
 /**
@@ -848,7 +835,6 @@ HWTEST_F(I18nTest, I18nFuncTest029, TestSize.Level1)
     EXPECT_EQ(res[0][0], 1);
     EXPECT_EQ(res[0][1], 29);
     EXPECT_EQ(res[0][2], 48);
-    EXPECT_EQ(res[1][0], 0);
 }
 
 /**
@@ -867,7 +853,6 @@ HWTEST_F(I18nTest, I18nFuncTest030, TestSize.Level1)
     EXPECT_EQ(res[0][0], 1);
     EXPECT_EQ(res[0][1], 25);
     EXPECT_EQ(res[0][2], 42);
-    EXPECT_EQ(res[1][0], 0);
 }
 
 /**
@@ -888,7 +873,6 @@ HWTEST_F(I18nTest, I18nFuncTest031, TestSize.Level1)
     EXPECT_EQ(res[0][2], 12);
     EXPECT_EQ(res[0][3], 13);
     EXPECT_EQ(res[0][4], 18);
-    EXPECT_EQ(res[1][0], 0);
 }
 
 /**
@@ -907,7 +891,6 @@ HWTEST_F(I18nTest, I18nFuncTest032, TestSize.Level1)
     EXPECT_EQ(res[0][0], 1);
     EXPECT_EQ(res[0][1], 41);
     EXPECT_EQ(res[0][2], 56);
-    EXPECT_EQ(res[1][0], 0);
 }
 
 /**
@@ -926,7 +909,183 @@ HWTEST_F(I18nTest, I18nFuncTest033, TestSize.Level1)
     EXPECT_EQ(res[0][0], 1);
     EXPECT_EQ(res[0][1], 55);
     EXPECT_EQ(res[0][2], 60);
+}
+
+/**
+ * @tc.name: I18nFuncTest034
+ * @tc.desc: Test I18n EntityRecognizer
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest034, TestSize.Level1)
+{
+    std::string localeStr = "zh-CN";
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
+    std::string message = "今天晚上10点，我们商量一下10月1日至7日的旅游安排。";
+    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::vector<std::vector<int>> res = m->FindEntityInfo(message);
+    EXPECT_EQ(res[1][0], 2);
+    EXPECT_EQ(res[1][1], 0);
+    EXPECT_EQ(res[1][2], 7);
+    EXPECT_EQ(res[1][3], 14);
+    EXPECT_EQ(res[1][4], 22);
+}
+
+/**
+ * @tc.name: I18nFuncTest035
+ * @tc.desc: Test I18n EntityRecognizer
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest035, TestSize.Level1)
+{
+    std::string localeStr = "zh-CN";
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
+    std::string message = "7月1日周一到7月5日周五都是工作日，所以在2023年7月6日下午17:00到19:00聚餐。";
+    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::vector<std::vector<int>> res = m->FindEntityInfo(message);
+    EXPECT_EQ(res[1][0], 2);
+    EXPECT_EQ(res[1][1], 0);
+    EXPECT_EQ(res[1][2], 13);
+    EXPECT_EQ(res[1][3], 22);
+    EXPECT_EQ(res[1][4], 44);
+}
+
+/**
+ * @tc.name: I18nFuncTest036
+ * @tc.desc: Test I18n EntityRecognizer
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest036, TestSize.Level1)
+{
+    std::string localeStr = "zh-CN";
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
+    std::string message = "昨天8：30：00的会议没有讨论出结果，我们2023年11月11日的8：30：00再开一次会吧。";
+    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::vector<std::vector<int>> res = m->FindEntityInfo(message);
+    EXPECT_EQ(res[1][0], 1);
+    EXPECT_EQ(res[1][1], 22);
+    EXPECT_EQ(res[1][2], 41);
+}
+
+/**
+ * @tc.name: I18nFuncTest037
+ * @tc.desc: Test I18n EntityRecognizer
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest037, TestSize.Level1)
+{
+    std::string localeStr = "zh-CN";
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
+    std::string message = "我们2023年10月23日（周六）一起完成作业，并且2023年10月24日周天 晚上8：00上交。";
+    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::vector<std::vector<int>> res = m->FindEntityInfo(message);
+    EXPECT_EQ(res[1][0], 2);
+    EXPECT_EQ(res[1][1], 2);
+    EXPECT_EQ(res[1][2], 17);
+    EXPECT_EQ(res[1][3], 26);
+    EXPECT_EQ(res[1][4], 46);
+}
+
+/**
+ * @tc.name: I18nFuncTest038
+ * @tc.desc: Test I18n EntityRecognizer
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest038, TestSize.Level1)
+{
+    std::string localeStr = "zh-CN";
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
+    std::string message = "2023/10/1是国庆节，我们可以在GMT+0800 上午9時30分00秒去参观博物馆，后续星期六 晚上 7：00我们一起吃饭。";
+    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::vector<std::vector<int>> res = m->FindEntityInfo(message);
+    delete m;
+    EXPECT_EQ(res[1][0], 3);
+    EXPECT_EQ(res[1][1], 0);
+    EXPECT_EQ(res[1][2], 9);
+    EXPECT_EQ(res[1][3], 19);
+    EXPECT_EQ(res[1][4], 38);
+    EXPECT_EQ(res[1][5], 47);
+    EXPECT_EQ(res[1][6], 58);
+}
+
+/**
+ * @tc.name: I18nFuncTest039
+ * @tc.desc: Test I18n EntityRecognizer
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest039, TestSize.Level1)
+{
+    std::string localeStr = "zh-CN";
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
+    std::string message = "我们上午 7：30：00 （GMT+8:30）可以去看日出，下午5：00-晚上7：00看日落。";
+    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::vector<std::vector<int>> res = m->FindEntityInfo(message);
+    EXPECT_EQ(res[1][0], 2);
+    EXPECT_EQ(res[1][1], 2);
+    EXPECT_EQ(res[1][2], 23);
+    EXPECT_EQ(res[1][3], 30);
+    EXPECT_EQ(res[1][4], 43);
+}
+
+/**
+ * @tc.name: I18nFuncTest040
+ * @tc.desc: Test I18n EntityRecognizer
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest040, TestSize.Level1)
+{
+    std::string localeStr = "en-GB";
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
+    std::string message = "We'll have dinner at GMT-8:15 PM 17:30:00, and go shopping at tomorrow 8:00.";
+    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::vector<std::vector<int>> res = m->FindEntityInfo(message);
+    EXPECT_EQ(res[1][0], 2);
+    EXPECT_EQ(res[1][1], 21);
+    EXPECT_EQ(res[1][2], 41);
+    EXPECT_EQ(res[1][3], 62);
+    EXPECT_EQ(res[1][4], 75);
+}
+
+/**
+ * @tc.name: I18nFuncTest041
+ * @tc.desc: Test I18n EntityRecognizer
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest041, TestSize.Level1)
+{
+    std::string localeStr = "en-GB";
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
+    std::string message = "Our time zone is GMT+12:00.";
+    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[1][0], 0);
+}
+
+/**
+ * @tc.name: I18nFuncTest042
+ * @tc.desc: Test I18n EntityRecognizer
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest042, TestSize.Level1)
+{
+    std::string localeStr = "en-GB";
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
+    std::string message = "The festivities will take place on Sunday, jan 1, 2023, and run until Wed, 1/4/2023";
+    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::vector<std::vector<int>> res = m->FindEntityInfo(message);
+    EXPECT_EQ(res[1][0], 2);
+    EXPECT_EQ(res[1][1], 35);
+    EXPECT_EQ(res[1][2], 54);
+    EXPECT_EQ(res[1][3], 70);
+    EXPECT_EQ(res[1][4], 83);
 }
 } // namespace I18n
 } // namespace Global

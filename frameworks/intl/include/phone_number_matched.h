@@ -35,7 +35,7 @@ class PhoneNumberMatched {
 public:
     PhoneNumberMatched(std::string& country);
     ~PhoneNumberMatched();
-    std::vector<int> GetMatchedPhoneNumber(std::string& message);
+    std::vector<int> GetMatchedPhoneNumber(icu::UnicodeString& message);
     static const int CONTAIN;
     static const int CONTAIN_OR_INTERSECT;
 
@@ -55,7 +55,6 @@ private:
     bool IsNumberWithOneBracket(icu::UnicodeString& message);
     void DealNumberWithOneBracket(MatchedNumberInfo& info);
     icu::UnicodeString DealStringWithOneBracket(icu::UnicodeString& message);
-    icu::UnicodeString ConvertQanChar(icu::UnicodeString& instr);
     icu::UnicodeString HandleNegativeRule(icu::UnicodeString& src);
     std::vector<MatchedNumberInfo> HandlePositiveRule(PhoneNumberMatch* match, icu::UnicodeString& message);
     bool HandleBorderRule(PhoneNumberMatch* match, icu::UnicodeString& message);

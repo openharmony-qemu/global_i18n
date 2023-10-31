@@ -49,16 +49,15 @@ PhoneNumberMatched::~PhoneNumberMatched()
     phoneNumberRule = nullptr;
 }
 
-std::vector<int> PhoneNumberMatched::GetMatchedPhoneNumber(std::string& messageStr)
+std::vector<int> PhoneNumberMatched::GetMatchedPhoneNumber(icu::UnicodeString& message)
 {
-    icu::UnicodeString message = messageStr.c_str();
-    icu::UnicodeString convertQanStr = ConvertQanChar(message);
+    icu::UnicodeString messageStr = message;
     if (!phoneNumberRule->isFixed) {
-        return DealWithoutFixed(convertQanStr, country);
+        return DealWithoutFixed(messageStr, country);
     }
-    icu::UnicodeString filteredString = HandleNegativeRule(convertQanStr);
+    icu::UnicodeString filteredString = HandleNegativeRule(messageStr);
     std::vector<MatchedNumberInfo> matchedNumberInfoList = GetPossibleNumberInfos(country,
-        convertQanStr, filteredString);
+        messageStr, filteredString);
     std::vector<MatchedNumberInfo> shortList = FindShortNumbers(country, filteredString);
     if (shortList.size() != 0) {
         matchedNumberInfoList.insert(matchedNumberInfoList.end(), shortList.begin(), shortList.end());
@@ -68,28 +67,6 @@ std::vector<int> PhoneNumberMatched::GetMatchedPhoneNumber(std::string& messageS
         DealNumberWithOneBracket(matchedNumberInfo);
     }
     return DealResult(matchedNumberInfoList);
-}
-
-// replace full-width symbols with half-width symbols
-icu::UnicodeString PhoneNumberMatched::ConvertQanChar(icu::UnicodeString& instr)
-{
-    icu::UnicodeString result = "";
-    icu::UnicodeString fwchstrFirst = "：／．＼∕，！（）？﹡；：﹣—－【】－＋＝｛％｝１２３４５６７８９０ａｂｃｄｅｆｇｈｉ";
-    icu::UnicodeString fwchstrSecond = "ｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ";
-    icu::UnicodeString fwchstr = fwchstrFirst + fwchstrSecond;
-    icu::UnicodeString hwchstrFirst = ":/.\\/,!()?*;:---[]-+={%}1234567890abcdefghi";
-    icu::UnicodeString hwchstrSecond = "jklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    icu::UnicodeString hwchstr = hwchstrFirst + hwchstrSecond;
-    int len = instr.length();
-    for (int i = 0; i < len; i++) {
-        int index = fwchstr.indexOf(instr[i]);
-        if (index == -1) {
-            result += instr[i];
-        } else {
-            result += hwchstr[index];
-        }
-    }
-    return result;
 }
 
 std::vector<int> PhoneNumberMatched::DealWithoutFixed(icu::UnicodeString& message, std::string& country)
@@ -479,8 +456,7 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::HandlePositiveRule(PhoneNumbe
             return infoList;
         }
         icu::RegexMatcher* mat2 = pattern->matcher(message, status);
-        mat2->reset(message);
-        if (mat2->find()) {
+        if (mat2->find(status)) {
             std::vector<MatchedNumberInfo> infoList = rule->Handle(match, message);
             if (infoList.size() == 0) {
                 continue;
