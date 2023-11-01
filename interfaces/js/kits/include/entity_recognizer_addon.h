@@ -17,6 +17,7 @@
 #define OHOS_GLOBAL_I18N_ENTITY_RECOGNIZER_ADDON_H
 
 #include "entity_recognizer.h"
+#include "locale_config.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 
