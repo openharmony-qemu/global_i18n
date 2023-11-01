@@ -71,20 +71,21 @@ napi_value EntityRecognizerAddon::constructor(napi_env env, napi_callback_info i
     if (status != napi_ok) {
         return nullptr;
     }
+    std::string localeStr;
     if (argv[0] == nullptr) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
-        return nullptr;
-    }
-    napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
-    if (valueType != napi_valuetype::napi_string) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
-        return nullptr;
-    }
-    int32_t code = 0;
-    std::string localeStr = VariableConvertor::GetString(env, argv[0], code);
-    if (code != 0) {
-        return nullptr;
+        localeStr = LocaleConfig::GetSystemLocale();
+    } else {
+        napi_valuetype valueType = napi_valuetype::napi_undefined;
+        napi_typeof(env, argv[0], &valueType);
+        if (valueType != napi_valuetype::napi_string) {
+            ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+            return nullptr;
+        }
+        int32_t code = 0;
+        localeStr = VariableConvertor::GetString(env, argv[0], code);
+        if (code != 0) {
+            return nullptr;
+        }
     }
     UErrorCode localeStatus = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, localeStatus);
@@ -123,7 +124,7 @@ napi_value EntityRecognizerAddon::FindEntityInfo(napi_env env, napi_callback_inf
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_string) {
         HiLog::Error(LABEL, "Invalid parameter type");
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
         return nullptr;
     }
     int32_t code = 0;
