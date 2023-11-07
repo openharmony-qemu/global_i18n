@@ -19,6 +19,9 @@
 #include <string>
 #include <vector>
 #include "i18n_types.h"
+#ifdef SUPPORT_APP_PREFERRED_LANGUAGE
+#include "preferences_helper.h"
+#endif
 
 namespace OHOS {
 namespace Global {
@@ -30,7 +33,23 @@ public:
     static std::vector<std::string> GetPreferredLanguageList();
     static std::string GetFirstPreferredLanguage();
 #ifdef SUPPORT_APP_PREFERRED_LANGUAGE
+    /**
+     * @brief Get App Language.
+     * Get the app language from app preferences data which saved by SetAppPreferredLanguage method.
+     *
+     * @return std::string return current app language.
+     */
     static std::string GetAppPreferredLanguage();
+
+    /**
+     * @brief Set App Language.
+     * The application interface will be refreshed in real time after call this method. And the language will be saved
+     * to app preferences data which will be used the next time the application starts.
+     *
+     * @param language language to be set.
+     * @param errCode Indicates whether the setting was successful; errCode == I18nErrorCode::SUCCESS means successful.
+     */
+    static void SetAppPreferredLanguage(const std::string &language, I18nErrorCode &errCode);
 #endif
     static std::string GetPreferredLocale();
 
@@ -43,14 +62,14 @@ private:
     static bool IsValidTag(const std::string &tag);
     static void Split(const std::string &src, const std::string &sep, std::vector<std::string> &dest);
 #ifdef SUPPORT_APP_PREFERRED_LANGUAGE
-    static std::string GetBundleName();
-    static std::set<std::string> GetResources();
-    static bool IsMatched(const std::string& preferred, const std::string& resource);
+    static std::shared_ptr<NativePreferences::Preferences> GetI18nAppPreferences();
 #endif
     static const char *RESOURCE_PATH_HEAD;
     static const char *RESOURCE_PATH_TAILOR;
     static const char *RESOURCE_PATH_SPLITOR;
     static const char *PREFERRED_LANGUAGES;
+    static const char *APP_LANGUAGE_KEY;
+    static const char *I18N_PREFERENCES_FILE_NAME;
     static constexpr int CONFIG_LEN = 128;
     static constexpr uint32_t LANGUAGE_LEN = 2;
 };

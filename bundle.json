@@ -61,6 +61,7 @@
                 "init",
                 "ipc",
                 "napi",
+                "preferences",
                 "resource_management",
                 "samgr"
             ],

@@ -324,7 +324,13 @@ napi_value I18nSystemAddon::SetAppPreferredLanguage(napi_env env, napi_callback_
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
         return nullptr;
     }
-    // Do something next
+#ifdef SUPPORT_APP_PREFERRED_LANGUAGE
+    I18nErrorCode errCode = I18nErrorCode::SUCCESS;
+    PreferredLanguage::SetAppPreferredLanguage(localeTag, errCode);
+    if (errCode != I18nErrorCode::SUCCESS) {
+        HiLog::Error(LABEL, "SetAppPreferredLanguage: set app language to i18n app preferences failed.");
+    }
+#endif
     return nullptr;
 }
 
