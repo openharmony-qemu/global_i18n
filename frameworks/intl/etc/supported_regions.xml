@@ -18,6 +18,8 @@
     <item>AF</item>
     <item>AG</item>
     <item>AI</item>
+    <item>AL</item>
+    <item>AM</item>
     <item>AO</item>
     <item>AR</item>
     <item>AS</item>
@@ -78,10 +80,12 @@
     <item>EH</item>
     <item>ER</item>
     <item>ES</item>
+    <item>ET</item>
     <item>FI</item>
     <item>FJ</item>
     <item>FK</item>
     <item>FM</item>
+    <item>FO</item>
     <item>FR</item>
     <item>GA</item>
     <item>GB</item>
@@ -115,6 +119,7 @@
     <item>IO</item>
     <item>IQ</item>
     <item>IR</item>
+    <item>IS</item>
     <item>IT</item>
     <item>JE</item>
     <item>JM</item>
@@ -160,6 +165,7 @@
     <item>MS</item>
     <item>MT</item>
     <item>MU</item>
+    <item>MV</item>
     <item>MW</item>
     <item>MX</item>
     <item>MY</item>
@@ -222,13 +228,16 @@
     <item>TD</item>
     <item>TG</item>
     <item>TH</item>
+    <item>TJ</item>
     <item>TK</item>
     <item>TL</item>
+    <item>TM</item>
     <item>TN</item>
     <item>TO</item>
     <item>TR</item>
     <item>TT</item>
     <item>TV</item>
+    <item>TW</item>
     <item>TZ</item>
     <item>UA</item>
     <item>UG</item>
