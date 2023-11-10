@@ -14,6 +14,7 @@
  */
 #ifdef SUPPORT_APP_PREFERRED_LANGUAGE
 #include <regex>
+#include "application_context.h"
 #include "bundle_info.h"
 #include "bundle_mgr_interface.h"
 #include "hap_resource.h"
@@ -36,6 +37,8 @@ const char *PreferredLanguage::RESOURCE_PATH_HEAD = "/data/accounts/account_0/ap
 const char *PreferredLanguage::RESOURCE_PATH_TAILOR = "/assets/entry/resources.index";
 const char *PreferredLanguage::RESOURCE_PATH_SPLITOR = "/";
 const char *PreferredLanguage::PREFERRED_LANGUAGES = "persist.sys.preferredLanguages";
+const char *PreferredLanguage::APP_LANGUAGE_KEY = "app_language";
+const char *PreferredLanguage::I18N_PREFERENCES_FILE_NAME = "/i18n";
 
 bool PreferredLanguage::AddPreferredLanguageExist(std::vector<std::string> &preferredLanguageList, int languageIdx,
     int index, const std::string& language)
@@ -200,108 +203,57 @@ std::string PreferredLanguage::GetFirstPreferredLanguage()
 }
 
 #ifdef SUPPORT_APP_PREFERRED_LANGUAGE
-std::string PreferredLanguage::GetBundleName()
+std::shared_ptr<NativePreferences::Preferences> PreferredLanguage::GetI18nAppPreferences()
 {
-    auto systemAbilityManager = OHOS::SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (systemAbilityManager == nullptr) {
-        HiLog::Error(LABEL, "Failed to create system ability manager.");
-        return "";
+    std::shared_ptr<AbilityRuntime::ApplicationContext> appContext = AbilityRuntime::ApplicationContext::GetInstance();
+    std::string preferencesDirPath = appContext->GetPreferencesDir();
+    std::string i18nPreferencesFilePath = preferencesDirPath + I18N_PREFERENCES_FILE_NAME;
+    int status;
+    NativePreferences::Options options(i18nPreferencesFilePath);
+    std::shared_ptr<NativePreferences::Preferences> preferences =
+        NativePreferences::PreferencesHelper::GetPreferences(options, status);
+    if (status != 0) {
+        HiLog::Error(LABEL, "PreferredLanguage::GetAppPreferredLanguage get i18n app preferences failed.");
+        return nullptr;
     }
-    auto bundleMgrSa = systemAbilityManager->GetSystemAbility(OHOS::BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
-    if (bundleMgrSa == nullptr) {
-        HiLog::Error(LABEL, "Failed to create bundle manager SA.");
-        return "";
-    }
-    auto bundleMgr = OHOS::iface_cast<AppExecFwk::IBundleMgr>(bundleMgrSa);
-    if (bundleMgr == nullptr) {
-        HiLog::Error(LABEL, "Failed to create bundle manager.");
-        return "";
-    }
-    AppExecFwk::BundleInfo bundleInfo;
-    bundleMgr->GetBundleInfoForSelf(0, bundleInfo);
-    return bundleInfo.name;
-}
-
-std::set<std::string> PreferredLanguage::GetResources()
-{
-    std::string bundleName = GetBundleName();
-    const std::string resourcePath = RESOURCE_PATH_HEAD + bundleName + RESOURCE_PATH_SPLITOR + bundleName +
-        RESOURCE_PATH_TAILOR;
-    const OHOS::Global::Resource::HapResource *resource =
-        OHOS::Global::Resource::HapResource::LoadFromIndex(resourcePath.c_str(), nullptr);
-    const std::vector<std::string> qualifiers = resource->GetQualifiers();
-    std::set<std::string> result;
-    std::regex languagePattern("type:0.*str:([a-z]{2})");
-    std::regex countryPattern("type:1.*str:([A-Z]{2})");
-    for (size_t i = 0; i < qualifiers.size(); i++) {
-        std::smatch match;
-        bool found = regex_search(qualifiers[i], match, languagePattern);
-        if (!found) {
-            continue;
-        }
-        std::string locale = match.str(1);
-        found = regex_search(qualifiers[i], match, countryPattern);
-        if (found) {
-            locale += "-";
-            locale += match.str(1);
-        }
-        result.insert(locale);
-    }
-    return result;
-}
-
-bool PreferredLanguage::IsMatched(const std::string& preferred, const std::string& resource)
-{
-    LocaleInfo preferredLocaleInfo(preferred);
-    LocaleInfo resourceLocaleInfo(resource);
-    if (preferred == resource) {
-        return true;
-    }
-    if (preferredLocaleInfo.GetLanguage() != resourceLocaleInfo.GetLanguage()) {
-        return false;
-    }
-    LocaleInfo maximizedResourceLocale(resourceLocaleInfo.Maximize());
-    std::string resourceScript = maximizedResourceLocale.GetScript();
-    if (resourceScript == "") {
-        std::string resourceCountry = maximizedResourceLocale.GetRegion();
-        if (resourceCountry == "") {
-            return true;
-        }
-        std::string preferredCountry = preferredLocaleInfo.GetRegion();
-        if (resourceCountry == preferredCountry) {
-            return true;
-        }
-        return false;
-    }
-    LocaleInfo maximizedPreferredLocale(preferredLocaleInfo.Maximize());
-    std::string preferredScript = maximizedResourceLocale.GetScript();
-    if (resourceScript == preferredScript) {
-        return true;
-    }
-    return false;
+    return preferences;
 }
 
 std::string PreferredLanguage::GetAppPreferredLanguage()
 {
-    std::vector<std::string> preferredLanguageList = GetPreferredLanguageList();
-    std::set<std::string> resources = GetResources();
-    int minmumMatchedIdx = -1;
-    for (size_t i = 0; i < preferredLanguageList.size(); i++) {
-        for (std::set<std::string>::iterator it = resources.begin(); it != resources.end(); ++it) {
-            std::string preferredLanguage = preferredLanguageList[i];
-            if (preferredLanguage == "en-Qaag") {
-                preferredLanguage = "en-Latn";
-            }
-            if (IsMatched(preferredLanguage, *it)) {
-                minmumMatchedIdx = (int)i;
-                break;
-            }
-        }
+    std::shared_ptr<NativePreferences::Preferences> preferences = GetI18nAppPreferences();
+    if (preferences == nullptr) {
+        HiLog::Error(LABEL, 
+            "PreferredLanguage::GetAppPreferredLanguage get i18n preferences failed, return system language.");
+        return LocaleConfig::GetSystemLanguage();
     }
-    if (minmumMatchedIdx != -1) {
-        return preferredLanguageList[minmumMatchedIdx];
+    std::string res = preferences->GetString(PreferredLanguage::APP_LANGUAGE_KEY, "");
+    if (res.length() == 0) {
+        HiLog::Info(LABEL, 
+            "PreferredLanguage::GetAppPreferredLanguage app language is empty, return system language.");
+        return LocaleConfig::GetSystemLanguage();
     }
-    return preferredLanguageList[0];
+    return res;
+}
+
+void PreferredLanguage::SetAppPreferredLanguage(const std::string &language, I18nErrorCode &errCode)
+{
+    std::shared_ptr<AbilityRuntime::ApplicationContext> appContext = AbilityRuntime::ApplicationContext::GetInstance();
+    appContext->SetLanguage(language);
+    std::shared_ptr<NativePreferences::Preferences> preferences = GetI18nAppPreferences();
+    if (preferences == nullptr) {
+        errCode = I18nErrorCode::FAILED;
+        HiLog::Error(LABEL, "PreferredLanguage::SetAppPreferredLanguage get i18n preferences failed.");
+        return;
+    }
+    int32_t status = preferences->PutString(PreferredLanguage::APP_LANGUAGE_KEY, language);
+    if (status != 0) {
+        errCode = I18nErrorCode::FAILED;
+        HiLog::Error(LABEL,
+            "PreferredLanguage::SetAppPreferredLanguage set app language to i18n preferences failed.");
+        return;
+    }
+    preferences->Flush();
 }
 #endif
 
