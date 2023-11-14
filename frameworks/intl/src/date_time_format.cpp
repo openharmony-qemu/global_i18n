@@ -291,6 +291,7 @@ void DateTimeFormat::InitDateFormat(UErrorCode &status)
         pattern =
             patternGenerator->replaceFieldTypes(patternGenerator->getBestPattern(pattern, status), pattern, status);
         pattern = patternGenerator->getBestPattern(pattern, status);
+        SetDayPeriod();
         status = U_ZERO_ERROR;
         dateFormat = new SimpleDateFormat(pattern, locale, status);
         if (!U_SUCCESS(status)) {
@@ -299,6 +300,19 @@ void DateTimeFormat::InitDateFormat(UErrorCode &status)
     }
     status = U_ZERO_ERROR;
     dateIntvFormat = DateIntervalFormat::createInstance(pattern, locale, status);
+}
+
+void DateTimeFormat::SetDayPeriod() {
+    if (dayPeriod == "short") {
+        pattern.findAndReplace(icu::UnicodeString::fromUTF8(StringPiece("a")),
+            icu::UnicodeString::fromUTF8(StringPiece("B")));
+    } else if (dayPeriod == "long") {
+        pattern.findAndReplace(icu::UnicodeString::fromUTF8(StringPiece("a")),
+            icu::UnicodeString::fromUTF8(StringPiece("BBBB")));
+    } else if (dayPeriod == "narrow") {
+        pattern.findAndReplace(icu::UnicodeString::fromUTF8(StringPiece("a")),
+            icu::UnicodeString::fromUTF8(StringPiece("BBBBB")));
+    }
 }
 
 void DateTimeFormat::ParseConfigsPartOne(std::map<std::string, std::string> &configs)
