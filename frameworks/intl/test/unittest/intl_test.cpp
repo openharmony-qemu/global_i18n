@@ -2221,7 +2221,7 @@ HWTEST_F(IntlTest, IntlFuncTest0059, TestSize.Level1)
     };
     NumberFormat formatter(localeTags, configs);
     std::string res = formatter.Format(12);
-    EXPECT_EQ(res, "");
+    EXPECT_EQ(res, "12");
 }
 
 /**

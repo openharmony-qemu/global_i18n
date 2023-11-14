@@ -125,6 +125,7 @@ private:
     void AddOptions(std::string option, char16_t optionChar);
     void ComputeSkeleton();
     void ComputePattern();
+    void SetDayPeriod();
     void ComputePartOfPattern(std::string option, char16_t character, std::string twoDigitChar,
         std::string numericChar);
     void ComputeHourCycleChars();
