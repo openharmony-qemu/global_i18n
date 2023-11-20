@@ -704,6 +704,11 @@ std::string I18nTimeZone::GetDisplayName(std::string localeStr, bool isDST)
 {
     icu::TimeZone::EDisplayType style = icu::TimeZone::EDisplayType::LONG_GENERIC;
     icu::Locale locale(localeStr.data());
+    if (!LocaleConfig::IsValidTag(localeStr)) {
+        UErrorCode status = U_ZERO_ERROR;
+        std::string systemLocale = LocaleConfig::GetSystemLocale();
+        locale = icu::Locale::forLanguageTag(systemLocale, status);
+    }
     icu::UnicodeString name;
     timezone->getDisplayName((UBool)isDST, style, locale, name);
     std::string result;
