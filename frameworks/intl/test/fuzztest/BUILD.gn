@@ -30,5 +30,8 @@ group("fuzztest") {
     "relativetimeformat_fuzzer:RelativeTimeFormatFuzzTest",
     "timezone_fuzzer:TimeZoneFuzzTest",
     "utils_fuzzer:UtilsFuzzTest",
+    "pluralrules_fuzzer:PluralRulesFuzzTest",
+    "calendar_fuzzer:CalendarFuzzTest",
+    "taboo_fuzzer:TabooFuzzTest",
   ]
 }
