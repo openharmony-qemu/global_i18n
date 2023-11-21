@@ -21,6 +21,7 @@ group("fuzztest") {
     "calendar_fuzzer:CalendarFuzzTest",
     "character_fuzzer:CharacterFuzzTest",
     "collator_fuzzer:CollatorFuzzTest",
+    "datetimeformat_fuzzer:DateTimeFormatFuzzTest",
     "localeconfigget_fuzzer:LocaleConfigGetFuzzTest",
     "localeconfigset_fuzzer:LocaleConfigSetFuzzTest",
     "localeinfo_fuzzer:LocaleInfoFuzzTest",
