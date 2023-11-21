@@ -22,11 +22,10 @@ module_output_path = "global/i18n"
 ohos_fuzztest("TabooFuzzTest") {
   module_out_path = module_output_path
 
-  fuzz_config_file =
-      "//base/global/i18n/frameworks/intl/test/fuzztest/taboo_fuzzer"
+  fuzz_config_file = "."
 
   include_dirs = [
-    "//base/global/i18n/frameworks/intl/include",
+    "../../../include",
     "//third_party/icu/icu4c/source/common",
     "//third_party/icu/icu4c/source/i18n",
   ]
@@ -40,7 +39,7 @@ ohos_fuzztest("TabooFuzzTest") {
   configs = []
 
   deps = [
-    "//base/global/i18n/frameworks/intl:intl_util",
+    "../../../../intl:intl_util",
     "//third_party/icu/icu4c:shared_icui18n",
     "//third_party/icu/icu4c:shared_icuuc",
   ]
