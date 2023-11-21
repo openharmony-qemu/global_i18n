@@ -49,8 +49,8 @@ namespace OHOS {
         dateTimeFormat.GetHour();
         dateTimeFormat.GetMinute();
         dateTimeFormat.GetSecond();
-        DateTimeFormat *dtFormat = DateTimeFormat::CreateInstance(localeTags, configs);
-        delete dtFormat;
+        std::unique_ptr<DateTimeFormat> dtFormat =
+                DateTimeFormat::CreateInstance(localeTags, configs);
     }
 }
 
