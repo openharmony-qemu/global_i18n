@@ -18,16 +18,20 @@ group("fuzztest") {
   deps += [
     # deps file
     "breakiterator_fuzzer:BreakIteratorFuzzTest",
+    "calendar_fuzzer:CalendarFuzzTest",
     "character_fuzzer:CharacterFuzzTest",
     "collator_fuzzer:CollatorFuzzTest",
+    "datetimeformat_fuzzer:DateTimeFormatFuzzTest",
     "localeconfigget_fuzzer:LocaleConfigGetFuzzTest",
     "localeconfigset_fuzzer:LocaleConfigSetFuzzTest",
     "localeinfo_fuzzer:LocaleInfoFuzzTest",
     "measuredata_fuzzer:MeasureDataFuzzTest",
     "numberformat_fuzzer:NumberFormatFuzzTest",
     "phonenumberformat_fuzzer:PhoneNumberFormatFuzzTest",
+    "pluralrules_fuzzer:PluralRulesFuzzTest",
     "preferredlanguage_fuzzer:PreferredLanguageFuzzTest",
     "relativetimeformat_fuzzer:RelativeTimeFormatFuzzTest",
+    "taboo_fuzzer:TabooFuzzTest",
     "timezone_fuzzer:TimeZoneFuzzTest",
     "utils_fuzzer:UtilsFuzzTest",
   ]
