@@ -32,8 +32,11 @@ std::set<std::string> LocaleInfo::GetValidLocales()
     int32_t validCount = 1;
     const Locale *validLocales = Locale::getAvailableLocales(validCount);
     std::set<std::string> allValidLocales;
-    for (int i = 0; i < validCount; i++) {
-        allValidLocales.insert(validLocales[i].getLanguage());
+    if (validLocales != nullptr) {
+        for (int i = 0; i < validCount; i++) {
+            allValidLocales.insert(validLocales[i].getLanguage());
+        }
+        delete[] validLocales;
     }
     allValidLocales.insert("in");
     allValidLocales.insert("iw");

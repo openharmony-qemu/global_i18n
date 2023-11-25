@@ -42,13 +42,16 @@ I18nNormalizer::~I18nNormalizer()
 std::string I18nNormalizer::Normalize(const char *text, int32_t length, I18nErrorCode &errorCode)
 {
     UErrorCode status = U_ZERO_ERROR;
+    std::string result;
+    if (text == nullptr) {
+        return result;
+    }
     icu::UnicodeString input(text, length);
     icu::UnicodeString output = normalizer->normalize(input, status);
     if (U_FAILURE(status)) {
         errorCode = I18nErrorCode::FAILED;
         return "";
     }
-    std::string result;
     output.toUTF8String(result);
     return result;
 }

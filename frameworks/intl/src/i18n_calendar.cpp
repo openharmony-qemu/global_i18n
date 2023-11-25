@@ -300,8 +300,10 @@ std::string I18nCalendar::GetDisplayName(std::string &displayLocaleTag)
     }
     icu::LocaleDisplayNames *dspName = icu::LocaleDisplayNames::createInstance(displayLocale);
     icu::UnicodeString unistr;
-    dspName->keyValueDisplayName("calendar", type, unistr);
-    delete dspName;
+    if (dspName != nullptr) {
+        dspName->keyValueDisplayName("calendar", type, unistr);
+        delete dspName;
+    }
     std::string ret;
     unistr.toUTF8String<std::string>(ret);
     return ret;

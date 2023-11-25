@@ -18,6 +18,7 @@
 #include "hilog/log.h"
 #include "regex_rule.h"
 #include "phone_number_matched.h"
+#include "utils.h"
 
 namespace OHOS {
 namespace Global {
@@ -47,6 +48,14 @@ PhoneNumberMatched::~PhoneNumberMatched()
         delete phoneNumberRule;
     }
     phoneNumberRule = nullptr;
+    if (phoneNumberUtil != nullptr) {
+        delete phoneNumberUtil;
+    }
+    phoneNumberUtil = nullptr;
+    if (shortNumberInfo != nullptr) {
+        delete shortNumberInfo;
+    }
+    shortNumberInfo = nullptr;
 }
 
 std::vector<int> PhoneNumberMatched::GetMatchedPhoneNumber(icu::UnicodeString& message)
@@ -74,6 +83,7 @@ std::vector<int> PhoneNumberMatched::DealWithoutFixed(icu::UnicodeString& messag
     std::vector<PhoneNumberMatch*> matchList = FindNumbers(country, message);
     std::vector<MatchedNumberInfo> result;
     for (auto& match : matchList) {
+        if (match == nullptr) continue;
         MatchedNumberInfo info;
         icu::UnicodeString content = match->raw_string().c_str();
         PhoneNumber phoneNumber = match->number();
@@ -86,6 +96,7 @@ std::vector<int> PhoneNumberMatched::DealWithoutFixed(icu::UnicodeString& messag
         if (match != nullptr) {
             delete match;
         }
+        match = nullptr;
     }
     std::vector<MatchedNumberInfo> shortResult = FindShortNumbers(country, message);
     // Merge result
@@ -166,7 +177,10 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::FindShortNumbers(std::string&
             matchedNumberInfoList.push_back(matcher);
         }
     }
-    delete shortMatch;
+    if (shortMatch != nullptr) {
+        delete shortMatch;
+    }
+    shortMatch = nullptr;
     return matchedNumberInfoList;
 }
 
@@ -262,7 +276,10 @@ bool PhoneNumberMatched::HandleWithShortAndShort(std::vector<MatchedNumberInfo>&
             ReplaceSpecifiedPos(filteredString, pos.first, pos.second);
             flag = true;
         }
-        delete matcher;
+        if (matcher != nullptr) {
+            delete matcher;
+        }
+        matcher = nullptr;
     } else {
         result.push_back(info);
         ReplaceSpecifiedPos(filteredString, pos.first, pos.second);
@@ -305,6 +322,10 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::GetPossibleNumberInfos(std::s
             }
             result.insert(result.end(), posList.begin(), posList.end());
         }
+        if (delMatch != nullptr) {
+            delete delMatch;
+        }
+        delMatch = nullptr;
     }
     return result;
 }
@@ -359,7 +380,7 @@ bool PhoneNumberMatched::IsNumberWithOneBracket(icu::UnicodeString& message)
 std::vector<int> PhoneNumberMatched::DealResult(std::vector<MatchedNumberInfo>& matchedNumberInfoList)
 {
     std::vector<int> result;
-    int length = matchedNumberInfoList.size();
+    size_t length = matchedNumberInfoList.size();
     if (length == 0) {
         result.push_back(0);
     } else {

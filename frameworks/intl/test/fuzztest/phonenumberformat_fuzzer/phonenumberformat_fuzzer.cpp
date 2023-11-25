@@ -16,6 +16,8 @@
 #include <cstddef>
 #include <cstdint>
 #include "phone_number_format.h"
+#include "phone_number_matched.h"
+#include "phone_number_rule.h"
 #include "phonenumberformat_fuzzer.h"
 
 namespace OHOS {
@@ -33,6 +35,20 @@ namespace OHOS {
         formatter.format(input);
         formatter.getLocationName(input, input);
         PhoneNumberFormat::CreateInstance(input, options);
+
+
+        PhoneNumberMatched phoneNumberMatched(input);
+        phoneNumberMatched.GetMatchedPhoneNumber(input);
+        phoneNumberMatched.GetCountry();
+
+        PhoneNumberRule phoneNumberRule(input);
+        phoneNumberRule.Init();
+        phoneNumberRule.GetBorderRules();
+        phoneNumberRule.GetCodesRules();
+        phoneNumberRule.GetPositiveRules();
+        phoneNumberRule.GetNegativeRules();
+        icu::UnicodeString message(input.c_str());
+        phoneNumberRule.HandleShortPhoneNumbers(message, input);
         return true;
     }
 }
