@@ -302,7 +302,8 @@ void DateTimeFormat::InitDateFormat(UErrorCode &status)
     dateIntvFormat = DateIntervalFormat::createInstance(pattern, locale, status);
 }
 
-void DateTimeFormat::SetDayPeriod() {
+void DateTimeFormat::SetDayPeriod()
+{
     if (dayPeriod == "short") {
         pattern.findAndReplace(icu::UnicodeString::fromUTF8(StringPiece("a")),
             icu::UnicodeString::fromUTF8(StringPiece("B")));
