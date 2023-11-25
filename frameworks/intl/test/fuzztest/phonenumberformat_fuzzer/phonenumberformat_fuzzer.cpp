@@ -36,10 +36,9 @@ namespace OHOS {
         formatter.getLocationName(input, input);
         PhoneNumberFormat::CreateInstance(input, options);
 
-
         PhoneNumberMatched phoneNumberMatched(input);
-        phoneNumberMatched.GetMatchedPhoneNumber(input);
-        phoneNumberMatched.GetCountry();
+        icu::UnicodeString message(input.c_str());
+        phoneNumberMatched.GetMatchedPhoneNumber(message);
 
         PhoneNumberRule phoneNumberRule(input);
         phoneNumberRule.Init();
@@ -47,8 +46,7 @@ namespace OHOS {
         phoneNumberRule.GetCodesRules();
         phoneNumberRule.GetPositiveRules();
         phoneNumberRule.GetNegativeRules();
-        icu::UnicodeString message(input.c_str());
-        phoneNumberRule.HandleShortPhoneNumbers(message, input);
+        phoneNumberRule.GetFindRules();
         return true;
     }
 }
