@@ -35,7 +35,7 @@ ohos_fuzztest("EntityRecongnizerFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "relativetimeformat_fuzzer.cpp" ]
+  sources = [ "entityrecongnizer_fuzzer.cpp" ]
   configs = []
 
   deps = [
