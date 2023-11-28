@@ -17,7 +17,6 @@
 #include <cstdint>
 #include <string>
 #include "plural_rules.h"
-#include "index_util.h"
 #include "pluralrules_fuzzer.h"
 
 namespace OHOS {
@@ -34,11 +33,6 @@ namespace OHOS {
 
         PluralRules pluralRules(localeTags, options);
         pluralRules.Select(number);
-
-        IndexUtil indexUtil(input);
-        indexUtil.GetIndexList();
-        indexUtil.AddLocale(input);
-        indexUtil.GetIndex(input);
     }
 }
 
