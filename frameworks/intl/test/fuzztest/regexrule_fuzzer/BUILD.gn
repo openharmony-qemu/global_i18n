@@ -28,6 +28,9 @@ ohos_fuzztest("RegexRuleFuzzTest") {
     "../../../include",
     "//third_party/icu/icu4c/source/common",
     "//third_party/icu/icu4c/source/i18n",
+    "//third_party/libphonenumber/cpp/src",
+    "//third_party/libphonenumber",
+    "//third_party/protobuf/src",
   ]
   cflags = [
     "-g",
@@ -42,6 +45,7 @@ ohos_fuzztest("RegexRuleFuzzTest") {
     "../../../../intl:intl_util",
     "//third_party/icu/icu4c:shared_icui18n",
     "//third_party/icu/icu4c:shared_icuuc",
+    "//third_party/libphonenumber/cpp:phonenumber_standard",
   ]
 
   subsystem_name = "global"
