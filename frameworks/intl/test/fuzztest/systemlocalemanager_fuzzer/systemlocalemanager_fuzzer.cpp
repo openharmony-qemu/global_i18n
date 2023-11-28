@@ -24,7 +24,7 @@ namespace OHOS {
     {
         using namespace Global::I18n;
         if (size < 1) {
-            return false;
+            return;
         }
         std::string input(reinterpret_cast<const char*>(data), size);
         std::vector<std::string> languages;
@@ -32,11 +32,12 @@ namespace OHOS {
 
         std::string systemLocale = LocaleConfig::GetSystemLocale();
         SortOptions sortOptions = {systemLocale, true, true};
-        SystemLocaleManager systemLocaleManager = new SystemLocaleManager();
+        SystemLocaleManager* systemLocaleManager = new SystemLocaleManager();
         
-        systemLocaleManager.GetLanguageInfoArray(languages, sortOptions);
-        systemLocaleManager.GetCountryInfoArray(languages, sortOptions);
-        systemLocaleManager.GetTimezoneCityInfoArray();
+        systemLocaleManager->GetLanguageInfoArray(languages, sortOptions);
+        systemLocaleManager->GetCountryInfoArray(languages, sortOptions);
+        systemLocaleManager->GetTimezoneCityInfoArray();
+        delete systemLocaleManager;
     }
 }
 

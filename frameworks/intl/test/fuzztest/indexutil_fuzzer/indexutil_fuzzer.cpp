@@ -25,7 +25,6 @@ namespace OHOS {
         using namespace Global::I18n;
 
         std::string input(reinterpret_cast<const char*>(data), size);
-        double number = static_cast<double>(data[0]);
 
         IndexUtil indexUtil(input);
         indexUtil.GetIndexList();

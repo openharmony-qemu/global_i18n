@@ -37,10 +37,11 @@ namespace OHOS {
         RulesSet ruleSet = {rulesMap, subRules, param, paramBackup};
 
         DateTimeRule* dateTimeRule = new DateTimeRule(input);
-        RulesEngine rulesEngine = new RulesEngine(dateTimeRule, ruleSet);
-        icu::UnicodeString message(input);
-        rulesEngine.Match(message);
+        RulesEngine* rulesEngine = new RulesEngine(dateTimeRule, ruleSet);
+        icu::UnicodeString message(input.c_str());
+        rulesEngine->Match(message);
         delete dateTimeRule;
+        delete rulesEngine;
         return true;
     }
 }

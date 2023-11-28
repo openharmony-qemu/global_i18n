@@ -28,7 +28,6 @@ namespace OHOS {
             return;
         }
         std::string input(reinterpret_cast<const char*>(data), size);
-        double number = static_cast<double>(data[0]);
 
         I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
         I18nNormalizer i18nNormalizer(I18nNormalizerMode::NFC, errorCode);
