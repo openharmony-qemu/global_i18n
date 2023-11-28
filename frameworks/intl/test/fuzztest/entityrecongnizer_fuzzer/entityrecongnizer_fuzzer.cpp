@@ -30,8 +30,9 @@ namespace OHOS {
         UErrorCode status = U_ZERO_ERROR;
         std::string systemLocale = LocaleConfig::GetSystemLocale();
         icu::Locale locale = icu::Locale::forLanguageTag(systemLocale, status);
-        EntityRecognizer entityRecongnizer = EntityRecognizer(locale);
-        entityRecongnizer.FindEntityInfo(input);
+        EntityRecognizer* entityRecongnizer = new EntityRecognizer(locale);
+        entityRecongnizer->FindEntityInfo(input);
+        delete entityRecongnizer;
         return true;
     }
 }

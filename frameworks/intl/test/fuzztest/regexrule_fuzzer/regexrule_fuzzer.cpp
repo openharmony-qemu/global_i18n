@@ -24,25 +24,28 @@ namespace OHOS {
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
         using namespace Global::I18n;
+        using namespace i18n::phonenumbers;
         if (size < 1) {
             return false;
         }
         std::string input(reinterpret_cast<const char*>(data), size);
-        icu::UnicodeString regex(input);
-        RegexRule regexRule = new RegexRule(regex, input, input, input, input);
+        icu::UnicodeString regex(input.c_str());
+        RegexRule* regexRule = new RegexRule(regex, input, input, input, input);
 
-        regexRule.GetType();
-        regexRule.GetPattern();
-        PhoneNumber phoneNumber;
-        PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil::GetInstance();
+        regexRule->GetType();
+        regexRule->GetPattern();
+        i18n::phonenumbers::PhoneNumber phoneNumber;
+        PhoneNumberUtil* phoneNumberUtil = i18n::phonenumbers::PhoneNumberUtil::GetInstance();
         std::string country = LocaleConfig::GetSystemRegion();
-        phoneNumberUtil.Parse(input, country, &phoneNumber);
+        phoneNumberUtil->Parse(input, country, &phoneNumber);
 
         PhoneNumberMatch* possibleNumber = new PhoneNumberMatch(size, input, phoneNumber);
-        regexRule.Handle(possibleNumber, input);
-        regexRule.IsValid(possibleNumber, input);
-        regexRule.CountDigits(regex);
+        regexRule->Handle(possibleNumber, regex);
+        regexRule->IsValid(possibleNumber, regex);
+        regexRule->CountDigits(regex);
+        delete phoneNumberUtil;
         delete possibleNumber;
+        delete regexRule;
         return true;
     }
 }
