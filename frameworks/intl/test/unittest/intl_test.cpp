@@ -2272,7 +2272,7 @@ HWTEST_F(IntlTest, IntlFuncTest0060, TestSize.Level1)
     EXPECT_TRUE(flag);
     flag = holiday_manager->IsHoliday();
     EXPECT_TRUE(!flag);
-    unlink(path);
+    std::unlink(path);
     delete holiday_manager;
 }
 
@@ -2330,8 +2330,8 @@ HWTEST_F(IntlTest, IntlFuncTest062, TestSize.Level1)
 }
 
 /**
- * @tc.name: IntlFuncTest0062
- * @tc.desc: Test Intl utils.cpp
+ * @tc.name: IntlFuncTest0063
+ * @tc.desc: Test Intl RegexRule
  * @tc.type: FUNC
  */
 HWTEST_F(IntlTest, IntlFuncTest063, TestSize.Level1)
