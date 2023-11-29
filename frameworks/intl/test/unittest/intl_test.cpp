@@ -44,6 +44,7 @@
 #include "utils.h"
 #include "intl_test.h"
 #include "generate_ics_file.h"
+#include <unistd.h>
 
 using namespace OHOS::Global::I18n;
 using testing::ext::TestSize;
@@ -2271,7 +2272,7 @@ HWTEST_F(IntlTest, IntlFuncTest0060, TestSize.Level1)
     EXPECT_TRUE(flag);
     flag = holiday_manager->IsHoliday();
     EXPECT_TRUE(!flag);
-    remove(path);
+    unlink(path);
     delete holiday_manager;
 }
 
