@@ -113,9 +113,6 @@ std::string PhoneNumberFormat::format(const std::string &number) const
 
 std::string PhoneNumberFormat::getLocationName(const std::string &number, const std::string &locale)
 {
-    if (!isValidPhoneNumber(number)) {
-        return "";
-    }
     // Combine country and locale parameters
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale displayLocale = icu::Locale::createFromName(locale.c_str());

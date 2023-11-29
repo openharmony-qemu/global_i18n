@@ -37,6 +37,7 @@
 #include "relative_time_format.h"
 #include "system_locale_manager.h"
 #include "taboo_utils.h"
+#include "taboo.h"
 #include "utils.h"
 #include "intl_test.h"
 
@@ -2041,6 +2042,10 @@ HWTEST_F(IntlTest, IntlFuncTest0053, TestSize.Level1)
     std::string number = "+8618622350085";
     std::string formated = phoneNumberFormat->format(number);
     EXPECT_EQ(formated, "186 2235 0085");
+    std::string location2 = phoneNumberFormat->getLocationName("fake number", "zh-CN");
+    EXPECT_EQ(location2, "");
+    phoneNumberFormat->getBlockedRegionName();
+    phoneNumberFormat->getCityName();
     delete phoneNumberFormat;
 }
 
@@ -2056,7 +2061,11 @@ HWTEST_F(IntlTest, IntlFuncTest0054, TestSize.Level1)
     EXPECT_EQ(res1, "China");
     std::string res2 = tabooUtils->ReplaceLanguageName("zh", "en", "chinese");
     EXPECT_EQ(res2, "chinese");
+    std::string res3 = tabooUtils->ReplaceCountryName("TW", "zh-Hans", "中国台湾");
+    EXPECT_EQ(res3, "中国台湾");
     delete tabooUtils;
+    Taboo* taboo = new Taboo();
+    delete taboo;
 }
 
 /**
@@ -2279,6 +2288,29 @@ HWTEST_F(IntlTest, IntlFuncTest061, TestSize.Level1)
     EXPECT_EQ(out, expects);
     EXPECT_EQ(numFmt->GetStyle(), style);
     delete numFmt;
+}
+
+/**
+ * @tc.name: IntlFuncTest0062
+ * @tc.desc: Test Intl utils.cpp
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest062, TestSize.Level1)
+{
+    string locale = "en-CN";
+    string emptyStr = "";
+    string sep = ";";
+    vector<string> dest;
+    std::unordered_set<std::string> allValidLocalesLanguageTag;
+    Split(emptyStr, sep, dest);
+    int32_t status = 0;
+    string numberStr = "12345678901234567890123456789012345678901234567890987654321";
+    ConvertString2Int(numberStr, status);
+    icu::Locale locale("fake tag");
+    bool isValid = IsValidLocaleTag(locale);
+    EXPECT_TRUE(!isValid);
+    GetAllValidLocalesTag(allValidLocalesLanguageTag);
+    EXPECT_TRUE(allValidLocalesLanguageTag.size() > 0);
 }
 } // namespace I18n
 } // namespace Global

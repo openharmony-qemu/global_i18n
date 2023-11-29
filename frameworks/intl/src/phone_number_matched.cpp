@@ -44,18 +44,9 @@ PhoneNumberMatched::PhoneNumberMatched(std::string& country)
 
 PhoneNumberMatched::~PhoneNumberMatched()
 {
-    if (phoneNumberRule != nullptr) {
-        delete phoneNumberRule;
-    }
-    phoneNumberRule = nullptr;
-    if (phoneNumberUtil != nullptr) {
-        delete phoneNumberUtil;
-    }
-    phoneNumberUtil = nullptr;
-    if (shortNumberInfo != nullptr) {
-        delete shortNumberInfo;
-    }
-    shortNumberInfo = nullptr;
+    delete phoneNumberRule;
+    delete phoneNumberUtil;
+    delete shortNumberInfo;
 }
 
 std::vector<int> PhoneNumberMatched::GetMatchedPhoneNumber(icu::UnicodeString& message)
@@ -93,10 +84,7 @@ std::vector<int> PhoneNumberMatched::DealWithoutFixed(icu::UnicodeString& messag
             info.SetContent(content);
             result.push_back(info);
         }
-        if (match != nullptr) {
-            delete match;
-        }
-        match = nullptr;
+        delete match;
     }
     std::vector<MatchedNumberInfo> shortResult = FindShortNumbers(country, message);
     // Merge result
@@ -116,10 +104,13 @@ icu::UnicodeString PhoneNumberMatched::HandleNegativeRule(icu::UnicodeString& sr
     std::vector<RegexRule*> rules = phoneNumberRule->GetNegativeRules();
     icu::UnicodeString ret = src;
     for (RegexRule* rule : rules) {
+        if (rule == nullptr) {
+            continue;
+        }
         icu::RegexPattern* pattern = rule->GetPattern();
         UErrorCode status = U_ZERO_ERROR;
         icu::RegexMatcher* matcher = pattern->matcher(ret, status);
-        while (matcher->find(status)) {
+        while (matcher != nullptr && matcher->find(status)) {
             int start = matcher->start(status);
             int end = matcher->end(status);
             ReplaceSpecifiedPos(ret, start, end);
@@ -177,10 +168,7 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::FindShortNumbers(std::string&
             matchedNumberInfoList.push_back(matcher);
         }
     }
-    if (shortMatch != nullptr) {
-        delete shortMatch;
-    }
-    shortMatch = nullptr;
+    delete shortMatch;
     return matchedNumberInfoList;
 }
 
@@ -322,10 +310,7 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::GetPossibleNumberInfos(std::s
             }
             result.insert(result.end(), posList.begin(), posList.end());
         }
-        if (delMatch != nullptr) {
-            delete delMatch;
-        }
-        delMatch = nullptr;
+        delete delMatch;
     }
     return result;
 }
