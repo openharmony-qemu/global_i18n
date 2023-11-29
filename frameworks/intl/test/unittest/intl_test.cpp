@@ -2272,7 +2272,6 @@ HWTEST_F(IntlTest, IntlFuncTest0060, TestSize.Level1)
     EXPECT_TRUE(flag);
     flag = holiday_manager->IsHoliday();
     EXPECT_TRUE(!flag);
-    std::unlink(path);
     delete holiday_manager;
 }
 
@@ -2351,10 +2350,10 @@ HWTEST_F(IntlTest, IntlFuncTest063, TestSize.Level1)
 
     i18n::phonenumbers::PhoneNumber phoneNumber;
     PhoneNumberUtil* phoneNumberUtil = i18n::phonenumbers::PhoneNumberUtil::GetInstance();
-    std::string input = "(010111111111111;ext=0782";
+    std::string input = "[010111111111111;ext=0782";
     std::string country = "CN";
     size_t size = input.length();
-    phoneNumberUtil->Parse(input, country, &phoneNumber);
+    phoneNumberUtil->ParseAndKeepRawInput(input, country, &phoneNumber);
     PhoneNumberMatch* possibleNumber = new PhoneNumberMatch(size, input, phoneNumber);
     PhoneNumberMatch* phoneNumberMatch = regexRule2->IsValid(possibleNumber, message);
     EXPECT_TRUE(phoneNumberMatch != nullptr);
