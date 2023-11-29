@@ -1086,9 +1086,9 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
     }
     uint32_t width, height;
     GetTzDataWidth(filePaths, &width, &height);
-    double calculateX = y * (width / TZ_X_PLUS * 0.1) + width / TZ_HALF_OF_SIZE * 0.1;
+    double calculateX = y * width / (TZ_X_PLUS * 0.1) + width / (TZ_HALF_OF_SIZE * 0.1);
     double calculateY = x * ((height * fileCount) / (TZ_X_PLUS * TZ_HALF_OF_SIZE * 0.1)) +
-                        (height * fileCount) / TZ_HALF_OF_SIZE * 0.1;
+                        (height * fileCount) / (TZ_HALF_OF_SIZE * 0.1);
     uint16_t fixedX = static_cast<uint16_t>(calculateX);
     uint16_t fixedY = static_cast<uint16_t>(calculateY);
     if (ParamExceedScope(fixedX, fixedY, width, height * fileCount)) {
