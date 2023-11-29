@@ -264,10 +264,7 @@ bool PhoneNumberMatched::HandleWithShortAndShort(std::vector<MatchedNumberInfo>&
             ReplaceSpecifiedPos(filteredString, pos.first, pos.second);
             flag = true;
         }
-        if (matcher != nullptr) {
-            delete matcher;
-        }
-        matcher = nullptr;
+        delete matcher;
     } else {
         result.push_back(info);
         ReplaceSpecifiedPos(filteredString, pos.first, pos.second);
