@@ -597,6 +597,7 @@ HWTEST_F(I18nTest, I18nFuncTest016, TestSize.Level1)
     EXPECT_EQ(res[0][0], 1);
     EXPECT_EQ(res[0][1], 32);
     EXPECT_EQ(res[0][2], 43);
+    delete m;
 }
 
 /**
@@ -617,6 +618,7 @@ HWTEST_F(I18nTest, I18nFuncTest017, TestSize.Level1)
     EXPECT_EQ(res[0][2], 43);
     EXPECT_EQ(res[0][3], 44);
     EXPECT_EQ(res[0][4], 55);
+    delete m;
 }
 
 /**
@@ -635,6 +637,7 @@ HWTEST_F(I18nTest, I18nFuncTest018, TestSize.Level1)
     EXPECT_EQ(res[0][0], 1);
     EXPECT_EQ(res[0][1], 68);
     EXPECT_EQ(res[0][2], 87);
+    delete m;
 }
 
 /**
@@ -653,6 +656,7 @@ HWTEST_F(I18nTest, I18nFuncTest019, TestSize.Level1)
     EXPECT_EQ(res[0][0], 1);
     EXPECT_EQ(res[0][1], 84);
     EXPECT_EQ(res[0][2], 90);
+    delete m;
 }
 
 /**
@@ -669,6 +673,7 @@ HWTEST_F(I18nTest, I18nFuncTest020, TestSize.Level1)
     EntityRecognizer* m = new EntityRecognizer(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[0][0], 0);
+    delete m;
 }
 
 /**
@@ -685,6 +690,7 @@ HWTEST_F(I18nTest, I18nFuncTest021, TestSize.Level1)
     EntityRecognizer* m = new EntityRecognizer(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[0][0], 0);
+    delete m;
 }
 
 /**
@@ -705,6 +711,7 @@ HWTEST_F(I18nTest, I18nFuncTest022, TestSize.Level1)
     EXPECT_EQ(res[0][2], 30);
     EXPECT_EQ(res[0][3], 49);
     EXPECT_EQ(res[0][4], 60);
+    delete m;
 }
 
 /**
@@ -725,6 +732,7 @@ HWTEST_F(I18nTest, I18nFuncTest023, TestSize.Level1)
     EXPECT_EQ(res[0][2], 6);
     EXPECT_EQ(res[0][3], 7);
     EXPECT_EQ(res[0][4], 12);
+    delete m;
 }
 
 /**
@@ -743,6 +751,7 @@ HWTEST_F(I18nTest, I18nFuncTest024, TestSize.Level1)
     EXPECT_EQ(res[0][0], 1);
     EXPECT_EQ(res[0][1], 32);
     EXPECT_EQ(res[0][2], 45);
+    delete m;
 }
 
 /**
@@ -763,6 +772,7 @@ HWTEST_F(I18nTest, I18nFuncTest025, TestSize.Level1)
     EXPECT_EQ(res[0][2], 43);
     EXPECT_EQ(res[0][3], 44);
     EXPECT_EQ(res[0][4], 55);
+    delete m;
 }
 
 /**
@@ -779,6 +789,7 @@ HWTEST_F(I18nTest, I18nFuncTest026, TestSize.Level1)
     EntityRecognizer* m = new EntityRecognizer(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[0][0], 0);
+    delete m;
 }
 
 /**
@@ -799,6 +810,7 @@ HWTEST_F(I18nTest, I18nFuncTest027, TestSize.Level1)
     EXPECT_EQ(res[0][2], 49);
     EXPECT_EQ(res[0][3], 53);
     EXPECT_EQ(res[0][4], 57);
+    delete m;
 }
 
 /**
@@ -817,6 +829,7 @@ HWTEST_F(I18nTest, I18nFuncTest028, TestSize.Level1)
     EXPECT_EQ(res[0][0], 1);
     EXPECT_EQ(res[0][1], 0);
     EXPECT_EQ(res[0][2], 19);
+    delete m;
 }
 
 /**
@@ -835,6 +848,7 @@ HWTEST_F(I18nTest, I18nFuncTest029, TestSize.Level1)
     EXPECT_EQ(res[0][0], 1);
     EXPECT_EQ(res[0][1], 29);
     EXPECT_EQ(res[0][2], 48);
+    delete m;
 }
 
 /**
@@ -853,6 +867,7 @@ HWTEST_F(I18nTest, I18nFuncTest030, TestSize.Level1)
     EXPECT_EQ(res[0][0], 1);
     EXPECT_EQ(res[0][1], 25);
     EXPECT_EQ(res[0][2], 42);
+    delete m;
 }
 
 /**
@@ -873,6 +888,7 @@ HWTEST_F(I18nTest, I18nFuncTest031, TestSize.Level1)
     EXPECT_EQ(res[0][2], 12);
     EXPECT_EQ(res[0][3], 13);
     EXPECT_EQ(res[0][4], 18);
+    delete m;
 }
 
 /**
@@ -891,6 +907,7 @@ HWTEST_F(I18nTest, I18nFuncTest032, TestSize.Level1)
     EXPECT_EQ(res[0][0], 1);
     EXPECT_EQ(res[0][1], 41);
     EXPECT_EQ(res[0][2], 56);
+    delete m;
 }
 
 /**
@@ -909,6 +926,7 @@ HWTEST_F(I18nTest, I18nFuncTest033, TestSize.Level1)
     EXPECT_EQ(res[0][0], 1);
     EXPECT_EQ(res[0][1], 55);
     EXPECT_EQ(res[0][2], 60);
+    delete m;
 }
 
 /**
@@ -929,6 +947,7 @@ HWTEST_F(I18nTest, I18nFuncTest034, TestSize.Level1)
     EXPECT_EQ(res[1][2], 7);
     EXPECT_EQ(res[1][3], 14);
     EXPECT_EQ(res[1][4], 22);
+    delete m;
 }
 
 /**
@@ -949,6 +968,7 @@ HWTEST_F(I18nTest, I18nFuncTest035, TestSize.Level1)
     EXPECT_EQ(res[1][2], 13);
     EXPECT_EQ(res[1][3], 22);
     EXPECT_EQ(res[1][4], 44);
+    delete m;
 }
 
 /**
@@ -967,6 +987,7 @@ HWTEST_F(I18nTest, I18nFuncTest036, TestSize.Level1)
     EXPECT_EQ(res[1][0], 1);
     EXPECT_EQ(res[1][1], 22);
     EXPECT_EQ(res[1][2], 41);
+    delete m;
 }
 
 /**
@@ -987,6 +1008,7 @@ HWTEST_F(I18nTest, I18nFuncTest037, TestSize.Level1)
     EXPECT_EQ(res[1][2], 17);
     EXPECT_EQ(res[1][3], 26);
     EXPECT_EQ(res[1][4], 46);
+    delete m;
 }
 
 /**
@@ -1030,6 +1052,7 @@ HWTEST_F(I18nTest, I18nFuncTest039, TestSize.Level1)
     EXPECT_EQ(res[1][2], 23);
     EXPECT_EQ(res[1][3], 30);
     EXPECT_EQ(res[1][4], 43);
+    delete m;
 }
 
 /**
@@ -1050,6 +1073,7 @@ HWTEST_F(I18nTest, I18nFuncTest040, TestSize.Level1)
     EXPECT_EQ(res[1][2], 41);
     EXPECT_EQ(res[1][3], 62);
     EXPECT_EQ(res[1][4], 75);
+    delete m;
 }
 
 /**
@@ -1066,6 +1090,7 @@ HWTEST_F(I18nTest, I18nFuncTest041, TestSize.Level1)
     EntityRecognizer* m = new EntityRecognizer(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[1][0], 0);
+    delete m;
 }
 
 /**
@@ -1086,6 +1111,7 @@ HWTEST_F(I18nTest, I18nFuncTest042, TestSize.Level1)
     EXPECT_EQ(res[1][2], 54);
     EXPECT_EQ(res[1][3], 70);
     EXPECT_EQ(res[1][4], 83);
+    delete m;
 }
 } // namespace I18n
 } // namespace Global
