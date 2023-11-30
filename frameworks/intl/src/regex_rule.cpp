@@ -492,7 +492,6 @@ std::vector<MatchedNumberInfo> RegexRule::GetNumbersWithSlant(icu::UnicodeString
         matchedNumberInfoEnd.SetContent(contentEnd);
         shortList.push_back(matchedNumberInfoEnd);
     }
-    delete pnu;
     delete shortInfo;
     return shortList;
 }
