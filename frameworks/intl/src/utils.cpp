@@ -91,7 +91,6 @@ void GetAllValidLocalesTag(std::unordered_set<std::string>& allValidLocalesLangu
     for (int i = 0; i < validCount; i++) {
         allValidLocalesLanguageTag.insert(validLocales[i].getLanguage());
     }
-    delete[] validLocales;
     init = true;
 }
 } // namespace I18n
