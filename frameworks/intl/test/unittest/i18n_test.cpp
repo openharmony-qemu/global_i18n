@@ -1087,6 +1087,90 @@ HWTEST_F(I18nTest, I18nFuncTest042, TestSize.Level1)
     EXPECT_EQ(res[1][3], 70);
     EXPECT_EQ(res[1][4], 83);
 }
+
+/**
+ * @tc.name: I18nFuncTest043
+ * @tc.desc: Test I18n EntityRecognizer
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest043, TestSize.Level1)
+{
+    std::string localeStr = "zh-CN";
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
+    // std::string message = "2023年1月2日至3日周三是一个好日子，上午可以11：00：00（周三）去逛街";
+    std::string message = "2023年1月2日至3日是一个好日子,12：00：00（2023年1月3日）一起吃饭。";
+    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::vector<std::vector<int>> res = m->FindEntityInfo(message);
+    EXPECT_EQ(res[1][0], 2);
+    EXPECT_EQ(res[1][1], 0);
+    EXPECT_EQ(res[1][2], 12);
+    EXPECT_EQ(res[1][3], 19);
+    EXPECT_EQ(res[1][4], 38);
+}
+
+/**
+ * @tc.name: I18nFuncTest044
+ * @tc.desc: Test I18n EntityRecognizer
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest044, TestSize.Level1)
+{
+    std::string localeStr = "zh-CN";
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
+    std::string message = "(2023年1月1日)12:00:00聚会,2023年1月2日，16：00：00返回深圳。";
+    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::vector<std::vector<int>> res = m->FindEntityInfo(message);
+    EXPECT_EQ(res[1][0], 2);
+    EXPECT_EQ(res[1][1], 0);
+    EXPECT_EQ(res[1][2], 19);
+    EXPECT_EQ(res[1][3], 22);
+    EXPECT_EQ(res[1][4], 40);
+}
+
+
+/**
+ * @tc.name: I18nFuncTest045
+ * @tc.desc: Test I18n EntityRecognizer
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest045, TestSize.Level1)
+{
+    std::string localeStr = "zh-CN";
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
+    std::string message = "2023年1月3日(今天(本周五))和2023年1月3日(12：00：00)是指同一天";
+    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::vector<std::vector<int>> res = m->FindEntityInfo(message);
+    EXPECT_EQ(res[1][0], 3);
+    EXPECT_EQ(res[1][1], 0);
+    EXPECT_EQ(res[1][2], 17);
+    EXPECT_EQ(res[1][3], 19);
+    EXPECT_EQ(res[1][4], 28);
+    EXPECT_EQ(res[1][5], 29);
+    EXPECT_EQ(res[1][6], 37);
+}
+
+/**
+ * @tc.name: I18nFuncTest046
+ * @tc.desc: Test I18n EntityRecognizer
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest046, TestSize.Level1)
+{
+    std::string localeStr = "zh-CN";
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
+    std::string message = "2023年1月3日今天(本周五)在7：00：00的2023年1月3日可以看日出";
+    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::vector<std::vector<int>> res = m->FindEntityInfo(message);
+    EXPECT_EQ(res[1][0], 2);
+    EXPECT_EQ(res[1][1], 0);
+    EXPECT_EQ(res[1][2], 16);
+    EXPECT_EQ(res[1][3], 17);
+    EXPECT_EQ(res[1][4], 34);
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
