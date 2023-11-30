@@ -19,7 +19,9 @@
 
 #include "character.h"
 #include "collator.h"
+#include "date_time_filter.h"
 #include "date_time_format.h"
+#include "date_time_rule.h"
 #include "holiday_manager.h"
 #include "i18n_break_iterator.h"
 #include "i18n_calendar.h"
@@ -34,11 +36,15 @@
 #include "phone_number_format.h"
 #include "plural_rules.h"
 #include "preferred_language.h"
+#include "regex_rule.h"
 #include "relative_time_format.h"
 #include "system_locale_manager.h"
 #include "taboo_utils.h"
+#include "taboo.h"
 #include "utils.h"
 #include "intl_test.h"
+#include "generate_ics_file.h"
+#include <unistd.h>
 
 using namespace OHOS::Global::I18n;
 using testing::ext::TestSize;
@@ -80,7 +86,7 @@ HWTEST_F(IntlTest, IntlFuncTest001, TestSize.Level1)
     locales.push_back("jessie");
     locales.push_back(locale);
     map<string, string> options = { { "year", "numeric" },
-                                    { "month", "long" },
+                                    { "month", "narrow" },
                                     { "day", "numeric" },
                                     { "hour", "numeric" },
                                     { "minute", "2-digit" },
@@ -96,7 +102,7 @@ HWTEST_F(IntlTest, IntlFuncTest001, TestSize.Level1)
     string out = dateFormat->Format(milliseconds);
     EXPECT_EQ(out, expects);
     EXPECT_EQ(dateFormat->GetYear(), "numeric");
-    EXPECT_EQ(dateFormat->GetMonth(), "long");
+    EXPECT_EQ(dateFormat->GetMonth(), "narrow");
     EXPECT_EQ(dateFormat->GetDay(), "numeric");
     EXPECT_EQ(dateFormat->GetHour(), "numeric");
     EXPECT_EQ(dateFormat->GetMinute(), "2-digit");
@@ -432,7 +438,8 @@ HWTEST_F(IntlTest, IntlFuncTest0012, TestSize.Level1)
     EXPECT_EQ(out, expects);
     options = {
         { "dateStyle", "long" },
-        { "hourCycle", "h11" }
+        { "hourCycle", "h11" },
+        { "hour12", "fakeValue" }
     };
     DateTimeFormat *dateFormatH11 = new (std::nothrow) DateTimeFormat(locales, options);
     options.insert({ "hourCycle", "h12" });
@@ -447,9 +454,15 @@ HWTEST_F(IntlTest, IntlFuncTest0012, TestSize.Level1)
     delete dateFormatH24;
     locales.clear();
     DateTimeFormat *dateFormatEmpty = new (std::nothrow) DateTimeFormat(locales, options);
-    locales.push_back("fake locale");
-    options = {};
+    locales.push_back("@@@&&");
+    options = { { "dayPeriod", "short" } };
     DateTimeFormat *dateFormatFake = new (std::nothrow) DateTimeFormat(locales, options);
+    options.insert({ "dayPeriod", "long" });
+    DateTimeFormat *dateFormatDayPeriod = new (std::nothrow) DateTimeFormat(locales, options);
+    delete dateFormatDayPeriod;
+    options.insert({ "dayPeriod", "narrow" });
+    DateTimeFormat *dateFormatDayPeriod2 = new (std::nothrow) DateTimeFormat(locales, options);
+    delete dateFormatDayPeriod2;
     options.insert({ "dateStyle", "long" });
     DateTimeFormat *dateFormatFake2 = new (std::nothrow) DateTimeFormat(locales, options);
     delete dateFormatEmpty;
@@ -515,14 +528,14 @@ HWTEST_F(IntlTest, IntlFuncTest0015, TestSize.Level1)
     vector<string> locales;
     locales.push_back("jessie");
     locales.push_back(locale);
-    map<string, string> options = { { "timeZone", "America/Los_Angeles"  }, { "timeZoneName", "long" } };
+    map<string, string> options = { { "timeZone", "America/Los_Angeles"  }, { "timeZoneName", "short" } };
     DateTimeFormat *dateFormat = new (std::nothrow) DateTimeFormat(locales, options);
     if (!dateFormat) {
         EXPECT_TRUE(false);
         return;
     }
     EXPECT_EQ(dateFormat->GetTimeZone(), "America/Los_Angeles");
-    EXPECT_EQ(dateFormat->GetTimeZoneName(), "long");
+    EXPECT_EQ(dateFormat->GetTimeZoneName(), "short");
     delete dateFormat;
 }
 
@@ -688,7 +701,7 @@ HWTEST_F(IntlTest, IntlFuncTest0019, TestSize.Level1)
 {
     // abnormal test case
     vector<string> locales;
-    locales.push_back("fake locale");
+    locales.push_back("7776@");
     map<string, string> inputOptions = {
         { "localeMatcher", "fake value" },
         { "usage", "fake value"},
@@ -737,7 +750,7 @@ HWTEST_F(IntlTest, IntlFuncTest0020, TestSize.Level1)
 {
     // abnormal test case
     vector<string> locales;
-    locales.push_back("fake locale");
+    locales.push_back("$$##");
     map<string, string> inputOptions = {
         { "ignorePunctuation", "fake value" },
         { "collation", "fake value"},
@@ -881,7 +894,7 @@ HWTEST_F(IntlTest, IntlFuncTest0024, TestSize.Level1)
     // abnormal test cast
     // normal test case
     vector<string> locales;
-    locales.push_back("fake_locale");
+    locales.push_back("$$$###");
     map<string, string> options = {
         { "fake_localeMatcher", "best fit" },
         { "type", "fake_cardinal" },
@@ -1099,8 +1112,8 @@ HWTEST_F(IntlTest, IntlFuncTest0028, TestSize.Level1)
 HWTEST_F(IntlTest, IntlFuncTest0029, TestSize.Level1)
 {
     vector<string> locales;
-    locales.push_back("xxxx");
-    locales.push_back("zh-Hans");
+    locales.push_back("####");
+    locales.push_back("zh-Hans-u-nu-latn");
     map<string, string> options = {
         { "localeMatcher", "best fit" },
         { "numeric", "auto" },
@@ -1139,15 +1152,22 @@ HWTEST_F(IntlTest, IntlFuncTest0030, TestSize.Level1)
 {
     vector<string> locales;
     locales.push_back("en-US");
-    map<string, string> options;
+    map<string, string> options = {
+        { "unitUsage", "default" }
+    };
     NumberFormat *formatter = new NumberFormat(locales, options);
     
     string res = formatter->Format(123);
     EXPECT_EQ(res, "123");
     res = formatter->Format(123.456);
     EXPECT_EQ(res, "123.456");
-    
+    locales.clear();
+    locales.push_back("$$@@");
+    NumberFormat *formatter2 = new NumberFormat(locales, options);
+    string res2 = formatter2->Format(123);
+    EXPECT_EQ(res2, "123");
     delete formatter;
+    delete formatter2;
 }
 
 /**
@@ -1271,7 +1291,7 @@ HWTEST_F(IntlTest, IntlFuncTest0033, TestSize.Level1)
     vector<string> locales;
     locales.push_back("zh-Hans");
     map<string, string> options = {
-        { "locale", "fake locale" },
+        { "locale", "@@##" },
         { "currency", "fake currency" },
         { "currencySign", "fake sign" },
         { "currencyDisplay", "symbol" },
@@ -1319,7 +1339,7 @@ HWTEST_F(IntlTest, IntlFuncTest0034, TestSize.Level1)
     vector<string> locales;
     locales.push_back("en-US");
     map<string, string> options = {
-        { "locale", "fake locale" },
+        { "locale", "$$$##43" },
         { "currency", "USD" },
         { "currencySign", "symbol" },
         { "currencyDisplay", "symbol" },
@@ -1546,7 +1566,6 @@ HWTEST_F(IntlTest, IntlFuncTest0039, TestSize.Level1)
         { "dateStyle", "medium" },
         { "timeStyle", "long" },
         { "hourCycle", "h12" },
-        { "timeZone", "Asia/Shanghai" },
         { "numberingSystem", "latn" },
         { "hour12", "true" },
         { "weekday", "long" },
@@ -1951,7 +1970,7 @@ HWTEST_F(IntlTest, IntlFuncTest0050, TestSize.Level1)
 {
     const std::string langugae = "zh-CN";
     const std::string langugaeDe = "de-DE";
-    const std::string fakeLangugae = "fake-language";
+    const std::string fakeLangugae = "1**1";
     I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
     PreferredLanguage::AddPreferredLanguage(langugae, 0, errorCode);
     EXPECT_TRUE(errorCode != I18nErrorCode::SUCCESS);
@@ -2041,6 +2060,8 @@ HWTEST_F(IntlTest, IntlFuncTest0053, TestSize.Level1)
     std::string number = "+8618622350085";
     std::string formated = phoneNumberFormat->format(number);
     EXPECT_EQ(formated, "186 2235 0085");
+    std::string location2 = phoneNumberFormat->getLocationName("fake-number", "zh-CN");
+    EXPECT_EQ(location2, "");
     delete phoneNumberFormat;
 }
 
@@ -2056,7 +2077,11 @@ HWTEST_F(IntlTest, IntlFuncTest0054, TestSize.Level1)
     EXPECT_EQ(res1, "China");
     std::string res2 = tabooUtils->ReplaceLanguageName("zh", "en", "chinese");
     EXPECT_EQ(res2, "chinese");
+    std::string res3 = tabooUtils->ReplaceCountryName("TW", "zh-Hans", "中国台湾");
+    EXPECT_EQ(res3, "中国台湾");
     delete tabooUtils;
+    Taboo* taboo = new Taboo();
+    delete taboo;
 }
 
 /**
@@ -2099,7 +2124,7 @@ HWTEST_F(IntlTest, IntlFuncTest0055, TestSize.Level1)
     EXPECT_EQ(resultHashEn, 8);
     int32_t resultHashQaagEn = LocaleCompare::Compare("en-Qaag-WS", "en-001");
     EXPECT_EQ(resultHashQaagEn, 8);
-    I18nBreakIterator *breakIterator = new I18nBreakIterator("fake locale");
+    I18nBreakIterator *breakIterator = new I18nBreakIterator("2--**");
     breakIterator->Current();
     breakIterator->First();
     breakIterator->Last();
@@ -2215,13 +2240,17 @@ HWTEST_F(IntlTest, IntlFuncTest0058, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest0059, TestSize.Level1)
 {
-    std::vector<std::string> localeTags = { "fake locale tag"};
+    std::vector<std::string> localeTags = { "$$@@#" };
     std::map<std::string, std::string> configs = {
         {"style", "unit"}, {"unit", "fake unit"}
     };
     NumberFormat formatter(localeTags, configs);
     std::string res = formatter.Format(12);
     EXPECT_EQ(res, "12");
+    localeTags = { "zh-Hans-u-nu-latn" };
+    NumberFormat* format = new (std::nothrow) NumberFormat(localeTags, configs);
+    EXPECT_EQ(res, format->Format(12));
+    delete format;
 }
 
 /**
@@ -2231,7 +2260,8 @@ HWTEST_F(IntlTest, IntlFuncTest0059, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest0060, TestSize.Level1)
 {
-    std::string path = "/system/lib/TR.ics";
+    IcsFileWriter icsFileWriter;
+    std::string path = icsFileWriter.GenerateFile();
     HolidayManager *holiday_manager = new HolidayManager(path.c_str());
     std::map<std::string, std::vector<HolidayInfoItem>> holidayDataMap;
     std::vector<HolidayInfoItem> infoList;
@@ -2279,6 +2309,69 @@ HWTEST_F(IntlTest, IntlFuncTest061, TestSize.Level1)
     EXPECT_EQ(out, expects);
     EXPECT_EQ(numFmt->GetStyle(), style);
     delete numFmt;
+}
+
+/**
+ * @tc.name: IntlFuncTest0062
+ * @tc.desc: Test Intl utils.cpp
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest062, TestSize.Level1)
+{
+    string emptyStr = "";
+    string sep = ";";
+    vector<string> dest;
+    std::unordered_set<std::string> allValidLocalesLanguageTag;
+    Split(emptyStr, sep, dest);
+    int32_t status = 0;
+    string numberStr = "12345678901234567890123456789012345678901234567890987654321";
+    ConvertString2Int(numberStr, status);
+    icu::Locale locale("$$$$5%%%");
+    bool isValid = IsValidLocaleTag(locale);
+    EXPECT_TRUE(!isValid);
+    GetAllValidLocalesTag(allValidLocalesLanguageTag);
+    EXPECT_TRUE(allValidLocalesLanguageTag.size() == 0);
+
+    std::string localeRule = "zh-Hans";
+    DateTimeRule* dateTimeRule = new DateTimeRule(localeRule);
+    DateTimeFilter* dateTimeFilter = new DateTimeFilter(localeRule, dateTimeRule);
+    delete dateTimeFilter;
+    delete dateTimeRule;
+}
+
+/**
+ * @tc.name: IntlFuncTest0063
+ * @tc.desc: Test Intl RegexRule
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest063, TestSize.Level1)
+{
+    using namespace i18n::phonenumbers;
+    string regexStr = "[a-z]1?";
+    icu::UnicodeString regex(regexStr.c_str());
+    std::string isValidType = "PrexxxxSuf";
+    std::string handleType = "EndWithMobile";
+    std::string insensitive = "False";
+    std::string type = "xxx";
+    RegexRule* regexRule = new RegexRule(regex, isValidType, handleType, insensitive, type);
+    handleType = "fake";
+    isValidType = "Code";
+    RegexRule* regexRule2 = new RegexRule(regex, isValidType, handleType, insensitive, type);
+    icu::UnicodeString message(type.c_str());
+
+    i18n::phonenumbers::PhoneNumber phoneNumber;
+    PhoneNumberUtil* phoneNumberUtil = i18n::phonenumbers::PhoneNumberUtil::GetInstance();
+    std::string input = "[010111111111111;ext=0782";
+    std::string country = "CN";
+    size_t size = input.length();
+    phoneNumberUtil->ParseAndKeepRawInput(input, country, &phoneNumber);
+    PhoneNumberMatch* possibleNumber = new PhoneNumberMatch(size, input, phoneNumber);
+    PhoneNumberMatch* phoneNumberMatch = regexRule2->IsValid(possibleNumber, message);
+    EXPECT_TRUE(phoneNumberMatch != nullptr);
+    delete phoneNumberUtil;
+    delete phoneNumberMatch;
+    delete regexRule;
+    delete regexRule2;
 }
 } // namespace I18n
 } // namespace Global
