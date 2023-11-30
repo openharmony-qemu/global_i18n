@@ -357,21 +357,7 @@ bool LocaleConfig::SetSystemLanguage(const string &language)
     std::string oldLanguage = GetSystemLanguage();
     if (SetParameter(LANGUAGE_KEY, language.data()) == 0) {
         bool isUpdateSuccess = UpdateSystemLocale(language);
-        if (isUpdateSuccess) {
-#ifdef SUPPORT_GRAPHICS
-        auto appMgrClient = std::make_unique<AppExecFwk::AppMgrClient>();
-        AppExecFwk::Configuration configuration;
-        configuration.AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE, language);
-        appMgrClient->UpdateConfiguration(configuration);
-
-        OHOS::AAFwk::Want localeChangeWant;
-        localeChangeWant.SetAction(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED);
-        OHOS::EventFwk::CommonEventData event(localeChangeWant);
-        if (!OHOS::EventFwk::CommonEventManager::PublishCommonEvent(event)) {
-            HiLog::Info(LABEL, "Failed to Publish event %{public}s", localeChangeWant.GetAction().c_str());
-            return false;
-        }
-#endif
+        if (isUpdateSuccess && updateLocal(language)) {
             return true;
         } else {
             SetParameter(LANGUAGE_KEY, oldLanguage.data());
@@ -410,7 +396,10 @@ bool LocaleConfig::SetSystemRegion(const string &region)
             return false;
         }
     }
-    return SetParameter(LOCALE_KEY, newLocale.data()) == 0;
+    if (SetParameter(LOCALE_KEY, newLocale.data()) == 0 && updateLocal(newLocale)) {
+        return true;
+    }
+    return false;
 }
 
 bool LocaleConfig::SetSystemLocale(const string &locale)
@@ -421,7 +410,30 @@ bool LocaleConfig::SetSystemLocale(const string &locale)
     if (!IsValidTag(locale)) {
         return false;
     }
-    return SetParameter(LOCALE_KEY, locale.data()) == 0;
+    if (SetParameter(LOCALE_KEY, locale.data()) == 0 && updateLocal(locale)) {
+        return true;
+    }
+    return false;
+}
+
+bool LocaleConfig::updateLocal(const string &locale) {
+#ifdef SUPPORT_GRAPHICS
+    auto appMgrClient = std::make_unique<AppExecFwk::AppMgrClient>();
+        AppExecFwk::Configuration configuration;
+        configuration.AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE, locale);
+        appMgrClient->UpdateConfiguration(configuration);
+
+        OHOS::AAFwk::Want localeChangeWant;
+        localeChangeWant.SetAction(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED);
+        OHOS::EventFwk::CommonEventData event(localeChangeWant);
+        if (!OHOS::EventFwk::CommonEventManager::PublishCommonEvent(event)) {
+            HiLog::Error(LABEL, "Failed to Publish event %{public}s", localeChangeWant.GetAction().c_str());
+            return false;
+        } else {
+            return true;
+        }
+#endif
+    return false;
 }
 
 bool LocaleConfig::IsValidLanguage(const string &language)

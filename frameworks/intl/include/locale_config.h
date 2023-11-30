@@ -141,6 +141,7 @@ private:
     static std::set<std::string> validHcTag;
     static bool listsInitialized;
     static bool InitializeLists();
+    static bool updateLocal(const std::string &locale);
 };
 } // namespace I18n
 } // namespace Global
