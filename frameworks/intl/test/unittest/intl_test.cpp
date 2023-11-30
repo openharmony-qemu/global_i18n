@@ -1152,15 +1152,22 @@ HWTEST_F(IntlTest, IntlFuncTest0030, TestSize.Level1)
 {
     vector<string> locales;
     locales.push_back("en-US");
-    map<string, string> options;
+    map<string, string> options = {
+        { "unitUsage", "default" }
+    };
     NumberFormat *formatter = new NumberFormat(locales, options);
     
     string res = formatter->Format(123);
     EXPECT_EQ(res, "123");
     res = formatter->Format(123.456);
     EXPECT_EQ(res, "123.456");
-    
+    locales.clear();
+    locales.push_back("$$@@");
+    NumberFormat *formatter2 = new NumberFormat(locales, options);
+    string res2 = formatter2->Format(123);
+    EXPECT_EQ(res2, "123");
     delete formatter;
+    delete formatter2;
 }
 
 /**
@@ -2233,13 +2240,17 @@ HWTEST_F(IntlTest, IntlFuncTest0058, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest0059, TestSize.Level1)
 {
-    std::vector<std::string> localeTags = { "$$@@#"};
+    std::vector<std::string> localeTags = { "$$@@#" };
     std::map<std::string, std::string> configs = {
         {"style", "unit"}, {"unit", "fake unit"}
     };
     NumberFormat formatter(localeTags, configs);
     std::string res = formatter.Format(12);
     EXPECT_EQ(res, "12");
+    localeTags = { "zh-Hans-u-nu-latn" };
+    NumberFormat* format = new (std::nothrow) NumberFormat(localeTags, configs);
+    EXPECT_EQ(res, format->Format(12));
+    delete format;
 }
 
 /**

@@ -32,11 +32,11 @@ IcsFileWriter::~IcsFileWriter()
 std::string IcsFileWriter::GenerateFile()
 {
     using namespace std;
-    std::string filePath = "/system/lib/TR.ics";
-    ofstream fstream;
-    fstream.open(filePath, ios::out);
-    if (!fstream) {
-        printf("file is noll\r\n");
+    std::string filePath = "/data/log/TR.ics";
+    ofstream fstream(filePath);
+    //fstream.open(filePath, ios::out);
+    if (!fstream.is_open()) {
+        printf("file can't access.\r\n");
         return filePath;
     }
     std::vector<std::string> list = {
@@ -59,7 +59,7 @@ std::string IcsFileWriter::GenerateFile()
         "END:VCALENDAR\r\n"
     };
     for (size_t i = 0; i < list.size(); i++) {
-        fstream.write(list[i].c_str(), sizeof(list[i]));
+        fstream << list[i] << endl;
     }
     
     fstream.close();
