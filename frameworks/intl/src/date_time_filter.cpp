@@ -187,24 +187,9 @@ std::vector<MatchedDateTimeInfo> DateTimeFilter::FilterOverlaySecond(std::vector
                 valid = false;
                 matchIterator++;
                 continue;
-            } else if (!(currentMatch.GetBegin() < match.GetBegin() && match.GetBegin() < currentMatch.GetEnd() &&
-                currentMatch.GetEnd() < match.GetEnd()) && !(match.GetBegin() < currentMatch.GetBegin() &&
-                currentMatch.GetBegin() < match.GetEnd() && match.GetEnd() < currentMatch.GetEnd())) {
+            } else {
                 matchIterator++;
                 continue;
-            }
-            std::string currentRegex = currentMatch.GetRegex();
-            std::string matchRegex = match.GetRegex();
-            if (this->dateTimeRule == nullptr) {
-                HiLog::Error(LABEL, "FilterOverlaySecond failed because this->dateTimeRule is nullptr.");
-                return matchList;
-            }
-            // if the matched time segments overlap, retain the high-priority.
-            if (this->dateTimeRule->CompareLevel(currentRegex, matchRegex) > -1) {
-                valid = false;
-                matchIterator++;
-            } else {
-                matchList.erase(matchIterator);
             }
         }
         if (valid) {
@@ -450,7 +435,7 @@ bool DateTimeFilter::DealBrackets(icu::UnicodeString& content, std::vector<Match
             return false;
         }
         icu::UnicodeString groupStr;
-        if (matcher->matches(status)) {
+        if (matcher->find(status)) {
             groupStr = matcher->group(1, status);
             add = matcher->group(status).length();
         }
