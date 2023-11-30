@@ -738,9 +738,6 @@ std::string I18nTimeZone::GetDisplayNameByTaboo(const std::string& localeStr, st
         getReplacedTimezoneDisplayName(localeStr.c_str(), GetID().c_str(), recvArr);
     }
     result = recvArr;
-#ifndef SUPPORT_ASAN
-    dlclose(i18nUtilHandle);
-#endif
     return result;
 }
 

@@ -45,7 +45,6 @@ PhoneNumberMatched::PhoneNumberMatched(std::string& country)
 PhoneNumberMatched::~PhoneNumberMatched()
 {
     delete phoneNumberRule;
-    delete phoneNumberUtil;
     delete shortNumberInfo;
 }
 
@@ -168,7 +167,6 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::FindShortNumbers(std::string&
             matchedNumberInfoList.push_back(matcher);
         }
     }
-    delete shortMatch;
     return matchedNumberInfoList;
 }
 
@@ -264,7 +262,6 @@ bool PhoneNumberMatched::HandleWithShortAndShort(std::vector<MatchedNumberInfo>&
             ReplaceSpecifiedPos(filteredString, pos.first, pos.second);
             flag = true;
         }
-        delete matcher;
     } else {
         result.push_back(info);
         ReplaceSpecifiedPos(filteredString, pos.first, pos.second);
@@ -454,12 +451,12 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::HandlePositiveRule(PhoneNumbe
         icu::RegexPattern* pattern = rule->GetPattern();
         UErrorCode status = U_ZERO_ERROR;
         icu::RegexMatcher* mat1 = pattern->matcher(str, status);
-        if (mat1->find(status)) {
+        if (mat1 != nullptr && mat1->find(status)) {
             std::vector<MatchedNumberInfo> infoList = rule->Handle(match, message);
             return infoList;
         }
         icu::RegexMatcher* mat2 = pattern->matcher(message, status);
-        if (mat2->find(status)) {
+        if (mat2 != nullptr &&mat2->find(status)) {
             std::vector<MatchedNumberInfo> infoList = rule->Handle(match, message);
             if (infoList.size() == 0) {
                 continue;

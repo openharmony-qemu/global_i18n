@@ -516,7 +516,6 @@ std::vector<MatchedNumberInfo> RegexRule::HandlePossibleNumberWithPattern(icu::R
             matchedList.push_back(info);
         }
     }
-    delete mat;
     return matchedList;
 }
 } // namespace I18n
