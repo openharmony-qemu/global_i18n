@@ -46,11 +46,11 @@ PhoneNumberRule::PhoneNumberRule(std::string& country)
 
 PhoneNumberRule::~PhoneNumberRule()
 {
-    //FreePointer(negativeRules);
-    //FreePointer(positiveRules);
-    //FreePointer(borderRules);
-    //FreePointer(codesRules);
-    //FreePointer(findRules);
+    FreePointer(negativeRules);
+    FreePointer(positiveRules);
+    FreePointer(borderRules);
+    FreePointer(codesRules);
+    FreePointer(findRules);
 }
 
 void PhoneNumberRule::FreePointer(std::vector<RegexRule*> &ruleList)
