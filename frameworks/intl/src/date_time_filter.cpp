@@ -30,6 +30,7 @@ DateTimeFilter::DateTimeFilter(std::string& locale, DateTimeRule* dateTimeRule)
 
 DateTimeFilter::~DateTimeFilter()
 {
+    delete dateTimeRule;
 }
 
 // type of the time calculated based on the rule number.
@@ -309,7 +310,6 @@ std::vector<MatchedDateTimeInfo> DateTimeFilter::FilterDateTime(icu::UnicodeStri
         MatchedDateTimeInfo lastMatch = matches[lastMatchIndex];
         int lType = lastMatch.GetType();
         int cType = match.GetType();
-        bool isJoiner = false;
         if ((lType == FilterType::TYPE_DATE && cType == FilterType::TYPE_TIME) ||
             (lType == FilterType::TYPE_DATE && cType == FilterType::TYPE_TIME_PERIOD && match.IsTimePeriod()) ||
             (lType == FilterType::TYPE_TIME && cType == FilterType::TYPE_DATE) ||
@@ -317,7 +317,8 @@ std::vector<MatchedDateTimeInfo> DateTimeFilter::FilterDateTime(icu::UnicodeStri
             // truncate the substring between two times.
             icu::UnicodeString joiner = content.tempSubString(lastMatch.GetEnd(),
                 match.GetBegin() - lastMatch.GetEnd());
-            isJoiner = (joiner.trim().isEmpty()) ? true : pattern->matcher(joiner, status)->matches(status);
+            icu::RegexMatcher* matcher = pattern->matcher(joiner, status);
+            bool isJoiner = (joiner.trim().isEmpty()) ? true : matcher->matches(status);
             // the substring meets the rule, the two times are combined.
             if (isJoiner) {
                 matches[lastMatchIndex].SetEnd(match.GetEnd());
@@ -330,6 +331,7 @@ std::vector<MatchedDateTimeInfo> DateTimeFilter::FilterDateTime(icu::UnicodeStri
             } else {
                 isDelete = DealBrackets(content, matches, matchIndex, matches[lastMatchIndex], match);
             }
+            delete matcher;
         }
         if (!isDelete) {
             lastMatchIndex = matchIndex;
@@ -402,11 +404,11 @@ std::vector<MatchedDateTimeInfo> DateTimeFilter::FilterDateTimePunc(icu::Unicode
         MatchedDateTimeInfo currentMatch =  matches[currentMatchIndex];
         int cType = currentMatch.GetType();
         int lType = match.GetType();
-        bool isPunc = false;
         if ((cType == FilterType::TYPE_DATE && lType == FilterType::TYPE_TIME) ||
             (cType == FilterType::TYPE_DATE && lType == FilterType::TYPE_TIME_PERIOD && match.IsTimePeriod()) ||
             (cType == FilterType::TYPE_TIME && lType == FilterType::TYPE_DATE) ||
             (cType == FilterType::TYPE_TIME_PERIOD && currentMatch.IsTimePeriod() && lType == FilterType::TYPE_DATE)) {
+            bool isPunc = false;
             icu::UnicodeString ss = content.tempSubString(currentMatch.GetEnd(),
                 match.GetBegin() - currentMatch.GetEnd());
             if (ss.trim() == ',' || ss.trim() == "，") {
@@ -500,13 +502,13 @@ int DateTimeFilter::GetResult(icu::UnicodeString& content, MatchedDateTimeInfo& 
     MatchedDateTimeInfo& nextMatch, std::vector<MatchedDateTimeInfo>& matches)
 {
     int result = 0;
-    bool isThree = false;
     icu::UnicodeString ss = content.tempSubString(current.GetEnd(), nextMatch.GetBegin() - current.GetEnd());
     if (this->dateTimeRule == nullptr) {
         HiLog::Error(LABEL, "GetResult failed because this->dateTimeRule is nullptr.");
         return result;
     }
     if (this->dateTimeRule->IsRelDates(ss, this->locale) || ss.trim() == '(') {
+        bool isThree = false;
         if (matches.size() > 1) {
             std::vector<MatchedDateTimeInfo> nextMatches(matches.begin() + 1, matches.end());
             int connect = NestDealDate(content, nextMatch, nextMatches, current.GetType());

@@ -114,6 +114,7 @@ icu::UnicodeString PhoneNumberMatched::HandleNegativeRule(icu::UnicodeString& sr
             int end = matcher->end(status);
             ReplaceSpecifiedPos(ret, start, end);
         }
+        delete matcher;
     }
     return ret;
 }
@@ -167,6 +168,7 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::FindShortNumbers(std::string&
             matchedNumberInfoList.push_back(matcher);
         }
     }
+    delete shortMatch;
     return matchedNumberInfoList;
 }
 
@@ -236,6 +238,7 @@ std::vector<PhoneNumberMatch*> PhoneNumberMatched::FindNumbers(std::string& coun
             AddPhoneNumber(lastStr, searchStart + start, matchList, country);
         }
     }
+    delete numberMatcher;
     return matchList;
 }
 
@@ -262,6 +265,7 @@ bool PhoneNumberMatched::HandleWithShortAndShort(std::vector<MatchedNumberInfo>&
             ReplaceSpecifiedPos(filteredString, pos.first, pos.second);
             flag = true;
         }
+        delete matcher;
     } else {
         result.push_back(info);
         ReplaceSpecifiedPos(filteredString, pos.first, pos.second);
@@ -409,6 +413,7 @@ bool PhoneNumberMatched::HandleBorderRule(PhoneNumberMatch* match, icu::UnicodeS
                 return false;
             }
         }
+        delete mat;
     }
     return true;
 }
@@ -453,16 +458,20 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::HandlePositiveRule(PhoneNumbe
         icu::RegexMatcher* mat1 = pattern->matcher(str, status);
         if (mat1 != nullptr && mat1->find(status)) {
             std::vector<MatchedNumberInfo> infoList = rule->Handle(match, message);
+            delete mat1;
             return infoList;
         }
+        delete mat1;
         icu::RegexMatcher* mat2 = pattern->matcher(message, status);
-        if (mat2 != nullptr &&mat2->find(status)) {
+        if (mat2 != nullptr && mat2->find(status)) {
             std::vector<MatchedNumberInfo> infoList = rule->Handle(match, message);
             if (infoList.size() == 0) {
                 continue;
             }
+            delete mat2;
             return infoList;
         }
+        delete mat2;
     }
     return {};
 }

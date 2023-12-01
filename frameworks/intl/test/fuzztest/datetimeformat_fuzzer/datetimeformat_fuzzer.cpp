@@ -51,6 +51,7 @@ namespace OHOS {
         dateTimeFormat.GetSecond();
         std::unique_ptr<DateTimeFormat> dtFormat =
                 DateTimeFormat::CreateInstance(localeTags, configs);
+        dtFormat->Format(size);
     }
 }
 

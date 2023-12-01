@@ -38,6 +38,15 @@ RulesEngine::RulesEngine(DateTimeRule* dateTimeRule, RulesSet& rulesSet)
 
 RulesEngine::~RulesEngine()
 {
+    std::unordered_map<std::string, icu::RegexPattern*>::iterator iter = patterns.begin();
+    for (iter = patterns.begin(); iter != patterns.end(); ++iter) {
+        icu::RegexPattern* pattern = iter->second;
+        if (pattern != nullptr) {
+            delete pattern;
+        }
+        pattern = nullptr;
+    }
+    delete dateTimeRule;
 }
 
 // match message based on patterns.
@@ -68,6 +77,7 @@ std::vector<MatchedDateTimeInfo> RulesEngine::Match(icu::UnicodeString& message)
             MatchedDateTimeInfo match(begin, end, key);
             matches.push_back(match);
         }
+        delete matcher;
     }
     return matches;
 }
@@ -75,7 +85,7 @@ std::vector<MatchedDateTimeInfo> RulesEngine::Match(icu::UnicodeString& message)
 void RulesEngine::Init()
 {
     UErrorCode status = U_ZERO_ERROR;
-    for (auto& rule : rulesMap) {
+    for (const auto& rule : rulesMap) {
         std::string rulesKey = rule.first;
         std::string rulesValue = rule.second;
         rulesValue = InitSubRules(rulesValue);
@@ -94,6 +104,10 @@ void RulesEngine::Init()
 bool RulesEngine::InitRules(std::string& rulesValue)
 {
     bool isVaild = true;
+    if (this->dateTimeRule == nullptr) {
+        HiLog::Error(LABEL, "InitRules failed because this->dateTimeRule is nullptr.");
+        return false;
+    }
     icu::RegexPattern* pattern = dateTimeRule->GetPatternsMap()["rules"];
     if (pattern == nullptr) {
         HiLog::Error(LABEL, "InitRules failed because pattern is nullptr.");
@@ -111,10 +125,6 @@ bool RulesEngine::InitRules(std::string& rulesValue)
             icu::UnicodeString value = matcher->group(1, status);
             std::string valueStr;
             value.toUTF8String(valueStr);
-            if (this->dateTimeRule == nullptr) {
-                HiLog::Error(LABEL, "InitRules failed because this->dateTimeRule is nullptr.");
-                return false;
-            }
             std::string paramValue = this->dateTimeRule->Get(param, valueStr);
             std::string paramBackupValue = this->dateTimeRule->Get(paramBackup, valueStr);
             std::string targetStr =
@@ -140,6 +150,10 @@ std::string RulesEngine::InitOptRules(std::string& rule)
     std::string rulesValue = rule;
     icu::UnicodeString matchedStr = rule.c_str();
     UErrorCode status = U_ZERO_ERROR;
+    if (this->dateTimeRule == nullptr) {
+        HiLog::Error(LABEL, "InitOptRules failed because this->dateTimeRule is nullptr.");
+        return rulesValue;
+    }
     icu::RegexPattern* pattern = dateTimeRule->GetPatternsMap()["optrules"];
     if (pattern == nullptr) {
         HiLog::Error(LABEL, "InitOptRules failed because pattern is nullptr.");
@@ -158,10 +172,6 @@ std::string RulesEngine::InitOptRules(std::string& rule)
             std::string value = "param_" + keyStr;
             int begin = matcher->start(status);
             int end = matcher->end(status);
-            if (this->dateTimeRule == nullptr) {
-                HiLog::Error(LABEL, "InitOptRules failed because this->dateTimeRule is nullptr.");
-                return rulesValue;
-            }
             std::string paramValue = this->dateTimeRule->Get(param, value);
             std::string paramBackupValue = this->dateTimeRule->Get(paramBackup, value);
             std::string targetStr = paramValue;

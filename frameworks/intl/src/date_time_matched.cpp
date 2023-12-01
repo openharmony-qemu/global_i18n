@@ -30,7 +30,7 @@ DateTimeMatched::DateTimeMatched(std::string& locale)
 
 DateTimeMatched::~DateTimeMatched()
 {
-    dateRuleInit = nullptr;
+    delete dateRuleInit;
 }
 
 std::vector<int> DateTimeMatched::GetMatchedDateTime(icu::UnicodeString& message)
