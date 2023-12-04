@@ -1101,7 +1101,6 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
         //255 is invalid pixel value required
         if (pixel[i] != TZ_MAX_PIXEL_VALUE && categoryMap.find(pixel[i]) != categoryMap.end()) {
             std::string zdId = categoryMap[pixel[i]];
-            HiLog::Error(LABEL, "zdd:  zdId: %{public}s ", zdId.c_str());
             tzIdList.push_back(zdId);
         }
     }
