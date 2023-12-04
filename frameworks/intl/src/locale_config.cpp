@@ -416,7 +416,8 @@ bool LocaleConfig::SetSystemLocale(const string &locale)
     return false;
 }
 
-bool LocaleConfig::updateLocal(const string &locale) {
+bool LocaleConfig::updateLocal(const string &locale)
+{
 #ifdef SUPPORT_GRAPHICS
     auto appMgrClient = std::make_unique<AppExecFwk::AppMgrClient>();
         AppExecFwk::Configuration configuration;
