@@ -60,10 +60,6 @@ RegexRule::RegexRule(icu::UnicodeString& regex, std::string& isValidType, std::s
 
 RegexRule::~RegexRule()
 {
-    if (pattern != nullptr) {
-        delete pattern;
-    }
-    pattern = nullptr;
 }
 
 int RegexRule::CountDigits(icu::UnicodeString& str)

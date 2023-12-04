@@ -38,15 +38,6 @@ RulesEngine::RulesEngine(DateTimeRule* dateTimeRule, RulesSet& rulesSet)
 
 RulesEngine::~RulesEngine()
 {
-    std::unordered_map<std::string, icu::RegexPattern*>::iterator iter = patterns.begin();
-    for (iter = patterns.begin(); iter != patterns.end(); ++iter) {
-        icu::RegexPattern* pattern = iter->second;
-        if (pattern != nullptr) {
-            delete pattern;
-        }
-        pattern = nullptr;
-    }
-    delete dateTimeRule;
 }
 
 // match message based on patterns.

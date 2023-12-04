@@ -1086,13 +1086,13 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
     }
     uint32_t width, height;
     GetTzDataWidth(filePaths, &width, &height);
-    double calculateX = y * width / (TZ_X_PLUS * 0.1) + width / (TZ_HALF_OF_SIZE * 0.1);
-    double calculateY = x * ((height * fileCount) / (TZ_X_PLUS * TZ_HALF_OF_SIZE * 0.1)) +
-                        (height * fileCount) / (TZ_HALF_OF_SIZE * 0.1);
+    double calculateX = y * width / (TZ_X_PLUS * 1.0) + width / (TZ_HALF_OF_SIZE * 1.0);
+    double calculateY = x * ((height * fileCount) / (TZ_X_PLUS * TZ_HALF_OF_SIZE * 1.0)) +
+                        (height * fileCount) / (TZ_HALF_OF_SIZE * 1.0);
     uint16_t fixedX = static_cast<uint16_t>(calculateX);
     uint16_t fixedY = static_cast<uint16_t>(calculateY);
     if (ParamExceedScope(fixedX, fixedY, width, height * fileCount)) {
-        HiLog::Error(LABEL, "invalid width:%{public}d or height: %{public}d ", fixedX, fixedY);
+        HiLog::Error(LABEL, "invalid width:%{public}d or height: %{public}d", fixedX, fixedY);
         return tzIdList;
     }
     uint16_t actualHeight = fileCount > 1 ? (fixedY % height) : fixedY;
@@ -1101,6 +1101,7 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
         //255 is invalid pixel value required
         if (pixel[i] != TZ_MAX_PIXEL_VALUE && categoryMap.find(pixel[i]) != categoryMap.end()) {
             std::string zdId = categoryMap[pixel[i]];
+            HiLog::Error(LABEL, "zdd:  zdId: %{public}s ", zdId.c_str());
             tzIdList.push_back(zdId);
         }
     }
@@ -1123,16 +1124,16 @@ std::map<int, std::string> I18nTimeZone::GetTimeZoneCategoryMap(const double x, 
 
 bool I18nTimeZone::CheckLatitudeAndLongitude(const double x, const double y)
 {
-    if (x < -1 * TZ_X_PLUS) {
+    if (x < -1.0 * TZ_X_PLUS) {
         return false;
     }
-    if (x >= TZ_X_PLUS - 0.1) {
+    if (x >= TZ_X_PLUS*1.0 - 0.1) {
         return false;
     }
-    if (y < -1 * TZ_X_PLUS/TZ_HALF_OF_SIZE) {
+    if (y < -1.0 * TZ_X_PLUS/TZ_HALF_OF_SIZE) {
         return false;
     }
-    if (y >= TZ_X_PLUS/TZ_HALF_OF_SIZE - 0.1) {
+    if (y >= TZ_X_PLUS*1.0/TZ_HALF_OF_SIZE - 0.1) {
         return false;
     }
     return true;

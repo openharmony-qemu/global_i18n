@@ -30,7 +30,6 @@ DateTimeFilter::DateTimeFilter(std::string& locale, DateTimeRule* dateTimeRule)
 
 DateTimeFilter::~DateTimeFilter()
 {
-    delete dateTimeRule;
 }
 
 // type of the time calculated based on the rule number.
