@@ -17,8 +17,6 @@
 #ifdef SUPPORT_GRAPHICS
 #include "app_mgr_client.h"
 #include "ability_manager_client.h"
-#include "configuration.h"
-#include <common_event_data.h>
 #include <common_event_manager.h>
 #include <common_event_publish_info.h>
 #include <common_event_support.h>
@@ -84,6 +82,7 @@ const char *LocaleConfig::rootTag = "languages";
 const char *LocaleConfig::secondRootTag = "lang";
 const char *LocaleConfig::rootRegion = "regions";
 const char *LocaleConfig::secondRootRegion = "region";
+const char *LocaleConfig::NUMBER_SYSTEM_KEY = "-nu-";
 unordered_set<string> LocaleConfig::supportedLocales;
 unordered_set<string> LocaleConfig::supportLocales;
 unordered_set<string> LocaleConfig::supportedRegions;
@@ -320,123 +319,6 @@ string LocaleConfig::GetSystemLocale()
     return systemLocale;
 }
 
-bool LocaleConfig::CheckPermission()
-{
-    uint64_t tokenId = IPCSkeleton::GetCallingFullTokenID();
-    bool isSystemApp = OHOS::Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(tokenId);
-    if (!isSystemApp) {
-        HiLog::Info(LABEL,
-            "LocaleConfig::CheckPermission: Get permission failed, because current app is not system app");
-        return false;
-    }
-    Security::AccessToken::AccessTokenID callerToken = IPCSkeleton::GetCallingTokenID();
-    int result = Security::AccessToken::PermissionState::PERMISSION_GRANTED;
-    if (Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken) ==
-        Security::AccessToken::ATokenTypeEnum::TOKEN_HAP) {
-        result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken,
-                                                                          "ohos.permission.UPDATE_CONFIGURATION");
-    } else {
-        HiLog::Info(LABEL, "Invlid tokenID");
-        return false;
-    }
-    if (result != Security::AccessToken::PermissionState::PERMISSION_GRANTED) {
-        HiLog::Info(LABEL, "Verify permission failed");
-        return false;
-    }
-    return true;
-}
-
-bool LocaleConfig::SetSystemLanguage(const string &language)
-{
-    if (!CheckPermission()) {
-        return false;
-    }
-    if (!IsValidTag(language)) {
-        return false;
-    }
-    std::string oldLanguage = GetSystemLanguage();
-    if (SetParameter(LANGUAGE_KEY, language.data()) == 0) {
-        bool isUpdateSuccess = UpdateSystemLocale(language);
-        if (isUpdateSuccess && updateLocal(language)) {
-            return true;
-        } else {
-            SetParameter(LANGUAGE_KEY, oldLanguage.data());
-            return false;
-        }
-    }
-    return false;
-}
-
-bool LocaleConfig::SetSystemRegion(const string &region)
-{
-    if (!CheckPermission()) {
-        return false;
-    }
-    if (!IsValidRegion(region)) {
-        return false;
-    }
-    char value[CONFIG_LEN];
-    int code = GetParameter(LOCALE_KEY, "", value, CONFIG_LEN);
-    string newLocale;
-    if (code > 0) {
-        string tag(value, code);
-        newLocale = GetRegionChangeLocale(tag, region);
-        if (newLocale == "") {
-            return false;
-        }
-    } else {
-        icu::Locale temp("", region.c_str());
-        UErrorCode status = U_ZERO_ERROR;
-        temp.addLikelySubtags(status);
-        if (status != U_ZERO_ERROR) {
-            return false;
-        }
-        newLocale = temp.toLanguageTag<string>(status);
-        if (status != U_ZERO_ERROR) {
-            return false;
-        }
-    }
-    if (SetParameter(LOCALE_KEY, newLocale.data()) == 0 && updateLocal(newLocale)) {
-        return true;
-    }
-    return false;
-}
-
-bool LocaleConfig::SetSystemLocale(const string &locale)
-{
-    if (!CheckPermission()) {
-        return false;
-    }
-    if (!IsValidTag(locale)) {
-        return false;
-    }
-    if (SetParameter(LOCALE_KEY, locale.data()) == 0 && updateLocal(locale)) {
-        return true;
-    }
-    return false;
-}
-
-bool LocaleConfig::updateLocal(const string &locale)
-{
-#ifdef SUPPORT_GRAPHICS
-    auto appMgrClient = std::make_unique<AppExecFwk::AppMgrClient>();
-        AppExecFwk::Configuration configuration;
-        configuration.AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE, locale);
-        appMgrClient->UpdateConfiguration(configuration);
-
-        OHOS::AAFwk::Want localeChangeWant;
-        localeChangeWant.SetAction(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED);
-        OHOS::EventFwk::CommonEventData event(localeChangeWant);
-        if (!OHOS::EventFwk::CommonEventManager::PublishCommonEvent(event)) {
-            HiLog::Error(LABEL, "Failed to Publish event %{public}s", localeChangeWant.GetAction().c_str());
-            return false;
-        } else {
-            return true;
-        }
-#endif
-    return false;
-}
-
 bool LocaleConfig::IsValidLanguage(const string &language)
 {
     string::size_type size = language.size();
@@ -661,23 +543,6 @@ bool LocaleConfig::InitializeLists()
     GetListFromFile(OVERRIDE_SUPPORTED_REGIONS_PATH, OVERRIDE_SUPPORTED_REGIONS_NAME, overrideSupportedRegions);
     GetListFromFile(DIALECT_LANGS_PATH, DIALECT_LANGS_NAME, dialectLang);
     return true;
-}
-
-string LocaleConfig::GetRegionChangeLocale(const string &languageTag, const string &region)
-{
-    UErrorCode status = U_ZERO_ERROR;
-    const icu::Locale origin = icu::Locale::forLanguageTag(languageTag, status);
-    if (status != U_ZERO_ERROR) {
-        return "";
-    }
-    icu::LocaleBuilder builder = icu::LocaleBuilder().setLanguage(origin.getLanguage()).
-        setScript(origin.getScript()).setRegion(region);
-    icu::Locale temp = builder.setExtension('u', "").build(status);
-    if (status != U_ZERO_ERROR) {
-        return "";
-    }
-    string ret = temp.toLanguageTag<string>(status);
-    return (status != U_ZERO_ERROR) ? "" : ret;
 }
 
 string LocaleConfig::GetMainLanguage(const string &language)
@@ -1114,75 +979,6 @@ bool LocaleConfig::Is24HourClock()
     return false;
 }
 
-bool LocaleConfig::Set24HourClock(bool option)
-{
-    if (!CheckPermission()) {
-        return false;
-    }
-    std::string optionStr = "";
-    if (option) {
-        optionStr = "true";
-    } else {
-        optionStr = "false";
-    }
-    if (SetParameter(HOUR_KEY, optionStr.data()) == 0) {
-#ifdef SUPPORT_GRAPHICS
-        auto appMgrClient = std::make_unique<AppExecFwk::AppMgrClient>();
-        AppExecFwk::Configuration configuration;
-        configuration.AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_HOUR, optionStr);
-        appMgrClient->UpdateConfiguration(configuration);
-
-        OHOS::AAFwk::Want timeChangeWant;
-        timeChangeWant.SetAction(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_TIME_CHANGED);
-        OHOS::EventFwk::CommonEventData event(timeChangeWant);
-        if (!OHOS::EventFwk::CommonEventManager::PublishCommonEvent(event)) {
-            HiLog::Info(LABEL, "Failed to Publish event %{public}s", timeChangeWant.GetAction().c_str());
-            return false;
-        }
-#endif
-        return true;
-    }
-    return false;
-}
-
-bool LocaleConfig::SetUsingLocalDigit(bool flag)
-{
-    if (!CheckPermission()) {
-        return false;
-    }
-    std::string locale = GetSystemLocale();
-    LocaleInfo localeInfo(locale);
-    std::string language = localeInfo.GetLanguage();
-    if (localDigitMap.find(language) == localDigitMap.end()) {
-        return false;
-    }
-    std::string numberSystem = "-nu-" + localDigitMap.at(language);
-    if (flag) {
-        if (locale.find("-u-") == std::string::npos) {
-            locale += "-u" + numberSystem;
-        } else if (locale.find("-nu-") == std::string::npos) {
-            locale += numberSystem;
-        } else {
-            std::string oldNumberSystem = "-nu-" + localeInfo.GetNumberingSystem();
-            locale.replace(locale.find("-nu-"), oldNumberSystem.length(), numberSystem);
-        }
-    } else {
-        size_t pos = locale.find(numberSystem);
-        if (pos != std::string::npos) {
-            locale.replace(pos, numberSystem.length(), "");
-        }
-        // 2 is string -u length
-        if (locale.find("-u") == (locale.length() - 2)) {
-            // 2 is string -u length
-            locale.resize(locale.length() - 2);
-        }
-    }
-    if (!SetSystemLocale(locale)) {
-        return false;
-    }
-    return true;
-}
-
 bool LocaleConfig::GetUsingLocalDigit()
 {
     std::string locale = GetSystemLocale();
@@ -1196,43 +992,6 @@ bool LocaleConfig::GetUsingLocalDigit()
         return false;
     }
     return true;
-}
-
-bool LocaleConfig::UpdateSystemLocale(const std::string &language)
-{
-    UErrorCode status = U_ZERO_ERROR;
-    icu::Locale languageLocale = icu::Locale::forLanguageTag(language.c_str(), status);
-    if (U_FAILURE(status)) {
-        return false;
-    }
-    std::string lang = languageLocale.getLanguage();
-    std::string script = languageLocale.getScript();
-
-    std::string systemLocaleTag = GetSystemLocale();
-    icu::Locale systemLocale = icu::Locale::forLanguageTag(systemLocaleTag.c_str(), status);
-    if (U_FAILURE(status)) {
-        return false;
-    }
-    std::string region = systemLocale.getCountry();
-
-    std::string extendParam;
-    size_t pos = systemLocaleTag.find("-u-");
-    if (pos < systemLocaleTag.length()) {
-        extendParam = systemLocaleTag.substr(pos);
-    }
-
-    std::string finalLocaleTag = lang;
-    std::string splitor = "-";
-    if (script.length() > 0) {
-        finalLocaleTag += splitor + script;
-    }
-    if (region.length() > 0) {
-        finalLocaleTag += splitor + region;
-    }
-    if (extendParam.length() > 0) {
-        finalLocaleTag += extendParam;
-    }
-    return SetSystemLocale(finalLocaleTag);
 }
 
 std::unordered_set<std::string> LocaleConfig::GetBlockedLanguages()
@@ -1253,6 +1012,247 @@ std::unordered_set<std::string> LocaleConfig::GetLanguageBlockedRegions()
     }
     std::unordered_set<std::string> emptyResult;
     return emptyResult;
+}
+
+I18nErrorCode LocaleConfig::SetSystemLanguage(const std::string &languageTag)
+{
+    if (!IsValidTag(languageTag)) {
+        HiLog::Error(LABEL, "LocaleConfig::SetSystemLanguage %{public}s is not valid language tag.",
+            languageTag.c_str());
+        return I18nErrorCode::INVALID_LANGUAGE_TAG;
+    }
+    // save old language, reset system language to old language if update locale failed.
+    std::string oldLanguageTag = GetSystemLanguage();
+    if (SetParameter(LANGUAGE_KEY, languageTag.data()) != 0) {
+        HiLog::Error(LABEL, "LocaleConfig::SetSystemLanguage update system language failed.");
+        return I18nErrorCode::UPDATE_SYSTEM_LANGUAGE_FAILED;
+    }
+    std::string newLocaleTag = UpdateLanguageOfLocale(languageTag);
+    if (SetSystemLocale(newLocaleTag) == I18nErrorCode::SUCCESS) {
+        return I18nErrorCode::SUCCESS;
+    }
+    // reset system language to old language in case that system language is inconsist with system locale's lanuage.
+    HiLog::Error(LABEL, "LocaleConfig::SetSystemLanguage update system locale failed.");
+    SetParameter(LANGUAGE_KEY, oldLanguageTag.data());
+    return I18nErrorCode::UPDATE_SYSTEM_LANGUAGE_FAILED;
+}
+
+I18nErrorCode LocaleConfig::SetSystemRegion(const std::string &regionTag)
+{
+    if (!IsValidRegion(regionTag)) {
+        HiLog::Error(LABEL, "LocaleConfig::SetSystemRegion %{public}s is not valid region tag.", regionTag.c_str());
+        return I18nErrorCode::INVALID_REGION_TAG;
+    }
+    return SetSystemLocale(UpdateRegionOfLocale(regionTag));
+}
+
+I18nErrorCode LocaleConfig::SetSystemLocale(const std::string &localeTag)
+{
+    if (!IsValidTag(localeTag)) {
+        HiLog::Error(LABEL, "LocaleConfig::SetSystemLocale %{public}s is not a valid locale tag.", localeTag.c_str());
+        return I18nErrorCode::INVALID_LOCALE_TAG;
+    }
+    if (SetParameter(LOCALE_KEY, localeTag.data()) != 0) {
+        return I18nErrorCode::UPDATE_SYSTEM_LOCALE_FAILED;
+    }
+#ifdef SUPPORT_GRAPHICS
+    UpdateConfiguration(AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE, localeTag);
+    return PublishCommonEvent(EventFwk::CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED);
+#endif
+    return I18nErrorCode::SUCCESS;
+}
+
+I18nErrorCode LocaleConfig::Set24HourClock(bool option)
+{
+    // HOUR_KEY system parameter's value is "true" or "false"
+    std::string optionStr = option ? "true" : "false";
+    if (SetParameter(HOUR_KEY, optionStr.data()) != 0) {
+        HiLog::Error(LABEL, "LocaleConfig::Set24HourClock update 24 hour clock failed with option=%{public}s",
+            optionStr.c_str());
+        return I18nErrorCode::UPDATE_24_HOUR_CLOCK_FAILED;
+    }
+#ifdef SUPPORT_GRAPHICS
+    UpdateConfiguration(AAFwk::GlobalConfigurationKey::SYSTEM_HOUR, optionStr);
+    return PublishCommonEvent(EventFwk::CommonEventSupport::COMMON_EVENT_TIME_CHANGED);
+#endif
+    return I18nErrorCode::SUCCESS;
+}
+
+I18nErrorCode LocaleConfig::SetUsingLocalDigit(bool flag)
+{
+    // check whether current language support local digit.
+    std::string localeTag = GetSystemLocale();
+    std::string languageTag = localeTag.substr(0, 2); // obtain 2 length language code.
+    auto it = localDigitMap.find(languageTag);
+    if (it == localDigitMap.end()) {
+        HiLog::Error(LABEL, "LocaleConfig::SetUsingLocalDigit current system doesn't support set local digit");
+        return I18nErrorCode::UPDATE_LOCAL_DIGIT_FAILED;
+    }
+    // update system locale.
+    return SetSystemLocale(UpdateNumberSystemOfLocale(it->second, flag));
+}
+
+std::string LocaleConfig::UpdateNumberSystemOfLocale(const std::string &localDigitTag, bool flag)
+{
+    if (flag) {
+        // add local digit tag to number system param of locale
+        return AddLocalDigitToLocale(localDigitTag);
+    }
+    // remove local digit tag to number system param of locale
+    return RemoveLocalDigitFromLocale(localDigitTag);
+}
+
+std::string LocaleConfig::AddLocalDigitToLocale(const std::string &localDigitTag)
+{
+    std::string localeTag = GetSystemLocale();
+    // Case: no extend param, add '-u-' and number system tag.
+    if (localeTag.find("-u-") == std::string::npos) {
+        localeTag += "-u" + std::string(NUMBER_SYSTEM_KEY) + localDigitTag;
+        return localeTag;
+    }
+    // Case: has extend param but doesn't hava number system param, add number system tag.
+    if (localeTag.find(NUMBER_SYSTEM_KEY) == std::string::npos) {
+        localeTag += std::string(NUMBER_SYSTEM_KEY) + localDigitTag;
+        return localeTag;
+    }
+    // Case: has number system param, replace local digit tag to localDigitTag.
+    LocaleInfo localeInfo(localeTag);
+    std::string oldNumberSystem = localeInfo.GetNumberingSystem();
+    localeTag.replace(localeTag.find(oldNumberSystem), oldNumberSystem.length(), localDigitTag);
+    return localeTag;
+}
+
+std::string LocaleConfig::RemoveLocalDigitFromLocale(const std::string &localDigitTag)
+{
+    // remove number system tag from locale
+    std::string localeTag = GetSystemLocale();
+    std::string numberSystemTag = NUMBER_SYSTEM_KEY + localDigitTag;
+    size_t pos = localeTag.find(numberSystemTag);
+    if (pos != std::string::npos) {
+        localeTag.replace(pos, numberSystemTag.length(), "");
+    }
+    // remove "-u" if localeTag ends with "-u"
+    size_t uLength = 2;
+    if (localeTag.find("-u") == (localeTag.length() - uLength)) {
+        localeTag.resize(localeTag.length() - uLength);
+    }
+    return localeTag;
+}
+
+#ifdef SUPPORT_GRAPHICS
+void LocaleConfig::UpdateConfiguration(const char *key, const std::string &value)
+{
+    AppExecFwk::Configuration configuration;
+    configuration.AddItem(key, value);
+    auto appMgrClient = std::make_unique<AppExecFwk::AppMgrClient>();
+    appMgrClient->UpdateConfiguration(configuration);
+    HiLog::Info(LABEL, "LocaleConfig::UpdateLanguageConfiguration update configuration finished.");
+}
+
+I18nErrorCode LocaleConfig::PublishCommonEvent(const std::string &eventType)
+{
+    OHOS::AAFwk::Want localeChangeWant;
+    localeChangeWant.SetAction(eventType);
+    OHOS::EventFwk::CommonEventData event(localeChangeWant);
+    if (!OHOS::EventFwk::CommonEventManager::PublishCommonEvent(event)) {
+        HiLog::Error(LABEL, "LocaleConfig::PublishCommonEvent Failed to Publish event %{public}s",
+            localeChangeWant.GetAction().c_str());
+        return I18nErrorCode::PUBLISH_COMMON_EVENT_FAILED;
+    }
+    HiLog::Info(LABEL, "LocaleConfig::PublishCommonEvent publish event finished.");
+    return I18nErrorCode::SUCCESS;
+}
+#endif
+
+std::string LocaleConfig::UpdateLanguageOfLocale(const std::string &languageTag)
+{
+    // Compute language and script part from languageTag.
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale languageLocale = icu::Locale::forLanguageTag(languageTag.c_str(), status);
+    if (U_FAILURE(status)) {
+        HiLog::Error(LABEL, "LocaleConfig::UpdateLanguageOfLocale init icu Locale for language %{public}s failed.",
+            languageTag.c_str());
+        return "";
+    }
+    std::string langTag = languageLocale.getLanguage();
+    std::string scriptTag = languageLocale.getScript();
+    // Compute region and extend param part from current system locale.
+    std::string systemLocaleTag = GetSystemLocale();
+    icu::Locale systemLocale = icu::Locale::forLanguageTag(systemLocaleTag.c_str(), status);
+    if (U_FAILURE(status)) {
+        HiLog::Error(LABEL, "LocaleConfig::UpdateSystemLocale init icu Locale for locale %{public}s failed.",
+            systemLocaleTag.c_str());
+        return "";
+    }
+    std::string regionTag = systemLocale.getCountry();
+    std::string extendParamTag;
+    size_t pos = systemLocaleTag.find("-u-");
+    if (pos != std::string::npos) {
+        extendParamTag = systemLocaleTag.substr(pos);
+    }
+    // Combine above elements.
+    return CreateLocale(langTag, scriptTag, regionTag, extendParamTag);
+}
+
+std::string LocaleConfig::CreateLocale(const std::string &languageTag, const std::string &scriptTag,
+    const std::string &regionTag, const std::string &extendParamTag)
+{
+    // combine language, script, region and extend param with '-'
+    std::string localeTag = languageTag;
+    std::string splitor = "-";
+    if (scriptTag.length() > 0) {
+        localeTag += splitor + scriptTag;
+    }
+    if (regionTag.length() > 0) {
+        localeTag += splitor + regionTag;
+    }
+    if (extendParamTag.length() > 0) {
+        localeTag += extendParamTag;
+    }
+    return localeTag;
+}
+
+std::string LocaleConfig::UpdateRegionOfLocale(const std::string &regionTag)
+{
+    std::string localeTag = GetSystemLocale();
+    // if current system locale is null, contruct a locale from region tag.
+    if (localeTag.length() == 0) {
+        return CreateLocaleFromRegion(regionTag);
+    }
+    // combine locale with origin locale's language and script with regionTag.
+    UErrorCode status = U_ZERO_ERROR;
+    const icu::Locale origin = icu::Locale::forLanguageTag(localeTag, status);
+    if (U_FAILURE(status)) {
+        HiLog::Error(LABEL, "LocaleConfig::UpdateRegionOfLocale init origin locale failed.");
+        return "";
+    }
+    icu::LocaleBuilder builder = icu::LocaleBuilder().setLanguage(origin.getLanguage()).
+        setScript(origin.getScript()).setRegion(regionTag);
+    icu::Locale temp = builder.setExtension('u', "").build(status);
+    string ret = temp.toLanguageTag<string>(status);
+    if (U_FAILURE(status)) {
+        HiLog::Error(LABEL, "LocaleConfig::UpdateRegionOfLocale obtain new locale's tag failed.");
+        return "";
+    }
+    return ret;
+}
+
+std::string LocaleConfig::CreateLocaleFromRegion(const std::string &regionTag)
+{
+    // fill locale with icu
+    icu::Locale locale("", regionTag.c_str());
+    UErrorCode status = U_ZERO_ERROR;
+    locale.addLikelySubtags(status);
+    if (U_FAILURE(status)) {
+        HiLog::Error(LABEL, "LocaleConfig::CreateLocaleFromRegion init new locale failed.");
+        return "";
+    }
+    std::string localeTag = locale.toLanguageTag<string>(status);
+    if (U_FAILURE(status)) {
+        HiLog::Error(LABEL, "LocaleConfig::CreateLocaleFromRegion obtain new locale's tag failed.");
+        return "";
+    }
+    return localeTag;
 }
 } // namespace I18n
 } // namespace Global

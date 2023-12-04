@@ -56,6 +56,7 @@ ohos_shared_library("i18n") {
   include_dirs = [
     "//base/global/i18n/frameworks/intl/include",
     "//base/global/i18n/interfaces/js/kits/include",
+    "//base/global/i18n/services/include",
     "//base/hiviewdfx/interfaces/native/inner_api/include",
     "//foundation/arkui/napi/native_engine",
     "//foundation/arkui/napi/interfaces/kits",
@@ -85,6 +86,7 @@ ohos_shared_library("i18n") {
   deps = [
     "//base/global/i18n/frameworks/intl:intl_util",
     "//base/global/i18n/frameworks/intl:preferred_language",
+    "//base/global/i18n/services:i18n_sa_client",
     "//third_party/icu/icu4c:shared_icui18n",
     "//third_party/icu/icu4c:shared_icuuc",
     "//third_party/libpng:libpng",

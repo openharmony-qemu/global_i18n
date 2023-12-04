@@ -11,10 +11,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-persist.global.language = root:root:0775
-persist.global.locale = root:root:0775
-persist.global.is24Hour = root:root:0775
-persist.sys.preferredLanguages = root:root:0775
-const.global.locale = root:root:0444
-const.global.language = root:root:0444
-const.global.region = root:root:0444
+persist.global.language = i18n:i18n:0775
+persist.global.locale = i18n:i18n:0775
+persist.global.is24Hour = i18n:i18n:0775
+persist.global.preferredLanguages = i18n:i18n:0775
+const.global.locale = i18n:i18n:0444
+const.global.language = i18n:i18n:0444
+const.global.region = i18n:i18n:0444
