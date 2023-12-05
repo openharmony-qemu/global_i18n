@@ -39,6 +39,10 @@ const char* HolidayManager::ITEM_RESOURCES_TAG = "RESOURCES";
 
 HolidayManager::HolidayManager(const char* path)
 {
+    if (path == nullptr) {
+        HiLog::Error(LABEL, "Failed: parameter path is NULL.");
+        return;
+    }
     std::string msg = ValidateHolidayFilePath(path);
     if (msg.length() != 0) {
         HiLog::Error(LABEL, "Failed: %{public}s .", msg.c_str());
@@ -147,10 +151,13 @@ std::string HolidayManager::ValidateHolidayFilePath(const char* path)
 
 std::vector<HolidayInfoItem> HolidayManager::ReadHolidayFile(const char* path)
 {
+    std::vector<HolidayInfoItem> items;
+    if (path == nullptr) {
+        return items;
+    }
     std::ifstream fin;
     fin.open(path, std::ios::in);
     std::string line;
-    std::vector<HolidayInfoItem> items;
     while (getline(fin, line)) {
         line = Trim(line);
         if (line.compare(ITEM_BEGIN_TAG) != 0) {
@@ -172,6 +179,9 @@ std::vector<HolidayInfoItem> HolidayManager::ReadHolidayFile(const char* path)
 
 void HolidayManager::ParseFileLine(const std::string &line, HolidayInfoItem *holidayItem)
 {
+    if (holidayItem == nullptr) {
+        return;
+    }
     std::regex reg("([A-Z]+)[:;](.+)");
     std::smatch match;
     bool found = std::regex_search(line, match, reg);

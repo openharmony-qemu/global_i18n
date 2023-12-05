@@ -703,15 +703,19 @@ std::string I18nTimeZone::GetDisplayName(std::string localeStr)
 std::string I18nTimeZone::GetDisplayName(std::string localeStr, bool isDST)
 {
     icu::TimeZone::EDisplayType style = icu::TimeZone::EDisplayType::LONG_GENERIC;
-    icu::Locale locale(localeStr.data());
-    if (!LocaleConfig::IsValidTag(localeStr)) {
-        UErrorCode status = U_ZERO_ERROR;
-        std::string systemLocale = LocaleConfig::GetSystemLocale();
-        locale = icu::Locale::forLanguageTag(systemLocale, status);
+    UErrorCode status = U_ZERO_ERROR;
+    std::string systemLocale = LocaleConfig::GetSystemLocale();
+    icu::Locale locale = icu::Locale::forLanguageTag(systemLocale, status);
+    std::string result;
+    if (LocaleConfig::IsValidTag(localeStr)) {
+        locale = icu::Locale::forLanguageTag(localeStr, status);
+    }
+    if (U_FAILURE(status)) {
+        HiLog::Error(LABEL, "create icu Locale for %{public}s failed.", localeStr.c_str());
+        return result;
     }
     icu::UnicodeString name;
     timezone->getDisplayName((UBool)isDST, style, locale, name);
-    std::string result;
     name.toUTF8String(result);
     return GetDisplayNameByTaboo(localeStr, result);
 }
@@ -1069,20 +1073,14 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
 {
     std::vector<std::string> tzIdList;
 #ifdef SUPPORT_GRAPHICS
-    std::map<int, std::string> categoryMap;
-    int fixedX, fixedY;
-    if (x < 0 && y >= 0) {
-        categoryMap = categoryNum2TimezoneWN;
-    } else if (x >= 0 && y >= 0) {
-        categoryMap = categoryNum2TimezoneEN;
-    } else if (x < 0 && y < 0) {
-        categoryMap = categoryNum2TimezoneWS;
-    } else {
-        categoryMap = categoryNum2TimezoneES;
+    if (!CheckLatitudeAndLongitude(x, y)) {
+        HiLog::Error(LABEL, "invalid longitude:%{public}f or latitude: %{public}f ", x, y);
+        return tzIdList;
     }
+    std::map<int, std::string> categoryMap = GetTimeZoneCategoryMap(x, y);
     std::vector<std::string> filePaths = FindTzData();
-    int pathLen = filePaths.size();
-    if (pathLen < 1) {
+    size_t fileCount = filePaths.size();
+    if (fileCount < 1) {
         return tzIdList;
     }
     std::string preferredPath = GetPreferredPath(x, filePaths);
@@ -1091,13 +1089,16 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
     }
     uint32_t width, height;
     GetTzDataWidth(filePaths, &width, &height);
-    fixedX = (int)(y * (width / TZ_X_PLUS) + width / TZ_HALF_OF_SIZE);
-    fixedY = (int)(x * ((height * pathLen) / (TZ_X_PLUS * TZ_HALF_OF_SIZE)) + (height * pathLen) / TZ_HALF_OF_SIZE);
-    if (ParamExceedScope(fixedX, fixedY, width, height * pathLen)) {
-        HiLog::Error(LABEL, "invalid width:%{public}d or height: %{public}d ", fixedX, fixedY);
+    double calculateX = y * width / (TZ_X_PLUS * 1.0) + width / (TZ_HALF_OF_SIZE * 1.0);
+    double calculateY = x * ((height * fileCount) / (TZ_X_PLUS * TZ_HALF_OF_SIZE * 1.0)) +
+                        (height * fileCount) / (TZ_HALF_OF_SIZE * 1.0);
+    uint16_t fixedX = static_cast<uint16_t>(calculateX);
+    uint16_t fixedY = static_cast<uint16_t>(calculateY);
+    if (ParamExceedScope(fixedX, fixedY, width, height * fileCount)) {
+        HiLog::Error(LABEL, "invalid width:%{public}d or height: %{public}d", fixedX, fixedY);
         return tzIdList;
     }
-    int actualHeight = pathLen > 1 ? (fixedY % height) : fixedY;
+    uint16_t actualHeight = fileCount > 1 ? (fixedY % height) : fixedY;
     std::vector<int> pixel = GetColorData(fixedX, fixedY, actualHeight, preferredPath);
     for (size_t i = 0; i < pixel.size(); i++) {
         //255 is invalid pixel value required
@@ -1110,7 +1111,38 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
     return tzIdList;
 }
 
-std::vector<int> I18nTimeZone::GetColorData(const int x, const int y, int actualHeight, std::string preferredPath)
+std::map<int, std::string> I18nTimeZone::GetTimeZoneCategoryMap(const double x, const double y)
+{
+    if (x < 0 && y >= 0) {
+        return categoryNum2TimezoneWN;
+    } else if (x >= 0 && y >= 0) {
+        return categoryNum2TimezoneEN;
+    } else if (x < 0 && y < 0) {
+        return categoryNum2TimezoneWS;
+    } else {
+        return categoryNum2TimezoneES;
+    }
+}
+
+bool I18nTimeZone::CheckLatitudeAndLongitude(const double x, const double y)
+{
+    if (x < -1.0 * TZ_X_PLUS) {
+        return false;
+    }
+    if (x >= TZ_X_PLUS*1.0 - 0.1) {
+        return false;
+    }
+    if (y < -1.0 * TZ_X_PLUS/TZ_HALF_OF_SIZE) {
+        return false;
+    }
+    if (y >= TZ_X_PLUS*1.0/TZ_HALF_OF_SIZE - 0.1) {
+        return false;
+    }
+    return true;
+}
+
+std::vector<int> I18nTimeZone::GetColorData(const uint16_t x, const uint16_t y,
+                                            uint16_t actualHeight, std::string preferredPath)
 {
     std::vector<int> result;
     FILE *fp;
@@ -1212,9 +1244,9 @@ int I18nTimeZone::InitPngptr(png_structp &png_ptr, png_infop &info_ptr, FILE **f
 
 bool I18nTimeZone::CheckTzDataFilePath(const std::string &filePath)
 {
-    char *realpathRes = NULL;
+    char *realpathRes = nullptr;
     realpathRes = realpath(filePath.c_str(), nullptr);
-    if (realpathRes == NULL) {
+    if (realpathRes == nullptr) {
         return false;
     }
     std::ifstream file(filePath.c_str());
@@ -1225,7 +1257,7 @@ bool I18nTimeZone::CheckTzDataFilePath(const std::string &filePath)
     }
     file.close();
     free(realpathRes);
-    realpathRes = NULL;
+    realpathRes = nullptr;
     return true;
 }
 
@@ -1290,6 +1322,9 @@ bool I18nTimeZone::ValidateDataIntegrity(const std::vector<std::string> &pathLis
 void I18nTimeZone::SetVersionPathMap(std::string verison, std::string path,
                                      std::map<std::string, std::vector<std::string>> *pathMap)
 {
+    if (pathMap == nullptr) {
+        return;
+    }
     if (pathMap->find(verison) != pathMap->end()) {
         std::vector<std::string> *list = &(pathMap->find(verison)->second);
         list->push_back(path);

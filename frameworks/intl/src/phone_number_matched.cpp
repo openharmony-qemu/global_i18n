@@ -18,6 +18,7 @@
 #include "hilog/log.h"
 #include "regex_rule.h"
 #include "phone_number_matched.h"
+#include "utils.h"
 
 namespace OHOS {
 namespace Global {
@@ -43,10 +44,8 @@ PhoneNumberMatched::PhoneNumberMatched(std::string& country)
 
 PhoneNumberMatched::~PhoneNumberMatched()
 {
-    if (phoneNumberRule != nullptr) {
-        delete phoneNumberRule;
-    }
-    phoneNumberRule = nullptr;
+    delete phoneNumberRule;
+    delete shortNumberInfo;
 }
 
 std::vector<int> PhoneNumberMatched::GetMatchedPhoneNumber(icu::UnicodeString& message)
@@ -74,6 +73,7 @@ std::vector<int> PhoneNumberMatched::DealWithoutFixed(icu::UnicodeString& messag
     std::vector<PhoneNumberMatch*> matchList = FindNumbers(country, message);
     std::vector<MatchedNumberInfo> result;
     for (auto& match : matchList) {
+        if (match == nullptr) continue;
         MatchedNumberInfo info;
         icu::UnicodeString content = match->raw_string().c_str();
         PhoneNumber phoneNumber = match->number();
@@ -83,9 +83,7 @@ std::vector<int> PhoneNumberMatched::DealWithoutFixed(icu::UnicodeString& messag
             info.SetContent(content);
             result.push_back(info);
         }
-        if (match != nullptr) {
-            delete match;
-        }
+        delete match;
     }
     std::vector<MatchedNumberInfo> shortResult = FindShortNumbers(country, message);
     // Merge result
@@ -105,14 +103,18 @@ icu::UnicodeString PhoneNumberMatched::HandleNegativeRule(icu::UnicodeString& sr
     std::vector<RegexRule*> rules = phoneNumberRule->GetNegativeRules();
     icu::UnicodeString ret = src;
     for (RegexRule* rule : rules) {
+        if (rule == nullptr) {
+            continue;
+        }
         icu::RegexPattern* pattern = rule->GetPattern();
         UErrorCode status = U_ZERO_ERROR;
         icu::RegexMatcher* matcher = pattern->matcher(ret, status);
-        while (matcher->find(status)) {
+        while (matcher != nullptr && matcher->find(status)) {
             int start = matcher->start(status);
             int end = matcher->end(status);
             ReplaceSpecifiedPos(ret, start, end);
         }
+        delete matcher;
     }
     return ret;
 }
@@ -236,6 +238,7 @@ std::vector<PhoneNumberMatch*> PhoneNumberMatched::FindNumbers(std::string& coun
             AddPhoneNumber(lastStr, searchStart + start, matchList, country);
         }
     }
+    delete numberMatcher;
     return matchList;
 }
 
@@ -305,6 +308,7 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::GetPossibleNumberInfos(std::s
             }
             result.insert(result.end(), posList.begin(), posList.end());
         }
+        delete delMatch;
     }
     return result;
 }
@@ -359,7 +363,7 @@ bool PhoneNumberMatched::IsNumberWithOneBracket(icu::UnicodeString& message)
 std::vector<int> PhoneNumberMatched::DealResult(std::vector<MatchedNumberInfo>& matchedNumberInfoList)
 {
     std::vector<int> result;
-    int length = matchedNumberInfoList.size();
+    size_t length = matchedNumberInfoList.size();
     if (length == 0) {
         result.push_back(0);
     } else {
@@ -409,6 +413,7 @@ bool PhoneNumberMatched::HandleBorderRule(PhoneNumberMatch* match, icu::UnicodeS
                 return false;
             }
         }
+        delete mat;
     }
     return true;
 }
@@ -451,18 +456,22 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::HandlePositiveRule(PhoneNumbe
         icu::RegexPattern* pattern = rule->GetPattern();
         UErrorCode status = U_ZERO_ERROR;
         icu::RegexMatcher* mat1 = pattern->matcher(str, status);
-        if (mat1->find(status)) {
+        if (mat1 != nullptr && mat1->find(status)) {
             std::vector<MatchedNumberInfo> infoList = rule->Handle(match, message);
+            delete mat1;
             return infoList;
         }
+        delete mat1;
         icu::RegexMatcher* mat2 = pattern->matcher(message, status);
-        if (mat2->find(status)) {
+        if (mat2 != nullptr && mat2->find(status)) {
             std::vector<MatchedNumberInfo> infoList = rule->Handle(match, message);
             if (infoList.size() == 0) {
                 continue;
             }
+            delete mat2;
             return infoList;
         }
+        delete mat2;
     }
     return {};
 }

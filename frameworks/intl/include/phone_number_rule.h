@@ -39,6 +39,7 @@ public:
 
 private:
     void InitRule(std::string& xmlPath);
+    void FreePointer(std::vector<RegexRule*> &ruleList);
 
     std::vector<RegexRule*> negativeRules;
     std::vector<RegexRule*> positiveRules;

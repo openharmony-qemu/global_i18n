@@ -249,8 +249,10 @@ string GetDisplayLanguageInner(const string &language, const string &displayLoca
         if (status != U_ZERO_ERROR) {
             return "";
         }
-        dspNames->localeDisplayName(tempLocale, unistr);
-        delete dspNames;
+        if (dspNames != nullptr) {
+            dspNames->localeDisplayName(tempLocale, unistr);
+            delete dspNames;
+        }
     } else {
         UErrorCode status = U_ZERO_ERROR;
         icu::Locale displayLoc = icu::Locale::forLanguageTag(displayLocaleTag, status);

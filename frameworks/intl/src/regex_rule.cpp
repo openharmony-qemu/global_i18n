@@ -60,10 +60,6 @@ RegexRule::RegexRule(icu::UnicodeString& regex, std::string& isValidType, std::s
 
 RegexRule::~RegexRule()
 {
-    if (pattern != nullptr) {
-        delete pattern;
-    }
-    pattern = nullptr;
 }
 
 int RegexRule::CountDigits(icu::UnicodeString& str)
@@ -358,7 +354,7 @@ std::vector<MatchedNumberInfo> RegexRule::HandleBlank(PhoneNumberMatch* possible
     icu::RegexMatcher negativePattern(negativeRegex, 0, negativeStatus);
     negativePattern.reset(number);
     std::vector<MatchedNumberInfo> matchedNumberInfoList;
-    if (matcher->find()) {
+    if (matcher != nullptr && matcher->find()) {
         if (negativePattern.find() || number == speString) {
             return matchedNumberInfoList;
         }
@@ -371,6 +367,7 @@ std::vector<MatchedNumberInfo> RegexRule::HandleBlank(PhoneNumberMatch* possible
         matchedNumberInfo.SetContent(number);
         matchedNumberInfoList.push_back(matchedNumberInfo);
     }
+    delete matcher;
     return matchedNumberInfoList;
 }
 
@@ -383,7 +380,7 @@ std::vector<MatchedNumberInfo> RegexRule::HandleSlant(PhoneNumberMatch* possible
     UErrorCode status;
     icu::RegexMatcher* matcher = pattern->matcher(number, status);
     std::vector<MatchedNumberInfo> matchedNumberInfoList;
-    if (matcher->find()) {
+    if (matcher != nullptr && matcher->find()) {
         int start = matcher->start(status);
         std::vector<MatchedNumberInfo> tempList = GetNumbersWithSlant(number);
         // 2 is the size of tempList.
@@ -406,6 +403,7 @@ std::vector<MatchedNumberInfo> RegexRule::HandleSlant(PhoneNumberMatch* possible
             }
         }
     }
+    delete matcher;
     return matchedNumberInfoList;
 }
 
@@ -501,7 +499,7 @@ std::vector<MatchedNumberInfo> RegexRule::HandlePossibleNumberWithPattern(icu::R
     std::vector<MatchedNumberInfo> matchedList;
     icu::UnicodeString possible = possibleNumber->raw_string().c_str();
     icu::RegexMatcher* mat = pattern->matcher(message, status);
-    while (mat->find(status)) {
+    while (mat != nullptr && mat->find(status)) {
         int start = mat->start(status);
         int end = mat->end(status);
         icu::UnicodeString matched = message.tempSubString(start, end - start);
@@ -514,6 +512,7 @@ std::vector<MatchedNumberInfo> RegexRule::HandlePossibleNumberWithPattern(icu::R
             matchedList.push_back(info);
         }
     }
+    delete mat;
     return matchedList;
 }
 } // namespace I18n

@@ -22,6 +22,7 @@
 #include "libxml/xmlstring.h"
 #include "matched_number_info.h"
 #include "phone_number_rule.h"
+#include "utils.h"
 
 namespace OHOS {
 namespace Global {
@@ -45,6 +46,23 @@ PhoneNumberRule::PhoneNumberRule(std::string& country)
 
 PhoneNumberRule::~PhoneNumberRule()
 {
+    FreePointer(negativeRules);
+    FreePointer(positiveRules);
+    FreePointer(borderRules);
+    FreePointer(codesRules);
+    FreePointer(findRules);
+}
+
+void PhoneNumberRule::FreePointer(std::vector<RegexRule*> &ruleList)
+{
+    std::vector<RegexRule*>::iterator iter;
+    for (iter = ruleList.begin(); iter != ruleList.end(); iter++) {
+        if (*iter != nullptr) {
+            delete *iter;
+        }
+        *iter = nullptr;
+    }
+    ruleList.clear();
 }
 
 void PhoneNumberRule::Init()

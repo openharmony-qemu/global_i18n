@@ -90,7 +90,8 @@ private:
     static std::string GetFallBack(std::string &localeStr);
     static void GetTimezoneIDFromZoneInfo(std::set<std::string> &availableIDs, std::string &parentPath,
         std::string &parentName);
-    static std::vector<int> GetColorData(const int x, const int y, int actualHeight, std::string preferredPath);
+    static std::vector<int> GetColorData(const uint16_t x, const uint16_t y,
+                                         uint16_t actualHeight, std::string preferredPath);
     static int InitPngptr(png_structp &png_ptr, png_infop &info_ptr, FILE **fp, std::string preferredPath);
     static std::vector<std::string> FindTzData();
     static bool ParamExceedScope(const int x, const int y, int fixedX, int fixedY);
@@ -101,6 +102,8 @@ private:
     static void CloseFile(FILE *fp);
     static bool ValidateDataIntegrity(const std::vector<std::string> &pathList);
     static bool CheckTzDataFilePath(const std::string &filePath);
+    static bool CheckLatitudeAndLongitude(const double x, const double y);
+    static std::map<int, std::string> GetTimeZoneCategoryMap(const double x, const double y);
 };
 } // namespace I18n
 } // namespace Global

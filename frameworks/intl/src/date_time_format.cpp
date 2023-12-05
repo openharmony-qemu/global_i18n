@@ -498,6 +498,9 @@ void DateTimeFormat::ComputeWeekdayOrEraOfPattern(std::string option, char16_t c
 
 int64_t DateTimeFormat::GetArrayValue(int64_t *dateArray, size_t index, size_t size)
 {
+    if (dateArray == nullptr) {
+        return 0;
+    }
     if (index < size) {
         return dateArray[index];
     } else {
@@ -525,8 +528,10 @@ std::string DateTimeFormat::Format(int64_t milliseconds)
     calendar->clear();
     std::string timezoneStr = timeZone.empty() ? GetSystemTimezone() : timeZone;
     auto zone = std::unique_ptr<TimeZone>(TimeZone::createTimeZone(timezoneStr.c_str()));
-    calendar->setTimeZone(*zone);
-    dateFormat->setTimeZone(*zone);
+    if (zone != nullptr) {
+        calendar->setTimeZone(*zone);
+        dateFormat->setTimeZone(*zone);
+    }
     calendar->setTime((UDate)milliseconds, status);
     dateFormat->format(calendar->getTime(status), dateString, status);
     dateString.toUTF8String(result);
@@ -535,7 +540,7 @@ std::string DateTimeFormat::Format(int64_t milliseconds)
 
 std::string DateTimeFormat::FormatRange(int64_t fromMilliseconds, int64_t toMilliseconds)
 {
-    if (!createSuccess) {
+    if (!createSuccess || calendar == nullptr) {
         return "";
     }
     UErrorCode status = U_ZERO_ERROR;
@@ -544,8 +549,10 @@ std::string DateTimeFormat::FormatRange(int64_t fromMilliseconds, int64_t toMill
     calendar->clear();
     std::string timezoneStr = timeZone.empty() ? GetSystemTimezone() : timeZone;
     auto zone = std::unique_ptr<TimeZone>(TimeZone::createTimeZone(timezoneStr.c_str()));
-    calendar->setTimeZone(*zone);
-    dateIntvFormat->setTimeZone(*zone);
+    if (zone != nullptr) {
+        calendar->setTimeZone(*zone);
+        dateIntvFormat->setTimeZone(*zone);
+    }
     calendar->setTime((UDate)fromMilliseconds, status);
 
     auto toCalendar = std::unique_ptr<Calendar>(Calendar::createInstance(locale, status));
@@ -553,7 +560,9 @@ std::string DateTimeFormat::FormatRange(int64_t fromMilliseconds, int64_t toMill
         return "";
     }
     toCalendar->clear();
-    toCalendar->setTimeZone(*zone);
+    if (zone != nullptr) {
+        toCalendar->setTimeZone(*zone);
+    }
     toCalendar->setTime((UDate)toMilliseconds, status);
     FieldPosition pos = 0;
     dateIntvFormat->format(*calendar, *toCalendar, dateString, pos, status);

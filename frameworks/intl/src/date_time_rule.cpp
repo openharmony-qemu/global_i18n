@@ -36,6 +36,14 @@ DateTimeRule::DateTimeRule(std::string& locale)
 
 DateTimeRule::~DateTimeRule()
 {
+    std::unordered_map<std::string, icu::RegexPattern*>::iterator iter;
+    for (iter = patternsMap.begin(); iter != patternsMap.end(); ++iter) {
+        icu::RegexPattern* pattern = iter->second;
+        if (pattern != nullptr) {
+            delete pattern;
+        }
+        pattern = nullptr;
+    }
 }
 
 void DateTimeRule::Init(std::string& locale)
@@ -139,7 +147,7 @@ void DateTimeRule::LoadStrToPattern(std::unordered_map<std::string, icu::RegexPa
         xmlNodePtr value = cur->xmlChildrenNode;
         bool flag = false;
         // load rule content
-        if (!xmlStrcmp(value->name, reinterpret_cast<const xmlChar*>("flag"))) {
+        if (value != nullptr && !xmlStrcmp(value->name, reinterpret_cast<const xmlChar*>("flag"))) {
             std::string type = reinterpret_cast<const char*>(xmlNodeGetContent(value));
             if (type == "True") {
                 flag = true;
@@ -173,7 +181,7 @@ void DateTimeRule::LoadStrToStr(std::unordered_map<std::string, std::string>* ma
         key = key.substr(3);
         xmlNodePtr value = cur->xmlChildrenNode;
         // load rule level
-        if (!xmlStrcmp(value->name, reinterpret_cast<const xmlChar*>("level"))) {
+        if (value != nullptr && !xmlStrcmp(value->name, reinterpret_cast<const xmlChar*>("level"))) {
             int level = reinterpret_cast<int>(xmlNodeGetContent(value));
             levels[key] = level;
             value = value->next;
