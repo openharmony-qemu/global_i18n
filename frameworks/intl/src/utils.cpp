@@ -65,6 +65,10 @@ int32_t ConvertString2Int(const string &numberStr, int32_t& status)
         status = -1;
         HiLog::Error(LABEL, "ConvertString2Int: invalid argument out of range");
         return -1;
+    } catch (...) {
+        status = -1;
+        HiLog::Error(LABEL, "ConvertString2Int: undefined behavior.");
+        return -1;
     }
 }
 
