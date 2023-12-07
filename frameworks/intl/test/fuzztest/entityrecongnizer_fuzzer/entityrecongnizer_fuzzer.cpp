@@ -113,7 +113,7 @@ namespace OHOS {
         icu::UnicodeString message(input.c_str());
         dateTimeMatched->GetMatchedDateTime(message);
         delete dateTimeMatched;
-        return flag;
+        return true;
     }
 }
 
