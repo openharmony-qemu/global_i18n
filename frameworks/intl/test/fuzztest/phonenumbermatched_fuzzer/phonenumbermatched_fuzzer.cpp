@@ -15,6 +15,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include "matched_number_info.h"
 #include "phone_number_matched.h"
 #include "phone_number_rule.h"
 #include "phonenumbermatched_fuzzer.h"
@@ -28,9 +29,9 @@ namespace OHOS {
         }
         std::string input(reinterpret_cast<const char*>(data), size);
 
-        PhoneNumberMatched phoneNumberMatched(input);
+        PhoneNumberMatched* phoneNumberMatched = new PhoneNumberMatched(input);
         icu::UnicodeString message(input.c_str());
-        phoneNumberMatched.GetMatchedPhoneNumber(message);
+        phoneNumberMatched->GetMatchedPhoneNumber(message);
 
         PhoneNumberRule phoneNumberRule(input);
         phoneNumberRule.Init();
@@ -39,7 +40,19 @@ namespace OHOS {
         phoneNumberRule.GetPositiveRules();
         phoneNumberRule.GetNegativeRules();
         phoneNumberRule.GetFindRules();
-        return true;
+        MatchedNumberInfo matchedNumberInfo = new MatchedNumberInfo();
+        icu::UnicodeString content(input.c_str());
+        MatchedNumberInfo matchedNumberInfo2 = new MatchedNumberInfo(size, size, content);
+
+        matchedNumberInfo2.SetBegin(size)
+        matchedNumberInfo2.GetBegin();
+        matchedNumberInfo2.SetEnd(size);
+        matchedNumberInfo2.GetEnd();
+        matchedNumberInfo2.SetContent(content);
+        matchedNumberInfo2.GetContent();
+        bool flag = matchedNumberInfo < matchedNumberInfo2;
+        delete phoneNumberMatched;
+        return flag;
     }
 }
 
