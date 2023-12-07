@@ -40,18 +40,20 @@ namespace OHOS {
         phoneNumberRule.GetPositiveRules();
         phoneNumberRule.GetNegativeRules();
         phoneNumberRule.GetFindRules();
-        MatchedNumberInfo matchedNumberInfo = new MatchedNumberInfo();
+        MatchedNumberInfo* matchedNumberInfo = new MatchedNumberInfo();
         icu::UnicodeString content(input.c_str());
-        MatchedNumberInfo matchedNumberInfo2 = new MatchedNumberInfo(size, size, content);
+        MatchedNumberInfo* matchedNumberInfo2 = new MatchedNumberInfo(size, size, content);
 
-        matchedNumberInfo2.SetBegin(size)
-        matchedNumberInfo2.GetBegin();
-        matchedNumberInfo2.SetEnd(size);
-        matchedNumberInfo2.GetEnd();
-        matchedNumberInfo2.SetContent(content);
-        matchedNumberInfo2.GetContent();
-        bool flag = matchedNumberInfo < matchedNumberInfo2;
+        matchedNumberInfo2->SetBegin(size);
+        matchedNumberInfo2->GetBegin();
+        matchedNumberInfo2->SetEnd(size);
+        matchedNumberInfo2->GetEnd();
+        matchedNumberInfo2->SetContent(content);
+        matchedNumberInfo2->GetContent();
+        bool flag = *matchedNumberInfo < *matchedNumberInfo2;
         delete phoneNumberMatched;
+        delete matchedNumberInfo2;
+        delete matchedNumberInfo;
         return flag;
     }
 }

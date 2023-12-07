@@ -82,10 +82,10 @@ namespace OHOS {
         DateTimeFilter* dateTimeFilter = new DateTimeFilter(input, dateTimeRule);
         std::vector<MatchedDateTimeInfo> matches;
         MatchedDateTimeInfo* matchedDateTimeInfo = new MatchedDateTimeInfo();
-        matches.push_back(matchedDateTimeInfo);
+        matches.push_back(*matchedDateTimeInfo);
         MatchedDateTimeInfo* matchedDateTimeInfo2 = new MatchedDateTimeInfo(size, size, input);
         std::vector<MatchedDateTimeInfo> clearMatches;
-        clearMatches.push_back(matchedDateTimeInfo2);
+        clearMatches.push_back(*matchedDateTimeInfo2);
         icu::UnicodeString hyphen(input.c_str());
         dateTimeFilter->Filter(hyphen, matches, clearMatches, clearMatches);
         matchedDateTimeInfo->SetIsTimePeriod(size % 2 == 0);
