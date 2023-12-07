@@ -81,24 +81,27 @@ namespace OHOS {
         DateTimeRule* dateTimeRule = new DateTimeRule(input);
         DateTimeFilter* dateTimeFilter = new DateTimeFilter(input, dateTimeRule);
         std::vector<MatchedDateTimeInfo> matches;
-        MatchedDateTimeInfo matchedDateTimeInfo = new MatchedDateTimeInfo();
+        MatchedDateTimeInfo* matchedDateTimeInfo = new MatchedDateTimeInfo();
         matches.push_back(matchedDateTimeInfo);
-        MatchedDateTimeInfo matchedDateTimeInfo2 = new MatchedDateTimeInfo(size, size, input);
+        MatchedDateTimeInfo* matchedDateTimeInfo2 = new MatchedDateTimeInfo(size, size, input);
         std::vector<MatchedDateTimeInfo> clearMatches;
         clearMatches.push_back(matchedDateTimeInfo2);
+        icu::UnicodeString hyphen(input.c_str());
         dateTimeFilter->Filter(hyphen, matches, clearMatches, clearMatches);
-        matchedDateTimeInfo.SetIsTimePeriod(size % 2 == 0);
-        matchedDateTimeInfo.IsTimePeriod();
-        matchedDateTimeInfo.SetBegin(size);
-        matchedDateTimeInfo.GetBegin();
-        matchedDateTimeInfo.SetEnd(size);
-        matchedDateTimeInfo.GetEnd();
-        matchedDateTimeInfo.GetRegex();
-        matchedDateTimeInfo.GetType();
-        matchedDateTimeInfo.SetType(size);
-        bool flag = matchedDateTimeInfo < matchedDateTimeInfo2;
+        matchedDateTimeInfo->SetIsTimePeriod(size % 2 == 0);
+        matchedDateTimeInfo->IsTimePeriod();
+        matchedDateTimeInfo->SetBegin(size);
+        matchedDateTimeInfo->GetBegin();
+        matchedDateTimeInfo->SetEnd(size);
+        matchedDateTimeInfo->GetEnd();
+        matchedDateTimeInfo->GetRegex();
+        matchedDateTimeInfo->GetType();
+        matchedDateTimeInfo->SetType(size);
+        bool flag = *matchedDateTimeInfo < *matchedDateTimeInfo2;
         delete dateTimeFilter;
         delete dateTimeRule;
+        delete matchedDateTimeInfo2;
+        delete matchedDateTimeInfo;
         return flag;
     }
 
@@ -109,7 +112,7 @@ namespace OHOS {
             return false;
         }
         std::string input(reinterpret_cast<const char*>(data), size);
-        DateTimeMatched* dateTimeMatched = new DateTimeMatched();
+        DateTimeMatched* dateTimeMatched = new DateTimeMatched(input);
         icu::UnicodeString message(input.c_str());
         dateTimeMatched->GetMatchedDateTime(message);
         delete dateTimeMatched;
