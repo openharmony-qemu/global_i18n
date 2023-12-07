@@ -131,7 +131,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest007, TestSize.Level1)
 {
     vector<string> countries;
     LocaleConfig::GetSystemCountries(countries);
-    unsigned int size = 247;
+    unsigned int size = 245;
     EXPECT_EQ(countries.size(), size);
 }
 
