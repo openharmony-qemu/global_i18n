@@ -32,6 +32,9 @@ namespace OHOS {
         formatter.isValidPhoneNumber(input);
         formatter.format(input);
         formatter.getLocationName(input, input);
+        formatter.getPhoneLocationName(input, input, input, input);
+        formatter.getBlockedRegionName(input, input);
+        formatter.getCityName(input, input, input);
         PhoneNumberFormat::CreateInstance(input, options);
         return true;
     }

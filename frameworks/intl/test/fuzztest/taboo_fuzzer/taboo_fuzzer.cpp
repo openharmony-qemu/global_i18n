@@ -16,6 +16,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include "taboo.h"
 #include "taboo_utils.h"
 #include "taboo_fuzzer.h"
 
@@ -28,6 +29,8 @@ namespace OHOS {
         TabooUtils tabooUtils;
         tabooUtils.ReplaceCountryName(input, input, input);
         tabooUtils.ReplaceLanguageName(input, input, input);
+        Taboo* taboo = new Taboo();
+        delete taboo;
     }
 }
 
