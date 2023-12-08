@@ -22,6 +22,8 @@ group("fuzztest") {
     "character_fuzzer:CharacterFuzzTest",
     "collator_fuzzer:CollatorFuzzTest",
     "datetimeformat_fuzzer:DateTimeFormatFuzzTest",
+    "datetimefilter_fuzzer:DateTimeFilterFuzzTest",
+    "datetimerule_fuzzer:DateTimeRuleFuzzTest",
     "entityrecongnizer_fuzzer:EntityRecongnizerFuzzTest",
     "holidaymanager_fuzzer:HolidayManagerFuzzTest",
     "indexutil_fuzzer:IndexUtilFuzzTest",

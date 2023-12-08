@@ -43,7 +43,6 @@ namespace OHOS {
         regexRule->Handle(possibleNumber, regex);
         regexRule->IsValid(possibleNumber, regex);
         regexRule->CountDigits(regex);
-        delete phoneNumberUtil;
         delete possibleNumber;
         delete regexRule;
         return true;

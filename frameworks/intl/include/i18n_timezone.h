@@ -70,6 +70,7 @@ private:
     static const uint32_t TZ_X_PLUS = 180;
     static const uint32_t TZ_HALF_OF_SIZE = 2;
     static const uint32_t TZ_MAX_PIXEL_VALUE = 255;
+    static constexpr double NUM_PRECISION = 0.1;
     static std::set<std::string> availableIDs;
     static std::set<std::string> supportedLocales;
     static std::set<std::string> availableZoneCityIDs;
@@ -101,7 +102,6 @@ private:
     static void GetTzDataWidth(std::vector<std::string> filePaths, uint32_t *width, uint32_t *height);
     static void CloseFile(FILE *fp);
     static bool ValidateDataIntegrity(const std::vector<std::string> &pathList);
-    static bool CheckTzDataFilePath(const std::string &filePath);
     static bool CheckLatitudeAndLongitude(const double x, const double y);
     static std::map<int, std::string> GetTimeZoneCategoryMap(const double x, const double y);
 };

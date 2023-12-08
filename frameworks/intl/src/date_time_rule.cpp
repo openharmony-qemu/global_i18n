@@ -90,9 +90,14 @@ void DateTimeRule::RuleLevel()
 
 void DateTimeRule::InitRules(std::string& xmlPath)
 {
+    if (!CheckTzDataFilePath(xmlPath)) {
+        return;
+    }
     xmlKeepBlanksDefault(0);
     xmlDocPtr doc = xmlParseFile(xmlPath.c_str());
-    xmlNodePtr cur = xmlDocGetRootElement(doc)->xmlChildrenNode;
+    if (doc == nullptr) return;
+    xmlNodePtr root = xmlDocGetRootElement(doc);
+    xmlNodePtr cur = root->xmlChildrenNode;
     while (cur != nullptr) {
         std::string category = reinterpret_cast<const char*>(cur->name);
         if (category == "sub_rules_map") {
@@ -121,8 +126,12 @@ void DateTimeRule::InitRules(std::string& xmlPath)
 
 void DateTimeRule::InitRuleBackup(std::string& xmlPathBackup)
 {
+    if (!CheckTzDataFilePath(xmlPathBackup)) {
+        return;
+    }
     xmlKeepBlanksDefault(0);
     xmlDocPtr doc = xmlParseFile(xmlPathBackup.c_str());
+    if (doc == nullptr) return;
     xmlNodePtr cur = xmlDocGetRootElement(doc)->xmlChildrenNode;
     while (cur != nullptr) {
         std::string category = reinterpret_cast<const char*>(cur->name);
@@ -228,7 +237,7 @@ std::string DateTimeRule::Get(std::unordered_map<std::string, std::string>& para
     }
     result = sb;
     if (CompareBeginEnd(result, "|", false)) {
-        result = result.substr(0, result.length() - 1);
+        result.pop_back();
     }
     return result;
 }
@@ -311,7 +320,8 @@ int DateTimeRule::CompareLevel(std::string& key1, std::string& key2)
 int DateTimeRule::GetLevel(std::string& name)
 {
     int baselevel;
-    int key = std::stoi(name);
+    int32_t status = 0;
+    int key = ConvertString2Int(name, status);
     // 9999 and 20000 are the rule numbers.
     if (key > 9999 && key < 20000) {
         // 10 is basic level.

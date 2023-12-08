@@ -15,6 +15,7 @@
 #include "date_time_filter.h"
 #include <algorithm>
 #include "hilog/log.h"
+#include "utils.h"
 
 namespace OHOS {
 namespace Global {
@@ -35,7 +36,8 @@ DateTimeFilter::~DateTimeFilter()
 // type of the time calculated based on the rule number.
 int DateTimeFilter::GetType(std::string& name)
 {
-    int key = std::stoi(name);
+    int32_t status = 0;
+    int key = ConvertString2Int(name, status);
     int type;
     // 19999 and 30000 are the matching rule numbers.
     if (key > 19999 && key < 30000) {
@@ -115,9 +117,10 @@ std::vector<MatchedDateTimeInfo> DateTimeFilter::FilterByPast(icu::UnicodeString
     if (pasts.size() == 0) {
         return matches;
     }
+    int32_t status = 0;
     for (auto& pastMatch : pasts) {
         std::string name = pastMatch.GetRegex();
-        int key = std::stoi(name);
+        int key = ConvertString2Int(name, status);
         auto matchIterator = matches.begin();
         while (matchIterator != matches.end()) {
             MatchedDateTimeInfo match =  (*matchIterator);
