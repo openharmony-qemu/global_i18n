@@ -28,8 +28,8 @@ namespace OHOS {
         }
         std::string input(reinterpret_cast<const char*>(data), size);
         UErrorCode status = U_ZERO_ERROR;
-        std::string systemLocale = LocaleConfig::GetSystemLocale();
-        icu::Locale locale = icu::Locale::forLanguageTag(systemLocale, status);
+        //std::string systemLocale = LocaleConfig::GetSystemLocale();
+        icu::Locale locale = icu::Locale::forLanguageTag(input, status);
         EntityRecognizer* entityRecongnizer = new EntityRecognizer(locale);
         entityRecongnizer->FindEntityInfo(input);
         delete entityRecongnizer;

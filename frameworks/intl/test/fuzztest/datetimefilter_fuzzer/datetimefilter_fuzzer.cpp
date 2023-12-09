@@ -53,8 +53,8 @@ namespace OHOS {
         DateTimeMatched* dateTimeMatched = new DateTimeMatched(input);
         icu::UnicodeString message(input.c_str());
         dateTimeMatched->GetMatchedDateTime(message);
-        delete dateTimeFilter;
         delete dateTimeRule;
+        delete dateTimeFilter;
         delete matchedDateTimeInfo2;
         delete matchedDateTimeInfo;
         delete dateTimeMatched;

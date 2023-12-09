@@ -191,14 +191,16 @@ void DateTimeRule::LoadStrToStr(std::unordered_map<std::string, std::string>* ma
         xmlNodePtr value = cur->xmlChildrenNode;
         // load rule level
         if (value != nullptr && !xmlStrcmp(value->name, reinterpret_cast<const xmlChar*>("level"))) {
-            int level = reinterpret_cast<int>(xmlNodeGetContent(value));
+            std::string levelStr = reinterpret_cast<const char*>(xmlNodeGetContent(value));
+            int32_t status = 0;
+            int level = ConvertString2Int(levelStr, status);
             levels[key] = level;
             value = value->next;
         }
         // load rule content
         std::string content;
         while (value != nullptr && !xmlStrcmp(value->name, reinterpret_cast<const xmlChar*>("content"))) {
-            std::string tempContent = reinterpret_cast<char*>(xmlNodeGetContent(value));
+            std::string tempContent = reinterpret_cast<const char*>(xmlNodeGetContent(value));
             content += tempContent;
             value = value->next;
         }
