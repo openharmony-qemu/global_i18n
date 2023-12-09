@@ -50,7 +50,7 @@ void DateTimeRule::Init(std::string& locale)
 {
     InitRules(xmlCommonPath);
     std::string xmlPath = "/system/usr/ohos_locale_config/datetime/" + locale + ".xml";
-    if (!std::filesystem::exists(xmlPath)) {
+    if (!CheckTzDataFilePath(xmlPath)) {
         this->locale = this->localeMap["locale"];
     } else {
         this->locale = locale;

@@ -40,7 +40,7 @@ namespace OHOS {
         clearMatches.push_back(*matchedDateTimeInfo2);
         icu::UnicodeString hyphen(input.c_str());
         dateTimeFilter->Filter(hyphen, matches, clearMatches, clearMatches);
-        matchedDateTimeInfo->SetIsTimePeriod(size % 2 == 0);
+        matchedDateTimeInfo->SetIsTimePeriod(size & 1);
         matchedDateTimeInfo->IsTimePeriod();
         matchedDateTimeInfo->SetBegin(size);
         matchedDateTimeInfo->GetBegin();

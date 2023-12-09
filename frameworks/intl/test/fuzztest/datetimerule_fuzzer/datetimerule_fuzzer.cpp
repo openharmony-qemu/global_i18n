@@ -44,8 +44,7 @@ namespace OHOS {
         dateTimeRule->GetParamBackup();
         dateTimeRule->GetPatternsMap();
         dateTimeRule->CompareLevel(input, input);
-        std::unordered_map<std::string, std::string> param =
-        {
+        std::unordered_map<std::string, std::string> param = {
             {input, input}
         };
         dateTimeRule->Get(param, input);
