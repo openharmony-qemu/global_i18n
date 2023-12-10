@@ -57,15 +57,17 @@
                 "bundle_framework",
                 "common_event_service",
                 "c_utils",
+                "data_share",
+                "eventhandler",
                 "hilog",
                 "init",
                 "ipc",
                 "napi",
                 "preferences",
+                "relational_store",
                 "resource_management",
                 "safwk",
-                "samgr",
-                "eventhandler"
+                "samgr"
             ],
             "third_party": [
                 "icu",

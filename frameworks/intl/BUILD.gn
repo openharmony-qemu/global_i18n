@@ -112,6 +112,7 @@ ohos_shared_library("intl_util") {
     "src/phone_number_matched.cpp",
     "src/phone_number_rule.cpp",
     "src/plural_rules.cpp",
+    "src/query_settings.cpp",
     "src/regex_rule.cpp",
     "src/relative_time_format.cpp",
     "src/rules_engine.cpp",

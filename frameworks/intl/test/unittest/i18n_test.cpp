@@ -23,6 +23,7 @@
 #include "measure_data.h"
 #include "phone_number_format_mock.h"
 #include "preferred_language.h"
+#include "query_settings.h"
 
 using namespace OHOS::Global::I18n;
 using testing::ext::TestSize;
@@ -1195,6 +1196,19 @@ HWTEST_F(I18nTest, I18nFuncTest046, TestSize.Level1)
     EXPECT_EQ(res[1][2], 16);
     EXPECT_EQ(res[1][3], 17);
     EXPECT_EQ(res[1][4], 34);
+}
+
+/**
+ * @tc.name: I18nFuncTest047
+ * @tc.desc: Test I18n QuerySettings
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest047, TestSize.Level1)
+{
+    const char* key = "settings.date.time_format";
+    std::string valueQuery;
+    bool flagQuery = QuerySettings::SettingsQuery(key, valueQuery);
+    EXPECT_EQ(flagQuery, true);
 }
 } // namespace I18n
 } // namespace Global

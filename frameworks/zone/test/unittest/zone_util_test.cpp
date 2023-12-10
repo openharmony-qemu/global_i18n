@@ -14,6 +14,7 @@
  */
 
 #include <gtest/gtest.h>
+#include "i18n_datashare_helper.h"
 #include "zone_util.h"
 
 using namespace OHOS::Global::I18n;
@@ -284,6 +285,19 @@ HWTEST_F(ZoneUtilTest, ZoneUtilFuncTest011, TestSize.Level1)
     CountryResult result5 = util.LookupTimezoneByCountry(region, currentMillis);
     EXPECT_EQ(result5.timezoneId, "Asia/Nicosia");
     EXPECT_EQ(result5.quality, 2);
+}
+
+/**
+ * @tc.name: ZoneUtilFuncTest012
+ * @tc.desc: Test i18n_datashare_helper Query
+ * @tc.type: FUNC
+ */
+HWTEST_F(ZoneUtilTest, ZoneUtilFuncTest012, TestSize.Level1)
+{
+    const char* key = "settings.date.time_format";
+    std::string valueQuery;
+    bool flagQuery = Query(key, valueQuery);
+    EXPECT_EQ(flagQuery, true);
 }
 } // namespace I18n
 } // namespace Global

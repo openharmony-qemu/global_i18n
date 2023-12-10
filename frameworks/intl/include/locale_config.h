@@ -107,6 +107,7 @@ private:
     static const char *LANGUAGE_KEY;
     static const char *LOCALE_KEY;
     static const char *HOUR_KEY;
+    static const char *TIME_FORMAT;
     static const char *DEFAULT_LOCALE_KEY;
     static const char *DEFAULT_LANGUAGE_KEY;
     static const char *DEFAULT_REGION_KEY;

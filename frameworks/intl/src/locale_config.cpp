@@ -31,6 +31,7 @@
 #include "locid.h"
 #include "ohos/init_data.h"
 #include "parameter.h"
+#include "query_settings.h"
 #include "securec.h"
 #include "string_ex.h"
 #include "ucase.h"
@@ -53,6 +54,7 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "Loc
 const char *LocaleConfig::LANGUAGE_KEY = "persist.global.language";
 const char *LocaleConfig::LOCALE_KEY = "persist.global.locale";
 const char *LocaleConfig::HOUR_KEY = "persist.global.is24Hour";
+const char *LocaleConfig::TIME_FORMAT = "settings.date.time_format";
 const char *LocaleConfig::DEFAULT_LOCALE_KEY = "const.global.locale";
 const char *LocaleConfig::DEFAULT_LANGUAGE_KEY = "const.global.language";
 const char *LocaleConfig::DEFAULT_REGION_KEY = "const.global.region";
@@ -971,7 +973,13 @@ std::string LocaleConfig::GetValidLocale(const std::string &localeTag)
 
 bool LocaleConfig::Is24HourClock()
 {
-    std::string is24Hour = ReadSystemParameter(HOUR_KEY, CONFIG_LEN);
+    std::string is24HourValue;
+    std::string is24Hour;
+    if (QuerySettings::SettingsQuery(TIME_FORMAT, is24HourValue)) {
+        is24Hour = (is24HourValue == "24") ? "true" : "false";
+    } else {
+        is24Hour = ReadSystemParameter(HOUR_KEY, CONFIG_LEN);
+    }
     if (is24Hour.empty()) {
         return false;
     }
