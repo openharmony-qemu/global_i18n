@@ -1938,27 +1938,33 @@ HWTEST_F(IntlTest, IntlFuncTest0049, TestSize.Level1)
 {
     std::unordered_set<std::string> blockedRegionSet = LocaleConfig::GetLanguageBlockedRegions();
     EXPECT_EQ(blockedRegionSet.size(), 0);
+    I18nErrorCode status = LocaleConfig::SetSystemLanguage("zh-Hans");
+    EXPECT_EQ(status, I18nErrorCode::SUCCESS);
     std::string systemLanguage = LocaleConfig::GetSystemLanguage();
     EXPECT_EQ(systemLanguage, "zh-Hans");
+
+    status = LocaleConfig::SetSystemRegion("CN");
+    EXPECT_EQ(status, I18nErrorCode::SUCCESS);
     std::string systemRegion = LocaleConfig::GetSystemRegion();
     EXPECT_EQ(systemRegion, "CN");
     std::string systemLocale = LocaleConfig::GetSystemLocale();
     EXPECT_EQ(systemLocale, "zh-Hans-CN");
+
     const std::string locale = "zh-CN";
     bool isRTL = LocaleConfig::IsRTL(locale);
     EXPECT_TRUE(!isRTL);
     std::string validLocale = LocaleConfig::GetValidLocale(locale);
     EXPECT_EQ(validLocale, "zh-CN");
+
+    status = LocaleConfig::Set24HourClock(false);
+    EXPECT_EQ(status, I18nErrorCode::SUCCESS);
     bool is24HourClock = LocaleConfig::Is24HourClock();
     EXPECT_TRUE(!is24HourClock);
-    bool set24HourClock = LocaleConfig::Set24HourClock(true);
-    EXPECT_TRUE(!set24HourClock);
-    bool permission = LocaleConfig::CheckPermission();
-    EXPECT_TRUE(!permission);
-    bool usingLocalDigit = LocaleConfig::SetUsingLocalDigit(true);
-    EXPECT_TRUE(!usingLocalDigit);
-    usingLocalDigit = LocaleConfig::GetUsingLocalDigit();
-    EXPECT_TRUE(!usingLocalDigit);
+
+    status = LocaleConfig::SetUsingLocalDigit(true);
+    EXPECT_EQ(status, I18nErrorCode::UPDATE_LOCAL_DIGIT_FAILED);
+    bool usingLocalDigit = LocaleConfig::GetUsingLocalDigit();
+    EXPECT_FALSE(usingLocalDigit);
 }
 
 /**
@@ -1968,26 +1974,42 @@ HWTEST_F(IntlTest, IntlFuncTest0049, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest0050, TestSize.Level1)
 {
-    const std::string langugae = "zh-CN";
-    const std::string langugaeDe = "de-DE";
-    const std::string fakeLangugae = "1**1";
-    I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
-    PreferredLanguage::AddPreferredLanguage(langugae, 0, errorCode);
-    EXPECT_TRUE(errorCode != I18nErrorCode::SUCCESS);
-    PreferredLanguage::AddPreferredLanguage(langugaeDe, 1, errorCode);
-    EXPECT_TRUE(errorCode != I18nErrorCode::SUCCESS);
-    PreferredLanguage::AddPreferredLanguage(langugae, 3, errorCode);
-    EXPECT_TRUE(errorCode != I18nErrorCode::SUCCESS);
-    PreferredLanguage::AddPreferredLanguage(fakeLangugae, -1, errorCode);
-    PreferredLanguage::AddPreferredLanguage(langugae, -1, errorCode);
+    // init test environment
+    I18nErrorCode status = LocaleConfig::SetSystemLanguage("zh-Hans");
+    EXPECT_EQ(status, I18nErrorCode::SUCCESS);
+    std::vector<std::string> preferredLanguageList = PreferredLanguage::GetPreferredLanguageList();
+    for (auto i = preferredLanguageList.size() - 1; i > 0; --i) {
+        status = PreferredLanguage::RemovePreferredLanguage(i);
+        EXPECT_EQ(status, I18nErrorCode::SUCCESS);
+    }
+    // execute test
+    const std::string language = "zh-CN";
+    const std::string languageDe = "de-DE";
+    const std::string fakeLanguage = "1**1";
+    status = PreferredLanguage::AddPreferredLanguage(language, 0);
+    EXPECT_EQ(status, I18nErrorCode::SUCCESS);
+    status = PreferredLanguage::AddPreferredLanguage(languageDe, 1);
+    EXPECT_EQ(status, I18nErrorCode::SUCCESS);
+    status = PreferredLanguage::AddPreferredLanguage(language, 3);
+    EXPECT_EQ(status, I18nErrorCode::SUCCESS);
+    PreferredLanguage::AddPreferredLanguage(fakeLanguage, -1);
+    PreferredLanguage::AddPreferredLanguage(language, -1);
     std::vector<std::string> list = PreferredLanguage::GetPreferredLanguageList();
-    EXPECT_EQ(list.size(), 1);
+    EXPECT_EQ(list.size(), 3);
     std::string firstPreferredLanguage = PreferredLanguage::GetFirstPreferredLanguage();
-    EXPECT_EQ(firstPreferredLanguage, "zh-Hans");
+    EXPECT_EQ(firstPreferredLanguage, "zh-CN");
     std::string preferredLocale = PreferredLanguage::GetPreferredLocale();
     EXPECT_EQ(preferredLocale, "zh-CN");
-    bool flag = PreferredLanguage::RemovePreferredLanguage(0);
-    EXPECT_TRUE(!flag);
+    status = PreferredLanguage::RemovePreferredLanguage(0);
+    EXPECT_EQ(status, I18nErrorCode::SUCCESS);
+    // restore environment
+    status = LocaleConfig::SetSystemLanguage("zh-Hans");
+    EXPECT_EQ(status, I18nErrorCode::SUCCESS);
+    preferredLanguageList = PreferredLanguage::GetPreferredLanguageList();
+    for (auto i = preferredLanguageList.size() - 1; i > 0; --i) {
+        status = PreferredLanguage::RemovePreferredLanguage(i);
+        EXPECT_EQ(status, I18nErrorCode::SUCCESS);
+    }
 }
 
 /**

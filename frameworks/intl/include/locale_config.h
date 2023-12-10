@@ -21,6 +21,11 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
+#ifdef SUPPORT_GRAPHICS
+#include "configuration.h"
+#include <common_event_data.h>
+#endif
+#include "i18n_types.h"
 
 namespace OHOS {
 namespace Global {
@@ -29,9 +34,48 @@ class LocaleConfig {
 public:
     LocaleConfig() = default;
     virtual ~LocaleConfig() = default;
-    static bool SetSystemLanguage(const std::string &language);
-    static bool SetSystemRegion(const std::string &region);
-    static bool SetSystemLocale(const std::string &locale);
+    
+    /**
+     * @brief Set the System Language to language Tag.
+     *
+     * @param languageTag language tag to set.
+     * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
+     */
+    static I18nErrorCode SetSystemLanguage(const std::string &languageTag);
+    
+    /**
+     * @brief Set the System Region to region tag.
+     *
+     * @param regionTag region tag to set.
+     * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
+     */
+    static I18nErrorCode SetSystemRegion(const std::string &regionTag);
+
+    /**
+     * @brief Set the System Locale to locale tag.
+     *
+     * @param localeTag locale tag to set.
+     * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
+     */
+    static I18nErrorCode SetSystemLocale(const std::string &localeTag);
+
+    /**
+     * @brief Set system hour to 12 or 24-hour clock.
+     *
+     * @param option When flag is True, the system adopts 24-hour clock;
+     * When flag is False, the system adopts 12-hour clock;
+     * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
+     */
+    static I18nErrorCode Set24HourClock(bool option);
+
+    /**
+     * @brief Set system digit to local digit or Arbic digit.
+     *
+     * @param flag When flag is True, the system adopts local digit;
+     * When flag is False, the system doesn't adopt local digit;
+     * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
+     */
+    static I18nErrorCode SetUsingLocalDigit(bool flag);
     static std::string GetSystemLanguage();
     static std::string GetSystemRegion();
     static std::string GetSystemLocale();
@@ -46,9 +90,6 @@ public:
     static bool IsRTL(const std::string &locale);
     static std::string GetValidLocale(const std::string &localeTag);
     static bool Is24HourClock();
-    static bool Set24HourClock(bool option);
-    static bool CheckPermission();
-    static bool SetUsingLocalDigit(bool flag);
     static bool GetUsingLocalDigit();
     static std::unordered_set<std::string> GetBlockedLanguages();
     static std::unordered_set<std::string> GetBlockedRegions();
@@ -59,7 +100,7 @@ public:
 
 private:
     static void Split(const std::string &src, const std::string &sep, std::vector<std::string> &dest);
-    static bool UpdateSystemLocale(const std::string &language);
+    static I18nErrorCode UpdateSystemLocale(const std::string &language);
     static constexpr uint32_t LANGUAGE_LEN = 2;
     static constexpr uint32_t LOCALE_ITEM_COUNT = 3;
     static constexpr uint32_t SCRIPT_OFFSET = 2;
@@ -107,7 +148,6 @@ private:
     static void GetCountriesFromSim(std::vector<std::string> &simCountries);
     static void GetRelatedLocales(std::unordered_set<std::string> &relatedLocales,
         const std::vector<std::string> countries);
-    static std::string GetRegionChangeLocale(const std::string &languageTag, const std::string &region);
     static void GetListFromFile(const char *path, const char *resourceName, std::unordered_set<std::string> &ret);
     static void Expunge(std::unordered_set<std::string> &src, const std::unordered_set<std::string> &another);
     static std::string GetMainLanguage(const std::string &language);
@@ -117,6 +157,85 @@ private:
     static void ReadLangData(const char *langDataPath);
     static void ReadRegionData(const char *regionDataPath);
     static void ProcessForbiddenRegions(const std::unordered_set<std::string> &forbiddenRegions);
+
+#ifdef SUPPORT_GRAPHICS
+    /**
+     * @brief Provided for updating i18n configuration include language and hour24.
+     *
+     * @param key Indicats configuration key.
+     * @param value Indicates configuration value.
+     */
+    static void UpdateConfiguration(const char *key, const std::string &value);
+
+    /**
+     * @brief Provided for public i18n event include locale-change event and time-change event.
+     *
+     * @param eventType Indicates event type.
+     * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
+     */
+    static I18nErrorCode PublishCommonEvent(const std::string &eventType);
+#endif
+
+    /**
+     * @brief Change language part of system locale to languageTag.
+     *
+     * @param languageTag Indicats language tag use to update locale.
+     * @return std::string Return locale tag.
+     */
+    static std::string UpdateLanguageOfLocale(const std::string &languageTag);
+
+    /**
+     * @brief Provided for combining language, script, region, extend param to locale.
+     *
+     * @param languageTag Indicate language part in locale.
+     * @param scriptTag Indicate script part in locale.
+     * @param regionTag Indicate region part in locale.
+     * @param extendParamTag Indicate extend param part in locale.
+     * @return std::string Return locale tag.
+     */
+    static std::string CreateLocale(const std::string &languageTag, const std::string &scriptTag,
+        const std::string &regionTag, const std::string &extendParamTag);
+    
+    /**
+     * @brief Create a locale tag from region tag. Use icu to fill in missing parts.
+     *
+     * @param regionTag Indicats region tag used to create locale.
+     * @return std::string Return locale tag.
+     */
+    static std::string CreateLocaleFromRegion(const std::string &regionTag);
+
+    /**
+     * @brief Change the region part of system locale to regionTag.
+     *
+     * @param regionTag Indicates region tag used to update locale.
+     * @return std::string Return locale Tag.
+     */
+    static std::string UpdateRegionOfLocale(const std::string &regionTag);
+
+    /**
+     * @brief Change number system extend param part of locale.
+     *
+     * @param flag When flag is true, change number system extend param part to local digit of system language,
+     * when flag is false, remove number system extend param part.
+     * @return std::string Return locale Tag.
+     */
+    static std::string UpdateNumberSystemOfLocale(const std::string &localDigitTag, bool flag);
+
+    /**
+     * @brief Add local digit tag to number system extend param of locale.
+     *
+     * @param localDigitTag Indicats local digit tag which define in localDigitMap.
+     * @return std::string Return locale Tag.
+     */
+    static std::string AddLocalDigitToLocale(const std::string &localDigitTag);
+
+    /**
+     * @brief Remove local digit tag from number system extend param of locale.
+     *
+     * @param localDigitTag Indicats local digit tag which define in localDigitMap.
+     * @return std::string Return locale Tag.
+     */
+    static std::string RemoveLocalDigitFromLocale(const std::string &localDigitTag);
     static std::unordered_set<std::string> supportedLocales;
     static std::unordered_set<std::string> supportedRegions;
     static std::unordered_set<std::string> supportLocales;
@@ -141,7 +260,7 @@ private:
     static std::set<std::string> validHcTag;
     static bool listsInitialized;
     static bool InitializeLists();
-    static bool updateLocal(const std::string &locale);
+    static const char *NUMBER_SYSTEM_KEY;
 };
 } // namespace I18n
 } // namespace Global

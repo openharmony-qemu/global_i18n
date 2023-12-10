@@ -28,8 +28,22 @@ namespace Global {
 namespace I18n {
 class PreferredLanguage {
 public:
-    static void AddPreferredLanguage(const std::string& language, int index, I18nErrorCode &errorCode);
-    static bool RemovePreferredLanguage(int index);
+    /**
+     * @brief Add language to system preferred language list on index.
+     *
+     * @param language Indicates language tag to add.
+     * @param index Indicates position to add.
+     * @return I18nErrorCode Return SUCCESS indicates that the add operation was successful.
+     */
+    static I18nErrorCode AddPreferredLanguage(const std::string &language, int32_t index);
+
+    /**
+     * @brief Remove language from system preferred language list on index.
+     *
+     * @param index Indicates position to remove.
+     * @return I18nErrorCode Return SUCCESS indicates that the add operation was successful.
+     */
+    static I18nErrorCode RemovePreferredLanguage(int32_t index);
     static std::vector<std::string> GetPreferredLanguageList();
     static std::string GetFirstPreferredLanguage();
 #ifdef SUPPORT_APP_PREFERRED_LANGUAGE
@@ -54,16 +68,66 @@ public:
     static std::string GetPreferredLocale();
 
 private:
-    static bool AddPreferredLanguageNonExist(std::vector<std::string> &preferredLangList, int index,
-                                             const std::string& language);
-    static bool AddPreferredLanguageExist(std::vector<std::string> &preferredLangList, int languageIdx, int index,
-                                          const std::string& language);
     static bool IsValidLanguage(const std::string &language);
     static bool IsValidTag(const std::string &tag);
     static void Split(const std::string &src, const std::string &sep, std::vector<std::string> &dest);
 #ifdef SUPPORT_APP_PREFERRED_LANGUAGE
     static std::shared_ptr<NativePreferences::Preferences> GetI18nAppPreferences();
 #endif
+    /**
+     * @brief Normalize index to target range [0, max].
+     *
+     * @param index Indicates value to normalize.
+     * @param max Indicates the max value of range.
+     * @return int32_t Return normalized index.
+     */
+    static int32_t NormalizeIndex(int32_t index, int32_t max);
+
+    /**
+     * @brief Find the language index in system preferred language list.
+     *
+     * @param language Indicates language tag to find.
+     * @return int32_t Return index of language in system preferred language list.
+     */
+    static int32_t FindLanguage(const std::string &language);
+
+    /**
+     * @brief Add language to position index of system preferred language list when language is not in list.
+     *
+     * @param language Indicates language tag to add.
+     * @param index Indicates position to add.
+     * @param preferredLanguages Indicates system preferred language list after inserting language.
+     * @return I18nErrorCode Return SUCCESS indicates that the add operation was successful.
+     */
+    static I18nErrorCode AddNonExistPreferredLanguage(const std::string& language, int32_t index,
+        std::vector<std::string> &preferredLanguages);
+
+    /**
+     * @brief Add language to position index of system preferred language list when language is in list.
+     *
+     * @param language Indicates language tag to add.
+     * @param index Indicates position to add.
+     * @param preferredLanguages Indicates system preferred language list after inserting language.
+     * @return I18nErrorCode Return SUCCESS indicates that the add operation was successful.
+     */
+    static I18nErrorCode AddExistPreferredLanguage(const std::string& language, int32_t index,
+        std::vector<std::string> &preferredLanguages);
+
+    /**
+     * @brief combin preferred language list to string.
+     *
+     * @param preferredLanguages Indicates preferred language list.
+     * @return string Return Indicates the joined preferred languages.
+     */
+    static std::string JoinPreferredLanguages(const std::vector<std::string> preferredLanguages);
+
+    /**
+     * @brief Set the Preferred Languages to System parameter.
+     *
+     * @param preferredLanguages Indicates preferreder languages.
+     * @return I18nErrorCode Return SUCCESS indicates that the add operation was successful.
+     */
+    static I18nErrorCode SetPreferredLanguages(const std::string &preferredLanguages);
     static const char *RESOURCE_PATH_HEAD;
     static const char *RESOURCE_PATH_TAILOR;
     static const char *RESOURCE_PATH_SPLITOR;

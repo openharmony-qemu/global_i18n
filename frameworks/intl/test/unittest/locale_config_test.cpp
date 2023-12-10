@@ -93,8 +93,10 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest003, TestSize.Level1)
 HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest004, TestSize.Level1)
 {
     string language = "pt-PT";
-    bool ret = LocaleConfig::SetSystemLanguage(language);
-    EXPECT_EQ(ret, false);
+    I18nErrorCode status = LocaleConfig::SetSystemLanguage(language);
+    EXPECT_EQ(status, I18nErrorCode::SUCCESS);
+    LocaleConfig::SetSystemLanguage("zh-Hans");
+    EXPECT_EQ(status, I18nErrorCode::SUCCESS);
 }
 
 /**
@@ -105,8 +107,10 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest004, TestSize.Level1)
 HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest005, TestSize.Level1)
 {
     string locale = "zh-Hant-TW";
-    bool ret = LocaleConfig::SetSystemLocale(locale);
-    EXPECT_EQ(ret, false);
+    I18nErrorCode status = LocaleConfig::SetSystemLocale(locale);
+    EXPECT_EQ(status, I18nErrorCode::SUCCESS);
+    status = LocaleConfig::SetSystemLocale("zh-Hans-CN");
+    EXPECT_EQ(status, I18nErrorCode::SUCCESS);
 }
 
 /**
@@ -117,9 +121,12 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest005, TestSize.Level1)
 HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest006, TestSize.Level1)
 {
     string locale = "zh-Hant-TW";
-    bool ret = LocaleConfig::SetSystemLocale(locale);
-    ret = LocaleConfig::SetSystemRegion("HK");
-    EXPECT_EQ(ret, false);
+    I18nErrorCode status = LocaleConfig::SetSystemLocale(locale);
+    EXPECT_EQ(status, I18nErrorCode::SUCCESS);
+    status = LocaleConfig::SetSystemRegion("HK");
+    EXPECT_EQ(status, I18nErrorCode::SUCCESS);
+    status = LocaleConfig::SetSystemLocale("zh-Hans-CN");
+    EXPECT_EQ(status, I18nErrorCode::SUCCESS);
 }
 
 /**
@@ -264,10 +271,10 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest012, TestSize.Level1)
 HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest013, TestSize.Level1)
 {
     bool current = LocaleConfig::GetUsingLocalDigit();
-    if (LocaleConfig::SetUsingLocalDigit(true)) {
-        current = LocaleConfig::GetUsingLocalDigit();
-        EXPECT_TRUE(current);
-    }
+    I18nErrorCode status = LocaleConfig::SetUsingLocalDigit(true);
+    EXPECT_EQ(status, I18nErrorCode::UPDATE_LOCAL_DIGIT_FAILED);
+    current = LocaleConfig::GetUsingLocalDigit();
+    EXPECT_FALSE(current);
 }
 
 /**
@@ -278,10 +285,10 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest013, TestSize.Level1)
 HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest014, TestSize.Level1)
 {
     bool current = LocaleConfig::Is24HourClock();
-    if (LocaleConfig::Set24HourClock(true)) {
-        current = LocaleConfig::Is24HourClock();
-        EXPECT_TRUE(current);
-    }
+    I18nErrorCode status = LocaleConfig::Set24HourClock(true);
+    EXPECT_EQ(status, I18nErrorCode::SUCCESS);
+    current = LocaleConfig::Is24HourClock();
+    EXPECT_TRUE(current);
 }
 
 /**
@@ -343,10 +350,10 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest018, TestSize.Level1)
     string currentRegion = LocaleConfig::GetSystemRegion();
     EXPECT_TRUE(currentRegion.length() > 0);
     string region = "CN";
-    if (LocaleConfig::SetSystemRegion(region)) {
-        currentRegion = LocaleConfig::GetSystemRegion();
-        EXPECT_EQ(currentRegion, region);
-    }
+    I18nErrorCode status = LocaleConfig::SetSystemRegion(region);
+    EXPECT_EQ(status, I18nErrorCode::SUCCESS);
+    currentRegion = LocaleConfig::GetSystemRegion();
+    EXPECT_EQ(currentRegion, region);
 }
 
 /**
@@ -359,10 +366,10 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest019, TestSize.Level1)
     string currentLocale = LocaleConfig::GetSystemLocale();
     EXPECT_TRUE(currentLocale.length() > 0);
     string locale = "zh-Hans-CN";
-    if (LocaleConfig::SetSystemLocale(locale)) {
-        currentLocale = LocaleConfig::GetSystemLocale();
-        EXPECT_EQ(currentLocale, locale);
-    }
+    I18nErrorCode status = LocaleConfig::SetSystemLocale(locale);
+    EXPECT_EQ(status, I18nErrorCode::SUCCESS);
+    currentLocale = LocaleConfig::GetSystemLocale();
+    EXPECT_EQ(currentLocale, locale);
 }
 
 /**

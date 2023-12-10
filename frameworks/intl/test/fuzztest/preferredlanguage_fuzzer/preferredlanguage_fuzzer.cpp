@@ -25,8 +25,7 @@ namespace OHOS {
         using namespace Global::I18n;
         std::string input(reinterpret_cast<const char*>(data), size);
         if (size > 0) {
-            I18nErrorCode errorcode = I18nErrorCode::SUCCESS;
-            PreferredLanguage::AddPreferredLanguage(input, data[0], errorcode);
+            PreferredLanguage::AddPreferredLanguage(input, data[0]);
             PreferredLanguage::RemovePreferredLanguage(data[0]);
         }
         return true;

@@ -15,6 +15,7 @@
 
 #include "error_util.h"
 #include "hilog/log.h"
+#include "i18n_service_ability_client.h"
 #include "i18n_system_addon.h"
 #include "locale_config.h"
 #include "preferred_language.h"
@@ -596,7 +597,9 @@ napi_value I18nSystemAddon::SetSystemLanguageImpl(napi_env env, napi_callback_in
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
         return nullptr;
     }
-    bool success = LocaleConfig::SetSystemLanguage(languageBuf.data());
+    I18nErrorCode err = I18nServiceAbilityClient::SetSystemLanguage(languageBuf.data());
+    HiLog::Info(LABEL, "I18nSystemAddon::SetSystemLanguageImpl with code %{public}d", static_cast<int32_t>(err));
+    bool success = err == I18nErrorCode::SUCCESS;
     if (throwError) {
         if (!success) {
             ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, throwError);
@@ -636,7 +639,9 @@ napi_value I18nSystemAddon::SetSystemRegionImpl(napi_env env, napi_callback_info
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
         return nullptr;
     }
-    bool success = LocaleConfig::SetSystemRegion(regionBuf.data());
+    I18nErrorCode err = I18nServiceAbilityClient::SetSystemRegion(regionBuf.data());
+    HiLog::Info(LABEL, "I18nSystemAddon::SetSystemRegionImpl with code %{public}d", static_cast<int32_t>(err));
+    bool success = err == I18nErrorCode::SUCCESS;
     if (throwError) {
         if (!success) {
             ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, throwError);
@@ -676,7 +681,9 @@ napi_value I18nSystemAddon::SetSystemLocaleImpl(napi_env env, napi_callback_info
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
         return nullptr;
     }
-    bool success = LocaleConfig::SetSystemLocale(localeBuf.data());
+    I18nErrorCode err = I18nServiceAbilityClient::SetSystemLocale(localeBuf.data());
+    HiLog::Info(LABEL, "I18nSystemAddon::SetSystemLocaleImpl with code %{public}d", static_cast<int32_t>(err));
+    bool success = err == I18nErrorCode::SUCCESS;
     if (throwError) {
         if (!success) {
             ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, throwError);
@@ -715,7 +722,9 @@ napi_value I18nSystemAddon::Set24HourClockImpl(napi_env env, napi_callback_info 
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
         return nullptr;
     }
-    bool success = LocaleConfig::Set24HourClock(option);
+    I18nErrorCode err = I18nServiceAbilityClient::Set24HourClock(option);
+    HiLog::Info(LABEL, "I18nSystemAddon::Set24HourClock with code %{public}d", static_cast<int32_t>(err));
+    bool success = err == I18nErrorCode::SUCCESS;
     if (throwError) {
         if (!success) {
             ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, throwError);
@@ -756,19 +765,19 @@ napi_value I18nSystemAddon::AddPreferredLanguageImpl(napi_env env, napi_callback
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
         return nullptr;
     }
-    I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
-    PreferredLanguage::AddPreferredLanguage(language.data(), index, errorCode);
+    I18nErrorCode err = I18nServiceAbilityClient::AddPreferredLanguage(language.data(), index);
+    HiLog::Info(LABEL, "I18nSystemAddon::AddPreferredLanguageImpl with code %{public}d", static_cast<int32_t>(err));
     if (throwError) {
-        if (errorCode == I18nErrorCode::NO_PERMISSION) {
+        if (err == I18nErrorCode::NO_PERMISSION) {
             ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, throwError);
         }
-        if (errorCode == I18nErrorCode::INVALID_PARAMETER || errorCode == I18nErrorCode::FAILED) {
+        if (err != I18nErrorCode::SUCCESS) {
             ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
         }
         return nullptr;
     }
     bool addResult = true;
-    if (errorCode != I18nErrorCode::SUCCESS) {
+    if (err != I18nErrorCode::SUCCESS) {
         addResult = false;
     }
     napi_value result = nullptr;
@@ -815,7 +824,8 @@ napi_value I18nSystemAddon::RemovePreferredLanguageImpl(napi_env env, napi_callb
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
         return nullptr;
     }
-    bool success = PreferredLanguage::RemovePreferredLanguage(index);
+    I18nErrorCode err = I18nServiceAbilityClient::RemovePreferredLanguage(index);
+    bool success = err == I18nErrorCode::SUCCESS;
 
     if (throwError) {
         if (!success) {
@@ -858,8 +868,10 @@ napi_value I18nSystemAddon::SetUsingLocalDigitAddonImpl(napi_env env, napi_callb
         HiLog::Error(LABEL, "Get parameter flag failed");
         return nullptr;
     }
-
-    bool res = LocaleConfig::SetUsingLocalDigit(flag);
+    I18nErrorCode err = I18nServiceAbilityClient::SetUsingLocalDigit(flag);
+    HiLog::Info(LABEL, "I18nSystemAddon::SetUsingLocalDigitAddonImpl with code %{public}d",
+        static_cast<int32_t>(err));
+    bool res = err == I18nErrorCode::SUCCESS;
     if (throwError) {
         if (!res) {
             ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, throwError);

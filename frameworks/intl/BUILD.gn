@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//base/global/i18n/i18n.gni")
+import("//base/startup/init/services/etc/param/param_fixer.gni")
 import("//build/ohos.gni")
 
 group("build_module") {
@@ -74,6 +75,9 @@ config("intl_util_config") {
     "//base/global/i18n/frameworks/intl/include",
     "//base/global/i18n/interfaces/native/inner_api/i18n/include",
   ]
+  if (i18n_support_ui) {
+    include_dirs += [ "//foundation/ability/ability_base/interfaces/kits/native/configuration/include" ]
+  }
 }
 ohos_shared_library("intl_util") {
   public_configs = [ ":intl_util_config" ]
@@ -134,9 +138,9 @@ ohos_shared_library("intl_util") {
     ":en_datetime_xml",
     ":forbidden_languages_xml",
     ":forbidden_regions_xml",
+    ":i18n.para",
+    ":i18n.para.dac",
     ":lang_supported_locales",
-    ":language_config.para",
-    ":language_config.para.dac",
     ":region_supported_locales_xml",
     ":root_timezone_xml",
     ":timezones_xml",
@@ -165,7 +169,6 @@ ohos_shared_library("intl_util") {
   defines = []
   if (i18n_support_ui) {
     include_dirs += [
-      "//foundation/ability/ability_base/interfaces/kits/native/configuration/include",
       "//foundation/ability/ability_runtime/interfaces/inner_api/app_manager/include/appmgr",
       "//foundation/ability/ability_runtime/interfaces/inner_api/ability_manager/include",
       "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include/",
@@ -189,14 +192,14 @@ ohos_shared_library("intl_util") {
   part_name = "i18n"
 }
 
-ohos_prebuilt_etc("language_config.para") {
-  source = "//base/global/i18n/frameworks/intl/etc/language_config.para"
+ohos_prebuilt_para("i18n.para") {
+  source = "//base/global/i18n/frameworks/intl/etc/i18n.para"
   part_name = "i18n"
   module_install_dir = "etc/param"
 }
 
-ohos_prebuilt_etc("language_config.para.dac") {
-  source = "//base/global/i18n/frameworks/intl/etc/language_config.para.dac"
+ohos_prebuilt_para("i18n.para.dac") {
+  source = "//base/global/i18n/frameworks/intl/etc/i18n.para.dac"
   part_name = "i18n"
   module_install_dir = "etc/param"
 }

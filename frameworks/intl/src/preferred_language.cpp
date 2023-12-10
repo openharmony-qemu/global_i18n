@@ -36,132 +36,9 @@ using namespace OHOS::HiviewDFX;
 const char *PreferredLanguage::RESOURCE_PATH_HEAD = "/data/accounts/account_0/applications/";
 const char *PreferredLanguage::RESOURCE_PATH_TAILOR = "/assets/entry/resources.index";
 const char *PreferredLanguage::RESOURCE_PATH_SPLITOR = "/";
-const char *PreferredLanguage::PREFERRED_LANGUAGES = "persist.sys.preferredLanguages";
+const char *PreferredLanguage::PREFERRED_LANGUAGES = "persist.global.preferredLanguages";
 const char *PreferredLanguage::APP_LANGUAGE_KEY = "app_language";
 const char *PreferredLanguage::I18N_PREFERENCES_FILE_NAME = "/i18n";
-
-bool PreferredLanguage::AddPreferredLanguageExist(std::vector<std::string> &preferredLanguageList, int languageIdx,
-    int index, const std::string& language)
-{
-    if (languageIdx == index) {
-        return false;
-    }
-    if (languageIdx < index) {
-        for (int i = languageIdx; i < index; i++) {
-            preferredLanguageList[i] = preferredLanguageList[i + 1];
-        }
-    }
-    if (languageIdx > index) {
-        for (int i = languageIdx; i > index; i--) {
-            preferredLanguageList[i] = preferredLanguageList[i - 1];
-        }
-    }
-    preferredLanguageList[index] = language;
-    if (!languageIdx || !index) {
-        bool status = LocaleConfig::SetSystemLanguage(preferredLanguageList[0]);
-        if (!status) {
-            return false;
-        }
-    }
-    return true;
-}
-
-bool PreferredLanguage::AddPreferredLanguageNonExist(std::vector<std::string> &preferredLanguageList, int index,
-    const std::string& language)
-{
-    preferredLanguageList.insert(preferredLanguageList.begin() + index, language);
-    if (!index) {
-        bool status = LocaleConfig::SetSystemLanguage(preferredLanguageList[0]);
-        if (!status) {
-            return false;
-        }
-    }
-    return true;
-}
-
-void PreferredLanguage::AddPreferredLanguage(const std::string &language, int index, I18nErrorCode &errorCode)
-{
-    if (!LocaleConfig::CheckPermission()) {
-        errorCode = I18nErrorCode::NO_PERMISSION;
-        return;
-    }
-    if (!IsValidTag(language)) {
-        errorCode = I18nErrorCode::INVALID_PARAMETER;
-        return;
-    }
-    std::vector<std::string> preferredLanguageList = GetPreferredLanguageList();
-    int idx = index;
-    if (index < 0) {
-        idx = 0;
-    }
-    if (index >= (int)preferredLanguageList.size()) {
-        idx = (int)preferredLanguageList.size();
-    }
-    int languageIdx = -1;
-    for (size_t i = 0; i < preferredLanguageList.size(); i++) {
-        if (preferredLanguageList[i] == language) {
-            languageIdx = (int)i;
-            break;
-        }
-    }
-    bool status = true;
-    if (languageIdx == -1) {
-        status = AddPreferredLanguageNonExist(preferredLanguageList, idx, language);
-    } else {
-        if (idx == (int)preferredLanguageList.size()) {
-            idx -= 1;
-        }
-        status = AddPreferredLanguageExist(preferredLanguageList, languageIdx, idx, language);
-    }
-    if (!status) {
-        errorCode = I18nErrorCode::FAILED;
-        return;
-    }
-    std::string result = "";
-    for (size_t i = 0; i < preferredLanguageList.size(); i++) {
-        result += preferredLanguageList[i];
-        result += ";";
-    }
-    result.pop_back();
-    if (result.length() > CONFIG_LEN || SetParameter(PREFERRED_LANGUAGES, result.data()) != 0) {
-        errorCode = I18nErrorCode::FAILED;
-    }
-}
-
-bool PreferredLanguage::RemovePreferredLanguage(int index)
-{
-    if (!LocaleConfig::CheckPermission()) {
-        return false;
-    }
-    std::vector<std::string> preferredLanguageList = GetPreferredLanguageList();
-    int idx = index;
-    if (index < 0) {
-        idx = 0;
-    }
-    if (index >= (int)preferredLanguageList.size()) {
-        idx = (int)preferredLanguageList.size() - 1;
-    }
-    if (preferredLanguageList.size() == 1) {
-        return false;
-    }
-    std::vector<std::string>::iterator it = preferredLanguageList.begin();
-    preferredLanguageList.erase(it + idx);
-    bool status = false;
-    if (!idx) {
-        status = LocaleConfig::SetSystemLanguage(preferredLanguageList[0]);
-        if (!status) {
-            return false;
-        }
-    }
-    std::string result = "";
-    for (it = preferredLanguageList.begin(); it != preferredLanguageList.end(); ++it) {
-        result += *it;
-        result += ";";
-    }
-    result.pop_back();
-    status = SetParameter(PREFERRED_LANGUAGES, result.data()) == 0;
-    return status;
-}
 
 std::vector<std::string> PreferredLanguage::GetPreferredLanguageList()
 {
@@ -223,13 +100,13 @@ std::string PreferredLanguage::GetAppPreferredLanguage()
 {
     std::shared_ptr<NativePreferences::Preferences> preferences = GetI18nAppPreferences();
     if (preferences == nullptr) {
-        HiLog::Error(LABEL, 
+        HiLog::Error(LABEL,
             "PreferredLanguage::GetAppPreferredLanguage get i18n preferences failed, return system language.");
         return LocaleConfig::GetSystemLanguage();
     }
     std::string res = preferences->GetString(PreferredLanguage::APP_LANGUAGE_KEY, "");
     if (res.length() == 0) {
-        HiLog::Info(LABEL, 
+        HiLog::Info(LABEL,
             "PreferredLanguage::GetAppPreferredLanguage app language is empty, return system language.");
         return LocaleConfig::GetSystemLanguage();
     }
@@ -308,6 +185,144 @@ void PreferredLanguage::Split(const std::string &src, const std::string &sep, st
     if (begin != src.size()) {
         dest.push_back(src.substr(begin));
     }
+}
+
+I18nErrorCode PreferredLanguage::AddPreferredLanguage(const std::string &language, int32_t index)
+{
+    if (!IsValidTag(language)) {
+        HiLog::Error(LABEL, "PreferredLanguage::AddPreferredLanguage %{public}s is not valid language tag.",
+            language.c_str());
+        return I18nErrorCode::INVALID_LANGUAGE_TAG;
+    }
+    std::vector<std::string> preferredLanguages;
+    I18nErrorCode status = I18nErrorCode::SUCCESS;
+    if (FindLanguage(language) == -1) {
+        // Case: language not in current preferred language list.
+        status = AddNonExistPreferredLanguage(language, index, preferredLanguages);
+    } else {
+        // Case: language in current preferred language list.
+        status = AddExistPreferredLanguage(language, index, preferredLanguages);
+    }
+    if (status != I18nErrorCode::SUCCESS) {
+        HiLog::Error(LABEL, "PreferredLanguage::AddPreferredLanguage failed.");
+        return status;
+    }
+    return SetPreferredLanguages(JoinPreferredLanguages(preferredLanguages));
+}
+
+I18nErrorCode PreferredLanguage::RemovePreferredLanguage(int32_t index)
+{
+    std::vector<std::string> preferredLanguages = GetPreferredLanguageList();
+    if (preferredLanguages.size() == 1) {
+        HiLog::Error(LABEL, "PreferredLanguage::RemovePreferredLanguage can't remove the only language.");
+        return I18nErrorCode::REMOVE_PREFERRED_LANGUAGE_FAILED;
+    }
+    // valid index is [0, preferredLanguages.size() - 1] for Remove
+    int32_t validIndex = NormalizeIndex(index, preferredLanguages.size() - 1);
+    preferredLanguages.erase(preferredLanguages.begin() + validIndex);
+    // The first language in preferred language list is system language, therefor when first language changed
+    // in preferred language list, we need to reset system language.
+    if (validIndex == 0) {
+        if (LocaleConfig::SetSystemLanguage(preferredLanguages[0]) != I18nErrorCode::SUCCESS) {
+            HiLog::Error(LABEL, "PreferredLanguage::RemovePreferredLanguage update system language failed.");
+            return I18nErrorCode::REMOVE_PREFERRED_LANGUAGE_FAILED;
+        }
+    }
+    return SetPreferredLanguages(JoinPreferredLanguages(preferredLanguages));
+}
+
+I18nErrorCode PreferredLanguage::AddNonExistPreferredLanguage(const std::string& language, int32_t index,
+    std::vector<std::string> &preferredLanguages)
+{
+    // valid index is [0, GetPreferredLanguageList().size()] for add non-exist language.
+    int32_t validIndex = NormalizeIndex(index, GetPreferredLanguageList().size());
+    preferredLanguages = GetPreferredLanguageList();
+    preferredLanguages.insert(preferredLanguages.begin() + validIndex, language);
+    // The first language in preferred language list is system language, therefor when first language changed
+    // in preferred language list, we need to reset system language.
+    if (validIndex == 0) {
+        if (LocaleConfig::SetSystemLanguage(preferredLanguages[0]) != I18nErrorCode::SUCCESS) {
+            HiLog::Error(LABEL, "PreferredLanguage::AddNonExistPreferredLanguage update system language failed.");
+            return I18nErrorCode::ADD_PREFERRED_LANGUAGE_NON_EXIST_FAILED;
+        }
+    }
+    return I18nErrorCode::SUCCESS;
+}
+
+I18nErrorCode PreferredLanguage::AddExistPreferredLanguage(const std::string& language, int32_t index,
+    std::vector<std::string> &preferredLanguages)
+{
+    // throw error when current index is same with target index.
+    // valid index is [0, GetPreferredLanguageList().size() - 1] for add exist language.
+    int32_t validIndex = NormalizeIndex(index, GetPreferredLanguageList().size() - 1);
+    int32_t languageIdx = FindLanguage(language);
+    if (languageIdx == validIndex) {
+        return I18nErrorCode::ADD_PREFERRED_LANGUAGE_EXIST_FAILED;
+    }
+    // Move language from languageIdx to validIdx.
+    preferredLanguages = GetPreferredLanguageList();
+    preferredLanguages.erase(preferredLanguages.begin() + languageIdx);
+    preferredLanguages.insert(preferredLanguages.begin() + validIndex, language);
+    // The first language in preferred language list is system language, therefor when first language changed
+    // in preferred language list, we need to reset system language.
+    if (languageIdx == 0 || validIndex == 0) {
+        if (LocaleConfig::SetSystemLanguage(preferredLanguages[0]) != I18nErrorCode::SUCCESS) {
+            HiLog::Error(LABEL, "PreferredLanguage::AddExistPreferredLanguage update system language failed.");
+            return I18nErrorCode::ADD_PREFERRED_LANGUAGE_EXIST_FAILED;
+        }
+    }
+    return I18nErrorCode::SUCCESS;
+}
+
+int32_t PreferredLanguage::NormalizeIndex(int32_t index, int32_t max)
+{
+    if (index <= 0) {
+        return 0;
+    }
+    if (index >= max) {
+        return max;
+    }
+    return index;
+}
+
+// Query the index of language in system preferred language list.
+int32_t PreferredLanguage::FindLanguage(const std::string &language)
+{
+    std::vector<std::string> preferredLanguageList = GetPreferredLanguageList();
+    for (size_t i = 0; i < preferredLanguageList.size(); ++i) {
+        if (preferredLanguageList[i] == language) {
+            return static_cast<int32_t>(i);
+        }
+    }
+    return -1;
+}
+
+// Join preferred language tags to string with ';'
+std::string PreferredLanguage::JoinPreferredLanguages(const std::vector<std::string> preferredLanguages)
+{
+    std::string result = "";
+    for (size_t i = 0; i < preferredLanguages.size(); ++i) {
+        result += preferredLanguages[i];
+        result += ";";
+    }
+    // delete the last ';'
+    result.pop_back();
+    return result;
+}
+
+// Set PREFERRED_LANGUAGES system parameter with preferredLanguages.
+I18nErrorCode PreferredLanguage::SetPreferredLanguages(const std::string &preferredLanguages)
+{
+    // System parameter value's length can't beyong CONFIG_LEN
+    if (preferredLanguages.length() > CONFIG_LEN) {
+        HiLog::Error(LABEL, "PreferredLanguage::SetPreferredLanguage preferred language list is too long.");
+        return I18nErrorCode::UPDATE_SYSTEM_PREFERRED_LANGUAGE_FAILED;
+    }
+    if (SetParameter(PREFERRED_LANGUAGES, preferredLanguages.data()) != 0) {
+        HiLog::Error(LABEL, "PreferredLanguage::AddPreferredLanguage udpate preferred language param failed.");
+        return I18nErrorCode::UPDATE_SYSTEM_PREFERRED_LANGUAGE_FAILED;
+    }
+    return I18nErrorCode::SUCCESS;
 }
 } // namespace I18n
 } // namespace Global

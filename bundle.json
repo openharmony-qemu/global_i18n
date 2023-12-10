@@ -63,7 +63,9 @@
                 "napi",
                 "preferences",
                 "resource_management",
-                "samgr"
+                "safwk",
+                "samgr",
+                "eventhandler"
             ],
             "third_party": [
                 "icu",
@@ -77,7 +79,9 @@
                 "//base/global/i18n/frameworks/zone:zone_util",
                 "//base/global/i18n/frameworks/intl:build_module",
                 "//base/global/i18n/interfaces/js/kits:build_module",
-                "//base/global/i18n/frameworks/intl:geocoding_depends"
+                "//base/global/i18n/frameworks/intl:geocoding_depends",
+                "//base/global/i18n/sa_profile:i18n_service_ability_profile",
+                "//base/global/i18n/services:i18n_service_ability"
             ],
             "inner_kits": [
                 {
