@@ -26,6 +26,7 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
+extern "C" __attribute__((used)) bool QueryWithProxy(const std::string& key, std::string& value, sptr<IRemoteObject> &proxy);
 extern "C" __attribute__((used)) bool Query(const std::string& key, std::string& value);
 __attribute__((used)) static std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper();
 __attribute__((used)) static Uri AssembleUri(const std::string& key);

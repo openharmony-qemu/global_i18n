@@ -16,6 +16,7 @@
 #include "error_util.h"
 #include "hilog/log.h"
 #include "i18n_service_ability_client.h"
+#include "i18n_service_ability_load_manager.h"
 #include "i18n_system_addon.h"
 #include "locale_config.h"
 #include "preferred_language.h"
@@ -219,7 +220,16 @@ napi_value I18nSystemAddon::SetSystemLocaleWithError(napi_env env, napi_callback
 
 napi_value I18nSystemAddon::Is24HourClock(napi_env env, napi_callback_info info)
 {
+#ifdef SUPPORT_GRAPHICS
+    // 1602 is i18n sa id
+    sptr<IRemoteObject> proxy = I18nServiceAbilityLoadManager::GetInstance()->GetI18nServiceAbility(1602);
+    if (proxy == nullptr) {
+        HiLog::Error(LABEL, "I18nSystemAddon::Is24HourClock load i18n sa failed");
+    }
+    bool is24HourClock = LocaleConfig::Is24HourClock(proxy);
+#else
     bool is24HourClock = LocaleConfig::Is24HourClock();
+#endif
     napi_value result = nullptr;
     napi_status status = napi_get_boolean(env, is24HourClock, &result);
     if (status != napi_ok) {
