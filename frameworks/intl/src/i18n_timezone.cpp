@@ -1129,13 +1129,13 @@ bool I18nTimeZone::CheckLatitudeAndLongitude(const double x, const double y)
     if (x < -1.0 * TZ_X_PLUS) {
         return false;
     }
-    if (x >= TZ_X_PLUS*1.0 - NUM_PRECISION) {
+    if (x >= TZ_X_PLUS * 1.0 - NUM_PRECISION) {
         return false;
     }
     if (y < -1.0 * TZ_X_PLUS/TZ_HALF_OF_SIZE) {
         return false;
     }
-    if (y >= TZ_X_PLUS*1.0/TZ_HALF_OF_SIZE - NUM_PRECISION) {
+    if (y >= TZ_X_PLUS * 1.0/TZ_HALF_OF_SIZE - NUM_PRECISION) {
         return false;
     }
     return true;

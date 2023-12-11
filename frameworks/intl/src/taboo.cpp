@@ -35,7 +35,7 @@ const char* Taboo::VALUE_TAG = "value";
 std::set<std::string> Taboo::supportedRegions;
 std::set<std::string> Taboo::supportedLanguages;
 std::map<std::string, std::string> Taboo::RESOURCES = {};
-const std::mutex Taboo::TABOO_MUTEX;
+std::mutex Taboo::TABOO_MUTEX;
 
 Taboo::Taboo()
 {

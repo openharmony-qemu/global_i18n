@@ -20,20 +20,17 @@
 #include "entityrecongnizer_fuzzer.h"
 
 namespace OHOS {
-    bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
+    void DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
         using namespace Global::I18n;
         if (size < 1) {
-            return false;
+            return;
         }
         std::string input(reinterpret_cast<const char*>(data), size);
         UErrorCode status = U_ZERO_ERROR;
-        //std::string systemLocale = LocaleConfig::GetSystemLocale();
         icu::Locale locale = icu::Locale::forLanguageTag(input, status);
-        EntityRecognizer* entityRecongnizer = new EntityRecognizer(locale);
-        entityRecongnizer->FindEntityInfo(input);
-        delete entityRecongnizer;
-        return true;
+        EntityRecognizer entityRecongnizer(locale);
+        entityRecongnizer.FindEntityInfo(input);
     }
 }
 

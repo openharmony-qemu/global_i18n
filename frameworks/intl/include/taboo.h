@@ -66,7 +66,7 @@ private:
     std::string regionKey = "region_"; // start part of region name replacement data key.
     std::string languageKey = "language_"; // start part of language name replacement data key.
     bool isTabooDataExist = false;
-    static const std::mutex TABOO_MUTEX;
+    static std::mutex TABOO_MUTEX;
 
     static const char* ROOT_TAG;
     static const char* ITEM_TAG;
