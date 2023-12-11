@@ -39,6 +39,8 @@ private:
     std::vector<MatchedDateTimeInfo> GetMatches(icu::UnicodeString& message);
     std::vector<MatchedDateTimeInfo> ClearFind(icu::UnicodeString& message);
     std::vector<MatchedDateTimeInfo> PastFind(icu::UnicodeString& message);
+    void GetMatchedInfo(std::vector<MatchedDateTimeInfo>& matches, MatchedDateTimeInfo match,
+        icu::UnicodeString& message);
 
     std::string locale;
     DateTimeRule* dateTimeRule;

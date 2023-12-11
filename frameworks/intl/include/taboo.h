@@ -20,6 +20,8 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <thread>
+#include <mutex>
 
 namespace OHOS {
 namespace Global {
@@ -49,11 +51,11 @@ private:
     void ReadResourceList();
     std::string GetLanguageFromFileName(const std::string& fileName);
 
-    std::set<std::string> supportedRegions; // Indicates which regions support name replacement using taboo data.
-    std::set<std::string> supportedLanguages; // Indicates which languages support name replacement using taboo data.
+    static std::set<std::string> supportedRegions; // Indicates which regions support name replacement using taboo data.
+    static std::set<std::string> supportedLanguages; // Indicates which languages support name replacement using taboo data.
     // cache the name replacement taboo data of different locale.
     std::map<std::string, std::map<std::string, std::string>> localeTabooData;
-    std::map<std::string, std::string> resources; // Indicates which locales are supported to find taboo data.
+    static std::map<std::string, std::string> RESOURCES; // Indicates which locales are supported to find taboo data.
 
     std::string tabooDataPath = "";
     std::string tabooConfigFileName = "taboo-config.xml";
@@ -64,6 +66,7 @@ private:
     std::string regionKey = "region_"; // start part of region name replacement data key.
     std::string languageKey = "language_"; // start part of language name replacement data key.
     bool isTabooDataExist = false;
+    static std::mutex tabooMutex;
 
     static const char* ROOT_TAG;
     static const char* ITEM_TAG;

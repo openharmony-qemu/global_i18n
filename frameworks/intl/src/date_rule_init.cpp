@@ -114,29 +114,29 @@ std::vector<MatchedDateTimeInfo> DateRuleInit::GetMatches(icu::UnicodeString& me
     std::vector<MatchedDateTimeInfo> matches;
     for (auto& detect : universalAndLocaleRules) {
         std::vector<MatchedDateTimeInfo> tempMatches = detect.Match(message);
-        matches.insert(matches.end(), tempMatches.begin(), tempMatches.end());
-    }
-    auto matchIterator = matches.begin();
-    std::vector<MatchedDateTimeInfo> subResult;
-    while (matchIterator != matches.end()) {
-        MatchedDateTimeInfo match = (*matchIterator);
-        // splitting results based on subRules.
-        if (subDetectsMap.find(match.GetRegex()) != subDetectsMap.end()) {
-            RulesEngine subRulesEngine = subDetectsMap[match.GetRegex()];
-            icu::UnicodeString subMessage = message.tempSubString(match.GetBegin(), match.GetEnd() - match.GetBegin());
-            std::vector<MatchedDateTimeInfo> subMatches = subRulesEngine.Match(subMessage);
-            for (auto& subMatch : subMatches) {
-                subMatch.SetBegin(subMatch.GetBegin() + match.GetBegin());
-                subMatch.SetEnd(subMatch.GetEnd() + match.GetBegin());
-            }
-            subResult.insert(subResult.end(), subMatches.begin(), subMatches.end());
-            matches.erase(matchIterator);
-        } else {
-            matchIterator++;
+        for (MatchedDateTimeInfo& match : tempMatches) {
+            GetMatchedInfo(matches, match, message);
         }
     }
-    matches.insert(matches.end(), subResult.begin(), subResult.end());
     return matches;
+}
+
+void DateRuleInit::GetMatchedInfo(std::vector<MatchedDateTimeInfo>& matches, MatchedDateTimeInfo match,
+        icu::UnicodeString& message)
+{
+    // splitting results based on subRules.
+    if (subDetectsMap.find(match.GetRegex()) != subDetectsMap.end()) {
+        RulesEngine subRulesEngine = subDetectsMap[match.GetRegex()];
+        icu::UnicodeString subMessage = message.tempSubString(match.GetBegin(), match.GetEnd() - match.GetBegin());
+        std::vector<MatchedDateTimeInfo> subMatches = subRulesEngine.Match(subMessage);
+        for (auto& subMatch : subMatches) {
+            subMatch.SetBegin(subMatch.GetBegin() + match.GetBegin());
+            subMatch.SetEnd(subMatch.GetEnd() + match.GetBegin());
+        }
+        matches.insert(matches.end(), subMatches.begin(), subMatches.end());
+    } else {
+        matches.push_back(match);
+    }
 }
 } // namespace I18n
 } // namespace Global
