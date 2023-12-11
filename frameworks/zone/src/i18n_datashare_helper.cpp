@@ -27,6 +27,41 @@ const std::string SETTINGS_DATA_EXT_URI = "datashare:///com.ohos.settingsdata.Da
 const std::string SETTINGS_DATA_COLUMN_KEYWORD = "KEYWORD";
 const std::string SETTINGS_DATA_COLUMN_VALUE = "VALUE";
 
+bool QueryWithProxy(const std::string& key, std::string& value, sptr<IRemoteObject> &proxy)
+{
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = DataShare::DataShareHelper::Creator(proxy, SETTINGS_DATASHARE_URI, SETTINGS_DATA_EXT_URI);
+    std::vector<std::string> columns = {SETTINGS_DATA_COLUMN_VALUE};
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(SETTINGS_DATA_COLUMN_KEYWORD, key);
+    Uri uri(AssembleUri(key));
+    if (dataShareHelper == nullptr) {
+        HiLog::Error(LABEL, "QueryWithProxy Query failed, dataShareHelper is nullptr.");
+        return false;
+    }
+    auto result = dataShareHelper->Query(uri, predicates, columns);
+    int32_t count;
+    if (result == nullptr) {
+        HiLog::Error(LABEL, "QueryWithProxy Query failed, result is nullptr.");
+        return false;
+    }
+    result->GetRowCount(count);
+    if (count == 0) {
+        HiLog::Error(LABEL, "QueryWithProxy Query failed, count is zero.");
+        return false;
+    }
+    const int32_t INDEX = 0;
+    result->GoToRow(INDEX);
+    int32_t ret = result->GetString(INDEX, value);
+    HiLog::Info(LABEL, "QueryWithProxy Query GetString %{public}s.", value.c_str());
+    if (ret != NativeRdb::E_OK) {
+        HiLog::Error(LABEL, "QueryWithProxy Query failed, GetString Failed.");
+        return false;
+    }
+    result->Close();
+    dataShareHelper->Release();
+    return true;
+}
+
 bool Query(const std::string& key, std::string& value)
 {
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataShareHelper();

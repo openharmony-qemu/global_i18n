@@ -16,12 +16,18 @@
 #define OHOS_GLOBAL_I18N_QUERY_SETTINGS_H
 
 #include <string>
+#ifdef SUPPORT_GRAPHICS
+#include "iremote_object.h"
+#endif
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
 class QuerySettings {
 public:
+#ifdef SUPPORT_GRAPHICS
+    static bool SettingsQuery(const std::string& key, std::string& value, sptr<IRemoteObject> &proxy);
+#endif
     static bool SettingsQuery(const std::string& key, std::string& value);
 };
 } // namespace I18n

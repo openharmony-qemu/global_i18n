@@ -24,6 +24,7 @@
 #ifdef SUPPORT_GRAPHICS
 #include "configuration.h"
 #include <common_event_data.h>
+#include "iremote_object.h"
 #endif
 #include "i18n_types.h"
 
@@ -89,6 +90,9 @@ public:
         bool sentenceCase);
     static bool IsRTL(const std::string &locale);
     static std::string GetValidLocale(const std::string &localeTag);
+#ifdef SUPPORT_GRAPHICS
+    static bool Is24HourClock(sptr<IRemoteObject> &proxy);
+#endif
     static bool Is24HourClock();
     static bool GetUsingLocalDigit();
     static std::unordered_set<std::string> GetBlockedLanguages();

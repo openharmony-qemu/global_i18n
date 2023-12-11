@@ -989,6 +989,26 @@ bool LocaleConfig::Is24HourClock()
     return false;
 }
 
+#ifdef SUPPORT_GRAPHICS
+bool LocaleConfig::Is24HourClock(sptr<IRemoteObject> &proxy)
+{
+    std::string is24HourValue;
+    std::string is24Hour;
+    if (QuerySettings::SettingsQuery(TIME_FORMAT, is24HourValue, proxy)) {
+        is24Hour = (is24HourValue == "24") ? "true" : "false";
+    } else {
+        is24Hour = ReadSystemParameter(HOUR_KEY, CONFIG_LEN);
+    }
+    if (is24Hour.empty()) {
+        return false;
+    }
+    if (is24Hour.compare("true") == 0) {
+        return true;
+    }
+    return false;
+}
+#endif
+
 bool LocaleConfig::GetUsingLocalDigit()
 {
     std::string locale = GetSystemLocale();
