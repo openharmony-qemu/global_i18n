@@ -35,7 +35,7 @@ const char* Taboo::VALUE_TAG = "value";
 std::set<std::string> Taboo::supportedRegions;
 std::set<std::string> Taboo::supportedLanguages;
 std::map<std::string, std::string> Taboo::RESOURCES = {};
-std::mutex Taboo::tabooMutex;
+const std::mutex Taboo::TABOO_MUTEX;
 
 Taboo::Taboo()
 {
@@ -49,7 +49,7 @@ Taboo::Taboo(const std::string& path) : tabooDataPath(path)
     struct stat s;
     isTabooDataExist = stat(tabooConfigFilePath.c_str(), &s) == 0;
     if (isTabooDataExist) {
-        std::lock_guard<std::mutex> tabooLock(tabooMutex);
+        std::lock_guard<std::mutex> tabooLock(TABOO_MUTEX);
         if (RESOURCES.size() == 0) {
             // parse taboo-config.xml to obtain supported regions and languages for name replacement.
             ParseTabooData(tabooConfigFilePath, DataFileType::CONFIG_FILE);
