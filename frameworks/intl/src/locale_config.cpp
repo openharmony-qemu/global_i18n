@@ -994,10 +994,16 @@ bool LocaleConfig::Is24HourClock(sptr<IRemoteObject> &proxy)
 {
     std::string is24HourValue;
     std::string is24Hour;
+    std::string is24HourSystem = ReadSystemParameter(HOUR_KEY, CONFIG_LEN);
     if (QuerySettings::SettingsQuery(TIME_FORMAT, is24HourValue, proxy)) {
         is24Hour = (is24HourValue == "24") ? "true" : "false";
+        if (is24HourSystem != is24Hour) {
+            if (SetParameter(HOUR_KEY, is24Hour.data()) != 0) {
+                HiLog::Error(LABEL, "LocaleConfig::Set parameter failed.");
+            }
+        }
     } else {
-        is24Hour = ReadSystemParameter(HOUR_KEY, CONFIG_LEN);
+        is24Hour = is24HourSystem;
     }
     if (is24Hour.empty()) {
         return false;
