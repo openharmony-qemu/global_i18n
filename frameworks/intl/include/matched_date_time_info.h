@@ -17,6 +17,7 @@
 
 #include <string>
 #include <unicode/regex.h>
+#include "utils.h"
 
 namespace OHOS {
 namespace Global {
@@ -41,7 +42,8 @@ public:
         if (regex == "") {
             return false;
         }
-        int key = std::stoi(regex);
+        int32_t status = 0;
+        int key = ConvertString2Int(regex, status);
         // 49999 and 60000 are rules number.
         return key > 49999 && key < 60000;
     }

@@ -1129,13 +1129,13 @@ bool I18nTimeZone::CheckLatitudeAndLongitude(const double x, const double y)
     if (x < -1.0 * TZ_X_PLUS) {
         return false;
     }
-    if (x >= TZ_X_PLUS*1.0 - 0.1) {
+    if (x >= TZ_X_PLUS * 1.0 - NUM_PRECISION) {
         return false;
     }
     if (y < -1.0 * TZ_X_PLUS/TZ_HALF_OF_SIZE) {
         return false;
     }
-    if (y >= TZ_X_PLUS*1.0/TZ_HALF_OF_SIZE - 0.1) {
+    if (y >= TZ_X_PLUS * 1.0/TZ_HALF_OF_SIZE - NUM_PRECISION) {
         return false;
     }
     return true;
@@ -1240,25 +1240,6 @@ int I18nTimeZone::InitPngptr(png_structp &png_ptr, png_infop &info_ptr, FILE **f
         return 1;
     }
     return 0;
-}
-
-bool I18nTimeZone::CheckTzDataFilePath(const std::string &filePath)
-{
-    char *realpathRes = nullptr;
-    realpathRes = realpath(filePath.c_str(), nullptr);
-    if (realpathRes == nullptr) {
-        return false;
-    }
-    std::ifstream file(filePath.c_str());
-    if (!file.good()) {
-        file.close();
-        free(realpathRes);
-        return false;
-    }
-    file.close();
-    free(realpathRes);
-    realpathRes = nullptr;
-    return true;
 }
 
 std::string I18nTimeZone::GetPreferredPath(const double x,

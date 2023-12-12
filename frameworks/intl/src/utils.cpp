@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include <filesystem>
+#include <fstream>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -96,6 +98,25 @@ void GetAllValidLocalesTag(std::unordered_set<std::string>& allValidLocalesLangu
         allValidLocalesLanguageTag.insert(validLocales[i].getLanguage());
     }
     init = true;
+}
+
+bool CheckTzDataFilePath(const std::string &filePath)
+{
+    char *realpathRes = nullptr;
+    realpathRes = realpath(filePath.c_str(), nullptr);
+    if (realpathRes == nullptr) {
+        return false;
+    }
+    std::ifstream file(filePath.c_str());
+    if (!file.good()) {
+        file.close();
+        free(realpathRes);
+        return false;
+    }
+    file.close();
+    free(realpathRes);
+    realpathRes = nullptr;
+    return true;
 }
 } // namespace I18n
 } // namespace Global

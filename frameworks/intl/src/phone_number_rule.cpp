@@ -56,7 +56,7 @@ PhoneNumberRule::~PhoneNumberRule()
 void PhoneNumberRule::FreePointer(std::vector<RegexRule*> &ruleList)
 {
     std::vector<RegexRule*>::iterator iter;
-    for (iter = ruleList.begin(); iter != ruleList.end(); iter++) {
+    for (iter = ruleList.begin(); iter != ruleList.end(); ++iter) {
         if (*iter != nullptr) {
             delete *iter;
         }
@@ -76,9 +76,14 @@ void PhoneNumberRule::Init()
 // Load the rules of the corresponding country
 void PhoneNumberRule::InitRule(std::string& xmlPath)
 {
+    if (!CheckTzDataFilePath(xmlPath)) {
+        return;
+    }
     xmlKeepBlanksDefault(0);
     xmlDocPtr doc = xmlParseFile(xmlPath.c_str());
-    xmlNodePtr cur = xmlDocGetRootElement(doc)->xmlChildrenNode;
+    if (doc == nullptr) return;
+    xmlNodePtr root = xmlDocGetRootElement(doc);
+    xmlNodePtr cur = root->xmlChildrenNode;
     while (cur != nullptr) {
         std::string category = reinterpret_cast<const char*>(cur->name);
         xmlNodePtr rule = cur->xmlChildrenNode;

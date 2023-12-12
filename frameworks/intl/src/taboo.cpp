@@ -32,6 +32,10 @@ const char* Taboo::ROOT_TAG = "taboo";
 const char* Taboo::ITEM_TAG = "item";
 const char* Taboo::NAME_TAG = "name";
 const char* Taboo::VALUE_TAG = "value";
+std::set<std::string> Taboo::supportedRegions;
+std::set<std::string> Taboo::supportedLanguages;
+std::map<std::string, std::string> Taboo::RESOURCES = {};
+std::mutex Taboo::TABOO_MUTEX;
 
 Taboo::Taboo()
 {
@@ -45,9 +49,12 @@ Taboo::Taboo(const std::string& path) : tabooDataPath(path)
     struct stat s;
     isTabooDataExist = stat(tabooConfigFilePath.c_str(), &s) == 0;
     if (isTabooDataExist) {
-        // parse taboo-config.xml to obtain supported regions and languages for name replacement.
-        ParseTabooData(tabooConfigFilePath, DataFileType::CONFIG_FILE);
-        ReadResourceList();
+        std::lock_guard<std::mutex> tabooLock(TABOO_MUTEX);
+        if (RESOURCES.size() == 0) {
+            // parse taboo-config.xml to obtain supported regions and languages for name replacement.
+            ParseTabooData(tabooConfigFilePath, DataFileType::CONFIG_FILE);
+            ReadResourceList();
+        }
     }
 }
 
@@ -167,6 +174,7 @@ void Taboo::ParseTabooData(const std::string& path, DataFileType fileType, const
         xmlFree(value);
         cur = cur->next;
     }
+    xmlFreeDoc(doc);
 }
 
 void Taboo::ProcessTabooConfigData(const std::string& name, const std::string& value)
@@ -217,7 +225,7 @@ std::tuple<std::string, std::string> Taboo::LanguageFallBack(const std::string& 
     std::string fileName;
     int32_t bestScore = -1;
 
-    for (auto it = resources.begin(); it != resources.end(); ++it) {
+    for (auto it = RESOURCES.begin(); it != RESOURCES.end(); ++it) {
         std::string resLanguage = it->first;
         int32_t score = LocaleCompare::Compare(language, resLanguage);
         if (score > bestScore) {
@@ -245,7 +253,7 @@ void Taboo::ReadResourceList()
         if (s.st_mode & S_IFDIR) {
             std::string fileName = path.substr(tabooDataPath.length());
             std::string language = GetLanguageFromFileName(fileName);
-            resources[language] = fileName;
+            RESOURCES[language] = fileName;
         }
     }
 }

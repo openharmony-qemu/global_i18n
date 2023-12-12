@@ -28,6 +28,7 @@ std::string ReadSystemParameter(const char *paramKey, const int paramLength);
 int32_t ConvertString2Int(const std::string &numberStr, int32_t& status);
 bool IsValidLocaleTag(icu::Locale &locale);
 void GetAllValidLocalesTag(std::unordered_set<std::string>& allValidLocalesLanguageTag);
+bool CheckTzDataFilePath(const std::string &filePath);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
