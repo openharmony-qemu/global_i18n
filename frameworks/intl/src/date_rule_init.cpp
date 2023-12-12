@@ -121,7 +121,7 @@ std::vector<MatchedDateTimeInfo> DateRuleInit::GetMatches(icu::UnicodeString& me
     return matches;
 }
 
-void DateRuleInit::GetMatchedInfo(std::vector<MatchedDateTimeInfo>& matches, MatchedDateTimeInfo match,
+void DateRuleInit::GetMatchedInfo(std::vector<MatchedDateTimeInfo>& matches, MatchedDateTimeInfo& match,
         icu::UnicodeString& message)
 {
     // splitting results based on subRules.

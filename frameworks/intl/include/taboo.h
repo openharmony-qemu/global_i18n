@@ -20,7 +20,6 @@
 #include <set>
 #include <string>
 #include <vector>
-#include <thread>
 #include <mutex>
 
 namespace OHOS {
