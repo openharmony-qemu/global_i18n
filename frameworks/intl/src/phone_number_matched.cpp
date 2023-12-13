@@ -115,6 +115,7 @@ icu::UnicodeString PhoneNumberMatched::HandleNegativeRule(icu::UnicodeString& sr
             ReplaceSpecifiedPos(ret, start, end);
         }
         delete matcher;
+        delete pattern;
     }
     return ret;
 }
@@ -169,6 +170,7 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::FindShortNumbers(std::string&
         }
     }
     delete shortMatch;
+    delete shortPattern;
     return matchedNumberInfoList;
 }
 
@@ -239,6 +241,7 @@ std::vector<PhoneNumberMatch*> PhoneNumberMatched::FindNumbers(std::string& coun
         }
     }
     delete numberMatcher;
+    delete numberPattern;
     return matchList;
 }
 
@@ -266,6 +269,7 @@ bool PhoneNumberMatched::HandleWithShortAndShort(std::vector<MatchedNumberInfo>&
             flag = true;
         }
         delete matcher;
+        delete pattern;
     } else {
         result.push_back(info);
         ReplaceSpecifiedPos(filteredString, pos.first, pos.second);
@@ -308,7 +312,7 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::GetPossibleNumberInfos(std::s
             }
             result.insert(result.end(), posList.begin(), posList.end());
         }
-        delete delMatch;
+        delete match;
     }
     return result;
 }
@@ -410,10 +414,13 @@ bool PhoneNumberMatched::HandleBorderRule(PhoneNumberMatch* match, icu::UnicodeS
                 isDel = true;
             }
             if (isDel) {
+                delete mat;
+                delete pattern;
                 return false;
             }
         }
         delete mat;
+        delete pattern;
     }
     return true;
 }
@@ -459,6 +466,7 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::HandlePositiveRule(PhoneNumbe
         if (mat1 != nullptr && mat1->find(status)) {
             std::vector<MatchedNumberInfo> infoList = rule->Handle(match, message);
             delete mat1;
+            delete pattern;
             return infoList;
         }
         delete mat1;
@@ -469,9 +477,11 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::HandlePositiveRule(PhoneNumbe
                 continue;
             }
             delete mat2;
+            delete pattern;
             return infoList;
         }
         delete mat2;
+        delete pattern;
     }
     return {};
 }

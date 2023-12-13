@@ -52,7 +52,9 @@ std::vector<MatchedDateTimeInfo> RulesEngine::Match(icu::UnicodeString& message)
     message.toUTF8String(res);
     for (auto& key : keys) {
         UErrorCode status = U_ZERO_ERROR;
-        icu::RegexPattern* pattern = this->patterns[key];
+        icu::UnicodeString regex = this->patterns[key];
+        icu::RegexPattern* pattern = icu::RegexPattern::compile(regex, URegexpFlag::UREGEX_CASE_INSENSITIVE,
+                status);
         if (pattern == nullptr) {
             HiLog::Error(LABEL, "Match failed because pattern is nullptr.");
             return matches;
@@ -69,13 +71,13 @@ std::vector<MatchedDateTimeInfo> RulesEngine::Match(icu::UnicodeString& message)
             matches.push_back(match);
         }
         delete matcher;
+        delete pattern;
     }
     return matches;
 }
 
 void RulesEngine::Init()
 {
-    UErrorCode status = U_ZERO_ERROR;
     for (const auto& rule : rulesMap) {
         std::string rulesKey = rule.first;
         std::string rulesValue = rule.second;
@@ -85,9 +87,7 @@ void RulesEngine::Init()
         // replace [param_ ] in the rule with the corresponding regular expression.
         icu::UnicodeString regex = rulesValue.c_str();
         if (!regex.trim().isEmpty() && isVaild) {
-            icu::RegexPattern* addPattern = icu::RegexPattern::compile(regex, URegexpFlag::UREGEX_CASE_INSENSITIVE,
-                status);
-            this->patterns.insert({rulesKey, addPattern});
+            this->patterns.insert({rulesKey, regex});
         }
     }
 }

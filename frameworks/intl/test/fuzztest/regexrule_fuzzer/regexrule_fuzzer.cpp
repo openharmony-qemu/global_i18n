@@ -33,7 +33,7 @@ namespace OHOS {
         RegexRule* regexRule = new RegexRule(regex, input, input, input, input);
 
         regexRule->GetType();
-        regexRule->GetPattern();
+        icu::RegexPattern* pattern = regexRule->GetPattern();
         i18n::phonenumbers::PhoneNumber phoneNumber;
         PhoneNumberUtil* phoneNumberUtil = i18n::phonenumbers::PhoneNumberUtil::GetInstance();
         std::string country = LocaleConfig::GetSystemRegion();
@@ -44,6 +44,7 @@ namespace OHOS {
         regexRule->IsValid(possibleNumber, regex);
         regexRule->CountDigits(regex);
         delete possibleNumber;
+        delete pattern;
         delete regexRule;
         return true;
     }

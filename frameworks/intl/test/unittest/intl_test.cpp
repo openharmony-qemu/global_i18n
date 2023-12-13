@@ -2390,7 +2390,6 @@ HWTEST_F(IntlTest, IntlFuncTest063, TestSize.Level1)
     PhoneNumberMatch* possibleNumber = new PhoneNumberMatch(size, input, phoneNumber);
     PhoneNumberMatch* phoneNumberMatch = regexRule2->IsValid(possibleNumber, message);
     EXPECT_TRUE(phoneNumberMatch != nullptr);
-    delete phoneNumberUtil;
     delete phoneNumberMatch;
     delete regexRule;
     delete regexRule2;
