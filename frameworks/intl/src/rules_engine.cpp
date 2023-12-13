@@ -53,8 +53,8 @@ std::vector<MatchedDateTimeInfo> RulesEngine::Match(icu::UnicodeString& message)
     for (auto& key : keys) {
         UErrorCode status = U_ZERO_ERROR;
         icu::UnicodeString regex = this->patterns[key];
-        icu::RegexPattern* pattern = icu::RegexPattern::compile(regex, URegexpFlag::UREGEX_CASE_INSENSITIVE,
-                status);
+        icu::RegexPattern* pattern = icu::RegexPattern::compile(regex,
+                URegexpFlag::UREGEX_CASE_INSENSITIVE, status);
         if (pattern == nullptr) {
             HiLog::Error(LABEL, "Match failed because pattern is nullptr.");
             return matches;
@@ -62,6 +62,7 @@ std::vector<MatchedDateTimeInfo> RulesEngine::Match(icu::UnicodeString& message)
         icu::RegexMatcher* matcher = pattern->matcher(message, status);
         if (matcher == nullptr) {
             HiLog::Error(LABEL, "Match failed because pattern matcher failed.");
+            delete pattern;
             return matches;
         }
         while (matcher->find(status)) {
