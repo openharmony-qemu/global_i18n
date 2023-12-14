@@ -41,8 +41,8 @@ public:
 private:
     void StartWithBrackets(icu::UnicodeString& phone);
     static std::vector<MatchedNumberInfo> GetNumbersWithSlant(icu::UnicodeString& testStr);
-    std::vector<MatchedNumberInfo> HandlePossibleNumberWithPattern(icu::RegexPattern* pattern,
-        PhoneNumberMatch* possibleNumber, icu::UnicodeString& message, bool isStartsWithNumber);
+    std::vector<MatchedNumberInfo> HandlePossibleNumberWithPattern(PhoneNumberMatch* possibleNumber,
+        icu::UnicodeString& message, bool isStartsWithNumber);
     bool NumberValid(icu::UnicodeString& number);
     bool PrefixValid(icu::UnicodeString& number, int length);
 
@@ -62,12 +62,13 @@ private:
 
     int type;
     icu::UnicodeString regex;
-    icu::RegexPattern* pattern;
+
     UErrorCode status;
     // Decide which IsValid function to use
     std::string isValidType;
     // Decide which Handle function to use
     std::string handleType;
+    std::string insensitive;
 };
 } // namespace I18n
 } // namespace Global

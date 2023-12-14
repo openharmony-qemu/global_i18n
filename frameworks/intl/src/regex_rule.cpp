@@ -44,14 +44,9 @@ RegexRule::RegexRule(icu::UnicodeString& regex, std::string& isValidType, std::s
     this->status = U_ZERO_ERROR;
     this->isValidType = isValidType;
     this->handleType = handleType;
+    this->insensitive = insensitive;
     if (regex.length() == 0) {
         return;
-    }
-    // Sets whether regular expression matching is case sensitive
-    if (insensitive == "True") {
-        this->pattern = icu::RegexPattern::compile(this->regex, URegexpFlag::UREGEX_CASE_INSENSITIVE, this->status);
-    } else {
-        this->pattern = icu::RegexPattern::compile(this->regex, 0, this->status);
     }
     if (U_FAILURE(this->status)) {
         HiLog::Error(LABEL, "member pattern construct failed.");
@@ -81,7 +76,12 @@ int RegexRule::GetType()
 
 icu::RegexPattern* RegexRule::GetPattern()
 {
-    return this->pattern;
+    // Sets whether regular expression matching is case sensitive
+    if (insensitive == "True") {
+        return icu::RegexPattern::compile(this->regex, URegexpFlag::UREGEX_CASE_INSENSITIVE, this->status);
+    } else {
+        return icu::RegexPattern::compile(this->regex, 0, this->status);
+    }
 }
 
 PhoneNumberMatch* RegexRule::IsValid(PhoneNumberMatch* possibleNumber, icu::UnicodeString& message)
@@ -368,6 +368,7 @@ std::vector<MatchedNumberInfo> RegexRule::HandleBlank(PhoneNumberMatch* possible
         matchedNumberInfoList.push_back(matchedNumberInfo);
     }
     delete matcher;
+    delete pattern;
     return matchedNumberInfoList;
 }
 
@@ -404,21 +405,20 @@ std::vector<MatchedNumberInfo> RegexRule::HandleSlant(PhoneNumberMatch* possible
         }
     }
     delete matcher;
+    delete pattern;
     return matchedNumberInfoList;
 }
 
 std::vector<MatchedNumberInfo> RegexRule::HandleStartWithMobile(PhoneNumberMatch* possibleNumber,
     icu::UnicodeString& message)
 {
-    icu::RegexPattern* pattern = this->GetPattern();
-    return HandlePossibleNumberWithPattern(pattern, possibleNumber, message, false);
+    return HandlePossibleNumberWithPattern(possibleNumber, message, false);
 }
 
 std::vector<MatchedNumberInfo> RegexRule::HandleEndWithMobile(PhoneNumberMatch* possibleNumber,
     icu::UnicodeString& message)
 {
-    icu::RegexPattern* pattern = this->GetPattern();
-    return HandlePossibleNumberWithPattern(pattern, possibleNumber, message, true);
+    return HandlePossibleNumberWithPattern(possibleNumber, message, true);
 }
 
 // Handle phone number starting with '(' or '['
@@ -492,12 +492,13 @@ std::vector<MatchedNumberInfo> RegexRule::GetNumbersWithSlant(icu::UnicodeString
     return shortList;
 }
 
-std::vector<MatchedNumberInfo> RegexRule::HandlePossibleNumberWithPattern(icu::RegexPattern* pattern,
-    PhoneNumberMatch* possibleNumber, icu::UnicodeString& message, bool isStartsWithNumber)
+std::vector<MatchedNumberInfo> RegexRule::HandlePossibleNumberWithPattern(PhoneNumberMatch* possibleNumber,
+    icu::UnicodeString& message, bool isStartsWithNumber)
 {
     UErrorCode status = U_ZERO_ERROR;
     std::vector<MatchedNumberInfo> matchedList;
     icu::UnicodeString possible = possibleNumber->raw_string().c_str();
+    icu::RegexPattern* pattern = GetPattern();
     icu::RegexMatcher* mat = pattern->matcher(message, status);
     while (mat != nullptr && mat->find(status)) {
         int start = mat->start(status);
@@ -513,6 +514,7 @@ std::vector<MatchedNumberInfo> RegexRule::HandlePossibleNumberWithPattern(icu::R
         }
     }
     delete mat;
+    delete pattern;
     return matchedList;
 }
 } // namespace I18n

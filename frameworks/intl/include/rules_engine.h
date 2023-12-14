@@ -60,7 +60,7 @@ private:
     std::unordered_map<std::string, std::string> subRules;
     std::unordered_map<std::string, std::string> param;
     std::unordered_map<std::string, std::string> paramBackup;
-    std::unordered_map<std::string, icu::RegexPattern*> patterns;
+    std::unordered_map<std::string, icu::UnicodeString> patterns;
 };
 } // namespace I18n
 } // namespace Global
