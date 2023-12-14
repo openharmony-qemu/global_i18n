@@ -48,11 +48,13 @@ public:
 
 private:
     PhoneNumberUtil* GetPhoneNumberUtil();
+    bool InitDynamicHandler();
+    void CloseLibrary();
     PhoneNumberUtil *util;
     std::string country;
     PhoneNumberUtil::PhoneNumberFormat phoneNumberFormat;
     void* g_dynamicHandler = nullptr;
-    ExposeLocationName g_func = nullptr;
+    ExposeLocationName locationNameFunc = nullptr;
 };
 } // namespace I18n
 } // namespace Global
