@@ -18,7 +18,7 @@
 #include <map>
 #include <set>
 #include <string>
-
+#include <mutex>
 #include "memory"
 #include "cpp/src/phonenumbers/phonenumberutil.h"
 
@@ -48,13 +48,12 @@ public:
 
 private:
     PhoneNumberUtil* GetPhoneNumberUtil();
-    bool InitDynamicHandler();
-    void CloseLibrary();
     PhoneNumberUtil *util;
     std::string country;
     PhoneNumberUtil::PhoneNumberFormat phoneNumberFormat;
-    void* g_dynamicHandler = nullptr;
+    void* dynamicHandler = nullptr;
     ExposeLocationName locationNameFunc = nullptr;
+    std::mutex phoneMutex;
 };
 } // namespace I18n
 } // namespace Global

@@ -63,23 +63,19 @@ PhoneNumberFormat::PhoneNumberFormat(const std::string &countryTag,
     } else {
         phoneNumberFormat = PhoneNumberUtil::PhoneNumberFormat::NATIONAL;
     }
-    InitDynamicHandler();
 }
 
 PhoneNumberFormat::~PhoneNumberFormat()
 {
-    CloseLibrary();
-}
-
-void PhoneNumberFormat::CloseLibrary()
-{
-    if (g_dynamicHandler == nullptr) {
+    if (dynamicHandler == nullptr) {
         return;
     }
+    std::lock_guard<std::mutex> phoneLock(phoneMutex);
+    if (dynamicHandler != nullptr) {
+        dlclose(dynamicHandler);
+    }
+    dynamicHandler = nullptr;
     locationNameFunc = nullptr;
-    dlclose(g_dynamicHandler);
-    g_dynamicHandler = nullptr;
-
 }
 
 std::unique_ptr<PhoneNumberFormat> PhoneNumberFormat::CreateInstance(const std::string &countryTag,
@@ -166,37 +162,31 @@ std::string PhoneNumberFormat::getLocationName(const std::string &number, const 
 std::string PhoneNumberFormat::getPhoneLocationName(const std::string& number, const std::string& phoneLocale,
     const std::string& displayLocale, const std::string& regionCode)
 {
-    if (locationNameFunc == nullptr && !InitDynamicHandler()) {
-        return LocaleConfig::GetDisplayRegion(regionCode, displayLocale, false);
+    if (dynamicHandler == nullptr) {
+#ifndef SUPPORT_ASAN
+        const char* geocodingSO = "libgeocoding.z.so";
+#else
+        const char* geocodingSO = "system/asan/lib64/libgeocoding.z.so";
+#endif
+        std::lock_guard<std::mutex> phoneLock(phoneMutex);
+        if (dynamicHandler == nullptr) {
+            dynamicHandler = dlopen(geocodingSO, RTLD_NOW);
+        }
+    }
+    if (dynamicHandler && !locationNameFunc) {
+        locationNameFunc = reinterpret_cast<ExposeLocationName>(dlsym(dynamicHandler, "exposeLocationName"));
     }
     std::string locName;
-    // The function uses the same locale for phone and display.
-    char recvArr[RECV_CHAR_LEN];
-    locationNameFunc(number.c_str(), phoneLocale.c_str(), recvArr);
-    locName = recvArr;
-    if (locName.empty()) {
+    if (locationNameFunc) {
+        // The function uses the same locale for phone and display.
+        char recvArr[RECV_CHAR_LEN];
+        locationNameFunc(number.c_str(), phoneLocale.c_str(), recvArr);
+        locName = recvArr;
+    }
+    if (!locationNameFunc || locName.empty()) {
         locName = LocaleConfig::GetDisplayRegion(regionCode, displayLocale, false);
     }
     return locName;
-}
-
-bool PhoneNumberFormat::InitDynamicHandler()
-{
-#ifndef SUPPORT_ASAN
-    const char* geocodingSO = "libgeocoding.z.so";
-#else
-    const char* geocodingSO = "system/asan/lib64/libgeocoding.z.so";
-#endif
-    g_dynamicHandler = dlopen(geocodingSO, RTLD_LAZY);
-    if (g_dynamicHandler == nullptr) {
-        return false;
-    }
-    locationNameFunc = reinterpret_cast<ExposeLocationName>(dlsym(g_dynamicHandler, "exposeLocationName"));
-    if (locationNameFunc == nullptr) {
-        CloseLibrary();
-        return false;
-    } 
-    return true;
 }
 
 bool PhoneNumberFormat::getBlockedRegionName(const std::string& regionCode, const std::string& language)
