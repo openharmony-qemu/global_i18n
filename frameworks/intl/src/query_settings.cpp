@@ -21,15 +21,13 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 const char* LIB_PATH = "/system/lib/libzone_util.z.so";
-const char* QUERY = "Query";
 const char* QUERY_WITH_PROXY = "QueryWithProxy";
-const char* UPDATE = "Update";
 
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "QuerySettings" };
 using namespace OHOS::HiviewDFX;
 
 #ifdef SUPPORT_GRAPHICS
-bool QuerySettings::SettingsQuery(const std::string& key, std::string& value, sptr<IRemoteObject> &proxy)
+bool QuerySettings::SettingsQuery(const std::string& key, std::string& value, sptr<IRemoteObject>& proxy)
 {
     if (proxy == nullptr) {
         HiLog::Error(LABEL, "QuerySettings::SettingsQuery proxy==nullptr.");
@@ -41,21 +39,13 @@ bool QuerySettings::SettingsQuery(const std::string& key, std::string& value, sp
     }
     bool (*query)(const std::string&, std::string&, sptr<IRemoteObject>);
     query = (bool (*)(const std::string&, std::string&, sptr<IRemoteObject>))dlsym(handle, QUERY_WITH_PROXY);
-    return query(key, value, proxy);
+    bool result = query(key, value, proxy);
+    if (handle != nullptr) {
+        dlclose(handle);
+    }
+    return result;
 }
 #endif
-
-bool QuerySettings::SettingsQuery(const std::string& key, std::string& value)
-{
-    void* handle = dlopen(LIB_PATH, RTLD_LAZY);
-    if (handle == nullptr) {
-        HiLog::Error(LABEL, "Query failed, handle is nullptr.");
-        return false;
-    }
-    bool (*query)(const std::string&, std::string&);
-    query = (bool (*)(const std::string&, std::string&))dlsym(handle, QUERY);
-    return query(key, value);
-}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

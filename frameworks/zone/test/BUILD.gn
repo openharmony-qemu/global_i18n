@@ -46,7 +46,11 @@ ohos_unittest("zone_util_test") {
   ]
   deps = [
     "//base/global/i18n/frameworks/zone:zone_util",
+    "//base/global/i18n/services:i18n_sa_client",
     "//third_party/libphonenumber/cpp:phonenumber_standard",
   ]
-  external_deps = [ "c_utils:utils" ]
+  external_deps = [
+    "c_utils:utils",
+    "samgr:samgr_proxy",
+  ]
 }
