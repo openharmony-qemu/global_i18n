@@ -28,7 +28,6 @@ public:
 #ifdef SUPPORT_GRAPHICS
     static bool SettingsQuery(const std::string& key, std::string& value, sptr<IRemoteObject> &proxy);
 #endif
-    static bool SettingsQuery(const std::string& key, std::string& value);
 };
 } // namespace I18n
 } // namespace Global
