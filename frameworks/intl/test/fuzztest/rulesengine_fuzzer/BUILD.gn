@@ -42,6 +42,7 @@ ohos_fuzztest("RulesEngineFuzzTest") {
     "../../../../intl:intl_util",
     "//third_party/icu/icu4c:shared_icui18n",
     "//third_party/icu/icu4c:shared_icuuc",
+    "//third_party/libxml2:xml2",
   ]
 
   subsystem_name = "global"
