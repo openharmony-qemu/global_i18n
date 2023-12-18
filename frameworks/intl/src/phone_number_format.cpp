@@ -19,6 +19,7 @@
 #include "localebuilder.h"
 #include "locale_config.h"
 #include "locid.h"
+#include "hilog/log.h"
 #include "map"
 #include "new"
 #include "set"
@@ -33,6 +34,8 @@ namespace Global {
 namespace I18n {
 const int RECV_CHAR_LEN = 128;
 using i18n::phonenumbers::PhoneNumberUtil;
+static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "PhoneNumberFormat" };
+using namespace OHOS::HiviewDFX;
 
 PhoneNumberFormat::PhoneNumberFormat(const std::string &countryTag,
                                      const std::map<std::string, std::string> &options)
@@ -67,11 +70,15 @@ PhoneNumberFormat::PhoneNumberFormat(const std::string &countryTag,
 
 PhoneNumberFormat::~PhoneNumberFormat()
 {
-    if (g_dynamicHandler != NULL) {
-        dlclose(g_dynamicHandler);
-        g_dynamicHandler = nullptr;
-        g_func = nullptr;
+    if (dynamicHandler == nullptr) {
+        return;
     }
+    std::lock_guard<std::mutex> phoneLock(phoneMutex);
+    if (dynamicHandler != nullptr) {
+        dlclose(dynamicHandler);
+    }
+    dynamicHandler = nullptr;
+    locationNameFunc = nullptr;
 }
 
 std::unique_ptr<PhoneNumberFormat> PhoneNumberFormat::CreateInstance(const std::string &countryTag,
@@ -158,28 +165,39 @@ std::string PhoneNumberFormat::getLocationName(const std::string &number, const 
 std::string PhoneNumberFormat::getPhoneLocationName(const std::string& number, const std::string& phoneLocale,
     const std::string& displayLocale, const std::string& regionCode)
 {
-    if (g_dynamicHandler == NULL) {
+    OpenHandler();
+    if (dynamicHandler && !locationNameFunc) {
+        HiLog::Error(LABEL, "LocationNameFunc Init");
+        locationNameFunc = reinterpret_cast<ExposeLocationName>(dlsym(dynamicHandler, "exposeLocationName"));
+    }
+    std::string locName;
+    if (locationNameFunc) {
+        // The function uses the same locale for phone and display.
+        char recvArr[RECV_CHAR_LEN];
+        locationNameFunc(number.c_str(), phoneLocale.c_str(), recvArr);
+        locName = recvArr;
+    }
+    if (!locationNameFunc || locName.empty()) {
+        locName = LocaleConfig::GetDisplayRegion(regionCode, displayLocale, false);
+    }
+    return locName;
+}
+
+void PhoneNumberFormat::OpenHandler()
+{
+    if (dynamicHandler == nullptr) {
+        HiLog::Info(LABEL, "DynamicHandler init.");
 #ifndef SUPPORT_ASAN
         const char* geocodingSO = "libgeocoding.z.so";
 #else
         const char* geocodingSO = "system/asan/lib64/libgeocoding.z.so";
 #endif
-        g_dynamicHandler = dlopen(geocodingSO, RTLD_NOW);
+        std::lock_guard<std::mutex> phoneLock(phoneMutex);
+        if (dynamicHandler == nullptr) {
+            HiLog::Info(LABEL, "DynamicHandler lock init.");
+            dynamicHandler = dlopen(geocodingSO, RTLD_NOW);
+        }
     }
-    if (g_dynamicHandler && !g_func) {
-        g_func = reinterpret_cast<ExposeLocationName>(dlsym(g_dynamicHandler, "exposeLocationName"));
-    }
-    std::string locName;
-    if (g_func) {
-        // The function uses the same locale for phone and display.
-        char recvArr[RECV_CHAR_LEN];
-        g_func(number.c_str(), phoneLocale.c_str(), recvArr);
-        locName = recvArr;
-    }
-    if (!g_func || locName.empty()) {
-        locName = LocaleConfig::GetDisplayRegion(regionCode, displayLocale, false);
-    }
-    return locName;
 }
 
 bool PhoneNumberFormat::getBlockedRegionName(const std::string& regionCode, const std::string& language)
