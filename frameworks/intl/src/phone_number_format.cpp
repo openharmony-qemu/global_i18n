@@ -162,17 +162,7 @@ std::string PhoneNumberFormat::getLocationName(const std::string &number, const 
 std::string PhoneNumberFormat::getPhoneLocationName(const std::string& number, const std::string& phoneLocale,
     const std::string& displayLocale, const std::string& regionCode)
 {
-    if (dynamicHandler == nullptr) {
-#ifndef SUPPORT_ASAN
-        const char* geocodingSO = "libgeocoding.z.so";
-#else
-        const char* geocodingSO = "system/asan/lib64/libgeocoding.z.so";
-#endif
-        std::lock_guard<std::mutex> phoneLock(phoneMutex);
-        if (dynamicHandler == nullptr) {
-            dynamicHandler = dlopen(geocodingSO, RTLD_NOW);
-        }
-    }
+    OpenHandler();
     if (dynamicHandler && !locationNameFunc) {
         locationNameFunc = reinterpret_cast<ExposeLocationName>(dlsym(dynamicHandler, "exposeLocationName"));
     }
@@ -187,6 +177,21 @@ std::string PhoneNumberFormat::getPhoneLocationName(const std::string& number, c
         locName = LocaleConfig::GetDisplayRegion(regionCode, displayLocale, false);
     }
     return locName;
+}
+
+void PhoneNumberFormat::OpenHandler()
+{
+    if (dynamicHandler == nullptr) {
+#ifndef SUPPORT_ASAN
+        const char* geocodingSO = "libgeocoding.z.so";
+#else
+        const char* geocodingSO = "system/asan/lib64/libgeocoding.z.so";
+#endif
+        std::lock_guard<std::mutex> phoneLock(phoneMutex);
+        if (dynamicHandler == nullptr) {
+            dynamicHandler = dlopen(geocodingSO, RTLD_NOW);
+        }
+    }
 }
 
 bool PhoneNumberFormat::getBlockedRegionName(const std::string& regionCode, const std::string& language)

@@ -48,6 +48,7 @@ public:
 
 private:
     PhoneNumberUtil* GetPhoneNumberUtil();
+    void OpenHandler();
     PhoneNumberUtil *util;
     std::string country;
     PhoneNumberUtil::PhoneNumberFormat phoneNumberFormat;
