@@ -974,12 +974,7 @@ std::string LocaleConfig::GetValidLocale(const std::string &localeTag)
 bool LocaleConfig::Is24HourClock()
 {
     std::string is24HourValue;
-    std::string is24Hour;
-    if (QuerySettings::SettingsQuery(TIME_FORMAT, is24HourValue)) {
-        is24Hour = (is24HourValue == "24") ? "true" : "false";
-    } else {
-        is24Hour = ReadSystemParameter(HOUR_KEY, CONFIG_LEN);
-    }
+    std::string is24Hour = ReadSystemParameter(HOUR_KEY, CONFIG_LEN);
     if (is24Hour.empty()) {
         return false;
     }
