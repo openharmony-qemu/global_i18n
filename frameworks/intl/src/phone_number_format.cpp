@@ -19,6 +19,7 @@
 #include "localebuilder.h"
 #include "locale_config.h"
 #include "locid.h"
+#include "hilog/log.h"
 #include "map"
 #include "new"
 #include "set"
@@ -33,6 +34,8 @@ namespace Global {
 namespace I18n {
 const int RECV_CHAR_LEN = 128;
 using i18n::phonenumbers::PhoneNumberUtil;
+static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "PhoneNumberFormat" };
+using namespace OHOS::HiviewDFX;
 
 PhoneNumberFormat::PhoneNumberFormat(const std::string &countryTag,
                                      const std::map<std::string, std::string> &options)
@@ -164,6 +167,7 @@ std::string PhoneNumberFormat::getPhoneLocationName(const std::string& number, c
 {
     OpenHandler();
     if (dynamicHandler && !locationNameFunc) {
+        HiLog::Error(LABEL, "LocationNameFunc Init");
         locationNameFunc = reinterpret_cast<ExposeLocationName>(dlsym(dynamicHandler, "exposeLocationName"));
     }
     std::string locName;
@@ -182,6 +186,7 @@ std::string PhoneNumberFormat::getPhoneLocationName(const std::string& number, c
 void PhoneNumberFormat::OpenHandler()
 {
     if (dynamicHandler == nullptr) {
+        HiLog::Info(LABEL, "DynamicHandler init.");
 #ifndef SUPPORT_ASAN
         const char* geocodingSO = "libgeocoding.z.so";
 #else
@@ -189,6 +194,7 @@ void PhoneNumberFormat::OpenHandler()
 #endif
         std::lock_guard<std::mutex> phoneLock(phoneMutex);
         if (dynamicHandler == nullptr) {
+            HiLog::Info(LABEL, "DynamicHandler lock init.");
             dynamicHandler = dlopen(geocodingSO, RTLD_NOW);
         }
     }
