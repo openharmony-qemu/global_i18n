@@ -31,6 +31,7 @@ bool QuerySettings::SettingsQuery(const std::string& key, std::string& value, sp
 {
     if (proxy == nullptr) {
         HiLog::Error(LABEL, "QuerySettings::SettingsQuery proxy==nullptr.");
+        return false;
     }
     void* handle = dlopen(LIB_PATH, RTLD_LAZY);
     if (handle == nullptr) {
