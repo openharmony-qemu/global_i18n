@@ -18,6 +18,7 @@
 #include "i18n_break_iterator.h"
 #include "i18n_calendar.h"
 #include "i18n_normalizer.h"
+#include "i18n_service_ability_load_manager.h"
 #include "i18n_timezone_mock.h"
 #include "locale_config.h"
 #include "measure_data.h"
@@ -1205,9 +1206,10 @@ HWTEST_F(I18nTest, I18nFuncTest046, TestSize.Level1)
  */
 HWTEST_F(I18nTest, I18nFuncTest047, TestSize.Level1)
 {
-    const char* key = "settings.date.time_format";
+    const std::string key = "settings.date.time_format";
     std::string valueQuery;
-    bool flagQuery = QuerySettings::SettingsQuery(key, valueQuery);
+    sptr<IRemoteObject> proxy = I18nServiceAbilityLoadManager::GetInstance()->GetI18nServiceAbility(1602);
+    bool flagQuery = QuerySettings::SettingsQuery(key, valueQuery, proxy);
     EXPECT_EQ(flagQuery, true);
 }
 } // namespace I18n

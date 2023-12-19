@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 #include "i18n_datashare_helper.h"
+#include "i18n_service_ability_load_manager.h"
 #include "zone_util.h"
 
 using namespace OHOS::Global::I18n;
@@ -295,8 +296,9 @@ HWTEST_F(ZoneUtilTest, ZoneUtilFuncTest011, TestSize.Level1)
 HWTEST_F(ZoneUtilTest, ZoneUtilFuncTest012, TestSize.Level1)
 {
     const char* key = "settings.date.time_format";
+    sptr<IRemoteObject> proxy = I18nServiceAbilityLoadManager::GetInstance()->GetI18nServiceAbility(I18N_SA_ID);
     std::string valueQuery;
-    bool flagQuery = Query(key, valueQuery);
+    bool flagQuery = QueryWithProxy(key, valueQuery, proxy);
     EXPECT_EQ(flagQuery, true);
 }
 } // namespace I18n
