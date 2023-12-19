@@ -376,7 +376,7 @@ std::vector<int> PhoneNumberMatched::DealResult(std::vector<MatchedNumberInfo>& 
         int posEnd = 2;
         result.resize(posNumber * length + 1);
         result[0] = length;
-        for (int i = 0; i < length; i++) {
+        for (size_t i = 0; i < length; i++) {
             result[posNumber * i + posStart] = matchedNumberInfoList[i].GetBegin();
             result[posNumber * i + posEnd] = matchedNumberInfoList[i].GetEnd();
         }

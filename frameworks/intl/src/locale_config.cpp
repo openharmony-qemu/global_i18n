@@ -988,8 +988,8 @@ bool LocaleConfig::Is24HourClock()
 bool LocaleConfig::Is24HourClock(sptr<IRemoteObject> &proxy)
 {
     std::string is24HourValue;
-    std::string is24Hour;
     std::string is24HourSystem = ReadSystemParameter(HOUR_KEY, CONFIG_LEN);
+    std::string is24Hour = is24HourSystem;
     if (QuerySettings::SettingsQuery(TIME_FORMAT, is24HourValue, proxy)) {
         is24Hour = (is24HourValue == "24") ? "true" : "false";
         if (is24HourSystem != is24Hour) {
@@ -997,8 +997,6 @@ bool LocaleConfig::Is24HourClock(sptr<IRemoteObject> &proxy)
                 HiLog::Error(LABEL, "LocaleConfig::Set parameter failed.");
             }
         }
-    } else {
-        is24Hour = is24HourSystem;
     }
     if (is24Hour.empty()) {
         return false;
@@ -1089,8 +1087,9 @@ I18nErrorCode LocaleConfig::SetSystemLocale(const std::string &localeTag)
 #ifdef SUPPORT_GRAPHICS
     UpdateConfiguration(AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE, localeTag);
     return PublishCommonEvent(EventFwk::CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED);
-#endif
+#else
     return I18nErrorCode::SUCCESS;
+#endif
 }
 
 I18nErrorCode LocaleConfig::Set24HourClock(bool option)
@@ -1105,8 +1104,9 @@ I18nErrorCode LocaleConfig::Set24HourClock(bool option)
 #ifdef SUPPORT_GRAPHICS
     UpdateConfiguration(AAFwk::GlobalConfigurationKey::SYSTEM_HOUR, optionStr);
     return PublishCommonEvent(EventFwk::CommonEventSupport::COMMON_EVENT_TIME_CHANGED);
-#endif
+#else
     return I18nErrorCode::SUCCESS;
+#endif
 }
 
 I18nErrorCode LocaleConfig::SetUsingLocalDigit(bool flag)

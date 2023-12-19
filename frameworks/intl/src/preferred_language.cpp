@@ -198,10 +198,10 @@ I18nErrorCode PreferredLanguage::AddPreferredLanguage(const std::string &languag
     I18nErrorCode status = I18nErrorCode::SUCCESS;
     if (FindLanguage(language) == -1) {
         // Case: language not in current preferred language list.
-        status = AddNonExistPreferredLanguage(language, index, preferredLanguages);
+        AddNonExistPreferredLanguage(language, index, preferredLanguages, status);
     } else {
         // Case: language in current preferred language list.
-        status = AddExistPreferredLanguage(language, index, preferredLanguages);
+        AddExistPreferredLanguage(language, index, preferredLanguages, status);
     }
     if (status != I18nErrorCode::SUCCESS) {
         HiLog::Error(LABEL, "PreferredLanguage::AddPreferredLanguage failed.");
@@ -231,8 +231,8 @@ I18nErrorCode PreferredLanguage::RemovePreferredLanguage(int32_t index)
     return SetPreferredLanguages(JoinPreferredLanguages(preferredLanguages));
 }
 
-I18nErrorCode PreferredLanguage::AddNonExistPreferredLanguage(const std::string& language, int32_t index,
-    std::vector<std::string> &preferredLanguages)
+void PreferredLanguage::AddNonExistPreferredLanguage(const std::string& language, int32_t index,
+    std::vector<std::string> &preferredLanguages, I18nErrorCode &errCode)
 {
     // valid index is [0, GetPreferredLanguageList().size()] for add non-exist language.
     int32_t validIndex = NormalizeIndex(index, GetPreferredLanguageList().size());
@@ -243,21 +243,23 @@ I18nErrorCode PreferredLanguage::AddNonExistPreferredLanguage(const std::string&
     if (validIndex == 0) {
         if (LocaleConfig::SetSystemLanguage(preferredLanguages[0]) != I18nErrorCode::SUCCESS) {
             HiLog::Error(LABEL, "PreferredLanguage::AddNonExistPreferredLanguage update system language failed.");
-            return I18nErrorCode::ADD_PREFERRED_LANGUAGE_NON_EXIST_FAILED;
+            errCode = I18nErrorCode::ADD_PREFERRED_LANGUAGE_NON_EXIST_FAILED;
+            return;
         }
     }
-    return I18nErrorCode::SUCCESS;
+    errCode = I18nErrorCode::SUCCESS;
 }
 
-I18nErrorCode PreferredLanguage::AddExistPreferredLanguage(const std::string& language, int32_t index,
-    std::vector<std::string> &preferredLanguages)
+void PreferredLanguage::AddExistPreferredLanguage(const std::string& language, int32_t index,
+    std::vector<std::string> &preferredLanguages, I18nErrorCode &errCode)
 {
     // throw error when current index is same with target index.
     // valid index is [0, GetPreferredLanguageList().size() - 1] for add exist language.
     int32_t validIndex = NormalizeIndex(index, GetPreferredLanguageList().size() - 1);
     int32_t languageIdx = FindLanguage(language);
     if (languageIdx == validIndex) {
-        return I18nErrorCode::ADD_PREFERRED_LANGUAGE_EXIST_FAILED;
+        errCode = I18nErrorCode::ADD_PREFERRED_LANGUAGE_EXIST_FAILED;
+        return;
     }
     // Move language from languageIdx to validIdx.
     preferredLanguages = GetPreferredLanguageList();
@@ -268,10 +270,11 @@ I18nErrorCode PreferredLanguage::AddExistPreferredLanguage(const std::string& la
     if (languageIdx == 0 || validIndex == 0) {
         if (LocaleConfig::SetSystemLanguage(preferredLanguages[0]) != I18nErrorCode::SUCCESS) {
             HiLog::Error(LABEL, "PreferredLanguage::AddExistPreferredLanguage update system language failed.");
-            return I18nErrorCode::ADD_PREFERRED_LANGUAGE_EXIST_FAILED;
+            errCode = I18nErrorCode::ADD_PREFERRED_LANGUAGE_EXIST_FAILED;
+            return;
         }
     }
-    return I18nErrorCode::SUCCESS;
+    errCode = I18nErrorCode::SUCCESS;
 }
 
 int32_t PreferredLanguage::NormalizeIndex(int32_t index, int32_t max)

@@ -97,10 +97,10 @@ private:
      * @param language Indicates language tag to add.
      * @param index Indicates position to add.
      * @param preferredLanguages Indicates system preferred language list after inserting language.
-     * @return I18nErrorCode Return SUCCESS indicates that the add operation was successful.
+     * @param errCode Indicates whether the add operation was successful.
      */
-    static I18nErrorCode AddNonExistPreferredLanguage(const std::string& language, int32_t index,
-        std::vector<std::string> &preferredLanguages);
+    static void AddNonExistPreferredLanguage(const std::string& language, int32_t index,
+        std::vector<std::string> &preferredLanguages, I18nErrorCode &errCode);
 
     /**
      * @brief Add language to position index of system preferred language list when language is in list.
@@ -108,10 +108,10 @@ private:
      * @param language Indicates language tag to add.
      * @param index Indicates position to add.
      * @param preferredLanguages Indicates system preferred language list after inserting language.
-     * @return I18nErrorCode Return SUCCESS indicates that the add operation was successful.
+     * @param errCode Indicates whether the add operation was successful.
      */
-    static I18nErrorCode AddExistPreferredLanguage(const std::string& language, int32_t index,
-        std::vector<std::string> &preferredLanguages);
+    static void AddExistPreferredLanguage(const std::string& language, int32_t index,
+        std::vector<std::string> &preferredLanguages, I18nErrorCode &errCode);
 
     /**
      * @brief combin preferred language list to string.

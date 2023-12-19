@@ -23,6 +23,8 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
+using I18nQuery = bool (*)(const std::string&, std::string&, sptr<IRemoteObject>);
+
 class QuerySettings {
 public:
 #ifdef SUPPORT_GRAPHICS

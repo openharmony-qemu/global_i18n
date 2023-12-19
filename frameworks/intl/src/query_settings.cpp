@@ -37,8 +37,8 @@ bool QuerySettings::SettingsQuery(const std::string& key, std::string& value, sp
         HiLog::Error(LABEL, "Query failed, handle is nullptr.");
         return false;
     }
-    bool (*query)(const std::string&, std::string&, sptr<IRemoteObject>);
-    query = (bool (*)(const std::string&, std::string&, sptr<IRemoteObject>))dlsym(handle, QUERY_WITH_PROXY);
+    //bool (*query)(const std::string&, std::string&, sptr<IRemoteObject>);
+    I18nQuery query = reinterpret_cast<I18nQuery>(dlsym(handle, QUERY_WITH_PROXY));
     bool result = query(key, value, proxy);
     if (handle != nullptr) {
         dlclose(handle);
