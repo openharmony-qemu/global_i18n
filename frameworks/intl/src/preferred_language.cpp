@@ -106,8 +106,6 @@ std::string PreferredLanguage::GetAppPreferredLanguage()
     }
     std::string res = preferences->GetString(PreferredLanguage::APP_LANGUAGE_KEY, "");
     if (res.length() == 0) {
-        HiLog::Info(LABEL,
-            "PreferredLanguage::GetAppPreferredLanguage app language is empty, return system language.");
         return LocaleConfig::GetSystemLanguage();
     }
     return res;
