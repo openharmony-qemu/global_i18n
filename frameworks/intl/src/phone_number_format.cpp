@@ -190,9 +190,9 @@ void PhoneNumberFormat::OpenHandler()
         std::lock_guard<std::mutex> phoneLock(phoneMutex);
         if (dynamicHandler == nullptr) {
 #ifndef SUPPORT_ASAN
-        const char* geocodingSO = "libgeocoding.z.so";
+            const char* geocodingSO = "libgeocoding.z.so";
 #else
-        const char* geocodingSO = "system/asan/lib64/libgeocoding.z.so";
+            const char* geocodingSO = "system/asan/lib64/libgeocoding.z.so";
 #endif
             HiLog::Info(LABEL, "DynamicHandler lock init.");
             dynamicHandler = dlopen(geocodingSO, RTLD_NOW);
