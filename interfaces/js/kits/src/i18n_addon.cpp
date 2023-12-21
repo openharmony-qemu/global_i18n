@@ -1272,7 +1272,7 @@ napi_value I18nAddon::IsBoundary(napi_env env, napi_callback_info info)
 napi_value I18nAddon::IndexUtilConstructor(napi_env env, napi_callback_info info)
 {
     size_t argc = 1;
-    napi_value argv[1] = { 0 };
+    napi_value argv[1] = { nullptr };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
@@ -1280,7 +1280,7 @@ napi_value I18nAddon::IndexUtilConstructor(napi_env env, napi_callback_info info
         return nullptr;
     }
     std::string localeTag = "";
-    if (argv[0] != nullptr) {
+    if (argc > 0) {
         napi_valuetype valueType = napi_valuetype::napi_undefined;
         napi_typeof(env, argv[0], &valueType);
         if (valueType != napi_valuetype::napi_string) {
@@ -1357,11 +1357,9 @@ napi_value I18nAddon::GetIndexUtil(napi_env env, napi_callback_info info)
 
 napi_value I18nAddon::GetIndexList(napi_env env, napi_callback_info info)
 {
-    size_t argc = 0;
-    napi_value argv[0];
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
 
     I18nAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
@@ -1471,11 +1469,9 @@ napi_value I18nAddon::GetIndex(napi_env env, napi_callback_info info)
 
 napi_value I18nAddon::ObjectConstructor(napi_env env, napi_callback_info info)
 {
-    size_t argc = 0;
-    napi_value argv[0];
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_status status = napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
     if (status != napi_ok) {
         return nullptr;
     }

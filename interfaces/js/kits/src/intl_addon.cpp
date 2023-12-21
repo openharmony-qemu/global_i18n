@@ -307,17 +307,17 @@ std::string GetLocaleTag(napi_env env, napi_value argv)
 napi_value IntlAddon::LocaleConstructor(napi_env env, napi_callback_info info)
 {
     size_t argc = 2;
-    napi_value argv[2] = { 0 };
+    napi_value argv[2] = { nullptr };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         return nullptr;
     }
-    std::string localeTag = GetLocaleTag(env, argv[0]);
+    std::string localeTag = GetLocaleTag(env, argc > 0 ? argv[0] : nullptr);
 
     std::map<std::string, std::string> map = {};
-    if (argv[1] != nullptr) {
+    if (argc > 1) {
         GetOptionValue(env, argv[1], "calendar", map);
         GetOptionValue(env, argv[1], "collation", map);
         GetOptionValue(env, argv[1], "hourCycle", map);
@@ -375,7 +375,7 @@ void GetLocaleTags(napi_env env, napi_value rawLocaleTag, std::vector<std::strin
 napi_value IntlAddon::DateTimeFormatConstructor(napi_env env, napi_callback_info info)
 {
     size_t argc = 2;
-    napi_value argv[2] = { 0 };
+    napi_value argv[2] = { nullptr };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
@@ -383,7 +383,7 @@ napi_value IntlAddon::DateTimeFormatConstructor(napi_env env, napi_callback_info
         return nullptr;
     }
     std::vector<std::string> localeTags;
-    if (argv[0] != nullptr) {
+    if (argc > 0) {
         napi_valuetype valueType = napi_valuetype::napi_undefined;
         napi_typeof(env, argv[0], &valueType);
         bool isArray = false;
@@ -401,7 +401,7 @@ napi_value IntlAddon::DateTimeFormatConstructor(napi_env env, napi_callback_info
         }
     }
     std::map<std::string, std::string> map = {};
-    if (argv[1] != nullptr) {
+    if (argc > 1) {
         GetDateOptionValues(env, argv[1], map);
     }
     std::unique_ptr<IntlAddon> obj = nullptr;
@@ -438,7 +438,7 @@ bool IntlAddon::InitDateTimeFormatContext(napi_env env, napi_callback_info info,
 napi_value IntlAddon::RelativeTimeFormatConstructor(napi_env env, napi_callback_info info)
 {
     size_t argc = 2;
-    napi_value argv[2] = { 0 };
+    napi_value argv[2] = { nullptr };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
@@ -446,7 +446,7 @@ napi_value IntlAddon::RelativeTimeFormatConstructor(napi_env env, napi_callback_
         return nullptr;
     }
     std::vector<std::string> localeTags;
-    if (argv[0] != nullptr) {
+    if (argc > 0) {
         napi_valuetype valueType = napi_valuetype::napi_undefined;
         napi_typeof(env, argv[0], &valueType);
         bool isArray = false;
@@ -464,7 +464,7 @@ napi_value IntlAddon::RelativeTimeFormatConstructor(napi_env env, napi_callback_
         }
     }
     std::map<std::string, std::string> map = {};
-    if (argv[1] != nullptr) {
+    if (argc > 1) {
         GetRelativeTimeOptionValues(env, argv[1], map);
     }
     std::unique_ptr<IntlAddon> obj = nullptr;
@@ -523,11 +523,11 @@ napi_value IntlAddon::FormatDateTime(napi_env env, napi_callback_info info)
 napi_value IntlAddon::FormatDateTimeRange(napi_env env, napi_callback_info info)
 {
     size_t argc = 2;
-    napi_value argv[2] = { 0 };
+    napi_value argv[2] = { nullptr };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
-    if (argv[0] == nullptr || argv[1] == nullptr) {
+    if (argc < 2) {
         HiLog::Error(LABEL, "Parameter wrong");
         return nullptr;
     }
@@ -577,7 +577,7 @@ void GetNumberOptionValues(napi_env env, napi_value options, std::map<std::strin
 napi_value IntlAddon::NumberFormatConstructor(napi_env env, napi_callback_info info)
 {
     size_t argc = 2;
-    napi_value argv[2] = { 0 };
+    napi_value argv[2] = { nullptr };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
@@ -585,7 +585,7 @@ napi_value IntlAddon::NumberFormatConstructor(napi_env env, napi_callback_info i
         return nullptr;
     }
     std::vector<std::string> localeTags;
-    if (argv[0] != nullptr) {
+    if (argc > 0) {
         napi_valuetype valueType = napi_valuetype::napi_undefined;
         napi_typeof(env, argv[0], &valueType);
         bool isArray = false;
@@ -604,7 +604,7 @@ napi_value IntlAddon::NumberFormatConstructor(napi_env env, napi_callback_info i
         }
     }
     std::map<std::string, std::string> map = {};
-    if (argv[1] != nullptr) {
+    if (argc > 1) {
         GetNumberOptionValues(env, argv[1], map);
     }
     std::unique_ptr<IntlAddon> obj = nullptr;
@@ -663,11 +663,9 @@ int64_t IntlAddon::GetMilliseconds(napi_env env, napi_value *argv, int index)
 
 napi_value IntlAddon::GetLanguage(napi_env env, napi_callback_info info)
 {
-    size_t argc = 0;
-    napi_value argv[0];
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
 
     IntlAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
@@ -688,11 +686,9 @@ napi_value IntlAddon::GetLanguage(napi_env env, napi_callback_info info)
 
 napi_value IntlAddon::GetScript(napi_env env, napi_callback_info info)
 {
-    size_t argc = 0;
-    napi_value argv[0];
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
 
     IntlAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
@@ -713,11 +709,9 @@ napi_value IntlAddon::GetScript(napi_env env, napi_callback_info info)
 
 napi_value IntlAddon::GetRegion(napi_env env, napi_callback_info info)
 {
-    size_t argc = 0;
-    napi_value argv[0];
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
 
     IntlAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
@@ -738,11 +732,9 @@ napi_value IntlAddon::GetRegion(napi_env env, napi_callback_info info)
 
 napi_value IntlAddon::GetBaseName(napi_env env, napi_callback_info info)
 {
-    size_t argc = 0;
-    napi_value argv[0];
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
 
     IntlAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
@@ -763,11 +755,9 @@ napi_value IntlAddon::GetBaseName(napi_env env, napi_callback_info info)
 
 napi_value IntlAddon::GetCalendar(napi_env env, napi_callback_info info)
 {
-    size_t argc = 0;
-    napi_value argv[0];
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
 
     IntlAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
@@ -788,11 +778,9 @@ napi_value IntlAddon::GetCalendar(napi_env env, napi_callback_info info)
 
 napi_value IntlAddon::GetCollation(napi_env env, napi_callback_info info)
 {
-    size_t argc = 0;
-    napi_value argv[0];
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
 
     IntlAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
@@ -813,11 +801,9 @@ napi_value IntlAddon::GetCollation(napi_env env, napi_callback_info info)
 
 napi_value IntlAddon::GetHourCycle(napi_env env, napi_callback_info info)
 {
-    size_t argc = 0;
-    napi_value argv[0];
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
 
     IntlAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
@@ -838,11 +824,9 @@ napi_value IntlAddon::GetHourCycle(napi_env env, napi_callback_info info)
 
 napi_value IntlAddon::GetNumberingSystem(napi_env env, napi_callback_info info)
 {
-    size_t argc = 0;
-    napi_value argv[0];
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
 
     IntlAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
@@ -863,11 +847,9 @@ napi_value IntlAddon::GetNumberingSystem(napi_env env, napi_callback_info info)
 
 napi_value IntlAddon::GetNumeric(napi_env env, napi_callback_info info)
 {
-    size_t argc = 0;
-    napi_value argv[0];
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
 
     IntlAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
@@ -888,11 +870,9 @@ napi_value IntlAddon::GetNumeric(napi_env env, napi_callback_info info)
 
 napi_value IntlAddon::GetCaseFirst(napi_env env, napi_callback_info info)
 {
-    size_t argc = 0;
-    napi_value argv[0];
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
 
     IntlAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
@@ -912,11 +892,9 @@ napi_value IntlAddon::GetCaseFirst(napi_env env, napi_callback_info info)
 
 napi_value IntlAddon::ToString(napi_env env, napi_callback_info info)
 {
-    size_t argc = 0;
-    napi_value argv[0];
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
 
     IntlAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
@@ -937,11 +915,9 @@ napi_value IntlAddon::ToString(napi_env env, napi_callback_info info)
 
 napi_value IntlAddon::Maximize(napi_env env, napi_callback_info info)
 {
-    size_t argc = 0;
-    napi_value argv[0];
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
 
     IntlAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
@@ -974,11 +950,9 @@ napi_value IntlAddon::Maximize(napi_env env, napi_callback_info info)
 
 napi_value IntlAddon::Minimize(napi_env env, napi_callback_info info)
 {
-    size_t argc = 0;
-    napi_value argv[0];
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
 
     IntlAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
@@ -1058,11 +1032,9 @@ void SetBooleanOptionProperties(napi_env env, napi_value &result, std::map<std::
 
 napi_value IntlAddon::GetRelativeTimeResolvedOptions(napi_env env, napi_callback_info info)
 {
-    size_t argc = 0;
-    napi_value argv[0];
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
 
     IntlAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
@@ -1083,11 +1055,9 @@ napi_value IntlAddon::GetRelativeTimeResolvedOptions(napi_env env, napi_callback
 
 napi_value IntlAddon::GetDateTimeResolvedOptions(napi_env env, napi_callback_info info)
 {
-    size_t argc = 0;
-    napi_value argv[0];
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
 
     IntlAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
@@ -1124,11 +1094,9 @@ napi_value IntlAddon::GetDateTimeResolvedOptions(napi_env env, napi_callback_inf
 
 napi_value IntlAddon::GetNumberResolvedOptions(napi_env env, napi_callback_info info)
 {
-    size_t argc = 0;
-    napi_value argv[0];
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
 
     IntlAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
@@ -1340,7 +1308,7 @@ napi_value IntlAddon::InitCollator(napi_env env, napi_value exports)
 napi_value IntlAddon::CollatorConstructor(napi_env env, napi_callback_info info)
 {
     size_t argc = 2;
-    napi_value argv[2] = { 0 };
+    napi_value argv[2] = { nullptr };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
@@ -1348,7 +1316,7 @@ napi_value IntlAddon::CollatorConstructor(napi_env env, napi_callback_info info)
         return nullptr;
     }
     std::vector<std::string> localeTags;
-    if (argv[0] != nullptr) {
+    if (argc > 0) {
         napi_valuetype valueType = napi_valuetype::napi_undefined;
         napi_typeof(env, argv[0], &valueType);
         bool isArray = false;
@@ -1366,7 +1334,7 @@ napi_value IntlAddon::CollatorConstructor(napi_env env, napi_callback_info info)
         }
     }
     std::map<std::string, std::string> map = {};
-    if (argv[1] != nullptr) {
+    if (argc > 1) {
         GetCollatorOptionValue(env, argv[1], map);
     }
     std::unique_ptr<IntlAddon> obj = nullptr;
@@ -1571,11 +1539,9 @@ napi_value IntlAddon::CompareString(napi_env env, napi_callback_info info)
 
 napi_value IntlAddon::GetCollatorResolvedOptions(napi_env env, napi_callback_info info)
 {
-    size_t argc = 0;
-    napi_value argv[0];
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
 
     IntlAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
@@ -1720,7 +1686,7 @@ napi_value IntlAddon::InitPluralRules(napi_env env, napi_value exports)
 napi_value IntlAddon::PluralRulesConstructor(napi_env env, napi_callback_info info)
 {
     size_t argc = 2;
-    napi_value argv[2] = { 0 };
+    napi_value argv[2] = { nullptr };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
@@ -1729,7 +1695,7 @@ napi_value IntlAddon::PluralRulesConstructor(napi_env env, napi_callback_info in
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     std::vector<std::string> localeTags;
-    if (argv[0] != nullptr) {
+    if (argc > 0) {
         napi_typeof(env, argv[0], &valueType);
         bool isArray = false;
         napi_is_array(env, argv[0], &isArray);
@@ -1746,7 +1712,7 @@ napi_value IntlAddon::PluralRulesConstructor(napi_env env, napi_callback_info in
         }
     }
     std::map<std::string, std::string> map = {};
-    if (argv[1] != nullptr) {
+    if (argc > 1) {
         GetPluralRulesOptionValues(env, argv[1], map);
     }
     std::unique_ptr<IntlAddon> obj = nullptr;

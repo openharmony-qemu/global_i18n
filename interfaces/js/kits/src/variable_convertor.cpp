@@ -25,7 +25,7 @@ using namespace OHOS::HiviewDFX;
 
 bool VariableConvertor::CheckNapiValueType(napi_env env, napi_value value)
 {
-    if (value) {
+    if (value != nullptr) {
         napi_valuetype valueType = napi_valuetype::napi_undefined;
         napi_typeof(env, value, &valueType);
         if (valueType != napi_valuetype::napi_undefined && valueType != napi_valuetype::napi_null) {
