@@ -97,8 +97,9 @@ I18nErrorCode I18nServiceAbilityStub::CheckPermission()
     Security::AccessToken::ATokenTypeEnum tokenType =
         Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
     bool isShell = tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL;
-    if (!isSystemApp && !isShell) {
-        HiLog::Error(LABEL, "I18nServiceAbilityStub caller process is not System app or Shell.");
+    bool isNative = tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE;
+    if (!isSystemApp && !isShell && !isNative) {
+        HiLog::Error(LABEL, "I18nServiceAbilityStub caller process is not System app, Shell or Native.");
         return I18nErrorCode::NO_PERMISSION;
     }
     int result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken,
