@@ -32,7 +32,7 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-const int RECV_CHAR_LEN = 128;
+const int RECV_CHAR_LEN = 256;
 using i18n::phonenumbers::PhoneNumberUtil;
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "PhoneNumberFormat" };
 using namespace OHOS::HiviewDFX;
@@ -174,7 +174,7 @@ std::string PhoneNumberFormat::getPhoneLocationName(const std::string& number, c
     if (locationNameFunc) {
         // The function uses the same locale for phone and display.
         char recvArr[RECV_CHAR_LEN];
-        locationNameFunc(number.c_str(), phoneLocale.c_str(), recvArr);
+        locationNameFunc(number.c_str(), phoneLocale.c_str(), recvArr, RECV_CHAR_LEN);
         locName = recvArr;
     }
     if (!locationNameFunc || locName.empty()) {
