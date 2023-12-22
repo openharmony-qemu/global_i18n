@@ -88,7 +88,7 @@ napi_value I18nNormalizerAddon::I18nNormalizerConstructor(napi_env env, napi_cal
     if (status != napi_ok) {
         return nullptr;
     }
-    if (argv[0] == nullptr) {
+    if (argc < 1) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
         return nullptr;
     }
@@ -129,14 +129,14 @@ napi_value I18nNormalizerAddon::I18nNormalizerConstructor(napi_env env, napi_cal
 napi_value I18nNormalizerAddon::Normalize(napi_env env, napi_callback_info info)
 {
     size_t argc = 1;
-    napi_value argv[1] = { 0 };
+    napi_value argv[1] = { nullptr };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         return nullptr;
     }
-    if (argv[0] == nullptr) {
+    if (argc < 1) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
         return nullptr;
     }

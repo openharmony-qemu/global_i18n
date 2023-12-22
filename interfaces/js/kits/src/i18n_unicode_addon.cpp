@@ -381,11 +381,9 @@ napi_value I18nUnicodeAddon::GetTypeAddon(napi_env env, napi_callback_info info)
 
 napi_value I18nUnicodeAddon::ObjectConstructor(napi_env env, napi_callback_info info)
 {
-    size_t argc = 0;
-    napi_value argv[0];
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_status status = napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
     if (status != napi_ok) {
         return nullptr;
     }

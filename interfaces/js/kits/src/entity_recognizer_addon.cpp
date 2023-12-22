@@ -72,7 +72,7 @@ napi_value EntityRecognizerAddon::constructor(napi_env env, napi_callback_info i
         return nullptr;
     }
     std::string localeStr;
-    if (argv[0] == nullptr) {
+    if (argc < 1) {
         localeStr = LocaleConfig::GetSystemLocale();
     } else {
         napi_valuetype valueType = napi_valuetype::napi_undefined;
@@ -116,7 +116,7 @@ napi_value EntityRecognizerAddon::FindEntityInfo(napi_env env, napi_callback_inf
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         return nullptr;
-    } else if (argv[0] == nullptr) {
+    } else if (argc < 1) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
         return nullptr;
     }

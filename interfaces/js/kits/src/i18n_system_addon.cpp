@@ -387,14 +387,14 @@ napi_value I18nSystemAddon::GetDisplayCountryImpl(napi_env env, napi_callback_in
 {
     // Need to get three parameters to get the display country.
     size_t argc = 3;
-    napi_value argv[3] = { 0 };
+    napi_value argv[3] = { nullptr };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         return nullptr;
     }
-    if (argv[1] == nullptr) {
+    if (argc < 2) {
         HiLog::Error(LABEL, "Missing parameter");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, throwError);
         return nullptr;
@@ -417,8 +417,8 @@ napi_value I18nSystemAddon::GetDisplayCountryImpl(napi_env env, napi_callback_in
         return nullptr;
     }
     bool sentenceCase = true;
-    int sentenceCaseIndex = 2;
-    if (argv[sentenceCaseIndex] != nullptr) {
+    size_t sentenceCaseIndex = 2;
+    if (argc > sentenceCaseIndex) {
         napi_get_value_bool(env, argv[sentenceCaseIndex], &sentenceCase);
     }
     std::string value = LocaleConfig::GetDisplayRegion(localeBuf.data(), displayLocaleBuf.data(), sentenceCase);
@@ -438,14 +438,14 @@ napi_value I18nSystemAddon::GetDisplayLanguageImpl(napi_env env, napi_callback_i
 {
     // Need to get three parameters to get the display Language.
     size_t argc = 3;
-    napi_value argv[3] = { 0 };
+    napi_value argv[3] = { nullptr };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         return nullptr;
     }
-    if (argv[1] == nullptr) {
+    if (argc < 2) {
         HiLog::Error(LABEL, "Missing parameter");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, throwError);
         return nullptr;
@@ -468,8 +468,8 @@ napi_value I18nSystemAddon::GetDisplayLanguageImpl(napi_env env, napi_callback_i
         return nullptr;
     }
     bool sentenceCase = true;
-    int sentenceCaseIndex = 2;
-    if (argv[sentenceCaseIndex] != nullptr) {
+    size_t sentenceCaseIndex = 2;
+    if (argc > sentenceCaseIndex) {
         napi_get_value_bool(env, argv[sentenceCaseIndex], &sentenceCase);
     }
 
@@ -490,14 +490,14 @@ napi_value I18nSystemAddon::GetDisplayLanguageImpl(napi_env env, napi_callback_i
 napi_value I18nSystemAddon::GetSystemCountriesImpl(napi_env env, napi_callback_info info, bool throwError)
 {
     size_t argc = 1;
-    napi_value argv[1] = { 0 };
+    napi_value argv[1] = { nullptr };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         return nullptr;
     }
-    if (argv[0] == nullptr) {
+    if (argc < 1) {
         HiLog::Error(LABEL, "Missing parameter");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, throwError);
         return nullptr;
@@ -539,14 +539,14 @@ napi_value I18nSystemAddon::IsSuggestedImpl(napi_env env, napi_callback_info inf
 {
     // Need to get two parameters to check is suggested or not.
     size_t argc = 2;
-    napi_value argv[2] = { 0 };
+    napi_value argv[2] = { nullptr };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         return nullptr;
     }
-    if (argv[0] == nullptr) {
+    if (argc < 1) {
         HiLog::Error(LABEL, "Missing parameter");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, throwError);
         return nullptr;
@@ -593,7 +593,7 @@ napi_value I18nSystemAddon::SetSystemLanguageImpl(napi_env env, napi_callback_in
     if (status != napi_ok) {
         return nullptr;
     }
-    if (argv[0] == nullptr) {
+    if (argc < 1) {
         HiLog::Error(LABEL, "Missing parameter");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, throwError);
         return nullptr;
@@ -628,14 +628,14 @@ napi_value I18nSystemAddon::SetSystemLanguageImpl(napi_env env, napi_callback_in
 napi_value I18nSystemAddon::SetSystemRegionImpl(napi_env env, napi_callback_info info, bool throwError)
 {
     size_t argc = 1;
-    napi_value argv[1] = { 0 };
+    napi_value argv[1] = { nullptr };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         return nullptr;
     }
-    if (argv[0] == nullptr) {
+    if (argc < 1) {
         HiLog::Error(LABEL, "Missing parameter");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, throwError);
         return nullptr;
@@ -670,14 +670,14 @@ napi_value I18nSystemAddon::SetSystemRegionImpl(napi_env env, napi_callback_info
 napi_value I18nSystemAddon::SetSystemLocaleImpl(napi_env env, napi_callback_info info, bool throwError)
 {
     size_t argc = 1;
-    napi_value argv[1] = { 0 };
+    napi_value argv[1] = { nullptr };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         return nullptr;
     }
-    if (argv[0] == nullptr) {
+    if (argc < 1) {
         HiLog::Error(LABEL, "Missing parameter");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, throwError);
         return nullptr;
@@ -712,14 +712,14 @@ napi_value I18nSystemAddon::SetSystemLocaleImpl(napi_env env, napi_callback_info
 napi_value I18nSystemAddon::Set24HourClockImpl(napi_env env, napi_callback_info info, bool throwError)
 {
     size_t argc = 1;
-    napi_value argv[1] = { 0 };
+    napi_value argv[1] = { nullptr };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         return nullptr;
     }
-    if (argv[0] == nullptr) {
+    if (argc < 1) {
         HiLog::Error(LABEL, "Missing parameter");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, throwError);
         return nullptr;
@@ -762,12 +762,12 @@ napi_value I18nSystemAddon::AddPreferredLanguageImpl(napi_env env, napi_callback
     }
 
     std::string language;
-    if (!ParseStringParam(env, argv[0], throwError, language)) {
+    if (!ParseStringParam(env, argc > 0 ? argv[0] : nullptr, throwError, language)) {
         return nullptr;
     }
 
     int index = 1000000;
-    if (VariableConvertor::CheckNapiValueType(env, argv[1])) {
+    if (VariableConvertor::CheckNapiValueType(env, argc > 1 ? argv[1] : nullptr)) {
         status = napi_get_value_int32(env, argv[1], &index);
     }
     if (status != napi_ok) {
@@ -802,7 +802,7 @@ napi_value I18nSystemAddon::AddPreferredLanguageImpl(napi_env env, napi_callback
 napi_value I18nSystemAddon::RemovePreferredLanguageImpl(napi_env env, napi_callback_info info, bool throwError)
 {
     size_t argc = 1;
-    napi_value argv[1] = { 0 };
+    napi_value argv[1] = { nullptr };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     int len = 0;
@@ -810,7 +810,7 @@ napi_value I18nSystemAddon::RemovePreferredLanguageImpl(napi_env env, napi_callb
     if (status != napi_ok) {
         return nullptr;
     }
-    if (argv[0] == nullptr) {
+    if (argc < 1) {
         HiLog::Error(LABEL, "Missing parameter");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, throwError);
         return nullptr;
@@ -855,12 +855,12 @@ napi_value I18nSystemAddon::RemovePreferredLanguageImpl(napi_env env, napi_callb
 napi_value I18nSystemAddon::SetUsingLocalDigitAddonImpl(napi_env env, napi_callback_info info, bool throwError)
 {
     size_t argc = 1;
-    napi_value argv[1] = { 0 };
+    napi_value argv[1] = { nullptr };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
 
-    if (argv[0] == nullptr) {
+    if (argc < 1) {
         HiLog::Error(LABEL, "Invalid parameter nullptr");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, throwError);
         return nullptr;
