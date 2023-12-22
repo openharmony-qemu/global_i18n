@@ -32,7 +32,7 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-const int RECV_CHAR_LEN = 256;
+const int RECV_CHAR_LEN = 128;
 using i18n::phonenumbers::PhoneNumberUtil;
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "PhoneNumberFormat" };
 using namespace OHOS::HiviewDFX;
