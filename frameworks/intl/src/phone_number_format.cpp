@@ -70,15 +70,6 @@ PhoneNumberFormat::PhoneNumberFormat(const std::string &countryTag,
 
 PhoneNumberFormat::~PhoneNumberFormat()
 {
-    if (dynamicHandler == nullptr) {
-        return;
-    }
-    std::lock_guard<std::mutex> phoneLock(phoneMutex);
-    if (dynamicHandler != nullptr) {
-        dlclose(dynamicHandler);
-    }
-    dynamicHandler = nullptr;
-    locationNameFunc = nullptr;
 }
 
 std::unique_ptr<PhoneNumberFormat> PhoneNumberFormat::CreateInstance(const std::string &countryTag,

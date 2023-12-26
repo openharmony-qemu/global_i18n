@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <dlfcn.h>
 #include <unordered_map>
 #include <vector>
 
@@ -48,6 +49,10 @@ I18nAddon::I18nAddon() : env_(nullptr) {}
 
 I18nAddon::~I18nAddon()
 {
+    if (PhoneNumberFormat::dynamicHandler != nullptr) {
+        dlclose(PhoneNumberFormat::dynamicHandler);
+    }
+    PhoneNumberFormat::dynamicHandler = nullptr;
 }
 
 void I18nAddon::Destructor(napi_env env, void *nativeObject, void *hint)
