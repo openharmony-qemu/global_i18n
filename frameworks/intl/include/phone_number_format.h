@@ -45,6 +45,7 @@ public:
     virtual bool getBlockedRegionName(const std::string& regionCode, const std::string& language);
     virtual std::string getCityName(const std::string& language, const std::string& phonenumber,
         const std::string& locationName);
+    static void* dynamicHandler;
 
 private:
     PhoneNumberUtil* GetPhoneNumberUtil();
@@ -52,7 +53,6 @@ private:
     PhoneNumberUtil *util;
     std::string country;
     PhoneNumberUtil::PhoneNumberFormat phoneNumberFormat;
-    void* dynamicHandler = nullptr;
     ExposeLocationName locationNameFunc = nullptr;
     std::mutex phoneMutex;
 };
