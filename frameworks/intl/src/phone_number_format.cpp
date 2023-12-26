@@ -36,6 +36,7 @@ const int RECV_CHAR_LEN = 128;
 using i18n::phonenumbers::PhoneNumberUtil;
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "PhoneNumberFormat" };
 using namespace OHOS::HiviewDFX;
+static PhoneNumberFormat::dynamicHandler = nullptr;
 
 PhoneNumberFormat::PhoneNumberFormat(const std::string &countryTag,
                                      const std::map<std::string, std::string> &options)
