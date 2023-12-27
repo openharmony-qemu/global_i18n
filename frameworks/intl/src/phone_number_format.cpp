@@ -74,7 +74,7 @@ PhoneNumberFormat::~PhoneNumberFormat()
 {
 }
 
-PhoneNumberFormat::CloseDynamicHandler()
+void PhoneNumberFormat::CloseDynamicHandler()
 {
     if (dynamicHandler != nullptr) {
         dlclose(dynamicHandler);
