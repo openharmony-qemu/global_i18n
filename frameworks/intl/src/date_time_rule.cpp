@@ -266,6 +266,9 @@ std::string DateTimeRule::SubReplace(std::string& src, const std::string& subStr
 {
     std::string::size_type pos = 0;
     std::string result = src;
+    if (subStr.empty() || subStr.compare(newStr) == 0) {
+        return result;
+    }
     while ((pos = result.find(subStr)) != std::string::npos) {
         result.replace(pos, subStr.length(), newStr);
     }
