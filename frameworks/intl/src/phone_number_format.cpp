@@ -74,6 +74,14 @@ PhoneNumberFormat::~PhoneNumberFormat()
 {
 }
 
+PhoneNumberFormat::CloseDynamicHandler()
+{
+    if (dynamicHandler != nullptr) {
+        dlclose(dynamicHandler);
+    }
+    dynamicHandler = nullptr;
+}
+
 std::unique_ptr<PhoneNumberFormat> PhoneNumberFormat::CreateInstance(const std::string &countryTag,
     const std::map<std::string, std::string> &options)
 {
