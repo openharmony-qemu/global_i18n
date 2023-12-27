@@ -54,7 +54,7 @@ private:
     std::string country;
     PhoneNumberUtil::PhoneNumberFormat phoneNumberFormat;
     ExposeLocationName locationNameFunc = nullptr;
-    std::mutex phoneMutex;
+    static std::mutex phoneMutex;
 };
 } // namespace I18n
 } // namespace Global

@@ -37,6 +37,7 @@ using i18n::phonenumbers::PhoneNumberUtil;
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "PhoneNumberFormat" };
 using namespace OHOS::HiviewDFX;
 void* PhoneNumberFormat::dynamicHandler = nullptr;
+std::mutex PhoneNumberFormat::phoneMutex;
 
 PhoneNumberFormat::PhoneNumberFormat(const std::string &countryTag,
                                      const std::map<std::string, std::string> &options)
