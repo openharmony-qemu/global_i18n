@@ -51,9 +51,9 @@ namespace OHOS {
         dateTimeRule->GetLocale();
         icu::UnicodeString hyphen(input.c_str());
         dateTimeRule->IsRelDates(hyphen, input);
-        dateTimeRule->trim(input);
-        dateTimeRule->CompareBeginEnd(input, input, false);
-        dateTimeRule->SubReplace(input, input, input);
+        DateTimeRule::trim(input);
+        DateTimeRule::CompareBeginEnd(input, input, false);
+        DateTimeRule::SubReplace(input, input, input);
         delete dateTimeRule;
         delete dateRuleInit;
         return true;
