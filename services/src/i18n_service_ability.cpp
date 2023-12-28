@@ -103,6 +103,7 @@ void I18nServiceAbility::OnStart()
         HiLog::Info(LABEL, "I18nServiceAbility Publish failed.");
     }
     handler = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::Create(true));
+    UnloadI18nServiceAbility();
 }
 
 void I18nServiceAbility::OnStop()
