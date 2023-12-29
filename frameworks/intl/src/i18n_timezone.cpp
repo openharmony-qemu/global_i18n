@@ -1263,11 +1263,12 @@ std::string I18nTimeZone::GetPreferredPath(const double x,
 
 std::vector<std::string> I18nTimeZone::FindTzData()
 {
+    using std::filesystem::directory_iterator;
     std::map<std::string, std::vector<std::string>> pathMap;
     std::regex reg("tz_[0-9]{7}-(\\d{6})\\.dat");
     std::regex regVersion("_[0-9]{7}");
-    for (auto& entry : recursive_directory_iterator(TZ_PIXEL_PATH)) {
-        const std::string path = entry.path().string();
+    for (const auto& entry : directory_iterator{TZ_PIXEL_PATH}) {
+        const std::string path = entry.path();
         std::smatch match;
         bool found = std::regex_search(path, match, reg);
         if (found) {
