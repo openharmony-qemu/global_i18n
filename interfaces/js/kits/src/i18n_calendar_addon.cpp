@@ -610,7 +610,7 @@ napi_value I18nCalendarAddon::IsWeekend(napi_env env, napi_callback_info info)
             HiLog::Error(LABEL, "Get calendar object failed");
             break;
         }
-        if (!argv[0]) {
+        if (!VariableConvertor::CheckNapiValueType(env, argv[0])) {
             isWeekEnd = obj->calendar_->IsWeekend();
         } else {
             napi_value funcGetDateInfo = nullptr;
