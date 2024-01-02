@@ -175,7 +175,7 @@ std::string PhoneNumberFormat::getPhoneLocationName(const std::string& number, c
     if (locationNameFunc) {
         // The function uses the same locale for phone and display.
         char recvArr[RECV_CHAR_LEN];
-        locationNameFunc(number.c_str(), phoneLocale.c_str(), recvArr);
+        locationNameFunc(number.c_str(), phoneLocale.c_str(), recvArr, RECV_CHAR_LEN);
         locName = recvArr;
     }
     if (!locationNameFunc || locName.empty()) {
