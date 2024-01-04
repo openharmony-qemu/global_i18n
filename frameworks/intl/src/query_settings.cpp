@@ -20,7 +20,11 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-const char* LIB_PATH = "/system/lib/libzone_util.z.so";
+#if sizeof(char *) == 8
+    const char* LIB_PATH = "/system/lib64/libzone_util.z.so";
+#else
+    const char* LIB_PATH = "/system/lib/libzone_util.z.so";
+#endif
 const char* QUERY_WITH_PROXY = "QueryWithProxy";
 
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "QuerySettings" };
@@ -35,6 +39,7 @@ bool QuerySettings::SettingsQuery(const std::string& key, std::string& value, sp
     }
     void* handle = dlopen(LIB_PATH, RTLD_LAZY);
     if (handle == nullptr) {
+        HiLog::Error(LABEL, "Query failed, handle is nullptr.");
         return false;
     }
     I18nQuery query = reinterpret_cast<I18nQuery>(dlsym(handle, QUERY_WITH_PROXY));
