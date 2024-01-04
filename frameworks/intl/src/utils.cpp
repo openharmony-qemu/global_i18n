@@ -69,7 +69,6 @@ int32_t ConvertString2Int(const string &numberStr, int32_t& status)
         return -1;
     } catch (...) {
         status = -1;
-        HiLog::Error(LABEL, "ConvertString2Int: undefined behavior.");
         return -1;
     }
 }

@@ -85,6 +85,7 @@ const char *LocaleConfig::secondRootTag = "lang";
 const char *LocaleConfig::rootRegion = "regions";
 const char *LocaleConfig::secondRootRegion = "region";
 const char *LocaleConfig::NUMBER_SYSTEM_KEY = "-nu-";
+bool LocaleConfig::queryWithProxy = true;
 unordered_set<string> LocaleConfig::supportedLocales;
 unordered_set<string> LocaleConfig::supportLocales;
 unordered_set<string> LocaleConfig::supportedRegions;
