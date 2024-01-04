@@ -101,6 +101,7 @@ public:
     static bool IsValidLanguage(const std::string &language);
     static bool IsValidRegion(const std::string &region);
     static bool IsValidTag(const std::string &tag);
+    static bool queryWithProxy;
 
 private:
     static void Split(const std::string &src, const std::string &sep, std::vector<std::string> &dest);

@@ -35,7 +35,6 @@ bool QuerySettings::SettingsQuery(const std::string& key, std::string& value, sp
     }
     void* handle = dlopen(LIB_PATH, RTLD_LAZY);
     if (handle == nullptr) {
-        HiLog::Error(LABEL, "Query failed, handle is nullptr.");
         return false;
     }
     I18nQuery query = reinterpret_cast<I18nQuery>(dlsym(handle, QUERY_WITH_PROXY));

@@ -48,7 +48,6 @@ sptr<IRemoteObject> I18nServiceAbilityLoadManager::GetI18nServiceAbility(int32_t
 
 sptr<ISystemAbilityManager> I18nServiceAbilityLoadManager::LoadI18nServiceAbility(int32_t systemAbilityId)
 {
-    HiLog::Info(LABEL, "I18nServiceAbilityLoadManager::LoadAndGetI18nServiceAbility start.");
     InitLoadState();
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgr == nullptr) {
@@ -73,7 +72,6 @@ sptr<ISystemAbilityManager> I18nServiceAbilityLoadManager::LoadI18nServiceAbilit
 void I18nServiceAbilityLoadManager::InitLoadState()
 {
     std::unique_lock<std::mutex> lock(loadStateMutex);
-    HiLog::Info(LABEL, "I18nServiceAbilityLoadManager::InitLoadState");
     loadState = false;
 }
 
