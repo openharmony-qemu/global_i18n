@@ -28,6 +28,9 @@ using I18nQuery = bool (*)(const std::string&, std::string&, sptr<IRemoteObject>
 #endif
 
 class QuerySettings {
+private:
+    static const char *QUERY_WITH_PROXY;
+    static const char *LIB_PATH;
 public:
 #ifdef SUPPORT_GRAPHICS
     static bool SettingsQuery(const std::string& key, std::string& value, sptr<IRemoteObject> &proxy);
