@@ -104,7 +104,6 @@ bool I18nServiceAbilityLoadManager::UnloadI18nService(int32_t systemAbilityId)
 
 void I18nServiceAbilityLoadManager::LoadSystemAbilitySuccess()
 {
-    HiLog::Info(LABEL, "I18nServiceAbilityLoadManager::LoadSystemAbilitySuccess.");
     std::unique_lock<std::mutex> lock(loadStateMutex);
     loadState = true;
     loadStateCondition.notify_one();
@@ -112,7 +111,6 @@ void I18nServiceAbilityLoadManager::LoadSystemAbilitySuccess()
 
 void I18nServiceAbilityLoadManager::LoadSystemAbilityFail()
 {
-    HiLog::Info(LABEL, "I18nServiceAbilityLoadManager::LoadSystemAbilityFail.");
     std::unique_lock<std::mutex> lock(loadStateMutex);
     loadState = false;
     loadStateCondition.notify_one();
