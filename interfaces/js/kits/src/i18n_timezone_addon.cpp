@@ -132,7 +132,7 @@ napi_value I18nTimeZoneAddon::I18nTimeZoneConstructor(napi_env env, napi_callbac
             return nullptr;
         }
     }
-    if (argc < 2) {
+    if (argc < FUNC_ARGS_COUNT) {
         return nullptr;
     }
     napi_typeof(env, argv[1], &valueType);
@@ -226,7 +226,7 @@ napi_value I18nTimeZoneAddon::GetCityDisplayName(napi_env env, napi_callback_inf
     if (status != napi_ok) {
         return nullptr;
     }
-    if (argc < 2) {
+    if (argc < FUNC_ARGS_COUNT) {
         return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
@@ -273,7 +273,7 @@ napi_value I18nTimeZoneAddon::GetTimezonesByLocation(napi_env env, napi_callback
     if (status != napi_ok) {
         return nullptr;
     }
-    if (argc < 2) {
+    if (argc < FUNC_ARGS_COUNT) {
         HiLog::Error(LABEL, "GetTimezonesByLocation: Missing parameter");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
         return nullptr;

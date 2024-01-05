@@ -37,7 +37,6 @@ private:
     // process js function call
     static napi_value IsHoliday(napi_env env, napi_callback_info info);
     static napi_value GetHolidayInfoItemArray(napi_env env, napi_callback_info info);
-    static bool CheckNapiValueType(napi_env env, napi_value value);
     static std::string GetString(napi_env &env, napi_value &value, int32_t &code);
     static int32_t ValidateParamNumber(napi_env &env, napi_value &argv);
     static std::vector<int> ValidateParamDate(napi_env &env, napi_value &argv);
