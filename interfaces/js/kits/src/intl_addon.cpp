@@ -17,7 +17,7 @@
 
 #include <vector>
 #include <set>
-
+#include "error_util.h"
 #include "hilog/log.h"
 #include "node_api.h"
 
@@ -527,7 +527,7 @@ napi_value IntlAddon::FormatDateTimeRange(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
-    if (argc < 2) {
+    if (argc < FUNC_ARGS_COUNT) {
         HiLog::Error(LABEL, "Parameter wrong");
         return nullptr;
     }

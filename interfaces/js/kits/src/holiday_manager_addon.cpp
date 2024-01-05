@@ -149,7 +149,7 @@ napi_value HolidayManagerAddon::IsHoliday(napi_env env, napi_callback_info info)
         return nullptr;
     }
     napi_value result = nullptr;
-    bool flag = CheckNapiValueType(env, argv[0]);
+    bool flag = VariableConvertor::CheckNapiValueType(env, argv[0]);
     bool res = false;
     if (flag) {
         std::vector<int> list = ValidateParamDate(env, argv[0]);
@@ -180,7 +180,7 @@ napi_value HolidayManagerAddon::GetHolidayInfoItemArray(napi_env env, napi_callb
         HiLog::Error(LABEL, "Get HolidayManager object failed");
         return nullptr;
     }
-    bool flag = CheckNapiValueType(env, argv[0]);
+    bool flag = VariableConvertor::CheckNapiValueType(env, argv[0]);
     if (flag) {
         int32_t year = ValidateParamNumber(env, argv[0]);
         std::vector<HolidayInfoItem> itemList = obj->holidayManager_->GetHolidayInfoItemArray(year);
@@ -267,18 +267,6 @@ int32_t HolidayManagerAddon::ValidateParamNumber(napi_env &env, napi_value &argv
         return -1;
     }
     return val;
-}
-
-bool HolidayManagerAddon::CheckNapiValueType(napi_env env, napi_value value)
-{
-    if (value) {
-        napi_valuetype valueType = napi_valuetype::napi_undefined;
-        napi_typeof(env, value, &valueType);
-        if (valueType != napi_valuetype::napi_undefined && valueType != napi_valuetype::napi_null) {
-            return true;
-        }
-    }
-    return false;
 }
 
 napi_value HolidayManagerAddon::CreateHolidayItem(napi_env env, const HolidayInfoItem &holidayItem)

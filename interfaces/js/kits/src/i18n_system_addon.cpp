@@ -400,7 +400,7 @@ napi_value I18nSystemAddon::GetDisplayCountryImpl(napi_env env, napi_callback_in
     if (status != napi_ok) {
         return nullptr;
     }
-    if (argc < 2) {
+    if (argc < FUNC_ARGS_COUNT) {
         HiLog::Error(LABEL, "Missing parameter");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, throwError);
         return nullptr;
@@ -451,7 +451,7 @@ napi_value I18nSystemAddon::GetDisplayLanguageImpl(napi_env env, napi_callback_i
     if (status != napi_ok) {
         return nullptr;
     }
-    if (argc < 2) {
+    if (argc < FUNC_ARGS_COUNT) {
         HiLog::Error(LABEL, "Missing parameter");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, throwError);
         return nullptr;
