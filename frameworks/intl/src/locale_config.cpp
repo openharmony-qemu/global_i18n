@@ -974,7 +974,6 @@ std::string LocaleConfig::GetValidLocale(const std::string &localeTag)
 
 bool LocaleConfig::Is24HourClock()
 {
-    std::string is24HourValue;
     std::string is24Hour = ReadSystemParameter(HOUR_KEY, CONFIG_LEN);
     if (is24Hour.empty()) {
         return false;
@@ -990,7 +989,7 @@ bool LocaleConfig::Is24HourClock(sptr<IRemoteObject> &proxy)
 {
     std::string is24HourValue;
     std::string is24HourSystem = ReadSystemParameter(HOUR_KEY, CONFIG_LEN);
-    std::string is24Hour = is24HourSystem.c_str();
+    std::string is24Hour;
     if (QuerySettings::SettingsQuery(TIME_FORMAT, is24HourValue, proxy)) {
         is24Hour = (is24HourValue == "24") ? "true" : "false";
         if (is24HourSystem != is24Hour) {
@@ -998,6 +997,8 @@ bool LocaleConfig::Is24HourClock(sptr<IRemoteObject> &proxy)
                 HiLog::Error(LABEL, "LocaleConfig::Set parameter failed.");
             }
         }
+    } else {
+        is24Hour = is24HourSystem.c_str();
     }
     if (is24Hour.empty()) {
         return false;
