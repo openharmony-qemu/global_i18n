@@ -278,7 +278,8 @@ napi_value I18nTimeZoneAddon::GetTimezonesByLocation(napi_env env, napi_callback
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
         return nullptr;
     }
-    double x, y;
+    double x;
+    double y;
     status = napi_get_value_double(env, argv[0], &x);
     if (status != napi_ok) {
         HiLog::Error(LABEL, "GetTimezonesByLocation: Parse first argument x failed");

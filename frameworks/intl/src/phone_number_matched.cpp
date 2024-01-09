@@ -431,22 +431,19 @@ PhoneNumberMatch* PhoneNumberMatched::HandleCodesRule(PhoneNumberMatch* phoneNum
     PhoneNumberMatch* match = phoneNumberMatch;
     std::vector<RegexRule*> rules = phoneNumberRule->GetCodesRules();
     bool isVaild = true;
-    if (rules.size() != 0) {
-        for (RegexRule* rule : rules) {
-            PhoneNumberMatch* tempmatch = rule->IsValid(match, message);
-            if (tempmatch == nullptr) {
-                isVaild = false;
-                break;
-            } else {
-                match = tempmatch;
-            }
-        }
-    }
-    if (isVaild) {
-        return match;
-    } else {
+    if (rules.size() == 0) {
         return nullptr;
     }
+    for (RegexRule* rule : rules) {
+        PhoneNumberMatch* tempmatch = rule->IsValid(match, message);
+        if (tempmatch == nullptr) {
+            isVaild = false;
+            break;
+        } else {
+            match = tempmatch;
+        }
+    }
+    return isVaild ? match : nullptr;
 }
 
 // Add phone numbers that meet the positive rule to the result

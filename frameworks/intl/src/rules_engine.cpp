@@ -54,7 +54,7 @@ std::vector<MatchedDateTimeInfo> RulesEngine::Match(icu::UnicodeString& message)
         UErrorCode status = U_ZERO_ERROR;
         icu::UnicodeString regex = this->patterns[key];
         icu::RegexPattern* pattern = icu::RegexPattern::compile(regex,
-                URegexpFlag::UREGEX_CASE_INSENSITIVE, status);
+            URegexpFlag::UREGEX_CASE_INSENSITIVE, status);
         if (pattern == nullptr) {
             HiLog::Error(LABEL, "Match failed because pattern is nullptr.");
             return matches;

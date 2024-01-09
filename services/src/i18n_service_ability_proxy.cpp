@@ -31,7 +31,8 @@ I18nServiceAbilityProxy::I18nServiceAbilityProxy(const sptr<IRemoteObject> &impl
 
 I18nErrorCode I18nServiceAbilityProxy::SetSystemLanguage(const std::string &language)
 {
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     MessageOption option;
     data.WriteInterfaceToken(DESCRIPTOR);
     data.WriteString(language);
@@ -42,7 +43,8 @@ I18nErrorCode I18nServiceAbilityProxy::SetSystemLanguage(const std::string &lang
 
 I18nErrorCode I18nServiceAbilityProxy::SetSystemRegion(const std::string &region)
 {
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     MessageOption option;
     data.WriteInterfaceToken(DESCRIPTOR);
     data.WriteString(region);
@@ -53,7 +55,8 @@ I18nErrorCode I18nServiceAbilityProxy::SetSystemRegion(const std::string &region
 
 I18nErrorCode I18nServiceAbilityProxy::SetSystemLocale(const std::string &locale)
 {
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     MessageOption option;
     data.WriteInterfaceToken(DESCRIPTOR);
     data.WriteString(locale);
@@ -64,7 +67,8 @@ I18nErrorCode I18nServiceAbilityProxy::SetSystemLocale(const std::string &locale
 
 I18nErrorCode I18nServiceAbilityProxy::Set24HourClock(bool flag)
 {
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     MessageOption option;
     data.WriteInterfaceToken(DESCRIPTOR);
     data.WriteBool(flag);
@@ -75,7 +79,8 @@ I18nErrorCode I18nServiceAbilityProxy::Set24HourClock(bool flag)
 
 I18nErrorCode I18nServiceAbilityProxy::SetUsingLocalDigit(bool flag)
 {
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     MessageOption option;
     data.WriteInterfaceToken(DESCRIPTOR);
     data.WriteBool(flag);
@@ -86,7 +91,8 @@ I18nErrorCode I18nServiceAbilityProxy::SetUsingLocalDigit(bool flag)
 
 I18nErrorCode I18nServiceAbilityProxy::AddPreferredLanguage(const std::string &language, int32_t index)
 {
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     MessageOption option;
     data.WriteInterfaceToken(DESCRIPTOR);
     data.WriteString(language);
@@ -98,7 +104,8 @@ I18nErrorCode I18nServiceAbilityProxy::AddPreferredLanguage(const std::string &l
 
 I18nErrorCode I18nServiceAbilityProxy::RemovePreferredLanguage(int32_t index)
 {
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     MessageOption option;
     data.WriteInterfaceToken(DESCRIPTOR);
     data.WriteInt32(index);

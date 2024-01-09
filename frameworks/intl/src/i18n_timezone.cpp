@@ -342,7 +342,7 @@ std::map<int, std::string> I18nTimeZone::categoryNum2TimezoneEN {
     { 97, "Asia/Tashkent" },
     { 98, "Asia/Tbilisi" },
     { 99, "Asia/Tehran" },
-    { 100, "Asia/Thimphu" },
+    { 100, "Asia/Thimbu" },
     { 101, "Asia/Tokyo" },
     { 102, "Asia/Tomsk" },
     { 103, "Asia/Ulaanbaatar" },
@@ -980,11 +980,12 @@ std::string I18nTimeZone::GetFallBack(std::string &localeStr)
     }
     size_t begin = 0;
     std::vector<std::string> localeParts;
-    while (true) {
+    bool breakFlag = true;
+    while (breakFlag) {
         size_t end = localeStr.find('_', begin);
         localeParts.push_back(localeStr.substr(begin, end - begin));
         if (end == std::string::npos) {
-            break;
+            breakFlag = false;
         }
         begin = end + 1;
     }
@@ -1087,7 +1088,8 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
     if (preferredPath == "") {
         return tzIdList;
     }
-    uint32_t width, height;
+    uint32_t width;
+    uint32_t height;
     GetTzDataWidth(filePaths, &width, &height);
     double calculateX = y * width / (TZ_X_PLUS * 1.0) + width / (TZ_HALF_OF_SIZE * 1.0);
     double calculateY = x * ((height * fileCount) / (TZ_X_PLUS * TZ_HALF_OF_SIZE * 1.0)) +

@@ -29,7 +29,8 @@ const std::string SETTINGS_DATA_COLUMN_VALUE = "VALUE";
 
 bool QueryWithProxy(const std::string& key, std::string& value, sptr<IRemoteObject> &proxy)
 {
-    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = DataShare::DataShareHelper::Creator(proxy, SETTINGS_DATASHARE_URI, SETTINGS_DATA_EXT_URI);
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
+        DataShare::DataShareHelper::Creator(proxy, SETTINGS_DATASHARE_URI, SETTINGS_DATA_EXT_URI);
     std::vector<std::string> columns = {SETTINGS_DATA_COLUMN_VALUE};
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(SETTINGS_DATA_COLUMN_KEYWORD, key);

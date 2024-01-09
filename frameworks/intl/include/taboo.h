@@ -50,11 +50,14 @@ private:
     void ReadResourceList();
     std::string GetLanguageFromFileName(const std::string& fileName);
 
-    static std::set<std::string> supportedRegions; // Indicates which regions support name replacement using taboo data.
-    static std::set<std::string> supportedLanguages; // Indicates which languages support name replacement using taboo data.
+    // Indicates which regions support name replacement using taboo data.
+    static std::set<std::string> supportedRegions;
+    // Indicates which languages support name replacement using taboo data.
+    static std::set<std::string> supportedLanguages;
     // cache the name replacement taboo data of different locale.
     std::map<std::string, std::map<std::string, std::string>> localeTabooData;
-    static std::map<std::string, std::string> RESOURCES; // Indicates which locales are supported to find taboo data.
+    // Indicates which locales are supported to find taboo data.
+    static std::map<std::string, std::string> RESOURCES;
 
     std::string tabooDataPath = "";
     std::string tabooConfigFileName = "taboo-config.xml";
