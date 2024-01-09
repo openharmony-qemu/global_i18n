@@ -137,8 +137,7 @@ std::vector<HolidayInfoItem> HolidayManager::GetHolidayInfoItemArray(int32_t yea
 
 std::string HolidayManager::ValidateHolidayFilePath(const char* path)
 {
-    char realPathBuffer[PATH_MAX];
-    char *realpathRes = realpath(path, realPathBuffer);
+    char *realpathRes = realpath(path, nullptr);
     if (realpathRes == NULL) {
         free(realpathRes);
         return "the holiday resource file not exists.";

@@ -118,7 +118,7 @@ void PhoneNumberRule::InitRule(std::string& xmlPath)
 }
 
 void PhoneNumberRule::SetRules(std::string& category, icu::UnicodeString& content, std::string& valid,
-        std::string& handle,std::string& insensitive,std::string& type)
+        std::string& handle, std::string& insensitive, std::string& type)
 {
     if (category == "negative" || (category == "common" && commonExit)) {
         negativeRules.push_back(new RegexRule(content, valid, handle, insensitive, type));

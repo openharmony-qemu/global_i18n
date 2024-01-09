@@ -26,7 +26,7 @@ class MatchedDateTimeInfo {
 public:
     MatchedDateTimeInfo() : _begin(-1), _end(-1), type(0), isTimePeriod(false) {}
     MatchedDateTimeInfo(int begin, int end, std::string& regex)
-    : _begin(begin), _end(end), regex(regex), type(0), isTimePeriod(false) {}
+        : _begin(begin), _end(end), regex(regex), type(0), isTimePeriod(false) {}
     ~MatchedDateTimeInfo() {}
 
     void SetIsTimePeriod(bool is)

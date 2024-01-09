@@ -102,9 +102,8 @@ void GetAllValidLocalesTag(std::unordered_set<std::string>& allValidLocalesLangu
 
 bool CheckTzDataFilePath(const std::string &filePath)
 {
-    char realPathBuffer[PATH_MAX];
     char *realpathRes = nullptr;
-    realpathRes = realpath(filePath.c_str(), realPathBuffer);
+    realpathRes = realpath(filePath.c_str(), nullptr);
     if (realpathRes == nullptr) {
         return false;
     }

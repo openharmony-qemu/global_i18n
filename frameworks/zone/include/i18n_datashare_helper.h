@@ -27,7 +27,7 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 extern "C" __attribute__((used)) bool QueryWithProxy(const std::string& key,
-        std::string& value, sptr<IRemoteObject> &proxy);
+    std::string& value, sptr<IRemoteObject> &proxy);
 __attribute__((used)) static Uri AssembleUri(const std::string& key);
 } // namespace I18n
 } // namespace Global
