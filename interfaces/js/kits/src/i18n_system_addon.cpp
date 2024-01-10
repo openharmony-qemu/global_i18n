@@ -220,22 +220,7 @@ napi_value I18nSystemAddon::SetSystemLocaleWithError(napi_env env, napi_callback
 
 napi_value I18nSystemAddon::Is24HourClock(napi_env env, napi_callback_info info)
 {
-#ifdef SUPPORT_GRAPHICS
-    bool is24HourClock;
-    if (LocaleConfig::queryWithProxy) {
-        // 1602 is i18n sa id
-        sptr<IRemoteObject> proxy = I18nServiceAbilityLoadManager::GetInstance()->GetI18nServiceAbility(1602);
-        if (proxy == nullptr) {
-            HiLog::Error(LABEL, "I18nSystemAddon::Is24HourClock load i18n sa failed");
-        }
-        LocaleConfig::queryWithProxy = false;
-        is24HourClock = LocaleConfig::Is24HourClock(proxy);
-    } else {
-        is24HourClock = LocaleConfig::Is24HourClock();
-    }
-#else
     bool is24HourClock = LocaleConfig::Is24HourClock();
-#endif
     napi_value result = nullptr;
     napi_status status = napi_get_boolean(env, is24HourClock, &result);
     if (status != napi_ok) {
