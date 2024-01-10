@@ -57,7 +57,7 @@ std::string IcsFileWriter::GenerateFile()
         "END:VCALENDAR\r\n"
     };
     for (size_t i = 0; i < list.size(); i++) {
-        fstream << list[i] << endl;
+        fstream << list[i] << std::endl;
     }
     fstream.close();
     return filePath;
