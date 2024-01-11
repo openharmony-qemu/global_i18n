@@ -96,11 +96,13 @@ string ZoneUtil::GetDefaultZone(const string &country)
 
 string ZoneUtil::GetDefaultZone(const int32_t number)
 {
+    using i18n::phonenumbers::PhoneNumberUtil;
     string *region_code = new(nothrow) string();
     if (!region_code) {
         return "";
     }
-    phone_util.GetRegionCodeForCountryCode(number, region_code);
+    PhoneNumberUtil* phoneUtil = PhoneNumberUtil::GetInstance();
+    phoneUtil->GetRegionCodeForCountryCode(number, region_code);
     if (!region_code) {
         return "";
     }
@@ -128,11 +130,13 @@ string ZoneUtil::GetDefaultZone(const string country, const int32_t offset)
 
 string ZoneUtil::GetDefaultZone(const int32_t number, const int32_t offset)
 {
+    using i18n::phonenumbers::PhoneNumberUtil;
     string *region_code = new(nothrow) string();
     if (!region_code) {
         return "";
     }
-    phone_util.GetRegionCodeForCountryCode(number, region_code);
+    PhoneNumberUtil* phoneUtil = PhoneNumberUtil::GetInstance();
+    phoneUtil->GetRegionCodeForCountryCode(number, region_code);
     if (!region_code) {
         return "";
     }

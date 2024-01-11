@@ -53,7 +53,7 @@ public:
     /**
      * default constructor
      */
-    ZoneUtil() : phone_util(*i18n::phonenumbers::PhoneNumberUtil::GetInstance()) {}
+    ZoneUtil() {}
 
     /**
      * deconstructor
@@ -144,7 +144,6 @@ public:
     CountryResult LookupTimezoneByCountry(std::string &region, int64_t currentMillis);
 
 private:
-    const i18n::phonenumbers::PhoneNumberUtil &phone_util;
     static std::unordered_map<std::string, std::string> defaultMap;
     static bool icuInitialized;
     static void GetList(icu::StringEnumeration *strEnum, std::vector<std::string> &ret);
