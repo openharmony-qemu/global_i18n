@@ -52,7 +52,11 @@ HolidayManager::HolidayManager(const char* path)
     for (size_t i = 0; i < items.size(); i++) {
         struct tm tmObj = {.tm_mday = items[i].day, .tm_mon = items[i].month, .tm_year = items[i].year};
         char strDate[10];
-        strftime(strDate, sizeof(strDate), "%Y%m%d", &tmObj);
+        size_t resCode = strftime(strDate, sizeof(strDate), "%Y%m%d", &tmObj);
+        if (resCode == 0) {
+            HiLog::Error(LABEL, "Failed: strftime error:%{public}d .", resCode);
+            return;
+        }
         std::string startDate(strDate);
         items[i].year += YEAR_START;
         items[i].month += MONTH_GREATER_ONE;

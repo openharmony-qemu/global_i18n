@@ -122,7 +122,7 @@ std::vector<MatchedDateTimeInfo> DateRuleInit::GetMatches(icu::UnicodeString& me
 }
 
 void DateRuleInit::GetMatchedInfo(std::vector<MatchedDateTimeInfo>& matches, MatchedDateTimeInfo& match,
-        icu::UnicodeString& message)
+    icu::UnicodeString& message)
 {
     // splitting results based on subRules.
     if (subDetectsMap.find(match.GetRegex()) != subDetectsMap.end()) {

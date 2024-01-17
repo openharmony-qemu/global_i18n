@@ -278,22 +278,9 @@ napi_value I18nTimeZoneAddon::GetTimezonesByLocation(napi_env env, napi_callback
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
         return nullptr;
     }
-    double x, y;
-    status = napi_get_value_double(env, argv[0], &x);
-    if (status != napi_ok) {
-        HiLog::Error(LABEL, "GetTimezonesByLocation: Parse first argument x failed");
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
-        return nullptr;
-    }
-    status = napi_get_value_double(env, argv[1], &y);
-    if (status != napi_ok) {
-        HiLog::Error(LABEL, "GetTimezonesByLocation: Parse second argument y failed");
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
-        return nullptr;
-    }
-    // -180 and 179.9 is the scope of longitude, -90 and 89.9 is the scope of latitude
-    if (x < -180 || x > 179.9 || y < -90 || y > 89.9) {
-        HiLog::Error(LABEL, "GetTimezonesByLocation: Args x or y exceed it's scope.");
+    double x;
+    double y;
+    if (!CheckParamTypeAndScope(env, argv, x, y)) {
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
         return nullptr;
     }
@@ -315,6 +302,26 @@ napi_value I18nTimeZoneAddon::GetTimezonesByLocation(napi_env env, napi_callback
     }
 
     return timezoneList;
+}
+
+bool I18nTimeZoneAddon::CheckParamTypeAndScope(napi_env env, napi_value *argv, double &x, double &y)
+{
+    napi_status status = napi_get_value_double(env, argv[0], &x);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "GetTimezonesByLocation: Parse first argument x failed");
+        return false;
+    }
+    status = napi_get_value_double(env, argv[1], &y);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "GetTimezonesByLocation: Parse second argument y failed");
+        return false;
+    }
+    // -180 and 179.9 is the scope of longitude, -90 and 89.9 is the scope of latitude
+    if (x < -180 || x > 179.9 || y < -90 || y > 89.9) {
+        HiLog::Error(LABEL, "GetTimezonesByLocation: Args x or y exceed it's scope.");
+        return false;
+    }
+    return true;
 }
 
 napi_value I18nTimeZoneAddon::GetID(napi_env env, napi_callback_info info)

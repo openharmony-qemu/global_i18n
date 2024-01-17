@@ -40,6 +40,8 @@ public:
 private:
     void InitRule(std::string& xmlPath);
     void FreePointer(std::vector<RegexRule*> &ruleList);
+    void SetRules(std::string& category, icu::UnicodeString& content, std::string& valid,
+        std::string& handle, std::string& insensitive, std::string& type);
 
     std::vector<RegexRule*> negativeRules;
     std::vector<RegexRule*> positiveRules;

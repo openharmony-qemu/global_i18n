@@ -109,22 +109,28 @@ void PhoneNumberRule::InitRule(std::string& xmlPath)
                 content += tempContent;
                 xmlFree(contentPtr);
             }
-            if (category == "negative" || (category == "common" && commonExit)) {
-                negativeRules.push_back(new RegexRule(content, valid, handle, insensitive, type));
-            } else if (category == "positive") {
-                positiveRules.push_back(new RegexRule(content, valid, handle, insensitive, type));
-            } else if (category == "border") {
-                borderRules.push_back(new RegexRule(content, valid, handle, insensitive, type));
-            } else if (category == "codes") {
-                codesRules.push_back(new RegexRule(content, valid, handle, insensitive, type));
-            } else if (category == "find_number") {
-                findRules.push_back(new RegexRule(content, valid, handle, insensitive, type));
-            }
+            SetRules(category, content, valid, handle, insensitive, type);
             rule = rule->next;
         }
         cur = cur->next;
     }
     xmlFreeDoc(doc);
+}
+
+void PhoneNumberRule::SetRules(std::string& category, icu::UnicodeString& content, std::string& valid,
+    std::string& handle, std::string& insensitive, std::string& type)
+{
+    if (category == "negative" || (category == "common" && commonExit)) {
+        negativeRules.push_back(new RegexRule(content, valid, handle, insensitive, type));
+    } else if (category == "positive") {
+        positiveRules.push_back(new RegexRule(content, valid, handle, insensitive, type));
+    } else if (category == "border") {
+        borderRules.push_back(new RegexRule(content, valid, handle, insensitive, type));
+    } else if (category == "codes") {
+        codesRules.push_back(new RegexRule(content, valid, handle, insensitive, type));
+    } else if (category == "find_number") {
+        findRules.push_back(new RegexRule(content, valid, handle, insensitive, type));
+    }
 }
 
 std::vector<RegexRule*> PhoneNumberRule::GetBorderRules()

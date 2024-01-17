@@ -31,10 +31,8 @@ IcsFileWriter::~IcsFileWriter()
 
 std::string IcsFileWriter::GenerateFile()
 {
-    using namespace std;
     std::string filePath = "/data/log/TR.ics";
-    ofstream fstream(filePath);
-    //fstream.open(filePath, ios::out);
+    std::ofstream fstream(filePath);
     if (!fstream.is_open()) {
         printf("file can't access.\r\n");
         return filePath;
@@ -59,9 +57,8 @@ std::string IcsFileWriter::GenerateFile()
         "END:VCALENDAR\r\n"
     };
     for (size_t i = 0; i < list.size(); i++) {
-        fstream << list[i] << endl;
+        fstream << list[i] << std::endl;
     }
-    
     fstream.close();
     return filePath;
 }

@@ -38,6 +38,7 @@ private:
     static napi_value GetCityDisplayName(napi_env env, napi_callback_info info);
     static napi_value GetTimezoneFromCity(napi_env env, napi_callback_info info);
     static napi_value GetTimezonesByLocation(napi_env env, napi_callback_info info);
+    static bool CheckParamTypeAndScope(napi_env env, napi_value *argv, double &x, double &y);
 
     static napi_value GetID(napi_env env, napi_callback_info info);
     static napi_value GetTimeZoneDisplayName(napi_env env, napi_callback_info info);

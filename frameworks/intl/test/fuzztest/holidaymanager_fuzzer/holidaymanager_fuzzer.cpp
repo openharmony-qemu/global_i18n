@@ -40,7 +40,7 @@ namespace OHOS {
         holidayManager->IsHoliday();
         holidayManager->IsHoliday(size, size, size);
         holidayManager->GetHolidayInfoItemArray();
-        holidayManager->GetHolidayInfoItemArray(size);        
+        holidayManager->GetHolidayInfoItemArray(size);
         delete holidayManager;
         return true;
     }
