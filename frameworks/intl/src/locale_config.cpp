@@ -31,7 +31,6 @@
 #include "locid.h"
 #include "ohos/init_data.h"
 #include "parameter.h"
-#include "query_settings.h"
 #include "securec.h"
 #include "string_ex.h"
 #include "ucase.h"
@@ -54,7 +53,6 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "Loc
 const char *LocaleConfig::LANGUAGE_KEY = "persist.global.language";
 const char *LocaleConfig::LOCALE_KEY = "persist.global.locale";
 const char *LocaleConfig::HOUR_KEY = "persist.global.is24Hour";
-const char *LocaleConfig::TIME_FORMAT = "settings.date.time_format";
 const char *LocaleConfig::DEFAULT_LOCALE_KEY = "const.global.locale";
 const char *LocaleConfig::DEFAULT_LANGUAGE_KEY = "const.global.language";
 const char *LocaleConfig::DEFAULT_REGION_KEY = "const.global.region";
@@ -85,7 +83,6 @@ const char *LocaleConfig::secondRootTag = "lang";
 const char *LocaleConfig::rootRegion = "regions";
 const char *LocaleConfig::secondRootRegion = "region";
 const char *LocaleConfig::NUMBER_SYSTEM_KEY = "-nu-";
-bool LocaleConfig::queryWithProxy = true;
 unordered_set<string> LocaleConfig::supportedLocales;
 unordered_set<string> LocaleConfig::supportLocales;
 unordered_set<string> LocaleConfig::supportedRegions;
@@ -983,32 +980,6 @@ bool LocaleConfig::Is24HourClock()
     }
     return false;
 }
-
-#ifdef SUPPORT_GRAPHICS
-bool LocaleConfig::Is24HourClock(sptr<IRemoteObject> &proxy)
-{
-    std::string is24HourValue;
-    std::string is24HourSystem = ReadSystemParameter(HOUR_KEY, CONFIG_LEN);
-    std::string is24Hour;
-    if (QuerySettings::SettingsQuery(TIME_FORMAT, is24HourValue, proxy)) {
-        is24Hour = (is24HourValue == "24") ? "true" : "false";
-        if (is24HourSystem != is24Hour) {
-            if (SetParameter(HOUR_KEY, is24Hour.data()) != 0) {
-                HiLog::Error(LABEL, "LocaleConfig::Set parameter failed.");
-            }
-        }
-    } else {
-        is24Hour = is24HourSystem.c_str();
-    }
-    if (is24Hour.empty()) {
-        return false;
-    }
-    if (is24Hour.compare("true") == 0) {
-        return true;
-    }
-    return false;
-}
-#endif
 
 bool LocaleConfig::GetUsingLocalDigit()
 {

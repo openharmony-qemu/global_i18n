@@ -30,8 +30,6 @@ ohos_unittest("intl_test") {
     "//base/global/i18n/frameworks/intl/include",
     "//base/global/i18n/frameworks/intl/test/unittest/mock/include",
     "//base/global/i18n/interfaces/native/inner_api/preferred_language/include",
-    "//base/global/i18n/interfaces/native/inner_api/zone/include",
-    "//base/global/i18n/services/include",
     "//third_party/icu/icu4c/source/common",
     "//third_party/icu/icu4c/source/common/unicode",
     "//third_party/icu/icu4c/source/i18n",
@@ -40,24 +38,16 @@ ohos_unittest("intl_test") {
     "//third_party/protobuf/src",
   ]
 
-  external_deps = [
-    "ability_base:configuration",
-    "c_utils:utils",
-    "init:libbegetutil",
-    "samgr:samgr_proxy",
-  ]
+  external_deps = [ "init:libbegetutil" ]
 
   deps = [
     "//base/global/i18n/frameworks/intl:build_module",
-    "//base/global/i18n/services:i18n_sa_client",
     "//third_party/googletest:gtest_main",
     "//third_party/icu/icu4c:shared_icui18n",
     "//third_party/icu/icu4c:shared_icuuc",
     "//third_party/libphonenumber/cpp:phonenumber_standard",
     "//third_party/libpng:libpng",
   ]
-
-  defines = [ "SUPPORT_GRAPHICS" ]
 }
 
 group("unittest") {
