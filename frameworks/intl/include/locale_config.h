@@ -24,7 +24,6 @@
 #ifdef SUPPORT_GRAPHICS
 #include "configuration.h"
 #include <common_event_data.h>
-#include "iremote_object.h"
 #endif
 #include "i18n_types.h"
 
@@ -101,7 +100,6 @@ public:
     static bool IsValidLanguage(const std::string &language);
     static bool IsValidRegion(const std::string &region);
     static bool IsValidTag(const std::string &tag);
-    static bool queryWithProxy;
 
 private:
     static void Split(const std::string &src, const std::string &sep, std::vector<std::string> &dest);
@@ -112,7 +110,6 @@ private:
     static const char *LANGUAGE_KEY;
     static const char *LOCALE_KEY;
     static const char *HOUR_KEY;
-    static const char *TIME_FORMAT;
     static const char *DEFAULT_LOCALE_KEY;
     static const char *DEFAULT_LANGUAGE_KEY;
     static const char *DEFAULT_REGION_KEY;

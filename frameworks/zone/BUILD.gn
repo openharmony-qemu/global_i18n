@@ -16,14 +16,7 @@ import("//build/ohos.gni")
 config("zone_util_public_configs") {
   include_dirs = [
     "//base/global/i18n/frameworks/intl/include",
-    "//base/global/i18n/frameworks/zone/include",
     "//base/global/i18n/interfaces/native/inner_api/zone/include",
-    "//base/global/i18n/services/include",
-    "//foundation/ability/ability_runtime/interfaces/inner_api/dataobs_manager/include",
-    "//foundation/distributeddatamgr/data_share/interfaces/inner_api/common/include",
-    "//foundation/distributeddatamgr/data_share/interfaces/inner_api/consumer/include",
-    "//foundation/distributeddatamgr/data_share/interfaces/inner_api/provider/include",
-    "//foundation/distributeddatamgr/relational_store/interfaces/inner_api/rdb/include",
     "//third_party/icu/icu4c/source",
     "//third_party/icu/icu4c/source/common",
     "//third_party/icu/icu4c/source/common/unicode",
@@ -38,17 +31,13 @@ config("zone_util_public_configs") {
 
 ohos_shared_library("zone_util") {
   public_configs = [ ":zone_util_public_configs" ]
-  sources = [
-    "src/i18n_datashare_helper.cpp",
-    "src/zone_util.cpp",
-  ]
+  sources = [ "src/zone_util.cpp" ]
   cflags_cc = [
     "-Wall",
     "-fPIC",
   ]
   deps = [
     "//base/global/i18n/frameworks/intl:intl_util",
-    "//base/global/i18n/services:i18n_sa_client",
     "//third_party/icu/icu4c:ohos_icudat",
     "//third_party/icu/icu4c:shared_icui18n",
     "//third_party/icu/icu4c:shared_icuuc",
@@ -56,16 +45,7 @@ ohos_shared_library("zone_util") {
     "//third_party/libpng:libpng",
     "//third_party/libxml2:xml2",
   ]
-  external_deps = [
-    "ability_base:zuri",
-    "ability_runtime:dataobs_manager",
-    "c_utils:utils",
-    "data_share:datashare_common",
-    "data_share:datashare_consumer",
-    "hilog:libhilog",
-    "relational_store:native_rdb",
-    "samgr:samgr_proxy",
-  ]
+  external_deps = [ "hilog:libhilog" ]
   subsystem_name = "global"
   part_name = "i18n"
 }
