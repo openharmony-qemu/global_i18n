@@ -30,6 +30,7 @@ ohos_unittest("intl_test") {
     "//base/global/i18n/frameworks/intl/include",
     "//base/global/i18n/frameworks/intl/test/unittest/mock/include",
     "//base/global/i18n/interfaces/native/inner_api/preferred_language/include",
+    "//base/global/i18n/services/include",
     "//third_party/icu/icu4c/source/common",
     "//third_party/icu/icu4c/source/common/unicode",
     "//third_party/icu/icu4c/source/i18n",
@@ -38,10 +39,16 @@ ohos_unittest("intl_test") {
     "//third_party/protobuf/src",
   ]
 
-  external_deps = [ "init:libbegetutil" ]
+  external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
+    "init:libbegetutil",
+  ]
 
   deps = [
     "//base/global/i18n/frameworks/intl:build_module",
+    "//base/global/i18n/services:i18n_service_ability",
     "//third_party/googletest:gtest_main",
     "//third_party/icu/icu4c:shared_icui18n",
     "//third_party/icu/icu4c:shared_icuuc",

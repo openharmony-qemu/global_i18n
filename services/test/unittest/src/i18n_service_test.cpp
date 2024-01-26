@@ -14,12 +14,12 @@
  */
 
 #include <gtest/gtest.h>
-#include "accesstoken_kit.h"
 #include "i18n_service_ability_client.h"
 #include "locale_config.h"
-#include "nativetoken_kit.h"
 #include "preferred_language.h"
 #include "token_setproc.h"
+#include "utils.h"
+#include "i18n_service_test.h"
 
 using testing::ext::TestSize;
 using namespace std;
@@ -27,8 +27,6 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 static const uint64_t selfTokenId = GetSelfTokenID();
-static constexpr int32_t I18N_UID = 3013;
-static constexpr int32_t ROOT_UID = 0;
 
 class I18nServiceTest : public testing::Test {
 public:
@@ -50,35 +48,6 @@ void I18nServiceTest::SetUp(void)
 void I18nServiceTest::TearDown(void)
 {}
 
-void RemoveNativeTokenTypeAndPermissions()
-{
-    SetSelfTokenID(selfTokenId);
-    seteuid(ROOT_UID);
-    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
-    seteuid(I18N_UID);
-}
-
-void AddNativeTokenTypeAndPermissions()
-{
-    const char* permissions[] = {
-        "ohos.permission.UPDATE_CONFIGURATION"
-    };
-    NativeTokenInfoParams infoInstance = {
-        .dcapsNum = 0,
-        .permsNum = sizeof(permissions) / sizeof(permissions[0]),
-        .aclsNum = 0,
-        .dcaps = nullptr,
-        .perms = permissions,
-        .acls = nullptr,
-        .aplStr = "system_basic",
-    };
-    infoInstance.processName = "I18nServiceTest";
-    SetSelfTokenID(GetAccessTokenId(&infoInstance));
-    seteuid(ROOT_UID);
-    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
-    seteuid(I18N_UID);
-}
-
 void InitTestEnvironment()
 {
     LocaleConfig::SetSystemLanguage("zh-Hans");
@@ -91,7 +60,7 @@ void InitTestEnvironment()
             PreferredLanguage::RemovePreferredLanguage(i);
         }
     }
-    RemoveNativeTokenTypeAndPermissions();
+    RemoveNativeTokenTypeAndPermissions(selfTokenId);
 }
 
 /**
