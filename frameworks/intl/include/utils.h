@@ -29,6 +29,8 @@ int32_t ConvertString2Int(const std::string &numberStr, int32_t& status);
 bool IsValidLocaleTag(icu::Locale &locale);
 void GetAllValidLocalesTag(std::unordered_set<std::string>& allValidLocalesLanguageTag);
 bool CheckTzDataFilePath(const std::string &filePath);
+void RemoveNativeTokenTypeAndPermissions(const uint64_t selfTokenId);
+void AddNativeTokenTypeAndPermissions();
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

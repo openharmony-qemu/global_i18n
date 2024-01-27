@@ -25,6 +25,7 @@
 #include "holiday_manager.h"
 #include "i18n_break_iterator.h"
 #include "i18n_calendar.h"
+#include "i18n_service_ability_client.h"
 #include "i18n_timezone.h"
 #include "i18n_types.h"
 #include "index_util.h"
@@ -41,6 +42,7 @@
 #include "system_locale_manager.h"
 #include "taboo_utils.h"
 #include "taboo.h"
+#include "token_setproc.h"
 #include "utils.h"
 #include "intl_test.h"
 #include "generate_ics_file.h"
@@ -53,6 +55,8 @@ using namespace std;
 namespace OHOS {
 namespace Global {
 namespace I18n {
+static const uint64_t selfTokenId = GetSelfTokenID();
+
 class IntlTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -72,6 +76,20 @@ void IntlTest::SetUp(void)
 
 void IntlTest::TearDown(void)
 {}
+
+void InitTestEnvironment()
+{
+    AddNativeTokenTypeAndPermissions();
+    I18nServiceAbilityClient::SetSystemLocale("zh-Hans-CN");
+    RemoveNativeTokenTypeAndPermissions(selfTokenId);
+}
+
+void RestoreEnvironment(const std::string &originLocaleTag)
+{
+    AddNativeTokenTypeAndPermissions();
+    I18nServiceAbilityClient::SetSystemLocale(originLocaleTag);
+    RemoveNativeTokenTypeAndPermissions(selfTokenId);
+}
 
 /**
  * @tc.name: IntlFuncTest001
@@ -893,6 +911,8 @@ HWTEST_F(IntlTest, IntlFuncTest0024, TestSize.Level1)
 {
     // abnormal test cast
     // normal test case
+    std::string currentSystemLocale = LocaleConfig::GetSystemLocale();
+    InitTestEnvironment();
     vector<string> locales;
     locales.push_back("$$$###");
     map<string, string> options = {
@@ -920,6 +940,7 @@ HWTEST_F(IntlTest, IntlFuncTest0024, TestSize.Level1)
     res = plurals->Select(12.34);
     EXPECT_EQ(res, "other");
     delete plurals;
+    RestoreEnvironment(currentSystemLocale);
 }
 
 /**
