@@ -796,7 +796,7 @@ void I18nTimeZone::GetTimezoneIDFromZoneInfo(std::set<std::string> &availableIDs
     for (const auto &dirEntry : directory_iterator{parentPath}) {
         std::string zonePath = dirEntry.path();
         if (stat(zonePath.c_str(), &s) != 0) {
-            HiLog::Error(LABEL, "zoneinfo path %{public}s not exist.", parentPath.c_str());
+            HiLog::Error(LABEL, "GetTimezoneIDFromZoneInfo: zoneinfo path %{public}s not exist.", parentPath.c_str());
             return;
         }
         std::string zoneName = zonePath.substr(parentPath.length() + 1); // 1 add length of path splitor
@@ -820,7 +820,7 @@ std::set<std::string> I18nTimeZone::GetAvailableIDs(I18nErrorCode &errorCode)
     for (const auto &dirEntry : directory_iterator{ZONEINFO_PATH}) {
         std::string parentPath = dirEntry.path();
         if (stat(parentPath.c_str(), &s) != 0) {
-            HiLog::Error(LABEL, "zoneinfo path %{public}s not exist.", parentPath.c_str());
+            HiLog::Error(LABEL, "GetAvailableIDs: zoneinfo path %{public}s not exist.", parentPath.c_str());
             errorCode = I18nErrorCode::FAILED;
             return availableIDs;
         }
@@ -859,13 +859,15 @@ std::string I18nTimeZone::FindCityDisplayNameFromXml(std::string &cityID, std::s
     }
     xmlDocPtr doc = xmlParseFile(xmlPath.c_str());
     if (!doc) {
-        HiLog::Error(LABEL, "can't parse city displayname file %{public}s", xmlPath.c_str());
+        HiLog::Error(LABEL,
+            "FindCityDisplayNameFromXml: can't parse city displayname file %{public}s", xmlPath.c_str());
         return "";
     }
     xmlNodePtr cur = xmlDocGetRootElement(doc);
     if (!cur || xmlStrcmp(cur->name, reinterpret_cast<const xmlChar *>(CITY_DISPLAYNAME_ROOT_TAG))) {
         xmlFreeDoc(doc);
-        HiLog::Error(LABEL, "city displayname file %{public}s has wrong root tag.", xmlPath.c_str());
+        HiLog::Error(LABEL,
+            "FindCityDisplayNameFromXml: city displayname file %{public}s has wrong root tag.", xmlPath.c_str());
         return "";
     }
     cur = cur->xmlChildrenNode;
@@ -911,13 +913,14 @@ std::map<std::string, std::string> I18nTimeZone::FindCityDisplayNameMap(std::str
     }
     xmlDocPtr doc = xmlParseFile(xmlPath.c_str());
     if (!doc) {
-        HiLog::Error(LABEL, "can't parse city displayname file %{public}s", xmlPath.c_str());
+        HiLog::Error(LABEL, "FindCityDisplayNameMap: can't parse city displayname file %{public}s", xmlPath.c_str());
         return resultMap;
     }
     xmlNodePtr cur = xmlDocGetRootElement(doc);
     if (!cur || xmlStrcmp(cur->name, reinterpret_cast<const xmlChar *>(CITY_DISPLAYNAME_ROOT_TAG))) {
         xmlFreeDoc(doc);
-        HiLog::Error(LABEL, "city displayname file %{public}s has wrong root tag.", xmlPath.c_str());
+        HiLog::Error(LABEL,
+            "FindCityDisplayNameMap: city displayname file %{public}s has wrong root tag.", xmlPath.c_str());
         return resultMap;
     }
     cur = cur->xmlChildrenNode;

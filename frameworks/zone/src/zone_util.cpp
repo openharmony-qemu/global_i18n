@@ -412,7 +412,7 @@ void ZoneUtil::GetICUCountryZones(std::string &region, std::vector<std::string> 
     I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
     std::set<std::string> validZoneIds = I18nTimeZone::GetAvailableIDs(errorCode);
     if (errorCode != I18nErrorCode::SUCCESS) {
-        HiLog::Error(LABEL, "ZoneUtil::LookupTimezoneByNITZ can not get icu data");
+        HiLog::Error(LABEL, "ZoneUtil::GetICUCountryZones can not get icu data");
     }
     std::set<std::string> countryZoneIds;
     StringEnumeration *strEnum = TimeZone::createEnumeration(region.c_str());
@@ -485,7 +485,7 @@ bool ZoneUtil::CheckSameDstOffset(std::vector<std::string> &zones, std::string &
     UErrorCode status = U_ZERO_ERROR;
     defaultTimezone->getOffset(currentMillis, (UBool)local, rawOffset, dstOffset, status);
     if (U_FAILURE(status)) {
-        HiLog::Error(LABEL, "ZoneUtil::CheckSameDstOffset can not get timezone offset");
+        HiLog::Error(LABEL, "ZoneUtil::CheckSameDstOffset can not get timezone defaultID offset");
         return false;
     }
     int32_t totalOffset = rawOffset + dstOffset;
@@ -494,7 +494,7 @@ bool ZoneUtil::CheckSameDstOffset(std::vector<std::string> &zones, std::string &
         TimeZone *timezone = TimeZone::createTimeZone(unicodeZoneID);
         timezone->getOffset(currentMillis, (UBool)local, rawOffset, dstOffset, status);
         if (U_FAILURE(status)) {
-            HiLog::Error(LABEL, "ZoneUtil::CheckSameDstOffset can not get timezone offset");
+            HiLog::Error(LABEL, "ZoneUtil::CheckSameDstOffset can not get timezone unicodeZoneID offset");
             return false;
         }
         if (totalOffset - rawOffset != dstOffset) {

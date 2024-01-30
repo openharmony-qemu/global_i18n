@@ -127,7 +127,7 @@ void GetOptionValue(napi_env env, napi_value options, const std::string &optionN
     napi_valuetype type = napi_undefined;
     napi_status status = napi_typeof(env, options, &type);
     if (status != napi_ok && type != napi_object) {
-        HiLog::Error(LABEL, "Get option failed, option is not an object");
+        HiLog::Error(LABEL, "GetOptionValue arg[3]:string: Get option failed, option is not an object");
         return;
     }
     bool hasProperty = false;
@@ -140,7 +140,7 @@ void GetOptionValue(napi_env env, napi_value options, const std::string &optionN
             std::vector<char> optionBuf(len + 1);
             status = napi_get_value_string_utf8(env, optionValue, optionBuf.data(), len + 1, &len);
             if (status != napi_ok) {
-                HiLog::Error(LABEL, "Failed to get string item");
+                HiLog::Error(LABEL, "GetOptionValue: Failed to get string item");
                 return;
             }
             value = optionBuf.data();
@@ -156,7 +156,7 @@ void GetOptionMap(napi_env env, napi_value option, std::map<std::string, std::st
         std::vector<char> styleBuf(len + 1);
         napi_status status = napi_get_value_string_utf8(env, option, styleBuf.data(), len + 1, &len);
         if (status != napi_ok) {
-            HiLog::Error(LABEL, "Failed to get string item");
+            HiLog::Error(LABEL, "GetOptionMap: Failed to get string item");
             return;
         }
         map.insert(std::make_pair("unitDisplay", styleBuf.data()));
@@ -209,7 +209,7 @@ napi_value I18nAddon::UnitConvert(napi_env env, napi_callback_info info)
     napi_value result;
     status = napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to create string item");
+        HiLog::Error(LABEL, "UnitConvert: Failed to create string item");
         return nullptr;
     }
     return result;
@@ -254,7 +254,7 @@ napi_value I18nAddon::GetDateOrder(napi_env env, napi_callback_info info)
     napi_value result;
     status = napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to create string item");
+        HiLog::Error(LABEL, "GetDateOrder Failed to create string item");
         return nullptr;
     }
     return result;
@@ -348,7 +348,7 @@ int I18nAddon::GetParamOfGetTimePeriodName(napi_env env, napi_callback_info info
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_number) {
-        HiLog::Error(LABEL, "GetTimePeriodName Parameter type does not match");
+        HiLog::Error(LABEL, "GetTimePeriodName Parameter type does not match argv[0]");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
     }
     status = napi_get_value_int32(env, argv[0], &hour);
@@ -369,7 +369,7 @@ int I18nAddon::GetParamOfGetTimePeriodName(napi_env env, napi_callback_info info
             return -1;
         }
     } else {
-        HiLog::Error(LABEL, "GetTimePeriodName Parameter type does not match");
+        HiLog::Error(LABEL, "GetTimePeriodName Parameter type does not match argv[1]");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
     }
     return 0;
@@ -531,13 +531,13 @@ napi_value I18nAddon::Transform(napi_env env, napi_callback_info info)
     size_t len = 0;
     status = napi_get_value_string_utf8(env, argv[0], nullptr, 0, &len);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Get field length failed");
+        HiLog::Error(LABEL, "Transform: Get field length failed napi_get_value_string_utf8");
         return nullptr;
     }
     std::vector<char> buf(len + 1);
     status = napi_get_value_string_utf8(env, argv[0], buf.data(), len + 1, &len);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Get string value failed");
+        HiLog::Error(LABEL, "Transform: Get string value failed");
         return nullptr;
     }
     icu::UnicodeString unistr = icu::UnicodeString::fromUTF8(buf.data());
@@ -547,7 +547,7 @@ napi_value I18nAddon::Transform(napi_env env, napi_callback_info info)
     napi_value value;
     status = napi_create_string_utf8(env, temp.c_str(), NAPI_AUTO_LENGTH, &value);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Get field length failed");
+        HiLog::Error(LABEL, "Transform: Get field length failed napi_create_string_utf8");
         return nullptr;
     }
     return value;
@@ -630,7 +630,7 @@ napi_value I18nAddon::IsRTL(napi_env env, napi_callback_info info)
     std::vector<char> localeBuf(len + 1);
     status = napi_get_value_string_utf8(env, argv[0], localeBuf.data(), len + 1, &len);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to get string item");
+        HiLog::Error(LABEL, "IsRTL: Failed to get string item");
         return nullptr;
     }
     bool isRTL = LocaleConfig::IsRTL(localeBuf.data());
@@ -656,7 +656,7 @@ napi_value I18nAddon::InitPhoneNumberFormat(napi_env env, napi_value exports)
     status = napi_define_class(env, "PhoneNumberFormat", NAPI_AUTO_LENGTH, PhoneNumberFormatConstructor, nullptr,
                                sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Define class failed when InitPhoneNumberFormat");
+        HiLog::Error(LABEL, "InitPhoneNumberFormat: Define class failed when InitPhoneNumberFormat");
         return nullptr;
     }
 
@@ -675,7 +675,7 @@ void GetOptionValue(napi_env env, napi_value options, const std::string &optionN
     napi_valuetype type = napi_undefined;
     napi_status status = napi_typeof(env, options, &type);
     if (status != napi_ok && type != napi_object) {
-        HiLog::Error(LABEL, "Get option failed, option is not an object");
+        HiLog::Error(LABEL, "GetOptionValue arg[3]:map: Get option failed, option is not an object");
         return;
     }
     bool hasProperty = false;
@@ -730,7 +730,7 @@ napi_value I18nAddon::PhoneNumberFormatConstructor(napi_env env, napi_callback_i
     status = napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()),
                        I18nAddon::Destructor, nullptr, nullptr);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Wrap I18nAddon failed");
+        HiLog::Error(LABEL, "PhoneNumberFormatConstructor: Wrap I18nAddon failed");
         return nullptr;
     }
     if (!obj->InitPhoneNumberFormatContext(env, info, country.data(), options)) {
@@ -746,7 +746,7 @@ bool I18nAddon::InitPhoneNumberFormatContext(napi_env env, napi_callback_info in
     napi_value global = nullptr;
     napi_status status = napi_get_global(env, &global);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Get global failed");
+        HiLog::Error(LABEL, "InitPhoneNumberFormatContext: Get global failed");
         return false;
     }
     env_ = env;
@@ -772,20 +772,20 @@ napi_value I18nAddon::IsValidPhoneNumber(napi_env env, napi_callback_info info)
     size_t len = 0;
     napi_status status = napi_get_value_string_utf8(env, argv[0], nullptr, 0, &len);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Get phone number length failed");
+        HiLog::Error(LABEL, "IsValidPhoneNumber: Get phone number length failed");
         return nullptr;
     }
     std::vector<char> buf(len + 1);
     status = napi_get_value_string_utf8(env, argv[0], buf.data(), len + 1, &len);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Get phone number failed");
+        HiLog::Error(LABEL, "IsValidPhoneNumber: Get phone number failed");
         return nullptr;
     }
 
     I18nAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->phonenumberfmt_) {
-        HiLog::Error(LABEL, "GetPhoneNumberFormat object failed");
+        HiLog::Error(LABEL, "IsValidPhoneNumber: GetPhoneNumberFormat object failed");
         return nullptr;
     }
 
@@ -794,7 +794,7 @@ napi_value I18nAddon::IsValidPhoneNumber(napi_env env, napi_callback_info info)
     napi_value result = nullptr;
     status = napi_get_boolean(env, isValid, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Create boolean failed");
+        HiLog::Error(LABEL, "IsValidPhoneNumber: Create boolean failed");
         return nullptr;
     }
 
@@ -822,7 +822,7 @@ napi_value I18nAddon::GetLocationName(napi_env env, napi_callback_info info)
     I18nAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->phonenumberfmt_) {
-        HiLog::Error(LABEL, "GetPhoneNumberFormat object failed");
+        HiLog::Error(LABEL, "GetLocationName: GetPhoneNumberFormat object failed");
         return nullptr;
     }
 
@@ -854,13 +854,13 @@ napi_value I18nAddon::FormatPhoneNumber(napi_env env, napi_callback_info info)
     size_t len = 0;
     napi_status status = napi_get_value_string_utf8(env, argv[0], nullptr, 0, &len);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Get phone number length failed");
+        HiLog::Error(LABEL, "FormatPhoneNumber: Get phone number length failed");
         return nullptr;
     }
     std::vector<char> buf(len + 1);
     status = napi_get_value_string_utf8(env, argv[0], buf.data(), len + 1, &len);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Get phone number failed");
+        HiLog::Error(LABEL, "FormatPhoneNumber: Get phone number failed");
         return nullptr;
     }
 
@@ -894,7 +894,7 @@ napi_value I18nAddon::InitIndexUtil(napi_env env, napi_value exports)
     napi_status status = napi_define_class(env, "IndexUtil", NAPI_AUTO_LENGTH, IndexUtilConstructor, nullptr,
         sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Define class failed when InitPhoneNumberFormat");
+        HiLog::Error(LABEL, "InitIndexUtil Define class failed when InitPhoneNumberFormat");
         return nullptr;
     }
 
@@ -1013,14 +1013,14 @@ napi_value I18nAddon::Current(napi_env env, napi_callback_info info)
     I18nAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->brkiter_) {
-        HiLog::Error(LABEL, "Get BreakIterator object failed");
+        HiLog::Error(LABEL, "Current: Get BreakIterator object failed");
         return nullptr;
     }
     int value = obj->brkiter_->Current();
     napi_value result = nullptr;
     status = napi_create_int32(env, value, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Create int32_t value failed");
+        HiLog::Error(LABEL, "Current: Create int32_t value failed");
         return nullptr;
     }
     return result;
@@ -1036,14 +1036,14 @@ napi_value I18nAddon::First(napi_env env, napi_callback_info info)
     I18nAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->brkiter_) {
-        HiLog::Error(LABEL, "Get BreakIterator object failed");
+        HiLog::Error(LABEL, "First: Get BreakIterator object failed");
         return nullptr;
     }
     int value = obj->brkiter_->First();
     napi_value result = nullptr;
     status = napi_create_int32(env, value, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Create int32_t value failed");
+        HiLog::Error(LABEL, "First: Create int32_t value failed");
         return nullptr;
     }
     return result;
@@ -1059,14 +1059,14 @@ napi_value I18nAddon::Last(napi_env env, napi_callback_info info)
     I18nAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->brkiter_) {
-        HiLog::Error(LABEL, "Get BreakIterator object failed");
+        HiLog::Error(LABEL, "Last: Get BreakIterator object failed");
         return nullptr;
     }
     int value = obj->brkiter_->Last();
     napi_value result = nullptr;
     status = napi_create_int32(env, value, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Create int32_t value failed");
+        HiLog::Error(LABEL, "Last: Create int32_t value failed");
         return nullptr;
     }
     return result;
@@ -1082,14 +1082,14 @@ napi_value I18nAddon::Previous(napi_env env, napi_callback_info info)
     I18nAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->brkiter_) {
-        HiLog::Error(LABEL, "Get BreakIterator object failed");
+        HiLog::Error(LABEL, "Previous: Get BreakIterator object failed");
         return nullptr;
     }
     int value = obj->brkiter_->Previous();
     napi_value result = nullptr;
     status = napi_create_int32(env, value, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Create int32_t value failed");
+        HiLog::Error(LABEL, "Previous: Create int32_t value failed");
         return nullptr;
     }
     return result;
@@ -1105,7 +1105,7 @@ napi_value I18nAddon::Next(napi_env env, napi_callback_info info)
     I18nAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->brkiter_) {
-        HiLog::Error(LABEL, "Get BreakIterator object failed");
+        HiLog::Error(LABEL, "Next: Get BreakIterator object failed");
         return nullptr;
     }
     int value = 1;
@@ -1126,7 +1126,7 @@ napi_value I18nAddon::Next(napi_env env, napi_callback_info info)
     napi_value result = nullptr;
     status = napi_create_int32(env, value, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Create int32_t value failed");
+        HiLog::Error(LABEL, "Next: Create int32_t value failed");
         return nullptr;
     }
     return result;
@@ -1142,7 +1142,7 @@ napi_value I18nAddon::SetText(napi_env env, napi_callback_info info)
     I18nAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->brkiter_) {
-        HiLog::Error(LABEL, "Get BreakIterator object failed");
+        HiLog::Error(LABEL, "SetText: Get BreakIterator object failed");
         return nullptr;
     }
     if (!argv[0]) {
@@ -1157,13 +1157,13 @@ napi_value I18nAddon::SetText(napi_env env, napi_callback_info info)
     size_t len = 0;
     status = napi_get_value_string_utf8(env, argv[0], nullptr, 0, &len);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Get field length failed");
+        HiLog::Error(LABEL, "SetText: Get field length failed");
         return nullptr;
     }
     std::vector<char> buf(len + 1);
     status = napi_get_value_string_utf8(env, argv[0], buf.data(), len + 1, &len);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Get string value failed");
+        HiLog::Error(LABEL, "SetText: Get string value failed");
         return nullptr;
     }
     obj->brkiter_->SetText(buf.data());
@@ -1180,7 +1180,7 @@ napi_value I18nAddon::GetText(napi_env env, napi_callback_info info)
     I18nAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->brkiter_) {
-        HiLog::Error(LABEL, "Get BreakIterator object failed");
+        HiLog::Error(LABEL, "GetText: Get BreakIterator object failed");
         return nullptr;
     }
     napi_value value = nullptr;
@@ -1188,7 +1188,7 @@ napi_value I18nAddon::GetText(napi_env env, napi_callback_info info)
     obj->brkiter_->GetText(temp);
     status = napi_create_string_utf8(env, temp.c_str(), NAPI_AUTO_LENGTH, &value);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Get field length failed");
+        HiLog::Error(LABEL, "GetText: Get field length failed");
         return nullptr;
     }
     return value;
@@ -1204,7 +1204,7 @@ napi_value I18nAddon::Following(napi_env env, napi_callback_info info)
     I18nAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->brkiter_) {
-        HiLog::Error(LABEL, "Get BreakIterator object failed");
+        HiLog::Error(LABEL, "Following: Get BreakIterator object failed");
         return nullptr;
     }
     if (!argv[0]) {
@@ -1219,14 +1219,14 @@ napi_value I18nAddon::Following(napi_env env, napi_callback_info info)
     int value;
     status = napi_get_value_int32(env, argv[0], &value);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Retrieve following value failed");
+        HiLog::Error(LABEL, "Following: Retrieve following value failed");
         return nullptr;
     }
     value = obj->brkiter_->Following(value);
     napi_value result = nullptr;
     status = napi_create_int32(env, value, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Create int32_t value failed");
+        HiLog::Error(LABEL, "Following: Create int32_t value failed");
         return nullptr;
     }
     return result;
@@ -1242,7 +1242,7 @@ napi_value I18nAddon::IsBoundary(napi_env env, napi_callback_info info)
     I18nAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->brkiter_) {
-        HiLog::Error(LABEL, "Get BreakIterator object failed");
+        HiLog::Error(LABEL, "IsBoundary: Get BreakIterator object failed");
         return nullptr;
     }
     if (!argv[0]) {
@@ -1257,14 +1257,14 @@ napi_value I18nAddon::IsBoundary(napi_env env, napi_callback_info info)
     }
     status = napi_get_value_int32(env, argv[0], &value);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Retrieve following value failed");
+        HiLog::Error(LABEL, "IsBoundary: Retrieve following value failed");
         return nullptr;
     }
     bool boundary = obj->brkiter_->IsBoundary(value);
     napi_value result = nullptr;
     status = napi_get_boolean(env, boundary, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Create boolean failed");
+        HiLog::Error(LABEL, "IsBoundary: Create boolean failed");
         return nullptr;
     }
     return result;
@@ -1291,13 +1291,13 @@ napi_value I18nAddon::IndexUtilConstructor(napi_env env, napi_callback_info info
         size_t len = 0;
         status = napi_get_value_string_utf8(env, argv[0], nullptr, 0, &len);
         if (status != napi_ok) {
-            HiLog::Error(LABEL, "Get locale length failed");
+            HiLog::Error(LABEL, "IndexUtilConstructor: Get locale length failed");
             return nullptr;
         }
         std::vector<char> localeBuf(len + 1);
         status = napi_get_value_string_utf8(env, argv[0], localeBuf.data(), len + 1, &len);
         if (status != napi_ok) {
-            HiLog::Error(LABEL, "Get locale failed");
+            HiLog::Error(LABEL, "IndexUtilConstructor: Get locale failed");
             return nullptr;
         }
         localeTag = localeBuf.data();
@@ -1322,7 +1322,7 @@ bool I18nAddon::InitIndexUtilContext(napi_env env, napi_callback_info info, cons
     napi_value global = nullptr;
     napi_status status = napi_get_global(env, &global);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Get global failed");
+        HiLog::Error(LABEL, "InitIndexUtilContext: Get global failed");
         return false;
     }
     env_ = env;
@@ -1365,7 +1365,7 @@ napi_value I18nAddon::GetIndexList(napi_env env, napi_callback_info info)
     I18nAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->indexUtil_) {
-        HiLog::Error(LABEL, "GetPhoneNumberFormat object failed");
+        HiLog::Error(LABEL, "GetIndexList: GetPhoneNumberFormat object failed");
         return nullptr;
     }
 
@@ -1380,7 +1380,7 @@ napi_value I18nAddon::GetIndexList(napi_env env, napi_callback_info info)
         napi_value element = nullptr;
         status = napi_create_string_utf8(env, indexList[i].c_str(), NAPI_AUTO_LENGTH, &element);
         if (status != napi_ok) {
-            HiLog::Error(LABEL, "Failed to create string item");
+            HiLog::Error(LABEL, "GetIndexList: Failed to create string item");
             return nullptr;
         }
         status = napi_set_element(env, result, i, element);
@@ -1408,19 +1408,19 @@ napi_value I18nAddon::AddLocale(napi_env env, napi_callback_info info)
     size_t len = 0;
     napi_status status = napi_get_value_string_utf8(env, argv[0], nullptr, 0, &len);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Get locale length failed");
+        HiLog::Error(LABEL, "AddLocale: Get locale length failed");
         return nullptr;
     }
     std::vector<char> buf(len + 1);
     status = napi_get_value_string_utf8(env, argv[0], buf.data(), len + 1, &len);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Get locale failed");
+        HiLog::Error(LABEL, "AddLocale: Get locale failed");
         return nullptr;
     }
     I18nAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->indexUtil_) {
-        HiLog::Error(LABEL, "Get IndexUtil object failed");
+        HiLog::Error(LABEL, "AddLocale: Get IndexUtil object failed");
         return nullptr;
     }
     obj->indexUtil_->AddLocale(buf.data());
@@ -1455,7 +1455,7 @@ napi_value I18nAddon::GetIndex(napi_env env, napi_callback_info info)
     I18nAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->indexUtil_) {
-        HiLog::Error(LABEL, "Get IndexUtil object failed");
+        HiLog::Error(LABEL, "GetIndex: Get IndexUtil object failed");
         return nullptr;
     }
     std::string index = obj->indexUtil_->GetIndex(buf.data());
@@ -1481,7 +1481,7 @@ napi_value I18nAddon::ObjectConstructor(napi_env env, napi_callback_info info)
     status =
         napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), I18nAddon::Destructor, nullptr, nullptr);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Wrap I18nAddon failed");
+        HiLog::Error(LABEL, "ObjectConstructor: Wrap I18nAddon failed");
         return nullptr;
     }
     obj.release();

@@ -145,7 +145,7 @@ napi_value HolidayManagerAddon::IsHoliday(napi_env env, napi_callback_info info)
     HolidayManagerAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->holidayManager_) {
-        HiLog::Error(LABEL, "Get HolidayManager object failed");
+        HiLog::Error(LABEL, "IsHoliday: Get HolidayManager object failed");
         return nullptr;
     }
     napi_value result = nullptr;
@@ -177,7 +177,7 @@ napi_value HolidayManagerAddon::GetHolidayInfoItemArray(napi_env env, napi_callb
     HolidayManagerAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->holidayManager_) {
-        HiLog::Error(LABEL, "Get HolidayManager object failed");
+        HiLog::Error(LABEL, "GetHolidayInfoItemArray: Get HolidayManager object failed");
         return nullptr;
     }
     bool flag = VariableConvertor::CheckNapiValueType(env, argv[0]);
@@ -246,7 +246,7 @@ int HolidayManagerAddon::GetDateValue(napi_env env, napi_value value, const std:
 
     status = napi_get_value_int32(env, ret_value, &val);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Retrieve field failed");
+        HiLog::Error(LABEL, "GetDateValue: Retrieve field failed");
         return val;
     }
     return val;
@@ -263,7 +263,7 @@ int32_t HolidayManagerAddon::ValidateParamNumber(napi_env &env, napi_value &argv
     int32_t val = 0;
     napi_status status = napi_get_value_int32(env, argv, &val);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Retrieve field failed");
+        HiLog::Error(LABEL, "ValidateParamNumber: Retrieve field failed");
         return -1;
     }
     return val;
