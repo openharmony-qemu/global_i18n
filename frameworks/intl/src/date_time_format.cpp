@@ -61,10 +61,6 @@ DateTimeFormat::DateTimeFormat(const std::vector<std::string> &localeTags, std::
 
 void DateTimeFormat::FreeDateTimeFormat()
 {
-    if (dateIntvFormat != nullptr) {
-        delete dateIntvFormat;
-        dateIntvFormat = nullptr;
-    }
     if (calendar != nullptr) {
         delete calendar;
         calendar = nullptr;
