@@ -668,33 +668,6 @@ napi_value I18nAddon::InitPhoneNumberFormat(napi_env env, napi_value exports)
     return exports;
 }
 
-void GetOptionValue(napi_env env, napi_value options, const std::string &optionName,
-                    std::map<std::string, std::string> &map)
-{
-    napi_value optionValue = nullptr;
-    napi_valuetype type = napi_undefined;
-    napi_status status = napi_typeof(env, options, &type);
-    if (status != napi_ok && type != napi_object) {
-        HiLog::Error(LABEL, "Get option failed, option is not an object");
-        return;
-    }
-    bool hasProperty = false;
-    napi_status propStatus = napi_has_named_property(env, options, optionName.c_str(), &hasProperty);
-    if (propStatus == napi_ok && hasProperty) {
-        status = napi_get_named_property(env, options, optionName.c_str(), &optionValue);
-        if (status == napi_ok) {
-            size_t len = 0;
-            napi_get_value_string_utf8(env, optionValue, nullptr, 0, &len);
-            std::vector<char> optionBuf(len + 1);
-            status = napi_get_value_string_utf8(env, optionValue, optionBuf.data(), len + 1, &len);
-            if (status != napi_ok) {
-                return;
-            }
-            map.insert(make_pair(optionName, optionBuf.data()));
-        }
-    }
-}
-
 napi_value I18nAddon::PhoneNumberFormatConstructor(napi_env env, napi_callback_info info)
 {
     size_t argc = 2;
@@ -724,7 +697,9 @@ napi_value I18nAddon::PhoneNumberFormatConstructor(napi_env env, napi_callback_i
         return nullptr;
     }
     std::map<std::string, std::string> options;
-    GetOptionValue(env, argv[1], "type", options);
+    std::string typeStr;
+    GetOptionValue(env, argv[1], "type", typeStr);
+    options.insert(std::make_pair("type", typeStr));
     std::unique_ptr<I18nAddon> obj = nullptr;
     obj = std::make_unique<I18nAddon>();
     status = napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()),
