@@ -154,7 +154,8 @@ void DateTimeFormat::InitDateFormatWithoutConfigs(UErrorCode &status)
     if (simDateFormat != nullptr) {
         simDateFormat->toPattern(pattern);
     }
-    dateIntvFormat = DateIntervalFormat::createInstance(pattern, locale, status);
+    dateIntvFormat =
+        std::unique_ptr<DateIntervalFormat>(DateIntervalFormat::createInstance(pattern, locale, status));
 }
 
 void DateTimeFormat::FixPatternPartOne()
@@ -295,7 +296,8 @@ void DateTimeFormat::InitDateFormat(UErrorCode &status)
         }
     }
     status = U_ZERO_ERROR;
-    dateIntvFormat = DateIntervalFormat::createInstance(pattern, locale, status);
+    dateIntvFormat =
+        std::unique_ptr<DateIntervalFormat>(DateIntervalFormat::createInstance(pattern, locale, status));
 }
 
 void DateTimeFormat::SetDayPeriod()
