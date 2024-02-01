@@ -1086,10 +1086,9 @@ HWTEST_F(I18nTest, I18nFuncTest041, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     std::string message = "Our time zone is GMT+12:00.";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[1][0], 0);
-    delete m;
 }
 
 /**
