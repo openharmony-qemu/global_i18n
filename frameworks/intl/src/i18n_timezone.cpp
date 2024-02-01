@@ -859,8 +859,7 @@ std::string I18nTimeZone::FindCityDisplayNameFromXml(std::string &cityID, std::s
     }
     xmlDocPtr doc = xmlParseFile(xmlPath.c_str());
     if (!doc) {
-        HiLog::Error(LABEL,
-            "FindCityDisplayNameFromXml: can't parse city displayname file %{public}s", xmlPath.c_str());
+        HiLog::Error(LABEL, "FindCityDisplayNameFromXml: can't parse city displayname: %{public}s", xmlPath.c_str());
         return "";
     }
     xmlNodePtr cur = xmlDocGetRootElement(doc);
