@@ -210,7 +210,7 @@ napi_value I18nCalendarAddon::SetTime(napi_env env, napi_callback_info info)
     I18nCalendarAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->calendar_) {
-        HiLog::Error(LABEL, "Get calendar object failed");
+        HiLog::Error(LABEL, "SetTime: Get calendar object failed");
         return nullptr;
     }
     napi_valuetype type = napi_valuetype::napi_undefined;
@@ -259,7 +259,7 @@ napi_value I18nCalendarAddon::Set(napi_env env, napi_callback_info info)
     I18nCalendarAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->calendar_) {
-        HiLog::Error(LABEL, "Get calendar object failed");
+        HiLog::Error(LABEL, "Set: Get calendar object failed");
         return nullptr;
     }
     obj->calendar_->Set(times[0], times[1], times[2]); // 2 is the index of date
@@ -279,7 +279,7 @@ napi_value I18nCalendarAddon::GetTimeZone(napi_env env, napi_callback_info info)
     I18nCalendarAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->calendar_) {
-        HiLog::Error(LABEL, "Get calendar object failed");
+        HiLog::Error(LABEL, "GetTimeZone: Get calendar object failed");
         return nullptr;
     }
     std::string temp = obj->calendar_->GetTimeZone();
@@ -322,7 +322,7 @@ napi_value I18nCalendarAddon::SetTimeZone(napi_env env, napi_callback_info info)
     I18nCalendarAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->calendar_) {
-        HiLog::Error(LABEL, "Get calendar object failed");
+        HiLog::Error(LABEL, "SetTimeZone: Get calendar object failed");
         return nullptr;
     }
     obj->calendar_->SetTimeZone(timezone);
@@ -339,14 +339,14 @@ napi_value I18nCalendarAddon::GetFirstDayOfWeek(napi_env env, napi_callback_info
     I18nCalendarAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->calendar_) {
-        HiLog::Error(LABEL, "Get calendar object failed");
+        HiLog::Error(LABEL, "GetFirstDayOfWeek: Get calendar object failed");
         return nullptr;
     }
     int32_t temp = obj->calendar_->GetFirstDayOfWeek();
     napi_value result = nullptr;
     status = napi_create_int32(env, temp, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Create int32 failed");
+        HiLog::Error(LABEL, "GetFirstDayOfWeek: Create int32 failed");
         return nullptr;
     }
     return result;
@@ -369,13 +369,13 @@ napi_value I18nCalendarAddon::SetFirstDayOfWeek(napi_env env, napi_callback_info
     int32_t value = 0;
     napi_status status = napi_get_value_int32(env, argv[0], &value);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Get int32 failed");
+        HiLog::Error(LABEL, "SetFirstDayOfWeek: Get int32 failed");
         return nullptr;
     }
     I18nCalendarAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->calendar_) {
-        HiLog::Error(LABEL, "Get calendar object failed");
+        HiLog::Error(LABEL, "SetFirstDayOfWeek: Get calendar object failed");
         return nullptr;
     }
     obj->calendar_->SetFirstDayOfWeek(value);
@@ -392,14 +392,14 @@ napi_value I18nCalendarAddon::GetMinimalDaysInFirstWeek(napi_env env, napi_callb
     I18nCalendarAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->calendar_) {
-        HiLog::Error(LABEL, "Get calendar object failed");
+        HiLog::Error(LABEL, "GetMinimalDaysInFirstWeek: Get calendar object failed");
         return nullptr;
     }
     int32_t temp = obj->calendar_->GetMinimalDaysInFirstWeek();
     napi_value result = nullptr;
     status = napi_create_int32(env, temp, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Create int32 failed");
+        HiLog::Error(LABEL, "GetMinimalDaysInFirstWeek: Create int32 failed");
         return nullptr;
     }
     return result;
@@ -422,13 +422,13 @@ napi_value I18nCalendarAddon::SetMinimalDaysInFirstWeek(napi_env env, napi_callb
     int32_t value = 0;
     napi_status status = napi_get_value_int32(env, argv[0], &value);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Get int32 failed");
+        HiLog::Error(LABEL, "SetMinimalDaysInFirstWeek: Get int32 failed");
         return nullptr;
     }
     I18nCalendarAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->calendar_) {
-        HiLog::Error(LABEL, "Get calendar object failed");
+        HiLog::Error(LABEL, "SetMinimalDaysInFirstWeek: Get calendar object failed");
         return nullptr;
     }
     obj->calendar_->SetMinimalDaysInFirstWeek(value);
@@ -469,14 +469,14 @@ napi_value I18nCalendarAddon::Get(napi_env env, napi_callback_info info)
     I18nCalendarAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->calendar_) {
-        HiLog::Error(LABEL, "Get calendar object failed");
+        HiLog::Error(LABEL, "Get: Get calendar object failed");
         return nullptr;
     }
     int32_t value = obj->calendar_->Get(g_fieldsMap[field]);
     napi_value result = nullptr;
     status = napi_create_int32(env, value, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Create int32 failed");
+        HiLog::Error(LABEL, "Get: Create int32 failed");
         return nullptr;
     }
     return result;
@@ -497,7 +497,7 @@ napi_value I18nCalendarAddon::Add(napi_env env, napi_callback_info info)
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_string) {
-        HiLog::Error(LABEL, "Parameter type does not match");
+        HiLog::Error(LABEL, "Parameter type does not match argv[0]");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
         return nullptr;
     }
@@ -508,7 +508,7 @@ napi_value I18nCalendarAddon::Add(napi_env env, napi_callback_info info)
     }
     napi_typeof(env, argv[1], &valueType);
     if (valueType != napi_valuetype::napi_number) {
-        HiLog::Error(LABEL, "Parameter type does not match");
+        HiLog::Error(LABEL, "Parameter type does not match argv[1]");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
         return nullptr;
     }
@@ -522,7 +522,7 @@ napi_value I18nCalendarAddon::Add(napi_env env, napi_callback_info info)
     I18nCalendarAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->calendar_) {
-        HiLog::Error(LABEL, "Get calendar object failed");
+        HiLog::Error(LABEL, "Add: Get calendar object failed");
         return nullptr;
     }
     obj->calendar_->Add(g_fieldsMap[field], amount);
@@ -551,7 +551,7 @@ napi_value I18nCalendarAddon::GetDisplayName(napi_env env, napi_callback_info in
     I18nCalendarAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->calendar_) {
-        HiLog::Error(LABEL, "Get calendar object failed");
+        HiLog::Error(LABEL, "GetDisplayName: Get calendar object failed");
         return nullptr;
     }
     if (!obj->calendar_) {
@@ -578,7 +578,7 @@ napi_value I18nCalendarAddon::GetTimeInMillis(napi_env env, napi_callback_info i
     I18nCalendarAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->calendar_) {
-        HiLog::Error(LABEL, "Get calendar object failed");
+        HiLog::Error(LABEL, "GetTimeInMillis: Get calendar object failed");
         flag = false;
     }
     UDate temp = 0;
@@ -607,7 +607,7 @@ napi_value I18nCalendarAddon::IsWeekend(napi_env env, napi_callback_info info)
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     do {
         if (status != napi_ok || !obj || !obj->calendar_) {
-            HiLog::Error(LABEL, "Get calendar object failed");
+            HiLog::Error(LABEL, "IsWeekend: Get calendar object failed");
             break;
         }
         if (!VariableConvertor::CheckNapiValueType(env, argv[0])) {
@@ -622,13 +622,13 @@ napi_value I18nCalendarAddon::IsWeekend(napi_env env, napi_callback_info info)
             napi_value value = nullptr;
             status = napi_call_function(env, argv[0], funcGetDateInfo, 0, nullptr, &value);
             if (status != napi_ok) {
-                HiLog::Error(LABEL, "Get milliseconds failed");
+                HiLog::Error(LABEL, "IsWeekend: Get milliseconds failed");
                 break;
             }
             double milliseconds = 0;
             status = napi_get_value_double(env, value, &milliseconds);
             if (status != napi_ok) {
-                HiLog::Error(LABEL, "Retrieve milliseconds failed");
+                HiLog::Error(LABEL, "IsWeekend: Retrieve milliseconds failed");
                 break;
             }
             UErrorCode error = U_ZERO_ERROR;
@@ -663,7 +663,7 @@ napi_value I18nCalendarAddon::CompareDays(napi_env env, napi_callback_info info)
     I18nCalendarAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->calendar_) {
-        HiLog::Error(LABEL, "Get calendar object failed");
+        HiLog::Error(LABEL, "CompareDays: Get calendar object failed");
         status = napi_create_int32(env, 0, &result); // if error return 0
         return result;
     }
@@ -755,7 +755,7 @@ napi_value I18nCalendarAddon::GetDate(napi_env env, napi_value value)
     napi_value ret_value = nullptr;
     status = napi_call_function(env, value, funcGetDateInfo, 0, nullptr, &ret_value);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Get milliseconds failed");
+        HiLog::Error(LABEL, "GetDate: Get milliseconds failed");
         return nullptr;
     }
     return ret_value;
@@ -775,7 +775,7 @@ void I18nCalendarAddon::SetMilliseconds(napi_env env, napi_value value)
     }
     napi_status status = napi_get_value_double(env, value, &milliseconds);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Retrieve milliseconds failed");
+        HiLog::Error(LABEL, "SetMilliseconds: Retrieve milliseconds failed");
         return;
     }
     if (calendar_ != nullptr) {

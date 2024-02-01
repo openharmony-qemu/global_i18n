@@ -124,7 +124,7 @@ napi_value SystemLocaleManagerAddon::GetLanguageInfoArray(napi_env env, napi_cal
     SystemLocaleManagerAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->systemLocaleManager_) {
-        HiLog::Error(LABEL, "Get SystemLocaleManager object failed");
+        HiLog::Error(LABEL, "GetLanguageInfoArray: Get SystemLocaleManager object failed");
         return nullptr;
     }
     std::vector<LocaleItem> localeItemList = obj->systemLocaleManager_->GetLanguageInfoArray(languageList, options);
@@ -154,7 +154,7 @@ napi_value SystemLocaleManagerAddon::GetCountryInfoArray(napi_env env, napi_call
     SystemLocaleManagerAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->systemLocaleManager_) {
-        HiLog::Error(LABEL, "Get SystemLocaleManager object failed");
+        HiLog::Error(LABEL, "GetCountryInfoArray: Get SystemLocaleManager object failed");
         return nullptr;
     }
     std::vector<LocaleItem> localeItemList = obj->systemLocaleManager_->GetCountryInfoArray(countryList, options);
@@ -187,7 +187,7 @@ napi_value SystemLocaleManagerAddon::CreateTimeZoneCityItem(napi_env env, const 
     napi_value result;
     napi_status status = napi_create_object(env, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Create Locale Item object failed.");
+        HiLog::Error(LABEL, "CreateTimeZoneCityItem: Create Locale Item object failed.");
         return nullptr;
     }
     status = napi_set_named_property(env, result, "zoneId",
@@ -282,7 +282,7 @@ napi_value SystemLocaleManagerAddon::CreateLocaleItem(napi_env env, const Locale
     napi_value result;
     napi_status status = napi_create_object(env, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Create Locale Item object failed.");
+        HiLog::Error(LABEL, "CreateLocaleItem: Create Locale Item object failed.");
         return nullptr;
     }
     status = napi_set_named_property(env, result, "id", VariableConvertor::CreateString(env, localeItem.id));
