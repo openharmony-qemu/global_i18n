@@ -24,6 +24,8 @@
 #include "i18n_system_addon.h"
 #include "i18n_timezone_addon.h"
 #include "i18n_unicode_addon.h"
+#include "locale_info.h"
+#include "locale_matcher.h"
 #include "node_api.h"
 #include "system_locale_manager_addon.h"
 #include "unicode/datefmt.h"
@@ -73,6 +75,7 @@ napi_value I18nAddon::CreateI18nUtilObject(napi_env env, napi_status &initStatus
         DECLARE_NAPI_FUNCTION("unitConvert", UnitConvert),
         DECLARE_NAPI_FUNCTION("getDateOrder", GetDateOrder),
         DECLARE_NAPI_FUNCTION("getTimePeriodName", GetTimePeriodName),
+        DECLARE_NAPI_FUNCTION("getBestMatchLocale", GetBestMatchLocale),
     };
     status = napi_define_properties(env, i18nUtil, sizeof(i18nUtilProperties) / sizeof(napi_property_descriptor),
         i18nUtilProperties);
@@ -373,6 +376,99 @@ int I18nAddon::GetParamOfGetTimePeriodName(napi_env env, napi_callback_info info
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
     }
     return 0;
+}
+
+LocaleInfo* ProcessJsParamLocale(napi_env env, napi_value argv)
+{
+    int32_t code = 0;
+    std::string localeTag = VariableConvertor::GetString(env, argv, code);
+    if (code != 0) {
+        HiLog::Error(LABEL, "GetBestMatchLocale get param locale failed.");
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        return nullptr;
+    }
+    UErrorCode icuStatus = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(localeTag.data(), icuStatus);
+    if (U_FAILURE(icuStatus) || !IsValidLocaleTag(locale)) {
+        HiLog::Error(LABEL, "GetBestMatchLocale param locale Invalid.");
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+        return nullptr;
+    }
+    return new LocaleInfo(localeTag);
+}
+
+bool ProcessJsParamLocaleList(napi_env env, napi_value argv, std::vector<LocaleInfo*> &candidateLocales,
+    LocaleInfo *requestLocale)
+{
+    std::vector<std::string> localeTagList;
+    if (!VariableConvertor::GetStringArrayFromJsParam(env, argv, localeTagList)) {
+        HiLog::Error(LABEL, "GetBestMatchLocale get param localeList failed.");
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        return false;
+    }
+    if (localeTagList.size() == 0) {
+        return false;
+    }
+    for (auto it = localeTagList.begin(); it != localeTagList.end(); ++it) {
+        UErrorCode icuStatus = U_ZERO_ERROR;
+        icu::Locale locale = icu::Locale::forLanguageTag(it->data(), icuStatus);
+        if (U_FAILURE(icuStatus) || !IsValidLocaleTag(locale)) {
+            HiLog::Error(LABEL, "GetBestMatchLocale param localeList Invalid: %{public}s.", it->data());
+            ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+            return false;
+        }
+        LocaleInfo *temp = new LocaleInfo(*it);
+        if (LocaleMatcher::Match(requestLocale, temp)) {
+            candidateLocales.push_back(temp);
+        } else {
+            delete temp;
+        }
+    }
+    return true;
+}
+
+void ReleaseParam(LocaleInfo *locale, std::vector<LocaleInfo*> &candidateLocales)
+{
+    delete locale;
+    for (auto it = candidateLocales.begin(); it != candidateLocales.end(); ++it) {
+        delete *it;
+    }
+}
+
+napi_value I18nAddon::GetBestMatchLocale(napi_env env, napi_callback_info info)
+{
+    size_t argc = 2;
+    napi_value argv[2] = { nullptr };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok || argc < 2) { // 2 is the request param num.
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        return nullptr;
+    }
+    LocaleInfo *requestLocale = ProcessJsParamLocale(env, argv[0]);
+    if (requestLocale == nullptr) {
+        return nullptr;
+    }
+    std::vector<LocaleInfo*> candidateLocales;
+    bool isValidParam = ProcessJsParamLocaleList(env, argv[1], candidateLocales, requestLocale);
+    if (!isValidParam || candidateLocales.size() == 0) {
+        ReleaseParam(requestLocale, candidateLocales);
+        return nullptr;
+    }
+    auto compareFunc = [requestLocale](LocaleInfo *locale1, LocaleInfo *locale2) {
+        return LocaleMatcher::IsMoreSuitable(locale1, locale2, requestLocale);
+    };
+    std::sort(candidateLocales.begin(), candidateLocales.end(), compareFunc);
+    std::string bestMatchLocaleTag = candidateLocales[candidateLocales.size() - 1]->ToString();
+    ReleaseParam(requestLocale, candidateLocales);
+    napi_value result = nullptr;
+    status = napi_create_string_utf8(env, bestMatchLocaleTag.c_str(), NAPI_AUTO_LENGTH, &result);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "Create format stirng failed.");
+        return nullptr;
+    }
+    return result;
 }
 
 void I18nAddon::ProcessNormal(char ch, int *order, size_t orderSize, int *lengths, size_t lengsSize)

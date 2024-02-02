@@ -65,6 +65,19 @@ int I18nFuncTest043(void);
 int I18nFuncTest044(void);
 int I18nFuncTest045(void);
 int I18nFuncTest046(void);
+int I18nFuncTest047(void);
+int I18nFuncTest048(void);
+int I18nFuncTest049(void);
+int I18nFuncTest050(void);
+int I18nFuncTest051(void);
+int I18nFuncTest052(void);
+int I18nFuncTest053(void);
+int I18nFuncTest054(void);
+int I18nFuncTest055(void);
+int I18nFuncTest056(void);
+int I18nFuncTest057(void);
+int I18nFuncTest058(void);
+int I18nFuncTest059(void);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
