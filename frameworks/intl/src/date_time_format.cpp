@@ -61,10 +61,6 @@ DateTimeFormat::DateTimeFormat(const std::vector<std::string> &localeTags, std::
 
 void DateTimeFormat::FreeDateTimeFormat()
 {
-    if (dateIntvFormat != nullptr) {
-        delete dateIntvFormat;
-        dateIntvFormat = nullptr;
-    }
     if (calendar != nullptr) {
         delete calendar;
         calendar = nullptr;
@@ -158,7 +154,8 @@ void DateTimeFormat::InitDateFormatWithoutConfigs(UErrorCode &status)
     if (simDateFormat != nullptr) {
         simDateFormat->toPattern(pattern);
     }
-    dateIntvFormat = DateIntervalFormat::createInstance(pattern, locale, status);
+    dateIntvFormat =
+        std::unique_ptr<DateIntervalFormat>(DateIntervalFormat::createInstance(pattern, locale, status));
 }
 
 void DateTimeFormat::FixPatternPartOne()
@@ -299,7 +296,8 @@ void DateTimeFormat::InitDateFormat(UErrorCode &status)
         }
     }
     status = U_ZERO_ERROR;
-    dateIntvFormat = DateIntervalFormat::createInstance(pattern, locale, status);
+    dateIntvFormat =
+        std::unique_ptr<DateIntervalFormat>(DateIntervalFormat::createInstance(pattern, locale, status));
 }
 
 void DateTimeFormat::SetDayPeriod()

@@ -79,7 +79,7 @@ private:
     std::string localeMatcher;
     std::string formatMatcher;
     icu::DateFormat *dateFormat = nullptr;
-    icu::DateIntervalFormat *dateIntvFormat = nullptr;
+    std::unique_ptr<icu::DateIntervalFormat> dateIntvFormat = nullptr;
     icu::Calendar *calendar = nullptr;
     LocaleInfo *localeInfo = nullptr;
     icu::Locale locale;
