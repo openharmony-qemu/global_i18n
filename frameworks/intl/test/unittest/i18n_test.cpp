@@ -20,6 +20,9 @@
 #include "i18n_normalizer.h"
 #include "i18n_timezone_mock.h"
 #include "locale_config.h"
+#include "locale_info.h"
+#include "locale_matcher.h"
+#include "locale_util.h"
 #include "measure_data.h"
 #include "phone_number_format_mock.h"
 #include "preferred_language.h"
@@ -1194,6 +1197,235 @@ HWTEST_F(I18nTest, I18nFuncTest046, TestSize.Level1)
     EXPECT_EQ(res[1][2], 16);
     EXPECT_EQ(res[1][3], 17);
     EXPECT_EQ(res[1][4], 34);
+}
+
+/**
+ * @tc.name: I18nFuncTest047
+ * @tc.desc: Test I18n LocaleUtil
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest047, TestSize.Level1)
+{
+    LocaleInfo *locale = new LocaleInfo("zh-Hans-CN");
+    uint16_t encodedLanguage = LocaleUtil::EncodeLanguageByLocaleInfo(locale);
+    EXPECT_EQ(encodedLanguage, 31336);
+    delete locale;
+}
+
+/**
+ * @tc.name: I18nFuncTest048
+ * @tc.desc: Test I18n LocaleUtil
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest048, TestSize.Level1)
+{
+    LocaleInfo *locale = new LocaleInfo("zh-Hans-CN");
+    uint16_t encodedScript = LocaleUtil::EncodeScriptByLocaleInfo(locale);
+    EXPECT_EQ(encodedScript, 28275);
+    delete locale;
+}
+
+/**
+ * @tc.name: I18nFuncTest049
+ * @tc.desc: Test I18n LocaleUtil
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest049, TestSize.Level1)
+{
+    LocaleInfo *locale = new LocaleInfo("zh-Hans-CN");
+    uint16_t encodedRegion = LocaleUtil::EncodeRegionByLocaleInfo(locale);
+    EXPECT_EQ(encodedRegion, 17230);
+    delete locale;
+}
+
+/**
+ * @tc.name: I18nFuncTest050
+ * @tc.desc: Test I18n LocaleUtil
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest050, TestSize.Level1)
+{
+    LocaleInfo locale("zh-Hans-CN");
+    uint16_t encodedLanguage = LocaleUtil::EncodeLanguage(locale.GetLanguage().c_str());
+    EXPECT_EQ(encodedLanguage, 31336);
+}
+
+/**
+ * @tc.name: I18nFuncTest051
+ * @tc.desc: Test I18n LocaleUtil
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest051, TestSize.Level1)
+{
+    LocaleInfo locale("zh-Hans-CN");
+    uint16_t encodedScript = LocaleUtil::EncodeScript(locale.GetScript().c_str());
+    EXPECT_EQ(encodedScript, 28275);
+}
+
+/**
+ * @tc.name: I18nFuncTest052
+ * @tc.desc: Test I18n LocaleUtil
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest052, TestSize.Level1)
+{
+    LocaleInfo locale("zh-Hans-CN");
+    uint16_t encodedRegion = LocaleUtil::EncodeRegion(locale.GetRegion().c_str());
+    EXPECT_EQ(encodedRegion, 17230);
+}
+
+/**
+ * @tc.name: I18nFuncTest053
+ * @tc.desc: Test I18n LocaleUtil
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest053, TestSize.Level1)
+{
+    LocaleInfo locale("zh-Hans-CN");
+    uint16_t encodedLocale = LocaleUtil::EncodeLocale(locale.GetLanguage().c_str(), locale.GetScript().c_str(),
+        locale.GetRegion().c_str());
+    EXPECT_EQ(encodedLocale, 17230);
+}
+
+/**
+ * @tc.name: I18nFuncTest054
+ * @tc.desc: Test I18n LocaleUtil
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest054, TestSize.Level1)
+{
+    std::string str1 = "non-empty";
+    std::string str2 = "";
+    bool isEmpty = LocaleUtil::IsStrEmpty(str1.c_str());
+    EXPECT_FALSE(isEmpty);
+    isEmpty = LocaleUtil::IsStrEmpty(str2.c_str());
+    EXPECT_TRUE(isEmpty);
+}
+
+/**
+ * @tc.name: I18nFuncTest055
+ * @tc.desc: Test I18n LocaleUtil
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest055, TestSize.Level1)
+{
+    LocaleInfo locale("zh-Hans-CN");
+    uint32_t encodedScript = LocaleUtil::EncodeScript(locale.GetScript().c_str());
+    char decodedScript[5] = { 0 };
+    LocaleUtil::DecodeScript(encodedScript, decodedScript);
+    std::string originScript = "Hans";
+    EXPECT_EQ(originScript.compare(decodedScript), 0);
+}
+
+/**
+ * @tc.name: I18nFuncTest056
+ * @tc.desc: Test I18n LocaleUtil
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest056, TestSize.Level1)
+{
+    std::string alphaString = "abc";
+    std::string nonAlphaString = "abc123abc";
+    bool isAlpha = LocaleUtil::IsAlphaString(alphaString.c_str(), alphaString.length());
+    EXPECT_TRUE(isAlpha);
+    isAlpha = LocaleUtil::IsAlphaString(nonAlphaString.c_str(), nonAlphaString.length());
+    EXPECT_FALSE(isAlpha);
+}
+
+/**
+ * @tc.name: I18nFuncTest057
+ * @tc.desc: Test I18n LocaleUtil
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest057, TestSize.Level1)
+{
+    std::string numericString = "123";
+    std::string nonNumericString = "123abc123";
+    bool isNumeric = LocaleUtil::IsNumericString(numericString.c_str(), numericString.length());
+    EXPECT_TRUE(isNumeric);
+    isNumeric = LocaleUtil::IsNumericString(nonNumericString.c_str(), nonNumericString.length());
+    EXPECT_FALSE(isNumeric);
+}
+
+/**
+ * @tc.name: I18nFuncTest058
+ * @tc.desc: Test I18n LocaleUtil
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest058, TestSize.Level1)
+{
+    LocaleInfo *locale1 = new LocaleInfo("zh-Hans-CN");
+    LocaleInfo *locale2 = new LocaleInfo("en-Latn-US");
+    bool isMatched = LocaleMatcher::Match(locale1, locale2);
+    EXPECT_FALSE(isMatched);
+    delete locale1;
+    delete locale2;
+
+    locale1 = new LocaleInfo("zh-Hans-CN");
+    locale2 = new LocaleInfo("zh-Hant-TW");
+    isMatched = LocaleMatcher::Match(locale1, locale2);
+    EXPECT_FALSE(isMatched);
+    delete locale1;
+    delete locale2;
+
+    locale1 = new LocaleInfo("zh-Hans-CN");
+    locale2 = new LocaleInfo("zh-Hant-TW");
+    isMatched = LocaleMatcher::Match(locale1, locale2);
+    EXPECT_FALSE(isMatched);
+    delete locale1;
+    delete locale2;
+
+    locale1 = new LocaleInfo("zh-Hans-CN");
+    locale2 = new LocaleInfo("zh-Hans-MO");
+    isMatched = LocaleMatcher::Match(locale1, locale2);
+    EXPECT_TRUE(isMatched);
+    delete locale1;
+    delete locale2;
+}
+
+/**
+ * @tc.name: I18nFuncTest059
+ * @tc.desc: Test I18n LocaleUtil
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest059, TestSize.Level1)
+{
+    LocaleInfo *request = nullptr;
+    LocaleInfo *current = new LocaleInfo("zh-Hans-CN");
+    LocaleInfo *other = nullptr;
+    int8_t res = LocaleMatcher::IsMoreSuitable(current, other, request);
+    EXPECT_TRUE(res < 0);
+    delete current;
+    current = nullptr;
+
+    res = LocaleMatcher::IsMoreSuitable(current, other, request);
+    EXPECT_TRUE(res == 0);
+
+    request = new LocaleInfo("en-GB");
+    current = new LocaleInfo("en-AU");
+    res = LocaleMatcher::IsMoreSuitable(current, other, request);
+    EXPECT_TRUE(res > 0);
+    
+    other = new LocaleInfo("en-GB");
+    res = LocaleMatcher::IsMoreSuitable(current, other, request);
+    EXPECT_TRUE(res < 0);
+
+    delete request;
+    delete current;
+    delete other;
+    request = new LocaleInfo("iw-Lant-GB");
+    current = new LocaleInfo("iw-Lant-AU");
+    other = new LocaleInfo("he-Latn-AU");
+    res = LocaleMatcher::IsMoreSuitable(current, other, request);
+    EXPECT_TRUE(res > 0);
+    delete other;
+
+    other = new LocaleInfo("iw-Latn-AG");
+    res = LocaleMatcher::IsMoreSuitable(current, other, request);
+    EXPECT_TRUE(res < 0);
+    delete request;
+    delete current;
+    delete other;
 }
 } // namespace I18n
 } // namespace Global

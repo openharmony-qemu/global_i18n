@@ -23,6 +23,8 @@
 #include "index_util.h"
 #include "napi/native_node_api.h"
 #include "locale_config.h"
+#include "locale_info.h"
+#include "locale_matcher.h"
 #include "measure_data.h"
 #include "number_format.h"
 #include "phone_number_format.h"
@@ -49,6 +51,7 @@ public:
     static napi_value InitIndexUtil(napi_env env, napi_value exports);
     static napi_value GetDateOrder(napi_env env, napi_callback_info info);
     static napi_value GetTimePeriodName(napi_env env, napi_callback_info info);
+    static napi_value GetBestMatchLocale(napi_env env, napi_callback_info info);
     static napi_value InitTransliterator(napi_env env, napi_value exports);
     static napi_value GetTransliteratorInstance(napi_env env, napi_callback_info info);
     static napi_value GetAvailableIDs(napi_env env, napi_callback_info info);
