@@ -77,7 +77,6 @@ I18nErrorCode I18nServiceAbility::RemovePreferredLanguage(int32_t index)
 
 void I18nServiceAbility::UnloadI18nServiceAbility()
 {
-    HiLog::Info(LABEL, "I18nServiceAbility::UnloadI18nServiceAbility ready to unload after 10 seconds.");
     if (handler != nullptr) {
         handler->RemoveTask(UNLOAD_TASK);
     }
