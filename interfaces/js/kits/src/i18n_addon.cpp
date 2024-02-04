@@ -407,7 +407,7 @@ bool ProcessJsParamLocaleList(napi_env env, napi_value argv, std::vector<LocaleI
         return false;
     }
     if (localeTagList.size() == 0) {
-        return false;
+        return true;
     }
     for (auto it = localeTagList.begin(); it != localeTagList.end(); ++it) {
         UErrorCode icuStatus = U_ZERO_ERROR;
@@ -452,15 +452,15 @@ napi_value I18nAddon::GetBestMatchLocale(napi_env env, napi_callback_info info)
     }
     std::vector<LocaleInfo*> candidateLocales;
     bool isValidParam = ProcessJsParamLocaleList(env, argv[1], candidateLocales, requestLocale);
-    if (!isValidParam || candidateLocales.size() == 0) {
+    if (!isValidParam) {
         ReleaseParam(requestLocale, candidateLocales);
         return nullptr;
     }
     auto compareFunc = [requestLocale](LocaleInfo *locale1, LocaleInfo *locale2) {
-        return LocaleMatcher::IsMoreSuitable(locale1, locale2, requestLocale);
+        return -1 * LocaleMatcher::IsMoreSuitable(locale1, locale2, requestLocale);
     };
     std::sort(candidateLocales.begin(), candidateLocales.end(), compareFunc);
-    std::string bestMatchLocaleTag = candidateLocales[candidateLocales.size() - 1]->ToString();
+    std::string bestMatchLocaleTag = candidateLocales.size() == 0 ? "" : candidateLocales[0]->ToString();
     ReleaseParam(requestLocale, candidateLocales);
     napi_value result = nullptr;
     status = napi_create_string_utf8(env, bestMatchLocaleTag.c_str(), NAPI_AUTO_LENGTH, &result);
