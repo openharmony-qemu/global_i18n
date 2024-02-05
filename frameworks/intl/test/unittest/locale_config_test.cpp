@@ -28,17 +28,35 @@ namespace Global {
 namespace I18n {
 class LocaleConfigTest : public testing::Test {
 public:
+    static string original_language;
+    static string original_region;
+    static string original_locale;
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
 };
 
+string LocaleConfigTest::original_language;
+string LocaleConfigTest::original_region;
+string LocaleConfigTest::original_locale;
+
 void LocaleConfigTest::SetUpTestCase(void)
-{}
+{
+    original_language = LocaleConfig::GetSystemLanguage();
+    original_region = LocaleConfig::GetSystemRegion();
+    original_locale = LocaleConfig::GetSystemLocale();
+    LocaleConfig::SetSystemLanguage("zh-Hans");
+    LocaleConfig::SetSystemRegion("CN");
+    LocaleConfig::SetSystemLocale("zh-Hans-CN");
+}
 
 void LocaleConfigTest::TearDownTestCase(void)
-{}
+{
+    LocaleConfig::SetSystemLanguage(original_language);
+    LocaleConfig::SetSystemRegion(original_region);
+    LocaleConfig::SetSystemLocale(original_locale);
+}
 
 void LocaleConfigTest::SetUp(void)
 {}
