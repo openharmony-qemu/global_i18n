@@ -35,7 +35,7 @@ void GetOptionValue(napi_env env, napi_value options, const std::string &optionN
     std::map<std::string, std::string> &map);
 void GetBoolOptionValue(napi_env env, napi_value options, const std::string &optionName,
     std::map<std::string, std::string> &map);
-void GetIntegerOptionValue(napi_env env, napi_value options, const std::string &optionName,
+int64_t GetIntegerOptionValue(napi_env env, napi_value options, const std::string &optionName,
     std::map<std::string, std::string> &map);
 void GetDateOptionValues(napi_env env, napi_value options, std::map<std::string, std::string> &map);
 void GetNumberOptionValues(napi_env env, napi_value options, std::map<std::string, std::string> &map);
