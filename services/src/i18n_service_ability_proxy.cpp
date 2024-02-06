@@ -65,13 +65,13 @@ I18nErrorCode I18nServiceAbilityProxy::SetSystemLocale(const std::string &locale
     return ProcessReply(reply.ReadInt32());
 }
 
-I18nErrorCode I18nServiceAbilityProxy::Set24HourClock(bool flag)
+I18nErrorCode I18nServiceAbilityProxy::Set24HourClock(const std::string &flag)
 {
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
     data.WriteInterfaceToken(DESCRIPTOR);
-    data.WriteBool(flag);
+    data.WriteString(flag);
     Remote()->SendRequest(static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_24_HOUR_CLOCK), data,
         reply, option);
     return ProcessReply(reply.ReadInt32());

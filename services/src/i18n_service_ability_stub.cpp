@@ -169,7 +169,7 @@ int32_t I18nServiceAbilityStub::Set24HourClockInner(MessageParcel &data, Message
         reply.WriteInt32(static_cast<int32_t>(err));
         return 0;
     }
-    bool flag = data.ReadBool();
+    std::string flag = data.ReadString();
     err = Set24HourClock(flag);
     if (err != I18nErrorCode::SUCCESS) {
         HiLog::Error(LABEL, "I18nServiceAbilityStub::Set24HourClockInner failed with errorCode=%{public}d",

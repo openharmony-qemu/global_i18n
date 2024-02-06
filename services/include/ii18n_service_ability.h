@@ -29,7 +29,7 @@ public:
     virtual I18nErrorCode SetSystemLanguage(const std::string &language) = 0;
     virtual I18nErrorCode SetSystemRegion(const std::string &region) = 0;
     virtual I18nErrorCode SetSystemLocale(const std::string &locale) = 0;
-    virtual I18nErrorCode Set24HourClock(bool flag) = 0;
+    virtual I18nErrorCode Set24HourClock(const std::string &flag) = 0;
     virtual I18nErrorCode SetUsingLocalDigit(bool flag) = 0;
     virtual I18nErrorCode AddPreferredLanguage(const std::string &language, int32_t index) = 0;
     virtual I18nErrorCode RemovePreferredLanguage(int32_t index) = 0;
