@@ -59,17 +59,35 @@ static const uint64_t selfTokenId = GetSelfTokenID();
 
 class IntlTest : public testing::Test {
 public:
+    static string originalLanguage;
+    static string originalRegion;
+    static string originalLocale;
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
 };
 
+string IntlTest::originalLanguage;
+string IntlTest::originalRegion;
+string IntlTest::originalLocale;
+
 void IntlTest::SetUpTestCase(void)
-{}
+{
+    originalLanguage = LocaleConfig::GetSystemLanguage();
+    originalRegion = LocaleConfig::GetSystemRegion();
+    originalLocale = LocaleConfig::GetSystemLocale();
+    LocaleConfig::SetSystemLanguage("zh-Hans");
+    LocaleConfig::SetSystemRegion("CN");
+    LocaleConfig::SetSystemLocale("zh-Hans-CN");
+}
 
 void IntlTest::TearDownTestCase(void)
-{}
+{
+    LocaleConfig::SetSystemLanguage(originalLanguage);
+    LocaleConfig::SetSystemRegion(originalRegion);
+    LocaleConfig::SetSystemLocale(originalLocale);
+}
 
 void IntlTest::SetUp(void)
 {}
