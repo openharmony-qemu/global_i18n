@@ -55,24 +55,24 @@ namespace Global {
 namespace I18n {
 class IntlTest : public testing::Test {
 public:
-    static string original_language;
-    static string original_region;
-    static string original_locale;
+    static string originalLanguage;
+    static string originalRegion;
+    static string originalLocale;
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
 };
 
-string IntlTest::original_language;
-string IntlTest::original_region;
-string IntlTest::original_locale;
+string IntlTest::originalLanguage;
+string IntlTest::originalRegion;
+string IntlTest::originalLocale;
 
 void IntlTest::SetUpTestCase(void)
 {
-    original_language = LocaleConfig::GetSystemLanguage();
-    original_region = LocaleConfig::GetSystemRegion();
-    original_locale = LocaleConfig::GetSystemLocale();
+    originalLanguage = LocaleConfig::GetSystemLanguage();
+    originalRegion = LocaleConfig::GetSystemRegion();
+    originalLocale = LocaleConfig::GetSystemLocale();
     LocaleConfig::SetSystemLanguage("zh-Hans");
     LocaleConfig::SetSystemRegion("CN");
     LocaleConfig::SetSystemLocale("zh-Hans-CN");
@@ -80,9 +80,9 @@ void IntlTest::SetUpTestCase(void)
 
 void IntlTest::TearDownTestCase(void)
 {
-    LocaleConfig::SetSystemLanguage(original_language);
-    LocaleConfig::SetSystemRegion(original_region);
-    LocaleConfig::SetSystemLocale(original_locale);
+    LocaleConfig::SetSystemLanguage(originalLanguage);
+    LocaleConfig::SetSystemRegion(originalRegion);
+    LocaleConfig::SetSystemLocale(originalLocale);
 }
 
 void IntlTest::SetUp(void)
