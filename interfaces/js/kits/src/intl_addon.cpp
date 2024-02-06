@@ -197,28 +197,29 @@ void GetOptionValue(napi_env env, napi_value options, const std::string &optionN
     }
 }
 
-void GetIntegerOptionValue(napi_env env, napi_value options, const std::string &optionName,
+int64_t GetIntegerOptionValue(napi_env env, napi_value options, const std::string &optionName,
     std::map<std::string, std::string> &map)
 {
     napi_value optionValue = nullptr;
+    int64_t integerValue = -1;
     napi_valuetype type = napi_undefined;
     napi_status status = napi_typeof(env, options, &type);
     if (status != napi_ok && type != napi_object) {
         HiLog::Error(LABEL, "GetIntegerOptionValue: Set option failed, option is not an object");
-        return;
+        return integerValue;
     }
     bool hasProperty = false;
     napi_status propStatus = napi_has_named_property(env, options, optionName.c_str(), &hasProperty);
     if (propStatus == napi_ok && hasProperty) {
         status = napi_get_named_property(env, options, optionName.c_str(), &optionValue);
         if (status == napi_ok) {
-            int64_t integerValue = -1;
             status = napi_get_value_int64(env, optionValue, &integerValue);
             if (status == napi_ok) {
                 map.insert(make_pair(optionName, std::to_string(integerValue)));
             }
         }
     }
+    return integerValue;
 }
 
 void GetBoolOptionValue(napi_env env, napi_value options, const std::string &optionName,
@@ -568,8 +569,12 @@ void GetNumberOptionValues(napi_env env, napi_value options, std::map<std::strin
     GetOptionValue(env, options, "unitUsage", map);
     GetBoolOptionValue(env, options, "useGrouping", map);
     GetIntegerOptionValue(env, options, "minimumIntegerDigits", map);
-    GetIntegerOptionValue(env, options, "minimumFractionDigits", map);
-    GetIntegerOptionValue(env, options, "maximumFractionDigits", map);
+    int64_t minFd = GetIntegerOptionValue(env, options, "minimumFractionDigits", map);
+    int64_t maxFd = GetIntegerOptionValue(env, options, "maximumFractionDigits", map);
+    if (minFd != -1 && maxFd != -1 && minFd > maxFd) {
+        HiLog::Error(LABEL,
+            "GetNumberOptionValues: Invalid parameter value: minimumFractionDigits > maximumFractionDigits");
+    }
     GetIntegerOptionValue(env, options, "minimumSignificantDigits", map);
     GetIntegerOptionValue(env, options, "maximumSignificantDigits", map);
 }

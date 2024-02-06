@@ -170,18 +170,19 @@ void NumberFormat::InitDigitsProperties()
                 numberFormat.integerWidth(icu::number::IntegerWidth::zeroFillTo(minIntegerDigits));
         }
 
-        status = 0;
-        int32_t minFractionDigits = ConvertString2Int(minimumFractionDigits, status);
-        if (status == 0) {
+        int32_t minFdStatus = 0;
+        int32_t minFractionDigits = ConvertString2Int(minimumFractionDigits, minFdStatus);
+        int32_t maxFdStatus = 0;
+        int32_t maxFractionDigits = ConvertString2Int(maximumFractionDigits, maxFdStatus);
+        if (minFdStatus == 0 && maxFdStatus != 0) {
             numberFormat =
                 numberFormat.precision(icu::number::Precision::minFraction(minFractionDigits));
-        }
-
-        status = 0;
-        int32_t maxFractionDigits = ConvertString2Int(maximumFractionDigits, status);
-        if (status == 0) {
+        } else if (minFdStatus != 0 && maxFdStatus == 0) {
             numberFormat =
                 numberFormat.precision(icu::number::Precision::maxFraction(maxFractionDigits));
+        } else if (minFdStatus == 0 && maxFdStatus == 0) {
+            numberFormat =
+                numberFormat.precision(icu::number::Precision::minMaxFraction(minFractionDigits, maxFractionDigits));
         }
     }
 }
