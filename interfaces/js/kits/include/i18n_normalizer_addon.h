@@ -33,10 +33,9 @@ public:
 
 private:
     static napi_value I18nNormalizerConstructor(napi_env env, napi_callback_info info);
-
     // process js function call
     static napi_value Normalize(napi_env env, napi_callback_info info);
-    
+    static napi_value InitNormalizer(napi_env env, napi_value exports);
     static napi_value GetI18nNormalizerInstance(napi_env env, napi_callback_info info);
     static napi_status SetEnumValue(napi_env env, napi_value enumObj, const char* enumName, int32_t enumVal);
     

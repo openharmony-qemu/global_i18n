@@ -27,11 +27,11 @@ public:
     I18nTimeZoneAddon();
     ~I18nTimeZoneAddon();
     static void Destructor(napi_env env, void *nativeObject, void *hint);
-    static napi_value CreateTimeZoneObject(napi_env env, napi_status &initStatus);
     static napi_value GetI18nTimeZone(napi_env env, napi_callback_info info);
     static napi_value InitI18nTimeZone(napi_env env, napi_value exports);
 
 private:
+    static napi_value InitTimeZone(napi_env env, napi_value exports);
     static napi_value I18nTimeZoneConstructor(napi_env env, napi_callback_info info);
     static napi_value GetAvailableTimezoneIDs(napi_env env, napi_callback_info info);
     static napi_value GetAvailableZoneCityIDs(napi_env env, napi_callback_info info);

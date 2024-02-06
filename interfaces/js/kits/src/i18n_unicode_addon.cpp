@@ -16,6 +16,7 @@
 #include "error_util.h"
 #include "hilog/log.h"
 #include "i18n_unicode_addon.h"
+#include "js_utils.h"
 #include "variable_convertor.h"
 
 namespace OHOS {
@@ -37,36 +38,33 @@ void I18nUnicodeAddon::Destructor(napi_env env, void *nativeObject, void *hint)
     nativeObject = nullptr;
 }
 
-napi_value I18nUnicodeAddon::CreateUnicodeObject(napi_env env, napi_status &initStatus)
+napi_value I18nUnicodeAddon::InitI18nUnicode(napi_env env, napi_value exports)
 {
-    napi_status status = napi_ok;
-    napi_value character = nullptr;
-    status = napi_create_object(env, &character);
-    if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to create character object at init");
-        initStatus = napi_generic_failure;
-        return nullptr;
-    }
-    napi_property_descriptor characterProperties[] = {
-        DECLARE_NAPI_FUNCTION("isDigit", IsDigitAddon),
-        DECLARE_NAPI_FUNCTION("isSpaceChar", IsSpaceCharAddon),
-        DECLARE_NAPI_FUNCTION("isWhitespace", IsWhiteSpaceAddon),
-        DECLARE_NAPI_FUNCTION("isRTL", IsRTLCharacterAddon),
-        DECLARE_NAPI_FUNCTION("isIdeograph", IsIdeoGraphicAddon),
-        DECLARE_NAPI_FUNCTION("isLetter", IsLetterAddon),
-        DECLARE_NAPI_FUNCTION("isLowerCase", IsLowerCaseAddon),
-        DECLARE_NAPI_FUNCTION("isUpperCase", IsUpperCaseAddon),
-        DECLARE_NAPI_FUNCTION("getType", GetTypeAddon),
+    napi_property_descriptor properties[] = {
+        DECLARE_NAPI_STATIC_FUNCTION("isDigit", IsDigitAddon),
+        DECLARE_NAPI_STATIC_FUNCTION("isSpaceChar", IsSpaceCharAddon),
+        DECLARE_NAPI_STATIC_FUNCTION("isWhitespace", IsWhiteSpaceAddon),
+        DECLARE_NAPI_STATIC_FUNCTION("isRTL", IsRTLCharacterAddon),
+        DECLARE_NAPI_STATIC_FUNCTION("isIdeograph", IsIdeoGraphicAddon),
+        DECLARE_NAPI_STATIC_FUNCTION("isLetter", IsLetterAddon),
+        DECLARE_NAPI_STATIC_FUNCTION("isLowerCase", IsLowerCaseAddon),
+        DECLARE_NAPI_STATIC_FUNCTION("isUpperCase", IsUpperCaseAddon),
+        DECLARE_NAPI_STATIC_FUNCTION("getType", GetTypeAddon),
     };
-    status = napi_define_properties(env, character,
-                                    sizeof(characterProperties) / sizeof(napi_property_descriptor),
-                                    characterProperties);
+    napi_value constructor = nullptr;
+    napi_status status = napi_define_class(env, "Unicode", NAPI_AUTO_LENGTH, JSUtils::DefaultConstructor, nullptr,
+        sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to set properties of character at init");
-        initStatus = napi_generic_failure;
+        HiLog::Error(LABEL, "InitI18nUnicode: Define class failed when InitUnicode.");
         return nullptr;
     }
-    return character;
+
+    status = napi_set_named_property(env, exports, "Unicode", constructor);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "InitI18nUnicode: Set property failed when InitUnicode.");
+        return nullptr;
+    }
+    return exports;
 }
 
 napi_value I18nUnicodeAddon::InitCharacter(napi_env env, napi_value exports)
