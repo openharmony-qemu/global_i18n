@@ -1977,7 +1977,7 @@ HWTEST_F(IntlTest, IntlFuncTest0049, TestSize.Level1)
     std::string validLocale = LocaleConfig::GetValidLocale(locale);
     EXPECT_EQ(validLocale, "zh-CN");
 
-    status = LocaleConfig::Set24HourClock(false);
+    status = LocaleConfig::Set24HourClock("false");
     EXPECT_EQ(status, I18nErrorCode::SUCCESS);
     bool is24HourClock = LocaleConfig::Is24HourClock();
     EXPECT_TRUE(!is24HourClock);

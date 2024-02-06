@@ -70,7 +70,7 @@ I18nErrorCode I18nServiceAbilityClient::SetSystemLocale(const std::string &local
     return i18nServiceAbilityObj->SetSystemLocale(locale);
 }
 
-I18nErrorCode I18nServiceAbilityClient::Set24HourClock(bool flag)
+I18nErrorCode I18nServiceAbilityClient::Set24HourClock(const std::string &flag)
 {
     I18nErrorCode err = I18nErrorCode::SUCCESS;
     sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);

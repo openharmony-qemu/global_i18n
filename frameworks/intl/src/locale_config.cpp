@@ -1065,17 +1065,27 @@ I18nErrorCode LocaleConfig::SetSystemLocale(const std::string &localeTag)
 #endif
 }
 
-I18nErrorCode LocaleConfig::Set24HourClock(bool option)
+bool LocaleConfig::IsValid24HourClockValue(const std::string &tag)
 {
-    // HOUR_KEY system parameter's value is "true" or "false"
-    std::string optionStr = option ? "true" : "false";
-    if (SetParameter(HOUR_KEY, optionStr.data()) != 0) {
+    if (tag.compare("true") == 0 || tag.compare("false") == 0 || tag.length() == 0) {
+        return true;
+    }
+    return false;
+}
+
+I18nErrorCode LocaleConfig::Set24HourClock(const std::string &option)
+{
+    if (!IsValid24HourClockValue(option)) {
+        HiLog::Error(LABEL, "LocaleConfig::Set24HourClock invalid 24 Hour clock tag: %{public}s", option.c_str());
+        return I18nErrorCode::INVALID_24_HOUR_CLOCK_TAG;
+    }
+    if (SetParameter(HOUR_KEY, option.data()) != 0) {
         HiLog::Error(LABEL, "LocaleConfig::Set24HourClock update 24 hour clock failed with option=%{public}s",
-            optionStr.c_str());
+            option.c_str());
         return I18nErrorCode::UPDATE_24_HOUR_CLOCK_FAILED;
     }
 #ifdef SUPPORT_GRAPHICS
-    UpdateConfiguration(AAFwk::GlobalConfigurationKey::SYSTEM_HOUR, optionStr);
+    UpdateConfiguration(AAFwk::GlobalConfigurationKey::SYSTEM_HOUR, option);
     return PublishCommonEvent(EventFwk::CommonEventSupport::COMMON_EVENT_TIME_CHANGED);
 #else
     return I18nErrorCode::SUCCESS;

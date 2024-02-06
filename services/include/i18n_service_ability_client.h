@@ -56,11 +56,12 @@ public:
     /**
      * @brief I18n service entry for setting the system to use 12 or 24-hour clock.
      *
-     * @param flag When flag is True, the system adopts 24-hour clock;
-     * When flag is False, the system adopts 12-hour clock;
+     * @param flag When flag is true, the system adopts 24-hour clock;
+     * When flag is false, the system adopts 12-hour clock; When flag is empty string, the system adopts
+     * system locale default behavior.
      * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
      */
-    static I18nErrorCode Set24HourClock(bool flag);
+    static I18nErrorCode Set24HourClock(const std::string &flag);
 
     /**
      * @brief I18n service entry for setting whether the system uses local numbers.

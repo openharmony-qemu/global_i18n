@@ -285,7 +285,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest013, TestSize.Level1)
 HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest014, TestSize.Level1)
 {
     bool current = LocaleConfig::Is24HourClock();
-    I18nErrorCode status = LocaleConfig::Set24HourClock(true);
+    I18nErrorCode status = LocaleConfig::Set24HourClock("true");
     EXPECT_EQ(status, I18nErrorCode::SUCCESS);
     current = LocaleConfig::Is24HourClock();
     EXPECT_TRUE(current);
