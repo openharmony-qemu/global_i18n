@@ -24,6 +24,7 @@
 #include "i18n_system_addon.h"
 #include "i18n_timezone_addon.h"
 #include "i18n_unicode_addon.h"
+#include "js_utils.h"
 #include "locale_info.h"
 #include "locale_matcher.h"
 #include "node_api.h"
@@ -62,29 +63,28 @@ void I18nAddon::Destructor(napi_env env, void *nativeObject, void *hint)
     nativeObject = nullptr;
 }
 
-napi_value I18nAddon::CreateI18nUtilObject(napi_env env, napi_status &initStatus)
+napi_value I18nAddon::InitI18nUtil(napi_env env, napi_value exports)
 {
-    napi_value i18nUtil = nullptr;
-    napi_status status = napi_create_object(env, &i18nUtil);
-    if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to create I18nUtil object at init");
-        initStatus = napi_generic_failure;
-        return nullptr;
-    }
-    napi_property_descriptor i18nUtilProperties[] = {
-        DECLARE_NAPI_FUNCTION("unitConvert", UnitConvert),
-        DECLARE_NAPI_FUNCTION("getDateOrder", GetDateOrder),
-        DECLARE_NAPI_FUNCTION("getTimePeriodName", GetTimePeriodName),
-        DECLARE_NAPI_FUNCTION("getBestMatchLocale", GetBestMatchLocale),
+    napi_property_descriptor properties[] = {
+        DECLARE_NAPI_STATIC_FUNCTION("unitConvert", UnitConvert),
+        DECLARE_NAPI_STATIC_FUNCTION("getDateOrder", GetDateOrder),
+        DECLARE_NAPI_STATIC_FUNCTION("getTimePeriodName", GetTimePeriodName),
+        DECLARE_NAPI_STATIC_FUNCTION("getBestMatchLocale", GetBestMatchLocale)
     };
-    status = napi_define_properties(env, i18nUtil, sizeof(i18nUtilProperties) / sizeof(napi_property_descriptor),
-        i18nUtilProperties);
+    napi_value constructor = nullptr;
+    napi_status status = napi_define_class(env, "I18NUtil", NAPI_AUTO_LENGTH, JSUtils::DefaultConstructor, nullptr,
+        sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to set properties of I18nUtil at init");
-        initStatus = napi_generic_failure;
+        HiLog::Error(LABEL, "InitI18nUtil: Define class failed when InitI18NUtil.");
         return nullptr;
     }
-    return i18nUtil;
+
+    status = napi_set_named_property(env, exports, "I18NUtil", constructor);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "InitI18nUtil: Set property failed when InitI18NUtil.");
+        return nullptr;
+    }
+    return exports;
 }
 
 napi_value I18nAddon::Init(napi_env env, napi_value exports)
@@ -98,10 +98,8 @@ napi_value I18nAddon::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getSystemLocale", I18nSystemAddon::GetSystemLocale),
         DECLARE_NAPI_FUNCTION("getCalendar", I18nCalendarAddon::GetCalendar),
         DECLARE_NAPI_FUNCTION("isRTL", IsRTL),
-        DECLARE_NAPI_PROPERTY("I18NUtil", CreateI18nUtilObject(env, initStatus)),
         DECLARE_NAPI_FUNCTION("getLineInstance", GetLineInstance),
         DECLARE_NAPI_FUNCTION("getInstance", GetIndexUtil),
-        DECLARE_NAPI_PROPERTY("Unicode", I18nUnicodeAddon::CreateUnicodeObject(env, initStatus)),
         DECLARE_NAPI_FUNCTION("addPreferredLanguage", I18nSystemAddon::AddPreferredLanguage),
         DECLARE_NAPI_FUNCTION("removePreferredLanguage", I18nSystemAddon::RemovePreferredLanguage),
         DECLARE_NAPI_FUNCTION("getPreferredLanguageList", I18nSystemAddon::GetPreferredLanguageList),
@@ -109,9 +107,6 @@ napi_value I18nAddon::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("is24HourClock", I18nSystemAddon::Is24HourClock),
         DECLARE_NAPI_FUNCTION("set24HourClock", I18nSystemAddon::Set24HourClock),
         DECLARE_NAPI_FUNCTION("getTimeZone", I18nTimeZoneAddon::GetI18nTimeZone),
-        DECLARE_NAPI_PROPERTY("Transliterator", CreateTransliteratorObject(env, initStatus)),
-        DECLARE_NAPI_PROPERTY("TimeZone", I18nTimeZoneAddon::CreateTimeZoneObject(env, initStatus)),
-        DECLARE_NAPI_PROPERTY("System", I18nSystemAddon::CreateSystemObject(env, initStatus)),
         DECLARE_NAPI_PROPERTY("NormalizerMode", I18nNormalizerAddon::CreateI18NNormalizerModeEnum(env, initStatus))
     };
     initStatus = napi_define_properties(env, exports, sizeof(properties) / sizeof(napi_property_descriptor),
@@ -502,33 +497,54 @@ void I18nAddon::ProcessNormal(char ch, int *order, size_t orderSize, int *length
     }
 }
 
-napi_value I18nAddon::InitTransliterator(napi_env env, napi_value exports)
+napi_value I18nAddon::InitI18nTransliterator(napi_env env, napi_value exports)
 {
-    napi_status status = napi_ok;
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("transform", Transform),
     };
     napi_value constructor = nullptr;
-    status = napi_define_class(env, "Transliterator", NAPI_AUTO_LENGTH, TransliteratorConstructor, nullptr,
-        sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
+    napi_status status = napi_define_class(env, "Transliterator", NAPI_AUTO_LENGTH, I18nTransliteratorConstructor,
+        nullptr, sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to define transliterator class at Init");
+        HiLog::Error(LABEL, "InitI18nTransliterator: Failed to define transliterator class at Init");
         return nullptr;
     }
+    exports = I18nAddon::InitTransliterator(env, exports);
     g_transConstructor = new (std::nothrow) napi_ref;
     if (!g_transConstructor) {
-        HiLog::Error(LABEL, "Failed to create trans ref at init");
+        HiLog::Error(LABEL, "InitI18nTransliterator: Failed to create trans ref at init");
         return nullptr;
     }
     status = napi_create_reference(env, constructor, 1, g_transConstructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to create trans reference at init");
+        HiLog::Error(LABEL, "InitI18nTransliterator: Failed to create trans reference at init");
         return nullptr;
     }
     return exports;
 }
 
-napi_value I18nAddon::TransliteratorConstructor(napi_env env, napi_callback_info info)
+napi_value I18nAddon::InitTransliterator(napi_env env, napi_value exports)
+{
+    napi_property_descriptor properties[] = {
+        DECLARE_NAPI_STATIC_FUNCTION("getAvailableIDs", GetAvailableIDs),
+        DECLARE_NAPI_STATIC_FUNCTION("getInstance", GetTransliteratorInstance)
+    };
+    napi_value constructor = nullptr;
+    napi_status status = napi_define_class(env, "I18nTransliterator", NAPI_AUTO_LENGTH, JSUtils::DefaultConstructor,
+        nullptr, sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "InitTransliterator: Failed to define class Transliterator.");
+        return nullptr;
+    }
+    status = napi_set_named_property(env, exports, "Transliterator", constructor);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "InitTransliterator: Set property failed When InitTransliterator.");
+        return nullptr;
+    }
+    return exports;
+}
+
+napi_value I18nAddon::I18nTransliteratorConstructor(napi_env env, napi_callback_info info)
 {
     size_t argc = 1;
     napi_value argv[1] = { 0 };
@@ -541,7 +557,7 @@ napi_value I18nAddon::TransliteratorConstructor(napi_env env, napi_callback_info
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_string) {
-        napi_throw_type_error(env, nullptr, "Parameter type does not match");
+        napi_throw_type_error(env, nullptr, "I18nTransliteratorConstructor: Parameter type does not match");
         return nullptr;
     }
     int32_t code = 0;
@@ -554,7 +570,7 @@ napi_value I18nAddon::TransliteratorConstructor(napi_env env, napi_callback_info
     status =
         napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), I18nAddon::Destructor, nullptr, nullptr);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "TransliteratorConstructor: Wrap II18nAddon failed");
+        HiLog::Error(LABEL, "I18nTransliteratorConstructor: TransliteratorConstructor: Wrap II18nAddon failed");
         return nullptr;
     }
     if (!obj->InitTransliteratorContext(env, info, idTag)) {
@@ -575,31 +591,6 @@ bool I18nAddon::InitTransliteratorContext(napi_env env, napi_callback_info info,
     }
     transliterator_ = std::unique_ptr<icu::Transliterator>(trans);
     return transliterator_ != nullptr;
-}
-
-napi_value I18nAddon::CreateTransliteratorObject(napi_env env, napi_status &initStatus)
-{
-    napi_status status = napi_ok;
-    napi_value transliterator = nullptr;
-    status = napi_create_object(env, &transliterator);
-    if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to create transliterator object at init");
-        initStatus = napi_generic_failure;
-        return nullptr;
-    }
-    napi_property_descriptor transProperties[] = {
-        DECLARE_NAPI_FUNCTION("getAvailableIDs", GetAvailableIDs),
-        DECLARE_NAPI_FUNCTION("getInstance", GetTransliteratorInstance)
-    };
-    status = napi_define_properties(env, transliterator,
-                                    sizeof(transProperties) / sizeof(napi_property_descriptor),
-                                    transProperties);
-    if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to set properties of transliterator at init");
-        initStatus = napi_generic_failure;
-        return nullptr;
-    }
-    return transliterator;
 }
 
 napi_value I18nAddon::Transform(napi_env env, napi_callback_info info)
@@ -953,7 +944,7 @@ napi_value I18nAddon::FormatPhoneNumber(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value I18nAddon::InitIndexUtil(napi_env env, napi_value exports)
+napi_value I18nAddon::InitI18nIndexUtil(napi_env env, napi_value exports)
 {
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("getIndexList", GetIndexList),
@@ -962,22 +953,40 @@ napi_value I18nAddon::InitIndexUtil(napi_env env, napi_value exports)
     };
 
     napi_value constructor = nullptr;
-    napi_status status = napi_define_class(env, "IndexUtil", NAPI_AUTO_LENGTH, IndexUtilConstructor, nullptr,
+    napi_status status = napi_define_class(env, "IndexUtil", NAPI_AUTO_LENGTH, I18nIndexUtilConstructor, nullptr,
         sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "InitIndexUtil Define class failed when InitPhoneNumberFormat");
+        HiLog::Error(LABEL, "InitI18nIndexUtil: Define class failed when InitI18nIndexUtil.");
         return nullptr;
     }
-
+    exports = I18nAddon::InitIndexUtil(env, exports);
     status = napi_create_reference(env, constructor, 1, &g_indexUtilConstructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to create reference at init");
+        HiLog::Error(LABEL, "InitI18nIndexUtil: Failed to create reference at init.");
         return nullptr;
     }
     return exports;
 }
 
-napi_value I18nAddon::BreakIteratorConstructor(napi_env env, napi_callback_info info)
+napi_value I18nAddon::InitIndexUtil(napi_env env, napi_value exports)
+{
+    napi_property_descriptor properties[] = {};
+    napi_value constructor = nullptr;
+    napi_status status = napi_define_class(env, "I18nIndexUtil", NAPI_AUTO_LENGTH, JSUtils::DefaultConstructor,
+        nullptr, sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "InitIndexUtil: Failed to define class IndexUtil.");
+        return nullptr;
+    }
+    status = napi_set_named_property(env, exports, "IndexUtil", constructor);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "InitIndexUtil: Set property failed When InitIndexUtil.");
+        return nullptr;
+    }
+    return exports;
+}
+
+napi_value I18nAddon::I18nBreakIteratorConstructor(napi_env env, napi_callback_info info)
 {
     size_t argc = 1;
     napi_value argv[1] = { nullptr };
@@ -1015,9 +1024,8 @@ napi_value I18nAddon::BreakIteratorConstructor(napi_env env, napi_callback_info 
     return thisVar;
 }
 
-napi_value I18nAddon::InitBreakIterator(napi_env env, napi_value exports)
+napi_value I18nAddon::InitI18nBreakIterator(napi_env env, napi_value exports)
 {
-    napi_status status = napi_ok;
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("current", Current),
         DECLARE_NAPI_FUNCTION("first", First),
@@ -1027,23 +1035,42 @@ napi_value I18nAddon::InitBreakIterator(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("setLineBreakText", SetText),
         DECLARE_NAPI_FUNCTION("following", Following),
         DECLARE_NAPI_FUNCTION("getLineBreakText", GetText),
-        DECLARE_NAPI_FUNCTION("isBoundary", IsBoundary),
+        DECLARE_NAPI_FUNCTION("isBoundary", IsBoundary)
     };
     napi_value constructor = nullptr;
-    status = napi_define_class(env, "BreakIterator", NAPI_AUTO_LENGTH, BreakIteratorConstructor, nullptr,
-        sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
+    napi_status status = napi_define_class(env, "BreakIterator", NAPI_AUTO_LENGTH, I18nBreakIteratorConstructor,
+        nullptr, sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to define class BreakIterator at Init");
+        HiLog::Error(LABEL, "InitI18nBreakIterator: Failed to define class BreakIterator at Init");
         return nullptr;
     }
+    exports = I18nAddon::InitBreakIterator(env, exports);
     g_brkConstructor = new (std::nothrow) napi_ref;
     if (!g_brkConstructor) {
-        HiLog::Error(LABEL, "Failed to create brkiterator ref at init");
+        HiLog::Error(LABEL, "InitI18nBreakIterator: Failed to create brkiterator ref at init");
         return nullptr;
     }
     status = napi_create_reference(env, constructor, 1, g_brkConstructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to create reference g_brkConstructor at init");
+        HiLog::Error(LABEL, "InitI18nBreakIterator: Failed to create reference g_brkConstructor at init");
+        return nullptr;
+    }
+    return exports;
+}
+
+napi_value I18nAddon::InitBreakIterator(napi_env env, napi_value exports)
+{
+    napi_property_descriptor properties[] = {};
+    napi_value constructor = nullptr;
+    napi_status status = napi_define_class(env, "I18nBreakIterator", NAPI_AUTO_LENGTH, JSUtils::DefaultConstructor,
+        nullptr, sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "InitBreakIterator: Failed to define class BreakIterator.");
+        return nullptr;
+    }
+    status = napi_set_named_property(env, exports, "BreakIterator", constructor);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "InitBreakIterator: Set property failed When InitBreakIterator.");
         return nullptr;
     }
     return exports;
@@ -1341,7 +1368,7 @@ napi_value I18nAddon::IsBoundary(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value I18nAddon::IndexUtilConstructor(napi_env env, napi_callback_info info)
+napi_value I18nAddon::I18nIndexUtilConstructor(napi_env env, napi_callback_info info)
 {
     size_t argc = 1;
     napi_value argv[1] = { nullptr };
@@ -1586,15 +1613,18 @@ napi_value Init(napi_env env, napi_value exports)
 {
     napi_value val = I18nAddon::Init(env, exports);
     val = I18nAddon::InitPhoneNumberFormat(env, val);
-    val = I18nAddon::InitBreakIterator(env, val);
+    val = I18nAddon::InitI18nBreakIterator(env, val);
     val = I18nCalendarAddon::InitI18nCalendar(env, val);
-    val = I18nAddon::InitIndexUtil(env, val);
+    val = I18nAddon::InitI18nIndexUtil(env, val);
+    val = I18nAddon::InitI18nUtil(env, val);
     val = I18nTimeZoneAddon::InitI18nTimeZone(env, val);
-    val = I18nAddon::InitTransliterator(env, val);
+    val = I18nAddon::InitI18nTransliterator(env, val);
     val = I18nUnicodeAddon::InitCharacter(env, val);
+    val = I18nUnicodeAddon::InitI18nUnicode(env, val);
     val = I18nAddon::InitUtil(env, val);
     val = I18nNormalizerAddon::InitI18nNormalizer(env, val);
     val = SystemLocaleManagerAddon::InitSystemLocaleManager(env, val);
+    val = I18nSystemAddon::InitI18nSystem(env, val);
     val = HolidayManagerAddon::InitHolidayManager(env, val);
     val = EntityRecognizerAddon::InitEntityRecognizer(env, val);
     return val;

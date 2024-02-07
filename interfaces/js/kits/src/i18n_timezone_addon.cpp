@@ -16,6 +16,7 @@
 #include "error_util.h"
 #include "hilog/log.h"
 #include "i18n_timezone_addon.h"
+#include "js_utils.h"
 #include "variable_convertor.h"
 
 namespace OHOS {
@@ -39,34 +40,6 @@ void I18nTimeZoneAddon::Destructor(napi_env env, void *nativeObject, void *hint)
     nativeObject = nullptr;
 }
 
-napi_value I18nTimeZoneAddon::CreateTimeZoneObject(napi_env env, napi_status &initStatus)
-{
-    napi_status status = napi_ok;
-    napi_value timezone = nullptr;
-    status = napi_create_object(env, &timezone);
-    if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to create timezone object at init");
-        initStatus = napi_generic_failure;
-        return nullptr;
-    }
-    napi_property_descriptor timezoneProperties[] = {
-        DECLARE_NAPI_FUNCTION("getAvailableIDs", GetAvailableTimezoneIDs),
-        DECLARE_NAPI_FUNCTION("getAvailableZoneCityIDs", GetAvailableZoneCityIDs),
-        DECLARE_NAPI_FUNCTION("getCityDisplayName", GetCityDisplayName),
-        DECLARE_NAPI_FUNCTION("getTimezoneFromCity", GetTimezoneFromCity),
-        DECLARE_NAPI_FUNCTION("getTimezonesByLocation", GetTimezonesByLocation)
-    };
-    status = napi_define_properties(env, timezone,
-                                    sizeof(timezoneProperties) / sizeof(napi_property_descriptor),
-                                    timezoneProperties);
-    if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to set properties of timezone at init");
-        initStatus = napi_generic_failure;
-        return nullptr;
-    }
-    return timezone;
-}
-
 napi_value I18nTimeZoneAddon::GetI18nTimeZone(napi_env env, napi_callback_info info)
 {
     size_t argc = 1;
@@ -82,7 +55,6 @@ napi_value I18nTimeZoneAddon::GetI18nTimeZone(napi_env env, napi_callback_info i
 
 napi_value I18nTimeZoneAddon::InitI18nTimeZone(napi_env env, napi_value exports)
 {
-    napi_status status = napi_ok;
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("getID", GetID),
         DECLARE_NAPI_FUNCTION("getDisplayName", GetTimeZoneDisplayName),
@@ -90,20 +62,45 @@ napi_value I18nTimeZoneAddon::InitI18nTimeZone(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getOffset", GetOffset),
     };
     napi_value constructor = nullptr;
-    status = napi_define_class(env, "TimeZone", NAPI_AUTO_LENGTH, I18nTimeZoneConstructor, nullptr,
+    napi_status status = napi_define_class(env, "TimeZone", NAPI_AUTO_LENGTH, I18nTimeZoneConstructor, nullptr,
         sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to define class TimeZone at Init");
+        HiLog::Error(LABEL, "InitI18nTimeZone: Failed to define class TimeZone at Init");
         return nullptr;
     }
+    exports = I18nTimeZoneAddon::InitTimeZone(env, exports);
     g_timezoneConstructor = new (std::nothrow) napi_ref;
     if (!g_timezoneConstructor) {
-        HiLog::Error(LABEL, "Failed to create TimeZone ref at init");
+        HiLog::Error(LABEL, "InitI18nTimeZone: Failed to create TimeZone ref at init");
         return nullptr;
     }
     status = napi_create_reference(env, constructor, 1, g_timezoneConstructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to create reference g_timezoneConstructor at init");
+        HiLog::Error(LABEL, "InitI18nTimeZone: Failed to create reference g_timezoneConstructor at init");
+        return nullptr;
+    }
+    return exports;
+}
+
+napi_value I18nTimeZoneAddon::InitTimeZone(napi_env env, napi_value exports)
+{
+    napi_property_descriptor properties[] = {
+        DECLARE_NAPI_STATIC_FUNCTION("getAvailableIDs", GetAvailableTimezoneIDs),
+        DECLARE_NAPI_STATIC_FUNCTION("getAvailableZoneCityIDs", GetAvailableZoneCityIDs),
+        DECLARE_NAPI_STATIC_FUNCTION("getCityDisplayName", GetCityDisplayName),
+        DECLARE_NAPI_STATIC_FUNCTION("getTimezoneFromCity", GetTimezoneFromCity),
+        DECLARE_NAPI_STATIC_FUNCTION("getTimezonesByLocation", GetTimezonesByLocation)
+    };
+    napi_value constructor = nullptr;
+    napi_status status = napi_define_class(env, "I18nTimeZone", NAPI_AUTO_LENGTH, JSUtils::DefaultConstructor, nullptr,
+        sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "InitTimeZone: Failed to define class TimeZone.");
+        return nullptr;
+    }
+    status = napi_set_named_property(env, exports, "TimeZone", constructor);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "InitTimeZone: Set property failed When InitTimeZone.");
         return nullptr;
     }
     return exports;

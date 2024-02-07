@@ -28,7 +28,7 @@ public:
     I18nSystemAddon();
     ~I18nSystemAddon();
     static void Destructor(napi_env env, void *nativeObject, void *finalize_hint);
-    static napi_value CreateSystemObject(napi_env env, napi_status &initStatus);
+    static napi_value InitI18nSystem(napi_env env, napi_value exports);
 
     static napi_value GetSystemLanguage(napi_env env, napi_callback_info info);
     static napi_value GetSystemCountriesWithError(napi_env env, napi_callback_info info);

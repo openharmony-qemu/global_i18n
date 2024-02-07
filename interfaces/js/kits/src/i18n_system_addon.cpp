@@ -18,6 +18,7 @@
 #include "i18n_service_ability_client.h"
 #include "i18n_service_ability_load_manager.h"
 #include "i18n_system_addon.h"
+#include "js_utils.h"
 #include "locale_config.h"
 #include "preferred_language.h"
 #include "utils.h"
@@ -42,48 +43,45 @@ void I18nSystemAddon::Destructor(napi_env env, void *nativeObject, void *finaliz
     nativeObject = nullptr;
 }
 
-napi_value I18nSystemAddon::CreateSystemObject(napi_env env, napi_status &initStatus)
+napi_value I18nSystemAddon::InitI18nSystem(napi_env env, napi_value exports)
 {
-    napi_status status = napi_ok;
-    napi_value system = nullptr;
-    status = napi_create_object(env, &system);
-    if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to create system object at init");
-        initStatus = napi_generic_failure;
-        return nullptr;
-    }
-    napi_property_descriptor systemProperties[] = {
-        DECLARE_NAPI_FUNCTION("getDisplayCountry", GetDisplayCountryWithError),
-        DECLARE_NAPI_FUNCTION("getDisplayLanguage", GetDisplayLanguageWithError),
-        DECLARE_NAPI_FUNCTION("getSystemLanguages", GetSystemLanguages),
-        DECLARE_NAPI_FUNCTION("getSystemCountries", GetSystemCountriesWithError),
-        DECLARE_NAPI_FUNCTION("isSuggested", IsSuggestedWithError),
-        DECLARE_NAPI_FUNCTION("getSystemLanguage", GetSystemLanguage),
-        DECLARE_NAPI_FUNCTION("setSystemLanguage", SetSystemLanguageWithError),
-        DECLARE_NAPI_FUNCTION("getSystemRegion", GetSystemRegion),
-        DECLARE_NAPI_FUNCTION("setSystemRegion", SetSystemRegionWithError),
-        DECLARE_NAPI_FUNCTION("getSystemLocale", GetSystemLocale),
-        DECLARE_NAPI_FUNCTION("setSystemLocale", SetSystemLocaleWithError),
-        DECLARE_NAPI_FUNCTION("is24HourClock", Is24HourClock),
-        DECLARE_NAPI_FUNCTION("set24HourClock", Set24HourClockWithError),
-        DECLARE_NAPI_FUNCTION("addPreferredLanguage", AddPreferredLanguageWithError),
-        DECLARE_NAPI_FUNCTION("removePreferredLanguage", RemovePreferredLanguageWithError),
-        DECLARE_NAPI_FUNCTION("getPreferredLanguageList", GetPreferredLanguageList),
-        DECLARE_NAPI_FUNCTION("setAppPreferredLanguage", SetAppPreferredLanguage),
-        DECLARE_NAPI_FUNCTION("getFirstPreferredLanguage", GetFirstPreferredLanguage),
-        DECLARE_NAPI_FUNCTION("getAppPreferredLanguage", GetAppPreferredLanguage),
-        DECLARE_NAPI_FUNCTION("setUsingLocalDigit", SetUsingLocalDigitAddonWithError),
-        DECLARE_NAPI_FUNCTION("getUsingLocalDigit", GetUsingLocalDigitAddon),
+    napi_property_descriptor properties[] = {
+        DECLARE_NAPI_STATIC_FUNCTION("getDisplayCountry", GetDisplayCountryWithError),
+        DECLARE_NAPI_STATIC_FUNCTION("getDisplayLanguage", GetDisplayLanguageWithError),
+        DECLARE_NAPI_STATIC_FUNCTION("getSystemLanguages", GetSystemLanguages),
+        DECLARE_NAPI_STATIC_FUNCTION("getSystemCountries", GetSystemCountriesWithError),
+        DECLARE_NAPI_STATIC_FUNCTION("isSuggested", IsSuggestedWithError),
+        DECLARE_NAPI_STATIC_FUNCTION("getSystemLanguage", GetSystemLanguage),
+        DECLARE_NAPI_STATIC_FUNCTION("setSystemLanguage", SetSystemLanguageWithError),
+        DECLARE_NAPI_STATIC_FUNCTION("getSystemRegion", GetSystemRegion),
+        DECLARE_NAPI_STATIC_FUNCTION("setSystemRegion", SetSystemRegionWithError),
+        DECLARE_NAPI_STATIC_FUNCTION("getSystemLocale", GetSystemLocale),
+        DECLARE_NAPI_STATIC_FUNCTION("setSystemLocale", SetSystemLocaleWithError),
+        DECLARE_NAPI_STATIC_FUNCTION("is24HourClock", Is24HourClock),
+        DECLARE_NAPI_STATIC_FUNCTION("set24HourClock", Set24HourClockWithError),
+        DECLARE_NAPI_STATIC_FUNCTION("addPreferredLanguage", AddPreferredLanguageWithError),
+        DECLARE_NAPI_STATIC_FUNCTION("removePreferredLanguage", RemovePreferredLanguageWithError),
+        DECLARE_NAPI_STATIC_FUNCTION("getPreferredLanguageList", GetPreferredLanguageList),
+        DECLARE_NAPI_STATIC_FUNCTION("setAppPreferredLanguage", SetAppPreferredLanguage),
+        DECLARE_NAPI_STATIC_FUNCTION("getFirstPreferredLanguage", GetFirstPreferredLanguage),
+        DECLARE_NAPI_STATIC_FUNCTION("getAppPreferredLanguage", GetAppPreferredLanguage),
+        DECLARE_NAPI_STATIC_FUNCTION("setUsingLocalDigit", SetUsingLocalDigitAddonWithError),
+        DECLARE_NAPI_STATIC_FUNCTION("getUsingLocalDigit", GetUsingLocalDigitAddon)
     };
-    status = napi_define_properties(env, system,
-                                    sizeof(systemProperties) / sizeof(napi_property_descriptor),
-                                    systemProperties);
+    napi_value constructor = nullptr;
+    napi_status status = napi_define_class(env, "System", NAPI_AUTO_LENGTH, JSUtils::DefaultConstructor, nullptr,
+        sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to set properties of system at init");
-        initStatus = napi_generic_failure;
+        HiLog::Error(LABEL, "Define class failed when InitSystem.");
         return nullptr;
     }
-    return system;
+
+    status = napi_set_named_property(env, exports, "System", constructor);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "Set property failed when InitSystem.");
+        return nullptr;
+    }
+    return exports;
 }
 
 napi_value I18nSystemAddon::GetDisplayCountry(napi_env env, napi_callback_info info)

@@ -47,12 +47,14 @@ public:
     static napi_value IsRTLWihtError(napi_env env, napi_callback_info info);
     static napi_value InitPhoneNumberFormat(napi_env env, napi_value exports);
     static napi_value UnitConvert(napi_env env, napi_callback_info info);
-    static napi_value InitBreakIterator(napi_env env, napi_value exports);
-    static napi_value InitIndexUtil(napi_env env, napi_value exports);
+    static napi_value InitI18nBreakIterator(napi_env env, napi_value exports);
+    static napi_value InitI18nIndexUtil(napi_env env, napi_value exports);
     static napi_value GetDateOrder(napi_env env, napi_callback_info info);
     static napi_value GetTimePeriodName(napi_env env, napi_callback_info info);
     static napi_value GetBestMatchLocale(napi_env env, napi_callback_info info);
-    static napi_value InitTransliterator(napi_env env, napi_value exports);
+    static napi_value InitI18nTransliterator(napi_env env, napi_value exports);
+    static napi_value InitIndexUtil(napi_env env, napi_value exports);
+    static napi_value InitI18nUtil(napi_env env, napi_value exports);
     static napi_value GetTransliteratorInstance(napi_env env, napi_callback_info info);
     static napi_value GetAvailableIDs(napi_env env, napi_callback_info info);
     static napi_value InitUtil(napi_env env, napi_value exports);
@@ -65,7 +67,8 @@ private:
     static napi_value GetLocationName(napi_env env, napi_callback_info info);
     bool InitPhoneNumberFormatContext(napi_env env, napi_callback_info info, const std::string &country,
                                       const std::map<std::string, std::string> &options);
-    static napi_value BreakIteratorConstructor(napi_env env, napi_callback_info info);
+    static napi_value I18nBreakIteratorConstructor(napi_env env, napi_callback_info info);
+    static napi_value InitBreakIterator(napi_env env, napi_value exports);
     static napi_value GetLineInstance(napi_env env, napi_callback_info info);
     static napi_value Current(napi_env env, napi_callback_info info);
     static napi_value First(napi_env env, napi_callback_info info);
@@ -78,24 +81,22 @@ private:
     static napi_value IsBoundary(napi_env env, napi_callback_info info);
 
     static napi_value GetIndexUtil(napi_env env, napi_callback_info info);
-    static napi_value IndexUtilConstructor(napi_env env, napi_callback_info info);
+    static napi_value I18nIndexUtilConstructor(napi_env env, napi_callback_info info);
     static napi_value GetIndexList(napi_env env, napi_callback_info info);
     static napi_value AddLocale(napi_env env, napi_callback_info info);
     static napi_value GetIndex(napi_env env, napi_callback_info info);
     bool InitIndexUtilContext(napi_env env, napi_callback_info info, const std::string &localeTag);
 
     static napi_value Transform(napi_env env, napi_callback_info info);
-    static napi_value CreateTransliteratorObject(napi_env env, napi_status &initStatus);
     bool InitTransliteratorContext(napi_env env, napi_callback_info info, const std::string &idTag);
-    static napi_value TransliteratorConstructor(napi_env env, napi_callback_info info);
+    static napi_value InitTransliterator(napi_env env, napi_value exports);
+    static napi_value I18nTransliteratorConstructor(napi_env env, napi_callback_info info);
     static std::string ModifyOrder(std::string &pattern);
     static void ProcessNormal(char ch, int *order, size_t orderSize, int *lengths, size_t lengsSize);
 
     static int GetParamOfGetTimePeriodName(napi_env env, napi_callback_info info, std::string &tag, int32_t &hour);
 
     static napi_value ObjectConstructor(napi_env env, napi_callback_info info);
-
-    static napi_value CreateI18nUtilObject(napi_env env, napi_status &initStatus);
 
     napi_env env_;
     std::unique_ptr<PhoneNumberFormat> phonenumberfmt_ = nullptr;

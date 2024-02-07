@@ -19,6 +19,7 @@
 #include <set>
 #include "error_util.h"
 #include "hilog/log.h"
+#include "js_utils.h"
 #include "node_api.h"
 
 namespace OHOS {
