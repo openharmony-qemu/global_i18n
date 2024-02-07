@@ -1168,7 +1168,7 @@ HWTEST_F(I18nTest, I18nFuncTest045, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     std::string message = "2023年1月3日(今天(本周五))和2023年1月3日(12：00：00)是指同一天";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[1][0], 3);
     EXPECT_EQ(res[1][1], 0);
