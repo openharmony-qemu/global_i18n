@@ -34,7 +34,7 @@ public:
     I18nErrorCode SetSystemLanguage(const std::string &language) override;
     I18nErrorCode SetSystemRegion(const std::string &region) override;
     I18nErrorCode SetSystemLocale(const std::string &locale) override;
-    I18nErrorCode Set24HourClock(bool flag) override;
+    I18nErrorCode Set24HourClock(const std::string &flag) override;
     I18nErrorCode SetUsingLocalDigit(bool flag) override;
     I18nErrorCode AddPreferredLanguage(const std::string &language, int32_t index) override;
     I18nErrorCode RemovePreferredLanguage(int32_t index) override;

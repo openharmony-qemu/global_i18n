@@ -723,7 +723,8 @@ napi_value I18nSystemAddon::Set24HourClockImpl(napi_env env, napi_callback_info 
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
         return nullptr;
     }
-    I18nErrorCode err = I18nServiceAbilityClient::Set24HourClock(option);
+    std::string optionStr = option ? "true" : "false";
+    I18nErrorCode err = I18nServiceAbilityClient::Set24HourClock(optionStr);
     HiLog::Info(LABEL, "I18nSystemAddon::Set24HourClock with code %{public}d", static_cast<int32_t>(err));
     bool success = err == I18nErrorCode::SUCCESS;
     if (throwError) {

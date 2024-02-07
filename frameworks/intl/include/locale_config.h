@@ -62,11 +62,12 @@ public:
     /**
      * @brief Set system hour to 12 or 24-hour clock.
      *
-     * @param option When flag is True, the system adopts 24-hour clock;
-     * When flag is False, the system adopts 12-hour clock;
+     * @param option When flag is true, the system adopts 24-hour clock;
+     * When flag is false, the system adopts 12-hour clock; When flag is empty string, the system adopts
+     * system locale default behavior.
      * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
      */
-    static I18nErrorCode Set24HourClock(bool option);
+    static I18nErrorCode Set24HourClock(const std::string &option);
 
     /**
      * @brief Set system digit to local digit or Arbic digit.
@@ -100,6 +101,7 @@ public:
     static bool IsValidLanguage(const std::string &language);
     static bool IsValidRegion(const std::string &region);
     static bool IsValidTag(const std::string &tag);
+    static bool IsValid24HourClockValue(const std::string &tag);
 
 private:
     static void Split(const std::string &src, const std::string &sep, std::vector<std::string> &dest);

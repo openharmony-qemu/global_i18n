@@ -53,7 +53,7 @@ void InitTestEnvironment()
     LocaleConfig::SetSystemLanguage("zh-Hans");
     LocaleConfig::SetSystemRegion("CN");
     LocaleConfig::SetSystemLocale("zh-Hans-CN");
-    LocaleConfig::Set24HourClock(true);
+    LocaleConfig::Set24HourClock("true");
     std::vector<std::string> preferredLanguageList = PreferredLanguage::GetPreferredLanguageList();
     if (preferredLanguageList.size() > 1) {
         for (size_t i = preferredLanguageList.size(); i > 1; --i) {
@@ -185,7 +185,7 @@ HWTEST_F(I18nServiceTest, I18nServiceFuncTest009, TestSize.Level1)
 HWTEST_F(I18nServiceTest, I18nServiceFuncTest010, TestSize.Level1)
 {
     InitTestEnvironment();
-    I18nErrorCode err = I18nServiceAbilityClient::Set24HourClock(false);
+    I18nErrorCode err = I18nServiceAbilityClient::Set24HourClock("false");
     EXPECT_EQ(err, I18nErrorCode::NO_PERMISSION);
 }
 
@@ -198,7 +198,7 @@ HWTEST_F(I18nServiceTest, I18nServiceFuncTest011, TestSize.Level1)
 {
     InitTestEnvironment();
     AddNativeTokenTypeAndPermissions();
-    I18nErrorCode err = I18nServiceAbilityClient::Set24HourClock(false);
+    I18nErrorCode err = I18nServiceAbilityClient::Set24HourClock("false");
     EXPECT_EQ(err, I18nErrorCode::SUCCESS);
 }
 
@@ -211,7 +211,7 @@ HWTEST_F(I18nServiceTest, I18nServiceFuncTest012, TestSize.Level1)
 {
     InitTestEnvironment();
     AddNativeTokenTypeAndPermissions();
-    I18nErrorCode err = I18nServiceAbilityClient::Set24HourClock(true);
+    I18nErrorCode err = I18nServiceAbilityClient::Set24HourClock("true");
     EXPECT_EQ(err, I18nErrorCode::SUCCESS);
 }
 
