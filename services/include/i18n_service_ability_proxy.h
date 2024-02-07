@@ -58,11 +58,12 @@ public:
     /**
      * @brief Initiating set system 12 or 24-hour clock request to i18n service.
      *
-     * @param flag When flag is True, request to set system 24-hour clock;
-     * When flag is False, request to set system 12-hour clock;
+     * @param flag When flag is true, the system adopts 24-hour clock;
+     * When flag is false, the system adopts 12-hour clock; When flag is empty string, the system adopts
+     * system locale default behavior.
      * @return I18nErrorCode Return SUCCESS indicates that the request was successful.
      */
-    I18nErrorCode Set24HourClock(bool flag);
+    I18nErrorCode Set24HourClock(const std::string &flag);
 
     /**
      * @brief Initiating set system digit request to i18n service.

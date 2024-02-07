@@ -55,7 +55,7 @@ I18nErrorCode I18nServiceAbility::SetSystemLocale(const std::string &locale)
     return LocaleConfig::SetSystemLocale(locale);
 }
 
-I18nErrorCode I18nServiceAbility::Set24HourClock(bool flag)
+I18nErrorCode I18nServiceAbility::Set24HourClock(const std::string &flag)
 {
     return LocaleConfig::Set24HourClock(flag);
 }

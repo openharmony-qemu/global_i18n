@@ -28,8 +28,8 @@ namespace OHOS {
         LocaleConfig::SetSystemLanguage(input);
         LocaleConfig::SetSystemRegion(input);
         LocaleConfig::SetSystemLocale(input);
-        LocaleConfig::Set24HourClock(true);
-        LocaleConfig::Set24HourClock(false);
+        LocaleConfig::Set24HourClock("true");
+        LocaleConfig::Set24HourClock("false");
         LocaleConfig::SetUsingLocalDigit(true);
         LocaleConfig::SetUsingLocalDigit(false);
         return true;
