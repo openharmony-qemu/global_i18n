@@ -19,6 +19,7 @@
 #include "error_util.h"
 #include "hilog/log.h"
 #include "i18n_calendar_addon.h"
+#include "js_utils.h"
 #include "variable_convertor.h"
 
 namespace OHOS {
@@ -88,7 +89,6 @@ void I18nCalendarAddon::Destructor(napi_env env, void *nativeObject, void *hint)
 
 napi_value I18nCalendarAddon::InitI18nCalendar(napi_env env, napi_value exports)
 {
-    napi_status status = napi_ok;
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("setTime", SetTime),
         DECLARE_NAPI_FUNCTION("set", Set),
@@ -106,12 +106,13 @@ napi_value I18nCalendarAddon::InitI18nCalendar(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("compareDays", CompareDays)
     };
     napi_value constructor = nullptr;
-    status = napi_define_class(env, "I18nCalendar", NAPI_AUTO_LENGTH, CalendarConstructor, nullptr,
+    napi_status status = napi_define_class(env, "Calendar", NAPI_AUTO_LENGTH, I18nCalendarConstructor, nullptr,
         sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
     if (status != napi_ok) {
         HiLog::Error(LABEL, "Failed to define class at Init");
         return nullptr;
     }
+    exports = I18nCalendarAddon::InitCalendar(env, exports);
     g_constructor = new (std::nothrow) napi_ref;
     if (!g_constructor) {
         HiLog::Error(LABEL, "Failed to create ref at init");
@@ -120,6 +121,24 @@ napi_value I18nCalendarAddon::InitI18nCalendar(napi_env env, napi_value exports)
     status = napi_create_reference(env, constructor, 1, g_constructor);
     if (status != napi_ok) {
         HiLog::Error(LABEL, "Failed to create reference at init");
+        return nullptr;
+    }
+    return exports;
+}
+
+napi_value I18nCalendarAddon::InitCalendar(napi_env env, napi_value exports)
+{
+    napi_property_descriptor properties[] = {};
+    napi_value constructor = nullptr;
+    napi_status status = napi_define_class(env, "I18nCalendar", NAPI_AUTO_LENGTH, JSUtils::DefaultConstructor, nullptr,
+        sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "InitCalendar: Failed to define class Calendar.");
+        return nullptr;
+    }
+    status = napi_set_named_property(env, exports, "Calendar", constructor);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "InitCalendar: Set property failed When InitCalendar.");
         return nullptr;
     }
     return exports;
@@ -157,7 +176,7 @@ napi_value I18nCalendarAddon::GetCalendar(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value I18nCalendarAddon::CalendarConstructor(napi_env env, napi_callback_info info)
+napi_value I18nCalendarAddon::I18nCalendarConstructor(napi_env env, napi_callback_info info)
 {
     size_t argc = 2;
     napi_value argv[2] = { 0 };
