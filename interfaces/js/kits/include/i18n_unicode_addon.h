@@ -26,7 +26,7 @@ public:
     I18nUnicodeAddon();
     ~I18nUnicodeAddon();
     static void Destructor(napi_env env, void *nativeObject, void *hint);
-    static napi_value CreateUnicodeObject(napi_env env, napi_status &initStatus);
+    static napi_value InitI18nUnicode(napi_env env, napi_value exports);
     static napi_value InitCharacter(napi_env env, napi_value exports);
 
 private:

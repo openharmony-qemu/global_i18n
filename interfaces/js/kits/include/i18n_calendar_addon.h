@@ -32,8 +32,8 @@ public:
     static napi_value GetCalendar(napi_env env, napi_callback_info info);
 
 private:
-    static napi_value CalendarConstructor(napi_env env, napi_callback_info info);
-
+    static napi_value InitCalendar(napi_env env, napi_value exports);
+    static napi_value I18nCalendarConstructor(napi_env env, napi_callback_info info);
     // process js function call
     static napi_value SetTime(napi_env env, napi_callback_info info);
     static napi_value Set(napi_env env, napi_callback_info info);
