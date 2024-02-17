@@ -111,6 +111,17 @@
                         ],
                         "header_base": "//base/global/i18n/interfaces/native/inner_api/preferred_language/include"
                     }
+                },
+                {
+                    "name": "//base/global/i18n/services:i18n_service_ability",
+                    "header": {
+                        "header_files": [
+                            "i18n_service_ability_client.h",
+                            "i18n_service_ability_load_manager.h",
+                            "ii18n_service_ability.h"
+                        ],
+                        "header_base": "//base/global/i18n/services/include"
+                    }
                 }
             ],
             "test": [
