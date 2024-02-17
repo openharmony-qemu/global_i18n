@@ -42,7 +42,7 @@ void VariableConvertor::GetOptionValue(napi_env env, napi_value options, const s
     napi_valuetype type = napi_undefined;
     napi_status status = napi_typeof(env, options, &type);
     if (status != napi_ok && type != napi_object) {
-        HiLog::Error(LABEL, "Get option failed, option is not an object");
+        HiLog::Error(LABEL, "GetOptionValue: Get option failed, option is not an object");
         return;
     }
     bool hasProperty = false;
@@ -55,7 +55,7 @@ void VariableConvertor::GetOptionValue(napi_env env, napi_value options, const s
             std::vector<char> optionBuf(len + 1);
             status = napi_get_value_string_utf8(env, optionValue, optionBuf.data(), len + 1, &len);
             if (status != napi_ok) {
-                HiLog::Error(LABEL, "Failed to get string item");
+                HiLog::Error(LABEL, "GetOptionValue: Failed to get string item");
                 return;
             }
             value = optionBuf.data();

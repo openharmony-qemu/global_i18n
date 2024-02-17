@@ -118,34 +118,6 @@ napi_value I18nAddon::Init(napi_env env, napi_value exports)
     return exports;
 }
 
-void GetOptionValue(napi_env env, napi_value options, const std::string &optionName,
-    std::string &value)
-{
-    napi_value optionValue = nullptr;
-    napi_valuetype type = napi_undefined;
-    napi_status status = napi_typeof(env, options, &type);
-    if (status != napi_ok && type != napi_object) {
-        HiLog::Error(LABEL, "GetOptionValue arg[3]:string: Get option failed, option is not an object");
-        return;
-    }
-    bool hasProperty = false;
-    napi_status propStatus = napi_has_named_property(env, options, optionName.c_str(), &hasProperty);
-    if (propStatus == napi_ok && hasProperty) {
-        status = napi_get_named_property(env, options, optionName.c_str(), &optionValue);
-        if (status == napi_ok) {
-            size_t len;
-            napi_get_value_string_utf8(env, optionValue, nullptr, 0, &len);
-            std::vector<char> optionBuf(len + 1);
-            status = napi_get_value_string_utf8(env, optionValue, optionBuf.data(), len + 1, &len);
-            if (status != napi_ok) {
-                HiLog::Error(LABEL, "GetOptionValue: Failed to get string item");
-                return;
-            }
-            value = optionBuf.data();
-        }
-    }
-}
-
 void GetOptionMap(napi_env env, napi_value option, std::map<std::string, std::string> &map)
 {
     if (VariableConvertor::CheckNapiValueType(env, option)) {
@@ -172,13 +144,13 @@ napi_value I18nAddon::UnitConvert(napi_env env, napi_callback_info info)
         return nullptr;
     }
     std::string fromUnit;
-    GetOptionValue(env, argv[0], "unit", fromUnit);
+    VariableConvertor::GetOptionValue(env, argv[0], "unit", fromUnit);
     std::string fromMeasSys;
-    GetOptionValue(env, argv[0], "measureSystem", fromMeasSys);
+    VariableConvertor::GetOptionValue(env, argv[0], "measureSystem", fromMeasSys);
     std::string toUnit;
-    GetOptionValue(env, argv[1], "unit", toUnit);
+    VariableConvertor::GetOptionValue(env, argv[1], "unit", toUnit);
     std::string toMeasSys;
-    GetOptionValue(env, argv[1], "measureSystem", toMeasSys);
+    VariableConvertor::GetOptionValue(env, argv[1], "measureSystem", toMeasSys);
     double number = 0;
     napi_get_value_double(env, argv[2], &number); // 2 is the index of value
     int convertStatus = Convert(number, fromUnit, fromMeasSys, toUnit, toMeasSys);
@@ -785,7 +757,7 @@ napi_value I18nAddon::PhoneNumberFormatConstructor(napi_env env, napi_callback_i
     }
     std::map<std::string, std::string> options;
     std::string typeStr;
-    GetOptionValue(env, argv[1], "type", typeStr);
+    VariableConvertor::GetOptionValue(env, argv[1], "type", typeStr);
     options.insert(std::make_pair("type", typeStr));
     std::unique_ptr<I18nAddon> obj = nullptr;
     obj = std::make_unique<I18nAddon>();
