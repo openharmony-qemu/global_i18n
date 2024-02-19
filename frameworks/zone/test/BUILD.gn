@@ -48,6 +48,8 @@ ohos_unittest("zone_util_test") {
     "//base/global/i18n/frameworks/zone:zone_util",
     "//third_party/libphonenumber/cpp:phonenumber_standard",
     "//third_party/libxml2:xml2",
+    "//third_party/libpng:libpng",
+    "//base/global/i18n/frameworks/intl:build_module",
   ]
   external_deps = [ "c_utils:utils" ]
 }
