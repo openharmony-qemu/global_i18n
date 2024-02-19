@@ -1635,7 +1635,8 @@ std::string I18nAddon::GetString(napi_env &env, napi_value &value, int32_t &code
     return buf.data();
 }
 
-std::string I18nAddon::GetAddField(napi_env &env, napi_value &value, int32_t &code) {
+std::string I18nAddon::GetAddField(napi_env &env, napi_value &value, int32_t &code)
+{
     std::string field = GetString(env, value, code);
     if (code != 0) {
         HiLog::Error(LABEL, "can't get string from js array param.");
@@ -2137,7 +2138,8 @@ napi_value I18nAddon::Get(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value I18nAddon::Add(napi_env env, napi_callback_info info) {
+napi_value I18nAddon::Add(napi_env env, napi_callback_info info)
+{
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     napi_value thisVar = nullptr;
@@ -2183,7 +2185,8 @@ napi_value I18nAddon::Add(napi_env env, napi_callback_info info) {
     return nullptr;
 }
 
-napi_value I18nAddon::GetTimeInMillis(napi_env env, napi_callback_info info) {
+napi_value I18nAddon::GetTimeInMillis(napi_env env, napi_callback_info info)
+{
     bool flag = true;
     size_t argc = 0;
     napi_value *argv = nullptr;
@@ -3803,7 +3806,8 @@ napi_value I18nAddon::GetTimezonesByLocation(napi_env env, napi_callback_info in
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
         return nullptr;
     }
-    double x, y;
+    double x;
+    double y;
     status = napi_get_value_double(env, argv[0], &x);
     if (status != napi_ok) {
         HiLog::Error(LABEL, "GetTimezonesByLocation: Parse first argument x failed");

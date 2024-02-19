@@ -91,6 +91,7 @@ private:
     UNumberSignDisplay signDisplay = UNumberSignDisplay::UNUM_SIGN_AUTO;
     static const int MAX_UNIT_NUM = 500;
     static const int DEFAULT_FRACTION_DIGITS = 3;
+    static const int POWER_VALUE = 2;
     icu::MeasureUnit unitArray[MAX_UNIT_NUM];
     static bool icuInitialized;
     static bool Init();

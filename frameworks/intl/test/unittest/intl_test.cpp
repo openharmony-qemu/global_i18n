@@ -1877,11 +1877,11 @@ HWTEST_F(IntlTest, IntlFuncTest0046, TestSize.Level1)
     EXPECT_TRUE(Urumqi.size() == 2);
     bool containsShanghai = false;
     bool containsUrumqi = false;
-    for(unsigned int i = 0; i < Urumqi.size(); i++){
-        if(Urumqi[i] == "Asia/Shanghai"){
+    for (unsigned int i = 0; i < Urumqi.size(); i++) {
+        if (Urumqi[i] == "Asia/Shanghai") {
             containsShanghai = true;
         }
-        if(Urumqi[i] == "Asia/Urumqi"){
+        if (Urumqi[i] == "Asia/Urumqi") {
             containsUrumqi = true;
         }
     }
@@ -2015,7 +2015,7 @@ HWTEST_F(IntlTest, IntlFuncTest0052, TestSize.Level1)
     delete indexUtil;
     delete indexUtil2;
 
-	IndexUtil indexUtil3("");
+    IndexUtil indexUtil3("");
     indexUtil3.AddLocale("en-US");
     indexStr = indexUtil3.GetIndex("A");
     EXPECT_EQ(indexStr, "A");

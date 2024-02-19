@@ -51,7 +51,8 @@ void VariableConvertor::GetOptionValue(napi_env env, napi_value options, const s
     }
 }
 
-bool VariableConvertor::GetBoolOptionValue(napi_env env, napi_value &options, const std::string &optionName, bool &boolVal)
+bool VariableConvertor::GetBoolOptionValue(napi_env env, napi_value &options,
+    const std::string &optionName, bool &boolVal)
 {
     napi_valuetype type = napi_undefined;
     napi_status status = napi_typeof(env, options, &type);

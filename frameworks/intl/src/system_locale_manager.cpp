@@ -47,7 +47,7 @@ SystemLocaleManager::~SystemLocaleManager()
  * 4. Sort the languages use locale displayName, local displyName and suggestion infomation.
  */
 std::vector<LocaleItem> SystemLocaleManager::GetLanguageInfoArray(const std::vector<std::string> &languages,
-        const SortOptions &options)
+    const SortOptions &options)
 {
     std::unordered_set<std::string> blockedLanguages = LocaleConfig::GetBlockedLanguages();
     std::vector<LocaleItem> localeItemList;
