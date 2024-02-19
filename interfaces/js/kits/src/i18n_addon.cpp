@@ -1635,8 +1635,7 @@ std::string I18nAddon::GetString(napi_env &env, napi_value &value, int32_t &code
     return buf.data();
 }
 
-std::string I18nAddon::GetAddField(napi_env &env, napi_value &value, int32_t &code)
-{
+std::string I18nAddon::GetAddField(napi_env &env, napi_value &value, int32_t &code) {
     std::string field = GetString(env, value, code);
     if (code != 0) {
         HiLog::Error(LABEL, "can't get string from js array param.");
