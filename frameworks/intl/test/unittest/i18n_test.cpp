@@ -547,16 +547,17 @@ HWTEST_F(I18nTest, I18nFuncTest014, TestSize.Level1)
  */
 HWTEST_F(I18nTest, I18nFuncTest015, TestSize.Level1)
 {
-    std::string id = "";
+    std::string id = "Asia/Shanghai";
     bool isZoneID = true;
     I18nTimeZone timezone1(id, isZoneID);
     std::string timezoneId = timezone1.GetID();
     EXPECT_EQ(timezoneId, "Asia/Shanghai");
 
+    id = "Shanghai";
     isZoneID = false;
     I18nTimeZone timezone2(id, isZoneID);
     timezoneId = timezone2.GetID();
-    EXPECT_EQ(timezoneId, "CST");
+    EXPECT_EQ(timezoneId, "Asia/Shanghai");
 
     id = "Auckland";
     I18nTimeZone timezone3(id, isZoneID);
