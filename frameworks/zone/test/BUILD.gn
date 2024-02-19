@@ -45,11 +45,11 @@ ohos_unittest("zone_util_test") {
     "//third_party/protobuf/src/google/protobuf",
   ]
   deps = [
+    "//base/global/i18n/frameworks/intl:build_module",
     "//base/global/i18n/frameworks/zone:zone_util",
     "//third_party/libphonenumber/cpp:phonenumber_standard",
-    "//third_party/libxml2:xml2",
     "//third_party/libpng:libpng",
-    "//base/global/i18n/frameworks/intl:build_module",
+    "//third_party/libxml2:xml2",
   ]
   external_deps = [ "c_utils:utils" ]
 }
