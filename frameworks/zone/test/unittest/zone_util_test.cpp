@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 #include "zone_util.h"
+#include "i18n_timezone.h"
 
 using namespace OHOS::Global::I18n;
 using testing::ext::TestSize;
