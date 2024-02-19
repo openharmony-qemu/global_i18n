@@ -237,7 +237,7 @@ HWTEST_F(ZoneUtilTest, ZoneUtilFuncTest010, TestSize.Level1)
     NITZData nitzData2 = { 1, 10800000, 1679969021999 };
     CountryResult result2 = util.LookupTimezoneByNITZ(nitzData2);
     EXPECT_FALSE(result2.isOnlyMatch);
-   EXPECT_TRUE(result.timezoneId == "Asia/Beirut" || result.timezoneId == defaultTimezone.GetID());
+    EXPECT_TRUE(result.timezoneId == "Asia/Beirut" || result.timezoneId == defaultTimezone.GetID());
 
     NITZData nitzData3 = { 1, 37800000, 1679969021999 };
     CountryResult result3 = util.LookupTimezoneByNITZ(nitzData3);
