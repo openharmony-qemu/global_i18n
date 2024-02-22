@@ -39,6 +39,7 @@ ohos_shared_library("i18n_sa_client") {
     "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]
+  innerapi_tags = [ "platformsdk" ]
   part_name = "i18n"
   subsystem_name = "global"
 }
