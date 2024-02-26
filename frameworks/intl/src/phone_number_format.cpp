@@ -76,6 +76,7 @@ PhoneNumberFormat::~PhoneNumberFormat()
 
 void PhoneNumberFormat::CloseDynamicHandler()
 {
+    std::lock_guard<std::mutex> phoneLock(phoneMutex);
     if (dynamicHandler != nullptr) {
         dlclose(dynamicHandler);
     }
@@ -167,11 +168,14 @@ std::string PhoneNumberFormat::getPhoneLocationName(const std::string& number, c
     const std::string& displayLocale, const std::string& regionCode)
 {
     OpenHandler();
+    std::lock_guard<std::mutex> phoneLock(phoneMutex);
+    std::string locName;
     if (dynamicHandler && !locationNameFunc) {
         HiLog::Error(LABEL, "LocationNameFunc Init");
-        locationNameFunc = reinterpret_cast<ExposeLocationName>(dlsym(dynamicHandler, "exposeLocationName"));
+        locationNameFunc = reinterpret_cast<ExposeLocationName>(
+            dlsym(dynamicHandler, "exposeLocationName"));
     }
-    std::string locName;
+
     if (locationNameFunc) {
         // The function uses the same locale for phone and display.
         char recvArr[RECV_CHAR_LEN];
