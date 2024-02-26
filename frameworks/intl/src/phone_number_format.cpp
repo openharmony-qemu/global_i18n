@@ -170,17 +170,19 @@ std::string PhoneNumberFormat::getPhoneLocationName(const std::string& number, c
     OpenHandler();
     std::lock_guard<std::mutex> phoneLock(phoneMutex);
     std::string locName;
-    if (dynamicHandler) {
+    if (dynamicHandler && !locationNameFunc) {
         HiLog::Error(LABEL, "LocationNameFunc Init");
-        ExposeLocationName locationNameFunc = reinterpret_cast<ExposeLocationName>(
+        locationNameFunc = reinterpret_cast<ExposeLocationName>(
             dlsym(dynamicHandler, "exposeLocationName"));
+    }
+
+    if (locationNameFunc) {
         // The function uses the same locale for phone and display.
         char recvArr[RECV_CHAR_LEN];
         locationNameFunc(number.c_str(), phoneLocale.c_str(), recvArr, RECV_CHAR_LEN);
         locName = recvArr;
     }
-
-    if (locName.empty()) {
+    if (!locationNameFunc || locName.empty()) {
         locName = LocaleConfig::GetDisplayRegion(regionCode, displayLocale, false);
     }
     return locName;

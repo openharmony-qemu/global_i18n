@@ -53,6 +53,7 @@ private:
     PhoneNumberUtil *util;
     std::string country;
     PhoneNumberUtil::PhoneNumberFormat phoneNumberFormat;
+    ExposeLocationName locationNameFunc = nullptr;
     static void* dynamicHandler;
     static std::mutex phoneMutex;
 };
