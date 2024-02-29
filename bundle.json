@@ -59,6 +59,7 @@
                 "c_utils",
                 "eventhandler",
                 "hilog",
+                "icu",
                 "init",
                 "ipc",
                 "napi",
