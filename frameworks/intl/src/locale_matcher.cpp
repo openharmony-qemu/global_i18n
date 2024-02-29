@@ -188,8 +188,7 @@ uint64_t LocaleMatcher::SearchParentLocale(uint64_t encodedLocale, const LocaleI
         }
     }
     if (IsContainRegion(encodedLocale)) {
-        size_t len = sizeof(LocaleData::LOCALE_PARENTS_KEY) / sizeof(LocaleData::LOCALE_PARENTS_KEY[0]);
-        for (size_t i = 0; i < len; i++) {
+        for (size_t i = 0; i < LocaleData::LOCALE_PARENTS_KEY.size(); i++) {
             if (LocaleData::LOCALE_PARENTS_KEY[i] == tempEncodedLocale) {
                 return LocaleData::LOCALE_PARENTS_VALUE[i];
             }
@@ -298,8 +297,7 @@ uint16_t LocaleMatcher::FindDefaultRegionEncode(const char *language, const char
     if (encodedLocale == LocaleUtil::EncodeLocale("en", "Qaag", nullptr)) {
         encodedLocale = LocaleUtil::EncodeLocale("en", "Latn", nullptr);
     }
-    size_t len = sizeof(LocaleData::LIKELY_TAGS_CODES_KEY) / sizeof(LocaleData::LIKELY_TAGS_CODES_KEY[0]);
-    for (size_t i = 0; i < len; i++) {
+    for (size_t i = 0; i < LocaleData::LIKELY_TAGS_CODES_KEY.size(); i++) {
         if (LocaleData::LIKELY_TAGS_CODES_KEY[i] == encodedLocale) {
             return static_cast<uint16_t>((LocaleData::LIKELY_TAGS_CODES_VALUE[i] & 0x000000000000ffff));
         }
@@ -307,7 +305,7 @@ uint16_t LocaleMatcher::FindDefaultRegionEncode(const char *language, const char
     /* if not found and script is not null,try language */
     if (script != nullptr) {
         encodedLocale = LocaleUtil::EncodeLocale(language, nullptr, nullptr);
-        for (size_t i = 0; i < len; i++) {
+        for (size_t i = 0; i < LocaleData::LIKELY_TAGS_CODES_KEY.size(); i++) {
             if (LocaleData::LIKELY_TAGS_CODES_KEY[i] == encodedLocale) {
                 return static_cast<uint16_t>((LocaleData::LIKELY_TAGS_CODES_VALUE[i] & 0x000000000000ffff));
             }
@@ -431,8 +429,7 @@ bool LocaleMatcher::IsDefaultLocale(const char *language, const char *script, co
     if (ClearRegion(encodedLocale) == LocaleMatcher::EN_QAAG_ENCODE) {
         encodedLocale = LocaleUtil::EncodeLocale("en", "Latn", region);
     }
-    size_t len = sizeof(LocaleData::TYPICAL_CODES_VALUE) / sizeof(LocaleData::TYPICAL_CODES_VALUE[0]);
-    for (size_t i = 0; i < len; i++) {
+    for (size_t i = 0; i < LocaleData::TYPICAL_CODES_VALUE.size(); i++) {
         if (LocaleData::TYPICAL_CODES_VALUE[i] == encodedLocale) {
             return true;
         }
@@ -508,8 +505,7 @@ bool LocaleMatcher::CompareScript(const LocaleInfo *current, const LocaleInfo *o
 uint32_t LocaleMatcher::FindDefaultScriptEncode(const char *language, const char *region)
 {
     uint64_t encodedLocale = LocaleUtil::EncodeLocale(language, nullptr, region);
-    size_t len = sizeof(LocaleData::LIKELY_TAGS_CODES_KEY) / sizeof(LocaleData::LIKELY_TAGS_CODES_KEY[0]);
-    for (size_t i = 0; i < len; i++) {
+    for (size_t i = 0; i < LocaleData::LIKELY_TAGS_CODES_KEY.size(); i++) {
         if (LocaleData::LIKELY_TAGS_CODES_KEY[i] == encodedLocale) {
             // 16 is the offset of script
             return static_cast<uint32_t>((LocaleData::LIKELY_TAGS_CODES_VALUE[i] & 0x0000ffffffff0000) >> 16);
@@ -517,7 +513,7 @@ uint32_t LocaleMatcher::FindDefaultScriptEncode(const char *language, const char
     }
     if (region != nullptr) {
         encodedLocale = LocaleUtil::EncodeLocale(language, nullptr, nullptr);
-        for (size_t i = 0; i < len; i++) {
+        for (size_t i = 0; i < LocaleData::LIKELY_TAGS_CODES_KEY.size(); i++) {
             if (LocaleData::LIKELY_TAGS_CODES_KEY[i] == encodedLocale) {
                 // 16 is the offset of script
                 return static_cast<uint32_t>((LocaleData::LIKELY_TAGS_CODES_VALUE[i] & 0x0000ffffffff0000) >> 16);
