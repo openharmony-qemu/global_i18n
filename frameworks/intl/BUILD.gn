@@ -168,6 +168,7 @@ ohos_shared_library("intl_util") {
     "access_token:libtokenid_sdk",
     "c_utils:utils",
     "hilog:libhilog",
+    "icu:icundk",
     "init:libbegetutil",
     "ipc:ipc_core",
   ]
