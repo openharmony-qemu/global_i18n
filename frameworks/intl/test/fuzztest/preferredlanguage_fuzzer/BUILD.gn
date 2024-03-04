@@ -27,8 +27,6 @@ ohos_fuzztest("PreferredLanguageFuzzTest") {
   include_dirs = [
     "../../../include",
     "../../../../../interfaces/native/inner_api/preferred_language/include",
-    "//third_party/icu/icu4c/source/common",
-    "//third_party/icu/icu4c/source/i18n",
   ]
   cflags = [
     "-g",
@@ -39,10 +37,11 @@ ohos_fuzztest("PreferredLanguageFuzzTest") {
   sources = [ "preferredlanguage_fuzzer.cpp" ]
   configs = []
 
-  deps = [
-    "../../../../intl:preferred_language",
-    "//third_party/icu/icu4c:shared_icui18n",
-    "//third_party/icu/icu4c:shared_icuuc",
+  deps = [ "../../../../intl:preferred_language" ]
+
+  external_deps = [
+    "icu:shared_icui18n",
+    "icu:shared_icuuc",
   ]
 
   subsystem_name = "global"

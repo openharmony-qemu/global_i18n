@@ -19,7 +19,7 @@
 
 #include "iosfwd"
 #include "unicode/brkiter.h"
-#include "unistr.h"
+#include "unicode/unistr.h"
 
 namespace OHOS {
 namespace Global {

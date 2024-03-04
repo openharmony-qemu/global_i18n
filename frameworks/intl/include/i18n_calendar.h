@@ -19,10 +19,10 @@
 #include <cstdint>
 
 #include "iosfwd"
-#include "locid.h"
+#include "unicode/locid.h"
 #include "unicode/calendar.h"
 #include "unicode/ucal.h"
-#include "utypes.h"
+#include "unicode/utypes.h"
 
 namespace OHOS {
 namespace Global {

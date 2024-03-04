@@ -19,7 +19,7 @@
 #include "i18n_calendar.h"
 #include "calendar_fuzzer.h"
 #include "unicode/ucal.h"
-#include "utypes.h"
+#include "unicode/utypes.h"
 
 namespace OHOS {
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
