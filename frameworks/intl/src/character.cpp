@@ -21,9 +21,9 @@
 #include "cctype"
 #include "map"
 #include "string"
-#include "umachine.h"
+#include "unicode/umachine.h"
 #include "unicode/unistr.h"
-#include "urename.h"
+#include "unicode/urename.h"
 
 namespace OHOS {
 namespace Global {

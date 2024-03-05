@@ -24,11 +24,7 @@ ohos_fuzztest("NormalizerFuzzTest") {
 
   fuzz_config_file = "."
 
-  include_dirs = [
-    "../../../include",
-    "//third_party/icu/icu4c/source/common",
-    "//third_party/icu/icu4c/source/i18n",
-  ]
+  include_dirs = [ "../../../include" ]
   cflags = [
     "-g",
     "-O0",
@@ -38,10 +34,11 @@ ohos_fuzztest("NormalizerFuzzTest") {
   sources = [ "normalizer_fuzzer.cpp" ]
   configs = []
 
-  deps = [
-    "../../../../intl:intl_util",
-    "//third_party/icu/icu4c:shared_icui18n",
-    "//third_party/icu/icu4c:shared_icuuc",
+  deps = [ "../../../../intl:intl_util" ]
+
+  external_deps = [
+    "icu:shared_icui18n",
+    "icu:shared_icuuc",
   ]
 
   subsystem_name = "global"

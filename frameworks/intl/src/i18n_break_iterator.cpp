@@ -14,9 +14,9 @@
  */
 #include "i18n_break_iterator.h"
 
-#include "brkiter.h"
+#include "unicode/brkiter.h"
 #include "string"
-#include "utypes.h"
+#include "unicode/utypes.h"
 
 namespace OHOS {
 namespace Global {

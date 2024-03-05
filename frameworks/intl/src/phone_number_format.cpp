@@ -16,9 +16,9 @@
 
 #include <dlfcn.h>
 
-#include "localebuilder.h"
+#include "unicode/localebuilder.h"
 #include "locale_config.h"
-#include "locid.h"
+#include "unicode/locid.h"
 #include "hilog/log.h"
 #include "map"
 #include "new"

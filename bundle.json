@@ -59,6 +59,7 @@
                 "c_utils",
                 "eventhandler",
                 "hilog",
+                "icu",
                 "init",
                 "ipc",
                 "napi",
@@ -68,7 +69,6 @@
                 "samgr"
             ],
             "third_party": [
-                "icu",
                 "libphonenumber",
                 "libpng",
                 "libxml2"

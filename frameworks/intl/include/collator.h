@@ -24,7 +24,7 @@
 #include "memory"
 #include "unicode/coll.h"
 #include "unicode/locid.h"
-#include "utypes.h"
+#include "unicode/utypes.h"
 
 namespace OHOS {
 namespace Global {

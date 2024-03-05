@@ -68,10 +68,6 @@ ohos_shared_library("preferred_language") {
 
 config("intl_util_config") {
   include_dirs = [
-    "//third_party/icu/icu4c/source",
-    "//third_party/icu/icu4c/source/common",
-    "//third_party/icu/icu4c/source/i18n",
-    "//third_party/icu/icu4c/source/common/unicode",
     "//base/global/i18n/frameworks/intl/include",
     "//base/global/i18n/interfaces/native/inner_api/i18n/include",
   ]
@@ -153,9 +149,6 @@ ohos_shared_library("intl_util") {
     ":zh_Hans_region_xml",
     ":zh_Hans_timezone_xml",
     ":zh_datetime_xml",
-    "//third_party/icu/icu4c:ohos_icudat",
-    "//third_party/icu/icu4c:shared_icui18n",
-    "//third_party/icu/icu4c:shared_icuuc",
     "//third_party/libphonenumber/cpp:phonenumber_standard",
     "//third_party/libpng:libpng",
     "//third_party/libxml2:xml2",
@@ -168,6 +161,10 @@ ohos_shared_library("intl_util") {
     "access_token:libtokenid_sdk",
     "c_utils:utils",
     "hilog:libhilog",
+    "icu:icundk",
+    "icu:ohos_icudat",
+    "icu:shared_icui18n",
+    "icu:shared_icuuc",
     "init:libbegetutil",
     "ipc:ipc_core",
   ]
