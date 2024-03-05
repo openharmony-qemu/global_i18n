@@ -25,7 +25,8 @@ namespace I18n {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "I18nServiceAbilityStub" };
 using namespace OHOS::HiviewDFX;
 
-I18nServiceAbilityStub::I18nServiceAbilityStub()
+I18nServiceAbilityStub::I18nServiceAbilityStub(bool serialInvokeFlag)
+    : IRemoteStub<II18nServiceAbility>(serialInvokeFlag)
 {
     InitInnerFuncMap();
     HiLog::Info(LABEL, "I18nServiceAbilityStub object init success.");

@@ -416,6 +416,21 @@ HWTEST_F(I18nServiceTest, I18nServiceFuncTest027, TestSize.Level1)
     err = I18nServiceAbilityClient::RemovePreferredLanguage(1);
     EXPECT_EQ(err, I18nErrorCode::SUCCESS);
 }
+
+/**
+ * @tc.name: I18nServiceFuncTest028
+ * @tc.desc: Test I18nServiceAbilityClient RemovePreferredLanguage: remove negative index.
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nServiceTest, I18nServiceFuncTest028, TestSize.Level1)
+{
+    InitTestEnvironment();
+    AddNativeTokenTypeAndPermissions();
+    I18nErrorCode err = I18nServiceAbilityClient::AddPreferredLanguage("fr", 0);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    err = I18nServiceAbilityClient::RemovePreferredLanguage(-1);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

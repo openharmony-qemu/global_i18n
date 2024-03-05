@@ -28,7 +28,7 @@ namespace Global {
 namespace I18n {
 class I18nServiceAbilityStub : public IRemoteStub<II18nServiceAbility> {
 public:
-    I18nServiceAbilityStub();
+    I18nServiceAbilityStub(bool serialInvokeFlag = true);
     ~I18nServiceAbilityStub();
 
     /**
