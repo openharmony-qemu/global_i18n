@@ -13,23 +13,21 @@
  * limitations under the License.
  */
 #include "date_rule_init.h"
-#include "hilog/log.h"
+#include "i18n_hilog.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "DateRuleInit" };
-using namespace OHOS::HiviewDFX;
 DateRuleInit::DateRuleInit(std::string& locale)
 {
     dateTimeRule = new DateTimeRule(locale);
     if (dateTimeRule == nullptr) {
-        HiLog::Error(LABEL, "DateTimeRule construct failed.");
+        HILOG_ERROR_I18N("DateTimeRule construct failed.");
     }
     this->locale = dateTimeRule->GetLocale();
     filter = new DateTimeFilter(this->locale, dateTimeRule);
     if (filter == nullptr) {
-        HiLog::Error(LABEL, "DateTimeFilter construct failed.");
+        HILOG_ERROR_I18N("DateTimeFilter construct failed.");
     }
     Init();
 }

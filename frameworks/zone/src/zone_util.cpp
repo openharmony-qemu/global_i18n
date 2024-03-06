@@ -15,7 +15,7 @@
 
 #include <filesystem>
 #include <sys/stat.h>
-#include "hilog/log.h"
+#include "i18n_hilog.h"
 #include "i18n_timezone.h"
 #include "ohos/init_data.h"
 #include "unicode/strenum.h"
@@ -27,8 +27,6 @@ using namespace OHOS::Global::I18n;
 using namespace icu;
 using namespace std;
 
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "ZoneUtil" };
-using namespace OHOS::HiviewDFX;
 const char *ZoneUtil::COUNTRY_ZONE_DATA_PATH = "/system/usr/ohos_timezone/tzlookup.xml";
 const char *ZoneUtil::DEFAULT_TIMEZONE = "GMT";
 const char *ZoneUtil::TIMEZONES_TAG = "timezones";
@@ -244,10 +242,10 @@ CountryResult ZoneUtil::LookupTimezoneByCountryAndNITZ(std::string &region, NITZ
     }
     if (CheckFileExist()) {
         bool isBoosted = false;
-        HiLog::Info(LABEL, "ZoneUtil::LookupTimezoneByCountryAndNITZ use tzlookup.xml");
+        HILOG_INFO_I18N("ZoneUtil::LookupTimezoneByCountryAndNITZ use tzlookup.xml");
         GetCountryZones(region, defaultTimezone, isBoosted, zones);
     } else {
-        HiLog::Info(LABEL, "ZoneUtil::LookupTimezoneByCountryAndNITZ use icu data");
+        HILOG_INFO_I18N("ZoneUtil::LookupTimezoneByCountryAndNITZ use icu data");
         GetICUCountryZones(region, zones, defaultTimezone);
     }
     return Match(zones, nitzData, systemTimezone);
@@ -262,7 +260,7 @@ CountryResult ZoneUtil::LookupTimezoneByNITZ(NITZData &nitzData)
     I18nErrorCode status = I18nErrorCode::SUCCESS;
     std::set<std::string> icuTimezones = I18nTimeZone::GetAvailableIDs(status);
     if (status != I18nErrorCode::SUCCESS) {
-        HiLog::Error(LABEL, "ZoneUtil::LookupTimezoneByNITZ can not get icu data");
+        HILOG_ERROR_I18N("ZoneUtil::LookupTimezoneByNITZ can not get icu data");
     }
     std::vector<std::string> validZones;
     for (auto it = icuTimezones.begin(); it != icuTimezones.end(); ++it) {
@@ -284,14 +282,14 @@ CountryResult ZoneUtil::LookupTimezoneByCountry(std::string &region, int64_t cur
     std::string defaultTimezone;
     CountryResult result = { true, MatchQuality::DEFAULT_BOOSTED, defaultTimezone };
     if (CheckFileExist()) {
-        HiLog::Info(LABEL, "ZoneUtil::LookupTimezoneByCountry use tzlookup.xml");
+        HILOG_INFO_I18N("ZoneUtil::LookupTimezoneByCountry use tzlookup.xml");
         GetCountryZones(region, defaultTimezone, isBoosted, zones);
         if (defaultTimezone.length() == 0) {
-            HiLog::Error(LABEL, "ZoneUtil::LookupTimezoneByCountry can't find default timezone for region %{public}s",
+            HILOG_ERROR_I18N("ZoneUtil::LookupTimezoneByCountry can't find default timezone for region %{public}s",
                 region.c_str());
         }
     } else {
-        HiLog::Info(LABEL, "ZoneUtil::LookupTimezoneByCountry use icu data");
+        HILOG_INFO_I18N("ZoneUtil::LookupTimezoneByCountry use icu data");
         GetICUCountryZones(region, zones, defaultTimezone);
     }
     result.timezoneId = defaultTimezone;
@@ -327,13 +325,13 @@ void ZoneUtil::GetCountryZones(std::string &region, std::string &defaultTimzone,
     xmlKeepBlanksDefault(0);
     xmlDocPtr doc = xmlParseFile(COUNTRY_ZONE_DATA_PATH);
     if (!doc) {
-        HiLog::Error(LABEL, "ZoneUtil::GetCountryZones can not open tzlookup.xml");
+        HILOG_ERROR_I18N("ZoneUtil::GetCountryZones can not open tzlookup.xml");
         return;
     }
     xmlNodePtr cur = xmlDocGetRootElement(doc);
     if (!cur || xmlStrcmp(cur->name, reinterpret_cast<const xmlChar *>(ROOT_TAG)) != 0) {
         xmlFreeDoc(doc);
-        HiLog::Error(LABEL, "ZoneUtil::GetCountryZones invalid Root_tag");
+        HILOG_ERROR_I18N("ZoneUtil::GetCountryZones invalid Root_tag");
         return;
     }
     cur = cur->xmlChildrenNode;
@@ -342,7 +340,7 @@ void ZoneUtil::GetCountryZones(std::string &region, std::string &defaultTimzone,
     while (cur != nullptr && xmlStrcmp(cur->name, reinterpret_cast<const xmlChar *>(SECOND_TAG)) == 0) {
         value = cur->xmlChildrenNode;
         if (xmlStrcmp(value->name, reinterpret_cast<const xmlChar*>(CODE_TAG)) != 0) {
-            HiLog::Error(LABEL, "ZoneUtil::GetCountryZones invalid code_tag");
+            HILOG_ERROR_I18N("ZoneUtil::GetCountryZones invalid code_tag");
             return;
         }
         xmlChar *codePtr = xmlNodeGetContent(value);
@@ -368,7 +366,7 @@ void ZoneUtil::GetDefaultAndBoost(xmlNodePtr &value, std::string &defaultTimezon
     std::vector<std::string> &zones)
 {
     if (value == nullptr || xmlStrcmp(value->name, reinterpret_cast<const xmlChar*>(DEFAULT_TAG)) != 0) {
-        HiLog::Error(LABEL, "ZoneUtil::GetDefaultAndBoost invalid default_tag");
+        HILOG_ERROR_I18N("ZoneUtil::GetDefaultAndBoost invalid default_tag");
         return;
     }
     xmlChar *defaultPtr = xmlNodeGetContent(value);
@@ -376,7 +374,7 @@ void ZoneUtil::GetDefaultAndBoost(xmlNodePtr &value, std::string &defaultTimezon
     xmlFree(defaultPtr);
     value = value->next;
     if (value == nullptr) {
-        HiLog::Error(LABEL, "ZoneUtil::GetDefaultAndBoost doesn't contains id");
+        HILOG_ERROR_I18N("ZoneUtil::GetDefaultAndBoost doesn't contains id");
         return;
     }
     if (xmlStrcmp(value->name, reinterpret_cast<const xmlChar *>(BOOSTED_TAG)) == 0) {
@@ -391,13 +389,13 @@ void ZoneUtil::GetDefaultAndBoost(xmlNodePtr &value, std::string &defaultTimezon
 void ZoneUtil::GetTimezones(xmlNodePtr &value, std::vector<std::string> &zones)
 {
     if (xmlStrcmp(value->name, reinterpret_cast<const xmlChar *>(TIMEZONES_TAG)) != 0) {
-        HiLog::Error(LABEL, "ZoneUtil::GetTimezones invalid timezones_tag");
+        HILOG_ERROR_I18N("ZoneUtil::GetTimezones invalid timezones_tag");
         return;
     }
     value = value->xmlChildrenNode;
     while (value != nullptr) {
         if (xmlStrcmp(value->name, reinterpret_cast<const xmlChar *>(ID_TAG)) != 0) {
-            HiLog::Error(LABEL, "ZoneUtil::GetTimezones invalid id_tag");
+            HILOG_ERROR_I18N("ZoneUtil::GetTimezones invalid id_tag");
             return;
         }
         xmlChar *idPtr = xmlNodeGetContent(value);
@@ -412,7 +410,7 @@ void ZoneUtil::GetICUCountryZones(std::string &region, std::vector<std::string> 
     I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
     std::set<std::string> validZoneIds = I18nTimeZone::GetAvailableIDs(errorCode);
     if (errorCode != I18nErrorCode::SUCCESS) {
-        HiLog::Error(LABEL, "ZoneUtil::GetICUCountryZones can not get icu data");
+        HILOG_ERROR_I18N("ZoneUtil::GetICUCountryZones can not get icu data");
     }
     std::set<std::string> countryZoneIds;
     StringEnumeration *strEnum = TimeZone::createEnumeration(region.c_str());
@@ -485,7 +483,7 @@ bool ZoneUtil::CheckSameDstOffset(std::vector<std::string> &zones, std::string &
     UErrorCode status = U_ZERO_ERROR;
     defaultTimezone->getOffset(currentMillis, (UBool)local, rawOffset, dstOffset, status);
     if (U_FAILURE(status)) {
-        HiLog::Error(LABEL, "ZoneUtil::CheckSameDstOffset can not get timezone defaultID offset");
+        HILOG_ERROR_I18N("ZoneUtil::CheckSameDstOffset can not get timezone defaultID offset");
         return false;
     }
     int32_t totalOffset = rawOffset + dstOffset;
@@ -494,7 +492,7 @@ bool ZoneUtil::CheckSameDstOffset(std::vector<std::string> &zones, std::string &
         TimeZone *timezone = TimeZone::createTimeZone(unicodeZoneID);
         timezone->getOffset(currentMillis, (UBool)local, rawOffset, dstOffset, status);
         if (U_FAILURE(status)) {
-            HiLog::Error(LABEL, "ZoneUtil::CheckSameDstOffset can not get timezone unicodeZoneID offset");
+            HILOG_ERROR_I18N("ZoneUtil::CheckSameDstOffset can not get timezone unicodeZoneID offset");
             return false;
         }
         if (totalOffset - rawOffset != dstOffset) {

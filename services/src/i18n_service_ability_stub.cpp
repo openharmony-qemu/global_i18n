@@ -14,7 +14,7 @@
  */
 
 #include "accesstoken_kit.h"
-#include "hilog/log.h"
+#include "i18n_hilog.h"
 #include "ipc_skeleton.h"
 #include "tokenid_kit.h"
 #include "i18n_service_ability_stub.h"
@@ -22,30 +22,27 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "I18nServiceAbilityStub" };
-using namespace OHOS::HiviewDFX;
-
 I18nServiceAbilityStub::I18nServiceAbilityStub(bool serialInvokeFlag)
     : IRemoteStub<II18nServiceAbility>(serialInvokeFlag)
 {
     InitInnerFuncMap();
-    HiLog::Info(LABEL, "I18nServiceAbilityStub object init success.");
+    HILOG_INFO_I18N("I18nServiceAbilityStub object init success.");
 }
 
 I18nServiceAbilityStub::~I18nServiceAbilityStub()
 {
-    HiLog::Info(LABEL, "I18nServiceAbilityStub object release.");
+    HILOG_INFO_I18N("I18nServiceAbilityStub object release.");
 }
 
 int32_t I18nServiceAbilityStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
-    HiLog::Info(LABEL, "I18nServiceAbilityStub::OnRemoteRequest process request for code=%{public}u", code);
+    HILOG_INFO_I18N("I18nServiceAbilityStub::OnRemoteRequest process request for code=%{public}u", code);
     // check whether request's descriptor is consistent with sa's descriptor
     std::u16string descriptor = GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
-        HiLog::Error(LABEL, "I18nServiceAbilityStub client and server's descriptor are inconsistent.");
+        HILOG_ERROR_I18N("I18nServiceAbilityStub client and server's descriptor are inconsistent.");
         reply.WriteInt32(I18nErrorCode::INCONSISTENT_DESCRIPTOR);
         return 0;
     }
@@ -61,7 +58,7 @@ int32_t I18nServiceAbilityStub::OnRemoteRequest(uint32_t code, MessageParcel &da
         }
     }
     if (!hasMappedInnerFunc) {
-        HiLog::Info(LABEL, "I18nServiceAbilityStub::OnRemoteRequest invalid request code=%{public}u", code);
+        HILOG_INFO_I18N("I18nServiceAbilityStub::OnRemoteRequest invalid request code=%{public}u", code);
         ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
     // trigger release i18n service after one request finished.
@@ -100,13 +97,13 @@ I18nErrorCode I18nServiceAbilityStub::CheckPermission()
     bool isShell = tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL;
     bool isNative = tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE;
     if (!isSystemApp && !isShell && !isNative) {
-        HiLog::Error(LABEL, "I18nServiceAbilityStub caller process is not System app, Shell or Native.");
+        HILOG_ERROR_I18N("I18nServiceAbilityStub caller process is not System app, Shell or Native.");
         return I18nErrorCode::NO_PERMISSION;
     }
     int result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken,
         "ohos.permission.UPDATE_CONFIGURATION");
     if (result != Security::AccessToken::PermissionState::PERMISSION_GRANTED) {
-        HiLog::Error(LABEL, "I18nServiceAbilityStub caller process doesn't have UPDATE_CONFIGURATION permission.");
+        HILOG_ERROR_I18N("I18nServiceAbilityStub caller process doesn't have UPDATE_CONFIGURATION permission.");
         return I18nErrorCode::NO_PERMISSION;
     }
     return I18nErrorCode::SUCCESS;
@@ -122,7 +119,7 @@ int32_t I18nServiceAbilityStub::SetSystemLanguageInner(MessageParcel &data, Mess
     std::string language = data.ReadString();
     err = SetSystemLanguage(language);
     if (err != I18nErrorCode::SUCCESS) {
-        HiLog::Error(LABEL, "I18nServiceAbilityStub::SetSystemLanguageInner failed with errorCode=%{public}d",
+        HILOG_ERROR_I18N("I18nServiceAbilityStub::SetSystemLanguageInner failed with errorCode=%{public}d",
             static_cast<int32_t>(err));
     }
     reply.WriteInt32(static_cast<int32_t>(err));
@@ -139,7 +136,7 @@ int32_t I18nServiceAbilityStub::SetSystemRegionInner(MessageParcel &data, Messag
     std::string region = data.ReadString();
     err = SetSystemRegion(region);
     if (err != I18nErrorCode::SUCCESS) {
-        HiLog::Error(LABEL, "I18nServiceAbilityStub::SetSystemRegionInner failed with errorCode=%{public}d",
+        HILOG_ERROR_I18N("I18nServiceAbilityStub::SetSystemRegionInner failed with errorCode=%{public}d",
             static_cast<int32_t>(err));
     }
     reply.WriteInt32(static_cast<int32_t>(err));
@@ -156,7 +153,7 @@ int32_t I18nServiceAbilityStub::SetSystemLocaleInner(MessageParcel &data, Messag
     std::string locale = data.ReadString();
     err = SetSystemLocale(locale);
     if (err != I18nErrorCode::SUCCESS) {
-        HiLog::Error(LABEL, "I18nServiceAbilityStub::SetSystemLocaleInner failed with errorCode=%{public}d",
+        HILOG_ERROR_I18N("I18nServiceAbilityStub::SetSystemLocaleInner failed with errorCode=%{public}d",
             static_cast<int32_t>(err));
     }
     reply.WriteInt32(static_cast<int32_t>(err));
@@ -173,7 +170,7 @@ int32_t I18nServiceAbilityStub::Set24HourClockInner(MessageParcel &data, Message
     std::string flag = data.ReadString();
     err = Set24HourClock(flag);
     if (err != I18nErrorCode::SUCCESS) {
-        HiLog::Error(LABEL, "I18nServiceAbilityStub::Set24HourClockInner failed with errorCode=%{public}d",
+        HILOG_ERROR_I18N("I18nServiceAbilityStub::Set24HourClockInner failed with errorCode=%{public}d",
             static_cast<int32_t>(err));
     }
     reply.WriteInt32(static_cast<int32_t>(err));
@@ -190,7 +187,7 @@ int32_t I18nServiceAbilityStub::SetUsingLocalDigitInner(MessageParcel &data, Mes
     bool flag = data.ReadBool();
     err = SetUsingLocalDigit(flag);
     if (err != I18nErrorCode::SUCCESS) {
-        HiLog::Error(LABEL, "I18nServiceAbilityStub::SetUsingLocalDigitInner failed with errorCode=%{public}d",
+        HILOG_ERROR_I18N("I18nServiceAbilityStub::SetUsingLocalDigitInner failed with errorCode=%{public}d",
             static_cast<int32_t>(err));
     }
     reply.WriteInt32(static_cast<int32_t>(err));
@@ -208,7 +205,7 @@ int32_t I18nServiceAbilityStub::AddPreferredLanguageInner(MessageParcel &data, M
     int32_t index = data.ReadInt32();
     err = AddPreferredLanguage(language, index);
     if (err != I18nErrorCode::SUCCESS) {
-        HiLog::Error(LABEL, "I18nServiceAbilityStub::AddPreferredLanguageInner failed with errorCode=%{public}d",
+        HILOG_ERROR_I18N("I18nServiceAbilityStub::AddPreferredLanguageInner failed with errorCode=%{public}d",
             static_cast<int32_t>(err));
     }
     reply.WriteInt32(static_cast<int32_t>(err));
@@ -225,7 +222,7 @@ int32_t I18nServiceAbilityStub::RemovePreferredLanguageInner(MessageParcel &data
     int32_t index = data.ReadInt32();
     err = RemovePreferredLanguage(index);
     if (err != I18nErrorCode::SUCCESS) {
-        HiLog::Error(LABEL, "I18nServiceAbilityStub::RemovePreferredLanguageInner failed with errorCode=%{public}d",
+        HILOG_ERROR_I18N("I18nServiceAbilityStub::RemovePreferredLanguageInner failed with errorCode=%{public}d",
             static_cast<int32_t>(err));
     }
     reply.WriteInt32(static_cast<int32_t>(err));

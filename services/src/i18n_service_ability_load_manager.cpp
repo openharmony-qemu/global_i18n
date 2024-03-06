@@ -13,16 +13,13 @@
  * limitations under the License.
  */
 
-#include "hilog/log.h"
+#include "i18n_hilog.h"
 #include "i18n_service_ability_load_callback.h"
 #include "i18n_service_ability_load_manager.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "I18nServiceAbilityLoadManager" };
-using namespace OHOS::HiviewDFX;
-
 static constexpr int32_t I18N_LOAD_SA_TIMEOUT_MS = 1000;
 
 I18nServiceAbilityLoadManager::I18nServiceAbilityLoadManager()
@@ -51,19 +48,19 @@ sptr<ISystemAbilityManager> I18nServiceAbilityLoadManager::LoadI18nServiceAbilit
     InitLoadState();
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgr == nullptr) {
-        HiLog::Error(LABEL, "I18nServiceAbilityLoadManager::LoadAndGetI18nServiceAbility can't get samgr");
+        HILOG_ERROR_I18N("I18nServiceAbilityLoadManager::LoadAndGetI18nServiceAbility can't get samgr");
         return nullptr;
     }
     sptr<I18nServiceAbilityLoadCallback> i18nSaLoadCallback = new I18nServiceAbilityLoadCallback();
     int32_t ret = samgr->LoadSystemAbility(systemAbilityId, i18nSaLoadCallback);
     if (ret != ERR_OK) {
-        HiLog::Error(LABEL,
+        HILOG_ERROR_I18N(
             "I18nServiceAbilityLoadManager::LoadAndGetI18nServiceAbility LoadSystemAbility failed.");
         return nullptr;
     }
     bool status = WaitLoadStateChange(systemAbilityId);
     if (!status) {
-        HiLog::Error(LABEL, "I18nServiceAbilityLoadManager::LoadAndGetI18nServiceAbility wait overtime.");
+        HILOG_ERROR_I18N("I18nServiceAbilityLoadManager::LoadAndGetI18nServiceAbility wait overtime.");
         return nullptr;
     }
     return samgr;
@@ -82,7 +79,7 @@ bool I18nServiceAbilityLoadManager::WaitLoadStateChange(int32_t systemAbilityId)
         return loadState;
     });
     if (!isLoadSuccess) {
-        HiLog::Error(LABEL, "I18nServiceAbilityLoadManager::WaitLoadStateChange timeout.");
+        HILOG_ERROR_I18N("I18nServiceAbilityLoadManager::WaitLoadStateChange timeout.");
     }
     return isLoadSuccess;
 }
@@ -91,12 +88,12 @@ bool I18nServiceAbilityLoadManager::UnloadI18nService(int32_t systemAbilityId)
 {
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgr == nullptr) {
-        HiLog::Error(LABEL, "I18nServiceAbilityLoadManager::UnloadI18nService can't get samgr.");
+        HILOG_ERROR_I18N("I18nServiceAbilityLoadManager::UnloadI18nService can't get samgr.");
         return false;
     }
     int32_t ret = samgr->UnloadSystemAbility(systemAbilityId);
     if (ret != ERR_OK) {
-        HiLog::Error(LABEL, "I18nServiceAbilityLoadManager::UnloadI18nService sa unload failed.");
+        HILOG_ERROR_I18N("I18nServiceAbilityLoadManager::UnloadI18nService sa unload failed.");
         return false;
     }
     return true;

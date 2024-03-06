@@ -15,7 +15,7 @@
 
 #include <unicode/locid.h>
 #include "error_util.h"
-#include "hilog/log.h"
+#include "i18n_hilog.h"
 #include "utils.h"
 #include "variable_convertor.h"
 #include "entity_recognizer_addon.h"
@@ -23,9 +23,6 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "EntityRecognizerAddonJs" };
-using namespace OHOS::HiviewDFX;
-
 EntityRecognizerAddon::EntityRecognizerAddon() {}
 
 EntityRecognizerAddon::~EntityRecognizerAddon()
@@ -50,12 +47,12 @@ napi_value EntityRecognizerAddon::InitEntityRecognizer(napi_env env, napi_value 
     napi_status status = napi_define_class(env, "EntityRecognizer", NAPI_AUTO_LENGTH, constructor, nullptr,
         sizeof(properties) / sizeof(napi_property_descriptor), properties, &entityConstructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to define class EntityRecognizer at Init.");
+        HILOG_ERROR_I18N("Failed to define class EntityRecognizer at Init.");
         return nullptr;
     }
     status = napi_set_named_property(env, exports, "EntityRecognizer", entityConstructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Set property failed when InitEntityRecognizer");
+        HILOG_ERROR_I18N("Set property failed when InitEntityRecognizer");
         return nullptr;
     }
     return exports;
@@ -123,7 +120,7 @@ napi_value EntityRecognizerAddon::FindEntityInfo(napi_env env, napi_callback_inf
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_string) {
-        HiLog::Error(LABEL, "Invalid parameter type");
+        HILOG_ERROR_I18N("Invalid parameter type");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
         return nullptr;
     }
@@ -135,7 +132,7 @@ napi_value EntityRecognizerAddon::FindEntityInfo(napi_env env, napi_callback_inf
     EntityRecognizerAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || obj == nullptr || obj->entityRecognizer_ == nullptr) {
-        HiLog::Error(LABEL, "Get EntityRecognizer object failed");
+        HILOG_ERROR_I18N("Get EntityRecognizer object failed");
         return nullptr;
     }
     std::vector<std::vector<int>> entityInfo = obj->entityRecognizer_->FindEntityInfo(message);
@@ -148,7 +145,7 @@ napi_value EntityRecognizerAddon::GetEntityInfoItem(napi_env env, std::vector<st
     napi_value result = nullptr;
     napi_status status = napi_create_array_with_length(env, entityInfo[0][0] + entityInfo[1][0], &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "create EntityInfo array failed.");
+        HILOG_ERROR_I18N("create EntityInfo array failed.");
         return nullptr;
     }
     std::vector<std::string> types = {"phone_number", "date"};
@@ -162,7 +159,7 @@ napi_value EntityRecognizerAddon::GetEntityInfoItem(napi_env env, std::vector<st
             status = napi_set_element(env, result, index, item);
             index++;
             if (status != napi_ok) {
-                HiLog::Error(LABEL, "Failed to set item element.");
+                HILOG_ERROR_I18N("Failed to set item element.");
                 return nullptr;
             }
         }
@@ -176,25 +173,25 @@ napi_value EntityRecognizerAddon::CreateEntityInfoItem(napi_env env, const int b
     napi_value result;
     napi_status status = napi_create_object(env, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Create EntityInfoItem object failed.");
+        HILOG_ERROR_I18N("Create EntityInfoItem object failed.");
         return nullptr;
     }
     status = napi_set_named_property(env, result, "begin",
         VariableConvertor::CreateNumber(env, begin));
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to set element begin.");
+        HILOG_ERROR_I18N("Failed to set element begin.");
         return nullptr;
     }
     status = napi_set_named_property(env, result, "end",
         VariableConvertor::CreateNumber(env, end));
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to set element end.");
+        HILOG_ERROR_I18N("Failed to set element end.");
         return nullptr;
     }
     status = napi_set_named_property(env, result, "type",
         VariableConvertor::CreateString(env, type));
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to set element type.");
+        HILOG_ERROR_I18N("Failed to set element type.");
         return nullptr;
     }
     return result;

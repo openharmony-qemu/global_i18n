@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 #include "regex_rule.h"
-#include "hilog/log.h"
+#include "i18n_hilog.h"
 #include "cpp/src/phonenumbers/phonenumberutil.h"
 #include "cpp/src/phonenumbers/phonenumber.h"
 #include "cpp/src/phonenumbers/shortnumberinfo.h"
@@ -25,8 +25,6 @@ using i18n::phonenumbers::PhoneNumberMatch;
 using i18n::phonenumbers::PhoneNumber;
 using i18n::phonenumbers::PhoneNumberUtil;
 using i18n::phonenumbers::ShortNumberInfo;
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "RegexRule" };
-using namespace OHOS::HiviewDFX;
 
 RegexRule::RegexRule(icu::UnicodeString& regex, std::string& isValidType, std::string& handleType,
     std::string& insensitive, std::string& type)
@@ -49,7 +47,7 @@ RegexRule::RegexRule(icu::UnicodeString& regex, std::string& isValidType, std::s
         return;
     }
     if (U_FAILURE(this->status)) {
-        HiLog::Error(LABEL, "member pattern construct failed.");
+        HILOG_ERROR_I18N("member pattern construct failed.");
     }
 }
 
@@ -455,7 +453,7 @@ std::vector<MatchedNumberInfo> RegexRule::GetNumbersWithSlant(icu::UnicodeString
     PhoneNumberUtil* pnu = PhoneNumberUtil::GetInstance();
     ShortNumberInfo* shortInfo = new ShortNumberInfo();
     if (shortInfo == nullptr) {
-        HiLog::Error(LABEL, "ShortNumberInfo construct failed.");
+        HILOG_ERROR_I18N("ShortNumberInfo construct failed.");
         return shortList;
     }
     std::string numberFisrt = "";

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "hilog/log.h"
+#include "i18n_hilog.h"
 #include "locale_config.h"
 #include "system_locale_manager.h"
 #include "unicode/calendar.h"
@@ -24,9 +24,6 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "SystemLocaleManager" };
-using namespace OHOS::HiviewDFX;
-
 const char* SystemLocaleManager::SIM_COUNTRY_CODE_KEY = "telephony.sim.countryCode0";
 
 SystemLocaleManager::SystemLocaleManager()
@@ -133,7 +130,7 @@ void SystemLocaleManager::SortLocaleItemList(std::vector<LocaleItem> &localeItem
                 return true;
             }
             if (result == CompareResult::INVALID) {
-                HiLog::Error(LABEL, "SystemLocaleManager: invalid compare result for local name.");
+                HILOG_ERROR_I18N("SystemLocaleManager: invalid compare result for local name.");
             }
             return false;
         }
@@ -142,7 +139,7 @@ void SystemLocaleManager::SortLocaleItemList(std::vector<LocaleItem> &localeItem
             return true;
         }
         if (result == CompareResult::INVALID) {
-            HiLog::Error(LABEL, "SystemLocaleManager: invalid compare result for display name.");
+            HILOG_ERROR_I18N("SystemLocaleManager: invalid compare result for display name.");
         }
         return false;
     };
@@ -204,7 +201,7 @@ void SystemLocaleManager::SortTimezoneCityItemList(const std::string &locale,
             return true;
         }
         if (result == CompareResult::INVALID) {
-            HiLog::Error(LABEL, "SystemLocaleManager: invalid compare result for city display name.");
+            HILOG_ERROR_I18N("SystemLocaleManager: invalid compare result for city display name.");
         }
         return false;
     };
