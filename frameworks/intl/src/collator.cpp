@@ -14,19 +14,19 @@
  */
 #include "collator.h"
 
-#include <unicode/stringpiece.h>
+#include <stringpiece.h>
 
 #include "locale_config.h"
 #include "map"
 #include "set"
-#include "unicode/strenum.h"
+#include "strenum.h"
 #include "string"
 #include "unicode/errorcode.h"
 #include "unicode/locid.h"
 #include "unicode/ucol.h"
 #include "unicode/uloc.h"
-#include "unicode/unistr.h"
-#include "unicode/urename.h"
+#include "unistr.h"
+#include "urename.h"
 #include "utility"
 #include "vector"
 

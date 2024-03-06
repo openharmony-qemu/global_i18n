@@ -26,6 +26,8 @@ ohos_fuzztest("RegexRuleFuzzTest") {
 
   include_dirs = [
     "../../../include",
+    "//third_party/icu/icu4c/source/common",
+    "//third_party/icu/icu4c/source/i18n",
     "//third_party/libphonenumber/cpp/src",
     "//third_party/libphonenumber",
     "//third_party/protobuf/src",
@@ -41,12 +43,9 @@ ohos_fuzztest("RegexRuleFuzzTest") {
 
   deps = [
     "../../../../intl:intl_util",
+    "//third_party/icu/icu4c:shared_icui18n",
+    "//third_party/icu/icu4c:shared_icuuc",
     "//third_party/libphonenumber/cpp:phonenumber_standard",
-  ]
-
-  external_deps = [
-    "icu:shared_icui18n",
-    "icu:shared_icuuc",
   ]
 
   subsystem_name = "global"

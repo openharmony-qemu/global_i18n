@@ -30,6 +30,9 @@ ohos_shared_library("intl") {
     "//foundation/arkui/napi/native_engine",
     "//foundation/arkui/napi/interfaces/kits",
     "//third_party/node/src",
+    "//third_party/icu/icu4c/source",
+    "//third_party/icu/icu4c/source/common",
+    "//third_party/icu/icu4c/source/i18n",
     "//third_party/libphonenumber/cpp/src",
     "//third_party/libphonenumber",
     "//third_party/protobuf/src",
@@ -37,10 +40,12 @@ ohos_shared_library("intl") {
 
   sources = [ "src/intl_addon.cpp" ]
 
-  deps = [ "//base/global/i18n/frameworks/intl:intl_util" ]
+  deps = [
+    "//base/global/i18n/frameworks/intl:intl_util",
+    "//third_party/icu/icu4c:shared_icuuc",
+  ]
   external_deps = [
     "hilog:libhilog",
-    "icu:shared_icuuc",
     "napi:ace_napi",
   ]
   relative_install_dir = "module"
@@ -58,6 +63,9 @@ ohos_shared_library("i18n") {
     "//foundation/arkui/napi/native_engine",
     "//foundation/arkui/napi/interfaces/kits",
     "//third_party/node/src",
+    "//third_party/icu/icu4c/source",
+    "//third_party/icu/icu4c/source/common",
+    "//third_party/icu/icu4c/source/i18n",
     "//third_party/libphonenumber/cpp/src",
     "//third_party/libphonenumber",
     "//third_party/protobuf/src",
@@ -82,13 +90,13 @@ ohos_shared_library("i18n") {
     "//base/global/i18n/frameworks/intl:intl_util",
     "//base/global/i18n/frameworks/intl:preferred_language",
     "//base/global/i18n/services:i18n_sa_client",
+    "//third_party/icu/icu4c:shared_icui18n",
+    "//third_party/icu/icu4c:shared_icuuc",
     "//third_party/libpng:libpng",
   ]
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
-    "icu:shared_icui18n",
-    "icu:shared_icuuc",
     "ipc:ipc_core",
     "napi:ace_napi",
     "samgr:samgr_proxy",

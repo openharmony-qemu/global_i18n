@@ -16,7 +16,7 @@
 #include "locale_config_test.h"
 #include <gtest/gtest.h>
 #include "locale_config.h"
-#include "unicode/locid.h"
+#include "locid.h"
 #include "parameter.h"
 
 using namespace OHOS::Global::I18n;

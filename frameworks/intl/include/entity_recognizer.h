@@ -15,7 +15,7 @@
 #ifndef OHOS_GLOBAL_I18N_ENTITY_RECOGNIZER_H
 #define OHOS_GLOBAL_I18N_ENTITY_RECOGNIZER_H
 
-#include <unicode/locid.h>
+#include <locid.h>
 #include <string>
 #include <vector>
 #include "date_time_matched.h"

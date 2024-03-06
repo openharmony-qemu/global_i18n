@@ -15,10 +15,10 @@
 #include "index_util.h"
 
 #include "locale_config.h"
-#include "unicode/locid.h"
+#include "locid.h"
 #include "string"
-#include "unicode/unistr.h"
-#include "unicode/utypes.h"
+#include "unistr.h"
+#include "utypes.h"
 #include "vector"
 
 namespace OHOS {

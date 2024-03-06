@@ -25,7 +25,11 @@ ohos_fuzztest("LocaleConfigGetFuzzTest") {
   fuzz_config_file =
       "//base/global/i18n/frameworks/intl/test/fuzztest/localeconfigget_fuzzer"
 
-  include_dirs = [ "//base/global/i18n/frameworks/intl/include" ]
+  include_dirs = [
+    "//base/global/i18n/frameworks/intl/include",
+    "//third_party/icu/icu4c/source/common",
+    "//third_party/icu/icu4c/source/i18n",
+  ]
   cflags = [
     "-g",
     "-O0",
@@ -35,11 +39,10 @@ ohos_fuzztest("LocaleConfigGetFuzzTest") {
   sources = [ "localeconfigget_fuzzer.cpp" ]
   configs = []
 
-  deps = [ "//base/global/i18n/frameworks/intl:intl_util" ]
-
-  external_deps = [
-    "icu:shared_icui18n",
-    "icu:shared_icuuc",
+  deps = [
+    "//base/global/i18n/frameworks/intl:intl_util",
+    "//third_party/icu/icu4c:shared_icui18n",
+    "//third_party/icu/icu4c:shared_icuuc",
   ]
 
   subsystem_name = "global"

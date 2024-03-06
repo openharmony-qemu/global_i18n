@@ -17,7 +17,7 @@
 #define OHOS_GLOBAL_I18N_I18N_NORMALIZER_H
 
 #include "i18n_types.h"
-#include "unicode/normalizer2.h"
+#include "normalizer2.h"
 
 namespace OHOS {
 namespace Global {

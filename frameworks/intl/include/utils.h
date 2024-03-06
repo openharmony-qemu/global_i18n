@@ -18,7 +18,7 @@
 #include <string>
 #include <vector>
 #include <unordered_set>
-#include <unicode/locid.h>
+#include <locid.h>
 
 namespace OHOS {
 namespace Global {

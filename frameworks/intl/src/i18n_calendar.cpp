@@ -22,18 +22,18 @@
 #include "indiancal.h"
 #include "islamcal.h"
 #include "japancal.h"
-#include "unicode/locdspnm.h"
+#include "locdspnm.h"
 #include "persncal.h"
 #include "string"
 #include "ureslocs.h"
 #include "ulocimp.h"
-#include "unicode/umachine.h"
+#include "umachine.h"
 #include "unicode/gregocal.h"
 #include "unicode/timezone.h"
-#include "unicode/unistr.h"
-#include "unicode/urename.h"
+#include "unistr.h"
+#include "urename.h"
 #include "ustr_imp.h"
-#include "unicode/ustring.h"
+#include "ustring.h"
 
 namespace OHOS {
 namespace Global {

@@ -14,13 +14,13 @@
  */
 #include "plural_rules.h"
 
-#include <unicode/stringpiece.h>
+#include <stringpiece.h>
 
 #include "algorithm"
 #include "hilog/log_c.h"
 #include "hilog/log_cpp.h"
 #include "locale_config.h"
-#include "unicode/locid.h"
+#include "locid.h"
 #include "plural_rules.h"
 #include "map"
 #include "set"
@@ -29,7 +29,7 @@
 #include "unicode/upluralrules.h"
 #include "utility"
 #include "utils.h"
-#include "unicode/utypes.h"
+#include "utypes.h"
 #include "vector"
 
 namespace OHOS {

@@ -23,7 +23,7 @@
 #include "libxml/tree.h"
 #include "libxml/xmlstring.h"
 #include "phonenumbers/phonenumberutil.h"
-#include "unicode/strenum.h"
+#include "strenum.h"
 
 namespace OHOS {
 namespace Global {

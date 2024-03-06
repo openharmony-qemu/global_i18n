@@ -18,7 +18,7 @@
 #include "hilog/log.h"
 #include "i18n_timezone.h"
 #include "ohos/init_data.h"
-#include "unicode/strenum.h"
+#include "strenum.h"
 #include "unicode/timezone.h"
 #include "utils.h"
 #include "zone_util.h"

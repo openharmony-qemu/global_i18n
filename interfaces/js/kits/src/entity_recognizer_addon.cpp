@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include <unicode/locid.h>
+#include <locid.h>
 #include "error_util.h"
 #include "hilog/log.h"
 #include "utils.h"
