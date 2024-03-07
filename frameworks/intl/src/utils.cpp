@@ -22,7 +22,7 @@
 #include <unistd.h>
 #include <vector>
 #include "accesstoken_kit.h"
-#include "hilog/log.h"
+#include "i18n_hilog.h"
 #include "nativetoken_kit.h"
 #include "parameter.h"
 #include "token_setproc.h"
@@ -32,8 +32,6 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 using namespace std;
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "Utils" };
-using namespace OHOS::HiviewDFX;
 static constexpr int32_t I18N_UID = 3013;
 static constexpr int32_t ROOT_UID = 0;
 
@@ -77,7 +75,7 @@ int32_t ConvertString2Int(const string &numberStr, int32_t& status)
             return -1;
         } catch (...) {
             status = -1;
-            HiLog::Error(LABEL, "ConvertString2Int: unknow error. numberStr: %{public}s.", numberStr.c_str());
+            HILOG_ERROR_I18N("ConvertString2Int: unknow error. numberStr: %{public}s.", numberStr.c_str());
             return -1;
         }
     } else {
@@ -92,7 +90,7 @@ bool IsValidLocaleTag(icu::Locale &locale)
     GetAllValidLocalesTag(allValidLocalesLanguageTag);
     std::string languageTag = locale.getLanguage();
     if (allValidLocalesLanguageTag.find(languageTag) == allValidLocalesLanguageTag.end()) {
-        HiLog::Error(LABEL, "GetTimePeriodName does not support this languageTag: %{public}s", languageTag.c_str());
+        HILOG_ERROR_I18N("GetTimePeriodName does not support this languageTag: %{public}s", languageTag.c_str());
         return false;
     }
     return true;

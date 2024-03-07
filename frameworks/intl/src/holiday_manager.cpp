@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 #include "holiday_manager.h"
-#include "hilog/log.h"
+#include "i18n_hilog.h"
 #include <algorithm>
 #include <climits>
 #include <ctime>
@@ -27,9 +27,6 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "HolidayManager" };
-using namespace OHOS::HiviewDFX;
-
 const char* HolidayManager::ITEM_BEGIN_TAG = "BEGIN:VEVENT";
 const char* HolidayManager::ITEM_END_TAG = "END:VEVENT";
 const char* HolidayManager::ITEM_DTSTART_TAG = "DTSTART";
@@ -40,12 +37,12 @@ const char* HolidayManager::ITEM_RESOURCES_TAG = "RESOURCES";
 HolidayManager::HolidayManager(const char* path)
 {
     if (path == nullptr) {
-        HiLog::Error(LABEL, "Failed: parameter path is NULL.");
+        HILOG_ERROR_I18N("Failed: parameter path is NULL.");
         return;
     }
     std::string msg = ValidateHolidayFilePath(path);
     if (msg.length() != 0) {
-        HiLog::Error(LABEL, "Failed: %{public}s .", msg.c_str());
+        HILOG_ERROR_I18N("Failed: %{public}s .", msg.c_str());
         return;
     }
     std::vector<HolidayInfoItem> items = ReadHolidayFile(path);
@@ -54,7 +51,7 @@ HolidayManager::HolidayManager(const char* path)
         char strDate[10];
         size_t resCode = strftime(strDate, sizeof(strDate), "%Y%m%d", &tmObj);
         if (resCode == 0) {
-            HiLog::Error(LABEL, "Failed: strftime error:%{public}d .", resCode);
+            HILOG_ERROR_I18N("Failed: strftime error:%{public}d .", resCode);
             return;
         }
         std::string startDate(strDate);

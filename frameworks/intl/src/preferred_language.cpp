@@ -21,7 +21,7 @@
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 #endif
-#include "hilog/log.h"
+#include "i18n_hilog.h"
 #include "locale_config.h"
 #include "locale_info.h"
 #include "parameter.h"
@@ -31,8 +31,6 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "PreferredLanguage" };
-using namespace OHOS::HiviewDFX;
 const char *PreferredLanguage::RESOURCE_PATH_HEAD = "/data/accounts/account_0/applications/";
 const char *PreferredLanguage::RESOURCE_PATH_TAILOR = "/assets/entry/resources.index";
 const char *PreferredLanguage::RESOURCE_PATH_SPLITOR = "/";
@@ -90,7 +88,7 @@ std::shared_ptr<NativePreferences::Preferences> PreferredLanguage::GetI18nAppPre
     std::shared_ptr<NativePreferences::Preferences> preferences =
         NativePreferences::PreferencesHelper::GetPreferences(options, status);
     if (status != 0) {
-        HiLog::Error(LABEL, "PreferredLanguage::GetAppPreferredLanguage get i18n app preferences failed.");
+        HILOG_ERROR_I18N("PreferredLanguage::GetAppPreferredLanguage get i18n app preferences failed.");
         return nullptr;
     }
     return preferences;
@@ -100,7 +98,7 @@ std::string PreferredLanguage::GetAppPreferredLanguage()
 {
     std::shared_ptr<NativePreferences::Preferences> preferences = GetI18nAppPreferences();
     if (preferences == nullptr) {
-        HiLog::Error(LABEL,
+        HILOG_ERROR_I18N(
             "PreferredLanguage::GetAppPreferredLanguage get i18n preferences failed, return system language.");
         return LocaleConfig::GetSystemLanguage();
     }
@@ -118,13 +116,13 @@ void PreferredLanguage::SetAppPreferredLanguage(const std::string &language, I18
     std::shared_ptr<NativePreferences::Preferences> preferences = GetI18nAppPreferences();
     if (preferences == nullptr) {
         errCode = I18nErrorCode::FAILED;
-        HiLog::Error(LABEL, "PreferredLanguage::SetAppPreferredLanguage get i18n preferences failed.");
+        HILOG_ERROR_I18N("PreferredLanguage::SetAppPreferredLanguage get i18n preferences failed.");
         return;
     }
     int32_t status = preferences->PutString(PreferredLanguage::APP_LANGUAGE_KEY, language);
     if (status != 0) {
         errCode = I18nErrorCode::FAILED;
-        HiLog::Error(LABEL,
+        HILOG_ERROR_I18N(
             "PreferredLanguage::SetAppPreferredLanguage set app language to i18n preferences failed.");
         return;
     }
@@ -188,7 +186,7 @@ void PreferredLanguage::Split(const std::string &src, const std::string &sep, st
 I18nErrorCode PreferredLanguage::AddPreferredLanguage(const std::string &language, int32_t index)
 {
     if (!IsValidTag(language)) {
-        HiLog::Error(LABEL, "PreferredLanguage::AddPreferredLanguage %{public}s is not valid language tag.",
+        HILOG_ERROR_I18N("PreferredLanguage::AddPreferredLanguage %{public}s is not valid language tag.",
             language.c_str());
         return I18nErrorCode::INVALID_LANGUAGE_TAG;
     }
@@ -202,7 +200,7 @@ I18nErrorCode PreferredLanguage::AddPreferredLanguage(const std::string &languag
         AddExistPreferredLanguage(language, index, preferredLanguages, status);
     }
     if (status != I18nErrorCode::SUCCESS) {
-        HiLog::Error(LABEL, "PreferredLanguage::AddPreferredLanguage failed.");
+        HILOG_ERROR_I18N("PreferredLanguage::AddPreferredLanguage failed.");
         return status;
     }
     return SetPreferredLanguages(JoinPreferredLanguages(preferredLanguages));
@@ -212,7 +210,7 @@ I18nErrorCode PreferredLanguage::RemovePreferredLanguage(int32_t index)
 {
     std::vector<std::string> preferredLanguages = GetPreferredLanguageList();
     if (preferredLanguages.size() == 1) {
-        HiLog::Error(LABEL, "PreferredLanguage::RemovePreferredLanguage can't remove the only language.");
+        HILOG_ERROR_I18N("PreferredLanguage::RemovePreferredLanguage can't remove the only language.");
         return I18nErrorCode::REMOVE_PREFERRED_LANGUAGE_FAILED;
     }
     // valid index is [0, preferredLanguages.size() - 1] for Remove
@@ -222,7 +220,7 @@ I18nErrorCode PreferredLanguage::RemovePreferredLanguage(int32_t index)
     // in preferred language list, we need to reset system language.
     if (validIndex == 0) {
         if (LocaleConfig::SetSystemLanguage(preferredLanguages[0]) != I18nErrorCode::SUCCESS) {
-            HiLog::Error(LABEL, "PreferredLanguage::RemovePreferredLanguage update system language failed.");
+            HILOG_ERROR_I18N("PreferredLanguage::RemovePreferredLanguage update system language failed.");
             return I18nErrorCode::REMOVE_PREFERRED_LANGUAGE_FAILED;
         }
     }
@@ -240,7 +238,7 @@ void PreferredLanguage::AddNonExistPreferredLanguage(const std::string& language
     // in preferred language list, we need to reset system language.
     if (validIndex == 0) {
         if (LocaleConfig::SetSystemLanguage(preferredLanguages[0]) != I18nErrorCode::SUCCESS) {
-            HiLog::Error(LABEL, "PreferredLanguage::AddNonExistPreferredLanguage update system language failed.");
+            HILOG_ERROR_I18N("PreferredLanguage::AddNonExistPreferredLanguage update system language failed.");
             errCode = I18nErrorCode::ADD_PREFERRED_LANGUAGE_NON_EXIST_FAILED;
             return;
         }
@@ -267,7 +265,7 @@ void PreferredLanguage::AddExistPreferredLanguage(const std::string& language, i
     // in preferred language list, we need to reset system language.
     if (languageIdx == 0 || validIndex == 0) {
         if (LocaleConfig::SetSystemLanguage(preferredLanguages[0]) != I18nErrorCode::SUCCESS) {
-            HiLog::Error(LABEL, "PreferredLanguage::AddExistPreferredLanguage update system language failed.");
+            HILOG_ERROR_I18N("PreferredLanguage::AddExistPreferredLanguage update system language failed.");
             errCode = I18nErrorCode::ADD_PREFERRED_LANGUAGE_EXIST_FAILED;
             return;
         }
@@ -316,11 +314,11 @@ I18nErrorCode PreferredLanguage::SetPreferredLanguages(const std::string &prefer
 {
     // System parameter value's length can't beyong CONFIG_LEN
     if (preferredLanguages.length() > CONFIG_LEN) {
-        HiLog::Error(LABEL, "PreferredLanguage::SetPreferredLanguage preferred language list is too long.");
+        HILOG_ERROR_I18N("PreferredLanguage::SetPreferredLanguage preferred language list is too long.");
         return I18nErrorCode::UPDATE_SYSTEM_PREFERRED_LANGUAGE_FAILED;
     }
     if (SetParameter(PREFERRED_LANGUAGES, preferredLanguages.data()) != 0) {
-        HiLog::Error(LABEL, "PreferredLanguage::AddPreferredLanguage udpate preferred language param failed.");
+        HILOG_ERROR_I18N("PreferredLanguage::AddPreferredLanguage udpate preferred language param failed.");
         return I18nErrorCode::UPDATE_SYSTEM_PREFERRED_LANGUAGE_FAILED;
     }
     return I18nErrorCode::SUCCESS;

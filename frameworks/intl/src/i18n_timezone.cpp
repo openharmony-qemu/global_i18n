@@ -18,7 +18,7 @@
 #include <filesystem>
 #include <fstream>
 #include <sys/stat.h>
-#include "hilog/log.h"
+#include "i18n_hilog.h"
 #include "libxml/globals.h"
 #include "libxml/tree.h"
 #include "libxml/xmlstring.h"
@@ -45,8 +45,6 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "I18nJs" };
-using namespace OHOS::HiviewDFX;
 using namespace std::filesystem;
 
 const char *I18nTimeZone::TIMEZONE_KEY = "persist.time.timezone";
@@ -711,7 +709,7 @@ std::string I18nTimeZone::GetDisplayName(std::string localeStr, bool isDST)
         locale = icu::Locale::forLanguageTag(localeStr, status);
     }
     if (U_FAILURE(status)) {
-        HiLog::Error(LABEL, "create icu Locale for %{public}s failed.", localeStr.c_str());
+        HILOG_ERROR_I18N("create icu Locale for %{public}s failed.", localeStr.c_str());
         return result;
     }
     icu::UnicodeString name;
@@ -796,7 +794,7 @@ void I18nTimeZone::GetTimezoneIDFromZoneInfo(std::set<std::string> &availableIDs
     for (const auto &dirEntry : directory_iterator{parentPath}) {
         std::string zonePath = dirEntry.path();
         if (stat(zonePath.c_str(), &s) != 0) {
-            HiLog::Error(LABEL, "GetTimezoneIDFromZoneInfo: zoneinfo path %{public}s not exist.", parentPath.c_str());
+            HILOG_ERROR_I18N("GetTimezoneIDFromZoneInfo: zoneinfo path %{public}s not exist.", parentPath.c_str());
             return;
         }
         std::string zoneName = zonePath.substr(parentPath.length() + 1); // 1 add length of path splitor
@@ -820,7 +818,7 @@ std::set<std::string> I18nTimeZone::GetAvailableIDs(I18nErrorCode &errorCode)
     for (const auto &dirEntry : directory_iterator{ZONEINFO_PATH}) {
         std::string parentPath = dirEntry.path();
         if (stat(parentPath.c_str(), &s) != 0) {
-            HiLog::Error(LABEL, "GetAvailableIDs: zoneinfo path %{public}s not exist.", parentPath.c_str());
+            HILOG_ERROR_I18N("GetAvailableIDs: zoneinfo path %{public}s not exist.", parentPath.c_str());
             errorCode = I18nErrorCode::FAILED;
             return availableIDs;
         }
@@ -859,13 +857,13 @@ std::string I18nTimeZone::FindCityDisplayNameFromXml(std::string &cityID, std::s
     }
     xmlDocPtr doc = xmlParseFile(xmlPath.c_str());
     if (!doc) {
-        HiLog::Error(LABEL, "FindCityDisplayNameFromXml: can't parse city displayname: %{public}s", xmlPath.c_str());
+        HILOG_ERROR_I18N("FindCityDisplayNameFromXml: can't parse city displayname: %{public}s", xmlPath.c_str());
         return "";
     }
     xmlNodePtr cur = xmlDocGetRootElement(doc);
     if (!cur || xmlStrcmp(cur->name, reinterpret_cast<const xmlChar *>(CITY_DISPLAYNAME_ROOT_TAG))) {
         xmlFreeDoc(doc);
-        HiLog::Error(LABEL,
+        HILOG_ERROR_I18N(
             "FindCityDisplayNameFromXml: city displayname file %{public}s has wrong root tag.", xmlPath.c_str());
         return "";
     }
@@ -912,13 +910,13 @@ std::map<std::string, std::string> I18nTimeZone::FindCityDisplayNameMap(std::str
     }
     xmlDocPtr doc = xmlParseFile(xmlPath.c_str());
     if (!doc) {
-        HiLog::Error(LABEL, "FindCityDisplayNameMap: can't parse city displayname file %{public}s", xmlPath.c_str());
+        HILOG_ERROR_I18N("FindCityDisplayNameMap: can't parse city displayname file %{public}s", xmlPath.c_str());
         return resultMap;
     }
     xmlNodePtr cur = xmlDocGetRootElement(doc);
     if (!cur || xmlStrcmp(cur->name, reinterpret_cast<const xmlChar *>(CITY_DISPLAYNAME_ROOT_TAG))) {
         xmlFreeDoc(doc);
-        HiLog::Error(LABEL,
+        HILOG_ERROR_I18N(
             "FindCityDisplayNameMap: city displayname file %{public}s has wrong root tag.", xmlPath.c_str());
         return resultMap;
     }
@@ -964,7 +962,7 @@ bool I18nTimeZone::GetSupportedLocales()
     for (const auto &dirEntry : directory_iterator{displayNamePath}) {
         std::string xmlPath = dirEntry.path();
         if (stat(xmlPath.c_str(), &s) != 0) {
-            HiLog::Error(LABEL, "city displayname file %{public}s not exist.", xmlPath.c_str());
+            HILOG_ERROR_I18N("city displayname file %{public}s not exist.", xmlPath.c_str());
             return false;
         }
         int32_t localeStrLen = static_cast<int32_t>(xmlPath.length()) - static_cast<int32_t>(
@@ -1011,7 +1009,7 @@ std::string I18nTimeZone::GetCityDisplayName(std::string &cityID, std::string &l
         GetAvailableZoneCityIDs();
     }
     if (availableZoneCityIDs.find(cityID) == availableZoneCityIDs.end()) {
-        HiLog::Error(LABEL, "%{public}s is not supported cityID.", cityID.c_str());
+        HILOG_ERROR_I18N("%{public}s is not supported cityID.", cityID.c_str());
         return "";
     }
     std::string requestLocaleStr = GetLocaleBaseName(localeStr);
@@ -1029,14 +1027,14 @@ std::string I18nTimeZone::GetLocaleBaseName(std::string &localeStr)
     if (supportedLocales.size() == 0) {
         bool status = GetSupportedLocales();
         if (!status) {
-            HiLog::Error(LABEL, "get supported Locales failed");
+            HILOG_ERROR_I18N("get supported Locales failed");
             return "";
         }
     }
     UErrorCode errorCode = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, errorCode);
     if (U_FAILURE(errorCode)) {
-        HiLog::Error(LABEL, "create icu Locale for %{public}s failed", localeStr.c_str());
+        HILOG_ERROR_I18N("create icu Locale for %{public}s failed", localeStr.c_str());
         return "";
     }
     std::string requestLocaleStr = locale.getBaseName();
@@ -1046,7 +1044,7 @@ std::string I18nTimeZone::GetLocaleBaseName(std::string &localeStr)
     }
     locale.addLikelySubtags(errorCode);
     if (U_FAILURE(errorCode)) {
-        HiLog::Error(LABEL, "add likely subtags for %{public}s failed", localeStr.c_str());
+        HILOG_ERROR_I18N("add likely subtags for %{public}s failed", localeStr.c_str());
         return "";
     }
     requestLocaleStr = locale.getBaseName();
@@ -1077,7 +1075,7 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
     std::vector<std::string> tzIdList;
 #ifdef SUPPORT_GRAPHICS
     if (!CheckLatitudeAndLongitude(x, y)) {
-        HiLog::Error(LABEL, "invalid longitude:%{public}f or latitude: %{public}f ", x, y);
+        HILOG_ERROR_I18N("invalid longitude:%{public}f or latitude: %{public}f ", x, y);
         return tzIdList;
     }
     std::map<int, std::string> categoryMap = GetTimeZoneCategoryMap(x, y);
@@ -1099,7 +1097,7 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
     uint16_t fixedX = static_cast<uint16_t>(calculateX);
     uint16_t fixedY = static_cast<uint16_t>(calculateY);
     if (ParamExceedScope(fixedX, fixedY, width, height * fileCount)) {
-        HiLog::Error(LABEL, "invalid width:%{public}d or height: %{public}d", fixedX, fixedY);
+        HILOG_ERROR_I18N("invalid width:%{public}d or height: %{public}d", fixedX, fixedY);
         return tzIdList;
     }
     uint16_t actualHeight = fileCount > 1 ? (fixedY % height) : fixedY;
@@ -1166,7 +1164,7 @@ std::vector<int> I18nTimeZone::GetColorData(const uint16_t x, const uint16_t y,
         if (row_pointers == nullptr) {
             png_destroy_read_struct(&png_ptr, &info_ptr, 0);
             CloseFile(fp);
-            HiLog::Error(LABEL, "malloc rowbytes failed.");
+            HILOG_ERROR_I18N("malloc rowbytes failed.");
             return result;
         }
         png_start_read_image(png_ptr);
@@ -1221,26 +1219,26 @@ int I18nTimeZone::InitPngptr(png_structp &png_ptr, png_infop &info_ptr, FILE **f
 {
     bool validFilePath = CheckTzDataFilePath(preferredPath);
     if (!validFilePath) {
-        HiLog::Error(LABEL, "timezone data filepath invalid.");
+        HILOG_ERROR_I18N("timezone data filepath invalid.");
         return 1;
     }
     *fp = fopen(preferredPath.c_str(), "rb");
     if (*fp == NULL) {
-        HiLog::Error(LABEL, "timezone data resource file not exists.");
+        HILOG_ERROR_I18N("timezone data resource file not exists.");
         return 1;
     }
     png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
     if (!png_ptr) {
         png_destroy_read_struct(&png_ptr, &info_ptr, 0);
         CloseFile(*fp);
-        HiLog::Error(LABEL, "create read_struct failed.");
+        HILOG_ERROR_I18N("create read_struct failed.");
         return 1;
     }
     info_ptr = png_create_info_struct(png_ptr);
     if (!info_ptr) {
         png_destroy_read_struct(&png_ptr, &info_ptr, 0);
         CloseFile(*fp);
-        HiLog::Error(LABEL, "create info_struct failed.");
+        HILOG_ERROR_I18N("create info_struct failed.");
         return 1;
     }
     return 0;

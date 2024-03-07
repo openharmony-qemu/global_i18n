@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "hilog/log.h"
+#include "i18n_hilog.h"
 #include "locale_compare.h"
 #include "ohos/init_data.h"
 #include "unicode/locid.h"
@@ -21,8 +21,6 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "LocaleCompare" };
-using namespace OHOS::HiviewDFX;
 std::string LocaleCompare::hantSegment = "-Hant-";
 std::string LocaleCompare::latnSegment = "-Latn-";
 std::string LocaleCompare::qaagSegment = "-Qaag-";
@@ -156,7 +154,7 @@ int32_t LocaleCompare::Compare(const std::string& localeTag1, const std::string&
     locale1.addLikelySubtags(status);
     locale2.addLikelySubtags(status);
     if (U_FAILURE(status)) {
-        HiLog::Error(LABEL, "LocaleCompare::Compare add likely subtags failed.");
+        HILOG_ERROR_I18N("LocaleCompare::Compare add likely subtags failed.");
         return -1;
     }
     std::string script1 = locale1.getScript();

@@ -22,7 +22,7 @@
 #include <common_event_support.h>
 #endif
 #include <cctype>
-#include "hilog/log.h"
+#include "i18n_hilog.h"
 #include "ipc_skeleton.h"
 #include "libxml/parser.h"
 #include "locale_info.h"
@@ -47,9 +47,6 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 using namespace std;
-using namespace OHOS::HiviewDFX;
-
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "LocaleConfig" };
 const char *LocaleConfig::LANGUAGE_KEY = "persist.global.language";
 const char *LocaleConfig::LOCALE_KEY = "persist.global.locale";
 const char *LocaleConfig::HOUR_KEY = "persist.global.is24Hour";
@@ -625,14 +622,14 @@ std::string LocaleConfig::ComputeLocale(const std::string &displayLocale)
         xmlNodePtr cur = xmlDocGetRootElement(doc);
         if (!cur || xmlStrcmp(cur->name, reinterpret_cast<const xmlChar *>(supportLocalesTag))) {
             xmlFreeDoc(doc);
-            HiLog::Info(LABEL, "can not parse language supported locale file");
+            HILOG_INFO_I18N("can not parse language supported locale file");
             return DEFAULT_LOCALE;
         }
         cur = cur->xmlChildrenNode;
         while (cur != nullptr) {
             xmlChar *content = xmlNodeGetContent(cur);
             if (content == nullptr) {
-                HiLog::Info(LABEL, "get xml node content failed");
+                HILOG_INFO_I18N("get xml node content failed");
                 break;
             }
             std::map<std::string, std::string> localeInfoConfigs = {};
@@ -670,13 +667,13 @@ void LocaleConfig::ReadLangData(const char *langDataPath)
     }
     xmlDocPtr doc = xmlParseFile(langDataPath);
     if (!doc) {
-        HiLog::Info(LABEL, "can not open language data file");
+        HILOG_INFO_I18N("can not open language data file");
         return;
     }
     xmlNodePtr cur = xmlDocGetRootElement(doc);
     if (!cur || xmlStrcmp(cur->name, reinterpret_cast<const xmlChar *>(rootTag))) {
         xmlFreeDoc(doc);
-        HiLog::Info(LABEL, "parse language data file failed");
+        HILOG_INFO_I18N("parse language data file failed");
         return;
     }
     cur = cur->xmlChildrenNode;
@@ -713,16 +710,16 @@ void LocaleConfig::ReadRegionData(const char *regionDataPath)
     }
     xmlDocPtr doc = xmlParseFile(regionDataPath);
     if (!doc) {
-        HiLog::Info(LABEL, "can not open region data file");
+        HILOG_INFO_I18N("can not open region data file");
         return;
     }
     xmlNodePtr cur = xmlDocGetRootElement(doc);
     if (cur) {
-        HiLog::Info(LABEL, "cur pointer is true");
+        HILOG_INFO_I18N("cur pointer is true");
     }
     if (!cur || xmlStrcmp(cur->name, reinterpret_cast<const xmlChar *>(rootRegion))) {
         xmlFreeDoc(doc);
-        HiLog::Info(LABEL, "parse region data file failed");
+        HILOG_INFO_I18N("parse region data file failed");
         return;
     }
     cur = cur->xmlChildrenNode;
@@ -1019,14 +1016,14 @@ std::unordered_set<std::string> LocaleConfig::GetLanguageBlockedRegions()
 I18nErrorCode LocaleConfig::SetSystemLanguage(const std::string &languageTag)
 {
     if (!IsValidTag(languageTag)) {
-        HiLog::Error(LABEL, "LocaleConfig::SetSystemLanguage %{public}s is not valid language tag.",
+        HILOG_ERROR_I18N("LocaleConfig::SetSystemLanguage %{public}s is not valid language tag.",
             languageTag.c_str());
         return I18nErrorCode::INVALID_LANGUAGE_TAG;
     }
     // save old language, reset system language to old language if update locale failed.
     std::string oldLanguageTag = GetSystemLanguage();
     if (SetParameter(LANGUAGE_KEY, languageTag.data()) != 0) {
-        HiLog::Error(LABEL, "LocaleConfig::SetSystemLanguage update system language failed.");
+        HILOG_ERROR_I18N("LocaleConfig::SetSystemLanguage update system language failed.");
         return I18nErrorCode::UPDATE_SYSTEM_LANGUAGE_FAILED;
     }
     std::string newLocaleTag = UpdateLanguageOfLocale(languageTag);
@@ -1034,7 +1031,7 @@ I18nErrorCode LocaleConfig::SetSystemLanguage(const std::string &languageTag)
         return I18nErrorCode::SUCCESS;
     }
     // reset system language to old language in case that system language is inconsist with system locale's lanuage.
-    HiLog::Error(LABEL, "LocaleConfig::SetSystemLanguage update system locale failed.");
+    HILOG_ERROR_I18N("LocaleConfig::SetSystemLanguage update system locale failed.");
     SetParameter(LANGUAGE_KEY, oldLanguageTag.data());
     return I18nErrorCode::UPDATE_SYSTEM_LANGUAGE_FAILED;
 }
@@ -1042,7 +1039,7 @@ I18nErrorCode LocaleConfig::SetSystemLanguage(const std::string &languageTag)
 I18nErrorCode LocaleConfig::SetSystemRegion(const std::string &regionTag)
 {
     if (!IsValidRegion(regionTag)) {
-        HiLog::Error(LABEL, "LocaleConfig::SetSystemRegion %{public}s is not valid region tag.", regionTag.c_str());
+        HILOG_ERROR_I18N("LocaleConfig::SetSystemRegion %{public}s is not valid region tag.", regionTag.c_str());
         return I18nErrorCode::INVALID_REGION_TAG;
     }
     return SetSystemLocale(UpdateRegionOfLocale(regionTag));
@@ -1051,7 +1048,7 @@ I18nErrorCode LocaleConfig::SetSystemRegion(const std::string &regionTag)
 I18nErrorCode LocaleConfig::SetSystemLocale(const std::string &localeTag)
 {
     if (!IsValidTag(localeTag)) {
-        HiLog::Error(LABEL, "LocaleConfig::SetSystemLocale %{public}s is not a valid locale tag.", localeTag.c_str());
+        HILOG_ERROR_I18N("LocaleConfig::SetSystemLocale %{public}s is not a valid locale tag.", localeTag.c_str());
         return I18nErrorCode::INVALID_LOCALE_TAG;
     }
     if (SetParameter(LOCALE_KEY, localeTag.data()) != 0) {
@@ -1076,11 +1073,11 @@ bool LocaleConfig::IsValid24HourClockValue(const std::string &tag)
 I18nErrorCode LocaleConfig::Set24HourClock(const std::string &option)
 {
     if (!IsValid24HourClockValue(option)) {
-        HiLog::Error(LABEL, "LocaleConfig::Set24HourClock invalid 24 Hour clock tag: %{public}s", option.c_str());
+        HILOG_ERROR_I18N("LocaleConfig::Set24HourClock invalid 24 Hour clock tag: %{public}s", option.c_str());
         return I18nErrorCode::INVALID_24_HOUR_CLOCK_TAG;
     }
     if (SetParameter(HOUR_KEY, option.data()) != 0) {
-        HiLog::Error(LABEL, "LocaleConfig::Set24HourClock update 24 hour clock failed with option=%{public}s",
+        HILOG_ERROR_I18N("LocaleConfig::Set24HourClock update 24 hour clock failed with option=%{public}s",
             option.c_str());
         return I18nErrorCode::UPDATE_24_HOUR_CLOCK_FAILED;
     }
@@ -1099,7 +1096,7 @@ I18nErrorCode LocaleConfig::SetUsingLocalDigit(bool flag)
     std::string languageTag = localeTag.substr(0, 2); // obtain 2 length language code.
     auto it = localDigitMap.find(languageTag);
     if (it == localDigitMap.end()) {
-        HiLog::Error(LABEL, "LocaleConfig::SetUsingLocalDigit current system doesn't support set local digit");
+        HILOG_ERROR_I18N("LocaleConfig::SetUsingLocalDigit current system doesn't support set local digit");
         return I18nErrorCode::UPDATE_LOCAL_DIGIT_FAILED;
     }
     // update system locale.
@@ -1160,7 +1157,7 @@ void LocaleConfig::UpdateConfiguration(const char *key, const std::string &value
     configuration.AddItem(key, value);
     auto appMgrClient = std::make_unique<AppExecFwk::AppMgrClient>();
     appMgrClient->UpdateConfiguration(configuration);
-    HiLog::Info(LABEL, "LocaleConfig::UpdateLanguageConfiguration update configuration finished.");
+    HILOG_INFO_I18N("LocaleConfig::UpdateLanguageConfiguration update configuration finished.");
 }
 
 I18nErrorCode LocaleConfig::PublishCommonEvent(const std::string &eventType)
@@ -1169,11 +1166,11 @@ I18nErrorCode LocaleConfig::PublishCommonEvent(const std::string &eventType)
     localeChangeWant.SetAction(eventType);
     OHOS::EventFwk::CommonEventData event(localeChangeWant);
     if (!OHOS::EventFwk::CommonEventManager::PublishCommonEvent(event)) {
-        HiLog::Error(LABEL, "LocaleConfig::PublishCommonEvent Failed to Publish event %{public}s",
+        HILOG_ERROR_I18N("LocaleConfig::PublishCommonEvent Failed to Publish event %{public}s",
             localeChangeWant.GetAction().c_str());
         return I18nErrorCode::PUBLISH_COMMON_EVENT_FAILED;
     }
-    HiLog::Info(LABEL, "LocaleConfig::PublishCommonEvent publish event finished.");
+    HILOG_INFO_I18N("LocaleConfig::PublishCommonEvent publish event finished.");
     return I18nErrorCode::SUCCESS;
 }
 #endif
@@ -1184,7 +1181,7 @@ std::string LocaleConfig::UpdateLanguageOfLocale(const std::string &languageTag)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale languageLocale = icu::Locale::forLanguageTag(languageTag.c_str(), status);
     if (U_FAILURE(status)) {
-        HiLog::Error(LABEL, "LocaleConfig::UpdateLanguageOfLocale init icu Locale for language %{public}s failed.",
+        HILOG_ERROR_I18N("LocaleConfig::UpdateLanguageOfLocale init icu Locale for language %{public}s failed.",
             languageTag.c_str());
         return "";
     }
@@ -1194,7 +1191,7 @@ std::string LocaleConfig::UpdateLanguageOfLocale(const std::string &languageTag)
     std::string systemLocaleTag = GetSystemLocale();
     icu::Locale systemLocale = icu::Locale::forLanguageTag(systemLocaleTag.c_str(), status);
     if (U_FAILURE(status)) {
-        HiLog::Error(LABEL, "LocaleConfig::UpdateSystemLocale init icu Locale for locale %{public}s failed.",
+        HILOG_ERROR_I18N("LocaleConfig::UpdateSystemLocale init icu Locale for locale %{public}s failed.",
             systemLocaleTag.c_str());
         return "";
     }
@@ -1237,7 +1234,7 @@ std::string LocaleConfig::UpdateRegionOfLocale(const std::string &regionTag)
     UErrorCode status = U_ZERO_ERROR;
     const icu::Locale origin = icu::Locale::forLanguageTag(localeTag, status);
     if (U_FAILURE(status)) {
-        HiLog::Error(LABEL, "LocaleConfig::UpdateRegionOfLocale init origin locale failed.");
+        HILOG_ERROR_I18N("LocaleConfig::UpdateRegionOfLocale init origin locale failed.");
         return "";
     }
     icu::LocaleBuilder builder = icu::LocaleBuilder().setLanguage(origin.getLanguage()).
@@ -1245,7 +1242,7 @@ std::string LocaleConfig::UpdateRegionOfLocale(const std::string &regionTag)
     icu::Locale temp = builder.setExtension('u', "").build(status);
     string ret = temp.toLanguageTag<string>(status);
     if (U_FAILURE(status)) {
-        HiLog::Error(LABEL, "LocaleConfig::UpdateRegionOfLocale obtain new locale's tag failed.");
+        HILOG_ERROR_I18N("LocaleConfig::UpdateRegionOfLocale obtain new locale's tag failed.");
         return "";
     }
     return ret;
@@ -1258,12 +1255,12 @@ std::string LocaleConfig::CreateLocaleFromRegion(const std::string &regionTag)
     UErrorCode status = U_ZERO_ERROR;
     locale.addLikelySubtags(status);
     if (U_FAILURE(status)) {
-        HiLog::Error(LABEL, "LocaleConfig::CreateLocaleFromRegion init new locale failed.");
+        HILOG_ERROR_I18N("LocaleConfig::CreateLocaleFromRegion init new locale failed.");
         return "";
     }
     std::string localeTag = locale.toLanguageTag<string>(status);
     if (U_FAILURE(status)) {
-        HiLog::Error(LABEL, "LocaleConfig::CreateLocaleFromRegion obtain new locale's tag failed.");
+        HILOG_ERROR_I18N("LocaleConfig::CreateLocaleFromRegion obtain new locale's tag failed.");
         return "";
     }
     return localeTag;

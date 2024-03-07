@@ -14,7 +14,7 @@
  */
 
 #include <singleton.h>
-#include "hilog/log.h"
+#include "i18n_hilog.h"
 #include "i18n_service_ability_load_manager.h"
 #include "iremote_object.h"
 #include "i18n_service_ability_load_callback.h"
@@ -22,15 +22,12 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "I18nServiceAbilityLoadCallback" };
-using namespace OHOS::HiviewDFX;
-
 void I18nServiceAbilityLoadCallback::OnLoadSystemAbilitySuccess(int32_t systemAbilityId,
     const sptr<IRemoteObject> &remoteObject)
 {
     auto loadMgr = DelayedSingleton<I18nServiceAbilityLoadManager>::GetInstance();
     if (loadMgr == nullptr) {
-        HiLog::Error(LABEL, "I18nServiceAbilityLoadCallback::OnLoadSystemAbilitySuccess get load manager failed.");
+        HILOG_ERROR_I18N("I18nServiceAbilityLoadCallback::OnLoadSystemAbilitySuccess get load manager failed.");
         return;
     }
     loadMgr->LoadSystemAbilitySuccess();
@@ -40,7 +37,7 @@ void I18nServiceAbilityLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbili
 {
     auto loadMgr = DelayedSingleton<I18nServiceAbilityLoadManager>::GetInstance();
     if (loadMgr == nullptr) {
-        HiLog::Error(LABEL, "I18nServiceAbilityLoadCallback::OnLoadSystemAbilityFail get load manager failed.");
+        HILOG_ERROR_I18N("I18nServiceAbilityLoadCallback::OnLoadSystemAbilityFail get load manager failed.");
         return;
     }
     loadMgr->LoadSystemAbilityFail();

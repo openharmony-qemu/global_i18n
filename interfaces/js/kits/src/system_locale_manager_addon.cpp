@@ -14,7 +14,7 @@
  */
 
 #include "error_util.h"
-#include "hilog/log.h"
+#include "i18n_hilog.h"
 #include "locale_config.h"
 #include "variable_convertor.h"
 #include "system_locale_manager_addon.h"
@@ -22,9 +22,6 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "SystemLocaleManagerJs" };
-using namespace OHOS::HiviewDFX;
-
 SystemLocaleManagerAddon::SystemLocaleManagerAddon() : env_(nullptr) {}
 
 SystemLocaleManagerAddon::~SystemLocaleManagerAddon()
@@ -53,13 +50,13 @@ napi_value SystemLocaleManagerAddon::InitSystemLocaleManager(napi_env env, napi_
     status = napi_define_class(env, "SystemLocaleManager", NAPI_AUTO_LENGTH, SystemLocaleManagerConstructor, nullptr,
         sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Define class failed when InitSystemLocaleManager");
+        HILOG_ERROR_I18N("Define class failed when InitSystemLocaleManager");
         return nullptr;
     }
 
     status = napi_set_named_property(env, exports, "SystemLocaleManager", constructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Set property failed when InitSystemLocaleManager");
+        HILOG_ERROR_I18N("Set property failed when InitSystemLocaleManager");
         return nullptr;
     }
     return exports;
@@ -77,11 +74,11 @@ napi_value SystemLocaleManagerAddon::SystemLocaleManagerConstructor(napi_env env
     status = napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), SystemLocaleManagerAddon::Destructor,
         nullptr, nullptr);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Wrap SystemLocaleManagerAddon failed");
+        HILOG_ERROR_I18N("Wrap SystemLocaleManagerAddon failed");
         return nullptr;
     }
     if (!obj->InitSystemLocaleManagerContext(env, info)) {
-        HiLog::Error(LABEL, "Init SystemLocaleManager failed");
+        HILOG_ERROR_I18N("Init SystemLocaleManager failed");
         return nullptr;
     }
     obj.release();
@@ -93,7 +90,7 @@ bool SystemLocaleManagerAddon::InitSystemLocaleManagerContext(napi_env env, napi
     napi_value global = nullptr;
     napi_status status = napi_get_global(env, &global);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Get global failed");
+        HILOG_ERROR_I18N("Get global failed");
         return false;
     }
     env_ = env;
@@ -110,7 +107,7 @@ napi_value SystemLocaleManagerAddon::GetLanguageInfoArray(napi_env env, napi_cal
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "can not obtain getLanguageInfoArray function param.");
+        HILOG_ERROR_I18N("can not obtain getLanguageInfoArray function param.");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
         return nullptr;
     }
@@ -124,7 +121,7 @@ napi_value SystemLocaleManagerAddon::GetLanguageInfoArray(napi_env env, napi_cal
     SystemLocaleManagerAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->systemLocaleManager_) {
-        HiLog::Error(LABEL, "GetLanguageInfoArray: Get SystemLocaleManager object failed");
+        HILOG_ERROR_I18N("GetLanguageInfoArray: Get SystemLocaleManager object failed");
         return nullptr;
     }
     std::vector<LocaleItem> localeItemList = obj->systemLocaleManager_->GetLanguageInfoArray(languageList, options);
@@ -140,7 +137,7 @@ napi_value SystemLocaleManagerAddon::GetCountryInfoArray(napi_env env, napi_call
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "can not obtain getCountryInfoArray function param.");
+        HILOG_ERROR_I18N("can not obtain getCountryInfoArray function param.");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
         return nullptr;
     }
@@ -154,7 +151,7 @@ napi_value SystemLocaleManagerAddon::GetCountryInfoArray(napi_env env, napi_call
     SystemLocaleManagerAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->systemLocaleManager_) {
-        HiLog::Error(LABEL, "GetCountryInfoArray: Get SystemLocaleManager object failed");
+        HILOG_ERROR_I18N("GetCountryInfoArray: Get SystemLocaleManager object failed");
         return nullptr;
     }
     std::vector<LocaleItem> localeItemList = obj->systemLocaleManager_->GetCountryInfoArray(countryList, options);
@@ -168,14 +165,14 @@ napi_value SystemLocaleManagerAddon::GetTimeZoneCityInfoArray(napi_env env, napi
     napi_value result = nullptr;
     napi_status status = napi_create_array_with_length(env, timezoneCityItemList.size(), &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "create TimeZoneCityItem array failed.");
+        HILOG_ERROR_I18N("create TimeZoneCityItem array failed.");
         return nullptr;
     }
     for (size_t i = 0; i < timezoneCityItemList.size(); ++i) {
         napi_value item = CreateTimeZoneCityItem(env, timezoneCityItemList[i]);
         status = napi_set_element(env, result, i, item);
         if (status != napi_ok) {
-            HiLog::Error(LABEL, "Failed to set TimeZoneCityItem element.");
+            HILOG_ERROR_I18N("Failed to set TimeZoneCityItem element.");
             return nullptr;
         }
     }
@@ -187,44 +184,44 @@ napi_value SystemLocaleManagerAddon::CreateTimeZoneCityItem(napi_env env, const 
     napi_value result;
     napi_status status = napi_create_object(env, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "CreateTimeZoneCityItem: Create Locale Item object failed.");
+        HILOG_ERROR_I18N("CreateTimeZoneCityItem: Create Locale Item object failed.");
         return nullptr;
     }
     status = napi_set_named_property(env, result, "zoneId",
         VariableConvertor::CreateString(env, timezoneCityItem.zoneId));
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to set element zoneId.");
+        HILOG_ERROR_I18N("Failed to set element zoneId.");
         return nullptr;
     }
     status = napi_set_named_property(env, result, "cityId",
         VariableConvertor::CreateString(env, timezoneCityItem.cityId));
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to set element cityId.");
+        HILOG_ERROR_I18N("Failed to set element cityId.");
         return nullptr;
     }
     status = napi_set_named_property(env, result, "cityDisplayName",
         VariableConvertor::CreateString(env, timezoneCityItem.cityDisplayName));
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to set element cityDisplayName.");
+        HILOG_ERROR_I18N("Failed to set element cityDisplayName.");
         return nullptr;
     }
     status = napi_set_named_property(env, result, "offset",
         VariableConvertor::CreateNumber(env, timezoneCityItem.offset));
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to set element offset.");
+        HILOG_ERROR_I18N("Failed to set element offset.");
         return nullptr;
     }
     status = napi_set_named_property(env, result, "zoneDisplayName",
         VariableConvertor::CreateString(env, timezoneCityItem.zoneDisplayName));
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to set element zoneDisplayName.");
+        HILOG_ERROR_I18N("Failed to set element zoneDisplayName.");
         return nullptr;
     }
     if (timezoneCityItem.rawOffset != 0) {
         status = napi_set_named_property(env, result, "rawOffset",
             VariableConvertor::CreateNumber(env, timezoneCityItem.rawOffset));
         if (status != napi_ok) {
-            HiLog::Error(LABEL, "Failed to set element rawOffset.");
+            HILOG_ERROR_I18N("Failed to set element rawOffset.");
             return nullptr;
         }
     }
@@ -263,14 +260,14 @@ napi_value SystemLocaleManagerAddon::CreateLocaleItemArray(napi_env env, const s
     napi_value result = nullptr;
     napi_status status = napi_create_array_with_length(env, localeItemList.size(), &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "create LocaleItem array failed.");
+        HILOG_ERROR_I18N("create LocaleItem array failed.");
         return nullptr;
     }
     for (size_t i = 0; i < localeItemList.size(); ++i) {
         napi_value item = CreateLocaleItem(env, localeItemList[i]);
         status = napi_set_element(env, result, i, item);
         if (status != napi_ok) {
-            HiLog::Error(LABEL, "Failed to set LocaleItem element.");
+            HILOG_ERROR_I18N("Failed to set LocaleItem element.");
             return nullptr;
         }
     }
@@ -282,32 +279,32 @@ napi_value SystemLocaleManagerAddon::CreateLocaleItem(napi_env env, const Locale
     napi_value result;
     napi_status status = napi_create_object(env, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "CreateLocaleItem: Create Locale Item object failed.");
+        HILOG_ERROR_I18N("CreateLocaleItem: Create Locale Item object failed.");
         return nullptr;
     }
     status = napi_set_named_property(env, result, "id", VariableConvertor::CreateString(env, localeItem.id));
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to set element id.");
+        HILOG_ERROR_I18N("Failed to set element id.");
         return nullptr;
     }
     status = napi_set_named_property(env, result, "displayName",
         VariableConvertor::CreateString(env, localeItem.displayName));
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to set element displayName.");
+        HILOG_ERROR_I18N("Failed to set element displayName.");
         return nullptr;
     }
     if (localeItem.localName.length() != 0) {
         status = napi_set_named_property(env, result, "localName",
             VariableConvertor::CreateString(env, localeItem.localName));
         if (status != napi_ok) {
-            HiLog::Error(LABEL, "Failed to set element localName.");
+            HILOG_ERROR_I18N("Failed to set element localName.");
             return nullptr;
         }
     }
     status = napi_set_named_property(env, result, "suggestionType", CreateSuggestionType(env,
         localeItem.suggestionType));
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to set element suggestionType.");
+        HILOG_ERROR_I18N("Failed to set element suggestionType.");
         return nullptr;
     }
     return result;
@@ -318,7 +315,7 @@ napi_value SystemLocaleManagerAddon::CreateSuggestionType(napi_env env, Suggesti
     napi_value result;
     napi_status status = napi_create_int32(env, static_cast<int32_t>(suggestionType), &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "create SuggestionType failed.");
+        HILOG_ERROR_I18N("create SuggestionType failed.");
         return nullptr;
     }
     return result;

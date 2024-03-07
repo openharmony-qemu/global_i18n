@@ -14,14 +14,11 @@
  */
 #include "rules_engine.h"
 #include <algorithm>
-#include "hilog/log.h"
+#include "i18n_hilog.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "RulesEngine" };
-using namespace OHOS::HiviewDFX;
-
 RulesEngine::RulesEngine()
 {
 }
@@ -56,12 +53,12 @@ std::vector<MatchedDateTimeInfo> RulesEngine::Match(icu::UnicodeString& message)
         icu::RegexPattern* pattern = icu::RegexPattern::compile(regex,
             URegexpFlag::UREGEX_CASE_INSENSITIVE, status);
         if (pattern == nullptr) {
-            HiLog::Error(LABEL, "Match failed because pattern is nullptr.");
+            HILOG_ERROR_I18N("Match failed because pattern is nullptr.");
             return matches;
         }
         icu::RegexMatcher* matcher = pattern->matcher(message, status);
         if (matcher == nullptr) {
-            HiLog::Error(LABEL, "Match failed because pattern matcher failed.");
+            HILOG_ERROR_I18N("Match failed because pattern matcher failed.");
             delete pattern;
             return matches;
         }
@@ -97,12 +94,12 @@ bool RulesEngine::InitRules(std::string& rulesValue)
 {
     bool isVaild = true;
     if (this->dateTimeRule == nullptr) {
-        HiLog::Error(LABEL, "InitRules failed because this->dateTimeRule is nullptr.");
+        HILOG_ERROR_I18N("InitRules failed because this->dateTimeRule is nullptr.");
         return false;
     }
     icu::RegexPattern* pattern = dateTimeRule->GetPatternsMap()["rules"];
     if (pattern == nullptr) {
-        HiLog::Error(LABEL, "InitRules failed because pattern is nullptr.");
+        HILOG_ERROR_I18N("InitRules failed because pattern is nullptr.");
         return isVaild;
     }
     UErrorCode status = U_ZERO_ERROR;
@@ -110,7 +107,7 @@ bool RulesEngine::InitRules(std::string& rulesValue)
         icu::UnicodeString rules = rulesValue.c_str();
         icu::RegexMatcher* matcher = pattern->matcher(rules, status);
         if (matcher == nullptr) {
-            HiLog::Error(LABEL, "InitRules failed because pattern matcher failed.");
+            HILOG_ERROR_I18N("InitRules failed because pattern matcher failed.");
             return false;
         }
         while (matcher->find(status) && isVaild) {
@@ -143,18 +140,18 @@ std::string RulesEngine::InitOptRules(std::string& rule)
     icu::UnicodeString matchedStr = rule.c_str();
     UErrorCode status = U_ZERO_ERROR;
     if (this->dateTimeRule == nullptr) {
-        HiLog::Error(LABEL, "InitOptRules failed because this->dateTimeRule is nullptr.");
+        HILOG_ERROR_I18N("InitOptRules failed because this->dateTimeRule is nullptr.");
         return rulesValue;
     }
     icu::RegexPattern* pattern = dateTimeRule->GetPatternsMap()["optrules"];
     if (pattern == nullptr) {
-        HiLog::Error(LABEL, "InitOptRules failed because pattern is nullptr.");
+        HILOG_ERROR_I18N("InitOptRules failed because pattern is nullptr.");
         return rulesValue;
     }
     if (param.size() != 0 || paramBackup.size() != 0) {
         icu::RegexMatcher* matcher = pattern->matcher(matchedStr, status);
         if (matcher == nullptr) {
-            HiLog::Error(LABEL, "InitOptRules failed because pattern matcher failed.");
+            HILOG_ERROR_I18N("InitOptRules failed because pattern matcher failed.");
             return rulesValue;
         }
         while (matcher->find(status)) {
@@ -195,13 +192,13 @@ std::string RulesEngine::InitSubRules(std::string& rule)
     UErrorCode status = U_ZERO_ERROR;
     icu::RegexPattern* pattern = dateTimeRule->GetPatternsMap()["subrules"];
     if (pattern == nullptr) {
-        HiLog::Error(LABEL, "InitSubRules failed because pattern is nullptr.");
+        HILOG_ERROR_I18N("InitSubRules failed because pattern is nullptr.");
         return rulesValue;
     }
     if (subRules.size() != 0) {
         icu::RegexMatcher* matcher = pattern->matcher(matchedStr, status);
         if (matcher == nullptr) {
-            HiLog::Error(LABEL, "InitSubRules failed because pattern matcher failed.");
+            HILOG_ERROR_I18N("InitSubRules failed because pattern matcher failed.");
             return rulesValue;
         }
         while (matcher->find(status)) {

@@ -14,7 +14,7 @@
  */
  
 #include "error_util.h"
-#include "hilog/log.h"
+#include "i18n_hilog.h"
 #include "js_utils.h"
 #include "locale_config.h"
 #include "variable_convertor.h"
@@ -23,9 +23,6 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "I18nNormalizerJs" };
-using namespace OHOS::HiviewDFX;
-
 static thread_local napi_ref* g_normalizerConstructor = nullptr;
 
 const char *I18nNormalizerAddon::NORMALIZER_MODE_NFC_NAME = "NFC";
@@ -56,18 +53,18 @@ napi_value I18nNormalizerAddon::InitI18nNormalizer(napi_env env, napi_value expo
     napi_status status = napi_define_class(env, "Normalizer", NAPI_AUTO_LENGTH, I18nNormalizerConstructor, nullptr,
         sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "InitI18nNormalizer: Failed to define class Normalizer at Init");
+        HILOG_ERROR_I18N("InitI18nNormalizer: Failed to define class Normalizer at Init");
         return nullptr;
     }
     exports = I18nNormalizerAddon::InitNormalizer(env, exports);
     g_normalizerConstructor = new (std::nothrow) napi_ref;
     if (!g_normalizerConstructor) {
-        HiLog::Error(LABEL, "InitI18nNormalizer: Failed to create Normalizer ref at init");
+        HILOG_ERROR_I18N("InitI18nNormalizer: Failed to create Normalizer ref at init");
         return nullptr;
     }
     status = napi_create_reference(env, constructor, 1, g_normalizerConstructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "InitI18nNormalizer: Failed to create reference g_normalizerConstructor at init.");
+        HILOG_ERROR_I18N("InitI18nNormalizer: Failed to create reference g_normalizerConstructor at init.");
         return nullptr;
     }
     return exports;
@@ -82,12 +79,12 @@ napi_value I18nNormalizerAddon::InitNormalizer(napi_env env, napi_value exports)
     napi_status status = napi_define_class(env, "I18nNormalizer", NAPI_AUTO_LENGTH, JSUtils::DefaultConstructor,
         nullptr, sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "InitNormalizer: Failed to define class Normalizer.");
+        HILOG_ERROR_I18N("InitNormalizer: Failed to define class Normalizer.");
         return nullptr;
     }
     status = napi_set_named_property(env, exports, "Normalizer", constructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "InitNormalizer: Set property failed When InitNormalizer.");
+        HILOG_ERROR_I18N("InitNormalizer: Set property failed When InitNormalizer.");
         return nullptr;
     }
     return exports;
@@ -158,7 +155,7 @@ napi_value I18nNormalizerAddon::Normalize(napi_env env, napi_callback_info info)
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_string) {
-        HiLog::Error(LABEL, "Invalid parameter type");
+        HILOG_ERROR_I18N("Invalid parameter type");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
         return nullptr;
     }
@@ -171,7 +168,7 @@ napi_value I18nNormalizerAddon::Normalize(napi_env env, napi_callback_info info)
     I18nNormalizerAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || obj == nullptr || obj->normalizer_ == nullptr) {
-        HiLog::Error(LABEL, "Get Normalizer object failed");
+        HILOG_ERROR_I18N("Get Normalizer object failed");
         return nullptr;
     }
     I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
@@ -183,7 +180,7 @@ napi_value I18nNormalizerAddon::Normalize(napi_env env, napi_callback_info info)
     napi_value result = nullptr;
     status = napi_create_string_utf8(env, normalizedText.c_str(), NAPI_AUTO_LENGTH, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Create result failed");
+        HILOG_ERROR_I18N("Create result failed");
         return nullptr;
     }
     return result;
@@ -251,21 +248,21 @@ napi_value I18nNormalizerAddon::GetI18nNormalizerInstance(napi_env env, napi_cal
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to get parameter of Normalizer.createInstance");
+        HILOG_ERROR_I18N("Failed to get parameter of Normalizer.createInstance");
         return nullptr;
     }
 
     napi_value constructor = nullptr;
     status = napi_get_reference_value(env, *g_normalizerConstructor, &constructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to create reference of normalizer Constructor");
+        HILOG_ERROR_I18N("Failed to create reference of normalizer Constructor");
         return nullptr;
     }
 
     napi_value result = nullptr;
     status = napi_new_instance(env, constructor, argc, argv, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "create normalizer instance failed");
+        HILOG_ERROR_I18N("create normalizer instance failed");
         return nullptr;
     }
     return result;

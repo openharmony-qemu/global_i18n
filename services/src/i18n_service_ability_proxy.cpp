@@ -13,15 +13,13 @@
  * limitations under the License.
  */
 
-#include "hilog/log.h"
+#include "i18n_hilog.h"
 #include "message_parcel.h"
 #include "i18n_service_ability_proxy.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "I18nServiceAbilityProxy" };
-using namespace OHOS::HiviewDFX;
 static const std::u16string DESCRIPTOR = u"OHOS.global.II18nServiceAbility";
 
 I18nServiceAbilityProxy::I18nServiceAbilityProxy(const sptr<IRemoteObject> &impl)
@@ -118,7 +116,7 @@ I18nErrorCode I18nServiceAbilityProxy::ProcessReply(int32_t reply)
 {
     I18nErrorCode err = static_cast<I18nErrorCode>(reply);
     if (err != I18nErrorCode::SUCCESS) {
-        HiLog::Error(LABEL,
+        HILOG_ERROR_I18N(
             "I18nServiceAbilityProxy::ProcessReply failed with errorcode=%{public}d", reply);
     }
     return err;

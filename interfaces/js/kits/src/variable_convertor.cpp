@@ -14,15 +14,12 @@
  */
 
 #include "error_util.h"
-#include "hilog/log.h"
+#include "i18n_hilog.h"
 #include "variable_convertor.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "VariableConvertor" };
-using namespace OHOS::HiviewDFX;
-
 bool VariableConvertor::CheckNapiValueType(napi_env env, napi_value value)
 {
     if (value != nullptr) {
@@ -42,7 +39,7 @@ void VariableConvertor::GetOptionValue(napi_env env, napi_value options, const s
     napi_valuetype type = napi_undefined;
     napi_status status = napi_typeof(env, options, &type);
     if (status != napi_ok && type != napi_object) {
-        HiLog::Error(LABEL, "GetOptionValue: Get option failed, option is not an object");
+        HILOG_ERROR_I18N("GetOptionValue: Get option failed, option is not an object");
         return;
     }
     bool hasProperty = false;
@@ -55,7 +52,7 @@ void VariableConvertor::GetOptionValue(napi_env env, napi_value options, const s
             std::vector<char> optionBuf(len + 1);
             status = napi_get_value_string_utf8(env, optionValue, optionBuf.data(), len + 1, &len);
             if (status != napi_ok) {
-                HiLog::Error(LABEL, "GetOptionValue: Failed to get string item");
+                HILOG_ERROR_I18N("GetOptionValue: Failed to get string item");
                 return;
             }
             value = optionBuf.data();
@@ -69,20 +66,20 @@ bool VariableConvertor::GetBoolOptionValue(napi_env env, napi_value &options, co
     napi_valuetype type = napi_undefined;
     napi_status status = napi_typeof(env, options, &type);
     if (status != napi_ok && type != napi_object) {
-        HiLog::Error(LABEL, "option is not an object");
+        HILOG_ERROR_I18N("option is not an object");
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
         return false;
     }
     bool hasProperty = false;
     status = napi_has_named_property(env, options, optionName.c_str(), &hasProperty);
     if (status != napi_ok || !hasProperty) {
-        HiLog::Info(LABEL, "option don't have property %{public}s", optionName.c_str());
+        HILOG_INFO_I18N("option don't have property %{public}s", optionName.c_str());
         return false;
     }
     napi_value optionValue = nullptr;
     status = napi_get_named_property(env, options, optionName.c_str(), &optionValue);
     if (status != napi_ok) {
-        HiLog::Info(LABEL, "get option %{public}s failed", optionName.c_str());
+        HILOG_INFO_I18N("get option %{public}s failed", optionName.c_str());
         return false;
     }
     napi_get_value_bool(env, optionValue, &boolVal);
@@ -94,14 +91,14 @@ std::string VariableConvertor::GetString(napi_env &env, napi_value &value, int32
     size_t len = 0;
     napi_status status = napi_get_value_string_utf8(env, value, nullptr, 0, &len);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Get string failed");
+        HILOG_ERROR_I18N("Get string failed");
         code = 1;
         return "";
     }
     std::vector<char> buf(len + 1);
     status = napi_get_value_string_utf8(env, value, buf.data(), len + 1, &len);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Create string failed");
+        HILOG_ERROR_I18N("Create string failed");
         code = 1;
         return "";
     }
@@ -111,14 +108,14 @@ std::string VariableConvertor::GetString(napi_env &env, napi_value &value, int32
 bool VariableConvertor::GetStringArrayFromJsParam(napi_env env, napi_value &jsArray, std::vector<std::string> &strArray)
 {
     if (jsArray == nullptr) {
-        HiLog::Error(LABEL, "js string array param not found.");
+        HILOG_ERROR_I18N("js string array param not found.");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
         return false;
     }
     bool isArray = false;
     napi_status status = napi_is_array(env, jsArray, &isArray);
     if (status != napi_ok || !isArray) {
-        HiLog::Error(LABEL, "js string array is not an Array.");
+        HILOG_ERROR_I18N("js string array is not an Array.");
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
         return false;
     }
@@ -130,7 +127,7 @@ bool VariableConvertor::GetStringArrayFromJsParam(napi_env env, napi_value &jsAr
         napi_get_element(env, jsArray, i, &element);
         std::string str = GetString(env, element, code);
         if (code != 0) {
-            HiLog::Error(LABEL, "can't get string from js array param.");
+            HILOG_ERROR_I18N("can't get string from js array param.");
             ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
             return false;
         }
@@ -144,7 +141,7 @@ napi_value VariableConvertor::CreateString(napi_env env, const std::string &str)
     napi_value result;
     napi_status status = napi_create_string_utf8(env, str.c_str(), NAPI_AUTO_LENGTH, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "create string js variable failed.");
+        HILOG_ERROR_I18N("create string js variable failed.");
         return nullptr;
     }
     return result;
@@ -155,7 +152,7 @@ napi_value VariableConvertor::CreateNumber(napi_env env, const int32_t &num)
     napi_value result;
     napi_status status = napi_create_int32(env, num, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "create number js variable failed.");
+        HILOG_ERROR_I18N("create number js variable failed.");
         return nullptr;
     }
     return result;

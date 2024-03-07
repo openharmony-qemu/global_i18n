@@ -13,24 +13,22 @@
  * limitations under the License.
  */
 #include "entity_recognizer.h"
-#include "hilog/log.h"
+#include "i18n_hilog.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "EntityRecognizer" };
-using namespace OHOS::HiviewDFX;
 EntityRecognizer::EntityRecognizer(icu::Locale& locale)
 {
     std::string region = locale.getCountry();
     std::string language = locale.getLanguage();
     phoneNumberMatched = new PhoneNumberMatched(region);
     if (phoneNumberMatched == nullptr) {
-        HiLog::Error(LABEL, "PhoneNumberMatched construct failed.");
+        HILOG_ERROR_I18N("PhoneNumberMatched construct failed.");
     }
     dateTimeMatched = new DateTimeMatched(language);
     if (dateTimeMatched == nullptr) {
-        HiLog::Error(LABEL, "DateTimeMatched construct failed.");
+        HILOG_ERROR_I18N("DateTimeMatched construct failed.");
     }
 }
 
@@ -46,13 +44,13 @@ std::vector<std::vector<int>> EntityRecognizer::FindEntityInfo(std::string& mess
     messageStr = ConvertQanChar(messageStr);
     std::vector<std::vector<int>> EntityInfo;
     if (phoneNumberMatched == nullptr) {
-        HiLog::Error(LABEL, "FindEntityInfo failed because phoneNumberMatched is nullptr.");
+        HILOG_ERROR_I18N("FindEntityInfo failed because phoneNumberMatched is nullptr.");
         return EntityInfo;
     }
     std::vector<int> phoneNumberInfo = phoneNumberMatched->GetMatchedPhoneNumber(messageStr);
     EntityInfo.push_back(phoneNumberInfo);
     if (dateTimeMatched == nullptr) {
-        HiLog::Error(LABEL, "FindEntityInfo failed because dateTimeMatched is nullptr.");
+        HILOG_ERROR_I18N("FindEntityInfo failed because dateTimeMatched is nullptr.");
         return EntityInfo;
     }
     std::vector<int> dateTimeInfo = dateTimeMatched->GetMatchedDateTime(messageStr);

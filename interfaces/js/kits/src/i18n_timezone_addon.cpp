@@ -14,7 +14,7 @@
  */
 #include "character.h"
 #include "error_util.h"
-#include "hilog/log.h"
+#include "i18n_hilog.h"
 #include "i18n_timezone_addon.h"
 #include "js_utils.h"
 #include "variable_convertor.h"
@@ -22,9 +22,6 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "I18nTimeZoneAddonJs" };
-using namespace OHOS::HiviewDFX;
-
 static thread_local napi_ref* g_timezoneConstructor = nullptr;
 
 I18nTimeZoneAddon::I18nTimeZoneAddon() {}
@@ -65,18 +62,18 @@ napi_value I18nTimeZoneAddon::InitI18nTimeZone(napi_env env, napi_value exports)
     napi_status status = napi_define_class(env, "TimeZone", NAPI_AUTO_LENGTH, I18nTimeZoneConstructor, nullptr,
         sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "InitI18nTimeZone: Failed to define class TimeZone at Init");
+        HILOG_ERROR_I18N("InitI18nTimeZone: Failed to define class TimeZone at Init");
         return nullptr;
     }
     exports = I18nTimeZoneAddon::InitTimeZone(env, exports);
     g_timezoneConstructor = new (std::nothrow) napi_ref;
     if (!g_timezoneConstructor) {
-        HiLog::Error(LABEL, "InitI18nTimeZone: Failed to create TimeZone ref at init");
+        HILOG_ERROR_I18N("InitI18nTimeZone: Failed to create TimeZone ref at init");
         return nullptr;
     }
     status = napi_create_reference(env, constructor, 1, g_timezoneConstructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "InitI18nTimeZone: Failed to create reference g_timezoneConstructor at init");
+        HILOG_ERROR_I18N("InitI18nTimeZone: Failed to create reference g_timezoneConstructor at init");
         return nullptr;
     }
     return exports;
@@ -95,12 +92,12 @@ napi_value I18nTimeZoneAddon::InitTimeZone(napi_env env, napi_value exports)
     napi_status status = napi_define_class(env, "I18nTimeZone", NAPI_AUTO_LENGTH, JSUtils::DefaultConstructor, nullptr,
         sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "InitTimeZone: Failed to define class TimeZone.");
+        HILOG_ERROR_I18N("InitTimeZone: Failed to define class TimeZone.");
         return nullptr;
     }
     status = napi_set_named_property(env, exports, "TimeZone", constructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "InitTimeZone: Set property failed When InitTimeZone.");
+        HILOG_ERROR_I18N("InitTimeZone: Set property failed When InitTimeZone.");
         return nullptr;
     }
     return exports;
@@ -165,7 +162,7 @@ napi_value I18nTimeZoneAddon::GetAvailableTimezoneIDs(napi_env env, napi_callbac
     napi_value result = nullptr;
     napi_status status = napi_create_array_with_length(env, timezoneIDs.size(), &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "GetAvailableTimezoneIDs: Failed to create array");
+        HILOG_ERROR_I18N("GetAvailableTimezoneIDs: Failed to create array");
         return nullptr;
     }
     size_t index = 0;
@@ -173,12 +170,12 @@ napi_value I18nTimeZoneAddon::GetAvailableTimezoneIDs(napi_env env, napi_callbac
         napi_value value = nullptr;
         status = napi_create_string_utf8(env, (*it).c_str(), NAPI_AUTO_LENGTH, &value);
         if (status != napi_ok) {
-            HiLog::Error(LABEL, "Failed to create string item");
+            HILOG_ERROR_I18N("Failed to create string item");
             return nullptr;
         }
         status = napi_set_element(env, result, index, value);
         if (status != napi_ok) {
-            HiLog::Error(LABEL, "Failed to set array item");
+            HILOG_ERROR_I18N("Failed to set array item");
             return nullptr;
         }
         ++index;
@@ -192,7 +189,7 @@ napi_value I18nTimeZoneAddon::GetAvailableZoneCityIDs(napi_env env, napi_callbac
     napi_value result = nullptr;
     napi_status status = napi_create_array_with_length(env, cityIDs.size(), &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "GetAvailableZoneCityIDs: Failed to create array");
+        HILOG_ERROR_I18N("GetAvailableZoneCityIDs: Failed to create array");
         return nullptr;
     }
     size_t index = 0;
@@ -200,12 +197,12 @@ napi_value I18nTimeZoneAddon::GetAvailableZoneCityIDs(napi_env env, napi_callbac
         napi_value value = nullptr;
         status = napi_create_string_utf8(env, (*it).c_str(), NAPI_AUTO_LENGTH, &value);
         if (status != napi_ok) {
-            HiLog::Error(LABEL, "GetAvailableZoneCityIDs: Failed to create string item");
+            HILOG_ERROR_I18N("GetAvailableZoneCityIDs: Failed to create string item");
             return nullptr;
         }
         status = napi_set_element(env, result, index, value);
         if (status != napi_ok) {
-            HiLog::Error(LABEL, "GetAvailableZoneCityIDs: Failed to set array item");
+            HILOG_ERROR_I18N("GetAvailableZoneCityIDs: Failed to set array item");
             return nullptr;
         }
         ++index;
@@ -229,7 +226,7 @@ napi_value I18nTimeZoneAddon::GetCityDisplayName(napi_env env, napi_callback_inf
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_string) {
-        HiLog::Error(LABEL, "GetCityDisplayName: Invalid parameter type");
+        HILOG_ERROR_I18N("GetCityDisplayName: Invalid parameter type");
         return nullptr;
     }
     int32_t code = 0;
@@ -271,7 +268,7 @@ napi_value I18nTimeZoneAddon::GetTimezonesByLocation(napi_env env, napi_callback
         return nullptr;
     }
     if (argc < FUNC_ARGS_COUNT) {
-        HiLog::Error(LABEL, "GetTimezonesByLocation: Missing parameter");
+        HILOG_ERROR_I18N("GetTimezonesByLocation: Missing parameter");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
         return nullptr;
     }
@@ -305,17 +302,17 @@ bool I18nTimeZoneAddon::CheckParamTypeAndScope(napi_env env, napi_value *argv, d
 {
     napi_status status = napi_get_value_double(env, argv[0], &x);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "GetTimezonesByLocation: Parse first argument x failed");
+        HILOG_ERROR_I18N("GetTimezonesByLocation: Parse first argument x failed");
         return false;
     }
     status = napi_get_value_double(env, argv[1], &y);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "GetTimezonesByLocation: Parse second argument y failed");
+        HILOG_ERROR_I18N("GetTimezonesByLocation: Parse second argument y failed");
         return false;
     }
     // -180 and 179.9 is the scope of longitude, -90 and 89.9 is the scope of latitude
     if (x < -180 || x > 179.9 || y < -90 || y > 89.9) {
-        HiLog::Error(LABEL, "GetTimezonesByLocation: Args x or y exceed it's scope.");
+        HILOG_ERROR_I18N("GetTimezonesByLocation: Args x or y exceed it's scope.");
         return false;
     }
     return true;
@@ -331,14 +328,14 @@ napi_value I18nTimeZoneAddon::GetID(napi_env env, napi_callback_info info)
     I18nTimeZoneAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->timezone_) {
-        HiLog::Error(LABEL, "GetID: Get TimeZone object failed");
+        HILOG_ERROR_I18N("GetID: Get TimeZone object failed");
         return nullptr;
     }
     std::string result = obj->timezone_->GetID();
     napi_value value = nullptr;
     status = napi_create_string_utf8(env, result.c_str(), NAPI_AUTO_LENGTH, &value);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "GetID: Create result failed");
+        HILOG_ERROR_I18N("GetID: Create result failed");
         return nullptr;
     }
     return value;
@@ -358,7 +355,7 @@ napi_value I18nTimeZoneAddon::GetTimeZoneDisplayName(napi_env env, napi_callback
     I18nTimeZoneAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->timezone_) {
-        HiLog::Error(LABEL, "GetTimeZoneDisplayName: Get TimeZone object failed");
+        HILOG_ERROR_I18N("GetTimeZoneDisplayName: Get TimeZone object failed");
         return nullptr;
     }
 
@@ -383,7 +380,7 @@ napi_value I18nTimeZoneAddon::GetTimeZoneDisplayName(napi_env env, napi_callback
     napi_value value = nullptr;
     status = napi_create_string_utf8(env, result.c_str(), NAPI_AUTO_LENGTH, &value);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "GetTimeZoneDisplayName: Create result failed");
+        HILOG_ERROR_I18N("GetTimeZoneDisplayName: Create result failed");
         return nullptr;
     }
     return value;
@@ -399,14 +396,14 @@ napi_value I18nTimeZoneAddon::GetRawOffset(napi_env env, napi_callback_info info
     I18nTimeZoneAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->timezone_) {
-        HiLog::Error(LABEL, "GetRawOffset: Get TimeZone object failed");
+        HILOG_ERROR_I18N("GetRawOffset: Get TimeZone object failed");
         return nullptr;
     }
     int32_t result = obj->timezone_->GetRawOffset();
     napi_value value = nullptr;
     status = napi_create_int32(env, result, &value);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "GetRawOffset: Create result failed");
+        HILOG_ERROR_I18N("GetRawOffset: Create result failed");
         return nullptr;
     }
     return value;
@@ -428,12 +425,12 @@ napi_value I18nTimeZoneAddon::GetOffset(napi_env env, napi_callback_info info)
         napi_valuetype valueType = napi_valuetype::napi_undefined;
         napi_typeof(env, argv[0], &valueType);
         if (valueType != napi_valuetype::napi_number) {
-            HiLog::Error(LABEL, "GetOffset: Invalid parameter type");
+            HILOG_ERROR_I18N("GetOffset: Invalid parameter type");
             return nullptr;
         }
         status = napi_get_value_double(env, argv[0], &date);
         if (status != napi_ok) {
-            HiLog::Error(LABEL, "Get parameter date failed");
+            HILOG_ERROR_I18N("Get parameter date failed");
             return nullptr;
         }
     } else {
@@ -446,14 +443,14 @@ napi_value I18nTimeZoneAddon::GetOffset(napi_env env, napi_callback_info info)
     I18nTimeZoneAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->timezone_) {
-        HiLog::Error(LABEL, "GetOffset: Get TimeZone object failed");
+        HILOG_ERROR_I18N("GetOffset: Get TimeZone object failed");
         return nullptr;
     }
     int32_t result = obj->timezone_->GetOffset(date);
     napi_value value = nullptr;
     status = napi_create_int32(env, result, &value);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "GetOffset: Create result failed");
+        HILOG_ERROR_I18N("GetOffset: Create result failed");
         return nullptr;
     }
     return value;
@@ -464,7 +461,7 @@ napi_value I18nTimeZoneAddon::StaticGetTimeZone(napi_env env, napi_value *argv, 
     napi_value constructor = nullptr;
     napi_status status = napi_get_reference_value(env, *g_timezoneConstructor, &constructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to create reference at StaticGetTimeZone");
+        HILOG_ERROR_I18N("Failed to create reference at StaticGetTimeZone");
         return nullptr;
     }
     napi_value newArgv[2] = { 0 };
@@ -476,7 +473,7 @@ napi_value I18nTimeZoneAddon::StaticGetTimeZone(napi_env env, napi_value *argv, 
     napi_value result = nullptr;
     status = napi_new_instance(env, constructor, 2, newArgv, &result); // 2 is parameter num
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "StaticGetTimeZone create instance failed");
+        HILOG_ERROR_I18N("StaticGetTimeZone create instance failed");
         return nullptr;
     }
     return result;
@@ -513,13 +510,13 @@ bool I18nTimeZoneAddon::GetStringFromJS(napi_env env, napi_value argv, std::stri
     size_t len = 0;
     napi_status status = napi_get_value_string_utf8(env, argv, nullptr, 0, &len);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to get string length");
+        HILOG_ERROR_I18N("Failed to get string length");
         return false;
     }
     std::vector<char> argvBuf(len + 1);
     status = napi_get_value_string_utf8(env, argv, argvBuf.data(), len + 1, &len);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to get string item");
+        HILOG_ERROR_I18N("Failed to get string item");
         return false;
     }
     jsString = argvBuf.data();

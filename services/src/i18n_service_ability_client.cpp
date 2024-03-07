@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "hilog/log.h"
+#include "i18n_hilog.h"
 #include "i18n_service_ability_load_manager.h"
 #include "iremote_object.h"
 #include "system_ability_definition.h"
@@ -22,18 +22,15 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "I18nServiceAbilityClient" };
-using namespace OHOS::HiviewDFX;
-
 sptr<II18nServiceAbility> I18nServiceAbilityClient::GetProxy(I18nErrorCode &err)
 {
     sptr<IRemoteObject> proxy = I18nServiceAbilityLoadManager::GetInstance()->GetI18nServiceAbility(I18N_SA_ID);
     if (proxy == nullptr) {
-        HiLog::Error(LABEL, "I18nServiceAbilityClient::GetProxy load sa failed, try again.");
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetProxy load sa failed, try again.");
         proxy = I18nServiceAbilityLoadManager::GetInstance()->GetI18nServiceAbility(I18N_SA_ID);
     }
     if (proxy == nullptr) {
-        HiLog::Error(LABEL, "I18nServiceAbilityClient::GetProxy load sa failed.");
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetProxy load sa failed.");
         err = I18nErrorCode::LOAD_SA_FAILED;
         return nullptr;
     }

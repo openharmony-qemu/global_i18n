@@ -15,7 +15,7 @@
 
 #include <vector>
 #include "error_util.h"
-#include "hilog/log.h"
+#include "i18n_hilog.h"
 #include "locale_config.h"
 #include "variable_convertor.h"
 #include "holiday_manager_addon.h"
@@ -23,9 +23,6 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "HolidayManagerJs" };
-using namespace OHOS::HiviewDFX;
-
 HolidayManagerAddon::HolidayManagerAddon() : env_(nullptr) {}
 
 HolidayManagerAddon::~HolidayManagerAddon()
@@ -53,13 +50,13 @@ napi_value HolidayManagerAddon::InitHolidayManager(napi_env env, napi_value expo
     status = napi_define_class(env, "HolidayManager", NAPI_AUTO_LENGTH, HolidayManagerConstructor, nullptr,
         sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Define class failed when InitHolidayManager");
+        HILOG_ERROR_I18N("Define class failed when InitHolidayManager");
         return nullptr;
     }
 
     status = napi_set_named_property(env, exports, "HolidayManager", constructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Set property failed when InitHolidayManager");
+        HILOG_ERROR_I18N("Set property failed when InitHolidayManager");
         return nullptr;
     }
     return exports;
@@ -85,7 +82,7 @@ napi_value HolidayManagerAddon::HolidayManagerConstructor(napi_env env, napi_cal
     status =
         napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), HolidayManagerAddon::Destructor, nullptr, nullptr);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Wrap HolidayManagerAddon failed");
+        HILOG_ERROR_I18N("Wrap HolidayManagerAddon failed");
         return nullptr;
     }
     int32_t code = 0;
@@ -94,7 +91,7 @@ napi_value HolidayManagerAddon::HolidayManagerConstructor(napi_env env, napi_cal
         return nullptr;
     }
     if (!obj->InitHolidayManagerContext(env, info, path.c_str())) {
-        HiLog::Error(LABEL, "Init HolidayManager failed");
+        HILOG_ERROR_I18N("Init HolidayManager failed");
         return nullptr;
     }
     obj.release();
@@ -106,7 +103,7 @@ bool HolidayManagerAddon::InitHolidayManagerContext(napi_env env, napi_callback_
     napi_value global = nullptr;
     napi_status status = napi_get_global(env, &global);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Get global failed");
+        HILOG_ERROR_I18N("Get global failed");
         return false;
     }
     env_ = env;
@@ -119,14 +116,14 @@ std::string HolidayManagerAddon::GetString(napi_env &env, napi_value &value, int
     size_t len = 0;
     napi_status status = napi_get_value_string_utf8(env, value, nullptr, 0, &len);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Get string failed");
+        HILOG_ERROR_I18N("Get string failed");
         code = 1;
         return "";
     }
     std::vector<char> buf(len + 1);
     status = napi_get_value_string_utf8(env, value, buf.data(), len + 1, &len);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Create string failed");
+        HILOG_ERROR_I18N("Create string failed");
         code = 1;
         return "";
     }
@@ -145,7 +142,7 @@ napi_value HolidayManagerAddon::IsHoliday(napi_env env, napi_callback_info info)
     HolidayManagerAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->holidayManager_) {
-        HiLog::Error(LABEL, "IsHoliday: Get HolidayManager object failed");
+        HILOG_ERROR_I18N("IsHoliday: Get HolidayManager object failed");
         return nullptr;
     }
     napi_value result = nullptr;
@@ -177,7 +174,7 @@ napi_value HolidayManagerAddon::GetHolidayInfoItemArray(napi_env env, napi_callb
     HolidayManagerAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->holidayManager_) {
-        HiLog::Error(LABEL, "GetHolidayInfoItemArray: Get HolidayManager object failed");
+        HILOG_ERROR_I18N("GetHolidayInfoItemArray: Get HolidayManager object failed");
         return nullptr;
     }
     bool flag = VariableConvertor::CheckNapiValueType(env, argv[0]);
@@ -196,14 +193,14 @@ napi_value HolidayManagerAddon::GetHolidayInfoItemResult(napi_env env, std::vect
     napi_value result = nullptr;
     napi_status status = napi_create_array_with_length(env, itemList.size(), &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "create HolidayInfoItem array failed.");
+        HILOG_ERROR_I18N("create HolidayInfoItem array failed.");
         return nullptr;
     }
     for (size_t i = 0; i < itemList.size(); i++) {
         napi_value item = CreateHolidayItem(env, itemList[i]);
         status = napi_set_element(env, result, i, item);
         if (status != napi_ok) {
-            HiLog::Error(LABEL, "Failed to set HolidayInfoItem element.");
+            HILOG_ERROR_I18N("Failed to set HolidayInfoItem element.");
             return nullptr;
         }
     }
@@ -234,19 +231,19 @@ int HolidayManagerAddon::GetDateValue(napi_env env, napi_value value, const std:
     napi_value funcGetDateInfo = nullptr;
     napi_status status = napi_get_named_property(env, value, method.c_str(), &funcGetDateInfo);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Get method %{public}s failed", method.c_str());
+        HILOG_ERROR_I18N("Get method %{public}s failed", method.c_str());
         return val;
     }
     napi_value ret_value = nullptr;
     status = napi_call_function(env, value, funcGetDateInfo, 0, nullptr, &ret_value);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Get milliseconds failed");
+        HILOG_ERROR_I18N("Get milliseconds failed");
         return val;
     }
 
     status = napi_get_value_int32(env, ret_value, &val);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "GetDateValue: Retrieve field failed");
+        HILOG_ERROR_I18N("GetDateValue: Retrieve field failed");
         return val;
     }
     return val;
@@ -263,7 +260,7 @@ int32_t HolidayManagerAddon::ValidateParamNumber(napi_env &env, napi_value &argv
     int32_t val = 0;
     napi_status status = napi_get_value_int32(env, argv, &val);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "ValidateParamNumber: Retrieve field failed");
+        HILOG_ERROR_I18N("ValidateParamNumber: Retrieve field failed");
         return -1;
     }
     return val;
@@ -274,38 +271,38 @@ napi_value HolidayManagerAddon::CreateHolidayItem(napi_env env, const HolidayInf
     napi_value result;
     napi_status status = napi_create_object(env, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Create Holiday Item object failed.");
+        HILOG_ERROR_I18N("Create Holiday Item object failed.");
         return nullptr;
     }
     status = napi_set_named_property(env, result, "baseName",
         VariableConvertor::CreateString(env, holidayItem.baseName));
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to set element baseName.");
+        HILOG_ERROR_I18N("Failed to set element baseName.");
         return nullptr;
     }
     status = napi_set_named_property(env, result, "year",
                                      VariableConvertor::CreateNumber(env, holidayItem.year));
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to set element year.");
+        HILOG_ERROR_I18N("Failed to set element year.");
         return nullptr;
     }
     status = napi_set_named_property(env, result, "month",
                                      VariableConvertor::CreateNumber(env, holidayItem.month));
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to set element month.");
+        HILOG_ERROR_I18N("Failed to set element month.");
         return nullptr;
     }
     status = napi_set_named_property(env, result, "day",
                                      VariableConvertor::CreateNumber(env, holidayItem.day));
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to set element day.");
+        HILOG_ERROR_I18N("Failed to set element day.");
         return nullptr;
     }
     napi_value localNames = HolidayLocalNameItem(env, holidayItem.localNames);
     if (localNames != nullptr) {
         status = napi_set_named_property(env, result, "localNames", localNames);
         if (status != napi_ok) {
-            HiLog::Error(LABEL, "Failed to set element localNames.");
+            HILOG_ERROR_I18N("Failed to set element localNames.");
             return nullptr;
         }
     }
@@ -317,31 +314,31 @@ napi_value HolidayManagerAddon::HolidayLocalNameItem(napi_env env, const std::ve
     napi_value result = nullptr;
     napi_status status = napi_create_array_with_length(env, localNames.size(), &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "create HolidayLocalName array failed.");
+        HILOG_ERROR_I18N("create HolidayLocalName array failed.");
         return nullptr;
     }
     for (size_t i = 0; i < localNames.size(); i++) {
         napi_value localNameItem;
         status = napi_create_object(env, &localNameItem);
         if (status != napi_ok) {
-            HiLog::Error(LABEL, "Create HolidayLocalName Item object failed.");
+            HILOG_ERROR_I18N("Create HolidayLocalName Item object failed.");
             return nullptr;
         }
         status = napi_set_named_property(env, localNameItem, "language",
                                          VariableConvertor::CreateString(env, localNames[i].language));
         if (status != napi_ok) {
-            HiLog::Error(LABEL, "Create HolidayLocalName.language Item object failed.");
+            HILOG_ERROR_I18N("Create HolidayLocalName.language Item object failed.");
             return nullptr;
         }
         status = napi_set_named_property(env, localNameItem, "name",
                                          VariableConvertor::CreateString(env, localNames[i].name));
         if (status != napi_ok) {
-            HiLog::Error(LABEL, "Create HolidayLocalName.name Item object failed.");
+            HILOG_ERROR_I18N("Create HolidayLocalName.name Item object failed.");
             return nullptr;
         }
         status = napi_set_element(env, result, i, localNameItem);
         if (status != napi_ok) {
-            HiLog::Error(LABEL, "Failed to set HolidayLocalName element.");
+            HILOG_ERROR_I18N("Failed to set HolidayLocalName element.");
             return nullptr;
         }
     }

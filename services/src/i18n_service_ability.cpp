@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "hilog/log.h"
+#include "i18n_hilog.h"
 #include "i18n_service_ability_load_manager.h"
 #include "locale_config.h"
 #include "preferred_language.h"
@@ -23,21 +23,18 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "I18nServiceAbility" };
-using namespace OHOS::HiviewDFX;
-
 REGISTER_SYSTEM_ABILITY_BY_ID(I18nServiceAbility, I18N_SA_ID, false);
 static const std::string UNLOAD_TASK = "i18n_service_unload";
 static const uint32_t DELAY_MILLISECONDS_FOR_UNLOAD_SA = 10000;
 
 I18nServiceAbility::I18nServiceAbility(int32_t saId, bool runOnCreate) : SystemAbility(saId, runOnCreate)
 {
-    HiLog::Info(LABEL, "I18nServiceAbility object init success.");
+    HILOG_INFO_I18N("I18nServiceAbility object init success.");
 }
 
 I18nServiceAbility::~I18nServiceAbility()
 {
-    HiLog::Info(LABEL, "I18nServiceAbility object release.");
+    HILOG_INFO_I18N("I18nServiceAbility object release.");
 }
 
 I18nErrorCode I18nServiceAbility::SetSystemLanguage(const std::string &language)
@@ -83,7 +80,7 @@ void I18nServiceAbility::UnloadI18nServiceAbility()
     auto task = [this]() {
         auto i18nSaLoadManager = DelayedSingleton<I18nServiceAbilityLoadManager>::GetInstance();
         if (i18nSaLoadManager != nullptr) {
-            HiLog::Info(LABEL, "I18nServiceAbility::UnloadI18nServiceAbility start to unload i18n sa.");
+            HILOG_INFO_I18N("I18nServiceAbility::UnloadI18nServiceAbility start to unload i18n sa.");
             i18nSaLoadManager->UnloadI18nService(I18N_SA_ID);
         }
     };
@@ -94,12 +91,12 @@ void I18nServiceAbility::UnloadI18nServiceAbility()
 
 void I18nServiceAbility::OnStart()
 {
-    HiLog::Info(LABEL, "I18nServiceAbility start.");
+    HILOG_INFO_I18N("I18nServiceAbility start.");
     bool status = Publish(this);
     if (status) {
-        HiLog::Info(LABEL, "I18nServiceAbility Publish success.");
+        HILOG_INFO_I18N("I18nServiceAbility Publish success.");
     } else {
-        HiLog::Info(LABEL, "I18nServiceAbility Publish failed.");
+        HILOG_INFO_I18N("I18nServiceAbility Publish failed.");
     }
     handler = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::Create(true));
     UnloadI18nServiceAbility();
@@ -107,7 +104,7 @@ void I18nServiceAbility::OnStart()
 
 void I18nServiceAbility::OnStop()
 {
-    HiLog::Info(LABEL, "I18nServiceAbility Stop.");
+    HILOG_INFO_I18N("I18nServiceAbility Stop.");
 }
 } // namespace I18n
 } // namespace Global

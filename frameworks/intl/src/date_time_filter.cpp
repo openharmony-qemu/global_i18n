@@ -14,15 +14,12 @@
  */
 #include "date_time_filter.h"
 #include <algorithm>
-#include "hilog/log.h"
+#include "i18n_hilog.h"
 #include "utils.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "DateTimeFilter" };
-using namespace OHOS::HiviewDFX;
-
 DateTimeFilter::DateTimeFilter(std::string& locale, DateTimeRule* dateTimeRule)
 {
     this->locale = locale;
@@ -155,7 +152,7 @@ std::vector<MatchedDateTimeInfo> DateTimeFilter::FilterOverlayFirst(std::vector<
             std::string currentRegex = currentMatch.GetRegex();
             std::string matchRegex = match.GetRegex();
             if (this->dateTimeRule == nullptr) {
-                HiLog::Error(LABEL, "FilterOverlayFirst failed because this->dateTimeRule is nullptr.");
+                HILOG_ERROR_I18N("FilterOverlayFirst failed because this->dateTimeRule is nullptr.");
                 return matchList;
             }
             // if the matched time segments overlap, retain the high-priority.
@@ -286,7 +283,7 @@ std::vector<MatchedDateTimeInfo> DateTimeFilter::FilterDateTime(icu::UnicodeStri
     UErrorCode status = U_ZERO_ERROR;
     icu::RegexPattern* pattern = dateTimeRule->GetPatternsMap()["datetime"];
     if (pattern == nullptr) {
-        HiLog::Error(LABEL, "FilterDateTime failed because pattern is nullptr.");
+        HILOG_ERROR_I18N("FilterDateTime failed because pattern is nullptr.");
         return matches;
     }
     std::string::size_type matchIndex = 1;
@@ -338,7 +335,7 @@ std::vector<MatchedDateTimeInfo> DateTimeFilter::FilterPeriod(icu::UnicodeString
     UErrorCode status = U_ZERO_ERROR;
     icu::RegexPattern* pattern = dateTimeRule->GetPatternsMap()["period"];
     if (pattern == nullptr) {
-        HiLog::Error(LABEL, "FilterPeriod failed because pattern is nullptr.");
+        HILOG_ERROR_I18N("FilterPeriod failed because pattern is nullptr.");
         return matches;
     }
     std::string::size_type matchIndex = 1;
@@ -355,7 +352,7 @@ std::vector<MatchedDateTimeInfo> DateTimeFilter::FilterPeriod(icu::UnicodeString
                 match.GetBegin() - currentMatch.GetEnd());
             icu::RegexMatcher* matcher = pattern->matcher(matchContent, status);
             if (matcher == nullptr) {
-                HiLog::Error(LABEL, "FilterPeriod failed because pattern matcher failed.");
+                HILOG_ERROR_I18N("FilterPeriod failed because pattern matcher failed.");
                 return matches;
             }
             if (matcher->matches(status)) {
@@ -430,12 +427,12 @@ bool DateTimeFilter::DealBrackets(icu::UnicodeString& content, std::vector<Match
         UErrorCode status = U_ZERO_ERROR;
         icu::RegexPattern* pattern = dateTimeRule->GetPatternsMap()["brackets"];
         if (pattern == nullptr) {
-            HiLog::Error(LABEL, "DealBrackets failed because pattern is nullptr.");
+            HILOG_ERROR_I18N("DealBrackets failed because pattern is nullptr.");
             return false;
         }
         icu::RegexMatcher* matcher = pattern->matcher(endStr, status);
         if (matcher == nullptr) {
-            HiLog::Error(LABEL, "DealBrackets failed because pattern matcher failed.");
+            HILOG_ERROR_I18N("DealBrackets failed because pattern matcher failed.");
             return false;
         }
         icu::UnicodeString groupStr;
@@ -491,7 +488,7 @@ int DateTimeFilter::GetResult(icu::UnicodeString& content, MatchedDateTimeInfo& 
     int result = 0;
     icu::UnicodeString ss = content.tempSubString(current.GetEnd(), nextMatch.GetBegin() - current.GetEnd());
     if (this->dateTimeRule == nullptr) {
-        HiLog::Error(LABEL, "GetResult failed because this->dateTimeRule is nullptr.");
+        HILOG_ERROR_I18N("GetResult failed because this->dateTimeRule is nullptr.");
         return result;
     }
     if (this->dateTimeRule->IsRelDates(ss, this->locale) || ss.trim() == '(') {
@@ -509,12 +506,12 @@ int DateTimeFilter::GetResult(icu::UnicodeString& content, MatchedDateTimeInfo& 
             UErrorCode status = U_ZERO_ERROR;
             icu::RegexPattern* pattern = dateTimeRule->GetPatternsMap()["brackets"];
             if (pattern == nullptr) {
-                HiLog::Error(LABEL, "GetResult failed because pattern is nullptr.");
+                HILOG_ERROR_I18N("GetResult failed because pattern is nullptr.");
                 return result;
             }
             icu::RegexMatcher* matcher = pattern->matcher(endStr, status);
             if (matcher == nullptr) {
-                HiLog::Error(LABEL, "GetResult failed because pattern matcher failed.");
+                HILOG_ERROR_I18N("GetResult failed because pattern matcher failed.");
                 return result;
             }
             icu::UnicodeString str = matcher->find(status) ? matcher->group(1, status) : "";

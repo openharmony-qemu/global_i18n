@@ -16,7 +16,7 @@
 #include <cstring>
 #include <filesystem>
 #include <sys/stat.h>
-#include "hilog/log.h"
+#include "i18n_hilog.h"
 #include "libxml/globals.h"
 #include "libxml/tree.h"
 #include "libxml/xmlstring.h"
@@ -26,8 +26,6 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "Taboo" };
-using namespace OHOS::HiviewDFX;
 const char* Taboo::ROOT_TAG = "taboo";
 const char* Taboo::ITEM_TAG = "item";
 const char* Taboo::NAME_TAG = "name";
@@ -66,11 +64,11 @@ std::string Taboo::ReplaceCountryName(const std::string& region, const std::stri
     const std::string& name)
 {
     if (!isTabooDataExist) {
-        HiLog::Info(LABEL, "Taboo::ReplaceCountryName Taboo data not exist.");
+        HILOG_INFO_I18N("Taboo::ReplaceCountryName Taboo data not exist.");
         return name;
     }
     if (supportedRegions.find(region) == supportedRegions.end()) {
-        HiLog::Info(LABEL, "Taboo::ReplaceCountryName taboo data don't support region %{public}s", region.c_str());
+        HILOG_INFO_I18N("Taboo::ReplaceCountryName taboo data don't support region %{public}s", region.c_str());
         return name;
     }
     std::string key = regionKey + region;
@@ -79,7 +77,7 @@ std::string Taboo::ReplaceCountryName(const std::string& region, const std::stri
     std::string fileName;
     std::tie(fallbackLanguage, fileName) = LanguageFallBack(displayLanguage);
     if (fallbackLanguage.length() == 0) {
-        HiLog::Info(LABEL, "Taboo::ReplaceCountryName language %{public}s fallback failed", displayLanguage.c_str());
+        HILOG_INFO_I18N("Taboo::ReplaceCountryName language %{public}s fallback failed", displayLanguage.c_str());
         return name;
     }
     if (localeTabooData.find(fallbackLanguage) == localeTabooData.end()) {
@@ -93,7 +91,7 @@ std::string Taboo::ReplaceCountryName(const std::string& region, const std::stri
             return tabooData[*it];
         }
     }
-    HiLog::Info(LABEL, "Taboo::ReplaceCountryName not find taboo data correspond to region %{public}s",
+    HILOG_INFO_I18N("Taboo::ReplaceCountryName not find taboo data correspond to region %{public}s",
         region.c_str());
     return name;
 }
@@ -102,11 +100,11 @@ std::string Taboo::ReplaceLanguageName(const std::string& language, const std::s
     const std::string& name)
 {
     if (!isTabooDataExist) {
-        HiLog::Info(LABEL, "Taboo::ReplaceLanguageName Taboo data not exist.");
+        HILOG_INFO_I18N("Taboo::ReplaceLanguageName Taboo data not exist.");
         return name;
     }
     if (supportedLanguages.find(language) == supportedLanguages.end()) {
-        HiLog::Error(LABEL, "Taboo::ReplaceLanguageName taboo data don't support language %{public}s",
+        HILOG_ERROR_I18N("Taboo::ReplaceLanguageName taboo data don't support language %{public}s",
             language.c_str());
         return name;
     }
@@ -116,7 +114,7 @@ std::string Taboo::ReplaceLanguageName(const std::string& language, const std::s
     std::string fileName;
     std::tie(fallbackLanguage, fileName) = LanguageFallBack(displayLanguage);
     if (fallbackLanguage.size() == 0) {
-        HiLog::Error(LABEL, "Taboo::ReplaceLanguageName language %{public}s fallback failed", displayLanguage.c_str());
+        HILOG_ERROR_I18N("Taboo::ReplaceLanguageName language %{public}s fallback failed", displayLanguage.c_str());
         return name;
     }
     if (localeTabooData.find(fallbackLanguage) == localeTabooData.end()) {
@@ -130,7 +128,7 @@ std::string Taboo::ReplaceLanguageName(const std::string& language, const std::s
             return tabooData[*it];
         }
     }
-    HiLog::Error(LABEL, "Taboo::ReplaceLanguageName not find taboo data correspond to language %{public}s",
+    HILOG_ERROR_I18N("Taboo::ReplaceLanguageName not find taboo data correspond to language %{public}s",
         language.c_str());
     return name;
 }
@@ -140,13 +138,13 @@ void Taboo::ParseTabooData(const std::string& path, DataFileType fileType, const
     xmlKeepBlanksDefault(0);
     xmlDocPtr doc = xmlParseFile(path.c_str());
     if (doc == nullptr) {
-        HiLog::Error(LABEL, "Taboo parse taboo data file failed: %{public}s", path.c_str());
+        HILOG_ERROR_I18N("Taboo parse taboo data file failed: %{public}s", path.c_str());
         return;
     }
     xmlNodePtr cur = xmlDocGetRootElement(doc);
     if (cur == nullptr || xmlStrcmp(cur->name, reinterpret_cast<const xmlChar*>(ROOT_TAG)) != 0) {
         xmlFreeDoc(doc);
-        HiLog::Error(LABEL, "Taboo get root tag from taboo data file failed: %{public}s", path.c_str());
+        HILOG_ERROR_I18N("Taboo get root tag from taboo data file failed: %{public}s", path.c_str());
         return;
     }
     cur = cur->xmlChildrenNode;
@@ -156,7 +154,7 @@ void Taboo::ParseTabooData(const std::string& path, DataFileType fileType, const
         xmlChar* name = xmlGetProp(cur, nameTag);
         xmlChar* value = xmlGetProp(cur, valueTag);
         if (name == nullptr || value == nullptr) {
-            HiLog::Error(LABEL, "Taboo get name and value property failed: %{public}s", path.c_str());
+            HILOG_ERROR_I18N("Taboo get name and value property failed: %{public}s", path.c_str());
             cur = cur->next;
             continue;
         }
@@ -247,7 +245,7 @@ void Taboo::ReadResourceList()
     for (const auto &dirEntry : directory_iterator{tabooDataPath}) {
         std::string path = dirEntry.path();
         if (stat(path.c_str(), &s) != 0) {
-            HiLog::Error(LABEL, "get path status failed");
+            HILOG_ERROR_I18N("get path status failed");
             continue;
         }
         if (s.st_mode & S_IFDIR) {

@@ -17,8 +17,7 @@
 #include <unicode/stringpiece.h>
 
 #include "algorithm"
-#include "hilog/log_c.h"
-#include "hilog/log_cpp.h"
+#include "i18n_hilog.h"
 #include "locale_config.h"
 #include "unicode/locid.h"
 #include "plural_rules.h"
@@ -35,9 +34,6 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "IntlJs" };
-using namespace OHOS::HiviewDFX;
-
 std::string PluralRules::ParseOption(std::map<std::string, std::string> &options, const std::string &key)
 {
     std::map<std::string, std::string>::iterator it = options.find(key);
@@ -132,7 +128,7 @@ void PluralRules::InitPluralRules(std::vector<std::string> &localeTags,
         }
     }
     if (status != UErrorCode::U_ZERO_ERROR || !pluralRules) {
-        HiLog::Error(LABEL, "PluralRules object created failed");
+        HILOG_ERROR_I18N("PluralRules object created failed");
         return;
     }
 }

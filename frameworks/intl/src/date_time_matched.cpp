@@ -13,18 +13,16 @@
  * limitations under the License.
  */
 #include "date_time_matched.h"
-#include "hilog/log.h"
+#include "i18n_hilog.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "DateTimeMatched" };
-using namespace OHOS::HiviewDFX;
 DateTimeMatched::DateTimeMatched(std::string& locale)
 {
     dateRuleInit = new DateRuleInit(locale);
     if (dateRuleInit == nullptr) {
-        HiLog::Error(LABEL, "DateRuleInit construct failed.");
+        HILOG_ERROR_I18N("DateRuleInit construct failed.");
     }
 }
 
@@ -38,7 +36,7 @@ std::vector<int> DateTimeMatched::GetMatchedDateTime(icu::UnicodeString& message
     icu::UnicodeString messageStr = message;
     std::vector<int> result {0};
     if (this->dateRuleInit == nullptr) {
-        HiLog::Error(LABEL, "GetMatchedDateTime failed because this->dateRuleInit is nullptr.");
+        HILOG_ERROR_I18N("GetMatchedDateTime failed because this->dateRuleInit is nullptr.");
         return result;
     }
     std::vector<MatchedDateTimeInfo> matches = this->dateRuleInit->Detect(messageStr);

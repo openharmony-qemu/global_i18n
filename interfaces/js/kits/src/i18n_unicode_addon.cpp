@@ -14,7 +14,7 @@
  */
 #include "character.h"
 #include "error_util.h"
-#include "hilog/log.h"
+#include "i18n_hilog.h"
 #include "i18n_unicode_addon.h"
 #include "js_utils.h"
 #include "variable_convertor.h"
@@ -22,9 +22,6 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "I18nUnicodeAddonJs" };
-using namespace OHOS::HiviewDFX;
-
 I18nUnicodeAddon::I18nUnicodeAddon() {}
 
 I18nUnicodeAddon::~I18nUnicodeAddon() {}
@@ -55,13 +52,13 @@ napi_value I18nUnicodeAddon::InitI18nUnicode(napi_env env, napi_value exports)
     napi_status status = napi_define_class(env, "Unicode", NAPI_AUTO_LENGTH, JSUtils::DefaultConstructor, nullptr,
         sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "InitI18nUnicode: Define class failed when InitUnicode.");
+        HILOG_ERROR_I18N("InitI18nUnicode: Define class failed when InitUnicode.");
         return nullptr;
     }
 
     status = napi_set_named_property(env, exports, "Unicode", constructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "InitI18nUnicode: Set property failed when InitUnicode.");
+        HILOG_ERROR_I18N("InitI18nUnicode: Set property failed when InitUnicode.");
         return nullptr;
     }
     return exports;
@@ -86,13 +83,13 @@ napi_value I18nUnicodeAddon::InitCharacter(napi_env env, napi_value exports)
     status = napi_define_class(env, "Character", NAPI_AUTO_LENGTH, ObjectConstructor, nullptr,
         sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Define class failed when InitCharacter");
+        HILOG_ERROR_I18N("Define class failed when InitCharacter");
         return nullptr;
     }
 
     status = napi_set_named_property(env, exports, "Character", constructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Set property failed when InitCharacter");
+        HILOG_ERROR_I18N("Set property failed when InitCharacter");
         return nullptr;
     }
     return exports;
@@ -123,7 +120,7 @@ napi_value I18nUnicodeAddon::IsDigitAddon(napi_env env, napi_callback_info info)
     napi_value result = nullptr;
     status = napi_get_boolean(env, isDigit, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Create isDigit boolean value failed");
+        HILOG_ERROR_I18N("Create isDigit boolean value failed");
         return nullptr;
     }
     return result;
@@ -154,7 +151,7 @@ napi_value I18nUnicodeAddon::IsSpaceCharAddon(napi_env env, napi_callback_info i
     napi_value result = nullptr;
     status = napi_get_boolean(env, isSpaceChar, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Create isSpaceChar boolean value failed");
+        HILOG_ERROR_I18N("Create isSpaceChar boolean value failed");
         return nullptr;
     }
     return result;
@@ -185,7 +182,7 @@ napi_value I18nUnicodeAddon::IsWhiteSpaceAddon(napi_env env, napi_callback_info 
     napi_value result = nullptr;
     status = napi_get_boolean(env, isWhiteSpace, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Create isWhiteSpace boolean value failed");
+        HILOG_ERROR_I18N("Create isWhiteSpace boolean value failed");
         return nullptr;
     }
     return result;
@@ -216,7 +213,7 @@ napi_value I18nUnicodeAddon::IsRTLCharacterAddon(napi_env env, napi_callback_inf
     napi_value result = nullptr;
     status = napi_get_boolean(env, isRTLCharacter, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Create isRTLCharacter boolean value failed");
+        HILOG_ERROR_I18N("Create isRTLCharacter boolean value failed");
         return nullptr;
     }
     return result;
@@ -247,7 +244,7 @@ napi_value I18nUnicodeAddon::IsIdeoGraphicAddon(napi_env env, napi_callback_info
     napi_value result = nullptr;
     status = napi_get_boolean(env, isIdeoGraphic, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Create isIdeoGraphic boolean value failed");
+        HILOG_ERROR_I18N("Create isIdeoGraphic boolean value failed");
         return nullptr;
     }
     return result;
@@ -278,7 +275,7 @@ napi_value I18nUnicodeAddon::IsLetterAddon(napi_env env, napi_callback_info info
     napi_value result = nullptr;
     status = napi_get_boolean(env, isLetter, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Create isLetter boolean value failed");
+        HILOG_ERROR_I18N("Create isLetter boolean value failed");
         return nullptr;
     }
     return result;
@@ -309,7 +306,7 @@ napi_value I18nUnicodeAddon::IsLowerCaseAddon(napi_env env, napi_callback_info i
     napi_value result = nullptr;
     status = napi_get_boolean(env, isLowerCase, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Create isLowerCase boolean value failed");
+        HILOG_ERROR_I18N("Create isLowerCase boolean value failed");
         return nullptr;
     }
     return result;
@@ -340,7 +337,7 @@ napi_value I18nUnicodeAddon::IsUpperCaseAddon(napi_env env, napi_callback_info i
     napi_value result = nullptr;
     status = napi_get_boolean(env, isUpperCase, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Create isUpperCase boolean value failed");
+        HILOG_ERROR_I18N("Create isUpperCase boolean value failed");
         return nullptr;
     }
     return result;
@@ -371,7 +368,7 @@ napi_value I18nUnicodeAddon::GetTypeAddon(napi_env env, napi_callback_info info)
     napi_value result = nullptr;
     status = napi_create_string_utf8(env, type.c_str(), NAPI_AUTO_LENGTH, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Create getType string value failed");
+        HILOG_ERROR_I18N("Create getType string value failed");
         return nullptr;
     }
     return result;
@@ -390,7 +387,7 @@ napi_value I18nUnicodeAddon::ObjectConstructor(napi_env env, napi_callback_info 
     status =
         napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), I18nUnicodeAddon::Destructor, nullptr, nullptr);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Wrap I18nAddon failed");
+        HILOG_ERROR_I18N("Wrap I18nAddon failed");
         return nullptr;
     }
     obj.release();

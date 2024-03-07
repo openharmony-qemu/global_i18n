@@ -15,7 +15,7 @@
 
 #include <climits>
 #include <set>
-#include "hilog/log.h"
+#include "i18n_hilog.h"
 #include "regex_rule.h"
 #include "phone_number_matched.h"
 #include "utils.h"
@@ -24,8 +24,6 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 using i18n::phonenumbers::PhoneNumber;
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "PhoneNumberMatched" };
-using namespace OHOS::HiviewDFX;
 
 const int PhoneNumberMatched::CONTAIN = 9;
 const int PhoneNumberMatched::CONTAIN_OR_INTERSECT = 8;
@@ -145,7 +143,7 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::FindShortNumbers(std::string&
     icu::RegexPattern* shortPattern = shortRegexRule->GetPattern();
     icu::RegexMatcher* shortMatch = shortPattern->matcher(message, status);
     if (shortMatch == nullptr) {
-        HiLog::Error(LABEL, "shortPattern  matcher failed.");
+        HILOG_ERROR_I18N("shortPattern  matcher failed.");
         return matchedNumberInfoList;
     }
     while (shortMatch->find(status)) {
@@ -156,7 +154,7 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::FindShortNumbers(std::string&
         PhoneNumberUtil::ErrorType errorType =
             phoneNumberUtil->ParseAndKeepRawInput(stringParse, country, &phoneNumber);
         if (errorType != PhoneNumberUtil::NO_PARSING_ERROR) {
-            HiLog::Error(LABEL, "PhoneNumberRule: failed to call the ParseAndKeepRawInput.");
+            HILOG_ERROR_I18N("PhoneNumberRule: failed to call the ParseAndKeepRawInput.");
             continue;
         }
         // Add the valid short number to the result
