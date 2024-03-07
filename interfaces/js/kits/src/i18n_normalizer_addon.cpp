@@ -34,7 +34,7 @@ const char *I18nNormalizerAddon::NORMALIZER_MODE_NFKD_NAME = "NFKD";
 
 I18nNormalizerAddon::I18nNormalizerAddon() {}
 I18nNormalizerAddon::~I18nNormalizerAddon()
-{    
+{
 }
 
 void I18nNormalizerAddon::Destructor(napi_env env, void *nativeObject, void *hint)

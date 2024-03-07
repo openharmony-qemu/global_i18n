@@ -70,6 +70,8 @@ private:
     static const char* NAME_TAG;
     static const char* VALUE_TAG;
     char tabooDataSplitor = ',';
+    static const int LANGUAGE_START_INDEX = 2; // language start index in locale string
+    static const size_t DIR_XML_LENGTH = 3; // resource directory xml's length
 };
 } // namespace I18n
 } // namespace Global

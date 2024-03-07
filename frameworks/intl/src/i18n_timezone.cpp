@@ -1037,7 +1037,8 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
     std::vector<std::string> tzIdList;
 #ifdef SUPPORT_GRAPHICS
     std::map<int, std::string> categoryMap;
-    int fixedX, fixedY;
+    int fixedX;
+    int fixedY;
     if (x < 0 && y >= 0) {
         categoryMap = categoryNum2TimezoneWN;
     } else if (x >= 0 && y >= 0) {
@@ -1056,7 +1057,8 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
     if (preferredPath == "") {
         return tzIdList;
     }
-    uint32_t width, height;
+    uint32_t width;
+    uint32_t height;
     GetTzDataWidth(filePaths, &width, &height);
     fixedX = (int)(y * (width / TZ_X_PLUS) + width / TZ_HALF_OF_SIZE);
     fixedY = (int)(x * ((height * pathLen) / (TZ_X_PLUS * TZ_HALF_OF_SIZE)) + (height * pathLen) / TZ_HALF_OF_SIZE);
