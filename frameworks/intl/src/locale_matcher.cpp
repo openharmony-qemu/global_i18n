@@ -383,14 +383,12 @@ int8_t LocaleMatcher::CompareDistance(uint64_t currentEncodedLocale, uint64_t ot
 
 size_t LocaleMatcher::ComputeTrackPathDistance(const uint64_t *requestPaths, const uint64_t *targetPaths, size_t len)
 {
-    size_t i = 0;
-    size_t j = 0;
-    for (i = 0; i < len; ++i) {
+    for (size_t i = 0; i < len; ++i) {
         if (targetPaths[i] == LocaleMatcher::ROOT_LOCALE) {
             // targetpath not in request path,so distance is 2*len
             return len * 2;
         }
-        for (j = 0; j < len; ++j) {
+        for (size_t j = 0; j < len; ++j) {
             if (requestPaths[j] == targetPaths[i]) {
                 return i + j;
             }
