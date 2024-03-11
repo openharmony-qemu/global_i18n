@@ -91,6 +91,8 @@ private:
     UNumberSignDisplay signDisplay = UNumberSignDisplay::UNUM_SIGN_AUTO;
     static const int MAX_UNIT_NUM = 500;
     static const int DEFAULT_FRACTION_DIGITS = 3;
+    static const char *DEVICE_TYPE_NAME;
+    static const int BUFFER_LEN = 10;
     icu::MeasureUnit unitArray[MAX_UNIT_NUM];
     static bool icuInitialized;
     static bool Init();
@@ -99,12 +101,15 @@ private:
     static std::unordered_map<std::string, UNumberSignDisplay> signAutoStyle;
     static std::unordered_map<std::string, UNumberSignDisplay> signAccountingStyle;
     static std::unordered_map<UMeasurementSystem, std::string> measurementSystem;
+    static std::unordered_map<std::string, UNumberUnitWidth> defaultUnitStyle;
+    static std::unordered_map<std::string, UNumberUnitWidth> defaultCurrencyStyle;
     void ParseConfigs(std::map<std::string, std::string> &configs);
     void ParseDigitsConfigs(std::map<std::string, std::string> &configs);
     void GetDigitsResolvedOptions(std::map<std::string, std::string> &map);
     void InitProperties();
     void InitDigitsProperties();
     void SetUnit(std::string &preferredUnit);
+    void SetDefaultStyle();
 };
 } // namespace I18n
 } // namespace Global

@@ -399,7 +399,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest020, TestSize.Level1)
 {
     vector<string> languages;
     LocaleConfig::GetSystemLanguages(languages);
-    EXPECT_EQ(languages.size(), 2);
+    EXPECT_EQ(languages.size(), 5);
 }
 
 /**
