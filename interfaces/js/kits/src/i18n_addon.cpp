@@ -420,11 +420,16 @@ napi_value I18nAddon::GetBestMatchLocale(napi_env env, napi_callback_info info)
         ReleaseParam(requestLocale, candidateLocales);
         return nullptr;
     }
-    auto compareFunc = [requestLocale](LocaleInfo *locale1, LocaleInfo *locale2) {
-        return -1 * LocaleMatcher::IsMoreSuitable(locale1, locale2, requestLocale);
-    };
-    std::sort(candidateLocales.begin(), candidateLocales.end(), compareFunc);
-    std::string bestMatchLocaleTag = candidateLocales.size() == 0 ? "" : candidateLocales[0]->ToString();
+    std::string bestMatchLocaleTag = "";
+    if (candidateLocales.size() > 0) {
+        LocaleInfo *bestMatch = candidateLocales[0];
+        for (size_t i = 1; i < candidateLocales.size(); ++i) {
+            if (LocaleMatcher::IsMoreSuitable(bestMatch, candidateLocales[i], requestLocale) < 0) {
+                bestMatch = candidateLocales[i];
+            }
+        }
+        bestMatchLocaleTag = bestMatch->ToString();
+    }
     ReleaseParam(requestLocale, candidateLocales);
     napi_value result = nullptr;
     status = napi_create_string_utf8(env, bestMatchLocaleTag.c_str(), NAPI_AUTO_LENGTH, &result);
