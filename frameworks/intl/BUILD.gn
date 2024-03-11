@@ -164,7 +164,6 @@ ohos_shared_library("intl_util") {
     "c_utils:utils",
     "hilog:libhilog",
     "icu:icundk",
-    "icu:ohos_icudat",
     "icu:shared_icui18n",
     "icu:shared_icuuc",
     "init:libbegetutil",
