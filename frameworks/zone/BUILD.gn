@@ -41,7 +41,6 @@ ohos_shared_library("zone_util") {
   ]
   external_deps = [
     "hilog:libhilog",
-    "icu:ohos_icudat",
     "icu:shared_icui18n",
     "icu:shared_icuuc",
   ]
