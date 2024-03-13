@@ -33,6 +33,12 @@ config("preferred_language_config") {
 }
 ohos_shared_library("preferred_language") {
   stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   public_configs = [ ":preferred_language_config" ]
   include_dirs = [ "include" ]
   sources = [ "src/preferred_language.cpp" ]
@@ -78,6 +84,12 @@ config("intl_util_config") {
 }
 ohos_shared_library("intl_util") {
   stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   public_configs = [ ":intl_util_config" ]
   include_dirs = [
     "//commonlibrary/c_utils/base/include",
