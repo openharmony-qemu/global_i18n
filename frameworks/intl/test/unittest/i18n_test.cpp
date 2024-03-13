@@ -26,6 +26,7 @@
 #include "measure_data.h"
 #include "phone_number_format_mock.h"
 #include "preferred_language.h"
+#include "date_time_sequence.h"
 
 using namespace OHOS::Global::I18n;
 using testing::ext::TestSize;
@@ -1427,6 +1428,46 @@ HWTEST_F(I18nTest, I18nFuncTest059, TestSize.Level1)
     delete request;
     delete current;
     delete other;
+}
+
+/**
+ * @tc.name: I18nFuncTest060
+ * @tc.desc: Test I18n DateTimeSequence
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest060, TestSize.Level1)
+{
+    std::string locale = "zh-Hans";
+    std::string order1 = DateTimeSequence::GetDateOrder(locale);
+    std::string order2 = DateTimeSequence::GetDateTimeOrder(locale);
+    std::string order3 = DateTimeSequence::GetAmPmTimeOrder(locale);
+    EXPECT_EQ(order1, "y-M-d");
+    EXPECT_EQ(order2, "{1} {0}");
+    EXPECT_EQ(order3, "10");
+
+    std::string locale2 = "en";
+    std::string order4 = DateTimeSequence::GetDateOrder(locale2);
+    std::string order5 = DateTimeSequence::GetDateTimeOrder(locale2);
+    std::string order6 = DateTimeSequence::GetAmPmTimeOrder(locale2);
+    EXPECT_EQ(order4, "M-d-y");
+    EXPECT_EQ(order5, "{1}, {0}");
+    EXPECT_EQ(order6, "0 1");
+
+    std::string locale3 = "ar";
+    std::string order7 = DateTimeSequence::GetDateOrder(locale3);
+    std::string order8 = DateTimeSequence::GetDateTimeOrder(locale3);
+    std::string order9 = DateTimeSequence::GetAmPmTimeOrder(locale3);
+    EXPECT_EQ(order7, "d-M-y");
+    EXPECT_EQ(order8, "{1}، {0}");
+    EXPECT_EQ(order9, "0 1");
+
+    std::string locale4 = "ug";
+    std::string order10 = DateTimeSequence::GetDateOrder(locale4);
+    std::string order11 = DateTimeSequence::GetDateTimeOrder(locale4);
+    std::string order12 = DateTimeSequence::GetAmPmTimeOrder(locale4);
+    EXPECT_EQ(order10, "d-M-y");
+    EXPECT_EQ(order11, "{1}، {0}");
+    EXPECT_EQ(order12, "0 1");
 }
 } // namespace I18n
 } // namespace Global

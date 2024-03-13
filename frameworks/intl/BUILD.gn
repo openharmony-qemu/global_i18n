@@ -125,7 +125,9 @@ ohos_shared_library("intl_util") {
   cflags_cc = [
     "-Wall",
     "-fPIC",
+    "-frtti",
   ]
+  remove_configs = [ "//build/config/compiler:no_rtti" ]
   deps = [
     ":CN_phonenumber_xml",
     ":GB_phonenumber_xml",
