@@ -25,7 +25,7 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 using i18n::phonenumbers::PhoneNumberUtil;
-using ExposeLocationName = void (*)(const char*, const char*, char*);
+using ExposeLocationName = int (*)(const char*, const char*, char*, const int);
 
 class PhoneNumberFormat {
 public:
