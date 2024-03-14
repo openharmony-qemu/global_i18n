@@ -699,10 +699,19 @@ std::string I18nTimeZone::GetDisplayName(std::string localeStr)
 std::string I18nTimeZone::GetDisplayName(std::string localeStr, bool isDST)
 {
     icu::TimeZone::EDisplayType style = icu::TimeZone::EDisplayType::LONG_GENERIC;
-    icu::Locale locale(localeStr.data());
+    UErrorCode status = U_ZERO_ERROR;
+    std::string systemLocale = LocaleConfig::GetSystemLocale();
+    icu::Locale locale = icu::Locale::forLanguageTag(systemLocale, status);
+    std::string result;
+    if (LocaleConfig::IsValidTag(localeStr)) {
+        locale = icu::Locale::forLanguageTag(localeStr, status);
+    }
+    if (U_FAILURE(status)) {
+        HiLog::Error(LABEL, "create icu Locale for %{public}s failed.", localeStr.c_str());
+        return result;
+    }
     icu::UnicodeString name;
     timezone->getDisplayName((UBool)isDST, style, locale, name);
-    std::string result;
     name.toUTF8String(result);
     return result;
 }
