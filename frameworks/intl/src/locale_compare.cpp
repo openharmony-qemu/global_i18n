@@ -140,7 +140,7 @@ int32_t LocaleCompare::Compare(const std::string& localeTag1, const std::string&
 	if (U_FAILURE(status) || U_FAILURE(status2)) {
 	    HiLog::Error(LABEL, "localeTag1: %{public}s or localeTag2: %{public}s is invalid.",
 		    locale1.c_str(), locale2.c_str());
-		return -1;
+        return -1;
 	}
     int32_t segmentScore = 3;
     const int32_t mapScore = 8;
