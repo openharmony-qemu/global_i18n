@@ -1036,21 +1036,14 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
 {
     std::vector<std::string> tzIdList;
 #ifdef SUPPORT_GRAPHICS
-    std::map<int, std::string> categoryMap;
-    int fixedX;
-    int fixedY;
-    if (x < 0 && y >= 0) {
-        categoryMap = categoryNum2TimezoneWN;
-    } else if (x >= 0 && y >= 0) {
-        categoryMap = categoryNum2TimezoneEN;
-    } else if (x < 0 && y < 0) {
-        categoryMap = categoryNum2TimezoneWS;
-    } else {
-        categoryMap = categoryNum2TimezoneES;
+    if (!CheckLatitudeAndLongitude(x, y)) {
+        HILOG_ERROR_I18N("invalid longitude:%{public}f or latitude: %{public}f ", x, y);
+        return tzIdList;
     }
+    std::map<int, std::string> categoryMap = GetTimeZoneCategoryMap(x, y);
     std::vector<std::string> filePaths = FindTzData();
-    int pathLen = filePaths.size();
-    if (pathLen < 1) {
+    size_t fileCount = filePaths.size();
+    if (fileCount < 1) {
         return tzIdList;
     }
     std::string preferredPath = GetPreferredPath(x, filePaths);
@@ -1060,13 +1053,16 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
     uint32_t width;
     uint32_t height;
     GetTzDataWidth(filePaths, &width, &height);
-    fixedX = (int)(y * (width / TZ_X_PLUS) + width / TZ_HALF_OF_SIZE);
-    fixedY = (int)(x * ((height * pathLen) / (TZ_X_PLUS * TZ_HALF_OF_SIZE)) + (height * pathLen) / TZ_HALF_OF_SIZE);
-    if (ParamExceedScope(fixedX, fixedY, width, height * pathLen)) {
+    double calculateX = y * width / (TZ_X_PLUS * 1.0) + width / (TZ_HALF_OF_SIZE * 1.0);
+    double calculateY = x * ((height * fileCount) / (TZ_X_PLUS * TZ_HALF_OF_SIZE * 1.0)) +
+                        (height * fileCount) / (TZ_HALF_OF_SIZE * 1.0);
+    uint16_t fixedX = static_cast<uint16_t>(calculateX);
+    uint16_t fixedY = static_cast<uint16_t>(calculateY);
+    if (ParamExceedScope(fixedX, fixedY, width, height * fileCount)) {
         HiLog::Error(LABEL, "invalid width:%{public}d or height: %{public}d ", fixedX, fixedY);
         return tzIdList;
     }
-    int actualHeight = pathLen > 1 ? (fixedY % height) : fixedY;
+    uint16_t actualHeight = fileCount > 1 ? (fixedY % height) : fixedY;
     std::vector<int> pixel = GetColorData(fixedX, fixedY, actualHeight, preferredPath);
     for (size_t i = 0; i < pixel.size(); i++) {
         //255 is invalid pixel value required
@@ -1079,7 +1075,38 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
     return tzIdList;
 }
 
-std::vector<int> I18nTimeZone::GetColorData(const int x, const int y, int actualHeight, std::string preferredPath)
+std::map<int, std::string> I18nTimeZone::GetTimeZoneCategoryMap(const double x, const double y)
+{
+    if (x < 0 && y >= 0) {
+        return categoryNum2TimezoneWN;
+    } else if (x >= 0 && y >= 0) {
+        return categoryNum2TimezoneEN;
+    } else if (x < 0 && y < 0) {
+        return categoryNum2TimezoneWS;
+    } else {
+        return categoryNum2TimezoneES;
+    }
+}
+
+bool I18nTimeZone::CheckLatitudeAndLongitude(const double x, const double y)
+{
+    if (x < -1.0 * TZ_X_PLUS) {
+        return false;
+    }
+    if (x >= TZ_X_PLUS * 1.0 - NUM_PRECISION) {
+        return false;
+    }
+    if (y < -1.0 * TZ_X_PLUS/TZ_HALF_OF_SIZE) {
+        return false;
+    }
+    if (y >= TZ_X_PLUS * 1.0/TZ_HALF_OF_SIZE - NUM_PRECISION) {
+        return false;
+    }
+    return true;
+}
+
+std::vector<int> I18nTimeZone::GetColorData(const uint16_t x, const uint16_t y,
+                                            uint16_t actualHeight, std::string preferredPath)
 {
     std::vector<int> result;
     FILE *fp;
@@ -1219,11 +1246,12 @@ std::string I18nTimeZone::GetPreferredPath(const double x,
 
 std::vector<std::string> I18nTimeZone::FindTzData()
 {
+    using std::filesystem::directory_iterator;
     std::map<std::string, std::vector<std::string>> pathMap;
     std::regex reg("tz_[0-9]{7}-(\\d{6})\\.dat");
     std::regex regVersion("_[0-9]{7}");
-    for (auto& entry : recursive_directory_iterator(TZ_PIXEL_PATH)) {
-        const std::string path = entry.path().string();
+    for (const auto& entry : directory_iterator{TZ_PIXEL_PATH}) {
+        const std::string path = entry.path();
         std::smatch match;
         bool found = std::regex_search(path, match, reg);
         if (found) {
@@ -1259,6 +1287,9 @@ bool I18nTimeZone::ValidateDataIntegrity(const std::vector<std::string> &pathLis
 void I18nTimeZone::SetVersionPathMap(std::string verison, std::string path,
                                      std::map<std::string, std::vector<std::string>> *pathMap)
 {
+    if (pathMap == nullptr) {
+        return;
+    }
     if (pathMap->find(verison) != pathMap->end()) {
         std::vector<std::string> *list = &(pathMap->find(verison)->second);
         list->push_back(path);
