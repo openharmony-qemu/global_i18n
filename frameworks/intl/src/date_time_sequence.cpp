@@ -24,81 +24,95 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 
-std::string DateTimeSequence::GetDateOrder(const std::string &locale)
+OrderResult DateTimeSequence::GetDateOrder(const std::string &locale)
 {
     UErrorCode icuStatus = U_ZERO_ERROR;
+    OrderResult orderResult;
     icu::Locale localeObj = icu::Locale::forLanguageTag(locale.data(), icuStatus);
     if (icuStatus != U_ZERO_ERROR) {
         HILOG_ERROR_I18N("Failed to create locale for GetDateOrder");
-        return "";
+        return orderResult;
     }
     icu::SimpleDateFormat* formatter = dynamic_cast<icu::SimpleDateFormat*>
         (icu::DateFormat::createDateInstance(icu::DateFormat::EStyle::kDefault, localeObj));
     if (icuStatus != U_ZERO_ERROR || formatter == nullptr) {
         HILOG_ERROR_I18N("Failed to create SimpleDateFormat");
-        return "";
+        return orderResult;
     }
     std::string tempValue;
     icu::UnicodeString unistr;
     formatter->toPattern(unistr);
-    delete formatter;
     unistr.toUTF8String<std::string>(tempValue);
     std::string value = ModifyOrder(tempValue);
     std::regex pattern("d+");
     std::regex reg("M+");
     value = regex_replace(value, pattern, "d");
     value = regex_replace(value, reg, "M");
-    return value;
+    orderResult = {value};
+    delete formatter;
+    return orderResult;
 }
 
-std::string DateTimeSequence::GetDateTimeOrder(const std::string &locale)
+OrderResult DateTimeSequence::GetDateTimeOrder(const std::string &locale)
 {
     UErrorCode status = U_ZERO_ERROR;
+    OrderResult orderResult;
     icu::Locale localeObj = icu::Locale::forLanguageTag(locale.data(), status);
     if (status != U_ZERO_ERROR) {
         HILOG_ERROR_I18N("Failed to create locale with inputs: %{public}s", locale.c_str());
-        return "";
+         orderResult.dateTimeOrder = -1;
+        return orderResult;
     }
     icu::SimpleDateFormat* formatter = dynamic_cast<icu::SimpleDateFormat*>
         (icu::DateFormat::createDateInstance(icu::DateFormat::EStyle::kDateTime, localeObj));
     if (status != U_ZERO_ERROR || formatter == nullptr) {
         HILOG_ERROR_I18N("Failed to create SimpleDateFormat");
-        return "";
+         orderResult.dateTimeOrder = -1;
+        return orderResult;
     }
     icu::UnicodeString pattern;
     formatter->toPattern(pattern);
-    
     std::string result;
     pattern.toUTF8String<std::string>(result);
+
+    std::regex pattrn("0([^01]+)1");
+    std::smatch match;
+    bool found = std::regex_search(result, match, pattrn);
+    // 1 represent date in front, 0 represent time in front
+    int8_t dateTimeOrder = found ? 0 : 1; 
+    orderResult = {result, dateTimeOrder};
     delete formatter;
-    return result;
+    return orderResult;
 }
 
-std::string DateTimeSequence::GetAmPmTimeOrder(const std::string &locale)
+OrderResult DateTimeSequence::GetAmPmTimeOrder(const std::string &locale)
 {
     UErrorCode status = U_ZERO_ERROR;
+    OrderResult orderResult;
     icu::Locale localeObj = icu::Locale::forLanguageTag(locale.data(), status);
     if (status != U_ZERO_ERROR) {
         HILOG_ERROR_I18N("Failed to create locale with inputs: %{public}s", locale.c_str());
-        return "";
+         orderResult.amPmTimeOrder = -1;
+        return orderResult;
     }
     icu::DateTimePatternGenerator* gen = icu::DateTimePatternGenerator::createInstance(localeObj, status);
     icu::UnicodeString skeleton("h");
     icu::UnicodeString resultStr = gen->getBestPattern(skeleton, status);
     if (U_FAILURE(status) || gen == nullptr) {
         HILOG_ERROR_I18N("Failed to create DateTimePatternGenerator");
-        return "";
+        orderResult.amPmTimeOrder = -1;
+        return orderResult;
     }
     std::string result;
     resultStr.toUTF8String<std::string>(result);
-    std::regex pattern0("a"); // a represent morning or afternoon
-    std::regex pattern1("h"); // h represent time pattern, eg: hh:mm:ss
-    std::regex pattern2("[^01\\s]");
-    result = regex_replace(result, pattern0, "1");
-    result = regex_replace(result, pattern1, "0");
-    result = regex_replace(result, pattern2, "");
+    std::regex pattrn("a[^ah]*h");
+    std::smatch match;
+    bool found = std::regex_search(result, match, pattrn);
+    // 0 represent am/pm in front
+    int8_t amPmTimeOrder = found ? 0 : 1; // 1 represent time in front
+    orderResult = {result, 0, amPmTimeOrder};
     delete gen;
-    return result;
+    return orderResult;
 }
 
 std::string DateTimeSequence::ModifyOrder(std::string &pattern)
