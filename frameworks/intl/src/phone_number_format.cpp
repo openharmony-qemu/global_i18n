@@ -131,7 +131,7 @@ std::string PhoneNumberFormat::getLocationName(const std::string &number, const 
     const char* numberStr = number.c_str();
     const char* localeStr = locale.c_str();
     char recvArr[RECV_CHAR_LEN];
-    g_func(numberStr, localeStr, recvArr);
+    g_func(numberStr, localeStr, recvArr, RECV_CHAR_LEN);
     std::string locName = recvArr;
     return locName;
 }
