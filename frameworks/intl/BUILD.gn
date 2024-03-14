@@ -94,6 +94,7 @@ ohos_shared_library("intl_util") {
     "src/date_time_format.cpp",
     "src/date_time_matched.cpp",
     "src/date_time_rule.cpp",
+    "src/date_time_sequence.cpp",
     "src/entity_recognizer.cpp",
     "src/holiday_manager.cpp",
     "src/i18n_break_iterator.cpp",
