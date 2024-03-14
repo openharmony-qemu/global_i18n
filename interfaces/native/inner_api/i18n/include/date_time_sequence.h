@@ -22,21 +22,25 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 struct OrderResult {
+
     /**
      * the year,month and day sequence,
      * empty value represent call interface failed
      */ 
     std::string dateOrder;
+
     /**
      * 0 represent time in front, 1 represent date in front
      * -1 represent call interface failed
      */
     int8_t dateTimeOrder;
+
     /**
      * 0 represent am/pm in front, 1 represent time in front
      * -1 represent call interface failed
      */
     int8_t amPmTimeOrder;
+
     // whether datetime format string starts with zero
     bool startsWithZero;
 };
@@ -50,7 +54,6 @@ public:
 private:
    static std::string ModifyOrder(std::string &pattern);
    static void ProcessNormal(char ch, int *order, size_t orderSize, int *lengths, size_t lengsSize);
-
 };
 } // namespace I18n
 } // namespace Global

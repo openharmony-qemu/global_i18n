@@ -60,14 +60,14 @@ OrderResult DateTimeSequence::GetDateTimeOrder(const std::string &locale)
     icu::Locale localeObj = icu::Locale::forLanguageTag(locale.data(), status);
     if (status != U_ZERO_ERROR) {
         HILOG_ERROR_I18N("Failed to create locale with inputs: %{public}s", locale.c_str());
-         orderResult.dateTimeOrder = -1;
+        orderResult.dateTimeOrder = -1;
         return orderResult;
     }
     icu::SimpleDateFormat* formatter = dynamic_cast<icu::SimpleDateFormat*>
         (icu::DateFormat::createDateInstance(icu::DateFormat::EStyle::kDateTime, localeObj));
     if (status != U_ZERO_ERROR || formatter == nullptr) {
         HILOG_ERROR_I18N("Failed to create SimpleDateFormat");
-         orderResult.dateTimeOrder = -1;
+        orderResult.dateTimeOrder = -1;
         return orderResult;
     }
     icu::UnicodeString pattern;
@@ -79,7 +79,7 @@ OrderResult DateTimeSequence::GetDateTimeOrder(const std::string &locale)
     std::smatch match;
     bool found = std::regex_search(result, match, pattrn);
     // 1 represent date in front, 0 represent time in front
-    int8_t dateTimeOrder = found ? 0 : 1; 
+    int8_t dateTimeOrder = found ? 0 : 1;
     orderResult = {result, dateTimeOrder};
     delete formatter;
     return orderResult;
@@ -92,7 +92,7 @@ OrderResult DateTimeSequence::GetAmPmTimeOrder(const std::string &locale)
     icu::Locale localeObj = icu::Locale::forLanguageTag(locale.data(), status);
     if (status != U_ZERO_ERROR) {
         HILOG_ERROR_I18N("Failed to create locale with inputs: %{public}s", locale.c_str());
-         orderResult.amPmTimeOrder = -1;
+        orderResult.amPmTimeOrder = -1;
         return orderResult;
     }
     icu::DateTimePatternGenerator* gen = icu::DateTimePatternGenerator::createInstance(localeObj, status);
