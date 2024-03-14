@@ -53,11 +53,11 @@ public:
     static std::unordered_set<std::string> GetBlockedLanguages();
     static std::unordered_set<std::string> GetBlockedRegions();
     static std::unordered_set<std::string> GetLanguageBlockedRegions();
+    static bool IsValidTag(const std::string &tag);
 
 private:
     static bool IsValidLanguage(const std::string &language);
     static bool IsValidRegion(const std::string &region);
-    static bool IsValidTag(const std::string &tag);
     static void Split(const std::string &src, const std::string &sep, std::vector<std::string> &dest);
     static bool UpdateSystemLocale(const std::string &language);
     static constexpr uint32_t LANGUAGE_LEN = 2;
