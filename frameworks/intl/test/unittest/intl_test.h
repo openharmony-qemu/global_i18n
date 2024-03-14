@@ -19,6 +19,17 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
+class IntlTest : public testing::Test {
+public:
+    static std::string originalLanguage;
+    static std::string originalRegion;
+    static std::string originalLocale;
+    static void SetUpTestCase(void);
+    static void TearDownTestCase(void);
+    void SetUp();
+    void TearDown();
+};
+
 int IntlFuncTest001(void);
 int IntlFuncTest002(void);
 int IntlFuncTest003(void);
@@ -82,6 +93,11 @@ int IntlFuncTest0060(void);
 int IntlFuncTest0061(void);
 int IntlFuncTest0062(void);
 int IntlFuncTest0063(void);
+int IntlFuncTest0064(void);
+int IntlFuncTest0065(void);
+int IntlFuncTest0066(void);
+int IntlFuncTest0067(void);
+int IntlFuncTest0068(void);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

@@ -116,8 +116,18 @@ private:
     static const char *TIMEZONE_KEY;
     static const char *DEFAULT_TIMEZONE;
     static constexpr int SYS_PARAM_LEN = 128;
+    static const int BUFFER_LEN = 10;
+    static const char* DEVICE_TYPE_NAME;
     static bool Init();
     static std::map<std::string, icu::DateFormat::EStyle> dateTimeStyle;
+    enum DefaultStyle {
+        LONG,
+        DEFAULT,
+        SHORT,
+    };
+    static std::unordered_map<DateTimeFormat::DefaultStyle, icu::DateFormat::EStyle> DefaultDTStyle;
+    static std::unordered_map<std::string, DefaultStyle> DeviceToStyle;
+    DefaultStyle defaultStyle;
     bool InitWithLocale(const std::string &curLocale, std::map<std::string, std::string> &configs);
     bool InitWithDefaultLocale(std::map<std::string, std::string> &configs);
     void ParseConfigsPartOne(std::map<std::string, std::string> &configs);
@@ -126,10 +136,15 @@ private:
     void ComputeSkeleton();
     void ComputePattern();
     void SetDayPeriod();
+    static DefaultStyle GetDefaultStyle();
     void ComputePartOfPattern(std::string option, char16_t character, std::string twoDigitChar,
         std::string numericChar);
     void ComputeHourCycleChars();
-    void ComputeWeekdayOrEraOfPattern(std::string option, char16_t character, std::string longChar,
+    void ComputeTimeZoneOfPattern(std::string option, char16_t character, std::string longChar,
+        std::string shortChar);
+    void ComputeWeekdayOfPattern(std::string option, char16_t character, std::string longChar,
+        std::string shortChar, std::string narrowChar);
+    void ComputeEraOfPattern(std::string option, char16_t character, std::string longChar,
         std::string shortChar, std::string narrowChar);
     void InitDateFormatWithoutConfigs(UErrorCode &status);
     void InitDateFormat(UErrorCode &status);

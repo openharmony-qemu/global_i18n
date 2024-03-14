@@ -14,12 +14,14 @@
  */
 #include "locale_config.h"
 #include "ohos/init_data.h"
+#include "parameter.h"
 #include "utils.h"
 #include "number_format.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
+const char* NumberFormat::DEVICE_TYPE_NAME = "const.product.devicetype";
 bool NumberFormat::icuInitialized = NumberFormat::Init();
 
 std::unordered_map<std::string, UNumberUnitWidth> NumberFormat::unitStyle = {
@@ -55,8 +57,25 @@ std::unordered_map<UMeasurementSystem, std::string> NumberFormat::measurementSys
     { UMeasurementSystem::UMS_UK, "UK" },
 };
 
+std::unordered_map<std::string, UNumberUnitWidth> NumberFormat::defaultUnitStyle = {
+    { "tablet", UNumberUnitWidth::UNUM_UNIT_WIDTH_FULL_NAME },
+    { "2in1", UNumberUnitWidth::UNUM_UNIT_WIDTH_FULL_NAME },
+    { "tv", UNumberUnitWidth::UNUM_UNIT_WIDTH_FULL_NAME },
+    { "pc", UNumberUnitWidth::UNUM_UNIT_WIDTH_FULL_NAME },
+    { "wearable", UNumberUnitWidth::UNUM_UNIT_WIDTH_NARROW },
+    { "liteWearable", UNumberUnitWidth::UNUM_UNIT_WIDTH_NARROW },
+    { "watch", UNumberUnitWidth::UNUM_UNIT_WIDTH_NARROW }
+};
+
+std::unordered_map<std::string, UNumberUnitWidth> NumberFormat::defaultCurrencyStyle = {
+    { "wearable", UNumberUnitWidth::UNUM_UNIT_WIDTH_NARROW },
+    { "liteWearable", UNumberUnitWidth::UNUM_UNIT_WIDTH_NARROW },
+    { "watch", UNumberUnitWidth::UNUM_UNIT_WIDTH_NARROW }
+};
+
 NumberFormat::NumberFormat(const std::vector<std::string> &localeTags, std::map<std::string, std::string> &configs)
 {
+    SetDefaultStyle();
     UErrorCode status = U_ZERO_ERROR;
     std::unique_ptr<icu::LocaleBuilder> builder = nullptr;
     builder = std::make_unique<icu::LocaleBuilder>();
@@ -458,6 +477,21 @@ bool NumberFormat::Init()
 {
     SetHwIcuDirectory();
     return true;
+}
+
+void NumberFormat::SetDefaultStyle()
+{
+    char value[BUFFER_LEN];
+    int code = GetParameter(DEVICE_TYPE_NAME, "", value, BUFFER_LEN);
+    if (code > 0) {
+        std::string deviceType = value;
+        if (defaultUnitStyle.find(deviceType) != defaultUnitStyle.end()) {
+            unitDisplay = defaultUnitStyle[deviceType];
+        }
+        if (defaultCurrencyStyle.find(deviceType) != defaultCurrencyStyle.end()) {
+            currencyDisplay = defaultCurrencyStyle[deviceType];
+        }
+    }
 }
 } // namespace I18n
 } // namespace Global

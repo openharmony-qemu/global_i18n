@@ -14,15 +14,24 @@
  */
 #include "locale_config.h"
 #include "ohos/init_data.h"
+#include "parameter.h"
 #include "relative_time_format.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
+const char* RelativeTimeFormat::DEVICE_TYPE_NAME = "const.product.devicetype";
+
 std::unordered_map<std::string, UDateRelativeDateTimeFormatterStyle> RelativeTimeFormat::relativeFormatStyle = {
     { "long", UDAT_STYLE_LONG },
     { "short", UDAT_STYLE_SHORT },
     { "narrow", UDAT_STYLE_NARROW }
+};
+
+std::unordered_map<std::string, std::string> RelativeTimeFormat::defaultFormatStyle = {
+    { "wearable", "narrow" },
+    { "liteWearable", "narrow" },
+    { "watch", "narrow" }
 };
 
 std::unordered_map<std::string, URelativeDateTimeUnit> RelativeTimeFormat::relativeUnits = {
@@ -47,6 +56,7 @@ std::unordered_map<std::string, URelativeDateTimeUnit> RelativeTimeFormat::relat
 RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTags,
     std::map<std::string, std::string> &configs)
 {
+    SetDefaultStyle();
     UErrorCode status = U_ZERO_ERROR;
     ParseConfigs(configs);
     for (size_t i = 0; i < localeTags.size(); i++) {
@@ -99,9 +109,9 @@ void RelativeTimeFormat::ParseConfigs(std::map<std::string, std::string> &config
 {
     if (configs.count("style") > 0) {
         styleString = configs["style"];
-        if (relativeFormatStyle.count(styleString) > 0) {
-            style = relativeFormatStyle[styleString];
-        }
+    }
+    if (relativeFormatStyle.count(styleString) > 0) {
+        style = relativeFormatStyle[styleString];
     }
     if (configs.count("numeric") > 0) {
         numeric = configs["numeric"];
@@ -207,6 +217,18 @@ void RelativeTimeFormat::GetResolvedOptions(std::map<std::string, std::string> &
     }
     if (!numberingSystem.empty()) {
         map.insert(std::make_pair("numberingSystem", numberingSystem));
+    }
+}
+
+void RelativeTimeFormat::SetDefaultStyle()
+{
+    char value[BUFFER_LEN];
+    int code = GetParameter(DEVICE_TYPE_NAME, "", value, BUFFER_LEN);
+    if (code > 0) {
+        std::string deviceType = value;
+        if (defaultFormatStyle.find(deviceType) != defaultFormatStyle.end()) {
+            styleString = defaultFormatStyle[deviceType];
+        }
     }
 }
 } // namespace I18n
