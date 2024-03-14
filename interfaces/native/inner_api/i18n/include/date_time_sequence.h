@@ -26,7 +26,7 @@ struct OrderResult {
     /**
      * the year,month and day sequence,
      * empty value represent call interface failed
-     */ 
+     */
     std::string dateOrder;
 
     /**
