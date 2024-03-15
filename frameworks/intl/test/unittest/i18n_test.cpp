@@ -1442,32 +1442,32 @@ HWTEST_F(I18nTest, I18nFuncTest060, TestSize.Level1)
     OrderResult order2 = DateTimeSequence::GetDateTimeOrder(locale);
     OrderResult order3 = DateTimeSequence::GetAmPmTimeOrder(locale);
     EXPECT_EQ(order1.dateOrder, "y-M-d");
-    EXPECT_EQ(order2.dateTimeOrder, 1);
-    EXPECT_EQ(order3.amPmTimeOrder, 0);
+    EXPECT_EQ(order2.dateTimeOrder, "10");
+    EXPECT_EQ(order3.amPmTimeOrder, "01");
 
     std::string locale2 = "en";
     OrderResult order4 = DateTimeSequence::GetDateOrder(locale2);
     OrderResult order5 = DateTimeSequence::GetDateTimeOrder(locale2);
     OrderResult order6 = DateTimeSequence::GetAmPmTimeOrder(locale2);
     EXPECT_EQ(order4.dateOrder, "M-d-y");
-    EXPECT_EQ(order5.dateTimeOrder, 1);
-    EXPECT_EQ(order6.amPmTimeOrder, 1);
+    EXPECT_EQ(order5.dateTimeOrder, "10");
+    EXPECT_EQ(order6.amPmTimeOrder, "10");
 
     std::string locale3 = "ar";
     OrderResult order7 = DateTimeSequence::GetDateOrder(locale3);
     OrderResult order8 = DateTimeSequence::GetDateTimeOrder(locale3);
     OrderResult order9 = DateTimeSequence::GetAmPmTimeOrder(locale3);
-    EXPECT_EQ(order7.dateOrder, "d-M-y");
-    EXPECT_EQ(order8.dateTimeOrder, 1);
-    EXPECT_EQ(order9.amPmTimeOrder, 1);
+    EXPECT_EQ(order7.dateOrder, "y-M-d");
+    EXPECT_EQ(order8.dateTimeOrder, "10");
+    EXPECT_EQ(order9.amPmTimeOrder, "01");
 
     std::string locale4 = "ug";
     OrderResult order10 = DateTimeSequence::GetDateOrder(locale4);
     OrderResult order11 = DateTimeSequence::GetDateTimeOrder(locale4);
     OrderResult order12 = DateTimeSequence::GetAmPmTimeOrder(locale4);
-    EXPECT_EQ(order10.dateOrder, "d-M-y");
-    EXPECT_EQ(order11.dateTimeOrder, 1);
-    EXPECT_EQ(order12.amPmTimeOrder, 1);
+    EXPECT_EQ(order10.dateOrder, "M-d-y");
+    EXPECT_EQ(order11.dateTimeOrder, "01");
+    EXPECT_EQ(order12.amPmTimeOrder, "10");
 }
 } // namespace I18n
 } // namespace Global
