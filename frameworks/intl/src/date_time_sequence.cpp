@@ -25,30 +25,30 @@ namespace Global {
 namespace I18n {
 
 const std::unordered_map<std::string, std::string> DateTimeSequence::DATE_ORDER_MAP = {
-    {"ug" , "M-d-y"},
-    {"ar" , "y-M-d"},
-    {"fa" , "y-M-d"},
-    {"ur" , "y-M-d"},
-    {"iw" , "y-M-d"},
-    {"he" , "y-M-d"},
+    { "ug", "M-d-y" },
+    { "ar", "y-M-d" },
+    { "fa", "y-M-d" },
+    { "ur", "y-M-d" },
+    { "iw", "y-M-d" },
+    { "he", "y-M-d" },
 };
 
 const std::unordered_map<std::string, std::string> DateTimeSequence::DATETIME_ORDER_MAP = {
-    {"ug" , "01"},
-    {"ar" , "10"},
-    {"fa" , "01"},
-    {"ur" , "10"},
-    {"iw" , "10"},
-    {"he" , "10"},
+    { "ug", "01" },
+    { "ar", "10" },
+    { "fa", "01" },
+    { "ur", "10" },
+    { "iw", "10" },
+    { "he", "10" },
 };
 
 const std::unordered_map<std::string, std::string> DateTimeSequence::AM_PM_TIME_ORDER_MAP = {
-    {"ug" , "10"},
-    {"ar" , "01"},
-    {"fa" , "01"},
-    {"ur" , "10"},
-    {"iw" , "01"},
-    {"he" , "01"},
+    { "ug", "10" },
+    { "ar", "01" },
+    { "fa", "01" },
+    { "ur", "10" },
+    { "iw", "01" },
+    { "he", "01" },
 };
 
 OrderResult DateTimeSequence::GetDateOrder(const std::string &locale)
