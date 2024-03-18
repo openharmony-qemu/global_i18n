@@ -19,7 +19,7 @@
 #include <vector>
 #include <string>
 #include "matched_number_info.h"
-#include "cpp/src/phonenumbers/phonenumbermatch.h"
+#include "phonenumbers/phonenumbermatch.h"
 
 namespace OHOS {
 namespace Global {

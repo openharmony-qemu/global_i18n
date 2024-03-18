@@ -14,9 +14,9 @@
  */
 #include "regex_rule.h"
 #include "i18n_hilog.h"
-#include "cpp/src/phonenumbers/phonenumberutil.h"
-#include "cpp/src/phonenumbers/phonenumber.h"
-#include "cpp/src/phonenumbers/shortnumberinfo.h"
+#include "phonenumbers/phonenumberutil.h"
+#include "phonenumbers/phonenumber.h"
+#include "phonenumbers/shortnumberinfo.h"
 
 namespace OHOS {
 namespace Global {

@@ -19,9 +19,9 @@
 #include <unicode/regex.h>
 #include <unordered_set>
 #include <vector>
-#include "cpp/src/phonenumbers/phonenumbermatch.h"
-#include "cpp/src/phonenumbers/phonenumberutil.h"
-#include "cpp/src/phonenumbers/shortnumberinfo.h"
+#include "phonenumbers/phonenumbermatch.h"
+#include "phonenumbers/phonenumberutil.h"
+#include "phonenumbers/shortnumberinfo.h"
 #include "matched_number_info.h"
 #include "phone_number_rule.h"
 

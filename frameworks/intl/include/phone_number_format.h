@@ -20,7 +20,7 @@
 #include <string>
 #include <mutex>
 #include "memory"
-#include "cpp/src/phonenumbers/phonenumberutil.h"
+#include "phonenumbers/phonenumberutil.h"
 
 namespace OHOS {
 namespace Global {

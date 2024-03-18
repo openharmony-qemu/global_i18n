@@ -32,13 +32,6 @@ ohos_shared_library("intl") {
   include_dirs = [
     "//base/global/i18n/frameworks/intl/include",
     "//base/global/i18n/interfaces/js/kits/include",
-    "//base/hiviewdfx/interfaces/native/inner_api/include",
-    "//foundation/arkui/napi/native_engine",
-    "//foundation/arkui/napi/interfaces/kits",
-    "//third_party/node/src",
-    "//third_party/libphonenumber/cpp/src",
-    "//third_party/libphonenumber",
-    "//third_party/protobuf/src",
   ]
 
   sources = [ "src/intl_addon.cpp" ]
@@ -47,7 +40,9 @@ ohos_shared_library("intl") {
   external_deps = [
     "hilog:libhilog",
     "icu:shared_icuuc",
+    "libphonenumber:phonenumber_standard",
     "napi:ace_napi",
+    "protobuf:protobuf_static"
   ]
   relative_install_dir = "module"
   subsystem_name = "global"
@@ -66,13 +61,6 @@ ohos_shared_library("i18n") {
     "//base/global/i18n/frameworks/intl/include",
     "//base/global/i18n/interfaces/js/kits/include",
     "//base/global/i18n/services/include",
-    "//base/hiviewdfx/interfaces/native/inner_api/include",
-    "//foundation/arkui/napi/native_engine",
-    "//foundation/arkui/napi/interfaces/kits",
-    "//third_party/node/src",
-    "//third_party/libphonenumber/cpp/src",
-    "//third_party/libphonenumber",
-    "//third_party/protobuf/src",
   ]
   cflags_cc = [ "-frtti" ]
   remove_configs = [ "//build/config/compiler:no_rtti" ]
@@ -94,7 +82,6 @@ ohos_shared_library("i18n") {
     "//base/global/i18n/frameworks/intl:intl_util",
     "//base/global/i18n/frameworks/intl:preferred_language",
     "//base/global/i18n/services:i18n_sa_client",
-    "//third_party/libpng:libpng",
   ]
   external_deps = [
     "c_utils:utils",
@@ -102,7 +89,10 @@ ohos_shared_library("i18n") {
     "icu:shared_icui18n",
     "icu:shared_icuuc",
     "ipc:ipc_core",
+    "libphonenumber:phonenumber_standard",
+    "libpng:libpng",
     "napi:ace_napi",
+    "protobuf:protobuf_static",
     "samgr:samgr_proxy",
   ]
   if (i18n_support_app_preferred_language) {
