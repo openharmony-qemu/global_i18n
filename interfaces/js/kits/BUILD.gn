@@ -42,7 +42,7 @@ ohos_shared_library("intl") {
     "icu:shared_icuuc",
     "libphonenumber:phonenumber_standard",
     "napi:ace_napi",
-    "protobuf:protobuf_static"
+    "protobuf:protobuf_static",
   ]
   relative_install_dir = "module"
   subsystem_name = "global"
