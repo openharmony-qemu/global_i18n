@@ -67,7 +67,6 @@
                 "libxml2",
                 "napi",
                 "preferences",
-                "protobuf",
                 "resource_management",
                 "safwk",
                 "samgr"
