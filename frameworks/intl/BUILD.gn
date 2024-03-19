@@ -23,9 +23,7 @@ group("build_module") {
 }
 
 group("geocoding_depends") {
-  external_deps = [ 
-    "libphonenumber:geocoding",
-  ]
+  external_deps = [ "libphonenumber:geocoding" ]
 }
 
 config("preferred_language_config") {
@@ -51,9 +49,8 @@ ohos_shared_library("preferred_language") {
   deps = [ "//base/global/i18n/frameworks/intl:intl_util" ]
   external_deps = [ "init:libbegetutil" ]
   if (i18n_support_app_preferred_language) {
-    include_dirs += [
-      "//base/global/resource_management/frameworks/resmgr/include",
-    ]
+    include_dirs +=
+        [ "//base/global/resource_management/frameworks/resmgr/include" ]
     external_deps += [
       "ability_runtime:app_context",
       "bundle_framework:appexecfwk_base",
