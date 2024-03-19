@@ -170,7 +170,6 @@ ohos_shared_library("intl_util") {
     "libphonenumber:phonenumber_standard",
     "libpng:libpng",
     "libxml2:libxml2",
-    "protobuf:protobuf_static",
   ]
   defines = []
   if (i18n_support_ui) {
