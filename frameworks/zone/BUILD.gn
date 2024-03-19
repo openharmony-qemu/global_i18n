@@ -34,9 +34,7 @@ ohos_shared_library("zone_util") {
     "-Wall",
     "-fPIC",
   ]
-  deps = [
-    "//base/global/i18n/frameworks/intl:intl_util",
-  ]
+  deps = [ "//base/global/i18n/frameworks/intl:intl_util" ]
   external_deps = [
     "hilog:libhilog",
     "icu:shared_icui18n",
