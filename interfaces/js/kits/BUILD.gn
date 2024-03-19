@@ -42,7 +42,6 @@ ohos_shared_library("intl") {
     "icu:shared_icuuc",
     "libphonenumber:phonenumber_standard",
     "napi:ace_napi",
-    "protobuf:protobuf_static",
   ]
   relative_install_dir = "module"
   subsystem_name = "global"
@@ -92,7 +91,6 @@ ohos_shared_library("i18n") {
     "libphonenumber:phonenumber_standard",
     "libpng:libpng",
     "napi:ace_napi",
-    "protobuf:protobuf_static",
     "samgr:samgr_proxy",
   ]
   if (i18n_support_app_preferred_language) {
