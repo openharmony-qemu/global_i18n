@@ -23,7 +23,7 @@ group("build_module") {
 }
 
 group("geocoding_depends") {
-  deps = [ "//third_party/libphonenumber/cpp:geocoding" ]
+  external_deps = [ "libphonenumber:geocoding" ]
 }
 
 config("preferred_language_config") {
@@ -49,12 +49,8 @@ ohos_shared_library("preferred_language") {
   deps = [ "//base/global/i18n/frameworks/intl:intl_util" ]
   external_deps = [ "init:libbegetutil" ]
   if (i18n_support_app_preferred_language) {
-    include_dirs += [
-      "//base/global/resource_management/frameworks/resmgr/include",
-      "//foundation/bundlemanager/bundle_framework/interfaces/inner_api/appexecfwk_base/include/",
-      "//foundation/bundlemanager/bundle_framework/interfaces/inner_api/appexecfwk_core/include/bundlemgr/",
-      "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include/",
-    ]
+    include_dirs +=
+        [ "//base/global/resource_management/frameworks/resmgr/include" ]
     external_deps += [
       "ability_runtime:app_context",
       "bundle_framework:appexecfwk_base",
@@ -91,13 +87,7 @@ ohos_shared_library("intl_util") {
   }
 
   public_configs = [ ":intl_util_config" ]
-  include_dirs = [
-    "//commonlibrary/c_utils/base/include",
-    "//third_party/libxml2/include",
-    "//third_party/libphonenumber/cpp/src",
-    "//third_party/libphonenumber",
-    "//third_party/protobuf/src",
-  ]
+  include_dirs = []
   sources = [
     "src/character.cpp",
     "src/collator.cpp",
@@ -163,9 +153,6 @@ ohos_shared_library("intl_util") {
     ":zh_Hans_region_xml",
     ":zh_Hans_timezone_xml",
     ":zh_datetime_xml",
-    "//third_party/libphonenumber/cpp:phonenumber_standard",
-    "//third_party/libpng:libpng",
-    "//third_party/libxml2:xml2",
   ]
   use_exceptions = true
   external_deps = [
@@ -180,6 +167,9 @@ ohos_shared_library("intl_util") {
     "icu:shared_icuuc",
     "init:libbegetutil",
     "ipc:ipc_core",
+    "libphonenumber:phonenumber_standard",
+    "libpng:libpng",
+    "libxml2:libxml2",
   ]
   defines = []
   if (i18n_support_ui) {

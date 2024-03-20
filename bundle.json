@@ -62,17 +62,16 @@
                 "icu",
                 "init",
                 "ipc",
+                "libphonenumber",
+                "libpng",
+                "libxml2",
                 "napi",
                 "preferences",
                 "resource_management",
                 "safwk",
                 "samgr"
             ],
-            "third_party": [
-                "libphonenumber",
-                "libpng",
-                "libxml2"
-            ]
+            "third_party": []
         },
         "build": {
             "sub_component": [

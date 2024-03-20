@@ -14,9 +14,9 @@
  */
 #include <cctype>
 #include <filesystem>
-#include "cpp/src/phonenumbers/phonenumber.h"
-#include "cpp/src/phonenumbers/shortnumberinfo.h"
-#include "cpp/src/phonenumbers/phonenumberutil.h"
+#include "phonenumbers/phonenumber.h"
+#include "phonenumbers/shortnumberinfo.h"
+#include "phonenumbers/phonenumberutil.h"
 #include "libxml/globals.h"
 #include "libxml/tree.h"
 #include "libxml/xmlstring.h"
