@@ -22,6 +22,7 @@
 #include <common_event_support.h>
 #endif
 #include <cctype>
+#include "config_policy_utils.h"
 #include "i18n_hilog.h"
 #include "ipc_skeleton.h"
 #include "libxml/parser.h"
@@ -55,15 +56,13 @@ const char *LocaleConfig::DEFAULT_LANGUAGE_KEY = "const.global.language";
 const char *LocaleConfig::DEFAULT_REGION_KEY = "const.global.region";
 const char *LocaleConfig::SIM_COUNTRY_CODE_KEY = "telephony.sim.countryCode0";
 const char *LocaleConfig::SUPPORTED_LOCALES_NAME = "supported_locales";
+const char *LocaleConfig::REGIONS_LANGUAGES_PATH = "etc/xml/i18n_param_config.xml";
+const char *LocaleConfig::REGIONS_LANGUAGES_NAME = "i18n_param_config";
 const char *LocaleConfig::SUPPORTED_REGIONS_NAME = "supported_regions";
 const char *LocaleConfig::WHITE_LANGUAGES_NAME = "white_languages";
 const char *LocaleConfig::FORBIDDEN_LANGUAGES_NAME = "forbidden_languages";
 const char *LocaleConfig::FORBIDDEN_REGIONS_NAME = "forbidden_regions";
-const char *LocaleConfig::FORBIDDEN_LANGUAGES_PATH = "/system/usr/ohos_locale_config/forbidden_languages.xml";
-const char *LocaleConfig::FORBIDDEN_REGIONS_PATH = "/system/usr/ohos_locale_config/forbidden_regions.xml";
 const char *LocaleConfig::SUPPORTED_LOCALES_PATH = "/system/usr/ohos_locale_config/supported_locales.xml";
-const char *LocaleConfig::SUPPORTED_REGIONS_PATH = "/system/usr/ohos_locale_config/supported_regions.xml";
-const char *LocaleConfig::WHITE_LANGUAGES_PATH = "/system/usr/ohos_locale_config/white_languages.xml";
 const char *LocaleConfig::SUPPORT_LOCALES_PATH = "/etc/ohos_lang_config/supported_locales.xml";
 const char *LocaleConfig::SUPPORT_LOCALES_NAME = "supported_locales";
 const char *LocaleConfig::DIALECT_LANGS_PATH = "/system/usr/ohos_locale_config/dialect_languages.xml";
@@ -373,6 +372,20 @@ void LocaleConfig::Split(const string &src, const string &sep, vector<string> &d
     }
 }
 
+void LocaleConfig::Split(const string &src, const string &sep, std::unordered_set<string> &dest)
+{
+    string::size_type begin = 0;
+    string::size_type end = src.find(sep);
+    while (end != string::npos) {
+        dest.insert(src.substr(begin, end - begin));
+        begin = end + sep.size();
+        end = src.find(sep, begin);
+    }
+    if (begin != src.size()) {
+        dest.insert(src.substr(begin));
+    }
+}
+
 // language in white languages should have script.
 void LocaleConfig::GetSystemLanguages(vector<string> &ret)
 {
@@ -529,19 +542,55 @@ void LocaleConfig::Expunge(unordered_set<string> &src, const unordered_set<strin
 bool LocaleConfig::InitializeLists()
 {
     SetHwIcuDirectory();
-    GetListFromFile(SUPPORTED_REGIONS_PATH, SUPPORTED_REGIONS_NAME, supportedRegions);
     unordered_set<string> forbiddenRegions;
-    GetListFromFile(FORBIDDEN_REGIONS_PATH, FORBIDDEN_REGIONS_NAME, forbiddenRegions);
+    LoadRegionsLanguages(forbiddenRegions);
     ProcessForbiddenRegions(forbiddenRegions);
     Expunge(supportedRegions, blockedRegions);
-    GetListFromFile(WHITE_LANGUAGES_PATH, WHITE_LANGUAGES_NAME, whiteLanguages);
-    GetListFromFile(FORBIDDEN_LANGUAGES_PATH, FORBIDDEN_LANGUAGES_NAME, blockedLanguages);
     Expunge(whiteLanguages, blockedLanguages);
     GetListFromFile(SUPPORTED_LOCALES_PATH, SUPPORTED_LOCALES_NAME, supportedLocales);
     GetListFromFile(SUPPORT_LOCALES_PATH, SUPPORT_LOCALES_NAME, supportLocales);
     GetListFromFile(OVERRIDE_SUPPORTED_REGIONS_PATH, OVERRIDE_SUPPORTED_REGIONS_NAME, overrideSupportedRegions);
     GetListFromFile(DIALECT_LANGS_PATH, DIALECT_LANGS_NAME, dialectLang);
     return true;
+}
+
+void LocaleConfig::LoadRegionsLanguages(unordered_set<std::string>& forbiddenRegions)
+{
+    char buf[MAX_PATH_LEN] = {0};
+    char* path = GetOneCfgFile(REGIONS_LANGUAGES_PATH, buf, MAX_PATH_LEN);
+    xmlKeepBlanksDefault(0);
+    if (!path) {
+        return;
+    }
+    xmlDocPtr doc = xmlParseFile(path);
+    if (!doc) {
+        return;
+    }
+    xmlNodePtr cur = xmlDocGetRootElement(doc);
+    if (!cur || xmlStrcmp(cur->name, reinterpret_cast<const xmlChar *>(REGIONS_LANGUAGES_NAME))) {
+        xmlFreeDoc(doc);
+        return;
+    }
+    cur = cur->xmlChildrenNode;
+    xmlChar *content = nullptr;
+    while (cur != nullptr) {
+        content = xmlNodeGetContent(cur);
+        if (content != nullptr && !xmlStrcmp(cur->name, reinterpret_cast<const xmlChar *>(SUPPORTED_REGIONS_NAME))) {
+            Split(reinterpret_cast<const char*>(content), ",", supportedRegions);
+        } else if (content != nullptr && !xmlStrcmp(cur->name,
+            reinterpret_cast<const xmlChar *>(WHITE_LANGUAGES_NAME))) {
+            Split(reinterpret_cast<const char*>(content), ",", whiteLanguages);
+        } else if (content != nullptr && !xmlStrcmp(cur->name,
+            reinterpret_cast<const xmlChar *>(FORBIDDEN_REGIONS_NAME))) {
+            Split(reinterpret_cast<const char*>(content), ",", forbiddenRegions);
+        } else if (content != nullptr && !xmlStrcmp(cur->name,
+            reinterpret_cast<const xmlChar *>(FORBIDDEN_LANGUAGES_NAME))) {
+            Split(reinterpret_cast<const char*>(content), ",", blockedLanguages);
+        }
+        xmlFree(content);
+        cur = cur->next;
+    }
+    xmlFreeDoc(doc);
 }
 
 string LocaleConfig::GetMainLanguage(const string &language)

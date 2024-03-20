@@ -134,21 +134,18 @@ ohos_shared_library("intl_util") {
     ":common_datetime_xml",
     ":common_phonenumber_xml",
     ":config_locales_xml",
-    ":config_regions_xml",
     ":dialect_languages_xml",
     ":en_Latn_lang_xml",
     ":en_Latn_region_xml",
     ":en_datetime_xml",
-    ":forbidden_languages_xml",
-    ":forbidden_regions_xml",
     ":i18n.para",
     ":i18n.para.dac",
+    ":i18n_param_config_xml",
     ":lang_supported_locales",
     ":region_supported_locales_xml",
     ":root_timezone_xml",
     ":timezones_xml",
     ":tz_pixel_dat",
-    ":white_languages_xml",
     ":zh_Hans_lang_xml",
     ":zh_Hans_region_xml",
     ":zh_Hans_timezone_xml",
@@ -184,6 +181,7 @@ ohos_shared_library("intl_util") {
       "ability_runtime:ability_manager",
       "ability_runtime:app_manager",
       "common_event_service:cesfwk_innerkits",
+      "config_policy:configpolicy_util",
     ]
     defines += [ "SUPPORT_GRAPHICS" ]
   }
@@ -216,23 +214,9 @@ ohos_prebuilt_etc("config_locales_xml") {
   subsystem_name = "global"
 }
 
-ohos_prebuilt_etc("config_regions_xml") {
-  source = "//base/global/i18n/frameworks/intl/etc/supported_regions.xml"
-  module_install_dir = "usr/ohos_locale_config/"
-  part_name = "i18n"
-  subsystem_name = "global"
-}
-
-ohos_prebuilt_etc("white_languages_xml") {
-  source = "//base/global/i18n/frameworks/intl/etc/white_languages.xml"
-  module_install_dir = "usr/ohos_locale_config/"
-  part_name = "i18n"
-  subsystem_name = "global"
-}
-
-ohos_prebuilt_etc("forbidden_languages_xml") {
-  source = "//base/global/i18n/frameworks/intl/etc/forbidden_languages.xml"
-  module_install_dir = "usr/ohos_locale_config/"
+ohos_prebuilt_etc("i18n_param_config_xml") {
+  source = "//base/global/i18n/frameworks/intl/etc/i18n_param_config.xml"
+  module_install_dir = "etc/xml/"
   part_name = "i18n"
   subsystem_name = "global"
 }
@@ -275,13 +259,6 @@ ohos_prebuilt_etc("en_datetime_xml") {
 ohos_prebuilt_etc("common_datetime_xml") {
   source = "//base/global/i18n/frameworks/intl/etc/datetime/common.xml"
   module_install_dir = "usr/ohos_locale_config/datetime/"
-  part_name = "i18n"
-  subsystem_name = "global"
-}
-
-ohos_prebuilt_etc("forbidden_regions_xml") {
-  source = "//base/global/i18n/frameworks/intl/etc/forbidden_regions.xml"
-  module_install_dir = "usr/ohos_locale_config/"
   part_name = "i18n"
   subsystem_name = "global"
 }
