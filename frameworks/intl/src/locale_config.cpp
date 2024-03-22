@@ -587,7 +587,7 @@ void LocaleConfig::LoadRegionsLanguages(unordered_set<std::string>& forbiddenReg
             reinterpret_cast<const xmlChar *>(FORBIDDEN_LANGUAGES_NAME))) {
             Split(reinterpret_cast<const char*>(content), ",", blockedLanguages);
         }
-        if (!content) {
+        if (content != nullptr) {
             xmlFree(content);
         }
         cur = cur->next;
