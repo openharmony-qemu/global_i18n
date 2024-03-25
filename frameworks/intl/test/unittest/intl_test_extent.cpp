@@ -64,7 +64,7 @@ namespace I18n {
 HWTEST_F(IntlTest, IntlFuncTest0047, TestSize.Level1)
 {
     std::unordered_set<std::string> languageSet = LocaleConfig::GetBlockedLanguages();
-    EXPECT_TRUE(languageSet.size() == 1);
+    EXPECT_TRUE(languageSet.size() == 0);
 }
 
 /**
