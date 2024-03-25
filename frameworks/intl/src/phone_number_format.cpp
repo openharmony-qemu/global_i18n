@@ -118,7 +118,8 @@ std::string PhoneNumberFormat::format(const std::string &number) const
     return formatted_number;
 }
 
-std::string PhoneNumberFormat::getLocationName(const std::string &number, const std::string &locale)
+__attribute__((no_sanitize("cfi"))) std::string PhoneNumberFormat::getLocationName(
+    const std::string &number, const std::string &locale)
 {
     // Combine country and locale parameters
     UErrorCode status = U_ZERO_ERROR;
@@ -162,7 +163,8 @@ std::string PhoneNumberFormat::getLocationName(const std::string &number, const 
     return getCityName(locale, formatted_number.substr(1), locName);
 }
 
-std::string PhoneNumberFormat::getPhoneLocationName(const std::string& number, const std::string& phoneLocale,
+__attribute__((no_sanitize("cfi"))) std::string PhoneNumberFormat::getPhoneLocationName(
+    const std::string& number, const std::string& phoneLocale,
     const std::string& displayLocale, const std::string& regionCode)
 {
     OpenHandler();
@@ -177,7 +179,9 @@ std::string PhoneNumberFormat::getPhoneLocationName(const std::string& number, c
     if (locationNameFunc) {
         // The function uses the same locale for phone and display.
         char recvArr[RECV_CHAR_LEN];
-        locationNameFunc(number.c_str(), phoneLocale.c_str(), recvArr, RECV_CHAR_LEN);
+        const char* numberArr = number.c_str();
+        const char* phoneLocaleArr = phoneLocale.c_str();
+        locationNameFunc(numberArr, phoneLocaleArr, recvArr, RECV_CHAR_LEN);
         locName = recvArr;
     }
     if (!locationNameFunc || locName.empty()) {
@@ -203,7 +207,8 @@ void PhoneNumberFormat::OpenHandler()
     }
 }
 
-bool PhoneNumberFormat::getBlockedRegionName(const std::string& regionCode, const std::string& language)
+__attribute__((no_sanitize("cfi"))) bool PhoneNumberFormat::getBlockedRegionName(
+    const std::string& regionCode, const std::string& language)
 {
     void *i18nUtilHandle = dlopen("libi18n_util.z.so", RTLD_NOW);
     if (i18nUtilHandle == nullptr) {
@@ -217,7 +222,8 @@ bool PhoneNumberFormat::getBlockedRegionName(const std::string& regionCode, cons
     }
 }
 
-std::string PhoneNumberFormat::getCityName(const std::string& language, const std::string& phonenumber,
+__attribute__((no_sanitize("cfi"))) std::string PhoneNumberFormat::getCityName(
+    const std::string& language, const std::string& phonenumber,
     const std::string& locationName)
 {
     char recvArr[RECV_CHAR_LEN];
