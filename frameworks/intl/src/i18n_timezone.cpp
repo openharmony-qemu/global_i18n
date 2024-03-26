@@ -711,12 +711,12 @@ __attribute__((no_sanitize("cfi"))) std::string I18nTimeZone::GetDisplayName(
     }
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("create icu Locale for %{public}s failed.", localeStr.c_str());
-        return result;
+        return PseudoLocalizationProcessor(result);
     }
     icu::UnicodeString name;
     timezone->getDisplayName((UBool)isDST, style, locale, name);
     name.toUTF8String(result);
-    return GetDisplayNameByTaboo(localeStr, result);
+    return PseudoLocalizationProcessor(GetDisplayNameByTaboo(localeStr, result));
 }
 
 __attribute__((no_sanitize("cfi"))) std::string I18nTimeZone::GetDisplayNameByTaboo(
@@ -1012,16 +1012,16 @@ std::string I18nTimeZone::GetCityDisplayName(std::string &cityID, std::string &l
     }
     if (availableZoneCityIDs.find(cityID) == availableZoneCityIDs.end()) {
         HILOG_ERROR_I18N("%{public}s is not supported cityID.", cityID.c_str());
-        return "";
+        return PseudoLocalizationProcessor("");
     }
     std::string requestLocaleStr = GetLocaleBaseName(localeStr);
     if (requestLocaleStr.length() != 0) {
         std::string displayName = FindCityDisplayNameFromXml(cityID, requestLocaleStr);
         if (displayName.length() != 0) {
-            return displayName;
+            return PseudoLocalizationProcessor(displayName);
         }
     }
-    return "";
+    return PseudoLocalizationProcessor("");
 }
 
 std::string I18nTimeZone::GetLocaleBaseName(std::string &localeStr)

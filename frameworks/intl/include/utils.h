@@ -31,6 +31,9 @@ void GetAllValidLocalesTag(std::unordered_set<std::string>& allValidLocalesLangu
 bool CheckTzDataFilePath(const std::string &filePath);
 void RemoveNativeTokenTypeAndPermissions(const uint64_t selfTokenId);
 void AddNativeTokenTypeAndPermissions();
+bool GetPseudoLocalizationEnforce();
+std::string PseudoLocalizationProcessor(const std::string &input);
+std::string PseudoLocalizationProcessor(const std::string &input, bool ifEnforce);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

@@ -294,7 +294,7 @@ napi_value I18nAddon::GetTimePeriodName(napi_env env, napi_callback_info info)
     calendar->set(UCalendarDateFields::UCAL_HOUR_OF_DAY, hour);
     formatter->format(calendar->getTime(icuStatus), name);
     name.toUTF8String(temp);
-    napi_create_string_utf8(env, temp.c_str(), NAPI_AUTO_LENGTH, &result);
+    napi_create_string_utf8(env, PseudoLocalizationProcessor(temp).c_str(), NAPI_AUTO_LENGTH, &result);
     delete formatter;
     delete calendar;
     return result;
