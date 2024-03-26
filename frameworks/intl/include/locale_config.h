@@ -105,6 +105,7 @@ public:
 
 private:
     static void Split(const std::string &src, const std::string &sep, std::vector<std::string> &dest);
+    static void Split(const std::string &src, const std::string &sep, std::unordered_set<std::string> &dest);
     static I18nErrorCode UpdateSystemLocale(const std::string &language);
     static constexpr uint32_t LANGUAGE_LEN = 2;
     static constexpr uint32_t LOCALE_ITEM_COUNT = 3;
@@ -117,16 +118,14 @@ private:
     static const char *DEFAULT_REGION_KEY;
     static const char *SIM_COUNTRY_CODE_KEY;
     static const char *SUPPORTED_LOCALES_PATH;
-    static const char *SUPPORTED_REGIONS_PATH;
     static constexpr int CONFIG_LEN = 128;
     static const char *SUPPORTED_LOCALES_NAME;
     static const char *SUPPORTED_REGIONS_NAME;
     static const char *WHITE_LANGUAGES_NAME;
-    static const char *WHITE_LANGUAGES_PATH;
-    static const char *FORBIDDEN_REGIONS_PATH;
     static const char *FORBIDDEN_REGIONS_NAME;
-    static const char *FORBIDDEN_LANGUAGES_PATH;
     static const char *FORBIDDEN_LANGUAGES_NAME;
+    static const char *REGIONS_LANGUAGES_PATH;
+    static const char *REGIONS_LANGUAGES_NAME;
     static const char *SUPPORT_LOCALES_PATH;
     static const char *SUPPORT_LOCALES_NAME;
     static const char *DEFAULT_LOCALE;
@@ -154,6 +153,7 @@ private:
     static void GetRelatedLocales(std::unordered_set<std::string> &relatedLocales,
         const std::vector<std::string> countries);
     static void GetListFromFile(const char *path, const char *resourceName, std::unordered_set<std::string> &ret);
+    static void LoadRegionsLanguages(std::unordered_set<std::string>& forbiddenRegions);
     static void Expunge(std::unordered_set<std::string> &src, const std::unordered_set<std::string> &another);
     static std::string GetMainLanguage(const std::string &language);
     static std::string GetDsiplayLanguageWithDialect(const std::string &language, const std::string &displayLocale);
