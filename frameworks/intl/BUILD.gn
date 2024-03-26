@@ -157,8 +157,6 @@ ohos_shared_library("intl_util") {
   use_exceptions = true
   external_deps = [
     "access_token:libaccesstoken_sdk",
-    "access_token:libnativetoken",
-    "access_token:libtoken_setproc",
     "access_token:libtokenid_sdk",
     "c_utils:utils",
     "hilog:libhilog",
