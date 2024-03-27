@@ -27,6 +27,7 @@
 #include "string"
 #include "taboo_utils.h"
 #include "utility"
+#include "utils.h"
 
 
 namespace OHOS {
@@ -111,11 +112,11 @@ std::string PhoneNumberFormat::format(const std::string &number) const
     i18n::phonenumbers::PhoneNumber phoneNumber;
     PhoneNumberUtil::ErrorType type = util->Parse(number, country, &phoneNumber);
     if (type != PhoneNumberUtil::ErrorType::NO_PARSING_ERROR) {
-        return "";
+        return PseudoLocalizationProcessor("");
     }
     std::string formatted_number;
     util->Format(phoneNumber, phoneNumberFormat, &formatted_number);
-    return formatted_number;
+    return PseudoLocalizationProcessor(formatted_number);
 }
 
 __attribute__((no_sanitize("cfi"))) std::string PhoneNumberFormat::getLocationName(

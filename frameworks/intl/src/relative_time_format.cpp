@@ -15,6 +15,7 @@
 #include "locale_config.h"
 #include "ohos/init_data.h"
 #include "parameter.h"
+#include "utils.h"
 #include "relative_time_format.h"
 
 namespace OHOS {
@@ -121,7 +122,7 @@ void RelativeTimeFormat::ParseConfigs(std::map<std::string, std::string> &config
 std::string RelativeTimeFormat::Format(double number, const std::string &unit)
 {
     if (!createSuccess || !relativeUnits.count(unit)) {
-        return "";
+        return PseudoLocalizationProcessor("");
     }
     UErrorCode status = U_ZERO_ERROR;
     icu::UnicodeString formattedTime;
@@ -132,7 +133,7 @@ std::string RelativeTimeFormat::Format(double number, const std::string &unit)
         formattedTime = relativeTimeFormat->formatToValue(number, relativeUnits[unit], status).toString(status);
     }
     formattedTime.toUTF8String(result);
-    return result;
+    return PseudoLocalizationProcessor(result);
 }
 
 void RelativeTimeFormat::InsertInfo(std::vector<std::vector<std::string>> &timeVector,

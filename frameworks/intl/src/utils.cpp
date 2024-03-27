@@ -23,6 +23,7 @@
 #include <vector>
 #include "accesstoken_kit.h"
 #include "i18n_hilog.h"
+#include "locale_config.h"
 #include "nativetoken_kit.h"
 #include "parameter.h"
 #include "token_setproc.h"
@@ -34,6 +35,9 @@ namespace I18n {
 using namespace std;
 static constexpr int32_t I18N_UID = 3013;
 static constexpr int32_t ROOT_UID = 0;
+static const std::string PSEUDO_LOCALE_TAG = "en-XA";
+static const std::string PSEUDO_START_TAG = "{";
+static const std::string PSEUDO_END_TAG = "}";
 
 void Split(const string &src, const string &sep, vector<string> &dest)
 {
@@ -156,6 +160,28 @@ void AddNativeTokenTypeAndPermissions()
     seteuid(ROOT_UID);
     OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
     seteuid(I18N_UID);
+}
+
+bool GetPseudoLocalizationEnforce()
+{
+    std::string systemLocale = LocaleConfig::GetSystemLocale();
+    if (systemLocale.compare(PSEUDO_LOCALE_TAG) == 0) {
+        return true;
+    }
+    return false;
+}
+
+std::string PseudoLocalizationProcessor(const std::string &input)
+{
+    return PseudoLocalizationProcessor(input, GetPseudoLocalizationEnforce());
+}
+
+std::string PseudoLocalizationProcessor(const std::string &input, bool ifEnforce)
+{
+    if (ifEnforce) {
+        return PSEUDO_START_TAG + input + PSEUDO_END_TAG;
+    }
+    return input;
 }
 } // namespace I18n
 } // namespace Global

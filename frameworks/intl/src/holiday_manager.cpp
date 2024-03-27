@@ -23,6 +23,7 @@
 #include <iostream>
 #include <regex>
 #include "map"
+#include "utils.h"
 
 namespace OHOS {
 namespace Global {
@@ -205,7 +206,7 @@ void HolidayManager::ParseFileLine(const std::string &line, HolidayInfoItem *hol
             std::string language = displayName.substr(0, displayName.find_first_of(":"));
             std::string localName = displayName.substr(displayName.find_first_of(":") + 1, displayName.length());
             transform(language.begin(), language.end(), language.begin(), ::tolower);
-            HolidayLocalName localeName = {language, localName};
+            HolidayLocalName localeName = {language, PseudoLocalizationProcessor(localName)};
             holidayItem->localNames.push_back(localeName);
         }
     }

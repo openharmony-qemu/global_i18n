@@ -306,7 +306,7 @@ void NumberFormat::SetUnit(std::string &preferredUnit)
 std::string NumberFormat::Format(double number)
 {
     if (!createSuccess) {
-        return "";
+        return PseudoLocalizationProcessor("");
     }
     double finalNumber = number;
     if (!unitUsage.empty()) {
@@ -343,7 +343,7 @@ std::string NumberFormat::Format(double number)
     std::string result;
     UErrorCode status = U_ZERO_ERROR;
     numberFormat.formatDouble(finalNumber, status).toString(status).toUTF8String(result);
-    return result;
+    return PseudoLocalizationProcessor(result);
 }
 
 void NumberFormat::GetResolvedOptions(std::map<std::string, std::string> &map)

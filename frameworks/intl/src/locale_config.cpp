@@ -638,11 +638,11 @@ string LocaleConfig::GetDisplayLanguage(const string &language, const string &di
         UErrorCode status = U_ZERO_ERROR;
         icu::Locale displayLoc = icu::Locale::forLanguageTag(displayLocale, status);
         if (status != U_ZERO_ERROR) {
-            return "";
+            return PseudoLocalizationProcessor("");
         }
         icu::Locale locale = icu::Locale::forLanguageTag(language, status);
         if (status != U_ZERO_ERROR) {
-            return "";
+            return PseudoLocalizationProcessor("");
         }
         icu::UnicodeString unistr;
         std::string lang(locale.getLanguage());
@@ -655,11 +655,11 @@ string LocaleConfig::GetDisplayLanguage(const string &language, const string &di
         }
         if (sentenceCase) {
             char ch = static_cast<char>(toupper(result[0]));
-            return result.replace(0, 1, 1, ch);
+            return PseudoLocalizationProcessor(result.replace(0, 1, 1, ch));
         }
-        return result;
+        return PseudoLocalizationProcessor(result);
     }
-    return GetDisplayLanguageInner(adjust, displayLocale, sentenceCase);
+    return PseudoLocalizationProcessor(GetDisplayLanguageInner(adjust, displayLocale, sentenceCase));
 }
 
 std::string LocaleConfig::ComputeLocale(const std::string &displayLocale)
@@ -877,14 +877,14 @@ string LocaleConfig::GetDisplayRegion(const string &region, const string &displa
     }
     std::string country(originLocale.getCountry());
     if (country.length() == 0) {
-        return "";
+        return PseudoLocalizationProcessor("");
     }
     if (status != U_ZERO_ERROR) {
-        return "";
+        return PseudoLocalizationProcessor("");
     }
     icu::Locale locale = icu::Locale::forLanguageTag(displayLocale, status);
     if (status != U_ZERO_ERROR) {
-        return "";
+        return PseudoLocalizationProcessor("");
     }
     icu::UnicodeString unistr;
     icu::UnicodeString displayRegion;
@@ -897,9 +897,9 @@ string LocaleConfig::GetDisplayRegion(const string &region, const string &displa
     }
     if (sentenceCase) {
         char ch = static_cast<char>(toupper(result[0]));
-        return result.replace(0, 1, 1, ch);
+        return PseudoLocalizationProcessor(result.replace(0, 1, 1, ch));
     }
-    return result;
+    return PseudoLocalizationProcessor(result);
 }
 
 bool LocaleConfig::IsRTL(const string &locale)
