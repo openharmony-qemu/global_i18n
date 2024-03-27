@@ -164,8 +164,10 @@ ohos_shared_library("intl_util") {
     "libpng:libpng",
     "libxml2:libxml2",
   ]
+  public_external_deps = []
   defines = []
   if (i18n_support_ui) {
+    public_external_deps += [ "ability_base:configuration" ]
     external_deps += [
       "ability_base:configuration",
       "ability_base:want",
