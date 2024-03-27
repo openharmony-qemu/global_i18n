@@ -49,8 +49,6 @@ ohos_shared_library("preferred_language") {
   deps = [ "//base/global/i18n/frameworks/intl:intl_util" ]
   external_deps = [ "init:libbegetutil" ]
   if (i18n_support_app_preferred_language) {
-    include_dirs +=
-        [ "//base/global/resource_management/frameworks/resmgr/include" ]
     external_deps += [
       "ability_runtime:app_context",
       "bundle_framework:appexecfwk_base",
@@ -74,9 +72,6 @@ config("intl_util_config") {
     "//base/global/i18n/frameworks/intl/include",
     "//base/global/i18n/interfaces/native/inner_api/i18n/include",
   ]
-  if (i18n_support_ui) {
-    include_dirs += [ "//foundation/ability/ability_base/interfaces/kits/native/configuration/include" ]
-  }
 }
 ohos_shared_library("intl_util") {
   stack_protector_ret = true
@@ -171,11 +166,6 @@ ohos_shared_library("intl_util") {
   ]
   defines = []
   if (i18n_support_ui) {
-    include_dirs += [
-      "//foundation/ability/ability_runtime/interfaces/inner_api/app_manager/include/appmgr",
-      "//foundation/ability/ability_runtime/interfaces/inner_api/ability_manager/include",
-      "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include/",
-    ]
     external_deps += [
       "ability_base:configuration",
       "ability_base:want",
