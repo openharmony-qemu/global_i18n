@@ -19,22 +19,16 @@
 #include <fstream>
 #include <stdexcept>
 #include <string>
-#include <unistd.h>
 #include <vector>
-#include "accesstoken_kit.h"
 #include "i18n_hilog.h"
 #include "locale_config.h"
-#include "nativetoken_kit.h"
 #include "parameter.h"
-#include "token_setproc.h"
 #include "utils.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
 using namespace std;
-static constexpr int32_t I18N_UID = 3013;
-static constexpr int32_t ROOT_UID = 0;
 static const std::string PSEUDO_LOCALE_TAG = "en-XA";
 static const std::string PSEUDO_START_TAG = "{";
 static const std::string PSEUDO_END_TAG = "}";
@@ -131,35 +125,6 @@ bool CheckTzDataFilePath(const std::string &filePath)
     free(realpathRes);
     realpathRes = nullptr;
     return true;
-}
-
-void RemoveNativeTokenTypeAndPermissions(const uint64_t selfTokenId)
-{
-    SetSelfTokenID(selfTokenId);
-    seteuid(ROOT_UID);
-    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
-    seteuid(I18N_UID);
-}
-
-void AddNativeTokenTypeAndPermissions()
-{
-    const char* permissions[] = {
-        "ohos.permission.UPDATE_CONFIGURATION"
-    };
-    NativeTokenInfoParams infoInstance = {
-        .dcapsNum = 0,
-        .permsNum = sizeof(permissions) / sizeof(permissions[0]),
-        .aclsNum = 0,
-        .dcaps = nullptr,
-        .perms = permissions,
-        .acls = nullptr,
-        .aplStr = "system_basic",
-    };
-    infoInstance.processName = "i18n_test";
-    SetSelfTokenID(GetAccessTokenId(&infoInstance));
-    seteuid(ROOT_UID);
-    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
-    seteuid(I18N_UID);
 }
 
 bool GetPseudoLocalizationEnforce()

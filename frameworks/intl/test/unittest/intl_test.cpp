@@ -17,6 +17,7 @@
 #include <map>
 #include <vector>
 
+#include "accesstoken_kit.h"
 #include "character.h"
 #include "collator.h"
 #include "date_time_filter.h"
@@ -32,6 +33,7 @@
 #include "locale_compare.h"
 #include "locale_config.h"
 #include "locale_info.h"
+#include "nativetoken_kit.h"
 #include "measure_data.h"
 #include "number_format.h"
 #include "phone_number_format.h"
@@ -56,6 +58,8 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 static const uint64_t selfTokenId = GetSelfTokenID();
+static constexpr int32_t I18N_UID = 3013;
+static constexpr int32_t ROOT_UID = 0;
 
 string IntlTest::originalLanguage;
 string IntlTest::originalRegion;
@@ -84,18 +88,47 @@ void IntlTest::SetUp(void)
 void IntlTest::TearDown(void)
 {}
 
+void RemoveTokenAndPermissions()
+{
+    SetSelfTokenID(selfTokenId);
+    seteuid(ROOT_UID);
+    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
+    seteuid(I18N_UID);
+}
+
+void AddTokenAndPermissions()
+{
+    const char* i18nPermissions[] = {
+        "ohos.permission.UPDATE_CONFIGURATION"
+    };
+    NativeTokenInfoParams i18nInfoInstance = {
+        .dcapsNum = 0,
+        .permsNum = sizeof(i18nPermissions) / sizeof(i18nPermissions[0]),
+        .aclsNum = 0,
+        .dcaps = nullptr,
+        .perms = i18nPermissions,
+        .acls = nullptr,
+        .aplStr = "system_basic",
+    };
+    i18nInfoInstance.processName = "I18nTest";
+    SetSelfTokenID(GetAccessTokenId(&i18nInfoInstance));
+    seteuid(ROOT_UID);
+    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
+    seteuid(I18N_UID);
+}
+
 void InitTestEnvironment()
 {
-    AddNativeTokenTypeAndPermissions();
+    AddTokenAndPermissions();
     I18nServiceAbilityClient::SetSystemLocale("zh-Hans-CN");
-    RemoveNativeTokenTypeAndPermissions(selfTokenId);
+    RemoveTokenAndPermissions();
 }
 
 void RestoreEnvironment(const std::string &originLocaleTag)
 {
-    AddNativeTokenTypeAndPermissions();
+    AddTokenAndPermissions();
     I18nServiceAbilityClient::SetSystemLocale(originLocaleTag);
-    RemoveNativeTokenTypeAndPermissions(selfTokenId);
+    RemoveTokenAndPermissions();
 }
 
 /**
