@@ -575,7 +575,7 @@ std::string DateTimeFormat::GetSystemTimezone()
 std::string DateTimeFormat::Format(int64_t milliseconds)
 {
     if (!createSuccess) {
-        return "";
+        return PseudoLocalizationProcessor("");
     }
     UErrorCode status = U_ZERO_ERROR;
     std::string result;
@@ -590,13 +590,13 @@ std::string DateTimeFormat::Format(int64_t milliseconds)
     calendar->setTime((UDate)milliseconds, status);
     dateFormat->format(calendar->getTime(status), dateString, status);
     dateString.toUTF8String(result);
-    return result;
+    return PseudoLocalizationProcessor(result);
 }
 
 std::string DateTimeFormat::FormatRange(int64_t fromMilliseconds, int64_t toMilliseconds)
 {
     if (!createSuccess || calendar == nullptr) {
-        return "";
+        return PseudoLocalizationProcessor("");
     }
     UErrorCode status = U_ZERO_ERROR;
     std::string result;
@@ -612,7 +612,7 @@ std::string DateTimeFormat::FormatRange(int64_t fromMilliseconds, int64_t toMill
 
     auto toCalendar = std::unique_ptr<Calendar>(Calendar::createInstance(locale, status));
     if (status != U_ZERO_ERROR || toCalendar == nullptr) {
-        return "";
+        return PseudoLocalizationProcessor("");
     }
     toCalendar->clear();
     if (zone != nullptr) {
@@ -622,7 +622,7 @@ std::string DateTimeFormat::FormatRange(int64_t fromMilliseconds, int64_t toMill
     FieldPosition pos = 0;
     dateIntvFormat->format(*calendar, *toCalendar, dateString, pos, status);
     dateString.toUTF8String(result);
-    return result;
+    return PseudoLocalizationProcessor(result);
 }
 
 void DateTimeFormat::GetResolvedOptions(std::map<std::string, std::string> &map)

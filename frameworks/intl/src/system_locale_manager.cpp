@@ -91,6 +91,7 @@ std::vector<LocaleItem> SystemLocaleManager::GetCountryInfoArray(const std::vect
     std::unordered_set<std::string> blockedRegions = LocaleConfig::GetBlockedRegions();
     std::unordered_set<std::string> blockedLanguageRegions = LocaleConfig::GetLanguageBlockedRegions();
     std::vector<LocaleItem> localeItemList;
+    std::string pseudoProcessedRegion = PseudoLocalizationProcessor("");
     for (auto it = countries.begin(); it != countries.end(); ++it) {
         if (blockedRegions.find(*it) != blockedRegions.end() || blockedLanguageRegions.find(*it) !=
             blockedLanguageRegions.end()) {
@@ -103,7 +104,7 @@ std::vector<LocaleItem> SystemLocaleManager::GetCountryInfoArray(const std::vect
         if (isSuggestedRegion) {
             suggestionType = SuggestionType::SUGGESTION_TYPE_RELATED;
         }
-        LocaleItem item { *it, suggestionType, regionDisplayName, "" };
+        LocaleItem item { *it, suggestionType, regionDisplayName, pseudoProcessedRegion };
         localeItemList.push_back(item);
     }
     SortLocaleItemList(localeItemList, options);
@@ -155,6 +156,7 @@ std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray()
     std::string localeBaseName = I18nTimeZone::GetLocaleBaseName(locale);
     std::map<std::string, std::string> displayNameMap = I18nTimeZone::FindCityDisplayNameMap(localeBaseName);
     std::map<std::string, icu::TimeZone*> tzMap;
+    bool ifEnforce = GetPseudoLocalizationEnforce();
     for (auto it = zoneCityIds.begin(); it != zoneCityIds.end(); ++it) {
         std::string cityId = *it;
         std::string cityDisplayName = "";
@@ -180,7 +182,8 @@ std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray()
             tzMap.insert({timezoneId, icuTimeZone});
         }
         struct TimeZoneCityItem tzCityItem = {
-            timezoneId, cityId, cityDisplayName, dstOffset + rawOffset, "", rawOffset
+            timezoneId, cityId, PseudoLocalizationProcessor(cityDisplayName, ifEnforce), dstOffset + rawOffset,
+            PseudoLocalizationProcessor("", ifEnforce), rawOffset
         };
         result.push_back(tzCityItem);
     }

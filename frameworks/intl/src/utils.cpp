@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 #include "i18n_hilog.h"
+#include "locale_config.h"
 #include "parameter.h"
 #include "utils.h"
 
@@ -28,6 +29,9 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 using namespace std;
+static const std::string PSEUDO_LOCALE_TAG = "en-XA";
+static const std::string PSEUDO_START_TAG = "{";
+static const std::string PSEUDO_END_TAG = "}";
 
 void Split(const string &src, const string &sep, vector<string> &dest)
 {
@@ -121,6 +125,28 @@ bool CheckTzDataFilePath(const std::string &filePath)
     free(realpathRes);
     realpathRes = nullptr;
     return true;
+}
+
+bool GetPseudoLocalizationEnforce()
+{
+    std::string systemLocale = LocaleConfig::GetSystemLocale();
+    if (systemLocale.compare(PSEUDO_LOCALE_TAG) == 0) {
+        return true;
+    }
+    return false;
+}
+
+std::string PseudoLocalizationProcessor(const std::string &input)
+{
+    return PseudoLocalizationProcessor(input, GetPseudoLocalizationEnforce());
+}
+
+std::string PseudoLocalizationProcessor(const std::string &input, bool ifEnforce)
+{
+    if (ifEnforce) {
+        return PSEUDO_START_TAG + input + PSEUDO_END_TAG;
+    }
+    return input;
 }
 } // namespace I18n
 } // namespace Global

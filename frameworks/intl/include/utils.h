@@ -29,6 +29,9 @@ int32_t ConvertString2Int(const std::string &numberStr, int32_t& status);
 bool IsValidLocaleTag(icu::Locale &locale);
 void GetAllValidLocalesTag(std::unordered_set<std::string>& allValidLocalesLanguageTag);
 bool CheckTzDataFilePath(const std::string &filePath);
+bool GetPseudoLocalizationEnforce();
+std::string PseudoLocalizationProcessor(const std::string &input);
+std::string PseudoLocalizationProcessor(const std::string &input, bool ifEnforce);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

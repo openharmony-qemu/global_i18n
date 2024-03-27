@@ -34,6 +34,7 @@
 #include "unicode/urename.h"
 #include "ustr_imp.h"
 #include "unicode/ustring.h"
+#include "utils.h"
 
 namespace OHOS {
 namespace Global {
@@ -287,16 +288,16 @@ bool I18nCalendar::IsWeekend(void)
 std::string I18nCalendar::GetDisplayName(std::string &displayLocaleTag)
 {
     if (calendar_ == nullptr) {
-        return "";
+        return PseudoLocalizationProcessor("");
     }
     const char *type = calendar_->getType();
     if (type == nullptr) {
-        return "";
+        return PseudoLocalizationProcessor("");
     }
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale displayLocale = icu::Locale::forLanguageTag(displayLocaleTag, status);
     if (status != U_ZERO_ERROR) {
-        return "";
+        return PseudoLocalizationProcessor("");
     }
     icu::LocaleDisplayNames *dspName = icu::LocaleDisplayNames::createInstance(displayLocale);
     icu::UnicodeString unistr;
@@ -306,7 +307,7 @@ std::string I18nCalendar::GetDisplayName(std::string &displayLocaleTag)
     }
     std::string ret;
     unistr.toUTF8String<std::string>(ret);
-    return ret;
+    return PseudoLocalizationProcessor(ret);
 }
 
 int32_t I18nCalendar::CompareDays(UDate date)
