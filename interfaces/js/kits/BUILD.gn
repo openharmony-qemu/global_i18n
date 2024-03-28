@@ -99,6 +99,9 @@ ohos_shared_library("i18n") {
       "SUPPORT_GRAPHICS",
     ]
   }
+  if (i18n_support_ui) {
+    external_deps += [ "ability_base:configuration" ]
+  }
   relative_install_dir = "module"
   subsystem_name = "global"
   part_name = "i18n"

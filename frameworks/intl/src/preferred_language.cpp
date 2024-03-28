@@ -17,7 +17,6 @@
 #include "application_context.h"
 #include "bundle_info.h"
 #include "bundle_mgr_interface.h"
-#include "hap_resource.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 #endif
