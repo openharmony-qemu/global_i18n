@@ -482,7 +482,9 @@ HWTEST_F(IntlTest, IntlFuncTest011, TestSize.Level1)
 HWTEST_F(IntlTest, IntlFuncTest0012, TestSize.Level1)
 {
     string locale = "en";
-    map<string, string> options = {};
+    map<string, string> options = {
+        { "dateStyle", "short" }
+    };
     vector<string> locales;
     locales.push_back(locale);
     std::string expects = "3/11/82";
@@ -1491,7 +1493,9 @@ HWTEST_F(IntlTest, IntlFuncTest0036, TestSize.Level1)
 {
     vector<string> locales;
     locales.push_back("en-US");
-    map<string, string> options;
+    map<string, string> options = {
+        { "dateStyle", "short" }
+    };
     DateTimeFormat *formatter = new DateTimeFormat(locales, options);
 
     int64_t milliseconds = 123456789;
