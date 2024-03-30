@@ -54,7 +54,7 @@ HolidayManager::HolidayManager(const char* path)
         char strDate[10];
         size_t resCode = strftime(strDate, sizeof(strDate), "%Y%m%d", &tmObj);
         if (resCode == 0) {
-            HiLog::Error(LABEL, "Failed: strftime error:%{public}d .", resCode);
+            HiLog::Error(LABEL, "Failed: strftime error:%{public}zu .", resCode);
             return;
         }
         std::string startDate(strDate);
