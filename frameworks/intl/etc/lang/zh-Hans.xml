@@ -41,4 +41,12 @@
         <id>fa-AF</id>
         <display_name>达里语</display_name>
     </lang>
+    <lang>
+        <id>bo</id>
+        <display_name>藏文</display_name>
+    </lang>
+    <lang>
+        <id>ug</id>
+        <display_name>维吾尔文</display_name>
+    </lang>
 </languages>
