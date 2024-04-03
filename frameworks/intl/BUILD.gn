@@ -129,6 +129,8 @@ ohos_shared_library("intl_util") {
   deps = [
     ":CN_phonenumber_xml",
     ":GB_phonenumber_xml",
+    ":bo_lang_xml",
+    ":bo_region_xml",
     ":common_datetime_xml",
     ":common_phonenumber_xml",
     ":config_locales_xml",
@@ -144,16 +146,14 @@ ohos_shared_library("intl_util") {
     ":root_timezone_xml",
     ":timezones_xml",
     ":tz_pixel_dat",
-    ":zh_Hans_lang_xml",
-    ":zh_Hant_lang_xml",
-    ":bo_lang_xml",
     ":ug_lang_xml",
+    ":ug_region_xml",
+    ":zh_Hans_lang_xml",
     ":zh_Hans_region_xml",
     ":zh_Hans_timezone_xml",
-    ":zh_datetime_xml",
+    ":zh_Hant_lang_xml",
     ":zh_Hant_region_xml",
-    ":bo_region_xml",
-    ":ug_region_xml",
+    ":zh_datetime_xml",
   ]
   use_exceptions = true
   external_deps = [
