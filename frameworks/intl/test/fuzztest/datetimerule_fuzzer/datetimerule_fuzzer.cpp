@@ -53,7 +53,6 @@ namespace OHOS {
         dateTimeRule->IsRelDates(hyphen, input);
         DateTimeRule::trim(input);
         DateTimeRule::CompareBeginEnd(input, input, false);
-        DateTimeRule::SubReplace(input, input, input);
         delete dateTimeRule;
         delete dateRuleInit;
         return true;

@@ -15,6 +15,7 @@
 #include "rules_engine.h"
 #include <algorithm>
 #include "i18n_hilog.h"
+#include "utils.h"
 
 namespace OHOS {
 namespace Global {
@@ -125,7 +126,7 @@ bool RulesEngine::InitRules(std::string& rulesValue)
             isVaild = (targetStr.length() == 0) ? false : true;
             std::string replaceStr = "[" + valueStr + "]";
             if (DateTimeRule::trim(paramValue).length() != 0) {
-                rulesValue = DateTimeRule::SubReplace(rulesValue, replaceStr, targetStr);
+                rulesValue = StrReplaceAll(rulesValue, replaceStr, targetStr);
             }
         }
         delete matcher;
@@ -174,10 +175,10 @@ std::string RulesEngine::InitOptRules(std::string& rule)
             if (paramValue.length() == 0 && paramBackupValue.length() == 0) {
                 int rIndex = (rule.substr(begin - 1, 1) == "|") ? begin - 1 : begin;
                 std::string replaceStr1 = rule.substr(rIndex, end - rIndex);
-                rulesValue = DateTimeRule::SubReplace(rulesValue, replaceStr1, "");
+                rulesValue = StrReplaceAll(rulesValue, replaceStr1, "");
             }
             std::string replaceStr2 = "[paramopt_" + keyStr + "]";
-            rulesValue = DateTimeRule::SubReplace(rulesValue, replaceStr2, targetStr);
+            rulesValue = StrReplaceAll(rulesValue, replaceStr2, targetStr);
         }
         delete matcher;
     }
@@ -209,7 +210,7 @@ std::string RulesEngine::InitSubRules(std::string& rule)
             std::string targetStr = subRules[valueStr];
             std::string replaceStr;
             text.toUTF8String(replaceStr);
-            rulesValue = DateTimeRule::SubReplace(rulesValue, replaceStr, targetStr);
+            rulesValue = StrReplaceAll(rulesValue, replaceStr, targetStr);
         }
         delete matcher;
     }
