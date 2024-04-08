@@ -15,4 +15,7 @@
 <supported_locales>
     <item>en-Latn</item>
     <item>zh-Hans</item>
+    <item>zh-Hant</item>
+    <item>bo</item>
+    <item>ug</item>
 </supported_locales>
