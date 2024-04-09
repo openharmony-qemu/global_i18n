@@ -987,7 +987,7 @@ std::string I18nTimeZone::GetFallBack(std::string &requestLocaleStr)
     LocaleInfo* requestLocale = new LocaleInfo(requestLocaleStr);
     for (auto it = supportedLocales.begin(); it != supportedLocales.end(); ++it) {
         std::string tempLocaleStr = it->data();
-        StrReplaceAll(tempLocaleStr, "_", "-");
+        tempLocaleStr = StrReplaceAll(tempLocaleStr, "_", "-");
         LocaleInfo* tempLocale = new LocaleInfo(tempLocaleStr);
         if (LocaleMatcher::Match(requestLocale, tempLocale)) {
             matchLocaleList.push_back(tempLocale);
@@ -1009,7 +1009,7 @@ std::string I18nTimeZone::GetFallBack(std::string &requestLocaleStr)
     for (size_t i = 0; i < matchLocaleList.size(); ++i) {
         delete matchLocaleList[i];
     }
-    StrReplaceAll(bestMatchLocaleTag, "-", "_");
+    bestMatchLocaleTag = StrReplaceAll(bestMatchLocaleTag, "-", "_");
     BEST_MATCH_LOCALE.insert(std::make_pair(requestLocaleStr, bestMatchLocaleTag));
     return bestMatchLocaleTag;
 }
