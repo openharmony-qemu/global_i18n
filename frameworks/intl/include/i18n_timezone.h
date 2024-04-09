@@ -24,6 +24,7 @@
 #include "memory"
 #include "unicode/timezone.h"
 #include <vector>
+#include <tuple>
 
 namespace OHOS {
 namespace Global {
@@ -79,6 +80,7 @@ private:
     static std::map<int, std::string> categoryNum2TimezoneEN;
     static std::map<int, std::string> categoryNum2TimezoneWS;
     static std::map<int, std::string> categoryNum2TimezoneES;
+    static std::map<std::string, std::string> BEST_MATCH_LOCALE;
     static constexpr int SYS_PARAM_LEN = 128;
     static bool useDeviceCityDispName;
     icu::TimeZone *timezone = nullptr;
