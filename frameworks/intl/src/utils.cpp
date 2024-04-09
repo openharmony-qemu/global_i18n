@@ -159,7 +159,7 @@ std::string StrReplaceAll(std::string& str, const std::string target, const std:
     while ((pos = str.find(target)) != std::string::npos) {
         str.replace(pos, target.length(), replace);
     }
-	return result;
+    return result;
 }
 } // namespace I18n
 } // namespace Global
