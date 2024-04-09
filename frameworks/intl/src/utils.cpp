@@ -152,9 +152,9 @@ std::string PseudoLocalizationProcessor(const std::string &input, bool ifEnforce
 std::string StrReplaceAll(std::string& str, const std::string target, const std::string replace)
 {
     std::string::size_type pos = 0;
-    std::string result = src;
+    std::string result = str;
     if (replace.empty() || target.compare(replace) == 0) {
-        return;
+        return result;
     }
     while ((pos = str.find(target)) != std::string::npos) {
         str.replace(pos, target.length(), replace);
