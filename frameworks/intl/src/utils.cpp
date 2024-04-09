@@ -156,8 +156,8 @@ std::string StrReplaceAll(std::string& str, const std::string target, const std:
     if (replace.empty() || target.compare(replace) == 0) {
         return result;
     }
-    while ((pos = str.find(target)) != std::string::npos) {
-        str.replace(pos, target.length(), replace);
+    while ((pos = result.find(target)) != std::string::npos) {
+        result.replace(pos, target.length(), replace);
     }
     return result;
 }
