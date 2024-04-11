@@ -1049,6 +1049,7 @@ std::string I18nTimeZone::GetLocaleBaseName(std::string &localeStr)
         return "";
     }
     std::string requestLocaleStr = locale.getBaseName();
+    requestLocaleStr = StrReplaceAll(requestLocaleStr, "_", "-");
     return GetFallBack(requestLocaleStr);
 }
 
