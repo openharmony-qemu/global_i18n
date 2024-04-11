@@ -32,6 +32,7 @@ bool CheckTzDataFilePath(const std::string &filePath);
 bool GetPseudoLocalizationEnforce();
 std::string PseudoLocalizationProcessor(const std::string &input);
 std::string PseudoLocalizationProcessor(const std::string &input, bool ifEnforce);
+std::string StrReplaceAll(std::string& str, const std::string target, const std::string replace);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

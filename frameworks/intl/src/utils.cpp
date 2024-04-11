@@ -148,6 +148,19 @@ std::string PseudoLocalizationProcessor(const std::string &input, bool ifEnforce
     }
     return input;
 }
+
+std::string StrReplaceAll(std::string& str, const std::string target, const std::string replace)
+{
+    std::string::size_type pos = 0;
+    std::string result = str;
+    if (replace.empty() || target.compare(replace) == 0) {
+        return result;
+    }
+    while ((pos = result.find(target)) != std::string::npos) {
+        result.replace(pos, target.length(), replace);
+    }
+    return result;
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

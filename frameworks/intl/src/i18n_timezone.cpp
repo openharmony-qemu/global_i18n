@@ -23,6 +23,7 @@
 #include "libxml/tree.h"
 #include "libxml/xmlstring.h"
 #include "locale_config.h"
+#include "locale_matcher.h"
 #include "locale_info.h"
 #include "map"
 #include "securec.h"
@@ -67,6 +68,7 @@ std::set<std::string> I18nTimeZone::availableIDs {};
 std::set<std::string> I18nTimeZone::supportedLocales {};
 std::set<std::string> I18nTimeZone::availableZoneCityIDs {};
 std::map<std::string, std::string> I18nTimeZone::city2TimeZoneID {};
+std::map<std::string, std::string> I18nTimeZone::BEST_MATCH_LOCALE {};
 bool I18nTimeZone::useDeviceCityDispName = false;
 
 const int RECV_CHAR_LEN = 128;
@@ -975,34 +977,41 @@ bool I18nTimeZone::GetSupportedLocales()
     return true;
 }
 
-std::string I18nTimeZone::GetFallBack(std::string &localeStr)
+std::string I18nTimeZone::GetFallBack(std::string &requestLocaleStr)
 {
-    if (strcmp(localeStr.c_str(), DEFAULT_LOCALE) == 0) {
-        return "";
+    auto iter = BEST_MATCH_LOCALE.find(requestLocaleStr);
+    if (iter != BEST_MATCH_LOCALE.end()) {
+        return iter->second;
     }
-    size_t begin = 0;
-    std::vector<std::string> localeParts;
-    bool breakFlag = true;
-    while (breakFlag) {
-        size_t end = localeStr.find('_', begin);
-        localeParts.push_back(localeStr.substr(begin, end - begin));
-        if (end == std::string::npos) {
-            breakFlag = false;
-        }
-        begin = end + 1;
-    }
-
-    if (localeParts.size() == 1) {
-        return DEFAULT_LOCALE;
-    }
-    std::string fallBackLocale;
-    for (size_t i = 0; i < localeParts.size() - 1; i++) {
-        fallBackLocale += localeParts[i];
-        if (i != localeParts.size() - 2) { // -2 represent the last part
-            fallBackLocale += "_";
+    std::vector<LocaleInfo*> matchLocaleList;
+    LocaleInfo* requestLocale = new LocaleInfo(requestLocaleStr);
+    for (auto it = supportedLocales.begin(); it != supportedLocales.end(); ++it) {
+        std::string tempLocaleStr = it->data();
+        tempLocaleStr = StrReplaceAll(tempLocaleStr, "_", "-");
+        LocaleInfo* tempLocale = new LocaleInfo(tempLocaleStr);
+        if (LocaleMatcher::Match(requestLocale, tempLocale)) {
+            matchLocaleList.push_back(tempLocale);
+        } else {
+            delete tempLocale;
         }
     }
-    return fallBackLocale;
+    std::string bestMatchLocaleTag = DEFAULT_LOCALE;
+    if (matchLocaleList.size() == 0) {
+        return bestMatchLocaleTag;
+    }
+    LocaleInfo *bestMatch = matchLocaleList[0];
+    for (size_t i = 1; i < matchLocaleList.size(); ++i) {
+        if (LocaleMatcher::IsMoreSuitable(bestMatch, matchLocaleList[i], requestLocale) < 0) {
+            bestMatch = matchLocaleList[i];
+        }
+    }
+    bestMatchLocaleTag = bestMatch->ToString();
+    for (size_t i = 0; i < matchLocaleList.size(); ++i) {
+        delete matchLocaleList[i];
+    }
+    bestMatchLocaleTag = StrReplaceAll(bestMatchLocaleTag, "-", "_");
+    BEST_MATCH_LOCALE.insert(std::make_pair(requestLocaleStr, bestMatchLocaleTag));
+    return bestMatchLocaleTag;
 }
 
 std::string I18nTimeZone::GetCityDisplayName(std::string &cityID, std::string &localeStr)
@@ -1040,24 +1049,8 @@ std::string I18nTimeZone::GetLocaleBaseName(std::string &localeStr)
         return "";
     }
     std::string requestLocaleStr = locale.getBaseName();
-    std::string displayName;
-    if (supportedLocales.find(requestLocaleStr) != supportedLocales.end()) {
-        return requestLocaleStr;
-    }
-    locale.addLikelySubtags(errorCode);
-    if (U_FAILURE(errorCode)) {
-        HILOG_ERROR_I18N("add likely subtags for %{public}s failed", localeStr.c_str());
-        return "";
-    }
-    requestLocaleStr = locale.getBaseName();
-    while (requestLocaleStr.length() != 0) {
-        if (supportedLocales.find(requestLocaleStr) != supportedLocales.end() || strcmp(requestLocaleStr.c_str(),
-            DEFAULT_LOCALE) == 0) {
-            return requestLocaleStr;
-        }
-        requestLocaleStr = GetFallBack(requestLocaleStr);
-    }
-    return displayName;
+    requestLocaleStr = StrReplaceAll(requestLocaleStr, "_", "-");
+    return GetFallBack(requestLocaleStr);
 }
 
 std::string I18nTimeZone::GetTimezoneIdByCityId(const std::string &cityId)

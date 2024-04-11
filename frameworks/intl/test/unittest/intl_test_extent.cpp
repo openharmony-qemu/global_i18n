@@ -383,7 +383,7 @@ HWTEST_F(IntlTest, IntlFuncTest0058, TestSize.Level1)
     EXPECT_EQ(displayName4, "中国标准时间");
     std::string cityId = "Shanghai";
     std::string localeId = "en-US";
-    std::string cityDisplayName = i18nTimeZone->GetCityDisplayName(cityId, localeId);
+    std::string cityDisplayName = I18nTimeZone::GetCityDisplayName(cityId, localeId);
     EXPECT_EQ(cityDisplayName, "Shanghai (China)");
     std::unique_ptr<I18nTimeZone> timezone = I18nTimeZone::CreateInstance(timezoneId, true);
     I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
