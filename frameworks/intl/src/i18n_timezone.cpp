@@ -1090,8 +1090,8 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
     if (preferredPath == "") {
         return tzIdList;
     }
-    uint32_t width;
-    uint32_t height;
+    uint32_t width = 0;
+    uint32_t height = 0;
     GetTzDataWidth(filePaths, &width, &height);
     double calculateX = y * width / (TZ_X_PLUS * 1.0) + width / (TZ_HALF_OF_SIZE * 1.0);
     double calculateY = x * ((height * fileCount) / (TZ_X_PLUS * TZ_HALF_OF_SIZE * 1.0)) +
@@ -1189,8 +1189,7 @@ std::vector<int> I18nTimeZone::GetColorData(const uint16_t x, const uint16_t y,
 void I18nTimeZone::GetTzDataWidth(std::vector<std::string> filePaths, uint32_t *width, uint32_t *height)
 {
     if (filePaths.size() == 0 || !CheckTzDataFilePath(filePaths.at(0))) {
-        *width = 0;
-        *height = 0;
+        return;
     } else {
         FILE* fp;
         png_structp png_ptr;
@@ -1198,6 +1197,9 @@ void I18nTimeZone::GetTzDataWidth(std::vector<std::string> filePaths, uint32_t *
         try {
             std::string path = filePaths.at(0);
             fp = fopen(path.c_str(), "rb");
+            if (fp == NULL) {
+                return;
+            }
             png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
             info_ptr = png_create_info_struct(png_ptr);
             rewind(fp);
