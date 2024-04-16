@@ -66,7 +66,9 @@ napi_value I18nAddon::InitI18nUtil(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("unitConvert", UnitConvert),
         DECLARE_NAPI_STATIC_FUNCTION("getDateOrder", GetDateOrder),
         DECLARE_NAPI_STATIC_FUNCTION("getTimePeriodName", GetTimePeriodName),
-        DECLARE_NAPI_STATIC_FUNCTION("getBestMatchLocale", GetBestMatchLocale)
+        DECLARE_NAPI_STATIC_FUNCTION("getBestMatchLocale", GetBestMatchLocale),
+        DECLARE_NAPI_STATIC_FUNCTION("getThreeLetterLanguage", GetThreeLetterLanguage),
+        DECLARE_NAPI_STATIC_FUNCTION("getThreeLetterRegion", GetThreeLetterRegion)
     };
     napi_value constructor = nullptr;
     napi_status status = napi_define_class(env, "I18NUtil", NAPI_AUTO_LENGTH, JSUtils::DefaultConstructor, nullptr,
@@ -439,6 +441,93 @@ napi_value I18nAddon::GetBestMatchLocale(napi_env env, napi_callback_info info)
     }
     return result;
 }
+
+napi_value I18nAddon::GetThreeLetterLanguage(napi_env env, napi_callback_info info)
+{
+    size_t argc = 1;
+    napi_value argv[1] = { 0 };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("GetThreeLetterLanguage napi get param error.");
+        return nullptr;
+    } else if (argc < 1) {
+        HILOG_ERROR_I18N("GetThreeLetterLanguage param argc < 1.");
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        return nullptr;
+    }
+
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    napi_typeof(env, argv[0], &valueType);
+    if (valueType != napi_valuetype::napi_string) {
+        HILOG_ERROR_I18N("GetThreeLetterLanguage param not valid.");
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+        return nullptr;
+    }
+
+    int32_t code = 0;
+    std::string languageTag = VariableConvertor::GetString(env, argv[0], code);
+    if (code != 0) {
+        HILOG_ERROR_I18N("GetThreeLetterLanguage get param locale failed.");
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        return nullptr;
+    }
+
+    std::string language = GetISO3Language(languageTag);
+
+    napi_value result;
+    status = napi_create_string_utf8(env, language.c_str(), NAPI_AUTO_LENGTH, &result);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("GetThreeLetterLanguage Failed to create string item");
+        return nullptr;
+    }
+    return result;
+}
+
+napi_value I18nAddon::GetThreeLetterRegion(napi_env env, napi_callback_info info)
+{
+    size_t argc = 1;
+    napi_value argv[1] = { 0 };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("GetThreeLetterRegion napi get param error.");
+        return nullptr;
+    } else if (argc < 1) {
+        HILOG_ERROR_I18N("GetThreeLetterRegion param argc < 1.");
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        return nullptr;
+    }
+
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    napi_typeof(env, argv[0], &valueType);
+    if (valueType != napi_valuetype::napi_string) {
+        HILOG_ERROR_I18N("GetThreeLetterRegion param not valid.");
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+        return nullptr;
+    }
+
+    int32_t code = 0;
+    std::string regionTag = VariableConvertor::GetString(env, argv[0], code);
+    if (code != 0) {
+        HILOG_ERROR_I18N("GetThreeLetterRegion get param locale failed.");
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        return nullptr;
+    }
+
+    std::string country = GetISO3Country(regionTag);
+
+    napi_value result;
+    status = napi_create_string_utf8(env, country.c_str(), NAPI_AUTO_LENGTH, &result);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("GetThreeLetterRegion Failed to create string item");
+        return nullptr;
+    }
+    return result;
+}
+
 
 void I18nAddon::ProcessNormal(char ch, int *order, size_t orderSize, int *lengths, size_t lengsSize)
 {

@@ -23,6 +23,7 @@
 #include "i18n_hilog.h"
 #include "locale_config.h"
 #include "parameter.h"
+#include "unicode/localebuilder.h"
 #include "utils.h"
 
 namespace OHOS {
@@ -161,6 +162,34 @@ std::string StrReplaceAll(std::string& str, const std::string target, const std:
     }
     return result;
 }
+
+std::string GetISO3Language(const string language)
+{
+    UErrorCode icuStatus = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(language.data(), icuStatus);
+    if (U_FAILURE(icuStatus) || !IsValidLocaleTag(locale)) {
+        return nullptr;
+    }
+    return locale.getISO3Language();
+}
+
+std::string GetISO3Country(const string country)
+{
+    UErrorCode icuStatus = U_ZERO_ERROR;
+    icu::Locale locale;
+    if (LocaleConfig::IsValidRegion(country)) {
+        locale = icu::LocaleBuilder().setLanguage("zh").setRegion(country).build(icuStatus);
+    } else if (LocaleConfig::IsValidTag(country)) {
+        locale = icu::Locale::forLanguageTag(country.data(), icuStatus);
+    } else {
+        return nullptr;
+    }
+    if (U_FAILURE(icuStatus) || !IsValidLocaleTag(locale)) {
+        return nullptr;
+    }
+    return locale.getISO3Country();
+}
+
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
