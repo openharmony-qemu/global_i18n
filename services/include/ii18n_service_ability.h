@@ -33,6 +33,7 @@ public:
     virtual I18nErrorCode SetUsingLocalDigit(bool flag) = 0;
     virtual I18nErrorCode AddPreferredLanguage(const std::string &language, int32_t index) = 0;
     virtual I18nErrorCode RemovePreferredLanguage(int32_t index) = 0;
+    virtual std::pair<int, int> VerifyLibphonenumberUpdate() = 0;
 
     // I18n service request code.
     enum class ILocaleConfigAbilityCode {
@@ -43,6 +44,7 @@ public:
         SET_USING_LOCAL_DIGIT = 4,
         ADD_PREFERRED_LANGUAGE = 5,
         REMOVE_PREFERRED_LANGUAGE = 6,
+        VERIFY_LIBPHONENUMBER_UPDATE = 7,
     };
 
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.global.II18nServiceAbility");

@@ -82,6 +82,8 @@ void I18nServiceAbilityStub::InitInnerFuncMap()
         &I18nServiceAbilityStub::AddPreferredLanguageInner;
     innerFuncMap[static_cast<uint32_t>(ILocaleConfigAbilityCode::REMOVE_PREFERRED_LANGUAGE)] =
         &I18nServiceAbilityStub::RemovePreferredLanguageInner;
+    innerFuncMap[static_cast<uint32_t>(ILocaleConfigAbilityCode::VERIFY_LIBPHONENUMBER_UPDATE)] =
+        &I18nServiceAbilityStub::VerifyLibphonenumberUpdateInner;
 }
 
 /**
@@ -226,6 +228,14 @@ int32_t I18nServiceAbilityStub::RemovePreferredLanguageInner(MessageParcel &data
             static_cast<int32_t>(err));
     }
     reply.WriteInt32(static_cast<int32_t>(err));
+    return 0;
+}
+
+int32_t I18nServiceAbilityStub::VerifyLibphonenumberUpdateInner(MessageParcel &data, MessageParcel &reply)
+{
+    std::pair<int, int> fds = VerifyLibphonenumberUpdate();
+    reply.WriteFileDescriptor(fds.first);
+    reply.WriteFileDescriptor(fds.second);
     return 0;
 }
 } // namespace I18n
