@@ -1485,6 +1485,8 @@ HWTEST_F(I18nTest, I18nFuncTest061, TestSize.Level1)
     EXPECT_EQ(language, "zho");
     language = GetISO3Language("en-US");
     EXPECT_EQ(language, "eng");
+    language = GetISO3Language("zz");
+    EXPECT_EQ(language, "");
     language = GetISO3Language("sdfsdf");
     EXPECT_EQ(language, "");
 }
@@ -1504,6 +1506,10 @@ HWTEST_F(I18nTest, I18nFuncTest062, TestSize.Level1)
     EXPECT_EQ(country, "CHN");
     country = GetISO3Country("en-US");
     EXPECT_EQ(country, "USA");
+    country = GetISO3Country("ZX");
+    EXPECT_EQ(country, "");
+    country = GetISO3Country("zh");
+    EXPECT_EQ(country, "");
     country = GetISO3Country("sdfsdf");
     EXPECT_EQ(country, "");
 }
