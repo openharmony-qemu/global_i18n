@@ -52,6 +52,8 @@ public:
     static napi_value GetDateOrder(napi_env env, napi_callback_info info);
     static napi_value GetTimePeriodName(napi_env env, napi_callback_info info);
     static napi_value GetBestMatchLocale(napi_env env, napi_callback_info info);
+    static napi_value GetThreeLetterLanguage(napi_env env, napi_callback_info info);
+    static napi_value GetThreeLetterRegion(napi_env env, napi_callback_info info);
     static napi_value InitI18nTransliterator(napi_env env, napi_value exports);
     static napi_value InitIndexUtil(napi_env env, napi_value exports);
     static napi_value InitI18nUtil(napi_env env, napi_value exports);

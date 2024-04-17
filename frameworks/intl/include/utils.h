@@ -33,6 +33,8 @@ bool GetPseudoLocalizationEnforce();
 std::string PseudoLocalizationProcessor(const std::string &input);
 std::string PseudoLocalizationProcessor(const std::string &input, bool ifEnforce);
 std::string StrReplaceAll(std::string& str, const std::string target, const std::string replace);
+std::string GetISO3Language(const std::string language);
+std::string GetISO3Country(const std::string country);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
