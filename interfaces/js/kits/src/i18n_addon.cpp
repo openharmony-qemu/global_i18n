@@ -451,6 +451,7 @@ napi_value I18nAddon::GetThreeLetterLanguage(napi_env env, napi_callback_info in
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("GetThreeLetterLanguage napi get param error.");
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
         return nullptr;
     } else if (argc < 1) {
         HILOG_ERROR_I18N("GetThreeLetterLanguage param argc < 1.");
@@ -495,6 +496,7 @@ napi_value I18nAddon::GetThreeLetterRegion(napi_env env, napi_callback_info info
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("GetThreeLetterRegion napi get param error.");
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
         return nullptr;
     } else if (argc < 1) {
         HILOG_ERROR_I18N("GetThreeLetterRegion param argc < 1.");
