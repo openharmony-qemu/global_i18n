@@ -168,7 +168,7 @@ std::string GetISO3Language(const string language)
     UErrorCode icuStatus = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(language.data(), icuStatus);
     if (U_FAILURE(icuStatus) || !IsValidLocaleTag(locale)) {
-        return nullptr;
+        return "";
     }
     return locale.getISO3Language();
 }
@@ -182,10 +182,10 @@ std::string GetISO3Country(const string country)
     } else if (LocaleConfig::IsValidTag(country)) {
         locale = icu::Locale::forLanguageTag(country.data(), icuStatus);
     } else {
-        return nullptr;
+        return "";
     }
     if (U_FAILURE(icuStatus) || !IsValidLocaleTag(locale)) {
-        return nullptr;
+        return "";
     }
     return locale.getISO3Country();
 }
