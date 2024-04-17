@@ -470,7 +470,7 @@ napi_value I18nAddon::GetThreeLetterLanguage(napi_env env, napi_callback_info in
     std::string languageTag = VariableConvertor::GetString(env, argv[0], code);
     if (code != 0) {
         HILOG_ERROR_I18N("GetThreeLetterLanguage get param locale failed.");
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
         return nullptr;
     }
 
@@ -478,8 +478,9 @@ napi_value I18nAddon::GetThreeLetterLanguage(napi_env env, napi_callback_info in
 
     napi_value result;
     status = napi_create_string_utf8(env, language.c_str(), NAPI_AUTO_LENGTH, &result);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("GetThreeLetterLanguage Failed to create string item");
+    if (status != napi_ok || language == "") {
+        HILOG_ERROR_I18N("GetThreeLetterLanguage create string fail or empty");
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
         return nullptr;
     }
     return result;
@@ -513,7 +514,7 @@ napi_value I18nAddon::GetThreeLetterRegion(napi_env env, napi_callback_info info
     std::string regionTag = VariableConvertor::GetString(env, argv[0], code);
     if (code != 0) {
         HILOG_ERROR_I18N("GetThreeLetterRegion get param locale failed.");
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
         return nullptr;
     }
 
@@ -521,8 +522,9 @@ napi_value I18nAddon::GetThreeLetterRegion(napi_env env, napi_callback_info info
 
     napi_value result;
     status = napi_create_string_utf8(env, country.c_str(), NAPI_AUTO_LENGTH, &result);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("GetThreeLetterRegion Failed to create string item");
+    if (status != napi_ok || country == "") {
+        HILOG_ERROR_I18N("GetThreeLetterRegion create string fail or empty");
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
         return nullptr;
     }
     return result;
