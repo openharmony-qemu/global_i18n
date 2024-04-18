@@ -1070,7 +1070,6 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
     std::vector<std::string> tzIdList;
 #ifdef SUPPORT_GRAPHICS
     if (!CheckLatitudeAndLongitude(x, y)) {
-        HILOG_ERROR_I18N("invalid longitude:%{public}f or latitude: %{public}f ", x, y);
         return tzIdList;
     }
     std::map<int, std::string> categoryMap = GetTimeZoneCategoryMap(x, y);
