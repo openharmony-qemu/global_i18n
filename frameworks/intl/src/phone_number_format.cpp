@@ -200,7 +200,7 @@ void PhoneNumberFormat::OpenHandler()
 #ifndef SUPPORT_ASAN
             const char* geocodingSO = "libgeocoding.z.so";
 #else
-            const char* geocodingSO = "system/asan/lib64/libgeocoding.z.so";
+            const char* geocodingSO = "system/asan/lib64/platformsdk/libgeocoding.z.so";
 #endif
             HILOG_INFO_I18N("DynamicHandler lock init.");
             dynamicHandler = dlopen(geocodingSO, RTLD_NOW);
