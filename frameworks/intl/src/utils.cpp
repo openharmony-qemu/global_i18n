@@ -150,7 +150,8 @@ std::string PseudoLocalizationProcessor(const std::string &input, bool ifEnforce
     return input;
 }
 
-std::string StrReplaceAll(std::string& str, const std::string target, const std::string replace)
+std::string StrReplaceAll(const std::string& str,
+    const std::string& target, const std::string& replace)
 {
     std::string::size_type pos = 0;
     std::string result = str;
