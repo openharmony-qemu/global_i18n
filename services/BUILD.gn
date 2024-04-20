@@ -81,6 +81,9 @@ ohos_shared_library("i18n_sa") {
     "eventhandler:libeventhandler",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "openssl:libcrypto_shared",
+    "openssl:libssl_shared",
+    "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]

@@ -73,6 +73,7 @@ private:
     int32_t SetUsingLocalDigitInner(MessageParcel &data, MessageParcel &reply);
     int32_t AddPreferredLanguageInner(MessageParcel &data, MessageParcel &reply);
     int32_t RemovePreferredLanguageInner(MessageParcel &data, MessageParcel &reply);
+    int32_t VerifyLibphonenumberUpdateInner(MessageParcel &data, MessageParcel &reply);
 };
 } // namespace I18n
 } // namespace Global

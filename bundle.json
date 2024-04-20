@@ -67,6 +67,7 @@
                 "libpng",
                 "libxml2",
                 "napi",
+                "openssl",
                 "preferences",
                 "resource_management",
                 "safwk",
