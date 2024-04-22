@@ -24,6 +24,7 @@
 #include <openssl/sha.h>
 #include <sstream>
 #include <unistd.h>
+#include "i18n_hilog.h"
 #include "verify_sign_tool.h"
 
 namespace OHOS {
@@ -135,7 +136,7 @@ VerifyStatus VerifySignTool::Verify()
 std::string VerifySignTool::LoadFileVersion(std::string& versionPath)
 {
     std::string version;
-    if (!std::filesystem::exists(versionPath.c_str())) {
+    if (!FileExist(versionPath.c_str())) {
         return version;
     }
     std::ifstream file(versionPath);
@@ -246,7 +247,7 @@ bool VerifySignTool::VerifyCertFile()
 bool VerifySignTool::VerifyConfigFiles()
 {
     std::string versionPath = CFG_PATH + VERSION_FILE;
-    if (!std::filesystem::exists(versionPath.c_str())) {
+    if (!FileExist(versionPath.c_str())) {
         return false;
     }
     if (VerifyParamFile(VERSION_FILE).length() == 0) {
@@ -254,12 +255,12 @@ bool VerifySignTool::VerifyConfigFiles()
     }
     std::string metadataPath = CFG_PATH + METADATA_FILE;
     std::string metadataDigest = VerifyParamFile(METADATA_FILE);
-    if (std::filesystem::exists(metadataPath.c_str()) && metadataDigest.length() == 0) {
+    if (FileExist(metadataPath.c_str()) && metadataDigest.length() == 0) {
         return false;
     }
     std::string geocodingDigest = VerifyParamFile(GEOCODING_FILE);
     std::string geocodingPath = CFG_PATH + GEOCODING_FILE;
-    if (std::filesystem::exists(geocodingPath.c_str()) && geocodingDigest.length() == 0) {
+    if (FileExist(geocodingPath.c_str()) && geocodingDigest.length() == 0) {
         return false;
     }
     if (preferences != nullptr) {
@@ -327,15 +328,15 @@ std::string VerifySignTool::trim(std::string &s)
 bool VerifySignTool::VerifyFileSign(const std::string& pubkeyPath, const std::string& signPath,
     const std::string& digestPath)
 {
-    if (!std::filesystem::exists(pubkeyPath.c_str())) {
+    if (!FileExist(pubkeyPath.c_str())) {
         return false;
     }
 
-    if (!std::filesystem::exists(signPath.c_str())) {
+    if (!FileExist(signPath.c_str())) {
         return false;
     }
 
-    if (!std::filesystem::exists(digestPath.c_str())) {
+    if (!FileExist(digestPath.c_str())) {
         return false;
     }
     std::string signStr = GetFileStream(signPath);
@@ -467,6 +468,23 @@ void VerifySignTool::Split(const std::string &src, const std::string &sep, std::
     if (begin != src.size()) {
         dest.push_back(src.substr(begin));
     }
+}
+
+bool VerifySignTool::FileExist(const std::string& path)
+{
+    bool status = false;
+    try {
+        status = std::filesystem::exists(path.c_str());
+    } catch (const std::filesystem::filesystem_error &except) {
+        HILOG_ERROR_I18N("FileExist failed because filesystem_error, error message: %{public}s.",
+            except.code().message().c_str());
+        return false;
+    } catch (const std::bad_alloc &except) {
+        HILOG_ERROR_I18N("FileExist failed because bad_alloc, error message: %{public}s.",
+            except.what());
+        return false;
+    }
+    return status;
 }
 }
 }
