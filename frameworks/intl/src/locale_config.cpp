@@ -712,7 +712,7 @@ std::string LocaleConfig::ComputeLocale(const std::string &displayLocale)
 
 void LocaleConfig::SetSupportedDialectLocales(const char* key, const char* value)
 {
-    std::lock_guard<std::mutex> matchLocaleLock(matchLocaleMutex);
+    std::lock_guard<std::mutex> dialectLocaleLock(dialectLocaleMutex);
     supportedDialectLocales.insert(
         std::make_pair<std::string, std::string>(key, value));
 }
@@ -747,8 +747,8 @@ void LocaleConfig::ReadLangData(const char *langDataPath)
             }
         }
         // 0 represents langid index, 1 represents displayname index
-        const char * key = reinterpret_cast<const char *>(langContents[0]);
-        const char * value = reinterpret_cast<const char *>(langContents[1]);
+        const char* key = reinterpret_cast<const char *>(langContents[0]);
+        const char* value = reinterpret_cast<const char *>(langContents[1]);
         SetLocale2DisplayName(key, value);
         for (size_t i = 0; i < ELEMENT_NUM; i++) {
             if (langContents[i] != nullptr) {

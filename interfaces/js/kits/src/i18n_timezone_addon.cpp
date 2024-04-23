@@ -316,7 +316,7 @@ bool I18nTimeZoneAddon::CheckLongitudeTypeAndScope(napi_env env, napi_value argv
 
 bool I18nTimeZoneAddon::CheckLatitudeTypeAndScope(napi_env env, napi_value argv, double &y)
 {
-    status = napi_get_value_double(env, argv, &y);
+    napi_status status = napi_get_value_double(env, argv, &y);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("GetTimezonesByLocation: Parse second argument y failed");
         return false;
