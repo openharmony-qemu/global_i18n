@@ -80,6 +80,7 @@ void PhoneNumberFormat::CloseDynamicHandler()
         dlclose(dynamicHandler);
     }
     dynamicHandler = nullptr;
+    locationNameFunc = nullptr;
 }
 
 std::unique_ptr<PhoneNumberFormat> PhoneNumberFormat::CreateInstance(const std::string &countryTag,
