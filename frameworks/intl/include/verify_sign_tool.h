@@ -57,6 +57,7 @@ private:
     static void Split(const std::string &src, const std::string &sep, std::vector<std::string> &dest);
     static std::string trim(std::string &s);
     static std::string GetFileStream(const std::string& filePath);
+    static bool FileExist(const std::string& path);
     static const int HASH_BUFFER_SIZE;
     static const int MIN_SIZE;
     static const int VERSION_SIZE;
