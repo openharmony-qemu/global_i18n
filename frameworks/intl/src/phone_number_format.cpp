@@ -80,7 +80,6 @@ void PhoneNumberFormat::CloseDynamicHandler()
         dlclose(dynamicHandler);
     }
     dynamicHandler = nullptr;
-    locationNameFunc = nullptr;
 }
 
 std::unique_ptr<PhoneNumberFormat> PhoneNumberFormat::CreateInstance(const std::string &countryTag,
@@ -172,21 +171,20 @@ __attribute__((no_sanitize("cfi"))) std::string PhoneNumberFormat::getPhoneLocat
     OpenHandler();
     std::lock_guard<std::mutex> phoneLock(phoneMutex);
     std::string locName;
-    if (dynamicHandler && !locationNameFunc) {
+    if (dynamicHandler) {
         HILOG_ERROR_I18N("LocationNameFunc Init");
-        locationNameFunc = reinterpret_cast<ExposeLocationName>(
+        ExposeLocationName locationNameFunc = reinterpret_cast<ExposeLocationName>(
             dlsym(dynamicHandler, "exposeLocationName"));
+        if (locationNameFunc) {
+            // The function uses the same locale for phone and display.
+            char recvArr[RECV_CHAR_LEN];
+            const char* numberArr = number.c_str();
+            const char* phoneLocaleArr = phoneLocale.c_str();
+            locationNameFunc(numberArr, phoneLocaleArr, recvArr, RECV_CHAR_LEN);
+            locName = recvArr;
+        }
     }
-
-    if (locationNameFunc) {
-        // The function uses the same locale for phone and display.
-        char recvArr[RECV_CHAR_LEN];
-        const char* numberArr = number.c_str();
-        const char* phoneLocaleArr = phoneLocale.c_str();
-        locationNameFunc(numberArr, phoneLocaleArr, recvArr, RECV_CHAR_LEN);
-        locName = recvArr;
-    }
-    if (!locationNameFunc || locName.empty()) {
+    if (locName.empty()) {
         locName = LocaleConfig::GetDisplayRegion(regionCode, displayLocale, false);
     }
     return locName;
