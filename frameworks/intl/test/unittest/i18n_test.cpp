@@ -539,6 +539,9 @@ HWTEST_F(I18nTest, I18nFuncTest014, TestSize.Level1)
     EXPECT_EQ(blocklCity, "");
     std::string replaceCity = formatter2->getLocationName("13731930016", "zh-CN");
     EXPECT_EQ(replaceCity, "安徽省宣城市2");
+    std::string number192 = "19200707087";
+    std::string formattedNumber = formatter2->format(number192);
+    EXPECT_EQ(formattedNumber, "+86 192 0070 7087");
 }
 
 /**

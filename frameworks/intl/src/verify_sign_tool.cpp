@@ -139,6 +139,9 @@ std::string VerifySignTool::LoadFileVersion(std::string& versionPath)
         return version;
     }
     std::ifstream file(versionPath);
+    if (!file.good()) {
+        return version;
+    }
     std::string line;
     std::vector<std::string> strs;
     while (std::getline(file, line)) {
@@ -399,7 +402,7 @@ std::string VerifySignTool::CalcFileSha256Digest(const std::string& path)
     return dist;
 }
 
-void VerifySignTool::CalcBase64(uint8_t* input, uint32_t inputLen, std::string& encodedStr)
+void VerifySignTool::CalcBase64(uint8_t* input, int inputLen, std::string& encodedStr)
 {
     size_t base64Len = static_cast<size_t>(ceil(static_cast<long double>(inputLen) / BASE64_ENCODE_PACKET_LEN) *
         BASE64_ENCODE_LEN_OF_EACH_GROUP_DATA + 1);
@@ -435,7 +438,7 @@ int VerifySignTool::CalcFileShaOriginal(const std::string& filePath, unsigned ch
 std::string VerifySignTool::GetFileStream(const std::string& filePath)
 {
     std::ifstream file(filePath, std::ios::in | std::ios::binary);
-    if (!file) {
+    if (!file.good()) {
         return "";
     }
     std::stringstream inFile;
