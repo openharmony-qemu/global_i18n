@@ -690,9 +690,9 @@ std::string LocaleConfig::ComputeLocale(const std::string &displayLocale)
             std::string languageAndScript = (script.length() == 0) ? language : language + "-" + script;
             LocaleInfo newLocaleInfo(languageAndScript, localeInfoConfigs);
             std::string maximizeLocale = newLocaleInfo.Maximize();
-            supportedDialectLocales.insert(
-                std::make_pair<std::string, std::string>(maximizeLocale.c_str(),
-                                                         reinterpret_cast<const char*>(content)));
+            const char* key = maximizeLocale.c_str();
+            const char* value = reinterpret_cast<const char*>(content);
+            SetSupportedDialectLocales(key, value);
             xmlFree(content);
             cur = cur->next;
         }
@@ -708,6 +708,13 @@ std::string LocaleConfig::ComputeLocale(const std::string &displayLocale)
         return supportedDialectLocales.at(maximizeLocale);
     }
     return DEFAULT_LOCALE;
+}
+
+void LocaleConfig::SetSupportedDialectLocales(const char* key, const char* value)
+{
+    std::lock_guard<std::mutex> matchLocaleLock(matchLocaleMutex);
+    supportedDialectLocales.insert(
+        std::make_pair<std::string, std::string>(key, value));
 }
 
 void LocaleConfig::ReadLangData(const char *langDataPath)
@@ -740,9 +747,9 @@ void LocaleConfig::ReadLangData(const char *langDataPath)
             }
         }
         // 0 represents langid index, 1 represents displayname index
-        locale2DisplayName.insert(
-            std::make_pair<std::string, std::string>(reinterpret_cast<const char *>(langContents[0]),
-                                                     reinterpret_cast<const char *>(langContents[1])));
+        const char * key = reinterpret_cast<const char *>(langContents[0]);
+        const char * value = reinterpret_cast<const char *>(langContents[1]);
+        SetLocale2DisplayName(key, value);
         for (size_t i = 0; i < ELEMENT_NUM; i++) {
             if (langContents[i] != nullptr) {
                 xmlFree(langContents[i]);
@@ -751,6 +758,20 @@ void LocaleConfig::ReadLangData(const char *langDataPath)
         cur = cur->next;
     }
     xmlFreeDoc(doc);
+}
+
+void LocaleConfig::SetRegion2DisplayName(const char* key, const char* value)
+{
+    std::lock_guard<std::mutex> regionDisplayLock(region2DisplayNameMutex);
+    region2DisplayName.insert(
+        std::make_pair<std::string, std::string>(key, value));
+}
+
+void LocaleConfig::SetLocale2DisplayName(const char* key, const char* value)
+{
+    std::lock_guard<std::mutex> localeDisplayLock(locale2DisplayNameMutex);
+    locale2DisplayName.insert(
+        std::make_pair<std::string, std::string>(key, value));
 }
 
 void LocaleConfig::ReadRegionData(const char *regionDataPath)
@@ -786,9 +807,9 @@ void LocaleConfig::ReadRegionData(const char *regionDataPath)
             }
         }
         // 0 represents langid index, 1 represents displayname index
-        region2DisplayName.insert(
-            std::make_pair<std::string, std::string>(reinterpret_cast<const char *>(regionContents[0]),
-                                                     reinterpret_cast<const char *>(regionContents[1])));
+        const char* regionKey = reinterpret_cast<const char *>(regionContents[0]);
+        const char* regionVal = reinterpret_cast<const char *>(regionContents[1]);
+        SetRegion2DisplayName(regionKey, regionVal);
         for (size_t i = 0; i < ELEMENT_NUM; i++) {
             if (regionContents[i] != nullptr) {
                 xmlFree(regionContents[i]);

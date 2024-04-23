@@ -16,6 +16,7 @@
 #define OHOS_GLOBAL_I18N_LOCALE_CONFIG_H
 
 #include <map>
+#include <mutex>
 #include <vector>
 #include <set>
 #include <string>
@@ -145,6 +146,9 @@ private:
     static const char *DIALECT_LANGS_PATH;
     static const char *DIALECT_LANGS_NAME;
     static const char *REGION_PATH;
+    static std::mutex dialectLocaleMutex;
+    static std::mutex region2DisplayNameMutex;
+    static std::mutex locale2DisplayNameMutex;
 
     static const std::unordered_set<std::string>& GetSupportedLocales();
     static const std::unordered_set<std::string>& GetForbiddenRegions();
@@ -162,6 +166,9 @@ private:
     static void ReadLangData(const char *langDataPath);
     static void ReadRegionData(const char *regionDataPath);
     static void ProcessForbiddenRegions(const std::unordered_set<std::string> &forbiddenRegions);
+    static void SetSupportedDialectLocales(const char* key, const char* value);
+    static void SetRegion2DisplayName(const char* key, const char* value);
+    static void SetLocale2DisplayName(const char* key, const char* value);
 
 #ifdef SUPPORT_GRAPHICS
     /**

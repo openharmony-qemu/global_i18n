@@ -247,8 +247,8 @@ std::string DateTimeRule::Get(std::unordered_map<std::string, std::string>& para
 // check whether src starts or ends with target.
 bool DateTimeRule::CompareBeginEnd(const std::string src, const std::string target, bool flag)
 {
-    int lengthSrc = src.length();
-    int lengthTarget = target.length();
+    size_t lengthSrc = src.length();
+    size_t lengthTarget = target.length();
     if (lengthSrc < lengthTarget) {
         return false;
     }
