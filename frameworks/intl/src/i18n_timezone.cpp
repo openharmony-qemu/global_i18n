@@ -70,6 +70,8 @@ std::set<std::string> I18nTimeZone::availableZoneCityIDs {};
 std::map<std::string, std::string> I18nTimeZone::city2TimeZoneID {};
 std::map<std::string, std::string> I18nTimeZone::BEST_MATCH_LOCALE {};
 bool I18nTimeZone::useDeviceCityDispName = false;
+std::mutex I18nTimeZone::cityTimeZoneMutex;
+std::mutex I18nTimeZone::matchLocaleMutex;
 
 const int RECV_CHAR_LEN = 128;
 

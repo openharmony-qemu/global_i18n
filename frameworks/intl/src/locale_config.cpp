@@ -131,6 +131,9 @@ std::map<string, string> LocaleConfig::locale2DisplayName {};
 std::map<string, string> LocaleConfig::region2DisplayName {};
 std::string LocaleConfig::currentDialectLocale = "";
 std::string LocaleConfig::currentOverrideRegion = "";
+std::mutex LocaleConfig::dialectLocaleMutex;
+std::mutex LocaleConfig::region2DisplayNameMutex;
+std::mutex LocaleConfig::locale2DisplayNameMutex;
 
 set<std::string> LocaleConfig::validCaTag {
     "buddhist",
