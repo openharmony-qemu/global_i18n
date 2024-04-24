@@ -438,6 +438,9 @@ int VerifySignTool::CalcFileShaOriginal(const std::string& filePath, unsigned ch
 // load file content
 std::string VerifySignTool::GetFileStream(const std::string& filePath)
 {
+    if (filePath.length() >= PATH_MAX) {
+        return "";
+    }
     char* resolvedPath = new char[PATH_MAX];
     if (realpath(filePath.c_str(), resolvedPath) == nullptr) {
         free(resolvedPath);
