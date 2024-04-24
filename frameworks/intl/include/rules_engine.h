@@ -54,7 +54,7 @@ private:
     std::string InitOptRules(std::string& rule);
     std::string InitSubRules(std::string& rule);
     bool InitRules(std::string& rulesValue);
-    DateTimeRule* dateTimeRule = nullptr;
+    DateTimeRule* dateTimeRule;
     std::unordered_map<std::string, std::string> rulesMap;
     std::unordered_map<std::string, std::string> subRules;
     std::unordered_map<std::string, std::string> param;
