@@ -17,12 +17,14 @@
 #include <fcntl.h>
 #include <filesystem>
 #include <fstream>
+#include <limits.h>
 #include <openssl/bio.h>
 #include <openssl/evp.h>
 #include <openssl/md5.h>
 #include <openssl/pem.h>
 #include <openssl/sha.h>
 #include <sstream>
+#include <stdlib.h> 
 #include <unistd.h>
 #include "verify_sign_tool.h"
 #include "utils.h"
@@ -438,7 +440,8 @@ int VerifySignTool::CalcFileShaOriginal(const std::string& filePath, unsigned ch
 std::string VerifySignTool::GetFileStream(const std::string& filePath)
 {
     char *realpathRes = nullptr;
-    realpathRes = realpath(filePath.c_str(), NULL);
+    char buf[PATH_MAX + 1] = { 0 };
+    realpathRes = realpath(filePath.c_str(), buf);
     if (realpathRes == nullptr) {
         return "";
     }
