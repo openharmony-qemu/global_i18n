@@ -24,7 +24,6 @@
 #include <openssl/pem.h>
 #include <openssl/sha.h>
 #include <sstream>
-#include <cstdlib>
 #include <unistd.h>
 #include "verify_sign_tool.h"
 #include "utils.h"
