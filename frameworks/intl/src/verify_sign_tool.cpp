@@ -444,19 +444,17 @@ std::string VerifySignTool::GetFileStream(const std::string& filePath)
     }
     char* resolvedPath = new char[PATH_MAX + 1];
     if (realpath(filePath.c_str(), resolvedPath) == nullptr) {
-        free(resolvedPath);
-        resolvedPath = nullptr;
+        delete[] resolvedPath;
         return "";
     }
     std::ifstream file(filePath, std::ios::in | std::ios::binary);
     if (!file.good()) {
-        free(resolvedPath);
+        delete[] resolvedPath;
         return "";
     }
     std::stringstream inFile;
     inFile << file.rdbuf();
-    free(resolvedPath);
-    resolvedPath = nullptr;
+    delete[] resolvedPath;
     return inFile.str();
 }
 
