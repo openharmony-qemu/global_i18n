@@ -438,7 +438,7 @@ int VerifySignTool::CalcFileShaOriginal(const std::string& filePath, unsigned ch
 std::string VerifySignTool::GetFileStream(const std::string& filePath)
 {
     char *realpathRes = nullptr;
-    realpathRes = realpath(filePath.c_str(), nullptr);
+    realpathRes = realpath(filePath.c_str(), NULL);
     if (realpathRes == nullptr) {
         return "";
     }
