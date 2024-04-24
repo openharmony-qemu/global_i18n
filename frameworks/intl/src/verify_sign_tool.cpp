@@ -439,25 +439,20 @@ int VerifySignTool::CalcFileShaOriginal(const std::string& filePath, unsigned ch
 // load file content
 std::string VerifySignTool::GetFileStream(const std::string& filePath)
 {
-    char* realpathRes = nullptr;
     char* resolvedPath = new char[PATH_MAX];
-    realpathRes = realpath(filePath.c_str(), resolvedPath);
-    if (realpathRes == nullptr) {
+    if (realpath(filePath.c_str(), resolvedPath) == nullptr) {
         free(resolvedPath);
         resolvedPath = nullptr;
         return "";
     }
     std::ifstream file(filePath, std::ios::in | std::ios::binary);
     if (!file.good()) {
-        free(realpathRes);
         free(resolvedPath);
         return "";
     }
     std::stringstream inFile;
     inFile << file.rdbuf();
-    free(realpathRes);
     free(resolvedPath);
-    realpathRes = nullptr;
     resolvedPath = nullptr;
     return inFile.str();
 }
