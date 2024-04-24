@@ -451,7 +451,7 @@ std::vector<MatchedNumberInfo> RegexRule::GetNumbersWithSlant(icu::UnicodeString
 {
     std::vector<MatchedNumberInfo> shortList;
     PhoneNumberUtil* pnu = PhoneNumberUtil::GetInstance();
-    ShortNumberInfo* shortInfo = new ShortNumberInfo();
+    ShortNumberInfo* shortInfo = new (std::nothrow) ShortNumberInfo();
     if (shortInfo == nullptr) {
         HILOG_ERROR_I18N("ShortNumberInfo construct failed.");
         return shortList;

@@ -214,8 +214,8 @@ std::vector<MatchedDateTimeInfo> DateTimeFilter::FilterDate(icu::UnicodeString& 
     std::vector<MatchedDateTimeInfo>& matches)
 {
     std::vector<MatchedDateTimeInfo> result;
-    int lengthMatches = matches.size();
-    for (int i = 0; i < lengthMatches; i++) {
+    size_t lengthMatches = matches.size();
+    for (size_t i = 0; i < lengthMatches; i++) {
         MatchedDateTimeInfo match = matches[i];
         std::string matchRegex = match.GetRegex();
         int type = GetType(matchRegex);
@@ -224,7 +224,7 @@ std::vector<MatchedDateTimeInfo> DateTimeFilter::FilterDate(icu::UnicodeString& 
             result.push_back(match);
             continue;
         }
-        int hasNum = matches.size() - 1 - i;
+        size_t hasNum = matches.size() - 1 - i;
         std::vector<MatchedDateTimeInfo> sub;
         if (hasNum > 1) {
             // 1 and 3 indicate the relative positions of the intercepted matches.

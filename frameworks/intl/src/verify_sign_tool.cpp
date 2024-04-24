@@ -17,6 +17,7 @@
 #include <fcntl.h>
 #include <filesystem>
 #include <fstream>
+#include <climits>
 #include <openssl/bio.h>
 #include <openssl/evp.h>
 #include <openssl/md5.h>
@@ -26,6 +27,7 @@
 #include <unistd.h>
 #include "i18n_hilog.h"
 #include "verify_sign_tool.h"
+#include "utils.h"
 
 namespace OHOS {
 namespace Global {
@@ -137,6 +139,9 @@ std::string VerifySignTool::LoadFileVersion(std::string& versionPath)
 {
     std::string version;
     if (!FileExist(versionPath.c_str())) {
+        return version;
+    }
+    if (!CheckTzDataFilePath(versionPath)) {
         return version;
     }
     std::ifstream file(versionPath);
@@ -284,8 +289,7 @@ std::string VerifySignTool::VerifyParamFile(const std::string& filePath)
         return "";
     }
     std::string absFilePath = CFG_PATH + filePath;
-    std::ifstream paramFile(absFilePath);
-    if (!paramFile.good()) {
+    if (!CheckTzDataFilePath(absFilePath)) {
         return "";
     }
     std::string sha256Digest;
@@ -400,7 +404,7 @@ std::string VerifySignTool::CalcFileSha256Digest(const std::string& path)
     return dist;
 }
 
-void VerifySignTool::CalcBase64(uint8_t* input, uint32_t inputLen, std::string& encodedStr)
+void VerifySignTool::CalcBase64(uint8_t* input, int inputLen, std::string& encodedStr)
 {
     size_t base64Len = static_cast<size_t>(ceil(static_cast<long double>(inputLen) / BASE64_ENCODE_PACKET_LEN) *
         BASE64_ENCODE_LEN_OF_EACH_GROUP_DATA + 1);
@@ -435,12 +439,24 @@ int VerifySignTool::CalcFileShaOriginal(const std::string& filePath, unsigned ch
 // load file content
 std::string VerifySignTool::GetFileStream(const std::string& filePath)
 {
+    if (filePath.length() >= PATH_MAX) {
+        return "";
+    }
+    char* resolvedPath = new char[PATH_MAX + 1];
+    if (realpath(filePath.c_str(), resolvedPath) == nullptr) {
+        free(resolvedPath);
+        resolvedPath = nullptr;
+        return "";
+    }
     std::ifstream file(filePath, std::ios::in | std::ios::binary);
-    if (!file) {
+    if (!file.good()) {
+        free(resolvedPath);
         return "";
     }
     std::stringstream inFile;
     inFile << file.rdbuf();
+    free(resolvedPath);
+    resolvedPath = nullptr;
     return inFile.str();
 }
 

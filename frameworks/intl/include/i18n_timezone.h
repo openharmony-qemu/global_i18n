@@ -17,6 +17,7 @@
 
 #include <cstdint>
 #include <map>
+#include <mutex>
 #include <png.h>
 #include <set>
 #include <string>
@@ -84,6 +85,8 @@ private:
     static constexpr int SYS_PARAM_LEN = 128;
     static bool useDeviceCityDispName;
     icu::TimeZone *timezone = nullptr;
+    static std::mutex cityTimeZoneMutex;
+    static std::mutex matchLocaleMutex;
 
     static bool ReadTimeZoneData(const char *xmlPath);
     static std::string ComputeLocale(std::string &locale);
@@ -106,6 +109,8 @@ private:
     static bool ValidateDataIntegrity(const std::vector<std::string> &pathList);
     static bool CheckLatitudeAndLongitude(const double x, const double y);
     static std::map<int, std::string> GetTimeZoneCategoryMap(const double x, const double y);
+    static void SetCity2TimeZoneID(const char* key, const char* value);
+    static void SetBestMatchLocale(const std::string& key, const std::string& value);
 };
 } // namespace I18n
 } // namespace Global

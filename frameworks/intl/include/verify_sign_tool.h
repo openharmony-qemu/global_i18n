@@ -47,7 +47,7 @@ private:
         const std::string& digestPath);
     static bool VerifyRsa(RSA* pubkey, const std::string& digest, const std::string& sign);
     static std::string CalcFileSha256Digest(const std::string& path);
-    static void CalcBase64(uint8_t* input, uint32_t inputLen, std::string& encodedStr);
+    static void CalcBase64(uint8_t* input, int inputLen, std::string& encodedStr);
     static int CalcFileShaOriginal(const std::string& filePath, unsigned char* hash, size_t len);
 
     static std::string LoadFileVersion(std::string& versionPath);

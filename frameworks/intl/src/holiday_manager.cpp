@@ -81,10 +81,13 @@ void HolidayManager::SetHolidayData(std::map<std::string, std::vector<HolidayInf
 bool HolidayManager::IsHoliday()
 {
     time_t timeStamp = time(NULL);
-    struct tm timObj = *localtime(&timeStamp);
-    int32_t year = timObj.tm_year + YEAR_START;
-    int32_t month = timObj.tm_mon + MONTH_GREATER_ONE;
-    return IsHoliday(year, month, timObj.tm_mday);
+    struct tm* timObj = localtime(&timeStamp);
+    if (timObj == nullptr) {
+        return false;
+    }
+    int32_t year = timObj->tm_year + YEAR_START;
+    int32_t month = timObj->tm_mon + MONTH_GREATER_ONE;
+    return IsHoliday(year, month, timObj->tm_mday);
 }
 
 bool HolidayManager::IsHoliday(int32_t year, int32_t month, int32_t day)
@@ -111,8 +114,12 @@ std::string HolidayManager::Format(int32_t year, int32_t month, int32_t day)
 std::vector<HolidayInfoItem> HolidayManager::GetHolidayInfoItemArray()
 {
     time_t timeStamp = time(NULL);
-    struct tm timObj = *localtime(&timeStamp);
-    int32_t realYear = timObj.tm_year + YEAR_START;
+    struct tm* timObj = localtime(&timeStamp);
+    if (timObj == nullptr) {
+        std::vector<HolidayInfoItem> emptyList;
+        return emptyList;
+    }
+    int32_t realYear = timObj->tm_year + YEAR_START;
     return GetHolidayInfoItemArray(realYear);
 }
 

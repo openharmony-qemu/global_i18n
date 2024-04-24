@@ -138,6 +138,10 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::FindShortNumbers(std::string&
     std::vector<MatchedNumberInfo> matchedNumberInfoList;
     UErrorCode status = U_ZERO_ERROR;
     size_t pos = phoneNumberRule->GetFindRules().size();
+    if (pos == 0) {
+        HILOG_ERROR_I18N("PhoneNumberRule.findRules is empty.");
+        return matchedNumberInfoList;
+    }
     // 1 indicates the last position.
     RegexRule* shortRegexRule = phoneNumberRule->GetFindRules()[pos - 1];
     icu::RegexPattern* shortPattern = shortRegexRule->GetPattern();
@@ -369,11 +373,11 @@ std::vector<int> PhoneNumberMatched::DealResult(std::vector<MatchedNumberInfo>& 
     if (length == 0) {
         result.push_back(0);
     } else {
-        int posNumber = 2;
-        int posStart = 1;
-        int posEnd = 2;
+        size_t posNumber = 2;
+        size_t posStart = 1;
+        size_t posEnd = 2;
         result.resize(posNumber * length + 1);
-        result[0] = length;
+        result[0] = static_cast<int>(length);
         for (size_t i = 0; i < length; i++) {
             result[posNumber * i + posStart] = matchedNumberInfoList[i].GetBegin();
             result[posNumber * i + posEnd] = matchedNumberInfoList[i].GetEnd();

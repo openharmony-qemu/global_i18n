@@ -70,6 +70,8 @@ std::set<std::string> I18nTimeZone::availableZoneCityIDs {};
 std::map<std::string, std::string> I18nTimeZone::city2TimeZoneID {};
 std::map<std::string, std::string> I18nTimeZone::BEST_MATCH_LOCALE {};
 bool I18nTimeZone::useDeviceCityDispName = false;
+std::mutex I18nTimeZone::cityTimeZoneMutex;
+std::mutex I18nTimeZone::matchLocaleMutex;
 
 const int RECV_CHAR_LEN = 128;
 
@@ -775,9 +777,9 @@ bool I18nTimeZone::ReadTimeZoneData(const char *xmlPath)
         }
         // 0 represents cityid index, 1 represents zoneid index
         availableZoneCityIDs.insert(reinterpret_cast<const char *>(contents[0]));
-        city2TimeZoneID.insert(
-            std::make_pair<std::string, std::string>(reinterpret_cast<const char *>(contents[0]),
-                                                     reinterpret_cast<const char *>(contents[1])));
+        const char* pairKey = reinterpret_cast<const char *>(contents[0]);
+        const char* pairVal = reinterpret_cast<const char *>(contents[1]);
+        SetCity2TimeZoneID(pairKey, pairVal);
         for (size_t i = 0; i < ELEMENT_NUM; i++) {
             if (contents[i] != nullptr) {
                 xmlFree(contents[i]);
@@ -787,6 +789,13 @@ bool I18nTimeZone::ReadTimeZoneData(const char *xmlPath)
     }
     xmlFreeDoc(doc);
     return true;
+}
+
+void I18nTimeZone::SetCity2TimeZoneID(const char* key, const char* value)
+{
+    std::lock_guard<std::mutex> cityTzLock(cityTimeZoneMutex);
+    city2TimeZoneID.insert(
+        std::make_pair<std::string, std::string>(key, value));
 }
 
 void I18nTimeZone::GetTimezoneIDFromZoneInfo(std::set<std::string> &availableIDs, std::string &parentPath,
@@ -997,6 +1006,7 @@ std::string I18nTimeZone::GetFallBack(std::string &requestLocaleStr)
     }
     std::string bestMatchLocaleTag = DEFAULT_LOCALE;
     if (matchLocaleList.size() == 0) {
+        delete requestLocale;
         return bestMatchLocaleTag;
     }
     LocaleInfo *bestMatch = matchLocaleList[0];
@@ -1010,8 +1020,14 @@ std::string I18nTimeZone::GetFallBack(std::string &requestLocaleStr)
         delete matchLocaleList[i];
     }
     bestMatchLocaleTag = StrReplaceAll(bestMatchLocaleTag, "-", "_");
-    BEST_MATCH_LOCALE.insert(std::make_pair(requestLocaleStr, bestMatchLocaleTag));
+    SetBestMatchLocale(requestLocaleStr, bestMatchLocaleTag);
     return bestMatchLocaleTag;
+}
+
+void I18nTimeZone::SetBestMatchLocale(const std::string& key, const std::string& value)
+{
+    std::lock_guard<std::mutex> matchLocaleLock(matchLocaleMutex);
+    BEST_MATCH_LOCALE.insert(std::make_pair(key, value));
 }
 
 std::string I18nTimeZone::GetCityDisplayName(std::string &cityID, std::string &localeStr)

@@ -36,7 +36,6 @@
 #include "nativetoken_kit.h"
 #include "measure_data.h"
 #include "number_format.h"
-#include "phone_number_format.h"
 #include "plural_rules.h"
 #include "preferred_language.h"
 #include "regex_rule.h"

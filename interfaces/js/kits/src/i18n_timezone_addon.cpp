@@ -274,7 +274,8 @@ napi_value I18nTimeZoneAddon::GetTimezonesByLocation(napi_env env, napi_callback
     }
     double x;
     double y;
-    if (!CheckParamTypeAndScope(env, argv, x, y)) {
+    if (!CheckLongitudeTypeAndScope(env, argv[0], x) ||
+        !CheckLatitudeTypeAndScope(env, argv[1], y)) {
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
         return nullptr;
     }
@@ -298,21 +299,31 @@ napi_value I18nTimeZoneAddon::GetTimezonesByLocation(napi_env env, napi_callback
     return timezoneList;
 }
 
-bool I18nTimeZoneAddon::CheckParamTypeAndScope(napi_env env, napi_value *argv, double &x, double &y)
+bool I18nTimeZoneAddon::CheckLongitudeTypeAndScope(napi_env env, napi_value argv, double &x)
 {
-    napi_status status = napi_get_value_double(env, argv[0], &x);
+    napi_status status = napi_get_value_double(env, argv, &x);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("GetTimezonesByLocation: Parse first argument x failed");
         return false;
     }
-    status = napi_get_value_double(env, argv[1], &y);
+    // -180 and 179.9 is the scope of longitude
+    if (x < -180 || x > 179.9) {
+        HILOG_ERROR_I18N("GetTimezonesByLocation: Args x exceed it's scope.");
+        return false;
+    }
+    return true;
+}
+
+bool I18nTimeZoneAddon::CheckLatitudeTypeAndScope(napi_env env, napi_value argv, double &y)
+{
+    napi_status status = napi_get_value_double(env, argv, &y);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("GetTimezonesByLocation: Parse second argument y failed");
         return false;
     }
-    // -180 and 179.9 is the scope of longitude, -90 and 89.9 is the scope of latitude
-    if (x < -180 || x > 179.9 || y < -90 || y > 89.9) {
-        HILOG_ERROR_I18N("GetTimezonesByLocation: Args x or y exceed it's scope.");
+    // -90 and 89.9 is the scope of latitude
+    if (y < -90 || y > 89.9) {
+        HILOG_ERROR_I18N("GetTimezonesByLocation: Args y exceed it's scope.");
         return false;
     }
     return true;
