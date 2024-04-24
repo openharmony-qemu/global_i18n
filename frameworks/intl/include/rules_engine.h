@@ -45,7 +45,6 @@ public:
 
 class RulesEngine {
 public:
-    RulesEngine();
     RulesEngine(DateTimeRule* dateTimeRule, RulesSet& rulesSet);
     ~RulesEngine();
     std::vector<MatchedDateTimeInfo> Match(icu::UnicodeString& message);

@@ -25,6 +25,7 @@
 #include <sstream>
 #include <unistd.h>
 #include "verify_sign_tool.h"
+#include "utils.h"
 
 namespace OHOS {
 namespace Global {
@@ -138,10 +139,10 @@ std::string VerifySignTool::LoadFileVersion(std::string& versionPath)
     if (!std::filesystem::exists(versionPath.c_str())) {
         return version;
     }
-    std::ifstream file(versionPath);
-    if (!file.good()) {
+    if (!CheckTzDataFilePath(versionPath)) {
         return version;
     }
+    std::ifstream file(versionPath);
     std::string line;
     std::vector<std::string> strs;
     while (std::getline(file, line)) {
@@ -286,8 +287,7 @@ std::string VerifySignTool::VerifyParamFile(const std::string& filePath)
         return "";
     }
     std::string absFilePath = CFG_PATH + filePath;
-    std::ifstream paramFile(absFilePath);
-    if (!paramFile.good()) {
+    if (!CheckTzDataFilePath(absFilePath)) {
         return "";
     }
     std::string sha256Digest;
@@ -437,12 +437,19 @@ int VerifySignTool::CalcFileShaOriginal(const std::string& filePath, unsigned ch
 // load file content
 std::string VerifySignTool::GetFileStream(const std::string& filePath)
 {
+    char *realpathRes = nullptr;
+    realpathRes = realpath(filePath.c_str(), nullptr);
+    if (realpathRes == nullptr) {
+        return "";
+    }
     std::ifstream file(filePath, std::ios::in | std::ios::binary);
     if (!file.good()) {
         return "";
     }
     std::stringstream inFile;
     inFile << file.rdbuf();
+    free(realpathRes);
+    realpathRes = nullptr;
     return inFile.str();
 }
 

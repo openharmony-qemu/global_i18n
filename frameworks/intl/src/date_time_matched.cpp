@@ -42,11 +42,11 @@ std::vector<int> DateTimeMatched::GetMatchedDateTime(icu::UnicodeString& message
     std::vector<MatchedDateTimeInfo> matches = this->dateRuleInit->Detect(messageStr);
     size_t length = matches.size();
     if (length > 0) {
-        int posDateTime = 2;
-        int posBegin = 1;
-        int posEnd = 2;
+        size_t posDateTime = 2;
+        size_t posBegin = 1;
+        size_t posEnd = 2;
         result.resize(posDateTime * length + 1);
-        result[0] = length;
+        result[0] = static_cast<int>(length);
         for (size_t i = 0; i < length; i++) {
             result[i * posDateTime + posBegin] = matches[i].GetBegin();
             result[i * posDateTime + posEnd] = matches[i].GetEnd();

@@ -40,10 +40,8 @@ namespace OHOS {
         RulesEngine* rulesEngine = new RulesEngine(dateTimeRule, ruleSet);
         icu::UnicodeString message(input.c_str());
         rulesEngine->Match(message);
-        RulesEngine* rulesEngine2 = new RulesEngine();
         delete dateTimeRule;
         delete rulesEngine;
-        delete rulesEngine2;
         return true;
     }
 }
