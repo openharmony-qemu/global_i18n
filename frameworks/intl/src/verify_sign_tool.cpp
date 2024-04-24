@@ -441,7 +441,7 @@ std::string VerifySignTool::GetFileStream(const std::string& filePath)
     if (filePath.length() >= PATH_MAX) {
         return "";
     }
-    char* resolvedPath = new char[PATH_MAX];
+    char* resolvedPath = new char[PATH_MAX + 1];
     if (realpath(filePath.c_str(), resolvedPath) == nullptr) {
         free(resolvedPath);
         resolvedPath = nullptr;
