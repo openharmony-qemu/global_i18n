@@ -31,6 +31,8 @@ void ComputeFactorValue(const std::string &unit, const std::string &measSys, std
 double ComputeSIPrefixValue(const std::string &unit);
 void ComputePowerValue(const std::string &unit, const std::string &measSys, std::vector<double> &factors);
 int ComputeValue(const std::string &unit, const std::string &measSys, std::vector<double> &factors);
+bool ConvertByte(double& number, std::string& unit);
+bool ConvertDate(double& number, std::string& unit);
 int Convert(double &value, const std::string &fromUnit, const std::string &fromMeasSys, const std::string &toUnit,
     const std::string &toMeasSys);
 } // namespace I18n

@@ -73,6 +73,10 @@ std::unordered_map<std::string, UNumberUnitWidth> NumberFormat::defaultCurrencyS
     { "watch", UNumberUnitWidth::UNUM_UNIT_WIDTH_NARROW }
 };
 
+std::map<std::string, std::string> NumberFormat::RelativeTimeFormatConfigs = {
+    { "numeric", "auto" }
+};
+
 NumberFormat::NumberFormat(const std::vector<std::string> &localeTags, std::map<std::string, std::string> &configs)
 {
     SetDefaultStyle();
@@ -89,6 +93,7 @@ NumberFormat::NumberFormat(const std::vector<std::string> &localeTags, std::map<
         }
         if (LocaleInfo::allValidLocales.count(locale.getLanguage()) > 0) {
             localeInfo = std::make_unique<LocaleInfo>(curLocale, configs);
+            CreateRelativeTimeFormat(curLocale);
             if (!localeInfo->InitSuccess()) {
                 continue;
             }
@@ -105,7 +110,9 @@ NumberFormat::NumberFormat(const std::vector<std::string> &localeTags, std::map<
         }
     }
     if (!createSuccess) {
-        localeInfo = std::make_unique<LocaleInfo>(LocaleConfig::GetSystemLocale(), configs);
+        std::string systemLocale = LocaleConfig::GetSystemLocale();
+        localeInfo = std::make_unique<LocaleInfo>(systemLocale, configs);
+        CreateRelativeTimeFormat(systemLocale);
         if (localeInfo->InitSuccess()) {
             locale = localeInfo->GetLocale();
             localeBaseName = localeInfo->GetBaseName();
@@ -123,6 +130,15 @@ NumberFormat::NumberFormat(const std::vector<std::string> &localeTags, std::map<
 
 NumberFormat::~NumberFormat()
 {
+}
+
+void NumberFormat::CreateRelativeTimeFormat(const std::string& locale)
+{
+    if (unitUsage == "elapsed-time-second") {
+        std::vector<std::string> locales = { locale };
+        relativeTimeFormat = std::make_unique<RelativeTimeFormat>(locales,
+            RelativeTimeFormatConfigs);
+    }
 }
 
 void NumberFormat::InitProperties()
@@ -309,7 +325,14 @@ std::string NumberFormat::Format(double number)
         return PseudoLocalizationProcessor("");
     }
     double finalNumber = number;
-    if (!unitUsage.empty()) {
+    std::string finalUnit = unit;
+    if ((unitUsage == "size-file-byte" || unitUsage == "size-shortfile-byte") && ConvertByte(finalNumber, finalUnit)) {
+        SetUnit(finalUnit);
+        SetPrecisionWithByte(finalNumber, finalUnit);
+    } else if (unitUsage == "elapsed-time-second" && ConvertDate(finalNumber, finalUnit) &&
+        relativeTimeFormat != nullptr) {
+        return relativeTimeFormat->Format(finalNumber, finalUnit);
+    } else if (!unitUsage.empty()) {
         std::vector<std::string> preferredUnits;
         if (unitUsage == "default") {
             GetDefaultPreferredUnit(localeInfo->GetRegion(), unitType, preferredUnits);
@@ -415,6 +438,36 @@ void NumberFormat::GetDigitsResolvedOptions(std::map<std::string, std::string> &
     }
     if (!notationString.empty()) {
         map.insert(std::make_pair("notation", notationString));
+    }
+}
+
+void NumberFormat::SetPrecisionWithByte(double number, const std::string& finalUnit)
+{
+    int32_t FractionDigits = -1;
+    // 100 is the threshold between different decimal
+    if (finalUnit == "byte" || number >= 100) {
+        FractionDigits = 0;
+    } else if (number < 1) {
+        // 2 is the number of significant digits in the decimal
+        FractionDigits = 2;
+    // 10 is the threshold between different decimal
+    } else if (number < 10) {
+        if (unitUsage == "size-shortfile-byte") {
+            FractionDigits = 1;
+        } else {
+            // 2 is the number of significant digits in the decimal
+            FractionDigits = 2;
+        }
+    } else {
+        if (unitUsage == "size-shortfile-byte") {
+            FractionDigits = 0;
+        } else {
+            // 2 is the number of significant digits in the decimal
+            FractionDigits = 2;
+        }
+    }
+    if (FractionDigits != -1) {
+        numberFormat = numberFormat.precision(icu::number::Precision::minMaxFraction(FractionDigits, FractionDigits));
     }
 }
 
