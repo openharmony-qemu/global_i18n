@@ -1310,7 +1310,8 @@ bool I18nTimeZone::ValidateDataIntegrity(const std::vector<std::string> &pathLis
         std::string path = pathList.at(i);
         std::string left = path.substr(path.find("-") + 1, 3);
         std::string right = path.substr(path.find("-") + 4, 3);
-        total += abs(atoi(right.c_str()) - atoi(left.c_str()));
+        int height = abs(atoi(right.c_str()) - atoi(left.c_str()));
+        total += static_cast<size_t>(height);
     }
     return total == TZ_X_PLUS * TZ_HALF_OF_SIZE;
 }
