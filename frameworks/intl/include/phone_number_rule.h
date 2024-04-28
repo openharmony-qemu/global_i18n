@@ -19,6 +19,9 @@
 #include <unicode/regex.h>
 #include <vector>
 #include "regex_rule.h"
+#include "libxml/globals.h"
+#include "libxml/tree.h"
+#include "libxml/xmlstring.h"
 
 namespace OHOS {
 namespace Global {
@@ -42,6 +45,10 @@ private:
     void FreePointer(std::vector<RegexRule*> &ruleList);
     void SetRules(std::string& category, icu::UnicodeString& content, std::string& valid,
         std::string& handle, std::string& insensitive, std::string& type);
+    void ParseXmlNode(xmlNodePtr cur, std::string& category);
+    std::string XmlNodePtrToString(xmlNodePtr valuePtr);
+    bool IsXmlNodeValueEmpty(const std::string& insensitive, const std::string& type,
+        const std::string& valid, const std::string& handle);
 
     std::vector<RegexRule*> negativeRules;
     std::vector<RegexRule*> positiveRules;

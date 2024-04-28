@@ -344,6 +344,10 @@ void ZoneUtil::GetCountryZones(std::string &region, std::string &defaultTimzone,
             return;
         }
         xmlChar *codePtr = xmlNodeGetContent(value);
+        if (codePtr == nullptr) {
+            cur = cur->next;
+            continue;
+        }
         if (strcmp(region.c_str(), reinterpret_cast<const char*>(codePtr)) == 0) {
             findCountry = true;
             xmlFree(codePtr);
@@ -370,8 +374,10 @@ void ZoneUtil::GetDefaultAndBoost(xmlNodePtr &value, std::string &defaultTimezon
         return;
     }
     xmlChar *defaultPtr = xmlNodeGetContent(value);
-    defaultTimezone = reinterpret_cast<const char*>(defaultPtr);
-    xmlFree(defaultPtr);
+    if (defaultPtr != nullptr) {
+        defaultTimezone = reinterpret_cast<const char*>(defaultPtr);
+        xmlFree(defaultPtr);
+    }
     value = value->next;
     if (value == nullptr) {
         HILOG_ERROR_I18N("ZoneUtil::GetDefaultAndBoost doesn't contains id");
@@ -399,8 +405,10 @@ void ZoneUtil::GetTimezones(xmlNodePtr &value, std::vector<std::string> &zones)
             return;
         }
         xmlChar *idPtr = xmlNodeGetContent(value);
-        zones.push_back(reinterpret_cast<const char*>(idPtr));
-        xmlFree(idPtr);
+        if (idPtr != nullptr) {
+            zones.push_back(reinterpret_cast<const char*>(idPtr));
+            xmlFree(idPtr);
+        }
         value = value->next;
     }
 }

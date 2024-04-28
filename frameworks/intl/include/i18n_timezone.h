@@ -92,6 +92,7 @@ private:
     static std::string ComputeLocale(std::string &locale);
     icu::TimeZone* GetTimeZone();
     static std::string FindCityDisplayNameFromXml(std::string &cityID, std::string &locale);
+    static std::string GetCityDisplayNameXmlPath(const std::string &locale);
     static bool GetSupportedLocales();
     static std::string GetFallBack(std::string &localeStr);
     static void GetTimezoneIDFromZoneInfo(std::set<std::string> &availableIDs, std::string &parentPath,

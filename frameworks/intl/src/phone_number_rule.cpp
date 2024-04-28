@@ -86,35 +86,68 @@ void PhoneNumberRule::InitRule(std::string& xmlPath)
     xmlNodePtr cur = root->xmlChildrenNode;
     while (cur != nullptr) {
         std::string category = reinterpret_cast<const char*>(cur->name);
-        xmlNodePtr rule = cur->xmlChildrenNode;
-        while (rule != nullptr && !xmlStrcmp(rule->name, reinterpret_cast<const xmlChar*>("rule"))) {
-            xmlNodePtr value = rule->xmlChildrenNode;
-            std::string insensitive = reinterpret_cast<char*>(xmlNodeGetContent(value));
-            value = value->next;
-            if (category == "common_exit") {
-                commonExit = (insensitive == "True");
-                break;
-            }
-            std::string type = reinterpret_cast<char*>(xmlNodeGetContent(value));
-            value = value->next;
-            std::string valid = reinterpret_cast<char*>(xmlNodeGetContent(value));
-            value = value->next;
-            std::string handle = reinterpret_cast<char*>(xmlNodeGetContent(value));
-            icu::UnicodeString content = "";
-            while (value->next != nullptr && !xmlStrcmp(value->next->name,
-                reinterpret_cast<const xmlChar*>("content"))) {
-                value = value->next;
-                xmlChar* contentPtr = xmlNodeGetContent(value);
-                icu::UnicodeString tempContent = reinterpret_cast<char*>(contentPtr);
-                content += tempContent;
-                xmlFree(contentPtr);
-            }
-            SetRules(category, content, valid, handle, insensitive, type);
-            rule = rule->next;
-        }
+        ParseXmlNode(cur, category);
         cur = cur->next;
     }
     xmlFreeDoc(doc);
+}
+
+void PhoneNumberRule::ParseXmlNode(xmlNodePtr cur, std::string& category)
+{
+    xmlNodePtr rule = cur->xmlChildrenNode;
+    while (rule != nullptr && !xmlStrcmp(rule->name, reinterpret_cast<const xmlChar*>("rule"))) {
+        xmlNodePtr value = rule->xmlChildrenNode;
+        std::string insensitive = XmlNodePtrToString(value);
+        value = value->next;
+        if (category == "common_exit") {
+            commonExit = (insensitive == "True");
+            break;
+        }
+        std::string type = XmlNodePtrToString(value);
+        value = value->next;
+        std::string valid = XmlNodePtrToString(value);
+        value = value->next;
+        std::string handle = XmlNodePtrToString(value);
+        if(IsXmlNodeValueEmpty(insensitive, type, valid, handle)) {
+            break;
+        }
+        icu::UnicodeString content = "";
+        while (value->next != nullptr && !xmlStrcmp(value->next->name,
+            reinterpret_cast<const xmlChar*>("content"))) {
+            value = value->next;
+            xmlChar* contentPtr = xmlNodeGetContent(value);
+            if (contentPtr == nullptr) continue;
+            icu::UnicodeString tempContent = reinterpret_cast<char*>(contentPtr);
+            content += tempContent;
+            xmlFree(contentPtr);
+        }
+        SetRules(category, content, valid, handle, insensitive, type);
+        rule = rule->next;
+    }
+}
+
+bool PhoneNumberRule::IsXmlNodeValueEmpty(const std::string& insensitive, const std::string& type,
+    const std::string& valid, const std::string& handle)
+{
+    if (insensitive.empty() || type.empty() ||
+        valid.empty() || handle.empty()) {
+        return true;
+    }
+    return false;
+}
+
+std::string PhoneNumberRule::XmlNodePtrToString(xmlNodePtr valuePtr)
+{
+    if (valuePtr == nullptr) {
+        return "";
+    }
+    xmlChar* charPtr = xmlNodeGetContent(valuePtr);
+    if (charPtr == nullptr) {
+        return "";
+    }
+    std::string result = reinterpret_cast<char*>(charPtr);
+    xmlFree(charPtr);
+    return result;
 }
 
 void PhoneNumberRule::SetRules(std::string& category, icu::UnicodeString& content, std::string& valid,

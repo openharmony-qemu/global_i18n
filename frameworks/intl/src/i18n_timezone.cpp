@@ -775,6 +775,9 @@ bool I18nTimeZone::ReadTimeZoneData(const char *xmlPath)
                 break;
             }
         }
+        if (contents[0] == nullptr || contents[1] == nullptr) {
+            continue;
+        }
         // 0 represents cityid index, 1 represents zoneid index
         availableZoneCityIDs.insert(reinterpret_cast<const char *>(contents[0]));
         const char* pairKey = reinterpret_cast<const char *>(contents[0]);
@@ -862,12 +865,7 @@ std::set<std::string> I18nTimeZone::GetAvailableZoneCityIDs()
 std::string I18nTimeZone::FindCityDisplayNameFromXml(std::string &cityID, std::string &locale)
 {
     xmlKeepBlanksDefault(0);
-    std::string xmlPath;
-    if (useDeviceCityDispName) {
-        xmlPath = DEVICE_CITY_DISPLAYNAME_PATH + locale + ".xml";
-    } else {
-        xmlPath = CITY_DISPLAYNAME_PATH + locale + ".xml";
-    }
+    std::string xmlPath = GetCityDisplayNameXmlPath(locale);
     xmlDocPtr doc = xmlParseFile(xmlPath.c_str());
     if (!doc) {
         HILOG_ERROR_I18N("FindCityDisplayNameFromXml: can't parse city displayname: %{public}s", xmlPath.c_str());
@@ -894,6 +892,9 @@ std::string I18nTimeZone::FindCityDisplayNameFromXml(std::string &cityID, std::s
                 break;
             }
         }
+        if (contents[0] == nullptr || contents[1] == nullptr) {
+            continue;
+        }
         if (strcmp(cityID.c_str(), reinterpret_cast<const char *>(contents[0])) == 0) {
             displayName = reinterpret_cast<const char *>(contents[1]);
         }
@@ -909,6 +910,15 @@ std::string I18nTimeZone::FindCityDisplayNameFromXml(std::string &cityID, std::s
     }
     xmlFreeDoc(doc);
     return displayName;
+}
+
+std::string I18nTimeZone::GetCityDisplayNameXmlPath(const std::string &locale)
+{
+    if (useDeviceCityDispName) {
+        return DEVICE_CITY_DISPLAYNAME_PATH + locale + ".xml";
+    } else {
+        return CITY_DISPLAYNAME_PATH + locale + ".xml";
+    }
 }
 
 std::map<std::string, std::string> I18nTimeZone::FindCityDisplayNameMap(std::string &locale)
@@ -945,6 +955,9 @@ std::map<std::string, std::string> I18nTimeZone::FindCityDisplayNameMap(std::str
             } else {
                 break;
             }
+        }
+        if (contents[0] == nullptr || contents[1] == nullptr) {
+            continue;
         }
         resultMap.insert(
             std::make_pair<std::string, std::string>(reinterpret_cast<const char *>(contents[0]),
