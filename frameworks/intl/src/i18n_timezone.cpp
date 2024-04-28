@@ -767,22 +767,21 @@ bool I18nTimeZone::ReadTimeZoneData(const char *xmlPath)
     while (cur != nullptr && !xmlStrcmp(cur->name, reinterpret_cast<const xmlChar *>(TIMEZONE_SECOND_ROOT_TAG))) {
         xmlNodePtr value = cur->xmlChildrenNode;
         xmlChar *contents[ELEMENT_NUM] = { 0 }; // 2 represent cityid, zoneid;
-        for (size_t i = 0; i < ELEMENT_NUM; i++) {
-            if (value != nullptr) {
-                contents[i] = xmlNodeGetContent(value);
-                value = value->next;
-            } else {
-                break;
+        bool xmlNodeIsNull = false;
+        for (size_t i = 0; i < ELEMENT_NUM && value != nullptr; i++) {
+            contents[i] = xmlNodeGetContent(value);
+            value = value->next;
+            if (contents[i] == nullptr) {
+                xmlNodeIsNull = true;
             }
         }
-        if (contents[0] == nullptr || contents[1] == nullptr) {
-            continue;
+        if (!xmlNodeIsNull) {
+            // 0 represents cityid index, 1 represents zoneid index
+            availableZoneCityIDs.insert(reinterpret_cast<const char *>(contents[0]));
+            const char* pairKey = reinterpret_cast<const char *>(contents[0]);
+            const char* pairVal = reinterpret_cast<const char *>(contents[1]);
+            SetCity2TimeZoneID(pairKey, pairVal);
         }
-        // 0 represents cityid index, 1 represents zoneid index
-        availableZoneCityIDs.insert(reinterpret_cast<const char *>(contents[0]));
-        const char* pairKey = reinterpret_cast<const char *>(contents[0]);
-        const char* pairVal = reinterpret_cast<const char *>(contents[1]);
-        SetCity2TimeZoneID(pairKey, pairVal);
         for (size_t i = 0; i < ELEMENT_NUM; i++) {
             if (contents[i] != nullptr) {
                 xmlFree(contents[i]);
@@ -884,18 +883,15 @@ std::string I18nTimeZone::FindCityDisplayNameFromXml(std::string &cityID, std::s
         reinterpret_cast<const xmlChar *>(CITY_DISPLAYNAME_SECOND_ROOT_TAG))) {
         xmlNodePtr value = cur->xmlChildrenNode;
         xmlChar *contents[ELEMENT_NUM] = { 0 }; // 2 represent cityid, displayName;
-        for (size_t i = 0; i < ELEMENT_NUM; i++) {
-            if (value != nullptr) {
-                contents[i] = xmlNodeGetContent(value);
-                value = value->next;
-            } else {
-                break;
+        bool xmlNodeIsNull = false;
+        for (size_t i = 0; i < ELEMENT_NUM && value != nullptr; i++) {
+            contents[i] = xmlNodeGetContent(value);
+            value = value->next;
+            if (contents[i] == nullptr) {
+                xmlNodeIsNull = true;
             }
         }
-        if (contents[0] == nullptr || contents[1] == nullptr) {
-            continue;
-        }
-        if (strcmp(cityID.c_str(), reinterpret_cast<const char *>(contents[0])) == 0) {
+        if (!xmlNodeIsNull && strcmp(cityID.c_str(), reinterpret_cast<const char *>(contents[0])) == 0) {
             displayName = reinterpret_cast<const char *>(contents[1]);
         }
         for (size_t i = 0; i < ELEMENT_NUM; i++) {
@@ -948,20 +944,19 @@ std::map<std::string, std::string> I18nTimeZone::FindCityDisplayNameMap(std::str
         reinterpret_cast<const xmlChar *>(CITY_DISPLAYNAME_SECOND_ROOT_TAG))) {
         xmlNodePtr value = cur->xmlChildrenNode;
         xmlChar *contents[ELEMENT_NUM] = { 0 }; // 2 represent cityid, displayName;
-        for (size_t i = 0; i < ELEMENT_NUM; i++) {
-            if (value != nullptr) {
-                contents[i] = xmlNodeGetContent(value);
-                value = value->next;
-            } else {
-                break;
+        bool xmlNodeIsNull = false;
+        for (size_t i = 0; i < ELEMENT_NUM && value != nullptr; i++) {
+            contents[i] = xmlNodeGetContent(value);
+            value = value->next;
+            if (contents[i] == nullptr) {
+                xmlNodeIsNull = true;
             }
         }
-        if (contents[0] == nullptr || contents[1] == nullptr) {
-            continue;
+        if (!xmlNodeIsNull) {
+            const char* key = reinterpret_cast<const char *>(contents[0]);
+            const char* value = reinterpret_cast<const char *>(contents[1]);
+            resultMap.insert(std::make_pair<std::string, std::string>(key, value));
         }
-        resultMap.insert(
-            std::make_pair<std::string, std::string>(reinterpret_cast<const char *>(contents[0]),
-                                                     reinterpret_cast<const char *>(contents[1])));
         for (size_t i = 0; i < ELEMENT_NUM; i++) {
             if (contents[i] != nullptr) {
                 xmlFree(contents[i]);
