@@ -340,6 +340,7 @@ void ZoneUtil::GetCountryZones(std::string &region, std::string &defaultTimzone,
     while (cur != nullptr && xmlStrcmp(cur->name, reinterpret_cast<const xmlChar *>(SECOND_TAG)) == 0) {
         value = cur->xmlChildrenNode;
         if (xmlStrcmp(value->name, reinterpret_cast<const xmlChar*>(CODE_TAG)) != 0) {
+            xmlFreeDoc(doc);
             HILOG_ERROR_I18N("ZoneUtil::GetCountryZones invalid code_tag");
             return;
         }
