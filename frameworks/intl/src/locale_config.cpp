@@ -699,6 +699,7 @@ std::string LocaleConfig::ComputeLocale(const std::string &displayLocale)
             xmlFree(content);
             cur = cur->next;
         }
+        xmlFreeDoc(doc);
     }
     std::map<std::string, std::string> configs = {};
     LocaleInfo localeinfo(displayLocale, configs);
