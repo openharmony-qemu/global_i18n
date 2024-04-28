@@ -205,7 +205,7 @@ void DateTimeRule::LoadStrToStr(std::unordered_map<std::string, std::string>* ma
                 levels[key] = level;
                 xmlFree(levelPtr);
             } else {
-                levels[key] = ;
+                break;
             }
             value = value->next;
         }
