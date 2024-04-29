@@ -765,6 +765,96 @@ HWTEST_F(IntlTest, IntlFuncTest0068, TestSize.Level1)
         EXPECT_EQ(timeZoneNameRes, "18 h UTC+8");
     }
 }
+
+/**
+ * @tc.name: IntlFuncTest0069
+ * @tc.desc: Test number format unitUsage
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0069, TestSize.Level1)
+{
+    std::string locale = "en-GB";
+    std::vector<std::string> locales;
+    locales.push_back(locale);
+    map<string, string> options = { { "style", "unit" },
+                                    { "unit", "day" },
+                                    { "unitUsage", "elapsed-time-second"} };
+    NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
+    if (!numFmt) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    std::string nowRes = numFmt->Format(0.00001);
+    std::string secondRes = numFmt->Format(0.00004);
+    std::string dayRes = numFmt->Format(1.5);
+    std::string monthRes = numFmt->Format(-62.5);
+
+    EXPECT_EQ(nowRes, "now");
+    EXPECT_EQ(secondRes, "3 seconds ago");
+    EXPECT_EQ(dayRes, "yesterday");
+    EXPECT_EQ(monthRes, "2 months ago");
+    delete numFmt;
+}
+
+/**
+ * @tc.name: IntlFuncTest0070
+ * @tc.desc: Test number format unitUsage
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0070, TestSize.Level1)
+{
+    std::string locale = "en-GB";
+    std::vector<std::string> locales;
+    locales.push_back(locale);
+    map<string, string> options = { { "style", "unit" },
+                                    { "unit", "megabyte" },
+                                    { "unitUsage", "size-file-byte"} };
+    NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
+    if (!numFmt) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    std::string byteRes = numFmt->Format(0.00000812);
+    std::string kbRes = numFmt->Format(0.125);
+    std::string mbRes = numFmt->Format(3.5);
+    std::string gbRes = numFmt->Format(23122);
+
+    EXPECT_EQ(byteRes, "8 byte");
+    EXPECT_EQ(kbRes, "125 kB");
+    EXPECT_EQ(mbRes, "3.50 MB");
+    EXPECT_EQ(gbRes, "23.12 GB");
+    delete numFmt;
+}
+
+/**
+ * @tc.name: IntlFuncTest0071
+ * @tc.desc: Test number format unitUsage
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0071, TestSize.Level1)
+{
+    std::string locale = "en-GB";
+    std::vector<std::string> locales;
+    locales.push_back(locale);
+    map<string, string> options = { { "style", "unit" },
+                                    { "unit", "megabyte" },
+                                    { "unitUsage", "size-shortfile-byte"} };
+    NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
+    if (!numFmt) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    std::string byteRes = numFmt->Format(0.00000812);
+    std::string kbRes = numFmt->Format(0.125);
+    std::string mbRes = numFmt->Format(3.5);
+    std::string gbRes = numFmt->Format(23122);
+
+    EXPECT_EQ(byteRes, "8 byte");
+    EXPECT_EQ(kbRes, "125 kB");
+    EXPECT_EQ(mbRes, "3.5 MB");
+    EXPECT_EQ(gbRes, "23 GB");
+    delete numFmt;
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

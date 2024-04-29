@@ -283,6 +283,24 @@ const std::unordered_map<std::string, double> PREFIX_VALUE {
     { "mega", pow(10, 6) },
 };
 
+const std::vector<std::string> BYTE_VALUE {
+    "byte",
+    "kilobyte",
+    "megabyte",
+    "gigabyte",
+    "terabyte",
+    "petabyte"
+};
+
+const std::vector<std::pair<std::string, double>> DATE_VALUE {
+    { "second", 1 },
+    { "minute", 60 },
+    { "hour", 60 },
+    { "day", 24},
+    { "month", 30 },
+    { "year", 365 / 30 }
+};
+
 const std::unordered_map<std::string, double> POWER_VALUE {
     { "square-", 2 },
     { "cubic-", 3 },
@@ -543,6 +561,93 @@ int ComputeValue(const string &unit, const string &measSys, vector<double> &fact
         return 0;
     }
     return 1;
+}
+
+bool ConvertByte(double& number, std::string& unit)
+{
+    double tempNumber = number;
+    if (tempNumber < 0) {
+        tempNumber *= -1;
+    }
+    std::string tempUnit = unit;
+    size_t indexFirst = -1;
+    for (size_t i = 0; i < BYTE_VALUE.size(); i++) {
+        if (BYTE_VALUE[i] == tempUnit) {
+            indexFirst = i;
+            break;
+        }
+    }
+    bool status = (indexFirst >= 0);
+    size_t indexSecond = indexFirst;
+    for (size_t i = indexFirst; i > 0; i--) {
+        if (tempNumber < 1) {
+            // 10 ^ 3 is the threshold for carry
+            tempNumber *= pow(10, 3);
+            tempUnit = BYTE_VALUE[i - 1];
+            indexSecond = i - 1;
+        }
+    }
+    
+    for (size_t i = indexSecond + 1; i < BYTE_VALUE.size(); i++) {
+        // 900 is the threshold for carry
+        if (tempNumber > 900) {
+            // 10 ^ 3 is the threshold for carry
+            tempNumber /= pow(10, 3);
+            tempUnit = BYTE_VALUE[i];
+        } else {
+            break;
+        }
+    }
+
+    if (status) {
+        number = tempNumber;
+        unit = tempUnit;
+        return true;
+    }
+    return false;
+}
+
+bool ConvertDate(double& number, std::string& unit)
+{
+    double tempNumber = number;
+    if (tempNumber < 0) {
+        tempNumber *= -1;
+    }
+    std::string tempUnit = unit;
+
+    size_t indexFirst = -1;
+    for (size_t i = 0; i < DATE_VALUE.size(); i++) {
+        if (DATE_VALUE[i].first == tempUnit) {
+            indexFirst = i;
+            break;
+        }
+    }
+    bool status = (indexFirst >= 0);
+    size_t indexSecond = indexFirst;
+    for (size_t i = indexFirst; i > 0; i--) {
+        if (tempNumber < 1) {
+            tempNumber *= DATE_VALUE[i].second;
+            tempUnit = DATE_VALUE[i - 1].first;
+            indexSecond = i - 1;
+        }
+    }
+
+    for (size_t i = indexSecond + 1; i < DATE_VALUE.size(); i++) {
+        if ((tempNumber / DATE_VALUE[i].second) >= 1) {
+            tempNumber /= DATE_VALUE[i].second;
+            tempUnit = DATE_VALUE[i].first;
+        } else {
+            break;
+        }
+    }
+
+    if (status) {
+        number = floor(tempNumber);
+        number *= -1;
+        unit = tempUnit;
+        return true;
+    }
+    return false;
 }
 
 int Convert(double &value, const string &fromUnit, const string &fromMeasSys, const string &toUnit,
