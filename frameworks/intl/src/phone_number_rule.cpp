@@ -108,7 +108,7 @@ void PhoneNumberRule::ParseXmlNode(xmlNodePtr cur, std::string& category)
         std::string valid = XmlNodePtrToString(value);
         value = value->next;
         std::string handle = XmlNodePtrToString(value);
-        if(IsXmlNodeValueEmpty(insensitive, type, valid, handle)) {
+        if (IsXmlNodeValueEmpty(insensitive, type, valid, handle)) {
             break;
         }
         icu::UnicodeString content = "";
