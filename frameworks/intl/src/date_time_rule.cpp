@@ -198,7 +198,7 @@ void DateTimeRule::LoadStrToStr(std::unordered_map<std::string, std::string>* ma
         // load rule level
         if (value != nullptr && !xmlStrcmp(value->name, reinterpret_cast<const xmlChar*>("level"))) {
             xmlChar* levelPtr = xmlNodeGetContent(value);
-            if (levelStr != nullptr) {
+            if (levelPtr != nullptr) {
                 std::string levelStr = reinterpret_cast<const char*>(levelPtr);
                 int32_t status = 0;
                 int level = ConvertString2Int(levelStr, status);
