@@ -25,7 +25,7 @@ namespace OHOS {
         if (size < 1) {
             return false;
         }
-        std::string input(reinterpret_cast<const char*>(data), size);
+        std::string input(reinterpret_cast<const char*>(data), 2);
         std::map<std::string, std::string> options;
         options[input] = input;
         PhoneNumberFormat formatter(input, options);
