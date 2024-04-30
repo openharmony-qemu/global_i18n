@@ -157,16 +157,22 @@ void DateTimeRule::LoadStrToPattern(std::unordered_map<std::string, icu::RegexPa
         bool flag = false;
         // load rule content
         if (value != nullptr && !xmlStrcmp(value->name, reinterpret_cast<const xmlChar*>("flag"))) {
-            std::string type = reinterpret_cast<const char*>(xmlNodeGetContent(value));
-            if (type == "True") {
-                flag = true;
+            xmlChar* typePtr = xmlNodeGetContent(value);
+            if (typePtr != nullptr) {
+                std::string type = reinterpret_cast<const char*>(typePtr);
+                flag = (type == "True") ? true : flag;
+                xmlFree(typePtr);
             }
             value = value->next;
         }
         icu::UnicodeString content;
         while (value != nullptr && !xmlStrcmp(value->name, reinterpret_cast<const xmlChar*>("content"))) {
-            icu::UnicodeString tempContent = reinterpret_cast<char*>(xmlNodeGetContent(value));
-            content += tempContent;
+            xmlChar* contentPtr = xmlNodeGetContent(value);
+            if (contentPtr != nullptr) {
+                icu::UnicodeString tempContent = reinterpret_cast<char*>(contentPtr);
+                content += tempContent;
+                xmlFree(contentPtr);
+            }
             value = value->next;
         }
         UErrorCode status = U_ZERO_ERROR;
@@ -191,17 +197,27 @@ void DateTimeRule::LoadStrToStr(std::unordered_map<std::string, std::string>* ma
         xmlNodePtr value = cur->xmlChildrenNode;
         // load rule level
         if (value != nullptr && !xmlStrcmp(value->name, reinterpret_cast<const xmlChar*>("level"))) {
-            std::string levelStr = reinterpret_cast<const char*>(xmlNodeGetContent(value));
-            int32_t status = 0;
-            int level = ConvertString2Int(levelStr, status);
-            levels[key] = level;
+            xmlChar* levelPtr = xmlNodeGetContent(value);
+            if (levelPtr != nullptr) {
+                std::string levelStr = reinterpret_cast<const char*>(levelPtr);
+                int32_t status = 0;
+                int level = ConvertString2Int(levelStr, status);
+                levels[key] = level;
+                xmlFree(levelPtr);
+            } else {
+                break;
+            }
             value = value->next;
         }
         // load rule content
         std::string content;
         while (value != nullptr && !xmlStrcmp(value->name, reinterpret_cast<const xmlChar*>("content"))) {
-            std::string tempContent = reinterpret_cast<const char*>(xmlNodeGetContent(value));
-            content += tempContent;
+            xmlChar* contentPtr = xmlNodeGetContent(value);
+            if (contentPtr != nullptr) {
+                std::string tempContent = reinterpret_cast<const char*>(contentPtr);
+                content += tempContent;
+                xmlFree(contentPtr);
+            }
             value = value->next;
         }
         (*map)[key] = content;

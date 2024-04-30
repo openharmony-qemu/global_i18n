@@ -742,18 +742,20 @@ void LocaleConfig::ReadLangData(const char *langDataPath)
     while (cur != nullptr && !xmlStrcmp(cur->name, reinterpret_cast<const xmlChar *>(secondRootTag))) {
         xmlChar *langContents[ELEMENT_NUM] = { 0 }; // 2 represent langid, displayname;
         xmlNodePtr langValue = cur->xmlChildrenNode;
-        for (size_t i = 0; i < ELEMENT_NUM; i++) {
-            if (langValue != nullptr) {
-                langContents[i] = xmlNodeGetContent(langValue);
-                langValue = langValue->next;
-            } else {
-                break;
+        bool xmlNodeNull = false;
+        for (size_t i = 0; i < ELEMENT_NUM && langValue != nullptr; i++) {
+            langContents[i] = xmlNodeGetContent(langValue);
+            langValue = langValue->next;
+            if (langContents[i] == nullptr) {
+                xmlNodeNull = true;
             }
         }
-        // 0 represents langid index, 1 represents displayname index
-        const char* key = reinterpret_cast<const char *>(langContents[0]);
-        const char* value = reinterpret_cast<const char *>(langContents[1]);
-        SetLocale2DisplayName(key, value);
+        if (!xmlNodeNull) {
+            // 0 represents langid index, 1 represents displayname index
+            const char* key = reinterpret_cast<const char *>(langContents[0]);
+            const char* value = reinterpret_cast<const char *>(langContents[1]);
+            SetLocale2DisplayName(key, value);
+        }
         for (size_t i = 0; i < ELEMENT_NUM; i++) {
             if (langContents[i] != nullptr) {
                 xmlFree(langContents[i]);
@@ -802,18 +804,20 @@ void LocaleConfig::ReadRegionData(const char *regionDataPath)
     while (cur != nullptr && !xmlStrcmp(cur->name, reinterpret_cast<const xmlChar *>(secondRootRegion))) {
         xmlChar *regionContents[ELEMENT_NUM] = { 0 };
         xmlNodePtr regionValue = cur->xmlChildrenNode;
-        for (size_t i = 0; i < ELEMENT_NUM; i++) {
-            if (regionValue != nullptr) {
-                regionContents[i] = xmlNodeGetContent(regionValue);
-                regionValue = regionValue->next;
-            } else {
-                break;
+        bool xmlNodeNull = false;
+        for (size_t i = 0; i < ELEMENT_NUM && regionValue != nullptr; i++) {
+            regionContents[i] = xmlNodeGetContent(regionValue);
+            regionValue = regionValue->next;
+            if (regionContents[i] == nullptr) {
+                xmlNodeNull = true;
             }
         }
-        // 0 represents langid index, 1 represents displayname index
-        const char* regionKey = reinterpret_cast<const char *>(regionContents[0]);
-        const char* regionVal = reinterpret_cast<const char *>(regionContents[1]);
-        SetRegion2DisplayName(regionKey, regionVal);
+        if (!xmlNodeNull) {
+            // 0 represents langid index, 1 represents displayname index
+            const char* regionKey = reinterpret_cast<const char *>(regionContents[0]);
+            const char* regionVal = reinterpret_cast<const char *>(regionContents[1]);
+            SetRegion2DisplayName(regionKey, regionVal);
+        }
         for (size_t i = 0; i < ELEMENT_NUM; i++) {
             if (regionContents[i] != nullptr) {
                 xmlFree(regionContents[i]);
