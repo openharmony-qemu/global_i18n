@@ -76,6 +76,10 @@ private:
     static napi_value AddPreferredLanguageImpl(napi_env env, napi_callback_info info, bool throwError);
     static napi_value RemovePreferredLanguageImpl(napi_env env, napi_callback_info info, bool throwError);
     static napi_value SetUsingLocalDigitAddonImpl(napi_env env, napi_callback_info info, bool throwError);
+    static bool GetNapiStringValueWithError(napi_env env, napi_value napiValue, size_t len, char* valueBuf,
+        std::string index);
+    static bool GetCountryNapiValueWithError(napi_env env, napi_value napiValue, size_t len, char* valueBuf,
+        std::string index);
 
     static bool ParseStringParam(napi_env env, napi_value argv, bool throwError, std::string &strParam);
 };

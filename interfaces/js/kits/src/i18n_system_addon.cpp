@@ -20,6 +20,7 @@
 #include "i18n_system_addon.h"
 #include "js_utils.h"
 #include "locale_config.h"
+#include "locale_info.h"
 #include "preferred_language.h"
 #include "utils.h"
 #include "variable_convertor.h"
@@ -305,7 +306,7 @@ napi_value I18nSystemAddon::SetAppPreferredLanguage(napi_env env, napi_callback_
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_string) {
         HILOG_ERROR_I18N("SetAppPreferredLanguage Parameter type is not string");
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "language", "string", true);
         return nullptr;
     }
     int code = 0;
@@ -317,8 +318,8 @@ napi_value I18nSystemAddon::SetAppPreferredLanguage(napi_env env, napi_callback_
     UErrorCode icuStatus = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeTag.data(), icuStatus);
     if (U_FAILURE(icuStatus) || !IsValidLocaleTag(locale)) {
-        HILOG_ERROR_I18N("GetTimePeriodName does not support this locale");
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+        HILOG_ERROR_I18N("SetAppPreferredLanguage does not support this locale");
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "language", "a valid language", true);
         return nullptr;
     }
 #ifdef SUPPORT_APP_PREFERRED_LANGUAGE
@@ -379,37 +380,39 @@ napi_value I18nSystemAddon::GetDisplayCountryImpl(napi_env env, napi_callback_in
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         return nullptr;
-    }
-    if (argc < FUNC_ARGS_COUNT) {
-        HILOG_ERROR_I18N("GetDisplayCountryImpl: Missing parameter");
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, throwError);
+    } else if (argc < FUNC_ARGS_COUNT) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "country or locale", "", throwError);
         return nullptr;
     }
     size_t len = 0;
+    VariableConvertor::VerifyType(env, "country", "string", argv[0]);
     napi_get_value_string_utf8(env, argv[0], nullptr, 0, &len);
     std::vector<char> localeBuf(len + 1);
-    status = napi_get_value_string_utf8(env, argv[0], localeBuf.data(), len + 1, &len);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("GetDisplayCountryImpl: Failed to get string item argv[0]");
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
+    if (!GetCountryNapiValueWithError(env, argv[0], len, localeBuf.data(), "0")) {
         return nullptr;
     }
+    VariableConvertor::VerifyType(env, "locale", "string", argv[1]);
     napi_get_value_string_utf8(env, argv[1], nullptr, 0, &len);
     std::vector<char> displayLocaleBuf(len + 1);
-    status = napi_get_value_string_utf8(env, argv[1], displayLocaleBuf.data(), len + 1, &len);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("GetDisplayCountryImpl: Failed to get string item argv[1]");
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
+    if (!GetCountryNapiValueWithError(env, argv[1], len, displayLocaleBuf.data(), "1")) {
+        return nullptr;
+    }
+    LocaleInfo localeInfo(localeBuf.data());
+    if (!LocaleConfig::IsValidRegion(localeBuf.data()) && localeInfo.GetRegion() == "") {
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "country", "a valid region", throwError);
+        return nullptr;
+    }
+    if (!LocaleConfig::IsValidTag(displayLocaleBuf.data())) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "locale", "a valid locale", throwError);
         return nullptr;
     }
     bool sentenceCase = true;
-    size_t sentenceCaseIndex = 2;
-    if (argc > sentenceCaseIndex) {
-        napi_get_value_bool(env, argv[sentenceCaseIndex], &sentenceCase);
+    if (argc > FUNC_ARGS_COUNT) {
+        napi_get_value_bool(env, argv[FUNC_ARGS_COUNT], &sentenceCase);
     }
     std::string value = LocaleConfig::GetDisplayRegion(localeBuf.data(), displayLocaleBuf.data(), sentenceCase);
     if (value.length() == 0) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
+        napi_throw_type_error(env, nullptr,"getDisplayCountry: result is empty.");
     }
     napi_value result = nullptr;
     status = napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &result);
@@ -418,6 +421,19 @@ napi_value I18nSystemAddon::GetDisplayCountryImpl(napi_env env, napi_callback_in
         return nullptr;
     }
     return result;
+}
+
+bool I18nSystemAddon::GetCountryNapiValueWithError(napi_env env, napi_value napiValue, size_t len, char* valueBuf,
+    std::string index)
+{
+    napi_status status = napi_get_value_string_utf8(env, napiValue, valueBuf, len + 1, &len);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("GetDisplayCountryImpl: Failed to get string item argv[%{public}s]", index.c_str());
+        std::string message = "getDisplayCountry: Failed to get string item argv[" + index + "].";
+        napi_throw_type_error(env, nullptr, message.c_str());
+        return false;
+    }
+    return true;
 }
 
 napi_value I18nSystemAddon::GetDisplayLanguageImpl(napi_env env, napi_callback_info info, bool throwError)
@@ -430,38 +446,35 @@ napi_value I18nSystemAddon::GetDisplayLanguageImpl(napi_env env, napi_callback_i
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         return nullptr;
-    }
-    if (argc < FUNC_ARGS_COUNT) {
-        HILOG_ERROR_I18N("GetDisplayLanguageImpl: Missing parameter");
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, throwError);
+    } else if (argc < FUNC_ARGS_COUNT) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "language or locale", "", throwError);
         return nullptr;
     }
+    VariableConvertor::VerifyType(env, "language", "string", argv[0]);
     size_t len = 0;
     napi_get_value_string_utf8(env, argv[0], nullptr, 0, &len);
     std::vector<char> localeBuf(len + 1);
-    status = napi_get_value_string_utf8(env, argv[0], localeBuf.data(), len + 1, &len);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("GetDisplayLanguageImpl: Failed to get string item argv[0]");
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
-        return nullptr;
+    if (!GetNapiStringValueWithError(env, argv[0], len, localeBuf.data(), "0")) {
+        return nullptr;     
     }
+    VariableConvertor::VerifyType(env, "locale", "string", argv[1]);
     napi_get_value_string_utf8(env, argv[1], nullptr, 0, &len);
     std::vector<char> displayLocaleBuf(len + 1);
-    status = napi_get_value_string_utf8(env, argv[1], displayLocaleBuf.data(), len + 1, &len);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("GetDisplayLanguageImpl: Failed to get string item argv[1]");
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
+    if (!GetNapiStringValueWithError(env, argv[1], len, displayLocaleBuf.data(), "1")) {
+        return nullptr;     
+    }
+    if (!LocaleConfig::IsValidTag(displayLocaleBuf.data())) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "locale", "a valid locale", throwError);
         return nullptr;
     }
     bool sentenceCase = true;
-    size_t sentenceCaseIndex = 2;
-    if (argc > sentenceCaseIndex) {
-        napi_get_value_bool(env, argv[sentenceCaseIndex], &sentenceCase);
+    if (argc > FUNC_ARGS_COUNT) {
+        napi_get_value_bool(env, argv[FUNC_ARGS_COUNT], &sentenceCase);
     }
-
     std::string value = LocaleConfig::GetDisplayLanguage(localeBuf.data(), displayLocaleBuf.data(), sentenceCase);
     if (value.length() == 0) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
+        std::string message = "getDisplayLanguage: result is empty.";
+        napi_throw_type_error(env, nullptr, message.c_str());
         return nullptr;
     }
     napi_value result = nullptr;
@@ -473,6 +486,19 @@ napi_value I18nSystemAddon::GetDisplayLanguageImpl(napi_env env, napi_callback_i
     return result;
 }
 
+bool I18nSystemAddon::GetNapiStringValueWithError(napi_env env, napi_value napiValue, size_t len, char* valueBuf,
+    std::string index)
+{
+    napi_status status = napi_get_value_string_utf8(env, napiValue, valueBuf, len + 1, &len);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("GetDisplayLanguageImpl: Failed to get string item argv[%{public}s]", index.c_str());
+        std::string message = "getDisplayLanguage: Failed to get string item argv[" + index + "].";
+        napi_throw_type_error(env, nullptr, message.c_str());
+        return false;
+    }
+    return true;
+}
+
 napi_value I18nSystemAddon::GetSystemCountriesImpl(napi_env env, napi_callback_info info, bool throwError)
 {
     size_t argc = 1;
@@ -482,19 +508,18 @@ napi_value I18nSystemAddon::GetSystemCountriesImpl(napi_env env, napi_callback_i
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         return nullptr;
-    }
-    if (argc < 1) {
-        HILOG_ERROR_I18N("GetSystemCountriesImpl: Missing parameter");
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, throwError);
+    } if (argc < 1) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "language", "", throwError);
         return nullptr;
     }
+    VariableConvertor::VerifyType(env, "language", "string", argv[0]);
     size_t len = 0;
     napi_get_value_string_utf8(env, argv[0], nullptr, 0, &len);
     std::vector<char> localeBuf(len + 1);
     status = napi_get_value_string_utf8(env, argv[0], localeBuf.data(), len + 1, &len);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("GetSystemCountriesImpl Failed to get string item");
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
+        std::string message = "getSystemCountries: Failed to get string item.";
+        napi_throw_type_error(env, nullptr, message.c_str());
         return nullptr;
     }
     std::vector<std::string> systemCountries;
@@ -531,19 +556,18 @@ napi_value I18nSystemAddon::IsSuggestedImpl(napi_env env, napi_callback_info inf
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         return nullptr;
-    }
-    if (argc < 1) {
-        HILOG_ERROR_I18N("IsSuggestedImpl: Missing parameter");
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, throwError);
+    } if (argc < 1) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "language", "", throwError);
         return nullptr;
     }
+    VariableConvertor::VerifyType(env, "language", "string", argv[0]);
     size_t len = 0;
     napi_get_value_string_utf8(env, argv[0], nullptr, 0, &len);
     std::vector<char> languageBuf(len + 1);
     status = napi_get_value_string_utf8(env, argv[0], languageBuf.data(), len + 1, &len);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("IsSuggestedImpl: Failed to get string item argv[0]");
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
+        std::string message = "isSuggested: Failed to get string item argv[0]";
+        napi_throw_type_error(env, nullptr, message.c_str());
         return nullptr;
     }
     bool isSuggested = false;
@@ -552,8 +576,8 @@ napi_value I18nSystemAddon::IsSuggestedImpl(napi_env env, napi_callback_info inf
         std::vector<char> regionBuf(len + 1);
         status = napi_get_value_string_utf8(env, argv[1], regionBuf.data(), len + 1, &len);
         if (status != napi_ok) {
-            HILOG_ERROR_I18N("IsSuggestedImpl: Failed to get string item argv[1]");
-            ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
+            std::string message = "isSuggested: Failed to get string item argv[1]";
+            napi_throw_type_error(env, nullptr, message.c_str());
             return nullptr;
         }
         isSuggested = LocaleConfig::IsSuggested(languageBuf.data(), regionBuf.data());
@@ -581,7 +605,7 @@ napi_value I18nSystemAddon::SetSystemLanguageImpl(napi_env env, napi_callback_in
     }
     if (argc < 1) {
         HILOG_ERROR_I18N("SetSystemLanguageImpl: Missing parameter");
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, throwError);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "language", "", throwError);
         return nullptr;
     }
     size_t len = 0;
@@ -590,7 +614,8 @@ napi_value I18nSystemAddon::SetSystemLanguageImpl(napi_env env, napi_callback_in
     status = napi_get_value_string_utf8(env, argv[0], languageBuf.data(), len + 1, &len);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("SetSystemLanguageImpl: Failed to get string item");
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
+        std::string message = "setSystemLanguage: Failed to get string item.";
+        napi_throw_type_error(env, nullptr, message.c_str());
         return nullptr;
     }
     I18nErrorCode err = I18nServiceAbilityClient::SetSystemLanguage(languageBuf.data());
@@ -598,7 +623,7 @@ napi_value I18nSystemAddon::SetSystemLanguageImpl(napi_env env, napi_callback_in
     bool success = err == I18nErrorCode::SUCCESS;
     if (throwError) {
         if (!success) {
-            ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, throwError);
+            ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, "", "", throwError);
         }
         return nullptr;
     }
@@ -623,7 +648,7 @@ napi_value I18nSystemAddon::SetSystemRegionImpl(napi_env env, napi_callback_info
     }
     if (argc < 1) {
         HILOG_ERROR_I18N("SetSystemRegionImpl: Missing parameter");
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, throwError);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "region", "", throwError);
         return nullptr;
     }
     size_t len = 0;
@@ -632,7 +657,8 @@ napi_value I18nSystemAddon::SetSystemRegionImpl(napi_env env, napi_callback_info
     status = napi_get_value_string_utf8(env, argv[0], regionBuf.data(), len + 1, &len);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("SetSystemRegionImpl: Failed to get string item");
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
+        std::string message = "setSystemRegion: Failed to get string item.";
+        napi_throw_type_error(env, nullptr, message.c_str());
         return nullptr;
     }
     I18nErrorCode err = I18nServiceAbilityClient::SetSystemRegion(regionBuf.data());
@@ -640,7 +666,7 @@ napi_value I18nSystemAddon::SetSystemRegionImpl(napi_env env, napi_callback_info
     bool success = err == I18nErrorCode::SUCCESS;
     if (throwError) {
         if (!success) {
-            ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, throwError);
+            ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, "", "", throwError);
         }
         return nullptr;
     }
@@ -665,7 +691,7 @@ napi_value I18nSystemAddon::SetSystemLocaleImpl(napi_env env, napi_callback_info
     }
     if (argc < 1) {
         HILOG_ERROR_I18N("SetSystemLocaleImpl: Missing parameter");
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, throwError);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "", throwError);
         return nullptr;
     }
     size_t len = 0;
@@ -674,7 +700,8 @@ napi_value I18nSystemAddon::SetSystemLocaleImpl(napi_env env, napi_callback_info
     status = napi_get_value_string_utf8(env, argv[0], localeBuf.data(), len + 1, &len);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("SetSystemLocaleImpl: Failed to get string item");
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
+        std::string message = "setSystemLocale: Failed to get string item.";
+        napi_throw_type_error(env, nullptr, message.c_str());
         return nullptr;
     }
     I18nErrorCode err = I18nServiceAbilityClient::SetSystemLocale(localeBuf.data());
@@ -682,7 +709,7 @@ napi_value I18nSystemAddon::SetSystemLocaleImpl(napi_env env, napi_callback_info
     bool success = err == I18nErrorCode::SUCCESS;
     if (throwError) {
         if (!success) {
-            ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, throwError);
+            ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, "", "", throwError);
         }
         return nullptr;
     }
@@ -707,7 +734,7 @@ napi_value I18nSystemAddon::Set24HourClockImpl(napi_env env, napi_callback_info 
     }
     if (argc < 1) {
         HILOG_ERROR_I18N("Set24HourClockImpl: Missing parameter");
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, throwError);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "option", "", throwError);
         return nullptr;
     }
 
@@ -715,7 +742,8 @@ napi_value I18nSystemAddon::Set24HourClockImpl(napi_env env, napi_callback_info 
     status = napi_get_value_bool(env, argv[0], &option);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Failed to get boolean item");
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
+        std::string message = "set24HourClock: Failed to get boolean item.";
+        napi_throw_type_error(env, nullptr, message.c_str());
         return nullptr;
     }
     std::string optionStr = option ? "true" : "false";
@@ -724,7 +752,7 @@ napi_value I18nSystemAddon::Set24HourClockImpl(napi_env env, napi_callback_info 
     bool success = err == I18nErrorCode::SUCCESS;
     if (throwError) {
         if (!success) {
-            ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, throwError);
+            ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, "", "", throwError);
         }
         return nullptr;
     }
@@ -756,20 +784,21 @@ napi_value I18nSystemAddon::AddPreferredLanguageImpl(napi_env env, napi_callback
     int index = 1000000;
     if (VariableConvertor::CheckNapiValueType(env, argc > 1 ? argv[1] : nullptr)) {
         status = napi_get_value_int32(env, argv[1], &index);
-    }
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("addPreferrdLanguage: get index failed");
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
-        return nullptr;
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("addPreferrdLanguage: get index failed");
+            std::string message = "addPreferrdLanguage: get index failed.";
+            napi_throw_type_error(env, nullptr, message.c_str());
+            return nullptr;
+        }
     }
     I18nErrorCode err = I18nServiceAbilityClient::AddPreferredLanguage(language.data(), index);
     HILOG_INFO_I18N("I18nSystemAddon::AddPreferredLanguageImpl with code %{public}d", static_cast<int32_t>(err));
     if (throwError) {
         if (err == I18nErrorCode::NO_PERMISSION) {
-            ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, throwError);
+            ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, "", "", throwError);
         }
         if (err != I18nErrorCode::SUCCESS) {
-            ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
+            ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "language", "a valid language", throwError);
         }
         return nullptr;
     }
@@ -799,26 +828,27 @@ napi_value I18nSystemAddon::RemovePreferredLanguageImpl(napi_env env, napi_callb
     }
     if (argc < 1) {
         HILOG_ERROR_I18N("RemovePreferredLanguageImpl: Missing parameter");
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, throwError);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "index", "", throwError);
         return nullptr;
     }
 
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_number) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "index", "number", throwError);
         return nullptr;
     }
     int index = 1000000;
     status = napi_get_value_int32(env, argv[0], &index);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("removePreferrdLanguage: get index failed");
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
+        std::string message = "removePreferrdLanguage: get index failed.";
+        napi_throw_type_error(env, nullptr, message.c_str());
         return nullptr;
     }
     len = static_cast<int>(PreferredLanguage::GetPreferredLanguageList().size());
     if ((index < 0 || index > len - 1) && throwError) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "index", "within the valid range", throwError);
         return nullptr;
     }
     I18nErrorCode err = I18nServiceAbilityClient::RemovePreferredLanguage(index);
@@ -826,7 +856,7 @@ napi_value I18nSystemAddon::RemovePreferredLanguageImpl(napi_env env, napi_callb
 
     if (throwError) {
         if (!success) {
-            ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, throwError);
+            ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, "", "", throwError);
         }
         return nullptr;
     }
@@ -849,14 +879,14 @@ napi_value I18nSystemAddon::SetUsingLocalDigitAddonImpl(napi_env env, napi_callb
 
     if (argc < 1) {
         HILOG_ERROR_I18N("Invalid parameter nullptr");
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, throwError);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "flag", "", throwError);
         return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_boolean) {
         HILOG_ERROR_I18N("Invalid parameter type");
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "flag", "boolean", throwError);
         return nullptr;
     }
     bool flag = false;
@@ -871,7 +901,7 @@ napi_value I18nSystemAddon::SetUsingLocalDigitAddonImpl(napi_env env, napi_callb
     bool res = err == I18nErrorCode::SUCCESS;
     if (throwError) {
         if (!res) {
-            ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, throwError);
+            ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, "", "", throwError);
         }
         return nullptr;
     }
@@ -888,20 +918,21 @@ bool I18nSystemAddon::ParseStringParam(napi_env env, napi_value argv, bool throw
 {
     if (argv == nullptr) {
         HILOG_ERROR_I18N("ParseStringParam: Missing parameter");
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, throwError);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "language", "", throwError);
         return false;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv, &valueType);
     if (valueType != napi_valuetype::napi_string) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "language", "string", throwError);
         return false;
     }
     size_t len = 0;
     napi_status status = napi_get_value_string_utf8(env, argv, nullptr, 0, &len);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("get string parameter length failed");
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, throwError);
+        std::string message = "get string parameter length failed.";
+        napi_throw_type_error(env, nullptr, message.c_str());
         return false;
     }
     std::vector<char> res(len + 1);

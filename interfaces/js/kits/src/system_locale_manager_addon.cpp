@@ -108,11 +108,14 @@ napi_value SystemLocaleManagerAddon::GetLanguageInfoArray(napi_env env, napi_cal
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("can not obtain getLanguageInfoArray function param.");
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        return nullptr;
+    }
+    if (argc < 1) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "languages", "", true);
         return nullptr;
     }
     std::vector<std::string> languageList;
-    bool isSuccess = VariableConvertor::GetStringArrayFromJsParam(env, argv[0], languageList);
+    bool isSuccess = VariableConvertor::GetStringArrayFromJsParam(env, argv[0], "languages", languageList);
     if (!isSuccess) {
         return nullptr;
     }
@@ -138,11 +141,14 @@ napi_value SystemLocaleManagerAddon::GetCountryInfoArray(napi_env env, napi_call
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("can not obtain getCountryInfoArray function param.");
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        return nullptr;
+    }
+    if (argc < 1) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "regions", "", true);
         return nullptr;
     }
     std::vector<std::string> countryList;
-    bool isSuccess = VariableConvertor::GetStringArrayFromJsParam(env, argv[0], countryList);
+    bool isSuccess = VariableConvertor::GetStringArrayFromJsParam(env, argv[0], "regions", countryList);
     if (!isSuccess) {
         return nullptr;
     }

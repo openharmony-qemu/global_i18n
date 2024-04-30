@@ -27,7 +27,8 @@ static const std::unordered_map<int32_t, std::string> ErrorCodeToMsg {
     {I18N_OPTION_NOT_VALID, "Invalid option name"}
 };
 
-void ErrorUtil::NapiThrow(napi_env env, int32_t errCode, bool throwError)
+void ErrorUtil::NapiThrow(napi_env env, int32_t errCode, const std::string& valueName,
+    const std::string& valueContent, bool throwError)
 {
     if (!throwError) {
         return;
@@ -38,13 +39,24 @@ void ErrorUtil::NapiThrow(napi_env env, int32_t errCode, bool throwError)
     napi_value message = nullptr;
     auto iter = ErrorCodeToMsg.find(errCode);
     std::string errMsg = iter != ErrorCodeToMsg.end() ? iter->second : "";
-    napi_create_string_latin1(env, errMsg.c_str(), NAPI_AUTO_LENGTH, &message);
+    std::string allErrMsg;
+
+    if (errCode == I18N_NO_PERMISSION) {
+        allErrMsg = errMsg;
+    } else if (errCode == I18N_NOT_VALID) {
+        allErrMsg = errMsg + ", the " + valueName + " must be " + valueContent + ".";
+    } else if (valueContent.length() == 0) {
+        allErrMsg = errMsg + ", the " + valueName + " cannot be empty.";
+    } else {
+        allErrMsg = errMsg + ", the type of " + valueName + " must be " + valueContent + ".";
+    }
+
+    napi_create_string_latin1(env, allErrMsg.c_str(), NAPI_AUTO_LENGTH, &message);
 
     napi_value error = nullptr;
     napi_create_error(env, code, message, &error);
     napi_throw(env, error);
 }
-
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

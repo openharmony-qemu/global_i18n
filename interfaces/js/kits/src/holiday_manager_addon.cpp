@@ -71,11 +71,14 @@ napi_value HolidayManagerAddon::HolidayManagerConstructor(napi_env env, napi_cal
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         return nullptr;
+    } else if (argc < 1) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "icsPath", "", true);
+        return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_string) {
-        napi_throw_type_error(env, nullptr, "Parameter type does not match");
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "icsPath", "string", true);
         return nullptr;
     }
     std::unique_ptr<HolidayManagerAddon> obj = std::make_unique<HolidayManagerAddon>();
@@ -86,7 +89,7 @@ napi_value HolidayManagerAddon::HolidayManagerConstructor(napi_env env, napi_cal
         return nullptr;
     }
     int32_t code = 0;
-    std::string path = GetString(env, argv[0], code);
+    std::string path = VariableConvertor::GetString(env, argv[0], code);
     if (code) {
         return nullptr;
     }
@@ -109,25 +112,6 @@ bool HolidayManagerAddon::InitHolidayManagerContext(napi_env env, napi_callback_
     env_ = env;
     holidayManager_ = std::make_unique<HolidayManager>(path);
     return holidayManager_ != nullptr;
-}
-
-std::string HolidayManagerAddon::GetString(napi_env &env, napi_value &value, int32_t &code)
-{
-    size_t len = 0;
-    napi_status status = napi_get_value_string_utf8(env, value, nullptr, 0, &len);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("Get string failed");
-        code = 1;
-        return "";
-    }
-    std::vector<char> buf(len + 1);
-    status = napi_get_value_string_utf8(env, value, buf.data(), len + 1, &len);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("Create string failed");
-        code = 1;
-        return "";
-    }
-    return buf.data();
 }
 
 napi_value HolidayManagerAddon::IsHoliday(napi_env env, napi_callback_info info)
@@ -213,7 +197,7 @@ std::vector<int> HolidayManagerAddon::ValidateParamDate(napi_env &env, napi_valu
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv, &valueType);
     if (valueType != napi_valuetype::napi_object) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "date", "Date object", true);
         return list;
     }
     list.push_back(GetDateValue(env, argv, "getFullYear"));
@@ -254,13 +238,17 @@ int32_t HolidayManagerAddon::ValidateParamNumber(napi_env &env, napi_value &argv
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv, &valueType);
     if (valueType != napi_valuetype::napi_number) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "year", "number", true);
         return -1;
     }
     int32_t val = 0;
     napi_status status = napi_get_value_int32(env, argv, &val);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("ValidateParamNumber: Retrieve field failed");
+        return -1;
+    }
+    if (val < 0) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "year", "a non-negative number", true);
         return -1;
     }
     return val;
