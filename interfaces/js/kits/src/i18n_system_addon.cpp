@@ -412,7 +412,7 @@ napi_value I18nSystemAddon::GetDisplayCountryImpl(napi_env env, napi_callback_in
     }
     std::string value = LocaleConfig::GetDisplayRegion(localeBuf.data(), displayLocaleBuf.data(), sentenceCase);
     if (value.length() == 0) {
-        napi_throw_type_error(env, nullptr,"getDisplayCountry: result is empty.");
+        napi_throw_type_error(env, nullptr, "getDisplayCountry: result is empty.");
     }
     napi_value result = nullptr;
     status = napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &result);
@@ -455,7 +455,7 @@ napi_value I18nSystemAddon::GetDisplayLanguageImpl(napi_env env, napi_callback_i
     napi_get_value_string_utf8(env, argv[0], nullptr, 0, &len);
     std::vector<char> localeBuf(len + 1);
     if (!GetNapiStringValueWithError(env, argv[0], len, localeBuf.data(), "0")) {
-        return nullptr;     
+        return nullptr;
     }
     VariableConvertor::VerifyType(env, "locale", "string", argv[1]);
     napi_get_value_string_utf8(env, argv[1], nullptr, 0, &len);
@@ -508,7 +508,7 @@ napi_value I18nSystemAddon::GetSystemCountriesImpl(napi_env env, napi_callback_i
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         return nullptr;
-    } if (argc < 1) {
+    } else if (argc < 1) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "language", "", throwError);
         return nullptr;
     }
@@ -556,7 +556,7 @@ napi_value I18nSystemAddon::IsSuggestedImpl(napi_env env, napi_callback_info inf
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         return nullptr;
-    } if (argc < 1) {
+    } else if (argc < 1) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "language", "", throwError);
         return nullptr;
     }
