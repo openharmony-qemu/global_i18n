@@ -32,7 +32,8 @@ public:
     static void GetOptionValue(napi_env env, napi_value options, const std::string &optionName, std::string &value);
     static bool GetBoolOptionValue(napi_env env, napi_value &options, const std::string &optionName, bool &boolVal);
     static std::string GetString(napi_env &env, napi_value &value, int32_t &code);
-    static bool GetStringArrayFromJsParam(napi_env env, napi_value &jsArray, const std::string& valueName, std::vector<std::string> &strArray);
+    static bool GetStringArrayFromJsParam(napi_env env, napi_value &jsArray, const std::string& valueName,
+        std::vector<std::string> &strArray);
 
     // Convert c++ variable to napi variable
     static napi_value CreateString(napi_env env, const std::string &str);
