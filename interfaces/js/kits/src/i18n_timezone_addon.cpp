@@ -274,6 +274,8 @@ napi_value I18nTimeZoneAddon::GetTimezonesByLocation(napi_env env, napi_callback
     }
     double x;
     double y;
+    VariableConvertor::VerifyType(env, "longitude", "number", argv[0]);
+    VariableConvertor::VerifyType(env, "latitude", "number", argv[1]);
     if (!CheckLongitudeTypeAndScope(env, argv[0], x) ||
         !CheckLatitudeTypeAndScope(env, argv[1], y)) {
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "longitude or latitude", "a valid value", true);
