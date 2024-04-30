@@ -166,6 +166,8 @@ void VariableConvertor::VerifyType(napi_env env, const std::string& valueName, c
     napi_typeof(env, argv, &valueType);
     if (type == "string" && valueType != napi_valuetype::napi_string) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, valueName, type, true);
+    } else if (type == "number" && valueType != napi_valuetype::napi_number) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, valueName, type, true);
     }
 }
 } // namespace I18n
