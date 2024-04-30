@@ -461,7 +461,7 @@ napi_value I18nSystemAddon::GetDisplayLanguageImpl(napi_env env, napi_callback_i
     napi_get_value_string_utf8(env, argv[1], nullptr, 0, &len);
     std::vector<char> displayLocaleBuf(len + 1);
     if (!GetNapiStringValueWithError(env, argv[1], len, displayLocaleBuf.data(), "1")) {
-        return nullptr;     
+        return nullptr;
     }
     if (!LocaleConfig::IsValidTag(displayLocaleBuf.data())) {
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "locale", "a valid locale", throwError);
