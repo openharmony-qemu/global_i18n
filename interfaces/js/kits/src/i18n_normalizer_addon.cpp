@@ -101,14 +101,14 @@ napi_value I18nNormalizerAddon::I18nNormalizerConstructor(napi_env env, napi_cal
         return nullptr;
     }
     if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "mode", "", true);
         return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     
     if (valueType != napi_valuetype::napi_number) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "mode", "number", true);
         return nullptr;
     }
     int32_t normalizerMode;
@@ -118,7 +118,7 @@ napi_value I18nNormalizerAddon::I18nNormalizerConstructor(napi_env env, napi_cal
     }
     if (normalizerMode != NORMALIZER_MODE_NFC && normalizerMode != NORMALIZER_MODE_NFD &&
         normalizerMode != NORMALIZER_MODE_NFKC && normalizerMode != NORMALIZER_MODE_NFKD) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "mode", "a valid mode", true);
         return nullptr;
     }
 
@@ -149,14 +149,14 @@ napi_value I18nNormalizerAddon::Normalize(napi_env env, napi_callback_info info)
         return nullptr;
     }
     if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "text", "", true);
         return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_string) {
         HILOG_ERROR_I18N("Invalid parameter type");
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "text", "string", true);
         return nullptr;
     }
     int32_t code = 0;

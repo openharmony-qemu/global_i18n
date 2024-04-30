@@ -269,14 +269,16 @@ napi_value I18nTimeZoneAddon::GetTimezonesByLocation(napi_env env, napi_callback
     }
     if (argc < FUNC_ARGS_COUNT) {
         HILOG_ERROR_I18N("GetTimezonesByLocation: Missing parameter");
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "longitude or latitude", "", true);
         return nullptr;
     }
     double x;
     double y;
+    VariableConvertor::VerifyType(env, "longitude", "number", argv[0]);
+    VariableConvertor::VerifyType(env, "latitude", "number", argv[1]);
     if (!CheckLongitudeTypeAndScope(env, argv[0], x) ||
         !CheckLatitudeTypeAndScope(env, argv[1], y)) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "longitude or latitude", "a valid value", true);
         return nullptr;
     }
     napi_value timezoneList = nullptr;

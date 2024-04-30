@@ -15,6 +15,7 @@
 
 #include "error_util.h"
 #include "i18n_hilog.h"
+#include "js_utils.h"
 #include "variable_convertor.h"
 
 namespace OHOS {
@@ -67,7 +68,7 @@ bool VariableConvertor::GetBoolOptionValue(napi_env env, napi_value &options, co
     napi_status status = napi_typeof(env, options, &type);
     if (status != napi_ok && type != napi_object) {
         HILOG_ERROR_I18N("option is not an object");
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, optionName, "a valid object", true);
         return false;
     }
     bool hasProperty = false;
@@ -105,18 +106,19 @@ std::string VariableConvertor::GetString(napi_env &env, napi_value &value, int32
     return buf.data();
 }
 
-bool VariableConvertor::GetStringArrayFromJsParam(napi_env env, napi_value &jsArray, std::vector<std::string> &strArray)
+bool VariableConvertor::GetStringArrayFromJsParam(napi_env env, napi_value &jsArray, const std::string& valueName,
+    std::vector<std::string> &strArray)
 {
     if (jsArray == nullptr) {
-        HILOG_ERROR_I18N("js string array param not found.");
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, valueName, "", true);
         return false;
     }
     bool isArray = false;
     napi_status status = napi_is_array(env, jsArray, &isArray);
-    if (status != napi_ok || !isArray) {
-        HILOG_ERROR_I18N("js string array is not an Array.");
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+    if (status != napi_ok) {
+        return false;
+    } else if (!isArray) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, valueName, "an Array", true);
         return false;
     }
     uint32_t arrayLength = 0;
@@ -127,8 +129,7 @@ bool VariableConvertor::GetStringArrayFromJsParam(napi_env env, napi_value &jsAr
         napi_get_element(env, jsArray, i, &element);
         std::string str = GetString(env, element, code);
         if (code != 0) {
-            HILOG_ERROR_I18N("can't get string from js array param.");
-            ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+            napi_throw_type_error(env, nullptr, "GetStringArrayFromJsParam: Failed to obtain the parameter.");
             return false;
         }
         strArray.push_back(str);
@@ -156,6 +157,18 @@ napi_value VariableConvertor::CreateNumber(napi_env env, const int32_t &num)
         return nullptr;
     }
     return result;
+}
+
+void VariableConvertor::VerifyType(napi_env env, const std::string& valueName, const std::string& type,
+    napi_value argv)
+{
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    napi_typeof(env, argv, &valueType);
+    if (type == "string" && valueType != napi_valuetype::napi_string) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, valueName, type, true);
+    } else if (type == "number" && valueType != napi_valuetype::napi_number) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, valueName, type, true);
+    }
 }
 } // namespace I18n
 } // namespace Global

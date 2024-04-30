@@ -278,8 +278,8 @@ napi_value I18nAddon::GetTimePeriodName(napi_env env, napi_callback_info info)
     UErrorCode icuStatus = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeTag.data(), icuStatus);
     if (U_FAILURE(icuStatus) || !IsValidLocaleTag(locale)) {
-        HILOG_ERROR_I18N("GetTimePeriodName does not support this locale");
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "locale", "a valid locale", true);
+        return nullptr;
     }
     icu::SimpleDateFormat* formatter = dynamic_cast<icu::SimpleDateFormat*>
         (icu::DateFormat::createDateInstance(icu::DateFormat::EStyle::kDefault, locale));
@@ -312,13 +312,16 @@ int I18nAddon::GetParamOfGetTimePeriodName(napi_env env, napi_callback_info info
     if (status != napi_ok) {
         HILOG_ERROR_I18N("GetTimePeriodName can't get parameters from getTimePerioudName.");
         return -1;
+    } else if (argc < 1) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "hour", "", true);
+        return -1;
     }
 
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_number) {
-        HILOG_ERROR_I18N("GetTimePeriodName Parameter type does not match argv[0]");
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "hour", "number", true);
+        return -1;
     }
     status = napi_get_value_int32(env, argv[0], &hour);
     if (status != napi_ok) {
@@ -338,8 +341,8 @@ int I18nAddon::GetParamOfGetTimePeriodName(napi_env env, napi_callback_info info
             return -1;
         }
     } else {
-        HILOG_ERROR_I18N("GetTimePeriodName Parameter type does not match argv[1]");
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "string", true);
+        return -1;
     }
     return 0;
 }
@@ -349,15 +352,13 @@ LocaleInfo* ProcessJsParamLocale(napi_env env, napi_value argv)
     int32_t code = 0;
     std::string localeTag = VariableConvertor::GetString(env, argv, code);
     if (code != 0) {
-        HILOG_ERROR_I18N("GetBestMatchLocale get param locale failed.");
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        napi_throw_type_error(env, nullptr, "ProcessJsParamLocale: Failed to obtain the parameter.");
         return nullptr;
     }
     UErrorCode icuStatus = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeTag.data(), icuStatus);
     if (U_FAILURE(icuStatus) || !IsValidLocaleTag(locale)) {
-        HILOG_ERROR_I18N("GetBestMatchLocale param locale Invalid.");
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "locale", "a valid locale", true);
         return nullptr;
     }
     return new LocaleInfo(localeTag);
@@ -367,9 +368,8 @@ bool ProcessJsParamLocaleList(napi_env env, napi_value argv, std::vector<LocaleI
     LocaleInfo *requestLocale)
 {
     std::vector<std::string> localeTagList;
-    if (!VariableConvertor::GetStringArrayFromJsParam(env, argv, localeTagList)) {
-        HILOG_ERROR_I18N("GetBestMatchLocale get param localeList failed.");
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+    if (!VariableConvertor::GetStringArrayFromJsParam(env, argv, "localeList", localeTagList)) {
+        napi_throw_type_error(env, nullptr, "ProcessJsParamLocaleList: Failed to obtain the parameter.");
         return false;
     }
     if (localeTagList.size() == 0) {
@@ -380,7 +380,7 @@ bool ProcessJsParamLocaleList(napi_env env, napi_value argv, std::vector<LocaleI
         icu::Locale locale = icu::Locale::forLanguageTag(it->data(), icuStatus);
         if (U_FAILURE(icuStatus) || !IsValidLocaleTag(locale)) {
             HILOG_ERROR_I18N("GetBestMatchLocale param localeList Invalid: %{public}s.", it->data());
-            ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+            ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "locale of localeList", "a valid locale", true);
             return false;
         }
         LocaleInfo *temp = new LocaleInfo(*it);
@@ -409,7 +409,7 @@ napi_value I18nAddon::GetBestMatchLocale(napi_env env, napi_callback_info info)
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok || argc < 2) { // 2 is the request param num.
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale or localeList", "", true);
         return nullptr;
     }
     LocaleInfo *requestLocale = ProcessJsParamLocale(env, argv[0]);
@@ -451,27 +451,23 @@ napi_value I18nAddon::GetThreeLetterLanguage(napi_env env, napi_callback_info in
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("GetThreeLetterLanguage napi get param error.");
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
         return nullptr;
     } else if (argc < 1) {
-        HILOG_ERROR_I18N("GetThreeLetterLanguage param argc < 1.");
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "", true);
         return nullptr;
     }
 
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_string) {
-        HILOG_ERROR_I18N("GetThreeLetterLanguage param not valid.");
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "string", true);
         return nullptr;
     }
 
     int32_t code = 0;
     std::string languageTag = VariableConvertor::GetString(env, argv[0], code);
     if (code != 0) {
-        HILOG_ERROR_I18N("GetThreeLetterLanguage get param locale failed.");
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+        napi_throw_type_error(env, nullptr, "GetThreeLetterLanguage: Failed to obtain the parameter.");
         return nullptr;
     }
 
@@ -481,7 +477,7 @@ napi_value I18nAddon::GetThreeLetterLanguage(napi_env env, napi_callback_info in
     status = napi_create_string_utf8(env, language.c_str(), NAPI_AUTO_LENGTH, &result);
     if (status != napi_ok || language == "") {
         HILOG_ERROR_I18N("GetThreeLetterLanguage create string fail or empty");
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "a valid locale", true);
         return nullptr;
     }
     return result;
@@ -495,28 +491,24 @@ napi_value I18nAddon::GetThreeLetterRegion(napi_env env, napi_callback_info info
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("GetThreeLetterRegion napi get param error.");
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        napi_throw_type_error(env, nullptr, "GetThreeLetterRegion: Failed to obtain the parameter.");
         return nullptr;
     } else if (argc < 1) {
-        HILOG_ERROR_I18N("GetThreeLetterRegion param argc < 1.");
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "", true);
         return nullptr;
     }
 
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_string) {
-        HILOG_ERROR_I18N("GetThreeLetterRegion param not valid.");
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "string", true);
         return nullptr;
     }
 
     int32_t code = 0;
     std::string regionTag = VariableConvertor::GetString(env, argv[0], code);
     if (code != 0) {
-        HILOG_ERROR_I18N("GetThreeLetterRegion get param locale failed.");
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+        napi_throw_type_error(env, nullptr, "GetThreeLetterRegion: Failed to obtain the parameter.");
         return nullptr;
     }
 
@@ -526,12 +518,11 @@ napi_value I18nAddon::GetThreeLetterRegion(napi_env env, napi_callback_info info
     status = napi_create_string_utf8(env, country.c_str(), NAPI_AUTO_LENGTH, &result);
     if (status != napi_ok || country == "") {
         HILOG_ERROR_I18N("GetThreeLetterRegion create string fail or empty");
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "locale", "a valid locale", true);
         return nullptr;
     }
     return result;
 }
-
 
 void I18nAddon::ProcessNormal(char ch, int *order, size_t orderSize, int *lengths, size_t lengsSize)
 {
