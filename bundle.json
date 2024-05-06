@@ -66,6 +66,7 @@
                 "libphonenumber",
                 "libpng",
                 "libxml2",
+                "memmgr",
                 "napi",
                 "openssl",
                 "preferences",

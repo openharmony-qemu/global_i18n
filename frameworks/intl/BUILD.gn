@@ -47,14 +47,16 @@ ohos_shared_library("preferred_language") {
     "-fPIC",
   ]
   deps = [ "//base/global/i18n/frameworks/intl:intl_util" ]
-  external_deps = [ "init:libbegetutil" ]
+  external_deps = [
+    "hilog:libhilog",
+    "init:libbegetutil",
+  ]
   if (i18n_support_app_preferred_language) {
     external_deps += [
       "ability_runtime:app_context",
       "bundle_framework:appexecfwk_base",
       "bundle_framework:appexecfwk_core",
       "c_utils:utils",
-      "hilog:libhilog",
       "ipc:ipc_core",
       "preferences:native_preferences",
       "resource_management:global_resmgr",
@@ -161,6 +163,7 @@ ohos_shared_library("intl_util") {
     "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
     "c_utils:utils",
+    "config_policy:configpolicy_util",
     "hilog:libhilog",
     "icu:icundk",
     "icu:shared_icui18n",
@@ -184,7 +187,6 @@ ohos_shared_library("intl_util") {
       "ability_runtime:ability_manager",
       "ability_runtime:app_manager",
       "common_event_service:cesfwk_innerkits",
-      "config_policy:configpolicy_util",
     ]
     defines += [ "SUPPORT_GRAPHICS" ]
   }

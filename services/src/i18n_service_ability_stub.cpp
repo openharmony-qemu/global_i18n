@@ -16,6 +16,9 @@
 #include "accesstoken_kit.h"
 #include "i18n_hilog.h"
 #include "ipc_skeleton.h"
+#include "mem_mgr_client.h"
+#include "mem_mgr_proxy.h"
+#include "system_ability_definition.h"
 #include "tokenid_kit.h"
 #include "i18n_service_ability_stub.h"
 
@@ -113,6 +116,8 @@ I18nErrorCode I18nServiceAbilityStub::CheckPermission()
 
 int32_t I18nServiceAbilityStub::SetSystemLanguageInner(MessageParcel &data, MessageParcel &reply)
 {
+    int pid = getpid();
+    Memory::MemMgrClient::GetInstance().SetCritical(pid, true, I18N_SA_ID);
     I18nErrorCode err = CheckPermission();
     if (err != I18nErrorCode::SUCCESS) {
         reply.WriteInt32(static_cast<int32_t>(err));
@@ -125,11 +130,14 @@ int32_t I18nServiceAbilityStub::SetSystemLanguageInner(MessageParcel &data, Mess
             static_cast<int32_t>(err));
     }
     reply.WriteInt32(static_cast<int32_t>(err));
+    Memory::MemMgrClient::GetInstance().SetCritical(pid, false, I18N_SA_ID);
     return 0;
 }
 
 int32_t I18nServiceAbilityStub::SetSystemRegionInner(MessageParcel &data, MessageParcel &reply)
 {
+    int pid = getpid();
+    Memory::MemMgrClient::GetInstance().SetCritical(pid, true, I18N_SA_ID);
     I18nErrorCode err = CheckPermission();
     if (err != I18nErrorCode::SUCCESS) {
         reply.WriteInt32(static_cast<int32_t>(err));
@@ -142,11 +150,14 @@ int32_t I18nServiceAbilityStub::SetSystemRegionInner(MessageParcel &data, Messag
             static_cast<int32_t>(err));
     }
     reply.WriteInt32(static_cast<int32_t>(err));
+    Memory::MemMgrClient::GetInstance().SetCritical(pid, false, I18N_SA_ID);
     return 0;
 }
 
 int32_t I18nServiceAbilityStub::SetSystemLocaleInner(MessageParcel &data, MessageParcel &reply)
 {
+    int pid = getpid();
+    Memory::MemMgrClient::GetInstance().SetCritical(pid, true, I18N_SA_ID);
     I18nErrorCode err = CheckPermission();
     if (err != I18nErrorCode::SUCCESS) {
         reply.WriteInt32(static_cast<int32_t>(err));
@@ -159,11 +170,14 @@ int32_t I18nServiceAbilityStub::SetSystemLocaleInner(MessageParcel &data, Messag
             static_cast<int32_t>(err));
     }
     reply.WriteInt32(static_cast<int32_t>(err));
+    Memory::MemMgrClient::GetInstance().SetCritical(pid, false, I18N_SA_ID);
     return 0;
 }
 
 int32_t I18nServiceAbilityStub::Set24HourClockInner(MessageParcel &data, MessageParcel &reply)
 {
+    int pid = getpid();
+    Memory::MemMgrClient::GetInstance().SetCritical(pid, true, I18N_SA_ID);
     I18nErrorCode err = CheckPermission();
     if (err != I18nErrorCode::SUCCESS) {
         reply.WriteInt32(static_cast<int32_t>(err));
@@ -176,11 +190,14 @@ int32_t I18nServiceAbilityStub::Set24HourClockInner(MessageParcel &data, Message
             static_cast<int32_t>(err));
     }
     reply.WriteInt32(static_cast<int32_t>(err));
+    Memory::MemMgrClient::GetInstance().SetCritical(pid, false, I18N_SA_ID);
     return 0;
 }
 
 int32_t I18nServiceAbilityStub::SetUsingLocalDigitInner(MessageParcel &data, MessageParcel &reply)
 {
+    int pid = getpid();
+    Memory::MemMgrClient::GetInstance().SetCritical(pid, true, I18N_SA_ID);
     I18nErrorCode err = CheckPermission();
     if (err != I18nErrorCode::SUCCESS) {
         reply.WriteInt32(static_cast<int32_t>(err));
@@ -193,11 +210,14 @@ int32_t I18nServiceAbilityStub::SetUsingLocalDigitInner(MessageParcel &data, Mes
             static_cast<int32_t>(err));
     }
     reply.WriteInt32(static_cast<int32_t>(err));
+    Memory::MemMgrClient::GetInstance().SetCritical(pid, false, I18N_SA_ID);
     return 0;
 }
 
 int32_t I18nServiceAbilityStub::AddPreferredLanguageInner(MessageParcel &data, MessageParcel &reply)
 {
+    int pid = getpid();
+    Memory::MemMgrClient::GetInstance().SetCritical(pid, true, I18N_SA_ID);
     I18nErrorCode err = CheckPermission();
     if (err != I18nErrorCode::SUCCESS) {
         reply.WriteInt32(static_cast<int32_t>(err));
@@ -211,11 +231,14 @@ int32_t I18nServiceAbilityStub::AddPreferredLanguageInner(MessageParcel &data, M
             static_cast<int32_t>(err));
     }
     reply.WriteInt32(static_cast<int32_t>(err));
+    Memory::MemMgrClient::GetInstance().SetCritical(pid, false, I18N_SA_ID);
     return 0;
 }
 
 int32_t I18nServiceAbilityStub::RemovePreferredLanguageInner(MessageParcel &data, MessageParcel &reply)
 {
+    int pid = getpid();
+    Memory::MemMgrClient::GetInstance().SetCritical(pid, true, I18N_SA_ID);
     I18nErrorCode err = CheckPermission();
     if (err != I18nErrorCode::SUCCESS) {
         reply.WriteInt32(static_cast<int32_t>(err));
@@ -228,14 +251,18 @@ int32_t I18nServiceAbilityStub::RemovePreferredLanguageInner(MessageParcel &data
             static_cast<int32_t>(err));
     }
     reply.WriteInt32(static_cast<int32_t>(err));
+    Memory::MemMgrClient::GetInstance().SetCritical(pid, false, I18N_SA_ID);
     return 0;
 }
 
 int32_t I18nServiceAbilityStub::VerifyLibphonenumberUpdateInner(MessageParcel &data, MessageParcel &reply)
 {
+    int pid = getpid();
+    Memory::MemMgrClient::GetInstance().SetCritical(pid, true, I18N_SA_ID);
     std::pair<int, int> fds = VerifyLibphonenumberUpdate();
     reply.WriteFileDescriptor(fds.first);
     reply.WriteFileDescriptor(fds.second);
+    Memory::MemMgrClient::GetInstance().SetCritical(pid, false, I18N_SA_ID);
     return 0;
 }
 } // namespace I18n
