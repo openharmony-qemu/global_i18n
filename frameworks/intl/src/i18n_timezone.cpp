@@ -954,8 +954,8 @@ std::map<std::string, std::string> I18nTimeZone::FindCityDisplayNameMap(std::str
         }
         if (!xmlNodeIsNull) {
             const char* key = reinterpret_cast<const char *>(contents[0]);
-            const char* value = reinterpret_cast<const char *>(contents[1]);
-            resultMap.insert(std::make_pair<std::string, std::string>(key, value));
+            const char* displayName = reinterpret_cast<const char *>(contents[1]);
+            resultMap.insert(std::make_pair<std::string, std::string>(key, displayName));
         }
         for (size_t i = 0; i < ELEMENT_NUM; i++) {
             if (contents[i] != nullptr) {
