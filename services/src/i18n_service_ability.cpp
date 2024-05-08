@@ -16,6 +16,8 @@
 #include "i18n_hilog.h"
 #include "i18n_service_ability_load_manager.h"
 #include "locale_config.h"
+#include "mem_mgr_client.h"
+#include "mem_mgr_proxy.h"
 #include "preferred_language.h"
 #include "preferences.h"
 #include "preferences_helper.h"
@@ -108,10 +110,14 @@ void I18nServiceAbility::OnStart()
     }
     handler = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::Create(true));
     UnloadI18nServiceAbility();
+    int pid = getpid();
+    Memory::MemMgrClient::GetInstance().NotifyProcessStatus(pid, 1, 1, I18N_SA_ID);
 }
 
 void I18nServiceAbility::OnStop()
 {
+    int pid = getpid();
+    Memory::MemMgrClient::GetInstance().NotifyProcessStatus(pid, 1, 0, I18N_SA_ID);
     HILOG_INFO_I18N("I18nServiceAbility Stop.");
 }
 } // namespace I18n
