@@ -88,6 +88,7 @@ ohos_shared_library("intl_util") {
   sources = [
     "src/character.cpp",
     "src/collator.cpp",
+    "src/date_order.cpp",
     "src/date_rule_init.cpp",
     "src/date_time_filter.cpp",
     "src/date_time_format.cpp",
