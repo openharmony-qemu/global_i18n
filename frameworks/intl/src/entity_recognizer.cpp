@@ -34,8 +34,12 @@ EntityRecognizer::EntityRecognizer(icu::Locale& locale)
 
 EntityRecognizer::~EntityRecognizer()
 {
-    delete phoneNumberMatched;
-    delete dateTimeMatched;
+    if (phoneNumberMatched != nullptr) {
+        delete phoneNumberMatched;
+    }
+    if (dateTimeMatched != nullptr) {
+        delete dateTimeMatched;
+    }
 }
 
 std::vector<std::vector<int>> EntityRecognizer::FindEntityInfo(std::string& message)
