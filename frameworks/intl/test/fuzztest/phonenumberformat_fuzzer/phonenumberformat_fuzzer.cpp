@@ -19,13 +19,15 @@
 #include "phonenumberformat_fuzzer.h"
 
 namespace OHOS {
+    const static size_t INPUT_DATA_LENGTH = 2;
+
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
         using namespace Global::I18n;
-        if (size < 2) {
+        if (size < INPUT_DATA_LENGTH) {
             return false;
         }
-        std::string input(reinterpret_cast<const char*>(data), 2);
+        std::string input(reinterpret_cast<const char*>(data), INPUT_DATA_LENGTH);
         std::map<std::string, std::string> options;
         options[input] = input;
         PhoneNumberFormat formatter(input, options);
