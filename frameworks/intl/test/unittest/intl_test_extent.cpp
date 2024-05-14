@@ -19,6 +19,7 @@
 
 #include "character.h"
 #include "collator.h"
+#include "date_order.h"
 #include "date_time_filter.h"
 #include "date_time_format.h"
 #include "date_time_rule.h"
@@ -854,6 +855,30 @@ HWTEST_F(IntlTest, IntlFuncTest0071, TestSize.Level1)
     EXPECT_EQ(mbRes, "3.5 MB");
     EXPECT_EQ(gbRes, "23 GB");
     delete numFmt;
+}
+
+/**
+ * @tc.name: IntlFuncTest0072
+ * @tc.desc: Test date order
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0072, TestSize.Level1)
+{
+    std::string locale = "en-GB";
+    std::string result = DateOrder::GetDateOrder(locale);
+    EXPECT_EQ(result, "");
+    locale = "zh-Hans";
+    result = DateOrder::GetDateOrder(locale);
+    EXPECT_EQ(result, "");
+    locale = "bo-CN";
+    result = DateOrder::GetDateOrder(locale);
+    EXPECT_EQ(result, "");
+    locale = "zh-Hant";
+    result = DateOrder::GetDateOrder(locale);
+    EXPECT_EQ(result, "");
+    locale = "ug";
+    result = DateOrder::GetDateOrder(locale);
+    EXPECT_EQ(result, "");
 }
 } // namespace I18n
 } // namespace Global

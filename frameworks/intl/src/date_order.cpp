@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "date_time_sequence.h"
+#include "date_order.h"
 #include "i18n_hilog.h"
 #include "unicode/datefmt.h"
 #include "unicode/locid.h"
@@ -23,10 +23,10 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 
-std::string DateOrder::GetDateOrder(const std::string &locale)
+std::string DateOrder::GetDateOrder(const std::string &languageTag)
 {
     UErrorCode icuStatus = U_ZERO_ERROR;
-    icu::Locale locale = icu::Locale::forLanguageTag(locale.c_str(), icuStatus);
+    icu::Locale locale = icu::Locale::forLanguageTag(languageTag.c_str(), icuStatus);
     if (icuStatus != U_ZERO_ERROR) {
         HILOG_ERROR_I18N("Failed to create locale for GetDateOrder");
         return nullptr;

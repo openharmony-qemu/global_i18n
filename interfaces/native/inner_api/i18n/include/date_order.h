@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_GLOBAL_I18N_DATE_TIME_SEQUENCE_H
-#define OHOS_GLOBAL_I18N_DATE_TIME_SEQUENCE_H
+#ifndef OHOS_GLOBAL_I18N_DATE_ORDER_H
+#define OHOS_GLOBAL_I18N_DATE_ORDER_H
 
 #include <cstring>
 #include "locale_info.h"
@@ -24,7 +24,7 @@ namespace I18n {
 
 class DateOrder {
 public:
-   static std::string GetDateOrder(const std::string &locale);
+   static std::string GetDateOrder(const std::string &languageTag);
 
 private:
    static std::string ModifyOrder(std::string &pattern);
