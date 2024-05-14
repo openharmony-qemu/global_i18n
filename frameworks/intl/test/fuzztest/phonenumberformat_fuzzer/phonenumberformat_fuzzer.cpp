@@ -22,7 +22,7 @@ namespace OHOS {
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
         using namespace Global::I18n;
-        if (size < 1) {
+        if (size < 2) {
             return false;
         }
         std::string input(reinterpret_cast<const char*>(data), 2);
