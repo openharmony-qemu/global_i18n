@@ -214,8 +214,6 @@ napi_value I18nAddon::GetDateOrder(napi_env env, napi_callback_info info)
     return result;
 }
 
-
-
 napi_value I18nAddon::GetTimePeriodName(napi_env env, napi_callback_info info)
 {
     napi_value result;

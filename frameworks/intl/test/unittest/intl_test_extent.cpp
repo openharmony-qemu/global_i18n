@@ -866,19 +866,19 @@ HWTEST_F(IntlTest, IntlFuncTest0072, TestSize.Level1)
 {
     std::string locale = "en-GB";
     std::string result = DateOrder::GetDateOrder(locale);
-    EXPECT_EQ(result, "");
+    EXPECT_EQ(result, "d-LLL-y");
     locale = "zh-Hans";
     result = DateOrder::GetDateOrder(locale);
-    EXPECT_EQ(result, "");
+    EXPECT_EQ(result, "y-L-d");
     locale = "bo-CN";
     result = DateOrder::GetDateOrder(locale);
-    EXPECT_EQ(result, "");
+    EXPECT_EQ(result, "y-LLL-d");
     locale = "zh-Hant";
     result = DateOrder::GetDateOrder(locale);
-    EXPECT_EQ(result, "");
+    EXPECT_EQ(result, "y-L-d");
     locale = "ug";
     result = DateOrder::GetDateOrder(locale);
-    EXPECT_EQ(result, "");
+    EXPECT_EQ(result, "d-LLL-y");
 }
 } // namespace I18n
 } // namespace Global
