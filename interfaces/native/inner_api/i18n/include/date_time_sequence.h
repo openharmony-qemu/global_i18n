@@ -12,22 +12,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_GLOBAL_I18N_DATE_ORDER_H
-#define OHOS_GLOBAL_I18N_DATE_ORDER_H
+#ifndef OHOS_GLOBAL_I18N_DATE_TIME_SEQUENCE_H
+#define OHOS_GLOBAL_I18N_DATE_TIME_SEQUENCE_H
 
-#include <cstring>
+#include <string>
 #include "locale_info.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
 
-class DateOrder {
+class DateTimeSequence {
 public:
-   static std::string GetDateOrder(const std::string &languageTag);
+   static std::string GetDateOrder(const std::string &locale);
 
 private:
    static std::string ModifyOrder(std::string &pattern);
+   const static std::unordered_map<std::string, std::string> DATE_ORDER_MAP;
    static void ProcessNormal(char ch, int *order, size_t orderSize, int *lengths, size_t lengsSize);
 };
 } // namespace I18n

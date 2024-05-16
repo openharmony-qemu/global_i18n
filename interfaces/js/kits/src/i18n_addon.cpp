@@ -36,7 +36,7 @@
 #include "utils.h"
 #include "variable_convertor.h"
 #include "i18n_addon.h"
-#include "date_order.h"
+#include "date_time_sequence.h"
 
 namespace OHOS {
 namespace Global {
@@ -204,7 +204,7 @@ napi_value I18nAddon::GetDateOrder(napi_env env, napi_callback_info info)
         return nullptr;
     }
     std::string languageTag = languageBuf.data();
-    std::string value = DateOrder::GetDateOrder(languageTag);
+    std::string value = DateTimeSequence::GetDateOrder(languageTag);
     napi_value result;
     status = napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &result);
     if (status != napi_ok) {

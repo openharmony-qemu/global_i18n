@@ -12,40 +12,61 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "date_order.h"
+#include "date_time_sequence.h"
 #include "i18n_hilog.h"
 #include "unicode/datefmt.h"
 #include "unicode/locid.h"
 #include "unicode/smpdtfmt.h"
 #include "unicode/dtptngen.h"
+#include <regex>
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
 
-std::string DateOrder::GetDateOrder(const std::string &languageTag)
+const std::unordered_map<std::string, std::string> DateTimeSequence::DATE_ORDER_MAP = {
+    { "ug", "L-d-y" },
+    { "ar", "y-L-d" },
+    { "fa", "y-L-d" },
+    { "ur", "y-L-d" },
+    { "iw", "y-L-d" },
+    { "he", "y-L-d" },
+};
+
+std::string DateTimeSequence::GetDateOrder(const std::string &locale)
 {
     UErrorCode icuStatus = U_ZERO_ERROR;
-    icu::Locale locale = icu::Locale::forLanguageTag(languageTag.c_str(), icuStatus);
-    if (icuStatus != U_ZERO_ERROR) {
+    icu::Locale localeObj = icu::Locale::forLanguageTag(locale.data(), icuStatus);
+    if (U_FAILURE(icuStatus)) {
         HILOG_ERROR_I18N("Failed to create locale for GetDateOrder");
-        return nullptr;
+        return "";
+    }
+    const char* language = localeObj.getBaseName();
+    if (language == nullptr) {
+        HILOG_ERROR_I18N("%{public}s getBaseName is null.", locale.c_str());
+        return "";
+    }
+    std::string languageTag = language;
+    if (DATE_ORDER_MAP.find(languageTag) != DATE_ORDER_MAP.end()) {
+        std::string dateOrder = DATE_ORDER_MAP.find(languageTag)->second;
+        return dateOrder;
     }
     icu::SimpleDateFormat* formatter = dynamic_cast<icu::SimpleDateFormat*>
-        (icu::DateFormat::createDateInstance(icu::DateFormat::EStyle::kDefault, locale));
-    if (icuStatus != U_ZERO_ERROR || formatter == nullptr) {
+        (icu::DateFormat::createDateInstance(icu::DateFormat::EStyle::kDefault, localeObj));
+    if (U_FAILURE(icuStatus) || formatter == nullptr) {
         HILOG_ERROR_I18N("Failed to create SimpleDateFormat");
-        return nullptr;
+        return "";
     }
     std::string tempValue;
     icu::UnicodeString unistr;
     formatter->toPattern(unistr);
-    delete formatter;
     unistr.toUTF8String<std::string>(tempValue);
-    return ModifyOrder(tempValue);
+    std::string value = ModifyOrder(tempValue);
+    delete formatter;
+    return value;
 }
 
-std::string DateOrder::ModifyOrder(std::string &pattern)
+std::string DateTimeSequence::ModifyOrder(std::string &pattern)
 {
     int order[3] = { 0 }; // total 3 elements 'y', 'M'/'L', 'd'
     int lengths[4] = { 0 }; // first elements is the currently found elememnts, thus 4 elements totally.
@@ -80,7 +101,7 @@ std::string DateOrder::ModifyOrder(std::string &pattern)
     return ret;
 }
 
-void DateOrder::ProcessNormal(char ch, int *order, size_t orderSize, int *lengths, size_t lengsSize)
+void DateTimeSequence::ProcessNormal(char ch, int *order, size_t orderSize, int *lengths, size_t lengsSize)
 {
     char adjust;
     int index = -1;
@@ -89,7 +110,7 @@ void DateOrder::ProcessNormal(char ch, int *order, size_t orderSize, int *length
         index = 3; // 3 is the index of 'd'
     } else if ((ch == 'L') || (ch == 'M')) {
         adjust = 'L';
-        index = 2; // 2 is the index of 'L'
+        index = 2; // 2 is the index of 'M'
     } else if (ch == 'y') {
         adjust = 'y';
         index = 1;

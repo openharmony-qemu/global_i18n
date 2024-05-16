@@ -19,7 +19,7 @@
 
 #include "character.h"
 #include "collator.h"
-#include "date_order.h"
+#include "date_time_sequence.h"
 #include "date_time_filter.h"
 #include "date_time_format.h"
 #include "date_time_rule.h"
@@ -865,20 +865,20 @@ HWTEST_F(IntlTest, IntlFuncTest0071, TestSize.Level1)
 HWTEST_F(IntlTest, IntlFuncTest0072, TestSize.Level1)
 {
     std::string locale = "en-GB";
-    std::string result = DateOrder::GetDateOrder(locale);
+    std::string result = DateTimeSequence::GetDateOrder(locale);
     EXPECT_EQ(result, "d-LLL-y");
     locale = "zh-Hans";
-    result = DateOrder::GetDateOrder(locale);
+    result = DateTimeSequence::GetDateOrder(locale);
     EXPECT_EQ(result, "y-L-d");
     locale = "bo-CN";
-    result = DateOrder::GetDateOrder(locale);
+    result = DateTimeSequence::GetDateOrder(locale);
     EXPECT_EQ(result, "y-LLL-d");
     locale = "zh-Hant";
-    result = DateOrder::GetDateOrder(locale);
+    result = DateTimeSequence::GetDateOrder(locale);
     EXPECT_EQ(result, "y-L-d");
     locale = "ug";
-    result = DateOrder::GetDateOrder(locale);
-    EXPECT_EQ(result, "d-LLL-y");
+    result = DateTimeSequence::GetDateOrder(locale);
+    EXPECT_EQ(result, "L-d-y");
 }
 } // namespace I18n
 } // namespace Global
