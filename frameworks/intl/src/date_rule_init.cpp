@@ -23,6 +23,7 @@ DateRuleInit::DateRuleInit(std::string& locale)
     dateTimeRule = new DateTimeRule(locale);
     if (dateTimeRule == nullptr) {
         HILOG_ERROR_I18N("DateTimeRule construct failed.");
+        return;
     }
     this->locale = dateTimeRule->GetLocale();
     filter = new DateTimeFilter(this->locale, dateTimeRule);
@@ -34,8 +35,12 @@ DateRuleInit::DateRuleInit(std::string& locale)
 
 DateRuleInit::~DateRuleInit()
 {
-    delete dateTimeRule;
-    delete filter;
+    if (dateTimeRule != nullptr) {
+        delete dateTimeRule;
+    }
+    if (filter != nullptr) {
+        delete filter;
+    }
 }
 
 std::vector<MatchedDateTimeInfo> DateRuleInit::Detect(icu::UnicodeString& message)
@@ -43,8 +48,10 @@ std::vector<MatchedDateTimeInfo> DateRuleInit::Detect(icu::UnicodeString& messag
     std::vector<MatchedDateTimeInfo> matches = GetMatches(message);
     std::vector<MatchedDateTimeInfo> clearMatches = ClearFind(message);
     std::vector<MatchedDateTimeInfo> pastMatches = PastFind(message);
-    // Filter results that don't meet rules
-    matches = filter->Filter(message, matches, clearMatches, pastMatches);
+    if (filter != nullptr) {
+        // Filter results that don't meet rules
+        matches = filter->Filter(message, matches, clearMatches, pastMatches);
+    }
     return matches;
 }
 
