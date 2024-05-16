@@ -21,8 +21,9 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 static const std::unordered_map<int32_t, std::string> ErrorCodeToMsg {
-    {I18N_NO_PERMISSION, "The application does not have permission to call this function"},
-    {I18N_NOT_VALID, "Param value not valid"},
+    {I18N_NO_PERMISSION,
+        "Permission verification failed. The application does not have the permission required to call the API."},
+    {I18N_NOT_VALID, "Invalid parameter"},
     {I18N_NOT_FOUND, "Parameter error"},
     {I18N_OPTION_NOT_VALID, "Invalid option name"}
 };
