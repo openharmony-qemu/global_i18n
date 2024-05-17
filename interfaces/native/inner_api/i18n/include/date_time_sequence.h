@@ -21,41 +21,14 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-struct OrderResult {
-
-    /**
-     * the year,month and day sequence,
-     * empty value represent call interface failed
-     */
-    std::string dateOrder;
-
-    /**
-     * 0 represent time position, 1 represent date position
-     * -1 represent call interface failed
-     */
-    std::string dateTimeOrder;
-
-    /**
-     * 0 represent am/pm position, 1 represent time position
-     * -1 represent call interface failed
-     */
-    std::string amPmTimeOrder;
-
-    // whether datetime format string starts with zero
-    bool startsWithZero;
-};
 
 class DateTimeSequence {
 public:
-   static OrderResult GetDateOrder(const std::string &locale);
-   static OrderResult GetDateTimeOrder(const std::string &locale);
-   static OrderResult GetAmPmTimeOrder(const std::string &locale);
+   static std::string GetDateOrder(const std::string &locale);
 
 private:
    static std::string ModifyOrder(std::string &pattern);
    const static std::unordered_map<std::string, std::string> DATE_ORDER_MAP;
-   const static std::unordered_map<std::string, std::string> DATETIME_ORDER_MAP;
-   const static std::unordered_map<std::string, std::string> AM_PM_TIME_ORDER_MAP;
    static void ProcessNormal(char ch, int *order, size_t orderSize, int *lengths, size_t lengsSize);
 };
 } // namespace I18n
