@@ -224,7 +224,7 @@ bool IsDirExist(const char *path)
     if (!(path && *path)) {
         return false;
     }
-    char resolved_path[PATH_MAX];
+    char resolved_path[PATH_MAX + 1];
     if (realpath(path, resolved_path) == nullptr) {
         return false;
     }
