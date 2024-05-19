@@ -116,12 +116,12 @@ ohos_shared_library("intl_util") {
     "src/regex_rule.cpp",
     "src/relative_time_format.cpp",
     "src/rules_engine.cpp",
+    "src/signature_verifier.cpp",
     "src/system_locale_manager.cpp",
     "src/taboo.cpp",
     "src/taboo_utils.cpp",
     "src/utils.cpp",
     "src/verify_sign_tool.cpp",
-    "src/signature_verifier.cpp",
   ]
   version_script = "libintl_util.map"
   cflags_cc = [
