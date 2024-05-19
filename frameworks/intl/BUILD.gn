@@ -121,6 +121,7 @@ ohos_shared_library("intl_util") {
     "src/taboo_utils.cpp",
     "src/utils.cpp",
     "src/verify_sign_tool.cpp",
+    "src/signature_verifier.cpp",
   ]
   version_script = "libintl_util.map"
   cflags_cc = [

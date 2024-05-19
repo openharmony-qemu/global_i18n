@@ -159,8 +159,10 @@ private:
         std::vector<std::string> &zones);
     void GetICUCountryZones(std::string &region, std::vector<std::string> &zones, std::string &defaultTimezone);
     CountryResult Match(std::vector<std::string> &zones, NITZData &nitzData, std::string &systemTimezone);
+    static const char *GetTZLookupDataPath();
 
     static const char *COUNTRY_ZONE_DATA_PATH;
+    static const char *DISTRO_COUNTRY_ZONE_DATA_PATH;
     static const char *DEFAULT_TIMEZONE;
     static const char *TIMEZONES_TAG;
     static const char *ID_TAG;
@@ -171,6 +173,7 @@ private:
     static const char *CODE_TAG;
     static const char *TIMEZONE_KEY;
     static constexpr int SYS_PARAM_LEN = 128;
+    static const char *TZLOOKUP_FILE_PATH;
 };
 } // namespace I18n
 } // namespace Global

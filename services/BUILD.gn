@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//base/startup/init/begetd.gni")
 
 group("i18n_service_ability") {
   deps = [
@@ -88,6 +89,27 @@ ohos_shared_library("i18n_sa") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
+  part_name = "i18n"
+  subsystem_name = "global"
+}
+
+ohos_executable("hmos_cust_timezone_mount") {
+  sources = [
+    "src/hmos_timezone_mount.cpp",
+  ]
+ 
+  include_dirs = [
+    "../frameworks/intl/include"
+  ]
+  deps = [
+    "../frameworks/intl:intl_util",
+  ]
+  external_deps = [
+    "hilog:libhilog",
+    "openssl:libcrypto_shared",
+    "openssl:libssl_shared",
+  ]
+  install_images = [ "system" ]
   part_name = "i18n"
   subsystem_name = "global"
 }

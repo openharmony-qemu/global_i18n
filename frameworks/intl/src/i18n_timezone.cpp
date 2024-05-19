@@ -53,10 +53,13 @@ const char *I18nTimeZone::DEFAULT_TIMEZONE = "GMT";
 
 const char *I18nTimeZone::CITY_TIMEZONE_DATA_PATH = "/system/usr/ohos_timezone/ohos_timezones.xml";
 const char *I18nTimeZone::DEVICE_CITY_TIMEZONE_DATA_PATH = "/system/usr/ohos_timezone/device_timezones.xml";
+const char *I18nTimeZone::DISTRO_DEVICE_CITY_TIMEZONE_DATA_PATH = "/system/etc/tzdata_distro/device_timezones.xml";
 const char *I18nTimeZone::TZ_PIXEL_PATH = "/system/usr/ohos_timezone";
 const char *I18nTimeZone::DEFAULT_LOCALE = "root";
 const char *I18nTimeZone::CITY_DISPLAYNAME_PATH = "/system/usr/ohos_timezone/ohos_city_dispname/";
-const char *I18nTimeZone::DEVICE_CITY_DISPLAYNAME_PATH = "/system/usr/ohos_timezone/device_city_dispname/";
+const char *I18nTimeZone::BASE_DEVICE_CITY_DISPLAYNAME_PATH = "/system/usr/ohos_timezone/device_city_dispname/";
+const char *I18nTimeZone::DISTRO_DEVICE_CITY_DISPLAYNAME_PATH = "/system/etc/tzdata_distro/device_city_dispname/";
+const char *I18nTimeZone::DEVICE_CITY_DISPLAYNAME_PATH = GetDeviceCityDisplayNamePath();
 
 const char *I18nTimeZone::TIMEZONE_ROOT_TAG = "timezones";
 const char *I18nTimeZone::TIMEZONE_SECOND_ROOT_TAG = "timezone";
@@ -69,7 +72,6 @@ std::set<std::string> I18nTimeZone::supportedLocales {};
 std::set<std::string> I18nTimeZone::availableZoneCityIDs {};
 std::map<std::string, std::string> I18nTimeZone::city2TimeZoneID {};
 std::map<std::string, std::string> I18nTimeZone::BEST_MATCH_LOCALE {};
-bool I18nTimeZone::useDeviceCityDispName = false;
 std::mutex I18nTimeZone::cityTimeZoneMutex;
 std::mutex I18nTimeZone::matchLocaleMutex;
 
@@ -853,7 +855,9 @@ std::set<std::string> I18nTimeZone::GetAvailableZoneCityIDs()
         return availableZoneCityIDs;
     }
     struct stat s;
-    if (stat(DEVICE_CITY_TIMEZONE_DATA_PATH, &s) == 0) {
+    if (stat(DISTRO_DEVICE_CITY_TIMEZONE_DATA_PATH, &s) == 0) {
+        ReadTimeZoneData(DISTRO_DEVICE_CITY_TIMEZONE_DATA_PATH);
+    } else if (stat(DEVICE_CITY_TIMEZONE_DATA_PATH, &s) == 0) {
         ReadTimeZoneData(DEVICE_CITY_TIMEZONE_DATA_PATH);
     } else {
         ReadTimeZoneData(CITY_TIMEZONE_DATA_PATH);
@@ -910,7 +914,7 @@ std::string I18nTimeZone::FindCityDisplayNameFromXml(std::string &cityID, std::s
 
 std::string I18nTimeZone::GetCityDisplayNameXmlPath(const std::string &locale)
 {
-    if (useDeviceCityDispName) {
+    if (DEVICE_CITY_DISPLAYNAME_PATH != nullptr) {
         return DEVICE_CITY_DISPLAYNAME_PATH + locale + ".xml";
     } else {
         return CITY_DISPLAYNAME_PATH + locale + ".xml";
@@ -922,7 +926,7 @@ std::map<std::string, std::string> I18nTimeZone::FindCityDisplayNameMap(std::str
     xmlKeepBlanksDefault(0);
     std::map<std::string, std::string> resultMap;
     std::string xmlPath;
-    if (useDeviceCityDispName) {
+    if (DEVICE_CITY_DISPLAYNAME_PATH != nullptr) {
         xmlPath = DEVICE_CITY_DISPLAYNAME_PATH + locale + ".xml";
     } else {
         xmlPath = CITY_DISPLAYNAME_PATH + locale + ".xml";
@@ -974,8 +978,7 @@ bool I18nTimeZone::GetSupportedLocales()
 
     struct stat s;
     std::string displayNamePath;
-    if (stat(DEVICE_CITY_DISPLAYNAME_PATH, &s) == 0) {
-        useDeviceCityDispName = true;
+    if (DEVICE_CITY_DISPLAYNAME_PATH != nullptr) {
         displayNamePath = DEVICE_CITY_DISPLAYNAME_PATH;
     } else {
         displayNamePath = CITY_DISPLAYNAME_PATH;
@@ -1356,6 +1359,18 @@ bool I18nTimeZone::ParamExceedScope(const int x, const int y, int fixedX, int fi
         return true;
     }
     return false;
+}
+
+const char *I18nTimeZone::GetDeviceCityDisplayNamePath()
+{
+    struct stat s;
+    if (stat(DISTRO_DEVICE_CITY_DISPLAYNAME_PATH, &s) == 0) {
+        return DISTRO_DEVICE_CITY_DISPLAYNAME_PATH;
+    } else if (stat(BASE_DEVICE_CITY_DISPLAYNAME_PATH, &s) == 0) {
+        return BASE_DEVICE_CITY_DISPLAYNAME_PATH;
+    } else {
+        return nullptr;
+    }
 }
 }
 }

@@ -58,9 +58,12 @@ private:
     static const char *DEFAULT_TIMEZONE;
     static const char *CITY_TIMEZONE_DATA_PATH;
     static const char *DEVICE_CITY_TIMEZONE_DATA_PATH;
+    static const char *DISTRO_DEVICE_CITY_TIMEZONE_DATA_PATH;
     static const char *TZ_PIXEL_PATH;
     static const char *DEFAULT_LOCALE;
     static const char *CITY_DISPLAYNAME_PATH;
+    static const char *BASE_DEVICE_CITY_DISPLAYNAME_PATH;
+    static const char *DISTRO_DEVICE_CITY_DISPLAYNAME_PATH;
     static const char *DEVICE_CITY_DISPLAYNAME_PATH;
     static const char *SUPPORTED_LOCALES_PATH;
     static const char *TIMEZONE_ROOT_TAG;
@@ -83,7 +86,6 @@ private:
     static std::map<int, std::string> categoryNum2TimezoneES;
     static std::map<std::string, std::string> BEST_MATCH_LOCALE;
     static constexpr int SYS_PARAM_LEN = 128;
-    static bool useDeviceCityDispName;
     icu::TimeZone *timezone = nullptr;
     static std::mutex cityTimeZoneMutex;
     static std::mutex matchLocaleMutex;
@@ -112,6 +114,7 @@ private:
     static std::map<int, std::string> GetTimeZoneCategoryMap(const double x, const double y);
     static void SetCity2TimeZoneID(const char* key, const char* value);
     static void SetBestMatchLocale(const std::string& key, const std::string& value);
+    static const char *GetDeviceCityDisplayNamePath();
 };
 } // namespace I18n
 } // namespace Global

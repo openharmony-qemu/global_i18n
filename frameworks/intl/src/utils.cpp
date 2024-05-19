@@ -190,7 +190,55 @@ std::string GetISO3Country(const string country)
     }
     return locale.getISO3Country();
 }
-
+ 
+bool FileExist(const std::string& path)
+{
+    bool status = false;
+    try {
+        status = std::filesystem::exists(path.c_str());
+    } catch (const std::filesystem::filesystem_error &except) {
+        HILOG_ERROR_I18N("FileExist failed because filesystem_error, error message: %{public}s.",
+            except.code().message().c_str());
+        return false;
+    } catch (const std::bad_alloc &except) {
+        HILOG_ERROR_I18N("FileExist failed because bad_alloc, error message: %{public}s.",
+            except.what());
+        return false;
+    }
+    return status;
+}
+ 
+bool IsLegalPath(const std::string& path)
+{
+    if (path.find("./") != std::string::npos ||
+        path.find("../") != std::string::npos) {
+        return false;
+    }
+    return true;
+}
+ 
+bool IsDirExist(const char *path)
+{
+    if (!(path && *path)) {
+        return false;
+    }
+    char resolved_path[PATH_MAX];
+    if (realpath(path, resolved_path) == nullptr) {
+        return false;
+    }
+    struct stat buf;
+    return stat(resolved_path, &buf) == 0 && S_ISDIR(buf.st_mode);
+}
+ 
+std::string trim(std::string &s)
+{
+    if (s.empty()) {
+        return s;
+    }
+    s.erase(0, s.find_first_not_of(" "));
+    s.erase(s.find_last_not_of(" ") + 1);
+    return s;
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
