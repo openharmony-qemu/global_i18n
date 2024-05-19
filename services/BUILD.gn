@@ -93,16 +93,10 @@ ohos_shared_library("i18n_sa") {
 }
 
 ohos_executable("hmos_cust_timezone_mount") {
-  sources = [
-    "src/hmos_timezone_mount.cpp",
-  ]
- 
-  include_dirs = [
-    "../frameworks/intl/include"
-  ]
-  deps = [
-    "../frameworks/intl:intl_util",
-  ]
+  sources = [ "src/hmos_timezone_mount.cpp" ]
+
+  include_dirs = [ "../frameworks/intl/include" ]
+  deps = [ "../frameworks/intl:intl_util" ]
   external_deps = [
     "hilog:libhilog",
     "openssl:libcrypto_shared",
