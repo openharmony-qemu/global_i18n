@@ -15,9 +15,12 @@ import("//build/ohos.gni")
 
 group("i18n_service_ability") {
   deps = [
+    ":hmos_cust_timezone_mount",
     ":i18n_sa",
     ":i18n_sa_client",
     "./etc:i18n_sa_etc",
+    "./etc:prefabrication",
+    "./etc:version_txt",
   ]
 }
 
