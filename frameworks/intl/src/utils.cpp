@@ -17,8 +17,10 @@
 #include <climits>
 #include <filesystem>
 #include <fstream>
+#include <dirent.h>
 #include <stdexcept>
 #include <string>
+#include <sys/stat.h>
 #include <vector>
 #include "i18n_hilog.h"
 #include "locale_config.h"
