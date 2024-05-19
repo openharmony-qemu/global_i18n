@@ -23,13 +23,13 @@ ohos_prebuilt_etc("i18n_sa_etc") {
 ohos_prebuilt_etc("version_txt") {
   source = "./timezone/version.txt"
   module_install_dir = "etc/TIMEZONE/generic/"
-  part_name = "global"
-  subsystem_name = "i18n"
+  subsystem_name = "global"
+  part_name = "i18n"
 }
 
 ohos_prebuilt_etc("prefabrication") {
   source = "./timezone/prefabrication"
-  module_install_dir = "etc/zoneinfo_distro"
-  part_name = "global"
-  subsystem_name = "i18n"
-}
+  module_install_dir = "etc/tzdata_distro"
+  subsystem_name = "global"
+  part_name = "i18n"
+}
