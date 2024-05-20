@@ -30,19 +30,17 @@ const std::string VERIFY_FILE = "CERT.SF";
 const std::string MANIFEST_FILE = "MANIFEST.MF";
 const std::string SUB_TYPE = "generic";
 const std::string CFG_PATH =
-    "/data/service/el1/public/update/param_service/install/system/etc/TIMEZONE/generic/";
+    "/data/service/el1/public/update/param_service/install/system/etc/TIMEZONE/generic/current/";
 const std::string LOCALE_PATH = "/system/etc/TIMEZONE/generic/";
 const std::string PUBKEY_PATH = "/system/etc/LIBPHONENUMBER/generic/";
 const std::string PUBKEY_NAME = "hota_i18n_upgrade_v1.pem";
 const std::string VVERSION_NAME = "version";
 const std::string VERIFY_CERT_NAME = "verify_cert";
-const std::vector<std::string> DATA_FILES = {"current/tzdata", "current/device_timezones.xml", "current/version.txt",
-    "current/distro_version", "current/tzlookup.xml", "current/device_city_dispname/bo_CN.xml",
-    "current/device_city_dispname/root.xml","current/device_city_dispname/ug.xml",
-    "current/device_city_dispname/zh_Hans.xml", "current/device_city_dispname/zh_HK.xml",
-    "current/device_city_dispname/zh_TW.xml", "current/device_city_dispname/zz_ZX.xml", "current/icu/icu_tzdata.dat",
-    "current/telephonylookup.xml"};
-
+const std::vector<std::string> DATA_FILES = {"tzdata", "device_timezones.xml", "version.txt", 
+    "distro_version", "tzlookup.xml", "device_city_dispname/bo_CN.xml", "device_city_dispname/root.xml",
+    "device_city_dispname/ug.xml", "device_city_dispname/zh_Hans.xml", "device_city_dispname/zh_HK.xml",
+    "device_city_dispname/zh_TW.xml", "device_city_dispname/zz_ZX.xml", "icu/icu_tzdata.dat", 
+    "telephonylookup.xml"};
 
 bool Mount()
 {
