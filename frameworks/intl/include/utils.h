@@ -36,6 +36,11 @@ std::string StrReplaceAll(const std::string& str,
     const std::string& target, const std::string& replace);
 std::string GetISO3Language(const std::string language);
 std::string GetISO3Country(const std::string country);
+std::string trim(std::string &s);
+bool FileExist(const std::string& path);
+bool IsLegalPath(const std::string& path);
+void Split(const std::string &src, const std::string &sep, std::vector<std::string> &dest);
+bool IsDirExist(const char *path);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

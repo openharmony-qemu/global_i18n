@@ -116,6 +116,7 @@ ohos_shared_library("intl_util") {
     "src/regex_rule.cpp",
     "src/relative_time_format.cpp",
     "src/rules_engine.cpp",
+    "src/signature_verifier.cpp",
     "src/system_locale_manager.cpp",
     "src/taboo.cpp",
     "src/taboo_utils.cpp",

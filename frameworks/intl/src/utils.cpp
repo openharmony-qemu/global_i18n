@@ -17,8 +17,10 @@
 #include <climits>
 #include <filesystem>
 #include <fstream>
+#include <dirent.h>
 #include <stdexcept>
 #include <string>
+#include <sys/stat.h>
 #include <vector>
 #include "i18n_hilog.h"
 #include "locale_config.h"
@@ -190,7 +192,63 @@ std::string GetISO3Country(const string country)
     }
     return locale.getISO3Country();
 }
-
+ 
+bool FileExist(const std::string& path)
+{
+    bool status = false;
+    try {
+        status = std::filesystem::exists(path.c_str());
+    } catch (const std::filesystem::filesystem_error &except) {
+        HILOG_ERROR_I18N("utils: FileExist failed because filesystem_error, error message: %{public}s.",
+            except.code().message().c_str());
+        return false;
+    } catch (const std::__h::__fs::filesystem::filesystem_error &except) {
+        HILOG_ERROR_I18N("utils: FileExist failed because filesystem_error, error message: %{public}s.",
+            except.code().message().c_str());
+        return false;
+    } catch (const std::bad_alloc &except) {
+        HILOG_ERROR_I18N("utils: FileExist failed because bad_alloc, error message: %{public}s.",
+            except.what());
+        return false;
+    }
+    return status;
+}
+ 
+bool IsLegalPath(const std::string& path)
+{
+    if (path.find("./") != std::string::npos ||
+        path.find("../") != std::string::npos) {
+        return false;
+    }
+    return true;
+}
+ 
+bool IsDirExist(const char *path)
+{
+    if (!(path && *path)) {
+        return false;
+    }
+    size_t length = strlen(path);
+    if (length > PATH_MAX) {
+        return false;
+    }
+    char resolvedPath[PATH_MAX];
+    if (realpath(path, resolvedPath) == nullptr) {
+        return false;
+    }
+    struct stat buf;
+    return stat(resolvedPath, &buf) == 0 && S_ISDIR(buf.st_mode);
+}
+ 
+std::string trim(std::string &s)
+{
+    if (s.empty()) {
+        return s;
+    }
+    s.erase(0, s.find_first_not_of(" "));
+    s.erase(s.find_last_not_of(" ") + 1);
+    return s;
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

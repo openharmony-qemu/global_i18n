@@ -28,6 +28,7 @@ using namespace icu;
 using namespace std;
 
 const char *ZoneUtil::COUNTRY_ZONE_DATA_PATH = "/system/usr/ohos_timezone/tzlookup.xml";
+const char *ZoneUtil::DISTRO_COUNTRY_ZONE_DATA_PATH = "/system/etc/tzdata_distro/tzlookup.xml";
 const char *ZoneUtil::DEFAULT_TIMEZONE = "GMT";
 const char *ZoneUtil::TIMEZONES_TAG = "timezones";
 const char *ZoneUtil::ID_TAG = "id";
@@ -37,6 +38,7 @@ const char *ZoneUtil::ROOT_TAG = "countryzones";
 const char *ZoneUtil::SECOND_TAG = "country";
 const char *ZoneUtil::CODE_TAG = "code";
 const char *ZoneUtil::TIMEZONE_KEY = "persist.time.timezone";
+const char *ZoneUtil::TZLOOKUP_FILE_PATH = ZoneUtil::GetTZLookupDataPath();
 
 unordered_map<string, string> ZoneUtil::defaultMap = {
     {"AQ", "Antarctica/McMurdo"},
@@ -240,7 +242,7 @@ CountryResult ZoneUtil::LookupTimezoneByCountryAndNITZ(std::string &region, NITZ
     if (systemTimezone.length() == 0) {
         systemTimezone = DEFAULT_TIMEZONE;
     }
-    if (CheckFileExist()) {
+    if (TZLOOKUP_FILE_PATH != nullptr) {
         bool isBoosted = false;
         HILOG_INFO_I18N("ZoneUtil::LookupTimezoneByCountryAndNITZ use tzlookup.xml");
         GetCountryZones(region, defaultTimezone, isBoosted, zones);
@@ -281,7 +283,7 @@ CountryResult ZoneUtil::LookupTimezoneByCountry(std::string &region, int64_t cur
     bool isBoosted = false;
     std::string defaultTimezone;
     CountryResult result = { true, MatchQuality::DEFAULT_BOOSTED, defaultTimezone };
-    if (CheckFileExist()) {
+    if (TZLOOKUP_FILE_PATH != nullptr) {
         HILOG_INFO_I18N("ZoneUtil::LookupTimezoneByCountry use tzlookup.xml");
         GetCountryZones(region, defaultTimezone, isBoosted, zones);
         if (defaultTimezone.length() == 0) {
@@ -308,14 +310,17 @@ CountryResult ZoneUtil::LookupTimezoneByCountry(std::string &region, int64_t cur
     return result;
 }
 
-bool ZoneUtil::CheckFileExist()
+const char *ZoneUtil::GetTZLookupDataPath()
 {
     using std::filesystem::directory_iterator;
     struct stat s;
+    if (stat(DISTRO_COUNTRY_ZONE_DATA_PATH, &s) == 0) {
+        return DISTRO_COUNTRY_ZONE_DATA_PATH;
+    }
     if (stat(COUNTRY_ZONE_DATA_PATH, &s) == 0) {
-        return true;
+        return COUNTRY_ZONE_DATA_PATH;
     } else {
-        return false;
+        return nullptr;
     }
 }
 
@@ -323,7 +328,7 @@ void ZoneUtil::GetCountryZones(std::string &region, std::string &defaultTimzone,
     std::vector<std::string> &zones)
 {
     xmlKeepBlanksDefault(0);
-    xmlDocPtr doc = xmlParseFile(COUNTRY_ZONE_DATA_PATH);
+    xmlDocPtr doc = xmlParseFile(TZLOOKUP_FILE_PATH);
     if (!doc) {
         HILOG_ERROR_I18N("ZoneUtil::GetCountryZones can not open tzlookup.xml");
         return;
