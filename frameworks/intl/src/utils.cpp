@@ -199,11 +199,15 @@ bool FileExist(const std::string& path)
     try {
         status = std::filesystem::exists(path.c_str());
     } catch (const std::filesystem::filesystem_error &except) {
-        HILOG_ERROR_I18N("FileExist failed because filesystem_error, error message: %{public}s.",
+        HILOG_ERROR_I18N("utils: FileExist failed because filesystem_error, error message: %{public}s.",
+            except.code().message().c_str());
+        return false;
+    } catch (const std::__h::__fs::filesystem::filesystem_error &except) {
+        HILOG_ERROR_I18N("utils: FileExist failed because filesystem_error, error message: %{public}s.",
             except.code().message().c_str());
         return false;
     } catch (const std::bad_alloc &except) {
-        HILOG_ERROR_I18N("FileExist failed because bad_alloc, error message: %{public}s.",
+        HILOG_ERROR_I18N("utils: FileExist failed because bad_alloc, error message: %{public}s.",
             except.what());
         return false;
     }
