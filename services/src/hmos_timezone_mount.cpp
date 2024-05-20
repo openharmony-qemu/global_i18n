@@ -36,10 +36,10 @@ const std::string PUBKEY_PATH = "/system/etc/LIBPHONENUMBER/generic/";
 const std::string PUBKEY_NAME = "hota_i18n_upgrade_v1.pem";
 const std::string VVERSION_NAME = "version";
 const std::string VERIFY_CERT_NAME = "verify_cert";
-const std::vector<std::string> DATA_FILES = {"tzdata", "device_timezones.xml", "version.txt", 
+const std::vector<std::string> DATA_FILES = {"tzdata", "device_timezones.xml", "version.txt",
     "distro_version", "tzlookup.xml", "device_city_dispname/bo_CN.xml", "device_city_dispname/root.xml",
     "device_city_dispname/ug.xml", "device_city_dispname/zh_Hans.xml", "device_city_dispname/zh_HK.xml",
-    "device_city_dispname/zh_TW.xml", "device_city_dispname/zz_ZX.xml", "icu/icu_tzdata.dat", 
+    "device_city_dispname/zh_TW.xml", "device_city_dispname/zz_ZX.xml", "icu/icu_tzdata.dat",
     "telephonylookup.xml"};
 
 bool Mount()
