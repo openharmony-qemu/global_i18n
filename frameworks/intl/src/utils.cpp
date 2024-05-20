@@ -224,12 +224,12 @@ bool IsDirExist(const char *path)
     if (!(path && *path)) {
         return false;
     }
-    char resolved_path[PATH_MAX];
-    if (realpath(path, resolved_path) == nullptr) {
+    char* resolvedPath = new char[PATH_MAX]; 
+    if (realpath(path, resolvedPath) == nullptr) {
         return false;
     }
     struct stat buf;
-    return stat(resolved_path, &buf) == 0 && S_ISDIR(buf.st_mode);
+    return stat(resolvedPath, &buf) == 0 && S_ISDIR(buf.st_mode);
 }
  
 std::string trim(std::string &s)
