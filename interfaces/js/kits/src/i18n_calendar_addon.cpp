@@ -188,7 +188,7 @@ napi_value I18nCalendarAddon::I18nCalendarConstructor(napi_env env, napi_callbac
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_string) {
-        napi_throw_type_error(env, nullptr, "Parameter type does not match");
+        HILOG_ERROR_I18N("CalendarConstructor: Parameter type does not match");
         return nullptr;
     }
     int32_t code = 0;
@@ -263,12 +263,12 @@ napi_value I18nCalendarAddon::Set(napi_env env, napi_callback_info info)
     for (int i = 0; i < 3; ++i) { // There are at least 3 arguments.
         napi_typeof(env, argv[i], &valueType);
         if (valueType != napi_valuetype::napi_number) {
-            napi_throw_type_error(env, nullptr, "Parameter type does not match");
+            HILOG_ERROR_I18N("Set: Parameter type does not match");
             return nullptr;
         }
         status = napi_get_value_int32(env, argv[i], times + i);
         if (status != napi_ok) {
-            HILOG_ERROR_I18N("Retrieve time value failed");
+            HILOG_ERROR_I18N("Set: Retrieve time value failed");
             return nullptr;
         }
     }
@@ -319,19 +319,19 @@ napi_value I18nCalendarAddon::SetTimeZone(napi_env env, napi_callback_info info)
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_string) {
-        napi_throw_type_error(env, nullptr, "Parameter type does not match");
+        HILOG_ERROR_I18N("SetTimeZone: Parameter type does not match");
         return nullptr;
     }
     size_t len = 0;
     napi_status status = napi_get_value_string_utf8(env, argv[0], nullptr, 0, &len);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("Get timezone length failed");
+        HILOG_ERROR_I18N("SetTimeZone: Get timezone length failed");
         return nullptr;
     }
     std::vector<char> buf(len + 1);
     status = napi_get_value_string_utf8(env, argv[0], buf.data(), len + 1, &len);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("Get timezone failed");
+        HILOG_ERROR_I18N("SetTimeZone: Get timezone failed");
         return nullptr;
     }
     std::string timezone(buf.data());
@@ -379,7 +379,7 @@ napi_value I18nCalendarAddon::SetFirstDayOfWeek(napi_env env, napi_callback_info
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_number) {
-        napi_throw_type_error(env, nullptr, "Parameter type does not match");
+        HILOG_ERROR_I18N("SetFirstDayOfWeek: Parameter type does not match");
         return nullptr;
     }
     int32_t value = 0;
@@ -432,7 +432,7 @@ napi_value I18nCalendarAddon::SetMinimalDaysInFirstWeek(napi_env env, napi_callb
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_number) {
-        napi_throw_type_error(env, nullptr, "Parameter type does not match");
+        HILOG_ERROR_I18N("SetMinimalDaysInFirstWeek: Parameter type does not match");
         return nullptr;
     }
     int32_t value = 0;
@@ -462,7 +462,7 @@ napi_value I18nCalendarAddon::Get(napi_env env, napi_callback_info info)
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_string) {
-        napi_throw_type_error(env, nullptr, "Parameter type does not match");
+        HILOG_ERROR_I18N("Get: Parameter type does not match");
         return nullptr;
     }
     size_t len = 0;
@@ -506,8 +506,7 @@ napi_value I18nCalendarAddon::Add(napi_env env, napi_callback_info info)
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("can not obtain add function param.");
-        napi_throw_type_error(env, nullptr, "I18nCalendarAddon::Add: Failed to obtain the parameter.");
+        HILOG_ERROR_I18N("Add: can not obtain add function param.");
         return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
@@ -531,8 +530,7 @@ napi_value I18nCalendarAddon::Add(napi_env env, napi_callback_info info)
     int32_t amount;
     status = napi_get_value_int32(env, argv[1], &amount);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("Can not obtain add function param.");
-        napi_throw_type_error(env, nullptr, "I18nCalendarAddon::Add: Failed to obtain the amount.");
+        HILOG_ERROR_I18N("Add: Can not obtain add function param.");
         return nullptr;
     }
     I18nCalendarAddon *obj = nullptr;
@@ -556,7 +554,7 @@ napi_value I18nCalendarAddon::GetDisplayName(napi_env env, napi_callback_info in
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_string) {
-        napi_throw_type_error(env, nullptr, "Parameter type does not match");
+        HILOG_ERROR_I18N("GetDisplayName: Parameter type does not match");
         return nullptr;
     }
     int32_t code = 0;
@@ -671,8 +669,7 @@ napi_value I18nCalendarAddon::CompareDays(napi_env env, napi_callback_info info)
     UDate milliseconds = 0;
     napi_status status = napi_get_date_value(env, argv[0], &milliseconds);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("compareDays function param is not Date");
-        napi_throw_type_error(env, nullptr, "CompareDays: Failed to obtain the milliseconds");
+        HILOG_ERROR_I18N("compareDays: function param is not Date");
         return nullptr;
     }
 
@@ -703,7 +700,7 @@ CalendarType I18nCalendarAddon::GetCalendarType(napi_env env, napi_value value)
         napi_valuetype valueType = napi_valuetype::napi_undefined;
         napi_typeof(env, value, &valueType);
         if (valueType != napi_valuetype::napi_string) {
-            napi_throw_type_error(env, nullptr, "Parameter type does not match");
+            HILOG_ERROR_I18N("GetCalendarType: Parameter type does not match");
             return type;
         }
         int32_t code = 0;
@@ -727,12 +724,12 @@ void I18nCalendarAddon::SetField(napi_env env, napi_value value, UCalendarDateFi
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, value, &valueType);
     if (valueType != napi_valuetype::napi_number) {
-        napi_throw_type_error(env, nullptr, "Parameter type does not match");
+        HILOG_ERROR_I18N("SetField: Parameter type does not match");
         return;
     }
     napi_status status = napi_get_value_int32(env, value, &val);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("Retrieve field failed");
+        HILOG_ERROR_I18N("SetField: Retrieve field failed");
         return;
     }
     if (calendar_ != nullptr) {
@@ -744,8 +741,7 @@ std::string I18nCalendarAddon::GetAddField(napi_env &env, napi_value &value, int
 {
     std::string field = VariableConvertor::GetString(env, value, code);
     if (code != 0) {
-        HILOG_ERROR_I18N("can't get string from js array param.");
-        napi_throw_type_error(env, nullptr, "GetAddField: Failed to obtain the field.");
+        HILOG_ERROR_I18N("GetAddField: can't get string from js array param.");
         return field;
     }
     if (g_fieldsInFunctionAdd.find(field) == g_fieldsInFunctionAdd.end()) {
@@ -786,7 +782,7 @@ void I18nCalendarAddon::SetMilliseconds(napi_env env, napi_value value)
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, value, &valueType);
     if (valueType != napi_valuetype::napi_number) {
-        napi_throw_type_error(env, nullptr, "Parameter type does not match");
+        HILOG_ERROR_I18N("SetMilliseconds: Parameter type does not match");
         return;
     }
     napi_status status = napi_get_value_double(env, value, &milliseconds);

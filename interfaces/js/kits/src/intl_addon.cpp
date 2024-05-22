@@ -282,7 +282,7 @@ std::string GetLocaleTag(napi_env env, napi_value argv)
         napi_valuetype valueType = napi_valuetype::napi_undefined;
         napi_typeof(env, argv, &valueType);
         if (valueType != napi_valuetype::napi_string) {
-            napi_throw_type_error(env, nullptr, "Parameter type does not match");
+            HILOG_ERROR_I18N("GetLocaleTag: Parameter type does not match");
             return "";
         }
         size_t len = 0;
@@ -1377,7 +1377,7 @@ bool GetStringParameter(napi_env env, napi_value value, std::vector<char> &buf)
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, value, &valueType);
     if (valueType != napi_valuetype::napi_string) {
-        napi_throw_type_error(env, nullptr, "Parameter type does not match");
+        HILOG_ERROR_I18N("Parameter type does not match");
         return false;
     }
     size_t len = 0;
@@ -1760,7 +1760,7 @@ napi_value IntlAddon::Select(napi_env env, napi_callback_info info)
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_number) {
-        napi_throw_type_error(env, nullptr, "Parameter type does not match");
+        HILOG_ERROR_I18N("Select: Parameter type does not match");
         return nullptr;
     }
 

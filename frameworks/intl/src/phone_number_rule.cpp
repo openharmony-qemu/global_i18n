@@ -17,6 +17,7 @@
 #include "phonenumbers/phonenumber.h"
 #include "phonenumbers/shortnumberinfo.h"
 #include "phonenumbers/phonenumberutil.h"
+#include "i18n_hilog.h"
 #include "libxml/globals.h"
 #include "libxml/tree.h"
 #include "libxml/xmlstring.h"
@@ -37,7 +38,18 @@ PhoneNumberRule::PhoneNumberRule(std::string& country)
 {
     xmlPath = "/system/usr/ohos_locale_config/phonenumber/" + country + ".xml";
     isFixed = true;
-    if (!std::filesystem::exists(xmlPath)) {
+    try {
+        isFixed = std::filesystem::exists(xmlPath);
+    } catch (const std::filesystem::filesystem_error &except) {
+        HILOG_ERROR_I18N("FileExist failed because filesystem_error, error message: %{public}s.",
+            except.code().message().c_str());
+        isFixed = false;
+    } catch (const std::__h::__fs::filesystem::filesystem_error &except) {
+        HILOG_ERROR_I18N("FileExist failed because filesystem_error, error message: %{public}s.",
+            except.code().message().c_str());
+        isFixed = false;
+    } catch (const std::bad_alloc &except) {
+        HILOG_ERROR_I18N("FileExist failed because bad_alloc, error message: %{public}s.", except.what());
         isFixed = false;
     }
     this->commonExit = false;

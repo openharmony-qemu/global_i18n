@@ -129,7 +129,7 @@ bool VariableConvertor::GetStringArrayFromJsParam(napi_env env, napi_value &jsAr
         napi_get_element(env, jsArray, i, &element);
         std::string str = GetString(env, element, code);
         if (code != 0) {
-            napi_throw_type_error(env, nullptr, "GetStringArrayFromJsParam: Failed to obtain the parameter.");
+            HILOG_ERROR_I18N("GetStringArrayFromJsParam: Failed to obtain the parameter.");
             return false;
         }
         strArray.push_back(str);

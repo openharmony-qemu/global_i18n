@@ -378,7 +378,7 @@ napi_value I18nTimeZoneAddon::GetTimeZoneDisplayName(napi_env env, napi_callback
 
     std::string result;
     if (parameterStatus == -1) {  // -1 represents Invalid parameter.
-        napi_throw_type_error(env, nullptr, "Parameter type does not match");
+        HILOG_ERROR_I18N("GetTimeZoneDisplayName: Parameter type does not match");
         return nullptr;
     } else if (parameterStatus == 0) {
         result = obj->timezone_->GetDisplayName();

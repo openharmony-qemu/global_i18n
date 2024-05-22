@@ -302,7 +302,7 @@ LocaleInfo* ProcessJsParamLocale(napi_env env, napi_value argv)
     int32_t code = 0;
     std::string localeTag = VariableConvertor::GetString(env, argv, code);
     if (code != 0) {
-        napi_throw_type_error(env, nullptr, "ProcessJsParamLocale: Failed to obtain the parameter.");
+        HILOG_ERROR_I18N("ProcessJsParamLocale: Failed to obtain the parameter.");
         return nullptr;
     }
     UErrorCode icuStatus = U_ZERO_ERROR;
@@ -319,7 +319,7 @@ bool ProcessJsParamLocaleList(napi_env env, napi_value argv, std::vector<LocaleI
 {
     std::vector<std::string> localeTagList;
     if (!VariableConvertor::GetStringArrayFromJsParam(env, argv, "localeList", localeTagList)) {
-        napi_throw_type_error(env, nullptr, "ProcessJsParamLocaleList: Failed to obtain the parameter.");
+        HILOG_ERROR_I18N("ProcessJsParamLocaleList: Failed to obtain the parameter.");
         return false;
     }
     if (localeTagList.size() == 0) {
@@ -417,7 +417,7 @@ napi_value I18nAddon::GetThreeLetterLanguage(napi_env env, napi_callback_info in
     int32_t code = 0;
     std::string languageTag = VariableConvertor::GetString(env, argv[0], code);
     if (code != 0) {
-        napi_throw_type_error(env, nullptr, "GetThreeLetterLanguage: Failed to obtain the parameter.");
+        HILOG_ERROR_I18N("GetThreeLetterLanguage: Failed to obtain the parameter.");
         return nullptr;
     }
 
@@ -427,7 +427,7 @@ napi_value I18nAddon::GetThreeLetterLanguage(napi_env env, napi_callback_info in
     status = napi_create_string_utf8(env, language.c_str(), NAPI_AUTO_LENGTH, &result);
     if (status != napi_ok || language == "") {
         HILOG_ERROR_I18N("GetThreeLetterLanguage create string fail or empty");
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "a valid locale", true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "locale", "a valid locale", true);
         return nullptr;
     }
     return result;
@@ -441,7 +441,7 @@ napi_value I18nAddon::GetThreeLetterRegion(napi_env env, napi_callback_info info
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
-        napi_throw_type_error(env, nullptr, "GetThreeLetterRegion: Failed to obtain the parameter.");
+        HILOG_ERROR_I18N("GetThreeLetterRegion: Failed to obtain the parameter.");
         return nullptr;
     } else if (argc < 1) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "", true);
@@ -458,7 +458,7 @@ napi_value I18nAddon::GetThreeLetterRegion(napi_env env, napi_callback_info info
     int32_t code = 0;
     std::string regionTag = VariableConvertor::GetString(env, argv[0], code);
     if (code != 0) {
-        napi_throw_type_error(env, nullptr, "GetThreeLetterRegion: Failed to obtain the parameter.");
+        HILOG_ERROR_I18N("GetThreeLetterRegion: Failed to obtain the parameter.");
         return nullptr;
     }
 
@@ -534,7 +534,7 @@ napi_value I18nAddon::I18nTransliteratorConstructor(napi_env env, napi_callback_
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_string) {
-        napi_throw_type_error(env, nullptr, "I18nTransliteratorConstructor: Parameter type does not match");
+        HILOG_ERROR_I18N("I18nTransliteratorConstructor: Parameter type does not match");
         return nullptr;
     }
     int32_t code = 0;
@@ -589,7 +589,7 @@ napi_value I18nAddon::Transform(napi_env env, napi_callback_info info)
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_string) {
-        napi_throw_type_error(env, nullptr, "Parameter type does not match");
+        HILOG_ERROR_I18N("Transform: Parameter type does not match");
         return nullptr;
     }
     size_t len = 0;
@@ -745,13 +745,13 @@ napi_value I18nAddon::PhoneNumberFormatConstructor(napi_env env, napi_callback_i
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_string) {
-        napi_throw_type_error(env, nullptr, "Parameter type does not match");
+        HILOG_ERROR_I18N("PhoneNumberFormatConstructor: Parameter type does not match");
         return nullptr;
     }
     size_t len = 0;
     status = napi_get_value_string_utf8(env, argv[0], nullptr, 0, &len);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("Get country tag length failed");
+        HILOG_ERROR_I18N("PhoneNumberFormatConstructor: Get country tag length failed");
         return nullptr;
     }
     std::vector<char> country (len + 1);
@@ -804,7 +804,7 @@ napi_value I18nAddon::IsValidPhoneNumber(napi_env env, napi_callback_info info)
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_string) {
-        napi_throw_type_error(env, nullptr, "Parameter type does not match");
+        HILOG_ERROR_I18N("IsValidPhoneNumber: Parameter type does not match");
         return nullptr;
     }
 
@@ -886,7 +886,7 @@ napi_value I18nAddon::FormatPhoneNumber(napi_env env, napi_callback_info info)
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_string) {
-        napi_throw_type_error(env, nullptr, "Parameter type does not match");
+        HILOG_ERROR_I18N("FormatPhoneNumber: Parameter type does not match");
         return nullptr;
     }
 
@@ -976,7 +976,7 @@ napi_value I18nAddon::I18nBreakIteratorConstructor(napi_env env, napi_callback_i
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_string) {
-        napi_throw_type_error(env, nullptr, "Parameter type does not match");
+        HILOG_ERROR_I18N("BreakIteratorConstructor: Parameter type does not match");
         return nullptr;
     }
     int32_t code = 0;
@@ -1188,12 +1188,12 @@ napi_value I18nAddon::Next(napi_env env, napi_callback_info info)
         napi_valuetype valueType = napi_valuetype::napi_undefined;
         napi_typeof(env, argv[0], &valueType);
         if (valueType != napi_valuetype::napi_number) {
-            napi_throw_type_error(env, nullptr, "Parameter type does not match");
+            HILOG_ERROR_I18N("Next: Parameter type does not match");
             return nullptr;
         }
         status = napi_get_value_int32(env, argv[0], &value);
         if (status != napi_ok) {
-            HILOG_ERROR_I18N("Retrieve next value failed");
+            HILOG_ERROR_I18N("Next: Retrieve next value failed");
             return nullptr;
         }
     }
@@ -1226,7 +1226,7 @@ napi_value I18nAddon::SetText(napi_env env, napi_callback_info info)
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_string) {
-        napi_throw_type_error(env, nullptr, "Parameter type does not match");
+        HILOG_ERROR_I18N("SetText: Parameter type does not match");
         return nullptr;
     }
     size_t len = 0;
@@ -1288,7 +1288,7 @@ napi_value I18nAddon::Following(napi_env env, napi_callback_info info)
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_number) {
-        napi_throw_type_error(env, nullptr, "Parameter type does not match");
+        HILOG_ERROR_I18N("Following: Parameter type does not match");
         return nullptr;
     }
     int value;
@@ -1327,7 +1327,7 @@ napi_value I18nAddon::IsBoundary(napi_env env, napi_callback_info info)
     int value;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_number) {
-        napi_throw_type_error(env, nullptr, "Parameter type does not match");
+        HILOG_ERROR_I18N("IsBoundary: Parameter type does not match");
         return nullptr;
     }
     status = napi_get_value_int32(env, argv[0], &value);
@@ -1360,7 +1360,7 @@ napi_value I18nAddon::I18nIndexUtilConstructor(napi_env env, napi_callback_info 
         napi_valuetype valueType = napi_valuetype::napi_undefined;
         napi_typeof(env, argv[0], &valueType);
         if (valueType != napi_valuetype::napi_string) {
-            napi_throw_type_error(env, nullptr, "Parameter type does not match");
+            HILOG_ERROR_I18N("IndexUtilConstructor: Parameter type does not match");
             return nullptr;
         }
         size_t len = 0;
@@ -1477,7 +1477,7 @@ napi_value I18nAddon::AddLocale(napi_env env, napi_callback_info info)
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_string) {
-        napi_throw_type_error(env, nullptr, "Parameter type does not match");
+        HILOG_ERROR_I18N("AddLocale: Parameter type does not match");
         return nullptr;
     }
     size_t len = 0;
@@ -1512,13 +1512,13 @@ napi_value I18nAddon::GetIndex(napi_env env, napi_callback_info info)
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_valuetype::napi_string) {
-        napi_throw_type_error(env, nullptr, "Parameter type does not match");
+        HILOG_ERROR_I18N("GetIndex: Parameter type does not match");
         return nullptr;
     }
     size_t len = 0;
     napi_status status = napi_get_value_string_utf8(env, argv[0], nullptr, 0, &len);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("Get String length failed");
+        HILOG_ERROR_I18N("GetIndex: Get String length failed");
         return nullptr;
     }
     std::vector<char> buf(len + 1);
