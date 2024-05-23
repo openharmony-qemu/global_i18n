@@ -166,7 +166,7 @@ std::string StrReplaceAll(const std::string& str,
     return result;
 }
 
-std::string GetISO3Language(const string language)
+std::string GetISO3Language(const string& language)
 {
     UErrorCode icuStatus = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(language.data(), icuStatus);
@@ -176,7 +176,7 @@ std::string GetISO3Language(const string language)
     return locale.getISO3Language();
 }
 
-std::string GetISO3Country(const string country)
+std::string GetISO3Country(const string& country)
 {
     UErrorCode icuStatus = U_ZERO_ERROR;
     icu::Locale locale;
