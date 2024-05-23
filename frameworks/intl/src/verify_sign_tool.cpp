@@ -385,7 +385,7 @@ bool VerifySignTool::VerifyRsa(RSA* pubkey, const std::string& digest, const std
         EVP_MD_CTX_free(ctx);
         return false;
     }
-    if (EVP_VerifyFinal(ctx, static_cast<unsigned char *>(sign.c_str()), sign.size(), evpKey) != 1) {
+    if (EVP_VerifyFinal(ctx, reinterpret_cast<unsigned char *>(sign.c_str()), sign.size(), evpKey) != 1) {
         EVP_PKEY_free(evpKey);
         EVP_MD_CTX_free(ctx);
         return false;
@@ -428,7 +428,7 @@ int VerifySignTool::CalcFileShaOriginal(const std::string& filePath, unsigned ch
     SHA256_CTX ctx;
     SHA256_Init(&ctx);
     while ((n = fread(buffer, 1, sizeof(buffer), fp))) {
-        SHA256_Update(&ctx, static_cast<unsigned char*>(buffer), n);
+        SHA256_Update(&ctx, reinterpret_cast<unsigned char*>(buffer), n);
     }
     SHA256_Final(hash, &ctx);
     if (fclose(fp) == -1) {
