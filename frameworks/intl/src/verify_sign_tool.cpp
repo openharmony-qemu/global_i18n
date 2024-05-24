@@ -385,7 +385,8 @@ bool VerifySignTool::VerifyRsa(RSA* pubkey, const std::string& digest, const std
         EVP_MD_CTX_free(ctx);
         return false;
     }
-    if (EVP_VerifyFinal(ctx, reinterpret_cast<unsigned char *>(sign.c_str()), sign.size(), evpKey) != 1) {
+    char* signArr = const_cast<char*>(sign.c_str());
+    if (EVP_VerifyFinal(ctx, reinterpret_cast<unsigned char *>(signArr), sign.size(), evpKey) != 1) {
         EVP_PKEY_free(evpKey);
         EVP_MD_CTX_free(ctx);
         return false;
