@@ -34,8 +34,8 @@ std::string PseudoLocalizationProcessor(const std::string &input);
 std::string PseudoLocalizationProcessor(const std::string &input, bool ifEnforce);
 std::string StrReplaceAll(const std::string& str,
     const std::string& target, const std::string& replace);
-std::string GetISO3Language(const std::string language);
-std::string GetISO3Country(const std::string country);
+std::string GetISO3Language(const std::string& language);
+std::string GetISO3Country(const std::string& country);
 std::string trim(std::string &s);
 bool FileExist(const std::string& path);
 bool IsLegalPath(const std::string& path);

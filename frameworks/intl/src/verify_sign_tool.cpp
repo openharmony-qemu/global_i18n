@@ -295,8 +295,8 @@ std::string VerifySignTool::VerifyParamFile(const std::string& filePath)
     std::string sha256Digest;
     std::string line;
     while (std::getline(file, line)) {
-        std::string nextLine;
         if (line.find("Name: " + filePath) != std::string::npos) {
+            std::string nextLine;
             std::getline(file, nextLine);
             std::vector<std::string> strs;
             Split(nextLine, ":", strs);
@@ -385,7 +385,8 @@ bool VerifySignTool::VerifyRsa(RSA* pubkey, const std::string& digest, const std
         EVP_MD_CTX_free(ctx);
         return false;
     }
-    if (EVP_VerifyFinal(ctx, (unsigned char *)sign.c_str(), sign.size(), evpKey) != 1) {
+    char* signArr = const_cast<char*>(sign.c_str());
+    if (EVP_VerifyFinal(ctx, reinterpret_cast<unsigned char *>(signArr), sign.size(), evpKey) != 1) {
         EVP_PKEY_free(evpKey);
         EVP_MD_CTX_free(ctx);
         return false;
@@ -428,7 +429,7 @@ int VerifySignTool::CalcFileShaOriginal(const std::string& filePath, unsigned ch
     SHA256_CTX ctx;
     SHA256_Init(&ctx);
     while ((n = fread(buffer, 1, sizeof(buffer), fp))) {
-        SHA256_Update(&ctx, (unsigned char*)buffer, n);
+        SHA256_Update(&ctx, reinterpret_cast<unsigned char*>(buffer), n);
     }
     SHA256_Final(hash, &ctx);
     if (fclose(fp) == -1) {
