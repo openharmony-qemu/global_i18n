@@ -213,7 +213,25 @@ bool FileExist(const std::string& path)
     }
     return status;
 }
- 
+
+bool FileCopy(const std::string& srcPath, const std::string& dstPath)
+{
+    try {
+        std::filesystem::copy(srcPath.c_str(), dstPath.c_str());
+        return true;
+    } catch (const std::filesystem::filesystem_error &except) {
+        HILOG_ERROR_I18N("utils: FileCopy failed because filesystem_error, error message: %{public}s.",
+            except.code().message().c_str());
+    } catch (const std::__h::__fs::filesystem::filesystem_error &except) {
+        HILOG_ERROR_I18N("utils: FileCopy failed because filesystem_error, error message: %{public}s.",
+            except.code().message().c_str());
+    } catch (const std::bad_alloc &except) {
+        HILOG_ERROR_I18N("utils: FileCopy failed because bad_alloc, error message: %{public}s.",
+            except.what());
+    }
+    return false;
+}
+
 bool IsLegalPath(const std::string& path)
 {
     if (path.find("./") != std::string::npos ||

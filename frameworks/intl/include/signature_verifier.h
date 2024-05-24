@@ -32,7 +32,7 @@ class SignatureVerifier {
 public:
     static bool VerifyCertFile(const std::string& certPath,
         const std::string& verifyPath, const std::string& pubkeyPath, const std::string& manifestPath);
-    static std::string VerifyParamFile(const std::string& filePath,
+    static bool VerifyParamFile(const std::string& filePath,
         const std::string& manifestPath, const std::string& absFilePath);
     static std::string LoadFileVersion(const std::string& versionPath);
     static int CompareVersion(std::string& preVersion, std::string& curVersion);
@@ -41,7 +41,7 @@ private:
     static bool VerifyRsa(RSA* pubkey, const std::string& digest, const std::string& sign);
     static std::string CalcFileSha256Digest(const std::string& path);
     static void CalcBase64(uint8_t* input, uint32_t inputLen, std::string& encodedStr);
-    static int CalcFileShaOriginal(const std::string& filePath, unsigned char* hash, size_t len);
+    static int CalcFileShaOriginal(const std::string& filePath, unsigned char* hash);
     static bool VerifyFileSign(const std::string& pubkeyPath, const std::string& signPath,
         const std::string& digestPath);
     static std::string GetFileStream(const std::string& filePath);
