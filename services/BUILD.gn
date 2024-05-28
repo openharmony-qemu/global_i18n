@@ -15,11 +15,13 @@ import("//build/ohos.gni")
 
 group("i18n_service_ability") {
   deps = [
+    ":hmos_cust_libphonenumber_mount",
     ":hmos_cust_timezone_mount",
     ":i18n_sa",
     ":i18n_sa_client",
     "./etc:i18n_sa_etc",
-    "./etc:prefabrication",
+    "./etc:prefabrication_libphonenumber",
+    "./etc:prefabrication_timezone",
     "./etc:version_txt",
   ]
 }
@@ -97,6 +99,21 @@ ohos_shared_library("i18n_sa") {
 
 ohos_executable("hmos_cust_timezone_mount") {
   sources = [ "src/hmos_timezone_mount.cpp" ]
+
+  include_dirs = [ "../frameworks/intl/include" ]
+  deps = [ "../frameworks/intl:intl_util" ]
+  external_deps = [
+    "hilog:libhilog",
+    "openssl:libcrypto_shared",
+    "openssl:libssl_shared",
+  ]
+  install_images = [ "system" ]
+  part_name = "i18n"
+  subsystem_name = "global"
+}
+
+ohos_executable("hmos_cust_libphonenumber_mount") {
+  sources = [ "src/hmos_libphonenumber_mount.cpp" ]
 
   include_dirs = [ "../frameworks/intl/include" ]
   deps = [ "../frameworks/intl:intl_util" ]

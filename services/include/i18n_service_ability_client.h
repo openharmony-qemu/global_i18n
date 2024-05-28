@@ -89,13 +89,6 @@ public:
      */
     static I18nErrorCode RemovePreferredLanguage(int32_t index);
 
-    /**
-     * @brief Verify the libphonenumber upgrade file.
-     *
-     * @return corresponding file descriptor {metadataFd, geocodingFd}.
-     */
-    static std::pair<int, int> VerifyLibphonenumberUpdate();
-
 private:
     /**
      * @brief Get the proxy of i18n service to access service.

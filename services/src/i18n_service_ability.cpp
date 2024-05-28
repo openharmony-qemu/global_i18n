@@ -22,7 +22,6 @@
 #include "preferences.h"
 #include "preferences_helper.h"
 #include "system_ability_definition.h"
-#include "verify_sign_tool.h"
 #include "i18n_service_ability.h"
 
 namespace OHOS {
@@ -75,11 +74,6 @@ I18nErrorCode I18nServiceAbility::AddPreferredLanguage(const std::string &langua
 I18nErrorCode I18nServiceAbility::RemovePreferredLanguage(int32_t index)
 {
     return PreferredLanguage::RemovePreferredLanguage(index);
-}
-
-std::pair<int, int> I18nServiceAbility::VerifyLibphonenumberUpdate()
-{
-    return VerifySignTool::Parse();
 }
 
 void I18nServiceAbility::UnloadI18nServiceAbility()

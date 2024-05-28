@@ -112,20 +112,6 @@ I18nErrorCode I18nServiceAbilityProxy::RemovePreferredLanguage(int32_t index)
     return ProcessReply(reply.ReadInt32());
 }
 
-std::pair<int, int> I18nServiceAbilityProxy::VerifyLibphonenumberUpdate()
-{
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option;
-    data.WriteInterfaceToken(DESCRIPTOR);
-    Remote()->SendRequest(static_cast<uint32_t>(ILocaleConfigAbilityCode::VERIFY_LIBPHONENUMBER_UPDATE),
-        data, reply, option);
-    int metadataFd = reply.ReadFileDescriptor();
-    int geocodingFd = reply.ReadFileDescriptor();
-    std::pair<int, int> fds = {metadataFd, geocodingFd};
-    return fds;
-}
-
 I18nErrorCode I18nServiceAbilityProxy::ProcessReply(int32_t reply)
 {
     I18nErrorCode err = static_cast<I18nErrorCode>(reply);

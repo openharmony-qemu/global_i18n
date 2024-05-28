@@ -26,7 +26,7 @@
 #include "i18n_hilog.h"
 #include "signature_verifier.h"
 #include "utils.h"
- 
+
 namespace OHOS {
 namespace Global {
 namespace I18n {
@@ -34,7 +34,7 @@ namespace {
     const int32_t BASE64_ENCODE_PACKET_LEN = 3;
     const int32_t BASE64_ENCODE_LEN_OF_EACH_GROUP_DATA = 4;
 }
- 
+
 const int SignatureVerifier::HASH_BUFFER_SIZE = 4096;
 const int SignatureVerifier::MIN_SIZE = 2;
 const int SignatureVerifier::VERSION_SIZE = 4;
@@ -62,7 +62,7 @@ std::string SignatureVerifier::LoadFileVersion(const std::string& versionPath)
     file.close();
     return version;
 }
- 
+
 // compare version
 int SignatureVerifier::CompareVersion(std::string& preVersion, std::string& curVersion)
 {
@@ -115,17 +115,17 @@ bool SignatureVerifier::VerifyCertFile(const std::string& certPath, const std::s
 
  
 // verify param file digest
-std::string SignatureVerifier::VerifyParamFile(const std::string& fileName, const std::string& filePath,
+bool SignatureVerifier::VerifyParamFile(const std::string& fileName, const std::string& filePath,
     const std::string& manifestPath)
 {
     std::ifstream file(manifestPath);
     if (!file.good()) {
-        return "manifestPath error";
+        return false;
     }
     std::string absFilePath = filePath + fileName;
     std::ifstream paramFile(absFilePath);
     if (!paramFile.good()) {
-        return "paramFile error";
+        return false;
     }
     std::string sha256Digest;
     std::string line;
@@ -136,7 +136,7 @@ std::string SignatureVerifier::VerifyParamFile(const std::string& fileName, cons
             std::vector<std::string> strs;
             Split(nextLine, ":", strs);
             if (strs.size() < MIN_SIZE) {
-                return "strs wrong";
+                return false;
             }
             sha256Digest = strs[1];
             sha256Digest = trim(sha256Digest);
@@ -144,13 +144,13 @@ std::string SignatureVerifier::VerifyParamFile(const std::string& fileName, cons
         }
     }
     if (sha256Digest.empty()) {
-        return "empty";
+        return false;
     }
     std::string fileDigest = CalcFileSha256Digest(absFilePath);
     if (fileDigest == sha256Digest) {
-        return fileDigest;
+        return true;
     }
-    return "unknow error";
+    return false;
 }
  
  
@@ -224,7 +224,7 @@ bool SignatureVerifier::VerifyRsa(RSA* pubkey, const std::string& digest, const 
 std::string SignatureVerifier::CalcFileSha256Digest(const std::string& path)
 {
     unsigned char res[SHA256_DIGEST_LENGTH] = {0};
-    CalcFileShaOriginal(path, res, SHA256_DIGEST_LENGTH);
+    CalcFileShaOriginal(path, res);
     std::string dist;
     CalcBase64(res, SHA256_DIGEST_LENGTH, dist);
     return dist;
@@ -239,9 +239,9 @@ void SignatureVerifier::CalcBase64(uint8_t* input, uint32_t inputLen, std::strin
     encodedStr = std::string(reinterpret_cast<char*>(base64Str.get()), outLen);
 }
  
-int SignatureVerifier::CalcFileShaOriginal(const std::string& filePath, unsigned char* hash, size_t len)
+int SignatureVerifier::CalcFileShaOriginal(const std::string& filePath, unsigned char* hash)
 {
-    if (filePath.empty() || hash == nullptr || !IsLegalPath(filePath) || len < SHA256_DIGEST_LENGTH) {
+    if (filePath.empty() || hash == nullptr || !IsLegalPath(filePath)) {
         return -1;
     }
     FILE* fp = fopen(filePath.c_str(), "rb");

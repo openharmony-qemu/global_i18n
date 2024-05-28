@@ -91,13 +91,6 @@ public:
      */
     I18nErrorCode RemovePreferredLanguage(int32_t index);
 
-    /**
-     * @brief Verify the libphonenumber upgrade file.
-     *
-     * @return corresponding file descriptor {metadataFd, geocodingFd}.
-     */
-    std::pair<int, int> VerifyLibphonenumberUpdate();
-
 private:
     static I18nErrorCode ProcessReply(int32_t reply);
     static inline BrokerDelegator<I18nServiceAbilityProxy> delegator_;

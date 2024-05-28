@@ -106,23 +106,6 @@ I18nErrorCode I18nServiceAbilityClient::RemovePreferredLanguage(int32_t index)
     }
     return i18nServiceAbilityObj->RemovePreferredLanguage(index);
 }
-
-std::pair<int, int> I18nServiceAbilityClient::VerifyLibphonenumberUpdate()
-{
-    I18nErrorCode err = I18nErrorCode::SUCCESS;
-    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
-    if (i18nServiceAbilityObj == nullptr) {
-        return {-1, -1};
-    }
-    return i18nServiceAbilityObj->VerifyLibphonenumberUpdate();
-}
-
-extern "C" void VerifyLibphonenumberUpdate(int* metadataFd, int* geocodingFd)
-{
-    std::pair<int, int> fds = I18nServiceAbilityClient::VerifyLibphonenumberUpdate();
-    *metadataFd = fds.first;
-    *geocodingFd = fds.second;
-}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

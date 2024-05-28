@@ -85,8 +85,6 @@ void I18nServiceAbilityStub::InitInnerFuncMap()
         &I18nServiceAbilityStub::AddPreferredLanguageInner;
     innerFuncMap[static_cast<uint32_t>(ILocaleConfigAbilityCode::REMOVE_PREFERRED_LANGUAGE)] =
         &I18nServiceAbilityStub::RemovePreferredLanguageInner;
-    innerFuncMap[static_cast<uint32_t>(ILocaleConfigAbilityCode::VERIFY_LIBPHONENUMBER_UPDATE)] =
-        &I18nServiceAbilityStub::VerifyLibphonenumberUpdateInner;
 }
 
 /**
@@ -251,17 +249,6 @@ int32_t I18nServiceAbilityStub::RemovePreferredLanguageInner(MessageParcel &data
             static_cast<int32_t>(err));
     }
     reply.WriteInt32(static_cast<int32_t>(err));
-    Memory::MemMgrClient::GetInstance().SetCritical(pid, false, I18N_SA_ID);
-    return 0;
-}
-
-int32_t I18nServiceAbilityStub::VerifyLibphonenumberUpdateInner(MessageParcel &data, MessageParcel &reply)
-{
-    int pid = getpid();
-    Memory::MemMgrClient::GetInstance().SetCritical(pid, true, I18N_SA_ID);
-    std::pair<int, int> fds = VerifyLibphonenumberUpdate();
-    reply.WriteFileDescriptor(fds.first);
-    reply.WriteFileDescriptor(fds.second);
     Memory::MemMgrClient::GetInstance().SetCritical(pid, false, I18N_SA_ID);
     return 0;
 }
