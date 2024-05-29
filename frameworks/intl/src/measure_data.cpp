@@ -570,16 +570,16 @@ bool ConvertByte(double& number, std::string& unit)
         tempNumber *= -1;
     }
     std::string tempUnit = unit;
-    size_t indexFirst = -1;
+    int indexFirst = -1;
     for (size_t i = 0; i < BYTE_VALUE.size(); i++) {
         if (BYTE_VALUE[i] == tempUnit) {
-            indexFirst = i;
+            indexFirst = static_cast<int>(i);
             break;
         }
     }
     bool status = (indexFirst >= 0);
-    size_t indexSecond = indexFirst;
-    for (size_t i = indexFirst; i > 0; i--) {
+    size_t indexSecond = status ? static_cast<size_t>(indexFirst) : 0;
+    for (size_t i = indexSecond; i > 0; i--) {
         if (tempNumber < 1) {
             // 10 ^ 3 is the threshold for carry
             tempNumber *= pow(10, 3);
@@ -615,16 +615,16 @@ bool ConvertDate(double& number, std::string& unit)
     }
     std::string tempUnit = unit;
 
-    size_t indexFirst = -1;
+    int indexFirst = -1;
     for (size_t i = 0; i < DATE_VALUE.size(); i++) {
         if (DATE_VALUE[i].first == tempUnit) {
-            indexFirst = i;
+            indexFirst = static_cast<int>(i);
             break;
         }
     }
     bool status = (indexFirst >= 0);
-    size_t indexSecond = indexFirst;
-    for (size_t i = indexFirst; i > 0; i--) {
+    size_t indexSecond = status ? static_cast<size_t>(indexFirst) : 0;
+    for (size_t i = indexSecond; i > 0; i--) {
         if (tempNumber < 1) {
             tempNumber *= DATE_VALUE[i].second;
             tempUnit = DATE_VALUE[i - 1].first;
