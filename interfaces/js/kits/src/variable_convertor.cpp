@@ -103,7 +103,8 @@ std::string VariableConvertor::GetString(napi_env &env, napi_value &value, int32
         code = 1;
         return "";
     }
-    return buf.data();
+    std::string result(buf.data());
+    return result;
 }
 
 bool VariableConvertor::GetStringArrayFromJsParam(napi_env env, napi_value &jsArray, const std::string& valueName,
