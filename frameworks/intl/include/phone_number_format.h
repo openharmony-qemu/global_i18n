@@ -21,11 +21,13 @@
 #include <mutex>
 #include "memory"
 #include "phonenumbers/phonenumberutil.h"
+#include "phonenumbers/asyoutypeformatter.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
 using i18n::phonenumbers::PhoneNumberUtil;
+using i18n::phonenumbers::AsYouTypeFormatter;
 using ExposeLocationName = int (*)(const char*, const char*, char*, const int);
 using GetBlockedRegionName = bool (*)(const char*, const char*);
 using GetBlockedPhoneLocationName = int (*)(const char*, const char*, char*);
@@ -50,7 +52,9 @@ public:
 private:
     PhoneNumberUtil* GetPhoneNumberUtil();
     void OpenHandler();
+    std::string GetAsYouTypeFormatResult(const std::string &number) const;
     PhoneNumberUtil *util;
+    std::unique_ptr<AsYouTypeFormatter> formatter = nullptr;
     std::string country;
     PhoneNumberUtil::PhoneNumberFormat phoneNumberFormat;
     static void* dynamicHandler;
