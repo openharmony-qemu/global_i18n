@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 #include "phone_number_format.h"
-
 #include <dlfcn.h>
 
 #include "unicode/localebuilder.h"
@@ -28,7 +27,6 @@
 #include "taboo_utils.h"
 #include "utility"
 #include "utils.h"
-
 
 namespace OHOS {
 namespace Global {
@@ -66,6 +64,9 @@ PhoneNumberFormat::PhoneNumberFormat(const std::string &countryTag,
         phoneNumberFormat = type2PhoneNumberFormat[type];
     } else {
         phoneNumberFormat = PhoneNumberUtil::PhoneNumberFormat::NATIONAL;
+    }
+    if (type.compare("TYPING") == 0) {
+        formatter = std::unique_ptr<AsYouTypeFormatter>(util->GetAsYouTypeFormatter(country));
     }
 }
 
@@ -115,8 +116,26 @@ std::string PhoneNumberFormat::format(const std::string &number) const
         return PseudoLocalizationProcessor("");
     }
     std::string formatted_number;
-    util->Format(phoneNumber, phoneNumberFormat, &formatted_number);
+    if (formatter != nullptr) {
+        formatted_number = GetAsYouTypeFormatResult(number);
+    } else {
+        util->Format(phoneNumber, phoneNumberFormat, &formatted_number);
+    }
     return PseudoLocalizationProcessor(formatted_number);
+}
+
+std::string PhoneNumberFormat::GetAsYouTypeFormatResult(const std::string &number) const
+{
+    if (formatter == nullptr) {
+        return number;
+    }
+    formatter->Clear();
+    std::string result;
+    std::string formattedNumber;
+    for (char c : number) {
+        formattedNumber = formatter->InputDigit(c, &result);
+    }
+    return formattedNumber;
 }
 
 __attribute__((no_sanitize("cfi"))) std::string PhoneNumberFormat::getLocationName(

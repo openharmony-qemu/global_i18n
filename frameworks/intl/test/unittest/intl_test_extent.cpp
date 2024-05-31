@@ -224,17 +224,29 @@ HWTEST_F(IntlTest, IntlFuncTest0053, TestSize.Level1)
     map<string, string> options = {
         { "type", "national" }
     };
-    PhoneNumberFormat *phoneNumberFormat = new PhoneNumberFormat("zh-CN", options);
+    std::unique_ptr<PhoneNumberFormat> phoneNumberFormat =
+        std::make_unique<PhoneNumberFormat>("zh-CN", options);
     std::string location = phoneNumberFormat->getLocationName("18622350085", "zh-CN");
     EXPECT_EQ(location, "天津市");
     bool flag = phoneNumberFormat->isValidPhoneNumber("+8618622350085");
     EXPECT_TRUE(flag);
-    std::string number = "+8618622350085";
-    std::string formated = phoneNumberFormat->format(number);
-    EXPECT_EQ(formated, "186 2235 0085");
+    std::string number2 = "+8618622350085";
+    std::string formatResult = phoneNumberFormat->format(number2);
+    EXPECT_EQ(formatResult, "186 2235 0085");
     std::string location2 = phoneNumberFormat->getLocationName("fake-number", "zh-CN");
     EXPECT_EQ(location2, "");
-    delete phoneNumberFormat;
+
+    map<string, string> options2 = {
+        { "type", "TYPING" }
+    };
+    std::unique_ptr<PhoneNumberFormat> phoneNumFmt =
+        std::make_unique<PhoneNumberFormat>("zh-CN", options2);
+    std::string number = "186223500";
+    std::string formated = phoneNumFmt->format(number);
+    EXPECT_EQ(formated, "186 2235 00");
+    number = "075576453";
+    formated = phoneNumFmt->format(number);
+    EXPECT_EQ(formated, "0755 7645 3");
 }
 
 /**
