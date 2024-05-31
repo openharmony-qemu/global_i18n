@@ -49,8 +49,6 @@
 #include "intl_test.h"
 #include "generate_ics_file.h"
 #include <unistd.h>
-#include <chrono>
-#include <iomanip>
 
 using namespace OHOS::Global::I18n;
 using testing::ext::TestSize;
@@ -233,8 +231,8 @@ HWTEST_F(IntlTest, IntlFuncTest0053, TestSize.Level1)
     bool flag = phoneNumberFormat->isValidPhoneNumber("+8618622350085");
     EXPECT_TRUE(flag);
     std::string number2 = "+8618622350085";
-    std::string formateResult = phoneNumberFormat->format(number2);
-    EXPECT_EQ(formateResult, "186 2235 0085");
+    std::string formatResult = phoneNumberFormat->format(number2);
+    EXPECT_EQ(formatResult, "186 2235 0085");
     std::string location2 = phoneNumberFormat->getLocationName("fake-number", "zh-CN");
     EXPECT_EQ(location2, "");
 
@@ -244,18 +242,10 @@ HWTEST_F(IntlTest, IntlFuncTest0053, TestSize.Level1)
     std::unique_ptr<PhoneNumberFormat> phoneNumFmt =
         std::make_unique<PhoneNumberFormat>("zh-CN", options2);
     std::string number = "186223500";
-    auto start = std::chrono::steady_clock::now();
     std::string formated = phoneNumFmt->format(number);
-    auto end = std::chrono::steady_clock::now();
-    auto dt = end - start;
-    printf("cost time is %lld \n.", dt.count());
     EXPECT_EQ(formated, "186 2235 00");
     number = "075576453";
-    auto start2 = std::chrono::steady_clock::now();
     formated = phoneNumFmt->format(number);
-    auto end2 = std::chrono::steady_clock::now();
-    auto dt2 = end2 - start2;
-    printf("cost time is %lld \n.", dt2.count());
     EXPECT_EQ(formated, "0755 7645 3");
 }
 
