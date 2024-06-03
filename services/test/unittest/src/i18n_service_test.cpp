@@ -27,7 +27,7 @@ using namespace std;
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static const uint64_t selfTokenId = GetSelfTokenID();
+static const uint64_t SELF_TOKEN_ID = GetSelfTokenID();
 static constexpr int32_t I18N_UID = 3013;
 static constexpr int32_t ROOT_UID = 0;
 
@@ -53,7 +53,7 @@ void I18nServiceTest::TearDown(void)
 
 void RemoveNativeTokenTypeAndPermissions()
 {
-    SetSelfTokenID(selfTokenId);
+    SetSelfTokenID(SELF_TOKEN_ID);
     seteuid(ROOT_UID);
     OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
     seteuid(I18N_UID);
