@@ -212,9 +212,8 @@ I18nErrorCode PreferredLanguage::RemovePreferredLanguage(int32_t index)
         HILOG_ERROR_I18N("PreferredLanguage::RemovePreferredLanguage can't remove the only language.");
         return I18nErrorCode::REMOVE_PREFERRED_LANGUAGE_FAILED;
     }
-    unsigned int arrayIndexLessValue = 1;
     // valid index is [0, preferredLanguages.size() - 1] for Remove
-    int32_t validIndex = NormalizeIndex(index, preferredLanguages.size() - arrayIndexLessValue);
+    int32_t validIndex = NormalizeIndex(index, preferredLanguages.size() - 1);
     preferredLanguages.erase(preferredLanguages.begin() + validIndex);
     // The first language in preferred language list is system language, therefor when first language changed
     // in preferred language list, we need to reset system language.
@@ -249,10 +248,9 @@ void PreferredLanguage::AddNonExistPreferredLanguage(const std::string& language
 void PreferredLanguage::AddExistPreferredLanguage(const std::string& language, int32_t index,
     std::vector<std::string> &preferredLanguages, I18nErrorCode &errCode)
 {
-    unsigned int arrayIndexLessValue = 1;
     // throw error when current index is same with target index.
     // valid index is [0, GetPreferredLanguageList().size() - 1] for add exist language.
-    int32_t validIndex = NormalizeIndex(index, GetPreferredLanguageList().size() - arrayIndexLessValue);
+    int32_t validIndex = NormalizeIndex(index, GetPreferredLanguageList().size() - 1);
     int32_t languageIdx = FindLanguage(language);
     if (languageIdx == validIndex) {
         errCode = I18nErrorCode::ADD_PREFERRED_LANGUAGE_EXIST_FAILED;

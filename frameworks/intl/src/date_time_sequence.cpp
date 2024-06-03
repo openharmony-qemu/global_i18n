@@ -25,143 +25,45 @@ namespace Global {
 namespace I18n {
 
 const std::unordered_map<std::string, std::string> DateTimeSequence::DATE_ORDER_MAP = {
-    { "ug", "M-d-y" },
-    { "ar", "y-M-d" },
-    { "fa", "y-M-d" },
-    { "ur", "y-M-d" },
-    { "iw", "y-M-d" },
-    { "he", "y-M-d" },
+    { "ug", "L-d-y" },
+    { "ar", "y-L-d" },
+    { "fa", "y-L-d" },
+    { "ur", "y-L-d" },
+    { "iw", "y-L-d" },
+    { "he", "y-L-d" },
 };
 
-const std::unordered_map<std::string, std::string> DateTimeSequence::DATETIME_ORDER_MAP = {
-    { "ug", "01" },
-    { "ar", "10" },
-    { "fa", "01" },
-    { "ur", "10" },
-    { "iw", "10" },
-    { "he", "10" },
-};
-
-const std::unordered_map<std::string, std::string> DateTimeSequence::AM_PM_TIME_ORDER_MAP = {
-    { "ug", "10" },
-    { "ar", "01" },
-    { "fa", "01" },
-    { "ur", "10" },
-    { "iw", "01" },
-    { "he", "01" },
-};
-
-OrderResult DateTimeSequence::GetDateOrder(const std::string &locale)
+std::string DateTimeSequence::GetDateOrder(const std::string &locale)
 {
     UErrorCode icuStatus = U_ZERO_ERROR;
-    OrderResult orderResult;
     icu::Locale localeObj = icu::Locale::forLanguageTag(locale.data(), icuStatus);
     if (U_FAILURE(icuStatus)) {
         HILOG_ERROR_I18N("Failed to create locale for GetDateOrder");
-        return orderResult;
+        return "";
     }
     const char* language = localeObj.getBaseName();
     if (language == nullptr) {
         HILOG_ERROR_I18N("%{public}s getBaseName is null.", locale.c_str());
-        return orderResult;
+        return "";
     }
     std::string languageTag = language;
     if (DATE_ORDER_MAP.find(languageTag) != DATE_ORDER_MAP.end()) {
-        orderResult.dateOrder = DATE_ORDER_MAP.find(languageTag)->second;
-        return orderResult;
+        std::string dateOrder = DATE_ORDER_MAP.find(languageTag)->second;
+        return dateOrder;
     }
     icu::SimpleDateFormat* formatter = dynamic_cast<icu::SimpleDateFormat*>
         (icu::DateFormat::createDateInstance(icu::DateFormat::EStyle::kDefault, localeObj));
     if (U_FAILURE(icuStatus) || formatter == nullptr) {
         HILOG_ERROR_I18N("Failed to create SimpleDateFormat");
-        return orderResult;
+        return "";
     }
     std::string tempValue;
     icu::UnicodeString unistr;
     formatter->toPattern(unistr);
     unistr.toUTF8String<std::string>(tempValue);
     std::string value = ModifyOrder(tempValue);
-    std::regex pattern("d+");
-    std::regex reg("M+");
-    value = regex_replace(value, pattern, "d");
-    value = regex_replace(value, reg, "M");
-    orderResult = {value};
     delete formatter;
-    return orderResult;
-}
-
-OrderResult DateTimeSequence::GetDateTimeOrder(const std::string &locale)
-{
-    UErrorCode status = U_ZERO_ERROR;
-    OrderResult orderResult;
-    icu::Locale localeObj = icu::Locale::forLanguageTag(locale.data(), status);
-    if (U_FAILURE(status)) {
-        HILOG_ERROR_I18N("Failed to create locale with inputs: %{public}s", locale.c_str());
-        orderResult.dateTimeOrder = "-1";
-        return orderResult;
-    }
-    const char* language = localeObj.getBaseName();
-    std::string languageTag = language == nullptr ? "" : language;
-    if (DATETIME_ORDER_MAP.find(languageTag) != DATETIME_ORDER_MAP.end()) {
-        orderResult.dateTimeOrder = DATETIME_ORDER_MAP.find(languageTag)->second;
-        return orderResult;
-    }
-    icu::SimpleDateFormat* formatter = dynamic_cast<icu::SimpleDateFormat*>
-        (icu::DateFormat::createDateInstance(icu::DateFormat::EStyle::kDateTime, localeObj));
-    if (status != U_ZERO_ERROR || formatter == nullptr) {
-        HILOG_ERROR_I18N("Failed to create SimpleDateFormat");
-        orderResult.dateTimeOrder = "-1";
-        return orderResult;
-    }
-    icu::UnicodeString pattern;
-    formatter->toPattern(pattern);
-    std::string result;
-    pattern.toUTF8String<std::string>(result);
-
-    std::regex pattrn("0([^01]+)1");
-    std::smatch match;
-    bool found = std::regex_search(result, match, pattrn);
-    // 1 represent date position, 0 represent time position
-    std::string dateTimeOrder = found ? "01" : "10";
-    orderResult = {result, dateTimeOrder};
-    delete formatter;
-    return orderResult;
-}
-
-OrderResult DateTimeSequence::GetAmPmTimeOrder(const std::string &locale)
-{
-    UErrorCode status = U_ZERO_ERROR;
-    OrderResult orderResult;
-    icu::Locale localeObj = icu::Locale::forLanguageTag(locale.data(), status);
-    if (status != U_ZERO_ERROR) {
-        HILOG_ERROR_I18N("Failed to create locale with inputs: %{public}s", locale.c_str());
-        orderResult.amPmTimeOrder = "-1";
-        return orderResult;
-    }
-    const char* language = localeObj.getBaseName();
-    std::string languageTag = language == nullptr ? "" : language;
-    if (AM_PM_TIME_ORDER_MAP.find(languageTag) != AM_PM_TIME_ORDER_MAP.end()) {
-        orderResult.amPmTimeOrder = AM_PM_TIME_ORDER_MAP.find(languageTag)->second;
-        return orderResult;
-    }
-    icu::DateTimePatternGenerator* gen = icu::DateTimePatternGenerator::createInstance(localeObj, status);
-    icu::UnicodeString skeleton("h");
-    icu::UnicodeString resultStr = gen->getBestPattern(skeleton, status);
-    if (U_FAILURE(status) || gen == nullptr) {
-        HILOG_ERROR_I18N("Failed to create DateTimePatternGenerator");
-        orderResult.amPmTimeOrder = "-1";
-        return orderResult;
-    }
-    std::string result;
-    resultStr.toUTF8String<std::string>(result);
-    std::regex pattrn("a[^ah]*h");
-    std::smatch match;
-    bool found = std::regex_search(result, match, pattrn);
-    // 0 represent am/pm position
-    std::string amPmTimeOrder = found ? "01" : "10"; // 1 represent time position
-    orderResult = {result, "", amPmTimeOrder};
-    delete gen;
-    return orderResult;
+    return value;
 }
 
 std::string DateTimeSequence::ModifyOrder(std::string &pattern)
@@ -179,7 +81,7 @@ std::string DateTimeSequence::ModifyOrder(std::string &pattern)
     }
     std::unordered_map<char, int> pattern2index = {
         { 'y', 1 },
-        { 'M', 2 },
+        { 'L', 2 },
         { 'd', 3 },
     };
     std::string ret;
@@ -207,7 +109,7 @@ void DateTimeSequence::ProcessNormal(char ch, int *order, size_t orderSize, int 
         adjust = 'd';
         index = 3; // 3 is the index of 'd'
     } else if ((ch == 'L') || (ch == 'M')) {
-        adjust = 'M';
+        adjust = 'L';
         index = 2; // 2 is the index of 'M'
     } else if (ch == 'y') {
         adjust = 'y';

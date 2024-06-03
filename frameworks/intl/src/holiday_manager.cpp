@@ -149,6 +149,7 @@ std::string HolidayManager::ValidateHolidayFilePath(const char* path)
     }
     std::ifstream file(path);
     if (!file.good()) {
+        free(realpathRes);
         file.close();
         return "the holiday resource file can't read.";
     }
