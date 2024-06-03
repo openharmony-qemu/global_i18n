@@ -235,18 +235,6 @@ HWTEST_F(IntlTest, IntlFuncTest0053, TestSize.Level1)
     EXPECT_EQ(formatResult, "186 2235 0085");
     std::string location2 = phoneNumberFormat->getLocationName("fake-number", "zh-CN");
     EXPECT_EQ(location2, "");
-
-    map<string, string> options2 = {
-        { "type", "TYPING" }
-    };
-    std::unique_ptr<PhoneNumberFormat> phoneNumFmt =
-        std::make_unique<PhoneNumberFormat>("zh-CN", options2);
-    std::string number = "186223500";
-    std::string formated = phoneNumFmt->format(number);
-    EXPECT_EQ(formated, "186 2235 00");
-    number = "075576453";
-    formated = phoneNumFmt->format(number);
-    EXPECT_EQ(formated, "0755 7645 3");
 }
 
 /**
@@ -891,6 +879,56 @@ HWTEST_F(IntlTest, IntlFuncTest0072, TestSize.Level1)
     locale = "ug";
     result = DateTimeSequence::GetDateOrder(locale);
     EXPECT_EQ(result, "L-d-y");
+}
+
+/**
+ * @tc.name: IntlFuncTest0073
+ * @tc.desc: Test PhoneNumberFormat.format()
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0073, TestSize.Level1)
+{
+    map<string, string> options = {
+        { "type", "TYPING" }
+    };
+    std::unique_ptr<PhoneNumberFormat> phoneNumFmt =
+        std::make_unique<PhoneNumberFormat>("zh-CN", options);
+    std::string number = "186223500";
+    std::string formated = "";
+    for (char c : number) {
+        formated =  formated + c;
+        formated = phoneNumFmt->format(formated);
+    }
+    EXPECT_EQ(formated, "186 2235 00");
+    number = "";
+    formated = phoneNumFmt->format(number);
+
+    number = "075576453";
+    for (char c : number) {
+        formated =  formated + c;
+        formated = phoneNumFmt->format(formated);
+    }
+    EXPECT_EQ(formated, "0755 7645 3");
+
+    std::unique_ptr<PhoneNumberFormat> phoneNumFmt2 =
+        std::make_unique<PhoneNumberFormat>("AD", options);
+    number = "7";
+    formated = phoneNumFmt2->format(number);
+    number = formated + "1";
+    formated = phoneNumFmt2->format(number);
+    number = formated + "2";
+    formated = phoneNumFmt2->format(number);
+    number = formated + "3";
+    formated = phoneNumFmt2->format(number);
+    number = formated + "9";
+    formated = phoneNumFmt2->format(number);
+    number = formated.substr(0, formated.length() - 1);
+    formated = phoneNumFmt2->format(number);
+    number = formated + "4";
+    formated = phoneNumFmt2->format(number);
+    number = formated + "5";
+    formated = phoneNumFmt2->format(number);
+    EXPECT_EQ(formated, "712 345");
 }
 } // namespace I18n
 } // namespace Global

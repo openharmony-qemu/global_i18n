@@ -59,6 +59,7 @@ private:
     PhoneNumberUtil::PhoneNumberFormat phoneNumberFormat;
     static void* dynamicHandler;
     static std::mutex phoneMutex;
+    static std::mutex AS_YOU_TYPE_FORMAT_MUTEX;
 };
 } // namespace I18n
 } // namespace Global

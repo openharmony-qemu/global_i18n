@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "phone_number_format.h"
+#include <cctype>
 #include <dlfcn.h>
 
 #include "unicode/localebuilder.h"
@@ -35,6 +36,7 @@ const int RECV_CHAR_LEN = 128;
 using i18n::phonenumbers::PhoneNumberUtil;
 void* PhoneNumberFormat::dynamicHandler = nullptr;
 std::mutex PhoneNumberFormat::phoneMutex;
+std::mutex PhoneNumberFormat::AS_YOU_TYPE_FORMAT_MUTEX;
 
 PhoneNumberFormat::PhoneNumberFormat(const std::string &countryTag,
                                      const std::map<std::string, std::string> &options)
@@ -110,30 +112,50 @@ bool PhoneNumberFormat::isValidPhoneNumber(const std::string &number) const
 
 std::string PhoneNumberFormat::format(const std::string &number) const
 {
+    std::string formatted_number;
+    if (formatter != nullptr) {
+        formatted_number = GetAsYouTypeFormatResult(number);
+        return PseudoLocalizationProcessor(formatted_number);
+    }
     i18n::phonenumbers::PhoneNumber phoneNumber;
     PhoneNumberUtil::ErrorType type = util->Parse(number, country, &phoneNumber);
     if (type != PhoneNumberUtil::ErrorType::NO_PARSING_ERROR) {
         return PseudoLocalizationProcessor("");
     }
-    std::string formatted_number;
-    if (formatter != nullptr) {
-        formatted_number = GetAsYouTypeFormatResult(number);
-    } else {
-        util->Format(phoneNumber, phoneNumberFormat, &formatted_number);
-    }
+    util->Format(phoneNumber, phoneNumberFormat, &formatted_number);
     return PseudoLocalizationProcessor(formatted_number);
 }
 
 std::string PhoneNumberFormat::GetAsYouTypeFormatResult(const std::string &number) const
 {
+    std::lock_guard<std::mutex> formatLock(AS_YOU_TYPE_FORMAT_MUTEX);
     if (formatter == nullptr) {
         return number;
     }
-    formatter->Clear();
     std::string result;
     std::string formattedNumber;
-    for (char c : number) {
-        formattedNumber = formatter->InputDigit(c, &result);
+    size_t len = number.length();
+    if (len == 0) {
+        formatter->Clear();
+        return number;
+    }
+    int currIndex = formatter->GetRememberedPosition();
+    size_t start = 0;
+    if (currIndex > static_cast<int>(len)) {
+        formatter->Clear();
+    } else {
+        start = static_cast<size_t>(currIndex);
+    }
+    for (size_t i = start; i < len; i++) {
+        char c = number.at(i);
+        if (!isdigit(c)) {
+            continue;
+        }
+        if (i == len - 1) {
+            formattedNumber = formatter->InputDigitAndRememberPosition(c, &result);
+        } else {
+            formattedNumber = formatter->InputDigit(c, &result);
+        }
     }
     return formattedNumber;
 }
