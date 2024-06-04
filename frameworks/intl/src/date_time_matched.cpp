@@ -28,7 +28,9 @@ DateTimeMatched::DateTimeMatched(std::string& locale)
 
 DateTimeMatched::~DateTimeMatched()
 {
-    delete dateRuleInit;
+    if (dateRuleInit != nullptr) {
+        delete dateRuleInit;
+    }
 }
 
 std::vector<int> DateTimeMatched::GetMatchedDateTime(icu::UnicodeString& message)

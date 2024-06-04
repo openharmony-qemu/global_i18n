@@ -303,6 +303,10 @@ std::vector<MatchedDateTimeInfo> DateTimeFilter::FilterDateTime(icu::UnicodeStri
             icu::UnicodeString joiner = content.tempSubString(lastMatch.GetEnd(),
                 match.GetBegin() - lastMatch.GetEnd());
             icu::RegexMatcher* matcher = pattern->matcher(joiner, status);
+            if (matcher == nullptr) {
+                HILOG_ERROR_I18N("FilterDateTime failed because pattern matcher failed.");
+                return matches;
+            }
             bool isJoiner = (joiner.trim().isEmpty()) ? true : matcher->matches(status);
             // the substring meets the rule, the two times are combined.
             if (isJoiner) {
