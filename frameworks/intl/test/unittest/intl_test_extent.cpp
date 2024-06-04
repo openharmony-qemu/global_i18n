@@ -901,6 +901,7 @@ HWTEST_F(IntlTest, IntlFuncTest0073, TestSize.Level1)
     }
     EXPECT_EQ(formated, "186 2235 00");
 
+    formated = "";
     number = "075576453";
     for (char c : number) {
         formated = formated + c;
