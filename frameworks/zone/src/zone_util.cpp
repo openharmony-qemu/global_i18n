@@ -28,7 +28,7 @@ using namespace icu;
 using namespace std;
 
 const char *ZoneUtil::COUNTRY_ZONE_DATA_PATH = "/system/usr/ohos_timezone/tzlookup.xml";
-const char *ZoneUtil::DISTRO_COUNTRY_ZONE_DATA_PATH = "/system/etc/tzdata_distro/tzlookup.xml";
+const char *ZoneUtil::DISTRO_COUNTRY_ZONE_DATA_PATH = "/system/etc/tzdata_distro/hos/tzlookup.xml";
 const char *ZoneUtil::DEFAULT_TIMEZONE = "GMT";
 const char *ZoneUtil::TIMEZONES_TAG = "timezones";
 const char *ZoneUtil::ID_TAG = "id";
