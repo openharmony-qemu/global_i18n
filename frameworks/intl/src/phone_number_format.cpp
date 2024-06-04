@@ -15,7 +15,7 @@
 #include "phone_number_format.h"
 #include <cctype>
 #include <dlfcn.h>
-
+#include <regex>
 #include "unicode/localebuilder.h"
 #include "locale_config.h"
 #include "unicode/locid.h"
@@ -37,6 +37,7 @@ using i18n::phonenumbers::PhoneNumberUtil;
 void* PhoneNumberFormat::dynamicHandler = nullptr;
 std::mutex PhoneNumberFormat::phoneMutex;
 std::mutex PhoneNumberFormat::AS_YOU_TYPE_FORMAT_MUTEX;
+size_t PhoneNumberFormat::MAX_NUMBER_LENGTH = 20;
 
 PhoneNumberFormat::PhoneNumberFormat(const std::string &countryTag,
                                      const std::map<std::string, std::string> &options)
@@ -110,7 +111,7 @@ bool PhoneNumberFormat::isValidPhoneNumber(const std::string &number) const
     return util->IsValidNumber(phoneNumber);
 }
 
-std::string PhoneNumberFormat::format(const std::string &number) const
+std::string PhoneNumberFormat::format(const std::string &number)
 {
     std::string formatted_number;
     if (formatter != nullptr) {
@@ -126,36 +127,39 @@ std::string PhoneNumberFormat::format(const std::string &number) const
     return PseudoLocalizationProcessor(formatted_number);
 }
 
-std::string PhoneNumberFormat::GetAsYouTypeFormatResult(const std::string &number) const
+std::string PhoneNumberFormat::GetAsYouTypeFormatResult(const std::string &number)
 {
     std::lock_guard<std::mutex> formatLock(AS_YOU_TYPE_FORMAT_MUTEX);
-    if (formatter == nullptr) {
+    if (formatter == nullptr || number.length() > MAX_NUMBER_LENGTH) {
         return number;
     }
+    std::regex pattern("[^\\d]");
+    std::string phoneNumber = std::regex_replace(number, pattern, "");
+    size_t len = phoneNumber.length();
+    if (len == lastFormatNumber.length() + 1) {
+        if (phoneNumber.compare(0, lastFormatNumber.length(), lastFormatNumber) != 0) {
+            return FormatAllInputNumber(phoneNumber);
+        }
+        char lastChar = phoneNumber.at(len - 1);
+        std::string result;
+        this->lastFormatNumber = phoneNumber;
+        return formatter->InputDigit(lastChar, &result);
+    }
+    return FormatAllInputNumber(phoneNumber);
+}
+
+std::string PhoneNumberFormat::FormatAllInputNumber(std::string &number)
+{
+    formatter->Clear();
+    this->lastFormatNumber = number;
     std::string result;
     std::string formattedNumber;
-    size_t len = number.length();
-    if (len == 0) {
-        formatter->Clear();
-        return number;
-    }
-    int currIndex = formatter->GetRememberedPosition();
-    size_t start = 0;
-    if (currIndex > static_cast<int>(len)) {
-        formatter->Clear();
-    } else {
-        start = static_cast<size_t>(currIndex);
-    }
-    for (size_t i = start; i < len; i++) {
+    for (size_t i = 0; i < number.length(); i++) {
         char c = number.at(i);
         if (!isdigit(c)) {
             continue;
         }
-        if (i == len - 1) {
-            formattedNumber = formatter->InputDigitAndRememberPosition(c, &result);
-        } else {
-            formattedNumber = formatter->InputDigit(c, &result);
-        }
+        formattedNumber = formatter->InputDigit(c, &result);
     }
     return formattedNumber;
 }

@@ -900,8 +900,6 @@ HWTEST_F(IntlTest, IntlFuncTest0073, TestSize.Level1)
         formated = phoneNumFmt->format(formated);
     }
     EXPECT_EQ(formated, "186 2235 00");
-    number = "";
-    formated = phoneNumFmt->format(number);
 
     number = "075576453";
     for (char c : number) {
