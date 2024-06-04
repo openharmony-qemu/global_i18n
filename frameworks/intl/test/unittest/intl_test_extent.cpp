@@ -896,7 +896,7 @@ HWTEST_F(IntlTest, IntlFuncTest0073, TestSize.Level1)
     std::string number = "186223500";
     std::string formated = "";
     for (char c : number) {
-        formated =  formated + c;
+        formated = formated + c;
         formated = phoneNumFmt->format(formated);
     }
     EXPECT_EQ(formated, "186 2235 00");
@@ -905,7 +905,7 @@ HWTEST_F(IntlTest, IntlFuncTest0073, TestSize.Level1)
 
     number = "075576453";
     for (char c : number) {
-        formated =  formated + c;
+        formated = formated + c;
         formated = phoneNumFmt->format(formated);
     }
     EXPECT_EQ(formated, "0755 7645 3");
