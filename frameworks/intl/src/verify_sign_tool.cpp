@@ -495,6 +495,10 @@ bool VerifySignTool::FileExist(const std::string& path)
         HILOG_ERROR_I18N("FileExist failed because filesystem_error, error message: %{public}s.",
             except.code().message().c_str());
         return false;
+    } catch (const std::__h::__fs::filesystem::filesystem_error &except) {
+        HILOG_ERROR_I18N("FileExist failed because filesystem_error, error message: %{public}s.",
+            except.code().message().c_str());
+        return false;
     } catch (const std::bad_alloc &except) {
         HILOG_ERROR_I18N("FileExist failed because bad_alloc, error message: %{public}s.",
             except.what());
