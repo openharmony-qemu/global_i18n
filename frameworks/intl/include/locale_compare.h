@@ -18,6 +18,7 @@
 #include <map>
 #include <set>
 #include <string>
+#include "unicode/locid.h"
 
 namespace OHOS {
 namespace Global {
@@ -31,7 +32,7 @@ private:
     static bool IsSameEnglishScript(const std::string& scriptTag1, const std::string& scriptTag2);
     static bool HasMapRelation(const std::string& languageTag, const std::string& localeTag1,
         const std::string& localeTag2);
-    static bool IsBaseNameRelation(const char* baseName1, const char* baseName2,
+    static bool IsBaseNameRelation(const icu::Locale& locale1, const icu::Locale& locale2,
         const std::string& languageTag);
     static std::string hantSegment;
     static std::string latnSegment;
