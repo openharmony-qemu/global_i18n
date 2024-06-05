@@ -132,8 +132,14 @@ std::map<std::string, std::string> LocaleCompare::extendedLatnParent {};
 int32_t LocaleCompare::Compare(const std::string& localeTag1, const std::string& localeTag2)
 {
     UErrorCode status = U_ZERO_ERROR;
+    UErrorCode status2 = U_ZERO_ERROR;
     icu::Locale locale1 = icu::Locale::forLanguageTag(icu::StringPiece(localeTag1), status);
-    icu::Locale locale2 = icu::Locale::forLanguageTag(icu::StringPiece(localeTag2), status);
+    icu::Locale locale2 = icu::Locale::forLanguageTag(icu::StringPiece(localeTag2), status2);
+    if (U_FAILURE(status) || U_FAILURE(status2)) {
+        HILOG_ERROR_I18N("localeTag1: %{public}s or localeTag2: %{public}s is invalid.",
+            localeTag1.c_str(), localeTag2.c_str());
+        return -1;
+    }
     int32_t segmentScore = 3;
     const int32_t mapScore = 8;
     int32_t score = 0;
@@ -144,9 +150,7 @@ int32_t LocaleCompare::Compare(const std::string& localeTag1, const std::string&
     } else {
         return -1;
     }
-    const char* baseName1 = locale1.getBaseName();
-    const char* baseName2 = locale2.getBaseName();
-    if (IsBaseNameRelation(baseName1, baseName2, language1)) {
+    if (IsBaseNameRelation(locale1, locale2, language1)) {
         return mapScore;
     }
     std::string region1 = locale1.getCountry();
@@ -248,9 +252,11 @@ bool LocaleCompare::HasMapRelation(const std::string& languageTag, const std::st
     return false;
 }
 
-bool LocaleCompare::IsBaseNameRelation(const char* baseName1, const char* baseName2,
+bool LocaleCompare::IsBaseNameRelation(const icu::Locale& locale1, const icu::Locale& locale2,
     const std::string& languageTag)
 {
+    const char* baseName1 = locale1.getBaseName();
+    const char* baseName2 = locale2.getBaseName();
     if (baseName1 != nullptr && baseName2 != nullptr) {
         std::string localeBaseName1(baseName1);
         std::string localeBaseName2(baseName2);

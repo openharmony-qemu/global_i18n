@@ -432,10 +432,10 @@ PhoneNumberMatch* PhoneNumberMatched::HandleCodesRule(PhoneNumberMatch* phoneNum
 {
     PhoneNumberMatch* match = phoneNumberMatch;
     std::vector<RegexRule*> rules = phoneNumberRule->GetCodesRules();
-    bool isVaild = true;
     if (rules.size() == 0) {
-        return nullptr;
+        return match;
     }
+    bool isVaild = true;
     for (RegexRule* rule : rules) {
         PhoneNumberMatch* tempmatch = rule->IsValid(match, message);
         if (tempmatch == nullptr) {
