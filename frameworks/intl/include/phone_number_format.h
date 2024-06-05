@@ -38,7 +38,7 @@ public:
     PhoneNumberFormat(const std::string &countryTag, const std::map<std::string, std::string> &options);
     virtual ~PhoneNumberFormat();
     bool isValidPhoneNumber(const std::string &number) const;
-    std::string format(const std::string &number) const;
+    std::string format(const std::string &number);
     static std::unique_ptr<PhoneNumberFormat> CreateInstance(const std::string &countryTag,
                                                              const std::map<std::string, std::string> &options);
     std::string getLocationName(const std::string &number, const std::string &locale);
@@ -52,13 +52,17 @@ public:
 private:
     PhoneNumberUtil* GetPhoneNumberUtil();
     void OpenHandler();
-    std::string GetAsYouTypeFormatResult(const std::string &number) const;
+    std::string GetAsYouTypeFormatResult(const std::string &number);
+    std::string FormatAllInputNumber(std::string &number);
     PhoneNumberUtil *util;
     std::unique_ptr<AsYouTypeFormatter> formatter = nullptr;
     std::string country;
     PhoneNumberUtil::PhoneNumberFormat phoneNumberFormat;
     static void* dynamicHandler;
     static std::mutex phoneMutex;
+    static std::mutex AS_YOU_TYPE_FORMAT_MUTEX;
+    static size_t MAX_NUMBER_LENGTH;
+    std::string lastFormatNumber;
 };
 } // namespace I18n
 } // namespace Global

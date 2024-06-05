@@ -47,11 +47,13 @@ Taboo::Taboo(const std::string& path) : tabooDataPath(path)
     struct stat s;
     isTabooDataExist = stat(tabooConfigFilePath.c_str(), &s) == 0;
     if (isTabooDataExist) {
-        std::lock_guard<std::mutex> tabooLock(TABOO_MUTEX);
         if (RESOURCES.size() == 0) {
-            // parse taboo-config.xml to obtain supported regions and languages for name replacement.
-            ParseTabooData(tabooConfigFilePath, DataFileType::CONFIG_FILE);
-            ReadResourceList();
+            std::lock_guard<std::mutex> tabooLock(TABOO_MUTEX);
+            if (RESOURCES.size() == 0) {
+                // parse taboo-config.xml to obtain supported regions and languages for name replacement.
+                ParseTabooData(tabooConfigFilePath, DataFileType::CONFIG_FILE);
+                ReadResourceList();
+            }
         }
     }
 }
