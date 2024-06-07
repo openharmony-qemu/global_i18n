@@ -25,8 +25,7 @@ namespace OHOS {
         using namespace Global::I18n;
 
         std::string input(reinterpret_cast<const char*>(data), size);
-        uint32_t offset = 0;
-        double number = static_cast<double>(data + offset);
+        double number = static_cast<double>(data[0]);
         std::vector<std::string> localeTags;
         localeTags.push_back(input);
         std::map<std::string, std::string> options;

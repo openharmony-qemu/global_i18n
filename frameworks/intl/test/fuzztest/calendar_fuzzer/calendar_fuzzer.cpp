@@ -27,9 +27,8 @@ namespace OHOS {
         using namespace Global::I18n;
 
         bool result = false;
-        uint32_t offset = 0;
         std::string input(reinterpret_cast<const char*>(data), size);
-        double number = static_cast<double>(data + offset);
+        double number = static_cast<double>(data[0]);
 
         I18nCalendar calendar(input, CalendarType::GREGORY);
         calendar.SetTime(number);
@@ -44,8 +43,7 @@ namespace OHOS {
         calendar.IsWeekend(size, status);
         calendar.IsWeekend();
         calendar.GetDisplayName(input);
-        offset += sizeof(double);
-        calendar.CompareDays(static_cast<double>(data + offset));
+        calendar.CompareDays(number);
         return result;
     }
 }

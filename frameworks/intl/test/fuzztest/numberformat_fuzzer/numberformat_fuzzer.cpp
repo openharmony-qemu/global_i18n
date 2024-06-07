@@ -30,8 +30,7 @@ namespace OHOS {
         std::map<std::string, std::string> options;
         options[input] = input;
         NumberFormat formatter(localeTags, options);
-        uint32_t offset = 0;
-        double number = static_cast<double>(data + offset);
+        double number = static_cast<double>(data[0]);
         formatter.Format(number);
         formatter.GetResolvedOptions(options);
         formatter.GetCurrency();
