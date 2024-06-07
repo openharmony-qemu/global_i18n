@@ -123,15 +123,14 @@ bool SignatureVerifier::VerifyParamFile(const std::string& fileName, const std::
         return false;
     }
     std::string absFilePath = filePath + fileName;
-    std::ifstream paramFile(absFilePath);
-    if (!paramFile.good()) {
+    if (!CheckTzDataFilePath(absFilePath)) {
         return false;
     }
     std::string sha256Digest;
     std::string line;
     while (std::getline(file, line)) {
-        std::string nextLine;
         if (line.find("Name: " + fileName) != std::string::npos) {
+            std::string nextLine;
             std::getline(file, nextLine);
             std::vector<std::string> strs;
             Split(nextLine, ":", strs);
@@ -211,7 +210,8 @@ bool SignatureVerifier::VerifyRsa(RSA* pubkey, const std::string& digest, const 
         EVP_MD_CTX_free(ctx);
         return false;
     }
-    if (EVP_VerifyFinal(ctx, (unsigned char *)sign.c_str(), sign.size(), evpKey) != 1) {
+    char* signArr = const_cast<char*>(sign.c_str());
+    if (EVP_VerifyFinal(ctx, reinterpret_cast<unsigned char *>(signArr), sign.size(), evpKey) != 1) {
         EVP_PKEY_free(evpKey);
         EVP_MD_CTX_free(ctx);
         return false;
@@ -235,7 +235,8 @@ void SignatureVerifier::CalcBase64(uint8_t* input, uint32_t inputLen, std::strin
     size_t base64Len = static_cast<size_t>(ceil(static_cast<long double>(inputLen) / BASE64_ENCODE_PACKET_LEN) *
         BASE64_ENCODE_LEN_OF_EACH_GROUP_DATA + 1);
     std::unique_ptr<unsigned char[]> base64Str = std::make_unique<unsigned char[]>(base64Len);
-    size_t outLen = EVP_EncodeBlock(reinterpret_cast<uint8_t*>(base64Str.get()), input, inputLen);
+    int encodeLen = EVP_EncodeBlock(reinterpret_cast<uint8_t*>(base64Str.get()), input, inputLen);
+    size_t outLen = static_cast<size_t>(encodeLen);
     encodedStr = std::string(reinterpret_cast<char*>(base64Str.get()), outLen);
 }
  
@@ -253,7 +254,7 @@ int SignatureVerifier::CalcFileShaOriginal(const std::string& filePath, unsigned
     SHA256_CTX ctx;
     SHA256_Init(&ctx);
     while ((n = fread(buffer, 1, sizeof(buffer), fp))) {
-        SHA256_Update(&ctx, (unsigned char*)buffer, n);
+        SHA256_Update(&ctx, reinterpret_cast<unsigned char*>(buffer), n);
     }
     SHA256_Final(hash, &ctx);
     if (fclose(fp) == -1) {
@@ -265,12 +266,23 @@ int SignatureVerifier::CalcFileShaOriginal(const std::string& filePath, unsigned
 // load file content
 std::string SignatureVerifier::GetFileStream(const std::string& filePath)
 {
-    std::ifstream file(filePath, std::ios::in | std::ios::binary);
-    if (!file) {
+    if (filePath.length() > PATH_MAX) {
+        return "";
+    }
+    char* resolvedPath = new char[PATH_MAX + 1];
+    if (realpath(filePath.c_str(), resolvedPath) == nullptr) {
+        delete[] resolvedPath;
+        return "";
+    }
+    const std::string newFilePath = resolvedPath;
+    std::ifstream file(newFilePath, std::ios::in | std::ios::binary);
+    if (!file.good()) {
+        delete[] resolvedPath;
         return "";
     }
     std::stringstream inFile;
     inFile << file.rdbuf();
+    delete[] resolvedPath;
     return inFile.str();
 }
 
