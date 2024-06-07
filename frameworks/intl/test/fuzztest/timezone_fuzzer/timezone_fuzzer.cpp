@@ -26,9 +26,10 @@ namespace OHOS {
         if (data == nullptr || size < 1) {
             return false;
         }
+        uint32_t offset = 0;
         std::string text(reinterpret_cast<const char*>(data), size);
         bool isDST = (data[0] % 2 == 1);
-        double date = static_cast<double>(data[0]);
+        double date = static_cast<double>(data + offset);
         I18nTimeZone timezone(text, isDST);
         timezone.GetOffset(date);
         timezone.GetRawOffset();

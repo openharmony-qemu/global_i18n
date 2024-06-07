@@ -25,20 +25,24 @@ namespace OHOS {
         if (size < 1) {
             return false;
         }
+        uint32_t offset = 0;
         std::string text(reinterpret_cast<const char*>(data), size - 1);
         int32_t number = static_cast<int32_t>(data[size - 1]);
         I18nBreakIterator iterator(text);
         iterator.SetText(text.c_str());
         std::string str;
         iterator.GetText(str);
-        iterator.IsBoundary(number);
+        offset += sizeof(int32_t);
+        iterator.IsBoundary(static_cast<int32_t>(data + offset));
         iterator.Current();
         iterator.First();
         iterator.Last();
-        iterator.Next(number);
+        offset += sizeof(int32_t);
+        iterator.Next(static_cast<int32_t>(data + offset));
         iterator.Next();
         iterator.Previous();
-        iterator.Following(number);
+        offset += sizeof(int32_t);
+        iterator.Following(static_cast<int32_t>(data + offset));
         return true;
     }
 }

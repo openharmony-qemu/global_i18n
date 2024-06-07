@@ -25,17 +25,20 @@ namespace OHOS {
         if (size < 1) {
             return false;
         }
+        uint32_t offset = 0;
         std::string input(reinterpret_cast<const char*>(data), size);
         std::vector<std::string> localeTags(1, input);
         std::map<std::string, std::string> options;
         options[input] = input;
         RelativeTimeFormat formatter(localeTags, options);
         
-        double number = static_cast<double>(data[0]);
+        double number = static_cast<double>(data + offset);
         formatter.Format(number, input);
         
         std::vector<std::vector<std::string>> timeVector;
-        formatter.FormatToParts(number, input, timeVector);
+        offset += sizeof(double);
+        double number2 = static_cast<double>(data + offset);
+        formatter.FormatToParts(number2, input, timeVector);
         
         std::map<std::string, std::string> res;
         formatter.GetResolvedOptions(res);

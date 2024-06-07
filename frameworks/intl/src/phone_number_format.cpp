@@ -37,7 +37,7 @@ using i18n::phonenumbers::PhoneNumberUtil;
 void* PhoneNumberFormat::dynamicHandler = nullptr;
 std::mutex PhoneNumberFormat::phoneMutex;
 std::mutex PhoneNumberFormat::AS_YOU_TYPE_FORMAT_MUTEX;
-size_t PhoneNumberFormat::MAX_NUMBER_LENGTH = 20;
+size_t PhoneNumberFormat::MAX_NUMBER_LENGTH = 30;
 
 PhoneNumberFormat::PhoneNumberFormat(const std::string &countryTag,
                                      const std::map<std::string, std::string> &options)
