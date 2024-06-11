@@ -23,10 +23,14 @@ namespace OHOS {
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
         using namespace Global::I18n;
+        uint32_t offset = 0;
         std::string input(reinterpret_cast<const char*>(data), size);
         if (size > 0) {
-            PreferredLanguage::AddPreferredLanguage(input, data[0]);
-            PreferredLanguage::RemovePreferredLanguage(data[0]);
+            int32_t index = *(reinterpret_cast<const int32_t*>(data + offset));
+            PreferredLanguage::AddPreferredLanguage(input, index);
+            offset += sizeof(int32_t);
+            int32_t index2 = *(reinterpret_cast<const int32_t*>(data + offset));
+            PreferredLanguage::RemovePreferredLanguage(index2);
         }
         return true;
     }
