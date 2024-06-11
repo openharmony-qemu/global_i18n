@@ -23,9 +23,9 @@ namespace OHOS {
     void DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
         using namespace Global::I18n;
-
+        uint32_t offset = 0;
         std::string input(reinterpret_cast<const char*>(data), size);
-        double number = static_cast<double>(data[0]);
+        double number = *(reinterpret_cast<const double*>(data + offset));
         std::vector<std::string> localeTags;
         localeTags.push_back(input);
         std::map<std::string, std::string> options;

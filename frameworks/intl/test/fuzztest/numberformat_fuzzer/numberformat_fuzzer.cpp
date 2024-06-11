@@ -25,12 +25,13 @@ namespace OHOS {
         if (size < 1) {
             return false;
         }
+        uint32_t offset = 0;
         std::string input(reinterpret_cast<const char*>(data), size);
         std::vector<std::string> localeTags(1, input);
         std::map<std::string, std::string> options;
         options[input] = input;
         NumberFormat formatter(localeTags, options);
-        double number = static_cast<double>(data[0]);
+        double number = *(reinterpret_cast<const double*>(data + offset));
         formatter.Format(number);
         formatter.GetResolvedOptions(options);
         formatter.GetCurrency();

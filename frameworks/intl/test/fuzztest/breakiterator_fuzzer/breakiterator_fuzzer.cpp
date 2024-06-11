@@ -25,8 +25,9 @@ namespace OHOS {
         if (size < 1) {
             return false;
         }
+        uint32_t offset = 0;
         std::string text(reinterpret_cast<const char*>(data), size - 1);
-        int32_t number = static_cast<int32_t>(data[size - 1]);
+        int32_t number = *(reinterpret_cast<const int32_t*>(data + offset));
         I18nBreakIterator iterator(text);
         iterator.SetText(text.c_str());
         std::string str;
@@ -35,10 +36,14 @@ namespace OHOS {
         iterator.Current();
         iterator.First();
         iterator.Last();
-        iterator.Next(number);
+        offset += sizeof(int32_t);
+        int32_t next = *(reinterpret_cast<const int32_t*>(data + offset));
+        iterator.Next(next);
         iterator.Next();
         iterator.Previous();
-        iterator.Following(number);
+        offset += sizeof(int32_t);
+        int32_t following = *(reinterpret_cast<const int32_t*>(data + offset));
+        iterator.Following(following);
         return true;
     }
 }
