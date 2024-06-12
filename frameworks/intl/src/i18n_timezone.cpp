@@ -60,7 +60,6 @@ const char *I18nTimeZone::CITY_DISPLAYNAME_PATH = "/system/usr/ohos_timezone/oho
 const char *I18nTimeZone::BASE_DEVICE_CITY_DISPLAYNAME_PATH = "/system/usr/ohos_timezone/device_city_dispname/";
 const char *I18nTimeZone::DISTRO_DEVICE_CITY_DISPLAYNAME_PATH = "/system/etc/tzdata_distro/device_city_dispname/";
 const char *I18nTimeZone::DISTRO_ROOT_DISPLAYNAME_PATH = "/system/etc/tzdata_distro/device_city_dispname/root.xml";
-GetDeviceCityDisplayNamePath();
 
 const char *I18nTimeZone::TIMEZONE_ROOT_TAG = "timezones";
 const char *I18nTimeZone::TIMEZONE_SECOND_ROOT_TAG = "timezone";
@@ -915,7 +914,7 @@ std::string I18nTimeZone::FindCityDisplayNameFromXml(std::string &cityID, std::s
 
 std::string I18nTimeZone::GetCityDisplayNameXmlPath(const std::string &locale)
 {
-	const char *deviceCityDisplayNamePath = GetDeviceCityDisplayNamePath();
+    const char *deviceCityDisplayNamePath = GetDeviceCityDisplayNamePath();
     if (deviceCityDisplayNamePath != nullptr) {
         return deviceCityDisplayNamePath + locale + ".xml";
     } else {
