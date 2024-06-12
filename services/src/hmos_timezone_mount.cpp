@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <filesystem>
 #include <string>
 #include <sys/mount.h>
 #include "i18n_hilog.h"
@@ -32,24 +33,26 @@ const std::string SUB_TYPE = "generic";
 const std::string CFG_PATH =
     "/data/service/el1/public/update/param_service/install/system/etc/TIMEZONE/generic/current/";
 const std::string LOCALE_PATH = "/system/etc/TIMEZONE/generic/current/";
+const std::string SAFE_PATH = "/data/service/el1/public/i18n/timezone/";
 const std::string PUBKEY_PATH = "/system/etc/LIBPHONENUMBER/generic/";
 const std::string PUBKEY_NAME = "hota_i18n_upgrade_v1.pem";
 const std::vector<std::string> DATA_FILES = {"tzdata", "device_timezones.xml", "version.txt",
     "distro_version", "tzlookup.xml", "device_city_dispname/bo_CN.xml", "device_city_dispname/root.xml",
     "device_city_dispname/ug.xml", "device_city_dispname/zh_Hans.xml", "device_city_dispname/zh_HK.xml",
     "device_city_dispname/zh_TW.xml", "device_city_dispname/zz_ZX.xml", "icu/icu_tzdata.dat",
-    "telephonylookup.xml"};
+    "telephonylookup.xml", "icu/metaZones.res", "icu/timezoneTypes.res", "icu/windowsZones.res",
+    "icu/zoneinfo64.res", "hos/tzlookup.xml"};
 
 bool Mount()
 {
     if (!IsDirExist(CUST_GLOBAL_CARRIER_DIR.c_str()) ||
-        !IsDirExist(CFG_PATH.c_str())) {
+        !IsDirExist(SAFE_PATH.c_str())) {
         HILOG_ERROR_I18N("Mount: CUST_GLOBAL_CARRIER_DIR or CFG_PATH not exist");
         return false;
     }
 
     int ret = 0;
-    std::string cotaOpkeyVersionDir = CFG_PATH;
+    std::string cotaOpkeyVersionDir = SAFE_PATH;
     std::string custOpkeyVersionDir = CUST_GLOBAL_CARRIER_DIR;
 
     if (mount(cotaOpkeyVersionDir.c_str(), custOpkeyVersionDir.c_str(), nullptr, MS_BIND, nullptr) != 0) {
@@ -60,6 +63,78 @@ bool Mount()
         HILOG_INFO_I18N("Mount: success to mount cotaDir to custDir: opkey(%{public}s)", cotaOpkeyVersionDir.c_str());
     }
     return true;
+}
+
+void ensureDirectoryExists(const std::filesystem::path& dir_path)
+{
+    std::error_code ec;
+    if (!std::filesystem::exists(dir_path)) {
+        HILOG_ERROR_I18N("Directory does not exist: %{public}s", dir_path.c_str());
+        std::filesystem::create_directories(dir_path, ec);
+        if (ec) {
+            HILOG_ERROR_I18N("Failed to create directory: %{public}s, Error: %{public}s", dir_path.c_str(),
+                ec.message().c_str());
+        }
+    }
+}
+
+void clearPath(const std::filesystem::path& dir_path)
+{
+    std::error_code ec;
+    for (const auto& entry : std::filesystem::directory_iterator(dir_path)) {
+        std::filesystem::remove_all(entry.path(), ec);
+        if (ec) {
+            HILOG_ERROR_I18N("clearPath: Error removing file: %{public}s, Error: %{public}s", entry.path().c_str(),
+                ec.message().c_str());
+        }
+    }
+}
+
+bool copySingleFile(const std::filesystem::path& src_path, const std::filesystem::path& dst_path)
+{
+    if (!FileExist(src_path.string())) {
+        HILOG_ERROR_I18N("copySingleFile: Source file does not exist: %{public}s", src_path.c_str());
+        return false;
+    }
+
+    ensureDirectoryExists(dst_path.parent_path());
+    HILOG_INFO_I18N("copySingleFile: copy file: %{public}s,  %{public}s", src_path.c_str(),  dst_path.c_str());
+    if (!FileCopy(src_path.string(), dst_path.string())) {
+        HILOG_ERROR_I18N("copySingleFile: Failed to copy file: %{public}s", src_path.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+bool CopyDataFile()
+{
+    HILOG_INFO_I18N("TimeZone CopyDataFile start");
+    if (!IsDirExist(SAFE_PATH.c_str())) {
+        HILOG_ERROR_I18N("TimeZone CopyDataFile: SAFE_PATH does not exist");
+        return false;
+    }
+
+    std::filesystem::path safe_dir(SAFE_PATH);
+    clearPath(safe_dir);
+
+    bool copySuccess = true;
+    for (const auto& file : DATA_FILES) {
+        std::filesystem::path src_path = std::filesystem::path(CFG_PATH) / file;
+        std::filesystem::path dst_path = std::filesystem::path(SAFE_PATH) / file;
+        if (!copySingleFile(src_path, dst_path)) {
+            HILOG_ERROR_I18N("CopyDataFile: Copy failed for %{public}s", file.c_str());
+            copySuccess = false;
+            break;
+        }
+    }
+
+    if (!copySuccess) {
+        HILOG_ERROR_I18N("CopyDataFile error, clearing the safe directory...");
+        clearPath(safe_dir);
+    }
+
+    return copySuccess;
 }
 
 bool CheckIfUpdateNecessary()
@@ -107,6 +182,10 @@ bool CheckFileIntegrity()
 
 void UpdateTimeZone()
 {
+    if (!Mount()) {
+        HILOG_INFO_I18N("UpdateTimeZone: mount error");
+        return;
+    }
     if (!CheckIfUpdateNecessary()) {
         HILOG_INFO_I18N("UpdateTimeZone: CheckIfUpdateNecessary error, no need to update");
         return;
@@ -115,8 +194,8 @@ void UpdateTimeZone()
         HILOG_INFO_I18N("UpdateTimeZone: CheckFileIntegrity error, no need to update");
         return;
     }
-    if (!Mount()) {
-        HILOG_INFO_I18N("UpdateTimeZone: mount error");
+    if (!CopyDataFile()) {
+        HILOG_INFO_I18N("UpdateTimeZone: CopyDataFile error");
         return;
     }
 
