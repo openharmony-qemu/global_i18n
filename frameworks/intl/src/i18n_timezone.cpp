@@ -59,7 +59,7 @@ const char *I18nTimeZone::DEFAULT_LOCALE = "root";
 const char *I18nTimeZone::CITY_DISPLAYNAME_PATH = "/system/usr/ohos_timezone/ohos_city_dispname/";
 const char *I18nTimeZone::BASE_DEVICE_CITY_DISPLAYNAME_PATH = "/system/usr/ohos_timezone/device_city_dispname/";
 const char *I18nTimeZone::DISTRO_DEVICE_CITY_DISPLAYNAME_PATH = "/system/etc/tzdata_distro/device_city_dispname/";
-const char *I18nTimeZone::DEVICE_CITY_DISPLAYNAME_PATH = GetDeviceCityDisplayNamePath();
+const char *I18nTimeZone::DISTRO_ROOT_DISPLAYNAME_PATH = "/system/etc/tzdata_distro/device_city_dispname/root.xml";
 
 const char *I18nTimeZone::TIMEZONE_ROOT_TAG = "timezones";
 const char *I18nTimeZone::TIMEZONE_SECOND_ROOT_TAG = "timezone";
@@ -912,8 +912,9 @@ std::string I18nTimeZone::FindCityDisplayNameFromXml(std::string &cityID, std::s
 
 std::string I18nTimeZone::GetCityDisplayNameXmlPath(const std::string &locale)
 {
-    if (DEVICE_CITY_DISPLAYNAME_PATH != nullptr) {
-        return DEVICE_CITY_DISPLAYNAME_PATH + locale + ".xml";
+    const char *deviceCityDisplayNamePath = GetDeviceCityDisplayNamePath();
+    if (deviceCityDisplayNamePath != nullptr) {
+        return deviceCityDisplayNamePath + locale + ".xml";
     } else {
         return CITY_DISPLAYNAME_PATH + locale + ".xml";
     }
@@ -923,12 +924,7 @@ std::map<std::string, std::string> I18nTimeZone::FindCityDisplayNameMap(std::str
 {
     xmlKeepBlanksDefault(0);
     std::map<std::string, std::string> resultMap;
-    std::string xmlPath;
-    if (DEVICE_CITY_DISPLAYNAME_PATH != nullptr) {
-        xmlPath = DEVICE_CITY_DISPLAYNAME_PATH + locale + ".xml";
-    } else {
-        xmlPath = CITY_DISPLAYNAME_PATH + locale + ".xml";
-    }
+    std::string xmlPath = GetCityDisplayNameXmlPath(locale);
     xmlDocPtr doc = xmlParseFile(xmlPath.c_str());
     if (!doc) {
         HILOG_ERROR_I18N("FindCityDisplayNameMap: can't parse city displayname file %{public}s", xmlPath.c_str());
@@ -975,10 +971,8 @@ bool I18nTimeZone::GetSupportedLocales()
     using std::filesystem::directory_iterator;
 
     struct stat s;
-    std::string displayNamePath;
-    if (DEVICE_CITY_DISPLAYNAME_PATH != nullptr) {
-        displayNamePath = DEVICE_CITY_DISPLAYNAME_PATH;
-    } else {
+    std::string displayNamePath = GetDeviceCityDisplayNamePath();
+    if (displayNamePath.length() == 0) {
         displayNamePath = CITY_DISPLAYNAME_PATH;
     }
     for (const auto &dirEntry : directory_iterator{displayNamePath}) {
@@ -1362,7 +1356,7 @@ bool I18nTimeZone::ParamExceedScope(const int x, const int y, int fixedX, int fi
 const char *I18nTimeZone::GetDeviceCityDisplayNamePath()
 {
     struct stat s;
-    if (stat(DISTRO_DEVICE_CITY_DISPLAYNAME_PATH, &s) == 0) {
+    if (stat(DISTRO_ROOT_DISPLAYNAME_PATH, &s) == 0) {
         return DISTRO_DEVICE_CITY_DISPLAYNAME_PATH;
     } else if (stat(BASE_DEVICE_CITY_DISPLAYNAME_PATH, &s) == 0) {
         return BASE_DEVICE_CITY_DISPLAYNAME_PATH;

@@ -64,7 +64,7 @@ private:
     static const char *CITY_DISPLAYNAME_PATH;
     static const char *BASE_DEVICE_CITY_DISPLAYNAME_PATH;
     static const char *DISTRO_DEVICE_CITY_DISPLAYNAME_PATH;
-    static const char *DEVICE_CITY_DISPLAYNAME_PATH;
+    static const char *DISTRO_ROOT_DISPLAYNAME_PATH;
     static const char *SUPPORTED_LOCALES_PATH;
     static const char *TIMEZONE_ROOT_TAG;
     static const char *TIMEZONE_SECOND_ROOT_TAG;
