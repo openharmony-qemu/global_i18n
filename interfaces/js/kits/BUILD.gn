@@ -36,9 +36,7 @@ ohos_shared_library("intl") {
 
   sources = [ "src/intl_addon.cpp" ]
 
-  deps = [
-    "//base/global/i18n/frameworks/intl:intl_util",
-  ]
+  deps = [ "//base/global/i18n/frameworks/intl:intl_util" ]
   external_deps = [
     "hilog:libhilog",
     "icu:shared_icuuc",
