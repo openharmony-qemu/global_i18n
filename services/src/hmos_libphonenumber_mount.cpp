@@ -46,14 +46,13 @@ bool Mount()
         return false;
     }
 
-    int ret = 0;
     std::string cotaOpkeyVersionDir = SAFE_PATH;
     std::string custOpkeyVersionDir = CUST_GLOBAL_CARRIER_DIR;
 
     if (mount(cotaOpkeyVersionDir.c_str(), custOpkeyVersionDir.c_str(), nullptr, MS_BIND, nullptr) != 0) {
         HILOG_ERROR_I18N("Mount: fail to mount: opkey(%{public}s) errno(%{public}s)",
             cotaOpkeyVersionDir.c_str(), strerror(errno));
-        ret = false;
+        return false;
     } else {
         HILOG_INFO_I18N("Mount: success to mount cotaDir to custDir: opkey(%{public}s)", cotaOpkeyVersionDir.c_str());
     }
