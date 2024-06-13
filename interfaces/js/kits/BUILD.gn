@@ -22,12 +22,12 @@ group("build_module") {
 }
 
 ohos_shared_library("intl") {
-  stack_protector_ret = true
   sanitize = {
     cfi = true
     cfi_cross_dso = true
     debug = false
   }
+  stack_protector_ret = true
 
   include_dirs = [
     "//base/global/i18n/frameworks/intl/include",
@@ -36,7 +36,9 @@ ohos_shared_library("intl") {
 
   sources = [ "src/intl_addon.cpp" ]
 
-  deps = [ "//base/global/i18n/frameworks/intl:intl_util" ]
+  deps = [
+    "//base/global/i18n/frameworks/intl:intl_util",
+  ]
   external_deps = [
     "hilog:libhilog",
     "icu:shared_icuuc",
@@ -49,12 +51,12 @@ ohos_shared_library("intl") {
 }
 
 ohos_shared_library("i18n") {
-  stack_protector_ret = true
   sanitize = {
     cfi = true
     cfi_cross_dso = true
     debug = false
   }
+  stack_protector_ret = true
 
   include_dirs = [
     "//base/global/i18n/frameworks/intl/include",

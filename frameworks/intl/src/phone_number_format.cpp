@@ -241,6 +241,7 @@ void PhoneNumberFormat::OpenHandler()
         HILOG_INFO_I18N("DynamicHandler init.");
         std::lock_guard<std::mutex> phoneLock(phoneMutex);
         if (dynamicHandler == nullptr) {
+            HILOG_INFO_I18N("DynamicHandler lock init.");
 #ifndef SUPPORT_ASAN
             const char* geocodingSO = "libgeocoding.z.so";
 #else
