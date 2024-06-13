@@ -401,8 +401,7 @@ napi_value I18nSystemAddon::GetDisplayCountryImpl(napi_env env, napi_callback_in
     if (!LocaleConfig::IsValidRegion(localeBuf.data()) && localeInfo.GetRegion() == "") {
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "country", "a valid region", throwError);
         return nullptr;
-    }
-    if (!LocaleConfig::IsValidTag(displayLocaleBuf.data())) {
+    } else if (!LocaleConfig::IsValidTag(displayLocaleBuf.data())) {
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "locale", "a valid locale", throwError);
         return nullptr;
     }
@@ -413,6 +412,7 @@ napi_value I18nSystemAddon::GetDisplayCountryImpl(napi_env env, napi_callback_in
     std::string value = LocaleConfig::GetDisplayRegion(localeBuf.data(), displayLocaleBuf.data(), sentenceCase);
     if (value.length() == 0) {
         HILOG_ERROR_I18N("GetDisplayCountryImpl: result is empty.");
+        return nullptr;
     }
     napi_value result = nullptr;
     status = napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &result);
