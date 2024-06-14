@@ -14,8 +14,8 @@
  */
 #include "locale_config.h"
 #include "ohos/init_data.h"
-#include "parameter.h"
 #include "utils.h"
+#include "parameter.h"
 #include "relative_time_format.h"
 
 namespace OHOS {

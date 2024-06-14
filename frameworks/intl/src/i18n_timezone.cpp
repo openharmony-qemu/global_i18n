@@ -744,9 +744,7 @@ __attribute__((no_sanitize("cfi"))) std::string I18nTimeZone::GetDisplayNameByTa
         getReplacedTimezoneDisplayName(localeStr.c_str(), GetID().c_str(), recvArr);
     }
     result = recvArr;
-#ifndef SUPPORT_ASAN
     dlclose(i18nUtilHandle);
-#endif
     return result;
 }
 
