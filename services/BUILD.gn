@@ -27,12 +27,12 @@ group("i18n_service_ability") {
 }
 
 ohos_shared_library("i18n_sa_client") {
-  stack_protector_ret = true
   sanitize = {
     cfi = true
     cfi_cross_dso = true
     debug = false
   }
+  stack_protector_ret = true
 
   sources = [
     "./src/i18n_service_ability_client.cpp",
@@ -57,12 +57,12 @@ ohos_shared_library("i18n_sa_client") {
 }
 
 ohos_shared_library("i18n_sa") {
-  stack_protector_ret = true
   sanitize = {
     cfi = true
     cfi_cross_dso = true
     debug = false
   }
+  stack_protector_ret = true
 
   sources = [
     "./src/i18n_service_ability.cpp",
