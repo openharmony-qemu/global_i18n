@@ -587,7 +587,10 @@ HWTEST_F(IntlTest, IntlFuncTest0015, TestSize.Level1)
     vector<string> locales;
     locales.push_back("jessie");
     locales.push_back(locale);
-    map<string, string> options = { { "timeZone", "America/Los_Angeles"  }, { "timeZoneName", "short" } };
+    map<string, string> options = {
+        { "timeZone", "America/Los_Angeles"  },
+        { "timeZoneName", "short" }
+    };
     DateTimeFormat *dateFormat = new (std::nothrow) DateTimeFormat(locales, options);
     if (!dateFormat) {
         EXPECT_TRUE(false);
@@ -1168,7 +1171,7 @@ HWTEST_F(IntlTest, IntlFuncTest0028, TestSize.Level1)
 
 /**
  * @tc.name: IntlFuncTest0029
- * @tc.desc: Test Intl RelativeTimeFormatter
+ * @tc.desc: Test Intl RelativeTimeFormat
  * @tc.type: FUNC
  */
 HWTEST_F(IntlTest, IntlFuncTest0029, TestSize.Level1)
