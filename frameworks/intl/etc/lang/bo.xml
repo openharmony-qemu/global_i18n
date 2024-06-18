@@ -18,10 +18,6 @@
         <display_name>རྒྱ་སྐད་</display_name>
     </lang>
     <lang>
-        <id>en</id>
-        <display_name>དབྱིན་ཇིའི་སྐད།</display_name>
-    </lang>
-    <lang>
         <id>zh-Hans</id>
         <display_name>རྒྱ་ཡིག་སྟབས་བདེ་རུ་གཏོང་བ།</display_name>
     </lang>
@@ -36,13 +32,5 @@
     <lang>
         <id>fa</id>
         <display_name>པོ་སིའི་སྐད།</display_name>
-    </lang>
-    <lang>
-        <id>bo</id>
-        <display_name>བོད་སྐད་</display_name>
-    </lang>
-    <lang>
-        <id>ug</id>
-        <display_name>ཡུ་གུར་སྐད།</display_name>
     </lang>
 </languages>
