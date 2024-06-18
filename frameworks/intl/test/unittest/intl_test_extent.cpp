@@ -237,8 +237,8 @@ HWTEST_F(IntlTest, IntlFuncTest0053, TestSize.Level1)
     std::string number2 = "+8618622350085";
     std::string formatResult = phoneNumberFormat->format(number2);
     EXPECT_EQ(formatResult, "186 2235 0085");
-    std::string location2 = phoneNumberFormat->getLocationName("fake-number", "zh-CN");
-    EXPECT_EQ(location2, "");
+    std::string location4 = phoneNumberFormat->getLocationName("fake-number", "zh-CN");
+    EXPECT_EQ(location4, "");
 }
 
 /**
