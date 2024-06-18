@@ -913,7 +913,7 @@ std::string I18nTimeZone::FindCityDisplayNameFromXml(std::string &cityID, std::s
 std::string I18nTimeZone::GetCityDisplayNameXmlPath(const std::string &locale)
 {
     const char *deviceCityDisplayNamePath = GetDeviceCityDisplayNamePath();
-    if (deviceCityDisplayNamePath != nullptr) {
+    if (strlen(deviceCityDisplayNamePath) != 0) {
         return deviceCityDisplayNamePath + locale + ".xml";
     } else {
         return CITY_DISPLAYNAME_PATH + locale + ".xml";
@@ -1361,7 +1361,7 @@ const char *I18nTimeZone::GetDeviceCityDisplayNamePath()
     } else if (stat(BASE_DEVICE_CITY_DISPLAYNAME_PATH, &s) == 0) {
         return BASE_DEVICE_CITY_DISPLAYNAME_PATH;
     } else {
-        return nullptr;
+        return "";
     }
 }
 }
