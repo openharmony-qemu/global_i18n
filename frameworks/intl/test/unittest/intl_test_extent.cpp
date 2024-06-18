@@ -226,8 +226,8 @@ HWTEST_F(IntlTest, IntlFuncTest0053, TestSize.Level1)
     };
     std::unique_ptr<PhoneNumberFormat> phoneNumberFormat =
         std::make_unique<PhoneNumberFormat>("zh-CN", options);
-    std::string location = phoneNumberFormat->getLocationName("18622350085", "zh-CN");
-    EXPECT_EQ(location, "天津市");
+    std::string location = phoneNumberFormat->getLocationName("13228901234", "en-US");
+    EXPECT_EQ(location, "Lhasa, Xizang");
     std::string location2 = phoneNumberFormat->getLocationName("15156712345", "zh-CN");
     EXPECT_EQ(location2, "安徽省亳州市");
     std::string location3 = phoneNumberFormat->getLocationName("17673241234", "zh-CN");
