@@ -598,12 +598,11 @@ HWTEST_F(I18nTest, I18nFuncTest016, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     std::string message = "您好，您的包裹已送至指定地点，请尽快签收：快递员：刘某某，手机：15912345678，QQ：123456789。";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[0][0], 1);
     EXPECT_EQ(res[0][1], 32);
     EXPECT_EQ(res[0][2], 43);
-    delete m;
 }
 
 /**
@@ -617,14 +616,13 @@ HWTEST_F(I18nTest, I18nFuncTest017, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     std::string message = "您好，您的包裹已送至指定地点，请尽快签收：快递员：刘某某，手机：15912345678 15512345678。";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[0][0], 2);
     EXPECT_EQ(res[0][1], 32);
     EXPECT_EQ(res[0][2], 43);
     EXPECT_EQ(res[0][3], 44);
     EXPECT_EQ(res[0][4], 55);
-    delete m;
 }
 
 /**
@@ -638,12 +636,11 @@ HWTEST_F(I18nTest, I18nFuncTest018, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     std::string message = "The stunning xxxxxx xxx in Verbier is availble for Christmas - call +44 (0)20 1234 5678.";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[0][0], 1);
     EXPECT_EQ(res[0][1], 68);
     EXPECT_EQ(res[0][2], 87);
-    delete m;
 }
 
 /**
@@ -657,12 +654,11 @@ HWTEST_F(I18nTest, I18nFuncTest019, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     std::string message = "RT @missingpeople: RT 32 yo missing since 26/09/2013 from Newry, NI. Seen him? Call 116000.";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[0][0], 1);
     EXPECT_EQ(res[0][1], 84);
     EXPECT_EQ(res[0][2], 90);
-    delete m;
 }
 
 /**
@@ -676,10 +672,9 @@ HWTEST_F(I18nTest, I18nFuncTest020, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     std::string message = "xxxx海滩 xxxxx xxxxxx街上的饰品店，皮革花朵戒指10000印尼盾，不到10块人民币。";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[0][0], 0);
-    delete m;
 }
 
 /**
@@ -693,10 +688,9 @@ HWTEST_F(I18nTest, I18nFuncTest021, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     std::string message = "New Job: Java Developer, Dublin, Republic of Ireland, $350000.00 - $45000 per annum.";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[0][0], 0);
-    delete m;
 }
 
 /**
@@ -710,14 +704,13 @@ HWTEST_F(I18nTest, I18nFuncTest022, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     std::string message = "您好，关于您的问题，可以拨打(0511) 8812 1234咨询，如果还有其他疑问，可联系刘某某（15512345678）";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[0][0], 2);
     EXPECT_EQ(res[0][1], 14);
     EXPECT_EQ(res[0][2], 30);
     EXPECT_EQ(res[0][3], 49);
     EXPECT_EQ(res[0][4], 60);
-    delete m;
 }
 
 /**
@@ -731,14 +724,13 @@ HWTEST_F(I18nTest, I18nFuncTest023, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     std::string message = "给10086/10010发了一条短信：“我爱你”，收到了回复：尊敬的用户，我也爱您。";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[0][0], 2);
     EXPECT_EQ(res[0][1], 1);
     EXPECT_EQ(res[0][2], 6);
     EXPECT_EQ(res[0][3], 7);
     EXPECT_EQ(res[0][4], 12);
-    delete m;
 }
 
 /**
@@ -752,12 +744,11 @@ HWTEST_F(I18nTest, I18nFuncTest024, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     std::string message = "您好，您的包裹已送至指定地点，请尽快签收：快递员：刘某某，手机：159/1234/5678，QQ：123456789。";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[0][0], 1);
     EXPECT_EQ(res[0][1], 32);
     EXPECT_EQ(res[0][2], 45);
-    delete m;
 }
 
 /**
@@ -771,14 +762,13 @@ HWTEST_F(I18nTest, I18nFuncTest025, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     std::string message = "您好，您的包裹已送至指定地点，请尽快签收：快递员：刘某某，手机：15912345678/15512345678。";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[0][0], 2);
     EXPECT_EQ(res[0][1], 32);
     EXPECT_EQ(res[0][2], 43);
     EXPECT_EQ(res[0][3], 44);
     EXPECT_EQ(res[0][4], 55);
-    delete m;
 }
 
 /**
@@ -792,10 +782,9 @@ HWTEST_F(I18nTest, I18nFuncTest026, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     std::string message = "今天一起去看的那个电影太搞笑了，2333333";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[0][0], 0);
-    delete m;
 }
 
 /**
@@ -809,14 +798,13 @@ HWTEST_F(I18nTest, I18nFuncTest027, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     std::string message = "Se você tiver alguma dúvida, ligue para 912345678 ou 1820 para consulta";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[0][0], 2);
     EXPECT_EQ(res[0][1], 40);
     EXPECT_EQ(res[0][2], 49);
     EXPECT_EQ(res[0][3], 53);
     EXPECT_EQ(res[0][4], 57);
-    delete m;
 }
 
 /**
@@ -830,12 +818,11 @@ HWTEST_F(I18nTest, I18nFuncTest028, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     std::string message = "+44 (0)20 1234 5678 is my phone number. If you need anything, please contact me.";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[0][0], 1);
     EXPECT_EQ(res[0][1], 0);
     EXPECT_EQ(res[0][2], 19);
-    delete m;
 }
 
 /**
@@ -849,12 +836,11 @@ HWTEST_F(I18nTest, I18nFuncTest029, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     std::string message = "To book a room, please call (+44 (0)20 1234 5678;ext=588)";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[0][0], 1);
     EXPECT_EQ(res[0][1], 29);
     EXPECT_EQ(res[0][2], 48);
-    delete m;
 }
 
 /**
@@ -868,12 +854,11 @@ HWTEST_F(I18nTest, I18nFuncTest030, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     std::string message = "我们提供23 24两种尺寸的屏幕，如有需要，请拨打11808 15512345678。";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[0][0], 1);
     EXPECT_EQ(res[0][1], 25);
     EXPECT_EQ(res[0][2], 42);
-    delete m;
 }
 
 /**
@@ -887,14 +872,13 @@ HWTEST_F(I18nTest, I18nFuncTest031, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     std::string message = "售后问题请拨打95528|95188。";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[0][0], 2);
     EXPECT_EQ(res[0][1], 7);
     EXPECT_EQ(res[0][2], 12);
     EXPECT_EQ(res[0][3], 13);
     EXPECT_EQ(res[0][4], 18);
-    delete m;
 }
 
 /**
@@ -908,12 +892,11 @@ HWTEST_F(I18nTest, I18nFuncTest032, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     std::string message = "If you need anything, please contact mob:(0)20 1234 5678.";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[0][0], 1);
     EXPECT_EQ(res[0][1], 41);
     EXPECT_EQ(res[0][2], 56);
-    delete m;
 }
 
 /**
@@ -927,12 +910,11 @@ HWTEST_F(I18nTest, I18nFuncTest033, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     std::string message = "尊敬的客户您好！4G套餐火热申办中，每月最高可获得20G手机上网流量，升级4G套餐享更多优惠。咨询及办理请致电10086。中国移动";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[0][0], 1);
     EXPECT_EQ(res[0][1], 55);
     EXPECT_EQ(res[0][2], 60);
-    delete m;
 }
 
 /**
@@ -946,14 +928,13 @@ HWTEST_F(I18nTest, I18nFuncTest034, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     std::string message = "今天晚上10点，我们商量一下10月1日至7日的旅游安排。";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[1][0], 2);
     EXPECT_EQ(res[1][1], 0);
     EXPECT_EQ(res[1][2], 7);
     EXPECT_EQ(res[1][3], 14);
     EXPECT_EQ(res[1][4], 22);
-    delete m;
 }
 
 /**
@@ -967,14 +948,13 @@ HWTEST_F(I18nTest, I18nFuncTest035, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     std::string message = "7月1日周一到7月5日周五都是工作日，所以在2023年7月6日下午17:00到19:00聚餐。";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[1][0], 2);
     EXPECT_EQ(res[1][1], 0);
     EXPECT_EQ(res[1][2], 13);
     EXPECT_EQ(res[1][3], 22);
     EXPECT_EQ(res[1][4], 44);
-    delete m;
 }
 
 /**
@@ -988,12 +968,11 @@ HWTEST_F(I18nTest, I18nFuncTest036, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     std::string message = "昨天8：30：00的会议没有讨论出结果，我们2023年11月11日的8：30：00再开一次会吧。";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[1][0], 1);
     EXPECT_EQ(res[1][1], 22);
     EXPECT_EQ(res[1][2], 41);
-    delete m;
 }
 
 /**
@@ -1007,14 +986,13 @@ HWTEST_F(I18nTest, I18nFuncTest037, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     std::string message = "我们2023年10月23日（周六）一起完成作业，并且2023年10月24日周天 晚上8：00上交。";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[1][0], 2);
     EXPECT_EQ(res[1][1], 2);
     EXPECT_EQ(res[1][2], 17);
     EXPECT_EQ(res[1][3], 26);
     EXPECT_EQ(res[1][4], 46);
-    delete m;
 }
 
 /**
@@ -1028,9 +1006,8 @@ HWTEST_F(I18nTest, I18nFuncTest038, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     std::string message = "2023/10/1是国庆节，我们可以在GMT+0800 上午9時30分00秒去参观博物馆，后续星期六 晚上 7：00我们一起吃饭。";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
-    delete m;
     EXPECT_EQ(res[1][0], 3);
     EXPECT_EQ(res[1][1], 0);
     EXPECT_EQ(res[1][2], 9);
@@ -1051,14 +1028,13 @@ HWTEST_F(I18nTest, I18nFuncTest039, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     std::string message = "我们上午 7：30：00 （GMT+8:30）可以去看日出，下午5：00-晚上7：00看日落。";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[1][0], 2);
     EXPECT_EQ(res[1][1], 2);
     EXPECT_EQ(res[1][2], 23);
     EXPECT_EQ(res[1][3], 30);
     EXPECT_EQ(res[1][4], 43);
-    delete m;
 }
 
 /**
@@ -1072,14 +1048,13 @@ HWTEST_F(I18nTest, I18nFuncTest040, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     std::string message = "We'll have dinner at GMT-8:15 PM 17:30:00, and go shopping at tomorrow 8:00.";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[1][0], 2);
     EXPECT_EQ(res[1][1], 21);
     EXPECT_EQ(res[1][2], 41);
     EXPECT_EQ(res[1][3], 62);
     EXPECT_EQ(res[1][4], 75);
-    delete m;
 }
 
 /**
@@ -1109,14 +1084,13 @@ HWTEST_F(I18nTest, I18nFuncTest042, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     std::string message = "The festivities will take place on Sunday, jan 1, 2023, and run until Wed, 1/4/2023";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[1][0], 2);
     EXPECT_EQ(res[1][1], 35);
     EXPECT_EQ(res[1][2], 54);
     EXPECT_EQ(res[1][3], 70);
     EXPECT_EQ(res[1][4], 83);
-    delete m;
 }
 
 /**
@@ -1131,7 +1105,7 @@ HWTEST_F(I18nTest, I18nFuncTest043, TestSize.Level1)
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     // std::string message = "2023年1月2日至3日周三是一个好日子，上午可以11：00：00（周三）去逛街";
     std::string message = "2023年1月2日至3日是一个好日子,12：00：00（2023年1月3日）一起吃饭。";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[1][0], 2);
     EXPECT_EQ(res[1][1], 0);
@@ -1151,7 +1125,7 @@ HWTEST_F(I18nTest, I18nFuncTest044, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     std::string message = "(2023年1月1日)12:00:00聚会,2023年1月2日，16：00：00返回深圳。";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[1][0], 2);
     EXPECT_EQ(res[1][1], 0);
@@ -1194,7 +1168,7 @@ HWTEST_F(I18nTest, I18nFuncTest046, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, status);
     std::string message = "2023年1月3日今天(本周五)在7：00：00的2023年1月3日可以看日出";
-    EntityRecognizer* m = new EntityRecognizer(locale);
+    std::unique_ptr<EntityRecognizer> m = std::make_unique<EntityRecognizer>(locale);
     std::vector<std::vector<int>> res = m->FindEntityInfo(message);
     EXPECT_EQ(res[1][0], 2);
     EXPECT_EQ(res[1][1], 0);

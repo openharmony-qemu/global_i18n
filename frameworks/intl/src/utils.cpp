@@ -14,7 +14,6 @@
  */
 
 #include <algorithm>
-#include <climits>
 #include <filesystem>
 #include <fstream>
 #include <dirent.h>
@@ -128,28 +127,6 @@ bool CheckTzDataFilePath(const std::string &filePath)
     free(realpathRes);
     realpathRes = nullptr;
     return true;
-}
-
-bool GetPseudoLocalizationEnforce()
-{
-    std::string systemLocale = LocaleConfig::GetSystemLocale();
-    if (systemLocale.compare(PSEUDO_LOCALE_TAG) == 0) {
-        return true;
-    }
-    return false;
-}
-
-std::string PseudoLocalizationProcessor(const std::string &input)
-{
-    return PseudoLocalizationProcessor(input, GetPseudoLocalizationEnforce());
-}
-
-std::string PseudoLocalizationProcessor(const std::string &input, bool ifEnforce)
-{
-    if (ifEnforce) {
-        return PSEUDO_START_TAG + input + PSEUDO_END_TAG;
-    }
-    return input;
 }
 
 std::string StrReplaceAll(const std::string& str,
@@ -266,6 +243,28 @@ std::string trim(std::string &s)
     s.erase(0, s.find_first_not_of(" "));
     s.erase(s.find_last_not_of(" ") + 1);
     return s;
+}
+
+bool GetPseudoLocalizationEnforce()
+{
+    std::string systemLocale = LocaleConfig::GetSystemLocale();
+    if (systemLocale.compare(PSEUDO_LOCALE_TAG) == 0) {
+        return true;
+    }
+    return false;
+}
+
+std::string PseudoLocalizationProcessor(const std::string &input)
+{
+    return PseudoLocalizationProcessor(input, GetPseudoLocalizationEnforce());
+}
+
+std::string PseudoLocalizationProcessor(const std::string &input, bool ifEnforce)
+{
+    if (ifEnforce) {
+        return PSEUDO_START_TAG + input + PSEUDO_END_TAG;
+    }
+    return input;
 }
 } // namespace I18n
 } // namespace Global

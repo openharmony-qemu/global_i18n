@@ -88,9 +88,7 @@ void PhoneNumberRule::Init()
 // Load the rules of the corresponding country
 void PhoneNumberRule::InitRule(std::string& xmlPath)
 {
-    if (!CheckTzDataFilePath(xmlPath)) {
-        return;
-    }
+    if (!CheckTzDataFilePath(xmlPath)) return;
     xmlKeepBlanksDefault(0);
     xmlDocPtr doc = xmlParseFile(xmlPath.c_str());
     if (doc == nullptr) return;
