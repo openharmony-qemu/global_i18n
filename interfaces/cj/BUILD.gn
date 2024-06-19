@@ -19,17 +19,11 @@ group("build_module") {
 }
 
 ohos_shared_library("cj_i18n_ffi") {
-  stack_protector_ret = true
   include_dirs = [
     "../../frameworks/intl/include",
     "../js/kits/include",
   ]
 
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
   cflags_cc = [ "-frtti" ]
   remove_configs = [ "//build/config/compiler:no_rtti" ]
 

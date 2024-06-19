@@ -704,7 +704,7 @@ std::string I18nTimeZone::GetDisplayName(std::string localeStr)
     return GetDisplayName(localeStr, false);
 }
 
-__attribute__((no_sanitize("cfi"))) std::string I18nTimeZone::GetDisplayName(
+std::string I18nTimeZone::GetDisplayName(
     std::string localeStr, bool isDST)
 {
     icu::TimeZone::EDisplayType style = icu::TimeZone::EDisplayType::LONG_GENERIC;
@@ -725,7 +725,7 @@ __attribute__((no_sanitize("cfi"))) std::string I18nTimeZone::GetDisplayName(
     return PseudoLocalizationProcessor(GetDisplayNameByTaboo(localeStr, result));
 }
 
-__attribute__((no_sanitize("cfi"))) std::string I18nTimeZone::GetDisplayNameByTaboo(
+std::string I18nTimeZone::GetDisplayNameByTaboo(
     const std::string& localeStr, std::string result)
 {
     void *i18nUtilHandle = dlopen("libi18n_util.z.so", RTLD_NOW);

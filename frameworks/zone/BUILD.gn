@@ -21,13 +21,6 @@ config("zone_util_public_configs") {
 }
 
 ohos_shared_library("zone_util") {
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
-  stack_protector_ret = true
-
   public_configs = [ ":zone_util_public_configs" ]
   sources = [ "src/zone_util.cpp" ]
   cflags_cc = [
