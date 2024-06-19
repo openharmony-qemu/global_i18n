@@ -18,31 +18,11 @@
         <display_name>خەنزۇچە</display_name>
     </lang>
     <lang>
-        <id>en</id>
-        <display_name>ئىنگلىزچە</display_name>
-    </lang>
-    <lang>
-        <id>zh-Hans</id>
-        <display_name>ئاددىي خەنچە</display_name>
-    </lang>
-    <lang>
-        <id>zh-Hant</id>
-        <display_name>مۇرەككەپ خەنچە</display_name>
-    </lang>
-    <lang>
         <id>ro</id>
         <display_name>رومىنچە</display_name>
     </lang>
     <lang>
         <id>fa</id>
         <display_name>پارسچە</display_name>
-    </lang>
-    <lang>
-        <id>bo</id>
-        <display_name>تىبەتچە</display_name>
-    </lang>
-    <lang>
-        <id>ug</id>
-        <display_name>ئۇيغۇرچە</display_name>
     </lang>
 </languages>
