@@ -164,7 +164,7 @@ std::string PhoneNumberFormat::FormatAllInputNumber(std::string &number)
     return formattedNumber;
 }
 
-__attribute__((no_sanitize("cfi"))) std::string PhoneNumberFormat::getLocationName(
+std::string PhoneNumberFormat::getLocationName(
     const std::string &number, const std::string &locale)
 {
     // Combine country and locale parameters
@@ -209,7 +209,7 @@ __attribute__((no_sanitize("cfi"))) std::string PhoneNumberFormat::getLocationNa
     return getCityName(locale, formatted_number.substr(1), locName);
 }
 
-__attribute__((no_sanitize("cfi"))) std::string PhoneNumberFormat::getPhoneLocationName(
+std::string PhoneNumberFormat::getPhoneLocationName(
     const std::string& number, const std::string& phoneLocale,
     const std::string& displayLocale, const std::string& regionCode)
 {
@@ -253,7 +253,7 @@ void PhoneNumberFormat::OpenHandler()
     }
 }
 
-__attribute__((no_sanitize("cfi"))) bool PhoneNumberFormat::getBlockedRegionName(
+bool PhoneNumberFormat::getBlockedRegionName(
     const std::string& regionCode, const std::string& language)
 {
     void *i18nUtilHandle = dlopen("libi18n_util.z.so", RTLD_NOW);
@@ -268,7 +268,7 @@ __attribute__((no_sanitize("cfi"))) bool PhoneNumberFormat::getBlockedRegionName
     }
 }
 
-__attribute__((no_sanitize("cfi"))) std::string PhoneNumberFormat::getCityName(
+std::string PhoneNumberFormat::getCityName(
     const std::string& language, const std::string& phonenumber,
     const std::string& locationName)
 {

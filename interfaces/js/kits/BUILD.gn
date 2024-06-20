@@ -22,13 +22,6 @@ group("build_module") {
 }
 
 ohos_shared_library("intl") {
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
-  stack_protector_ret = true
-
   include_dirs = [
     "//base/global/i18n/frameworks/intl/include",
     "//base/global/i18n/interfaces/js/kits/include",
@@ -49,13 +42,6 @@ ohos_shared_library("intl") {
 }
 
 ohos_shared_library("i18n") {
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
-  stack_protector_ret = true
-
   include_dirs = [
     "//base/global/i18n/frameworks/intl/include",
     "//base/global/i18n/interfaces/js/kits/include",
