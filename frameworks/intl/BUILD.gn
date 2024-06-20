@@ -61,7 +61,7 @@ ohos_shared_library("preferred_language") {
       "resource_management:global_resmgr",
       "samgr:samgr_proxy",
     ]
-    if (host_cpu != "arm64") {
+    if (!(host_os == "linux" && host_cpu == "arm64")) {
       external_deps += [ "preferences:native_preferences" ]
     }
     defines = [ "SUPPORT_APP_PREFERRED_LANGUAGE" ]
