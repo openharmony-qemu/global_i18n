@@ -58,11 +58,31 @@ PhoneNumberRule::PhoneNumberRule(std::string& country)
 
 PhoneNumberRule::~PhoneNumberRule()
 {
-    FreePointer(negativeRules);
-    FreePointer(positiveRules);
-    FreePointer(borderRules);
-    FreePointer(codesRules);
-    FreePointer(findRules);
+    for (auto it = negativeRules.begin(); it != negativeRules.end(); ++it) {
+        if (*it != nullptr) {
+            delete *it;
+        }
+    }
+    for (auto it = positiveRules.begin(); it != positiveRules.end(); ++it) {
+        if (*it != nullptr) {
+            delete *it;
+        }
+    }
+    for (auto it = borderRules.begin(); it != borderRules.end(); ++it) {
+        if (*it != nullptr) {
+            delete *it;
+        }
+    }
+    for (auto it = codesRules.begin(); it != codesRules.end(); ++it) {
+        if (*it != nullptr) {
+            delete *it;
+        }
+    }
+    for (auto it = findRules.begin(); it != findRules.end(); ++it) {
+        if (*it != nullptr) {
+            delete *it;
+        }
+    }
 }
 
 void PhoneNumberRule::FreePointer(std::vector<RegexRule*> &ruleList)
@@ -88,7 +108,9 @@ void PhoneNumberRule::Init()
 // Load the rules of the corresponding country
 void PhoneNumberRule::InitRule(std::string& xmlPath)
 {
-    if (!CheckTzDataFilePath(xmlPath)) return;
+    if (!CheckTzDataFilePath(xmlPath)) {
+        return;
+    }
     xmlKeepBlanksDefault(0);
     xmlDocPtr doc = xmlParseFile(xmlPath.c_str());
     if (doc == nullptr) return;
@@ -164,39 +186,39 @@ void PhoneNumberRule::SetRules(std::string& category, icu::UnicodeString& conten
     std::string& handle, std::string& insensitive, std::string& type)
 {
     if (category == "negative" || (category == "common" && commonExit)) {
-        negativeRules.push_back(new RegexRule(content, valid, handle, insensitive, type));
+        negativeRules.push_back(new NegativeRule(content, insensitive));
     } else if (category == "positive") {
-        positiveRules.push_back(new RegexRule(content, valid, handle, insensitive, type));
+        positiveRules.push_back(new PositiveRule(content, handle, insensitive));
     } else if (category == "border") {
-        borderRules.push_back(new RegexRule(content, valid, handle, insensitive, type));
+        borderRules.push_back(new BorderRule(content, insensitive, type));
     } else if (category == "codes") {
-        codesRules.push_back(new RegexRule(content, valid, handle, insensitive, type));
+        codesRules.push_back(new CodeRule(valid));
     } else if (category == "find_number") {
-        findRules.push_back(new RegexRule(content, valid, handle, insensitive, type));
+        findRules.push_back(new FindRule(content, insensitive));
     }
 }
 
-std::vector<RegexRule*> PhoneNumberRule::GetBorderRules()
+std::vector<BorderRule*> PhoneNumberRule::GetBorderRules()
 {
     return borderRules;
 }
 
-std::vector<RegexRule*> PhoneNumberRule::GetCodesRules()
+std::vector<CodeRule*> PhoneNumberRule::GetCodesRules()
 {
     return codesRules;
 }
 
-std::vector<RegexRule*> PhoneNumberRule::GetPositiveRules()
+std::vector<PositiveRule*> PhoneNumberRule::GetPositiveRules()
 {
     return positiveRules;
 }
 
-std::vector<RegexRule*> PhoneNumberRule::GetNegativeRules()
+std::vector<NegativeRule*> PhoneNumberRule::GetNegativeRules()
 {
     return negativeRules;
 }
 
-std::vector<RegexRule*> PhoneNumberRule::GetFindRules()
+std::vector<FindRule*> PhoneNumberRule::GetFindRules()
 {
     return findRules;
 }

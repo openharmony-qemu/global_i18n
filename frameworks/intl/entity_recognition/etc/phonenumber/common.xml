@@ -15,9 +15,9 @@
 <phone_number_rule>
     <common>
         <rule>
-            <insensitive>False</insensitive>
+            <insensitive>False</insensitive>  // 控制是否区分大小写
             <type>ZERO</type>
-            <valid>Default</valid>
+            <valid>Default</valid>  // 控制有效性规则校验类型
             <handle>Default</handle>
             <content>[@#][a-zA-Z_0-9-]{0,20}[0-9]{3,}[a-zA-Z_0-9-]{0,20}</content>
         </rule>
