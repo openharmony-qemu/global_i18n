@@ -49,7 +49,7 @@ int32_t I18nServiceAbilityStub::OnRemoteRequest(uint32_t code, MessageParcel &da
         return 0;
     }
     // map request code to corresponding process function.
-    int32_t ret = InitInnerFuncMap(code, data, reply);
+    int32_t ret = InvokeInnerFunc(code, data, reply);
     bool hasMappedInnerFunc = ret > -1;
     if (!hasMappedInnerFunc) {
         HILOG_INFO_I18N("I18nServiceAbilityStub::OnRemoteRequest invalid request code=%{public}u", code);
@@ -60,7 +60,7 @@ int32_t I18nServiceAbilityStub::OnRemoteRequest(uint32_t code, MessageParcel &da
     return ret;
 }
 
-int32_t I18nServiceAbilityStub::InitInnerFuncMap(uint32_t code, MessageParcel &data, MessageParcel &reply)
+int32_t I18nServiceAbilityStub::InvokeInnerFunc(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     switch (code) {
         case static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_SYSTEM_LANGUAGE): {

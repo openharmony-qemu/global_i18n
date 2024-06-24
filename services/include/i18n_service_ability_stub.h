@@ -49,11 +49,10 @@ public:
     virtual void UnloadI18nServiceAbility() = 0;
 
 private:
-
     /**
      * @brief Construct map from request codes to request handling functions.
      */
-    int32_t InitInnerFuncMap(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    int32_t InvokeInnerFunc(uint32_t code, MessageParcel &data, MessageParcel &reply);
 
     /**
      * @brief Check whether caller's token type is system app or shell, and has UPDATE_CONFIGURATION permission.
