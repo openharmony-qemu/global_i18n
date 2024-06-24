@@ -49,13 +49,11 @@ public:
     virtual void UnloadI18nServiceAbility() = 0;
 
 private:
-    using I18nServiceAbilityInnerFunc = int32_t (I18nServiceAbilityStub::*)(MessageParcel &data, MessageParcel &reply);
-    std::map<uint32_t, I18nServiceAbilityInnerFunc> innerFuncMap;
 
     /**
      * @brief Construct map from request codes to request handling functions.
      */
-    void InitInnerFuncMap();
+    int32_t InitInnerFuncMap(uint32_t code, MessageParcel &data, MessageParcel &reply);
 
     /**
      * @brief Check whether caller's token type is system app or shell, and has UPDATE_CONFIGURATION permission.
