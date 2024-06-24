@@ -23,6 +23,7 @@ public:
     IcsFileWriter();
     ~IcsFileWriter();
     std::string GenerateFile();
+    std::string WriteVersionFile(const std::string& verison, std::string fileName);
 };
 } // namespace I18n
 } // namespace Global

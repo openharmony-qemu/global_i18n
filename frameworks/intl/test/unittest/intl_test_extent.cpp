@@ -26,13 +26,13 @@
 #include "holiday_manager.h"
 #include "i18n_break_iterator.h"
 #include "i18n_calendar.h"
-#include "i18n_service_ability_client.h"
 #include "i18n_timezone.h"
 #include "i18n_types.h"
 #include "index_util.h"
 #include "locale_compare.h"
 #include "locale_config.h"
 #include "locale_info.h"
+#include "locale_matcher.h"
 #include "measure_data.h"
 #include "number_format.h"
 #include "parameter.h"
@@ -41,6 +41,7 @@
 #include "preferred_language.h"
 #include "regex_rule.h"
 #include "relative_time_format.h"
+#include "rules_engine.h"
 #include "system_locale_manager.h"
 #include "taboo_utils.h"
 #include "taboo.h"
@@ -48,6 +49,7 @@
 #include "utils.h"
 #include "intl_test.h"
 #include "generate_ics_file.h"
+#include "signature_verifier.h"
 #include <unistd.h>
 
 using namespace OHOS::Global::I18n;
@@ -205,8 +207,12 @@ HWTEST_F(IntlTest, IntlFuncTest0052, TestSize.Level1)
     std::string indexStr = indexUtil->GetIndex("A");
     EXPECT_EQ(indexStr, "A");
     IndexUtil *indexUtil2 = new IndexUtil("");
+    IndexUtil *idxUtil = new IndexUtil("@@#");
+    idxUtil->GetIndexList();
+    idxUtil->GetIndex("**");
     delete indexUtil;
     delete indexUtil2;
+    delete idxUtil;
 
     IndexUtil indexUtil3("");
     indexUtil3.AddLocale("en-US");
@@ -502,11 +508,17 @@ HWTEST_F(IntlTest, IntlFuncTest0062, TestSize.Level1)
     int32_t status = 0;
     string numberStr = "12345678901234567890123456789012345678901234567890987654321";
     ConvertString2Int(numberStr, status);
+    numberStr = "@#";
+    ConvertString2Int(numberStr, status);
     icu::Locale locale("$$$$5%%%");
     bool isValid = IsValidLocaleTag(locale);
     EXPECT_TRUE(!isValid);
     GetAllValidLocalesTag(allValidLocalesLanguageTag);
     EXPECT_TRUE(allValidLocalesLanguageTag.size() == 0);
+    const std::string str = "zh_Hans_CN";
+    const std::string target = "-";
+    const std::string replace = "";
+    StrReplaceAll(str, target, replace);
 
     std::string localeRule = "zh-Hans";
     DateTimeRule* dateTimeRule = new DateTimeRule(localeRule);
@@ -904,6 +916,14 @@ HWTEST_F(IntlTest, IntlFuncTest0073, TestSize.Level1)
         formated = phoneNumFmt->format(formated);
     }
     EXPECT_EQ(formated, "186 2235 00");
+    number = "186223500102933884747757758585885858854774";
+    phoneNumFmt->format(number);
+    number = "(020) 6355";
+    phoneNumFmt->format(number);
+    number = "123";
+    phoneNumFmt->format(number);
+    number = "2134";
+    phoneNumFmt->format(number);
 
     formated = "";
     number = "075576453";
@@ -915,23 +935,106 @@ HWTEST_F(IntlTest, IntlFuncTest0073, TestSize.Level1)
 
     std::unique_ptr<PhoneNumberFormat> phoneNumFmt2 =
         std::make_unique<PhoneNumberFormat>("AD", options);
-    number = "7";
-    formated = phoneNumFmt2->format(number);
-    number = formated + "1";
-    formated = phoneNumFmt2->format(number);
-    number = formated + "2";
-    formated = phoneNumFmt2->format(number);
-    number = formated + "3";
-    formated = phoneNumFmt2->format(number);
-    number = formated + "9";
-    formated = phoneNumFmt2->format(number);
-    number = formated.substr(0, formated.length() - 1);
-    formated = phoneNumFmt2->format(number);
-    number = formated + "4";
-    formated = phoneNumFmt2->format(number);
-    number = formated + "5";
-    formated = phoneNumFmt2->format(number);
+    formated = "";
+    number = "7123945";
+    for (char c : number) {
+        if (c == '4') {
+            formated = formated.substr(0, formated.length() - 1);
+            formated = phoneNumFmt->format(formated);
+        }
+        formated = formated + c;
+        formated = phoneNumFmt->format(formated);
+    }
     EXPECT_EQ(formated, "712 345");
+    PhoneNumberFormat::CloseDynamicHandler();
+}
+
+/**
+ * @tc.name: IntlFuncTest0074
+ * @tc.desc: Test LocaleMatcher
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0074, TestSize.Level1)
+{
+    const LocaleInfo* current = nullptr;
+    const LocaleInfo* other = new LocaleInfo("fil");
+    const LocaleInfo* other2 = nullptr;
+    LocaleMatcher::IsMoreSuitable(current, other, nullptr);
+    LocaleMatcher::IsMoreSuitable(current, other2, nullptr);
+    const LocaleInfo* request = new LocaleInfo("en-Qaag-GB");
+    const LocaleInfo* currentHE = new LocaleInfo("he");
+    const LocaleInfo* otherIW = new LocaleInfo("iw");
+    LocaleMatcher::IsMoreSuitable(currentHE, otherIW, request);
+    const LocaleInfo* currentTL = new LocaleInfo("tl");
+    LocaleMatcher::IsMoreSuitable(currentTL, other, request);
+    LocaleMatcher::IsMoreSuitable(other, currentTL, request);
+    const LocaleInfo* currentJI = new LocaleInfo("ji");
+    const LocaleInfo* otherYI = new LocaleInfo("yi");
+    LocaleMatcher::IsMoreSuitable(currentJI, otherYI, request);
+    LocaleMatcher::IsMoreSuitable(otherYI, currentJI, request);
+    const LocaleInfo* currentJW = new LocaleInfo("jw");
+    const LocaleInfo* otherJV = new LocaleInfo("jv");
+    LocaleMatcher::IsMoreSuitable(currentJW, otherJV, request);
+    LocaleMatcher::IsMoreSuitable(otherJV, currentJW, request);
+    const LocaleInfo* currentIN = new LocaleInfo("in-PH");
+    const LocaleInfo* otherID = new LocaleInfo("id-MY");
+    LocaleMatcher::IsMoreSuitable(currentIN, otherID, request);
+    LocaleMatcher::IsMoreSuitable(otherID, currentIN, request);
+    LocaleMatcher::IsMoreSuitable(nullptr, currentIN, request);
+    LocaleMatcher::IsMoreSuitable(currentIN, nullptr, request);
+    const LocaleInfo* enLatn = new LocaleInfo("en-Latn-US");
+    LocaleMatcher::Match(request, enLatn);
+    const LocaleInfo* otherIN = new LocaleInfo("in-MY");
+    LocaleMatcher::Match(currentIN, otherIN);
+    delete other;
+    delete request;
+    delete currentHE;
+    delete otherIW;
+    delete currentTL;
+    delete currentJI;
+    delete otherYI;
+    delete currentJW;
+    delete otherJV;
+    delete currentIN;
+    delete otherID;
+    delete enLatn;
+    delete otherIN;
+}
+
+/**
+ * @tc.name: IntlFuncTest0075
+ * @tc.desc: Test RulesEngine
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0075, TestSize.Level1)
+{
+    DateTimeRule* dateTimeRule = nullptr;
+    std::unordered_map<std::string, std::string> rulesMap = {};
+    std::unordered_map<std::string, std::string> subRules = {};
+    std::unordered_map<std::string, std::string> param = {};
+    std::unordered_map<std::string, std::string> paramBackup = {};
+    RulesSet rulesSet(rulesMap, subRules, param, paramBackup);
+    RulesEngine rulesEngine(dateTimeRule, rulesSet);
+    std::string locale = "&&%";
+    DateTimeSequence::GetDateOrder(locale);
+    const std::string oldWriteVersion = "1.10.23.100";
+    const std::string newWriteVersion = "1.10.24.100";
+    IcsFileWriter icsFileWriter;
+    std::string oldFilePath = icsFileWriter.WriteVersionFile(oldWriteVersion, "old");
+    std::string newFilePath = icsFileWriter.WriteVersionFile(newWriteVersion, "new");
+    std::string oldVersion = SignatureVerifier::LoadFileVersion(oldFilePath);
+    std::string newVersion = SignatureVerifier::LoadFileVersion(newFilePath);
+    int res = SignatureVerifier::CompareVersion(oldVersion, newVersion);
+    EXPECT_EQ(res, 1);
+    FileExist(oldFilePath);
+    trim(locale);
+    const std::string destPath = "/data/log/copy.txt";
+    FileCopy(oldFilePath, destPath);
+    IsLegalPath(destPath);
+    const std::string relativePath = "../log/copy.txt";
+    IsLegalPath(relativePath);
+    const char* dirPath = "/data/log";
+    IsDirExist(dirPath);
 }
 } // namespace I18n
 } // namespace Global

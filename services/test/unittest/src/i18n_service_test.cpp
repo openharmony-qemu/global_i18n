@@ -76,7 +76,8 @@ void AddNativeTokenTypeAndPermissions()
     infoInstance.processName = "I18nServiceTest";
     SetSelfTokenID(GetAccessTokenId(&infoInstance));
     seteuid(ROOT_UID);
-    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
+    int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
+    printf("ReloadNativeTokenInfo result is %d. \n", ret);
     seteuid(I18N_UID);
 }
 
@@ -194,6 +195,8 @@ HWTEST_F(I18nServiceTest, I18nServiceFuncTest008, TestSize.Level1)
     AddNativeTokenTypeAndPermissions();
     I18nErrorCode err = I18nServiceAbilityClient::SetSystemLocale("en-US");
     EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    err = I18nServiceAbilityClient::SetSystemLocale("en-XA");
+    LocaleConfig::GetDisplayLanguage("zh", "en-US", true);
 }
 
 /**
