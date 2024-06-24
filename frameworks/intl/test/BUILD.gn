@@ -45,6 +45,7 @@ ohos_unittest("intl_test") {
     "icu:shared_icui18n",
     "icu:shared_icuuc",
     "init:libbegetutil",
+    "openssl:libssl_shared",
   ]
 
   deps = [

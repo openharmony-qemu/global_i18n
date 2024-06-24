@@ -63,6 +63,19 @@ std::string IcsFileWriter::GenerateFile()
     return filePath;
 }
 
+std::string IcsFileWriter::WriteVersionFile(const std::string& verison, std::string fileName)
+{
+    std::string filePath = "/data/log/" + fileName + ".txt";
+    std::ofstream fstream(filePath);
+    if (!fstream.is_open()) {
+        printf("file can't access.\r\n");
+        return filePath;
+    }
+    std::string content = "version=" + verison;
+    fstream << content << std::endl;
+    fstream.close();
+    return filePath;
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

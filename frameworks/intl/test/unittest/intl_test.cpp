@@ -1119,6 +1119,10 @@ HWTEST_F(IntlTest, IntlFuncTest0027, TestSize.Level1)
     formatter->FormatToParts(number, unit, timeVector);
     EXPECT_EQ(timeVector.size(), 10);
     delete formatter;
+    locales.clear();
+    locales.push_back("##$$");
+    RelativeTimeFormat *fmt = new RelativeTimeFormat(locales, options);
+    delete fmt;
 }
 
 /**
