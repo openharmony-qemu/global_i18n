@@ -84,7 +84,7 @@ int32_t I18nServiceAbilityStub::InvokeInnerFunc(uint32_t code, MessageParcel &da
         case static_cast<uint32_t>(ILocaleConfigAbilityCode::REMOVE_PREFERRED_LANGUAGE): {
             return I18nServiceAbilityStub::RemovePreferredLanguageInner(data, reply);
         } break;
-        default break;
+        default: break;
     }
     return -1;
 }
