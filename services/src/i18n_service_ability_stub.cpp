@@ -65,26 +65,27 @@ int32_t I18nServiceAbilityStub::InvokeInnerFunc(uint32_t code, MessageParcel &da
     switch (code) {
         case static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_SYSTEM_LANGUAGE): {
             return I18nServiceAbilityStub::SetSystemLanguageInner(data, reply);
-        } break;
+        }
         case static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_SYSTEM_REGION): {
             return I18nServiceAbilityStub::SetSystemRegionInner(data, reply);
-        } break;
+        }
         case static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_SYSTEM_LOCALE): {
             return I18nServiceAbilityStub::SetSystemLocaleInner(data, reply);
-        } break;
+        }
         case static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_24_HOUR_CLOCK): {
             return I18nServiceAbilityStub::Set24HourClockInner(data, reply);
-        } break;
+        }
         case static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_USING_LOCAL_DIGIT): {
             return I18nServiceAbilityStub::SetUsingLocalDigitInner(data, reply);
-        } break;
+        }
         case static_cast<uint32_t>(ILocaleConfigAbilityCode::ADD_PREFERRED_LANGUAGE): {
             return I18nServiceAbilityStub::AddPreferredLanguageInner(data, reply);
-        } break;
+        }
         case static_cast<uint32_t>(ILocaleConfigAbilityCode::REMOVE_PREFERRED_LANGUAGE): {
             return I18nServiceAbilityStub::RemovePreferredLanguageInner(data, reply);
-        } break;
-        default: break;
+        }
+        default:
+            break;
     }
     return -1;
 }
