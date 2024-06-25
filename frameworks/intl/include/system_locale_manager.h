@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 #include "collator.h"
+#include "i18n_types.h"
 #include "taboo_utils.h"
 
 namespace OHOS {
@@ -93,7 +94,7 @@ public:
      * @return std::vector<LocaleItem> sort result.
      */
     std::vector<LocaleItem> GetLanguageInfoArray(const std::vector<std::string> &languages,
-        const SortOptions &options);
+        const SortOptions &options, I18nErrorCode &status);
 
     /**
      * @brief sort input countries according to SortOptions and obtain sorted result.
@@ -102,14 +103,15 @@ public:
      * @param options sort options.
      * @return std::vector<LocaleItem> sort result.
      */
-    std::vector<LocaleItem> GetCountryInfoArray(const std::vector<std::string> &countries, const SortOptions &options);
+    std::vector<LocaleItem> GetCountryInfoArray(const std::vector<std::string> &countries, const SortOptions &options,
+        I18nErrorCode &status);
 
     /**
      * @brief obtains sorted time zone city array.
      *
      * @return std::vector<TimeZoneCityItem> sort result.
      */
-    static std::vector<TimeZoneCityItem> GetTimezoneCityInfoArray();
+    static std::vector<TimeZoneCityItem> GetTimezoneCityInfoArray(I18nErrorCode &status);
 
 private:
     void SortLocaleItemList(std::vector<LocaleItem> &localeItemList, const SortOptions &options);

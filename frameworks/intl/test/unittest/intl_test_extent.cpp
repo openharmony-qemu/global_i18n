@@ -329,12 +329,13 @@ HWTEST_F(IntlTest, IntlFuncTest0056, TestSize.Level1)
     SystemLocaleManager *systemLocaleManager = new SystemLocaleManager();
     std::vector<std::string> languages = {"en", "de", "es", "fr"};
     SortOptions sortOptions = {"en-US", true, true};
-    std::vector<LocaleItem> languageInfos = systemLocaleManager->GetLanguageInfoArray(languages, sortOptions);
+    I18nErrorCode status;
+    std::vector<LocaleItem> languageInfos = systemLocaleManager->GetLanguageInfoArray(languages, sortOptions, status);
     EXPECT_EQ(languageInfos.size(), 4);
     const std::vector<std::string> countries = {"US", "GB", "DE", "CA"};
-    std::vector<LocaleItem> countryInfos = systemLocaleManager->GetCountryInfoArray(countries, sortOptions);
+    std::vector<LocaleItem> countryInfos = systemLocaleManager->GetCountryInfoArray(countries, sortOptions, status);
     EXPECT_EQ(countryInfos.size(), 4);
-    std::vector<TimeZoneCityItem> timezoneCityItemList = SystemLocaleManager::GetTimezoneCityInfoArray();
+    std::vector<TimeZoneCityItem> timezoneCityItemList = SystemLocaleManager::GetTimezoneCityInfoArray(status);
     EXPECT_TRUE(timezoneCityItemList.size() > 0);
     delete systemLocaleManager;
 }

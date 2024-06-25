@@ -33,10 +33,10 @@ namespace OHOS {
         std::string systemLocale = LocaleConfig::GetSystemLocale();
         SortOptions sortOptions = {systemLocale, true, true};
         SystemLocaleManager* systemLocaleManager = new SystemLocaleManager();
-        
-        systemLocaleManager->GetLanguageInfoArray(languages, sortOptions);
-        systemLocaleManager->GetCountryInfoArray(languages, sortOptions);
-        systemLocaleManager->GetTimezoneCityInfoArray();
+        I18nErrorCode status;
+        systemLocaleManager->GetLanguageInfoArray(languages, sortOptions, status);
+        systemLocaleManager->GetCountryInfoArray(languages, sortOptions, status);
+        systemLocaleManager->GetTimezoneCityInfoArray(status);
         delete systemLocaleManager;
     }
 }
