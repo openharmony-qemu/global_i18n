@@ -28,7 +28,6 @@ namespace I18n {
 I18nServiceAbilityStub::I18nServiceAbilityStub(bool serialInvokeFlag)
     : IRemoteStub<II18nServiceAbility>(serialInvokeFlag)
 {
-    InitInnerFuncMap();
     HILOG_INFO_I18N("I18nServiceAbilityStub object init success.");
 }
 
@@ -50,16 +49,8 @@ int32_t I18nServiceAbilityStub::OnRemoteRequest(uint32_t code, MessageParcel &da
         return 0;
     }
     // map request code to corresponding process function.
-    int32_t ret;
-    bool hasMappedInnerFunc = false;
-    auto funcIter = innerFuncMap.find(code);
-    if (funcIter != innerFuncMap.end()) {
-        auto func = funcIter->second;
-        if (func != nullptr) {
-            hasMappedInnerFunc = true;
-            ret = (this->*func)(data, reply);
-        }
-    }
+    int32_t ret = InvokeInnerFunc(code, data, reply);
+    bool hasMappedInnerFunc = ret > -1;
     if (!hasMappedInnerFunc) {
         HILOG_INFO_I18N("I18nServiceAbilityStub::OnRemoteRequest invalid request code=%{public}u", code);
         ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -69,22 +60,34 @@ int32_t I18nServiceAbilityStub::OnRemoteRequest(uint32_t code, MessageParcel &da
     return ret;
 }
 
-void I18nServiceAbilityStub::InitInnerFuncMap()
+int32_t I18nServiceAbilityStub::InvokeInnerFunc(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
-    innerFuncMap[static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_SYSTEM_LANGUAGE)] =
-        &I18nServiceAbilityStub::SetSystemLanguageInner;
-    innerFuncMap[static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_SYSTEM_REGION)] =
-        &I18nServiceAbilityStub::SetSystemRegionInner;
-    innerFuncMap[static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_SYSTEM_LOCALE)] =
-        &I18nServiceAbilityStub::SetSystemLocaleInner;
-    innerFuncMap[static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_24_HOUR_CLOCK)] =
-        &I18nServiceAbilityStub::Set24HourClockInner;
-    innerFuncMap[static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_USING_LOCAL_DIGIT)] =
-        &I18nServiceAbilityStub::SetUsingLocalDigitInner;
-    innerFuncMap[static_cast<uint32_t>(ILocaleConfigAbilityCode::ADD_PREFERRED_LANGUAGE)] =
-        &I18nServiceAbilityStub::AddPreferredLanguageInner;
-    innerFuncMap[static_cast<uint32_t>(ILocaleConfigAbilityCode::REMOVE_PREFERRED_LANGUAGE)] =
-        &I18nServiceAbilityStub::RemovePreferredLanguageInner;
+    switch (code) {
+        case static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_SYSTEM_LANGUAGE): {
+            return I18nServiceAbilityStub::SetSystemLanguageInner(data, reply);
+        }
+        case static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_SYSTEM_REGION): {
+            return I18nServiceAbilityStub::SetSystemRegionInner(data, reply);
+        }
+        case static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_SYSTEM_LOCALE): {
+            return I18nServiceAbilityStub::SetSystemLocaleInner(data, reply);
+        }
+        case static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_24_HOUR_CLOCK): {
+            return I18nServiceAbilityStub::Set24HourClockInner(data, reply);
+        }
+        case static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_USING_LOCAL_DIGIT): {
+            return I18nServiceAbilityStub::SetUsingLocalDigitInner(data, reply);
+        }
+        case static_cast<uint32_t>(ILocaleConfigAbilityCode::ADD_PREFERRED_LANGUAGE): {
+            return I18nServiceAbilityStub::AddPreferredLanguageInner(data, reply);
+        }
+        case static_cast<uint32_t>(ILocaleConfigAbilityCode::REMOVE_PREFERRED_LANGUAGE): {
+            return I18nServiceAbilityStub::RemovePreferredLanguageInner(data, reply);
+        }
+        default:
+            break;
+    }
+    return -1;
 }
 
 /**
