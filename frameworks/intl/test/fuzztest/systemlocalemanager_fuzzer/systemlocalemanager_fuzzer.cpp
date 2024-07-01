@@ -36,7 +36,7 @@ namespace OHOS {
         I18nErrorCode status;
         systemLocaleManager->GetLanguageInfoArray(languages, sortOptions, status);
         systemLocaleManager->GetCountryInfoArray(languages, sortOptions, status);
-        systemLocaleManager->GetTimezoneCityInfoArray(status);
+        systemLocaleManager->GetTimezoneCityInfoArray();
         delete systemLocaleManager;
     }
 }
