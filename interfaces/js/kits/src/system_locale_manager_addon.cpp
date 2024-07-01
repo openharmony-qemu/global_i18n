@@ -178,12 +178,7 @@ napi_value SystemLocaleManagerAddon::GetCountryInfoArray(napi_env env, napi_call
 
 napi_value SystemLocaleManagerAddon::GetTimeZoneCityInfoArray(napi_env env, napi_callback_info info)
 {
-    I18nErrorCode err;
-    std::vector<TimeZoneCityItem> timezoneCityItemList = SystemLocaleManager::GetTimezoneCityInfoArray(err);
-    if (err == I18nErrorCode::NOT_SYSTEM_APP) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_SYSTEM_APP, "", "", true);
-        return nullptr;
-    }
+    std::vector<TimeZoneCityItem> timezoneCityItemList = SystemLocaleManager::GetTimezoneCityInfoArray();
     napi_value result = nullptr;
     napi_status status = napi_create_array_with_length(env, timezoneCityItemList.size(), &result);
     if (status != napi_ok) {
