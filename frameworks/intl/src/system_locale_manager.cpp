@@ -158,16 +158,11 @@ void SystemLocaleManager::SortLocaleItemList(std::vector<LocaleItem> &localeItem
     delete collator;
 }
 
-std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray(I18nErrorCode &status)
+std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray()
 {
-    std::vector<TimeZoneCityItem> result;
-    status = I18nErrorCode::SUCCESS;
-    if (!CheckSystemPermission()) {
-        status = I18nErrorCode::NOT_SYSTEM_APP;
-        return result;
-    }
     std::set<std::string> zoneCityIds = I18nTimeZone::GetAvailableZoneCityIDs();
     std::string locale = LocaleConfig::GetSystemLocale();
+    std::vector<TimeZoneCityItem> result;
     std::string localeBaseName = I18nTimeZone::GetLocaleBaseName(locale);
     std::map<std::string, std::string> displayNameMap = I18nTimeZone::FindCityDisplayNameMap(localeBaseName);
     std::map<std::string, icu::TimeZone*> tzMap;
