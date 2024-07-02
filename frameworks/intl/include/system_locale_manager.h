@@ -111,7 +111,7 @@ public:
      *
      * @return std::vector<TimeZoneCityItem> sort result.
      */
-    static std::vector<TimeZoneCityItem> GetTimezoneCityInfoArray();
+    static std::vector<TimeZoneCityItem> GetTimezoneCityInfoArray(I18nErrorCode &status);
 
 private:
     void SortLocaleItemList(std::vector<LocaleItem> &localeItemList, const SortOptions &options);
