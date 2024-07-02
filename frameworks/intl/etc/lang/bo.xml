@@ -15,22 +15,22 @@
 <languages>
     <lang>
         <id>zh</id>
-        <display_name>རྒྱ་སྐད་</display_name>
+        <display_name>རྒྱ་སྐད།</display_name>
     </lang>
     <lang>
         <id>zh-Hans</id>
-        <display_name>རྒྱ་ཡིག་སྟབས་བདེ་རུ་གཏོང་བ།</display_name>
+        <display_name>བསྡུས་གཟུགས་རྒྱ་ཡིག</display_name>
     </lang>
     <lang>
         <id>zh-Hant</id>
-        <display_name>རྒྱ་ཡིག་གི་རྣམ་པ།</display_name>
+        <display_name>བརྡ་རྙིང་རྒྱ་ཡིག</display_name>
     </lang>
     <lang>
         <id>ro</id>
-        <display_name>རོ་མ་ཉི་ཡའི་སྐད།</display_name>
+        <display_name>རོ་མ་ནི་ཡའི་སྐད།</display_name>
     </lang>
     <lang>
         <id>fa</id>
-        <display_name>པོ་སིའི་སྐད།</display_name>
+        <display_name>ཧྥ་ར་སིའི་སྐད།</display_name>
     </lang>
 </languages>
