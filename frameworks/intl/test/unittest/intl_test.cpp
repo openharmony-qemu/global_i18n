@@ -588,7 +588,7 @@ HWTEST_F(IntlTest, IntlFuncTest0015, TestSize.Level1)
     locales.push_back("jessie");
     locales.push_back(locale);
     map<string, string> options = {
-        { "timeZone", "America/Los_Angeles"  },
+        { "timeZone", "America/Los_Angeles" },
         { "timeZoneName", "short" }
     };
     DateTimeFormat *dateFormat = new (std::nothrow) DateTimeFormat(locales, options);
