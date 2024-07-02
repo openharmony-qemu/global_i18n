@@ -169,7 +169,7 @@ std::string GetISO3Country(const string& country)
     }
     return locale.getISO3Country();
 }
- 
+
 bool FileExist(const std::string& path)
 {
     bool status = false;
