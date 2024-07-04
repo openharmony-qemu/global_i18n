@@ -19,6 +19,8 @@
 #include "numberformat_fuzzer.h"
 
 namespace OHOS {
+    static size_t FIRST_PARAM_OFFSET_SIZE = 4;
+
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
         using namespace Global::I18n;
@@ -31,7 +33,7 @@ namespace OHOS {
         std::map<std::string, std::string> options;
         options[input] = input;
         NumberFormat formatter(localeTags, options);
-        if (size >= 4) {
+        if (size >= FIRST_PARAM_OFFSET_SIZE) {
             int32_t temp = *(reinterpret_cast<const int32_t*>(data + offset));
             double number = static_cast<double>(temp);
             formatter.Format(number);
