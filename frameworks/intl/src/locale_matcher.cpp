@@ -26,6 +26,21 @@ uint64_t LocaleMatcher::ZH_HANT_MO_ENCODE = LocaleUtil::EncodeLocale("zh", "Hant
 uint64_t LocaleMatcher::ZH_HK_ENCODE = LocaleUtil::EncodeLocale("zh", nullptr, "HK");
 uint32_t LocaleMatcher::HANT_ENCODE = LocaleUtil::EncodeScript("Hant");
 
+std::string LocaleMatcher::GetBestMatchedLocale(const LocaleInfo* requestLocale,
+    const std::vector<LocaleInfo*>& candidateLocales)
+{
+    if (candidateLocales.size() == 0) {
+        return "";
+    }
+    LocaleInfo* bestMatch = candidateLocales[0];
+    for (size_t i = 1; i < candidateLocales.size(); ++i) {
+        if (IsMoreSuitable(bestMatch, candidateLocales[i], requestLocale) < 0) {
+            bestMatch = candidateLocales[i];
+        }
+    }
+    return bestMatch->ToString();
+}
+
 int8_t LocaleMatcher::IsMoreSuitable(const LocaleInfo *current, const LocaleInfo *other, const LocaleInfo *request)
 {
     if (request == nullptr) {
