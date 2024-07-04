@@ -42,6 +42,7 @@ bool IsDirExist(const char *path);
 bool GetPseudoLocalizationEnforce();
 std::string PseudoLocalizationProcessor(const std::string &input);
 std::string PseudoLocalizationProcessor(const std::string &input, bool ifEnforce);
+bool CheckSystemPermission();
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

@@ -23,6 +23,8 @@ namespace I18n {
 static const std::unordered_map<int32_t, std::string> ErrorCodeToMsg {
     {I18N_NO_PERMISSION,
         "Permission verification failed. The application does not have the permission required to call the API."},
+    {I18N_NOT_SYSTEM_APP,
+        "Permission verification failed. A non-system application calls a system API."},
     {I18N_NOT_VALID, "Invalid parameter"},
     {I18N_NOT_FOUND, "Parameter error"},
     {I18N_OPTION_NOT_VALID, "Invalid option name"}
@@ -42,7 +44,7 @@ void ErrorUtil::NapiThrow(napi_env env, int32_t errCode, const std::string& valu
     std::string errMsg = iter != ErrorCodeToMsg.end() ? iter->second : "";
     std::string allErrMsg;
 
-    if (errCode == I18N_NO_PERMISSION) {
+    if (errCode == I18N_NO_PERMISSION || errCode == I18N_NOT_SYSTEM_APP) {
         allErrMsg = errMsg;
     } else if (errCode == I18N_NOT_VALID) {
         allErrMsg = errMsg + ", the " + valueName + " must be " + valueContent + ".";

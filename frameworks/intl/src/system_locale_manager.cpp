@@ -44,10 +44,15 @@ SystemLocaleManager::~SystemLocaleManager()
  * 4. Sort the languages use locale displayName, local displyName and suggestion infomation.
  */
 std::vector<LocaleItem> SystemLocaleManager::GetLanguageInfoArray(const std::vector<std::string> &languages,
-    const SortOptions &options)
+    const SortOptions &options, I18nErrorCode &status)
 {
-    std::unordered_set<std::string> blockedLanguages = LocaleConfig::GetBlockedLanguages();
     std::vector<LocaleItem> localeItemList;
+    status = I18nErrorCode::SUCCESS;
+    if (!CheckSystemPermission()) {
+        status = I18nErrorCode::NOT_SYSTEM_APP;
+        return localeItemList;
+    }
+    std::unordered_set<std::string> blockedLanguages = LocaleConfig::GetBlockedLanguages();
     for (auto it = languages.begin(); it != languages.end(); ++it) {
         if (blockedLanguages.find(*it) != blockedLanguages.end()) {
             continue;
@@ -86,11 +91,16 @@ std::vector<LocaleItem> SystemLocaleManager::GetLanguageInfoArray(const std::vec
  * 4. Sort the regions use locale displayName and suggestion infomation.
  */
 std::vector<LocaleItem> SystemLocaleManager::GetCountryInfoArray(const std::vector<std::string> &countries,
-    const SortOptions &options)
+    const SortOptions &options, I18nErrorCode &status)
 {
+    std::vector<LocaleItem> localeItemList;
+    status = I18nErrorCode::SUCCESS;
+    if (!CheckSystemPermission()) {
+        status = I18nErrorCode::NOT_SYSTEM_APP;
+        return localeItemList;
+    }
     std::unordered_set<std::string> blockedRegions = LocaleConfig::GetBlockedRegions();
     std::unordered_set<std::string> blockedLanguageRegions = LocaleConfig::GetLanguageBlockedRegions();
-    std::vector<LocaleItem> localeItemList;
     std::string pseudoProcessedRegion = PseudoLocalizationProcessor("");
     for (auto it = countries.begin(); it != countries.end(); ++it) {
         if (blockedRegions.find(*it) != blockedRegions.end() || blockedLanguageRegions.find(*it) !=
@@ -148,11 +158,16 @@ void SystemLocaleManager::SortLocaleItemList(std::vector<LocaleItem> &localeItem
     delete collator;
 }
 
-std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray()
+std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray(I18nErrorCode& status)
 {
+    std::vector<TimeZoneCityItem> result;
+    status = I18nErrorCode::SUCCESS;
+    if (!CheckSystemPermission()) {
+        status = I18nErrorCode::NOT_SYSTEM_APP;
+        return result;
+    }
     std::set<std::string> zoneCityIds = I18nTimeZone::GetAvailableZoneCityIDs();
     std::string locale = LocaleConfig::GetSystemLocale();
-    std::vector<TimeZoneCityItem> result;
     std::string localeBaseName = I18nTimeZone::GetLocaleBaseName(locale);
     std::map<std::string, std::string> displayNameMap = I18nTimeZone::FindCityDisplayNameMap(localeBaseName);
     std::map<std::string, icu::TimeZone*> tzMap;

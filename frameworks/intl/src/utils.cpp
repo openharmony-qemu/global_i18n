@@ -21,9 +21,12 @@
 #include <string>
 #include <sys/stat.h>
 #include <vector>
+#include "accesstoken_kit.h"
 #include "i18n_hilog.h"
+#include "ipc_skeleton.h"
 #include "locale_config.h"
 #include "parameter.h"
+#include "tokenid_kit.h"
 #include "unicode/localebuilder.h"
 #include "utils.h"
 
@@ -265,6 +268,22 @@ std::string PseudoLocalizationProcessor(const std::string &input, bool ifEnforce
         return PSEUDO_START_TAG + input + PSEUDO_END_TAG;
     }
     return input;
+}
+
+bool CheckSystemPermission()
+{
+    uint64_t tokenId = IPCSkeleton::GetCallingFullTokenID();
+    uint32_t callerToken = IPCSkeleton::GetCallingTokenID();
+    bool isSystemApp = Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(tokenId);
+    Security::AccessToken::ATokenTypeEnum tokenType =
+        Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
+    bool isShell = tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL;
+    bool isNative = tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE;
+    if (!isSystemApp && !isShell && !isNative) {
+        HILOG_ERROR_I18N("CheckSystemPermission failed, because current app is not system app.");
+        return false;
+    }
+    return true;
 }
 } // namespace I18n
 } // namespace Global

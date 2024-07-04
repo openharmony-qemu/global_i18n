@@ -127,7 +127,13 @@ napi_value SystemLocaleManagerAddon::GetLanguageInfoArray(napi_env env, napi_cal
         HILOG_ERROR_I18N("GetLanguageInfoArray: Get SystemLocaleManager object failed");
         return nullptr;
     }
-    std::vector<LocaleItem> localeItemList = obj->systemLocaleManager_->GetLanguageInfoArray(languageList, options);
+    I18nErrorCode err;
+    std::vector<LocaleItem> localeItemList =
+        obj->systemLocaleManager_->GetLanguageInfoArray(languageList, options, err);
+    if (err == I18nErrorCode::NOT_SYSTEM_APP) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_SYSTEM_APP, "", "", true);
+        return nullptr;
+    }
     napi_value result = CreateLocaleItemArray(env, localeItemList);
     return result;
 }
@@ -160,14 +166,24 @@ napi_value SystemLocaleManagerAddon::GetCountryInfoArray(napi_env env, napi_call
         HILOG_ERROR_I18N("GetCountryInfoArray: Get SystemLocaleManager object failed");
         return nullptr;
     }
-    std::vector<LocaleItem> localeItemList = obj->systemLocaleManager_->GetCountryInfoArray(countryList, options);
+    I18nErrorCode err;
+    std::vector<LocaleItem> localeItemList = obj->systemLocaleManager_->GetCountryInfoArray(countryList, options, err);
+    if (err == I18nErrorCode::NOT_SYSTEM_APP) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_SYSTEM_APP, "", "", true);
+        return nullptr;
+    }
     napi_value result = CreateLocaleItemArray(env, localeItemList);
     return result;
 }
 
 napi_value SystemLocaleManagerAddon::GetTimeZoneCityInfoArray(napi_env env, napi_callback_info info)
 {
-    std::vector<TimeZoneCityItem> timezoneCityItemList = SystemLocaleManager::GetTimezoneCityInfoArray();
+    I18nErrorCode err;
+    std::vector<TimeZoneCityItem> timezoneCityItemList = SystemLocaleManager::GetTimezoneCityInfoArray(err);
+    if (err == I18nErrorCode::NOT_SYSTEM_APP) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_SYSTEM_APP, "", "", true);
+        return nullptr;
+    }
     napi_value result = nullptr;
     napi_status status = napi_create_array_with_length(env, timezoneCityItemList.size(), &result);
     if (status != napi_ok) {

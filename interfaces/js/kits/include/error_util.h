@@ -25,6 +25,7 @@ namespace Global {
 namespace I18n {
 // Common error code
 const int32_t I18N_NO_PERMISSION  = 201;          // The app don't have requested permission
+const int32_t I18N_NOT_SYSTEM_APP = 202;          // The app isn't a system app
 const int32_t I18N_NOT_FOUND     = 401;          // Input parameter is missing
 
 // I18N error code
