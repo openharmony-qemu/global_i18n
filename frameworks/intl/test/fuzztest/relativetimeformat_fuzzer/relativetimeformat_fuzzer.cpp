@@ -19,6 +19,9 @@
 #include "relativetimeformat_fuzzer.h"
 
 namespace OHOS {
+    static size_t FIRST_PARAM_OFFSET_SIZE = 4;
+    static size_t SECOND_PARAM_OFFSET_SIZE = 8;
+
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
         using namespace Global::I18n;
@@ -31,15 +34,20 @@ namespace OHOS {
         std::map<std::string, std::string> options;
         options[input] = input;
         RelativeTimeFormat formatter(localeTags, options);
-        
-        double number = *(reinterpret_cast<const double*>(data + offset));
-        formatter.Format(number, input);
-        
-        std::vector<std::vector<std::string>> timeVector;
-        offset += sizeof(double);
-        double number2 = *(reinterpret_cast<const double*>(data + offset));
-        formatter.FormatToParts(number2, input, timeVector);
-        
+        if (size >= FIRST_PARAM_OFFSET_SIZE) {
+            uint32_t tempVal = *(reinterpret_cast<const uint32_t*>(data + offset));
+            double number = static_cast<double>(tempVal);
+            formatter.Format(number, input);
+        }
+
+        if (size >= SECOND_PARAM_OFFSET_SIZE) {
+            std::vector<std::vector<std::string>> timeVector;
+            offset += sizeof(uint32_t);
+            uint32_t tempValue = *(reinterpret_cast<const uint32_t*>(data + offset));
+            double number2 = static_cast<double>(tempValue);
+            formatter.FormatToParts(number2, input, timeVector);
+        }
+    
         std::map<std::string, std::string> res;
         formatter.GetResolvedOptions(res);
         return true;

@@ -20,6 +20,8 @@
 #include "timezone_fuzzer.h"
 
 namespace OHOS {
+    static size_t FIRST_PARAM_OFFSET_SIZE = 4;
+
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
         using namespace Global::I18n;
@@ -29,9 +31,13 @@ namespace OHOS {
         uint32_t offset = 0;
         std::string text(reinterpret_cast<const char*>(data), size);
         bool isDST = (data[0] % 2 == 1);
-        double date = *(reinterpret_cast<const double*>(data + offset));
         I18nTimeZone timezone(text, isDST);
-        timezone.GetOffset(date);
+        if () {
+            uint32_t tempVal = *(reinterpret_cast<const uint32_t*>(data + offset));
+            double date = static_cast<>(tempVal);
+            timezone.GetOffset(date);
+        }
+
         timezone.GetRawOffset();
         timezone.GetID();
         timezone.GetDisplayName();
