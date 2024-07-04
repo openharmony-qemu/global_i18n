@@ -22,17 +22,19 @@
 #include "unicode/utypes.h"
 
 namespace OHOS {
-    bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
+    void DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
         using namespace Global::I18n;
 
-        bool result = false;
         uint32_t offset = 0;
         std::string input(reinterpret_cast<const char*>(data), size);
-        double number = *(reinterpret_cast<const double*>(data + offset));
+        if (size >= 4) {
+            int32_t temp = *(reinterpret_cast<const int32_t*>(data + offset));
+            I18nCalendar calendar(input, CalendarType::GREGORY);
+            double number = static_cast<double>(temp);
+            calendar.SetTime(number);
+        }
 
-        I18nCalendar calendar(input, CalendarType::GREGORY);
-        calendar.SetTime(number);
         calendar.Set(size, size, size);
         calendar.Set(UCalendarDateFields::UCAL_YEAR, size);
         calendar.GetTimeZone();
@@ -44,10 +46,13 @@ namespace OHOS {
         calendar.IsWeekend(size, status);
         calendar.IsWeekend();
         calendar.GetDisplayName(input);
-        offset += sizeof(double);
-        double compareDay = *(reinterpret_cast<const double*>(data + offset));
+        if (size < 8) {
+            return;
+        }
+        offset += sizeof(uint32_t);
+        int32_t intVal = *(reinterpret_cast<const int32_t*>(data + offset));
+        double compareDay = static_cast<double>(intVal);
         calendar.CompareDays(compareDay);
-        return result;
     }
 }
 
