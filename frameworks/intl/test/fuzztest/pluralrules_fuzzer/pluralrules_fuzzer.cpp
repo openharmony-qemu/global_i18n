@@ -20,7 +20,7 @@
 #include "pluralrules_fuzzer.h"
 
 namespace OHOS {
-    static size_t FIRST_PARAM_OFFSET_SIZE = 4;
+    const size_t FIRST_PARAM_OFFSET_SIZE = 4;
 
     void DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
