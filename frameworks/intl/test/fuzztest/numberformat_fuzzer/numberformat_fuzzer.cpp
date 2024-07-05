@@ -19,7 +19,7 @@
 #include "numberformat_fuzzer.h"
 
 namespace OHOS {
-    static size_t FIRST_PARAM_OFFSET_SIZE = 4;
+    const size_t FIRST_PARAM_OFFSET_SIZE = 4;
 
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {

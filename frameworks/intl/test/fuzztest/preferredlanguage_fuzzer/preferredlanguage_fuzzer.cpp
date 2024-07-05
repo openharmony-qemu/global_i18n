@@ -20,8 +20,8 @@
 #include "preferred_language.h"
 
 namespace OHOS {
-    static size_t FIRST_PARAM_OFFSET_SIZE = 4;
-    static size_t SECOND_PARAM_OFFSET_SIZE = 8;
+    const size_t FIRST_PARAM_OFFSET_SIZE = 4;
+    const size_t SECOND_PARAM_OFFSET_SIZE = 8;
 
     void DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
