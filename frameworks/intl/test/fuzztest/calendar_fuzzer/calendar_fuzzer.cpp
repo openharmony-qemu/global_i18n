@@ -22,8 +22,8 @@
 #include "unicode/utypes.h"
 
 namespace OHOS {
-    const size_t FIRST_PARAM_OFFSET_SIZE = 4;
-    const size_t SECOND_PARAM_OFFSET_SIZE = 8;
+    const size_t FIRST_PARAM_OFFSET_SIZE = 8;
+    const size_t SECOND_PARAM_OFFSET_SIZE = 16;
 
     void DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
@@ -33,8 +33,7 @@ namespace OHOS {
         std::string input(reinterpret_cast<const char*>(data), size);
         I18nCalendar calendar(input, CalendarType::GREGORY);
         if (size >= FIRST_PARAM_OFFSET_SIZE) {
-            int32_t temp = *(reinterpret_cast<const int32_t*>(data + offset));
-            double number = static_cast<double>(temp);
+            double number = *(reinterpret_cast<const double*>(data + offset));
             calendar.SetTime(number);
         }
 
@@ -52,9 +51,8 @@ namespace OHOS {
         if (size < SECOND_PARAM_OFFSET_SIZE) {
             return;
         }
-        offset += sizeof(uint32_t);
-        int32_t intVal = *(reinterpret_cast<const int32_t*>(data + offset));
-        double compareDay = static_cast<double>(intVal);
+        offset += sizeof(double);
+        double compareDay = *(reinterpret_cast<const double*>(data + offset));
         calendar.CompareDays(compareDay);
     }
 }

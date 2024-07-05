@@ -19,7 +19,7 @@
 #include "numberformat_fuzzer.h"
 
 namespace OHOS {
-    const size_t FIRST_PARAM_OFFSET_SIZE = 4;
+    const size_t FIRST_PARAM_OFFSET_SIZE = 8;
 
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
@@ -34,8 +34,7 @@ namespace OHOS {
         options[input] = input;
         NumberFormat formatter(localeTags, options);
         if (size >= FIRST_PARAM_OFFSET_SIZE) {
-            int32_t temp = *(reinterpret_cast<const int32_t*>(data + offset));
-            double number = static_cast<double>(temp);
+            double number = *(reinterpret_cast<const double*>(data + offset));
             formatter.Format(number);
         }
         formatter.GetResolvedOptions(options);
