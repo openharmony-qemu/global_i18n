@@ -19,6 +19,11 @@
 #include <unicode/regex.h>
 #include <vector>
 #include "regex_rule.h"
+#include "negative_rule.h"
+#include "border_rule.h"
+#include "code_rule.h"
+#include "positive_rule.h"
+#include "find_rule.h"
 #include "libxml/globals.h"
 #include "libxml/tree.h"
 #include "libxml/xmlstring.h"
@@ -32,11 +37,11 @@ public:
     ~PhoneNumberRule();
     void Init();
     
-    std::vector<RegexRule*> GetBorderRules();
-    std::vector<RegexRule*> GetCodesRules();
-    std::vector<RegexRule*> GetPositiveRules();
-    std::vector<RegexRule*> GetNegativeRules();
-    std::vector<RegexRule*> GetFindRules();
+    std::vector<BorderRule*> GetBorderRules();
+    std::vector<CodeRule*> GetCodesRules();
+    std::vector<PositiveRule*> GetPositiveRules();
+    std::vector<NegativeRule*> GetNegativeRules();
+    std::vector<FindRule*> GetFindRules();
     // Indicates whether the rules of the country are optimized
     bool isFixed;
 
@@ -50,11 +55,11 @@ private:
     bool IsXmlNodeValueEmpty(const std::string& insensitive, const std::string& type,
         const std::string& valid, const std::string& handle);
 
-    std::vector<RegexRule*> negativeRules;
-    std::vector<RegexRule*> positiveRules;
-    std::vector<RegexRule*> borderRules;
-    std::vector<RegexRule*> codesRules;
-    std::vector<RegexRule*> findRules;
+    std::vector<NegativeRule*> negativeRules;
+    std::vector<PositiveRule*> positiveRules;
+    std::vector<BorderRule*> borderRules;
+    std::vector<CodeRule*> codesRules;
+    std::vector<FindRule*> findRules;
     std::string country;
     std::string xmlPath;
     bool commonExit;

@@ -66,6 +66,9 @@ ohos_shared_library("preferred_language") {
 
 config("intl_util_config") {
   include_dirs = [
+    "//base/global/i18n/frameworks/intl/entity_recognition/date_time_recognition/include",
+    "//base/global/i18n/frameworks/intl/entity_recognition/include",
+    "//base/global/i18n/frameworks/intl/entity_recognition/phone_number_recognition/include",
     "//base/global/i18n/frameworks/intl/include",
     "//base/global/i18n/interfaces/native/inner_api/i18n/include",
   ]
@@ -74,15 +77,24 @@ ohos_shared_library("intl_util") {
   public_configs = [ ":intl_util_config" ]
   include_dirs = []
   sources = [
+    "entity_recognition/date_time_recognition/src/date_rule_init.cpp",
+    "entity_recognition/date_time_recognition/src/date_time_filter.cpp",
+    "entity_recognition/date_time_recognition/src/date_time_matched.cpp",
+    "entity_recognition/date_time_recognition/src/date_time_rule.cpp",
+    "entity_recognition/date_time_recognition/src/date_time_sequence.cpp",
+    "entity_recognition/date_time_recognition/src/rules_engine.cpp",
+    "entity_recognition/phone_number_recognition/src/border_rule.cpp",
+    "entity_recognition/phone_number_recognition/src/code_rule.cpp",
+    "entity_recognition/phone_number_recognition/src/find_rule.cpp",
+    "entity_recognition/phone_number_recognition/src/negative_rule.cpp",
+    "entity_recognition/phone_number_recognition/src/phone_number_matched.cpp",
+    "entity_recognition/phone_number_recognition/src/phone_number_rule.cpp",
+    "entity_recognition/phone_number_recognition/src/positive_rule.cpp",
+    "entity_recognition/phone_number_recognition/src/regex_rule.cpp",
+    "entity_recognition/src/entity_recognizer.cpp",
     "src/character.cpp",
     "src/collator.cpp",
-    "src/date_rule_init.cpp",
-    "src/date_time_filter.cpp",
     "src/date_time_format.cpp",
-    "src/date_time_matched.cpp",
-    "src/date_time_rule.cpp",
-    "src/date_time_sequence.cpp",
-    "src/entity_recognizer.cpp",
     "src/holiday_manager.cpp",
     "src/i18n_break_iterator.cpp",
     "src/i18n_calendar.cpp",
@@ -98,12 +110,8 @@ ohos_shared_library("intl_util") {
     "src/measure_data.cpp",
     "src/number_format.cpp",
     "src/phone_number_format.cpp",
-    "src/phone_number_matched.cpp",
-    "src/phone_number_rule.cpp",
     "src/plural_rules.cpp",
-    "src/regex_rule.cpp",
     "src/relative_time_format.cpp",
-    "src/rules_engine.cpp",
     "src/signature_verifier.cpp",
     "src/system_locale_manager.cpp",
     "src/taboo.cpp",
@@ -211,42 +219,42 @@ ohos_prebuilt_etc("i18n_param_config_xml") {
 }
 
 ohos_prebuilt_etc("CN_phonenumber_xml") {
-  source = "//base/global/i18n/frameworks/intl/etc/phonenumber/CN.xml"
+  source = "//base/global/i18n/frameworks/intl/entity_recognition/etc/phonenumber/CN.xml"
   module_install_dir = "usr/ohos_locale_config/phonenumber/"
   part_name = "i18n"
   subsystem_name = "global"
 }
 
 ohos_prebuilt_etc("GB_phonenumber_xml") {
-  source = "//base/global/i18n/frameworks/intl/etc/phonenumber/GB.xml"
+  source = "//base/global/i18n/frameworks/intl/entity_recognition/etc/phonenumber/GB.xml"
   module_install_dir = "usr/ohos_locale_config/phonenumber/"
   part_name = "i18n"
   subsystem_name = "global"
 }
 
 ohos_prebuilt_etc("common_phonenumber_xml") {
-  source = "//base/global/i18n/frameworks/intl/etc/phonenumber/common.xml"
+  source = "//base/global/i18n/frameworks/intl/entity_recognition/etc/phonenumber/common.xml"
   module_install_dir = "usr/ohos_locale_config/phonenumber/"
   part_name = "i18n"
   subsystem_name = "global"
 }
 
 ohos_prebuilt_etc("zh_datetime_xml") {
-  source = "//base/global/i18n/frameworks/intl/etc/datetime/zh.xml"
+  source = "//base/global/i18n/frameworks/intl/entity_recognition/etc/datetime/zh.xml"
   module_install_dir = "usr/ohos_locale_config/datetime/"
   part_name = "i18n"
   subsystem_name = "global"
 }
 
 ohos_prebuilt_etc("en_datetime_xml") {
-  source = "//base/global/i18n/frameworks/intl/etc/datetime/en.xml"
+  source = "//base/global/i18n/frameworks/intl/entity_recognition/etc/datetime/en.xml"
   module_install_dir = "usr/ohos_locale_config/datetime/"
   part_name = "i18n"
   subsystem_name = "global"
 }
 
 ohos_prebuilt_etc("common_datetime_xml") {
-  source = "//base/global/i18n/frameworks/intl/etc/datetime/common.xml"
+  source = "//base/global/i18n/frameworks/intl/entity_recognition/etc/datetime/common.xml"
   module_install_dir = "usr/ohos_locale_config/datetime/"
   part_name = "i18n"
   subsystem_name = "global"
