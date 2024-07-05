@@ -20,19 +20,25 @@
 #include "preferred_language.h"
 
 namespace OHOS {
-    bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
+    const size_t FIRST_PARAM_OFFSET_SIZE = 4;
+    const size_t SECOND_PARAM_OFFSET_SIZE = 8;
+
+    void DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
         using namespace Global::I18n;
-        uint32_t offset = 0;
         std::string input(reinterpret_cast<const char*>(data), size);
-        if (size > 0) {
-            int32_t index = *(reinterpret_cast<const int32_t*>(data + offset));
-            PreferredLanguage::AddPreferredLanguage(input, index);
-            offset += sizeof(int32_t);
-            int32_t index2 = *(reinterpret_cast<const int32_t*>(data + offset));
-            PreferredLanguage::RemovePreferredLanguage(index2);
+        if (size < FIRST_PARAM_OFFSET_SIZE) {
+            return;
         }
-        return true;
+        uint32_t offset = 0;
+        int32_t index = *(reinterpret_cast<const int32_t*>(data + offset));
+        PreferredLanguage::AddPreferredLanguage(input, index);
+        if (size < SECOND_PARAM_OFFSET_SIZE) {
+            return;
+        }
+        offset += sizeof(int32_t);
+        int32_t index2 = *(reinterpret_cast<const int32_t*>(data + offset));
+        PreferredLanguage::RemovePreferredLanguage(index2);
     }
 }
 
