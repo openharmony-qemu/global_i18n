@@ -20,19 +20,22 @@
 #include "pluralrules_fuzzer.h"
 
 namespace OHOS {
+    const size_t FIRST_PARAM_OFFSET_SIZE = 8;
+
     void DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
         using namespace Global::I18n;
         uint32_t offset = 0;
         std::string input(reinterpret_cast<const char*>(data), size);
-        double number = *(reinterpret_cast<const double*>(data + offset));
         std::vector<std::string> localeTags;
         localeTags.push_back(input);
         std::map<std::string, std::string> options;
         options[input] = input;
-
         PluralRules pluralRules(localeTags, options);
-        pluralRules.Select(number);
+        if (size >= FIRST_PARAM_OFFSET_SIZE) {
+            double number = *(reinterpret_cast<const double*>(data + offset));
+            pluralRules.Select(number);
+        }
     }
 }
 
