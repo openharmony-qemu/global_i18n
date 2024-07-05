@@ -20,7 +20,7 @@
 #include "timezone_fuzzer.h"
 
 namespace OHOS {
-    const size_t FIRST_PARAM_OFFSET_SIZE = 4;
+    const size_t FIRST_PARAM_OFFSET_SIZE = 8;
 
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
@@ -33,8 +33,7 @@ namespace OHOS {
         bool isDST = (data[0] % 2 == 1);
         I18nTimeZone timezone(text, isDST);
         if (size >= FIRST_PARAM_OFFSET_SIZE) {
-            uint32_t tempVal = *(reinterpret_cast<const uint32_t*>(data + offset));
-            double date = static_cast<double>(tempVal);
+            double date = *(reinterpret_cast<const double*>(data + offset));
             timezone.GetOffset(date);
         }
 
