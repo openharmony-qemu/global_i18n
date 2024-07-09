@@ -225,7 +225,6 @@ HWTEST_F(ZoneUtilTest, ZoneUtilFuncTest009, TestSize.Level1)
 HWTEST_F(ZoneUtilTest, ZoneUtilFuncTest010, TestSize.Level1)
 {
     ZoneUtil util;
-    std::string id = "";
 
     NITZData nitzData = { 0, 28800000, 1679969021999 };
     CountryResult result = util.LookupTimezoneByNITZ(nitzData);
