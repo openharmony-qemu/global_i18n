@@ -60,6 +60,7 @@ private:
     static const char *DEVICE_CITY_TIMEZONE_DATA_PATH;
     static const char *DISTRO_DEVICE_CITY_TIMEZONE_DATA_PATH;
     static const char *TZ_PIXEL_PATH;
+    static const char *DISTRO_TZ_PIXEL_PATH;
     static const char *DEFAULT_LOCALE;
     static const char *CITY_DISPLAYNAME_PATH;
     static const char *BASE_DEVICE_CITY_DISPLAYNAME_PATH;

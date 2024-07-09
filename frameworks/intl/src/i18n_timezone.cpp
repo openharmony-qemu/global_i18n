@@ -55,6 +55,7 @@ const char *I18nTimeZone::CITY_TIMEZONE_DATA_PATH = "/system/usr/ohos_timezone/o
 const char *I18nTimeZone::DEVICE_CITY_TIMEZONE_DATA_PATH = "/system/usr/ohos_timezone/device_timezones.xml";
 const char *I18nTimeZone::DISTRO_DEVICE_CITY_TIMEZONE_DATA_PATH = "/system/etc/tzdata_distro/device_timezones.xml";
 const char *I18nTimeZone::TZ_PIXEL_PATH = "/system/usr/ohos_timezone";
+const char *I18nTimeZone::DISTRO_TZ_PIXEL_PATH = "/system/etc/tzdata_distro";
 const char *I18nTimeZone::DEFAULT_LOCALE = "root";
 const char *I18nTimeZone::CITY_DISPLAYNAME_PATH = "/system/usr/ohos_timezone/ohos_city_dispname/";
 const char *I18nTimeZone::BASE_DEVICE_CITY_DISPLAYNAME_PATH = "/system/usr/ohos_timezone/device_city_dispname/";
@@ -1283,13 +1284,19 @@ std::vector<std::string> I18nTimeZone::FindTzData()
     std::map<std::string, std::vector<std::string>> pathMap;
     std::regex reg("tz_[0-9]{7}-(\\d{6})\\.dat");
     std::regex regVersion("_[0-9]{7}");
-    for (const auto& entry : directory_iterator{TZ_PIXEL_PATH}) {
-        const std::string path = entry.path();
-        std::smatch match;
-        bool found = std::regex_search(path, match, reg);
-        if (found) {
+    const std::vector<std::filesystem::path> pixelPaths = {TZ_PIXEL_PATH, DISTRO_TZ_PIXEL_PATH};
+    for (const auto& pixelPath : pixelPaths) {
+        if (!std::filesystem::exists(pixelPath)) {
+            HILOG_INFO_I18N("pixelPaths does not exists: %{public}s.", pixelPath.c_str());
+            continue;
+        }
+
+        for (const auto& entry : directory_iterator{pixelPath}) {
+            const std::string path = entry.path();
+            std::smatch match;
+            bool found = std::regex_search(path, match, reg);
             bool hasVerison = std::regex_search(path, match, regVersion);
-            if (hasVerison) {
+            if (found && hasVerison) {
                 std::string version = match[0].str();
                 SetVersionPathMap(version, path, &pathMap);
             }

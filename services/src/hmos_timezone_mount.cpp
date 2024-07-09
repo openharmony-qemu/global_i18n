@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include <filesystem>
+#include <fstream>
 #include <string>
 #include <sys/mount.h>
 #include "i18n_hilog.h"
@@ -36,12 +37,26 @@ const std::string LOCALE_PATH = "/system/etc/TIMEZONE/generic/current/";
 const std::string SAFE_PATH = "/data/service/el1/public/i18n/timezone/";
 const std::string PUBKEY_PATH = "/system/etc/LIBPHONENUMBER/generic/";
 const std::string PUBKEY_NAME = "hota_i18n_upgrade_v1.pem";
-const std::vector<std::string> DATA_FILES = {"tzdata", "device_timezones.xml", "version.txt",
-    "distro_version", "tzlookup.xml", "device_city_dispname/bo_CN.xml", "device_city_dispname/root.xml",
-    "device_city_dispname/ug.xml", "device_city_dispname/zh_Hans.xml", "device_city_dispname/zh_HK.xml",
-    "device_city_dispname/zh_TW.xml", "device_city_dispname/zz_ZX.xml", "icu/icu_tzdata.dat",
-    "telephonylookup.xml", "icu/metaZones.res", "icu/timezoneTypes.res", "icu/windowsZones.res",
-    "icu/zoneinfo64.res", "hos/tzlookup.xml"};
+const int FILE_NAME_INDEX = 6;
+
+std::vector<std::string> g_dataFiles = {};
+
+bool Init()
+{
+    std::ifstream file(CFG_PATH + MANIFEST_FILE);
+    std::string line;
+    if (file.is_open()) {
+        while (std::getline(file, line)) {
+            if (line.find("Name: " == 0)) {
+                g_dataFiles.push_back(line.substr(FILE_NAME_INDEX));
+            }
+        }
+        file.close();
+        return true;
+    } else {
+        return false;
+    }
+}
 
 bool Mount()
 {
@@ -58,9 +73,18 @@ bool Mount()
         HILOG_ERROR_I18N("Mount: fail to mount: opkey(%{public}s) errno(%{public}s)",
             cotaOpkeyVersionDir.c_str(), strerror(errno));
         return false;
-    } else {
-        HILOG_INFO_I18N("Mount: success to mount cotaDir to custDir: opkey(%{public}s)", cotaOpkeyVersionDir.c_str());
     }
+
+    if (mount(NULL, custOpkeyVersionDir.c_str(), nullptr, MS_REMOUNT | MS_BIND | MS_RDONLY, nullptr) != 0) {
+        HILOG_ERROR_I18N("Mount: fail to mount read only: opkey(%{public}s) errno(%{public}s)",
+            cotaOpkeyVersionDir.c_str(), strerror(errno));
+        if (umount(custOpkeyVersionDir.c_str()) != 0) {
+            HILOG_ERROR_I18N("Error during unmount: %{public}s\n", strerror(errno));
+        }
+        return false;
+    }
+
+    HILOG_INFO_I18N("Mount: success ro bind cotaDir to custDir: opkey(%{public}s)", cotaOpkeyVersionDir.c_str());
     return true;
 }
 
@@ -118,7 +142,7 @@ bool CopyDataFile()
     clearPath(safe_dir);
 
     bool copySuccess = true;
-    for (const auto& file : DATA_FILES) {
+    for (const auto& file : g_dataFiles) {
         std::filesystem::path src_path = std::filesystem::path(CFG_PATH) / file;
         std::filesystem::path dst_path = std::filesystem::path(SAFE_PATH) / file;
         if (!copySingleFile(src_path, dst_path)) {
@@ -163,14 +187,14 @@ bool CheckFileIntegrity()
         return false;
     }
 
-    for (unsigned long i = 0; i < DATA_FILES.size(); i++) {
-        HILOG_ERROR_I18N("CheckFileIntegrity: file to verify (%{public}s)", DATA_FILES[i].c_str());
-        std::string filePath = CFG_PATH + DATA_FILES[i];
+    for (unsigned long i = 0; i < g_dataFiles.size(); i++) {
+        HILOG_ERROR_I18N("CheckFileIntegrity: file to verify (%{public}s)", g_dataFiles[i].c_str());
+        std::string filePath = CFG_PATH + g_dataFiles[i];
         if (!FileExist(filePath.c_str())) {
-            HILOG_ERROR_I18N("CheckFileIntegrity: file not exist (%{public}s)", DATA_FILES[i].c_str());
+            HILOG_ERROR_I18N("CheckFileIntegrity: file not exist (%{public}s)", g_dataFiles[i].c_str());
             return false;
         }
-        if (!SignatureVerifier::VerifyParamFile(DATA_FILES[i], CFG_PATH, manifestPath)) {
+        if (!SignatureVerifier::VerifyParamFile(g_dataFiles[i], CFG_PATH, manifestPath)) {
             HILOG_ERROR_I18N("CheckFileIntegrity: VerifyParamFile error");
             return false;
         }
@@ -181,6 +205,10 @@ bool CheckFileIntegrity()
 
 void UpdateTimeZone()
 {
+    if (!Init()) {
+        HILOG_INFO_I18N("UpdateTimeZone: init error");
+        return;
+    }
     if (!Mount()) {
         HILOG_INFO_I18N("UpdateTimeZone: mount error");
         return;
