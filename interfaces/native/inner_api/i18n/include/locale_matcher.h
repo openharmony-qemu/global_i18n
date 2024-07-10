@@ -24,6 +24,16 @@ namespace I18n {
 class LocaleMatcher {
 public:
     /**
+     * @brief Obtain the best matching locale from candidateLocales for the requestLocale.
+     *
+     * @param requestLocale Represents request matching locale.
+     * @param candidateLocales Represents the list of locale to be matched.
+     * @return result Represents the best matching locale.
+     */
+    static std::string GetBestMatchedLocale(const LocaleInfo* requestLocale,
+        const std::vector<LocaleInfo*>& candidateLocales);
+
+    /**
      * @brief compare current and other locale which is more matching with request.
      *
      * @param current Represents current resource locale.
@@ -32,6 +42,7 @@ public:
      * @return int8_t Return 1 represents current locale is more matching, Returning -1 is the opposite.
      */
     static int8_t IsMoreSuitable(const LocaleInfo *current, const LocaleInfo *other, const LocaleInfo *request);
+
     static bool Match(const LocaleInfo *current, const LocaleInfo *other);
 
 public:
@@ -60,7 +71,7 @@ private:
         const LocaleInfo *request);
     static int8_t CompareRegionWhenQaag(const LocaleInfo *current, const LocaleInfo *other, const LocaleInfo *request);
     static bool IsSimilarToUsEnglish(const LocaleInfo *localeInfo);
-    
+
     /**
      * @brief find locale ancestors, including itself and ROOT_LOCALE.
      *
