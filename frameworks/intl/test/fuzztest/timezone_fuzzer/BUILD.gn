@@ -35,9 +35,7 @@ ohos_fuzztest("TimeZoneFuzzTest") {
   sources = [ "timezone_fuzzer.cpp" ]
   configs = []
 
-  deps = [
-    "//base/global/i18n/frameworks/intl:intl_util",
-  ]
+  deps = [ "//base/global/i18n/frameworks/intl:intl_util" ]
 
   external_deps = [
     "icu:shared_icui18n",

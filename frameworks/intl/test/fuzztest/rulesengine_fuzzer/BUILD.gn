@@ -34,9 +34,7 @@ ohos_fuzztest("RulesEngineFuzzTest") {
   sources = [ "rulesengine_fuzzer.cpp" ]
   configs = []
 
-  deps = [
-    "../../../../intl:intl_util",
-  ]
+  deps = [ "../../../../intl:intl_util" ]
 
   external_deps = [
     "icu:shared_icui18n",

@@ -24,9 +24,7 @@ ohos_fuzztest("DateTimeFilterFuzzTest") {
 
   fuzz_config_file = "."
 
-  include_dirs = [
-    "../../../include",
-  ]
+  include_dirs = [ "../../../include" ]
   cflags = [
     "-g",
     "-O0",
@@ -36,9 +34,7 @@ ohos_fuzztest("DateTimeFilterFuzzTest") {
   sources = [ "datetimefilter_fuzzer.cpp" ]
   configs = []
 
-  deps = [
-    "../../../../intl:intl_util",
-  ]
+  deps = [ "../../../../intl:intl_util" ]
 
   external_deps = [
     "icu:shared_icui18n",
