@@ -34,10 +34,7 @@ config("preferred_language_config") {
 ohos_shared_library("preferred_language") {
   public_configs = [ ":preferred_language_config" ]
   include_dirs = [ "include" ]
-  sources = [
-    "src/preferred_language.cpp",
-    "src/preferred_language_migrate.cpp",
-  ]
+  sources = [ "src/preferred_language.cpp" ]
   cflags_cc = [
     "-Wall",
     "-fPIC",
