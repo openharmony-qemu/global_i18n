@@ -43,7 +43,7 @@ ohos_unittest("zone_util_test") {
     "c_utils:utils",
     "googletest:gtest",
     "libphonenumber:phonenumber_standard",
-    "libxml2:xml2",
+    "libxml2:libxml2",
     "protobuf:protobuf",
   ]
 }

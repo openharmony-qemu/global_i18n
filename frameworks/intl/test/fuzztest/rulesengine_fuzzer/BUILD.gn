@@ -41,7 +41,7 @@ ohos_fuzztest("RulesEngineFuzzTest") {
   external_deps = [
     "icu:shared_icui18n",
     "icu:shared_icuuc",
-    "libxml2:xml2",
+    "libxml2:libxml2",
   ]
 
   subsystem_name = "global"

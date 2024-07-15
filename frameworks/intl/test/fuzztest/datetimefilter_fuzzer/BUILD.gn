@@ -44,7 +44,7 @@ ohos_fuzztest("DateTimeFilterFuzzTest") {
     "icu:shared_icui18n",
     "icu:shared_icuuc",
     "libphonenumber:phonenumber_standard",
-    "libxml2:xml2",
+    "libxml2:libxml2",
     "protobuf:protobuf",
   ]
 
