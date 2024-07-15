@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//base/global/i18n/i18n.gni")
 import("//build/test.gni")
 
 module_output_path = "i18n/intl_test"
@@ -42,7 +43,6 @@ ohos_unittest("intl_test") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
-    "googletest:gtest",
     "icu:shared_icui18n",
     "icu:shared_icuuc",
     "init:libbegetutil",
@@ -51,6 +51,9 @@ ohos_unittest("intl_test") {
     "openssl:libssl_shared",
     "protobuf:protobuf",
   ]
+  if (i18n_testonly) {
+    external_deps += [ "googletest:gtest" ]
+  }
 
   deps = [
     "//base/global/i18n/frameworks/intl:build_module",

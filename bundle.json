@@ -59,25 +59,24 @@
                 "config_policy",
                 "c_utils",
                 "eventhandler",
+                "googletest",
                 "hilog",
+                "icu",
                 "init",
                 "ipc",
+                "libphonenumber",
+                "libpng",
+                "libxml2",
                 "memmgr",
                 "napi",
+                "openssl",
                 "preferences",
+                "protobuf",
                 "resource_management",
                 "safwk",
                 "samgr"
             ],
-            "third_party": [
-                "googletest",
-                "icu",
-                "libphonenumber",
-                "libpng",
-                "libxml2",
-                "openssl",
-                "protobuf"
-            ]
+            "third_party": []
         },
         "build": {
             "sub_component": [
