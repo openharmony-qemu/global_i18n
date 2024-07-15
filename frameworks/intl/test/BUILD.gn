@@ -53,8 +53,8 @@ ohos_unittest("intl_test") {
   ]
 
   deps = [
-    "../intl:build_module",
     "../../../services:i18n_sa_client",
+    "../intl:build_module",
   ]
 }
 
