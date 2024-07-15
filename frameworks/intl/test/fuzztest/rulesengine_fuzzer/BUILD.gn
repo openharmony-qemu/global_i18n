@@ -36,12 +36,12 @@ ohos_fuzztest("RulesEngineFuzzTest") {
 
   deps = [
     "../../../../intl:intl_util",
-    "//third_party/libxml2:xml2",
   ]
 
   external_deps = [
     "icu:shared_icui18n",
     "icu:shared_icuuc",
+    "libxml2:xml2",
   ]
 
   subsystem_name = "global"

@@ -37,12 +37,12 @@ ohos_fuzztest("TimeZoneFuzzTest") {
 
   deps = [
     "//base/global/i18n/frameworks/intl:intl_util",
-    "//third_party/libpng:libpng",
   ]
 
   external_deps = [
     "icu:shared_icui18n",
     "icu:shared_icuuc",
+    "libpng:libpng",
   ]
 
   subsystem_name = "global"

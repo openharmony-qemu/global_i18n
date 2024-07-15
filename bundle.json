@@ -59,6 +59,7 @@
                 "config_policy",
                 "c_utils",
                 "eventhandler",
+                "googletest",
                 "hilog",
                 "icu",
                 "init",
@@ -70,6 +71,7 @@
                 "napi",
                 "openssl",
                 "preferences",
+                "protobuf",
                 "resource_management",
                 "safwk",
                 "samgr"

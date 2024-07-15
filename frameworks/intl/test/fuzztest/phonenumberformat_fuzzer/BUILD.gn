@@ -26,9 +26,6 @@ ohos_fuzztest("PhoneNumberFormatFuzzTest") {
 
   include_dirs = [
     "//base/global/i18n/frameworks/intl/include",
-    "//third_party/libphonenumber",
-    "//third_party/libphonenumber/cpp/src",
-    "//third_party/protobuf/src",
   ]
   cflags = [
     "-g",
@@ -44,6 +41,8 @@ ohos_fuzztest("PhoneNumberFormatFuzzTest") {
   external_deps = [
     "icu:shared_icui18n",
     "icu:shared_icuuc",
+    "libphonenumber:phonenumber_standard",
+    "protobuf:protobuf",
   ]
 
   subsystem_name = "global"

@@ -26,9 +26,6 @@ ohos_fuzztest("DateTimeRuleFuzzTest") {
 
   include_dirs = [
     "../../../include",
-    "//third_party/libphonenumber/cpp/src",
-    "//third_party/libphonenumber",
-    "//third_party/protobuf/src",
   ]
   cflags = [
     "-g",
@@ -41,13 +38,14 @@ ohos_fuzztest("DateTimeRuleFuzzTest") {
 
   deps = [
     "../../../../intl:intl_util",
-    "//third_party/libphonenumber/cpp:phonenumber_standard",
-    "//third_party/libxml2:xml2",
   ]
 
   external_deps = [
     "icu:shared_icui18n",
     "icu:shared_icuuc",
+    "libphonenumber:phonenumber_standard",
+    "libxml2:xml2",
+    "protobuf:protobuf",
   ]
 
   subsystem_name = "global"
