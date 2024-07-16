@@ -130,22 +130,6 @@ bool copySingleFile(const std::filesystem::path& src_path, const std::filesystem
     return true;
 }
 
-bool CopyIcuFileToUpperDir(std::filesystem::path &src_path, std::filesystem::path &dst_path)
-{
-    std::filesystem::path parent = dst_path.parent_path();
-    std::filesystem::path parentName = parent.filename();
-    const std::string icuDirName = "icu";
-    if (icuDirName.compare(parentName) == 0) {
-        std::filesystem::path newDstPath = parent.parent_path() / dst_path.filename();
-        HILOG_ERROR_I18N("CopyDataFile: Copy %{public}s", newDstPath.string().c_str());
-        if (!copySingleFile(src_path, newDstPath)) {
-            HILOG_ERROR_I18N("CopyDataFile: Copy failed for %{public}s", newDstPath.string().c_str());
-            return false;
-        }
-    }
-    return true;
-}
-
 bool CopyDataFile()
 {
     HILOG_INFO_I18N("TimeZone CopyDataFile start");
@@ -163,11 +147,6 @@ bool CopyDataFile()
         std::filesystem::path dst_path = std::filesystem::path(SAFE_PATH) / file;
         if (!copySingleFile(src_path, dst_path)) {
             HILOG_ERROR_I18N("CopyDataFile: Copy failed for %{public}s", file.c_str());
-            copySuccess = false;
-            break;
-        }
-
-        if (!CopyIcuFileToUpperDir(src_path, dst_path)) {
             copySuccess = false;
             break;
         }
