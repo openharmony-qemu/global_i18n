@@ -75,6 +75,22 @@ private:
     static std::shared_ptr<NativePreferences::Preferences> GetI18nAppPreferences();
 #endif
     /**
+     * @brief Filtering the language list.
+     *
+     * @param preferredLanguagesList Indicates list of languages to be filtered.
+     * @return vector Return list of supported languages.
+     */
+    static std::vector<std::string> FilterLanguages(std::vector<std::string>& preferredLanguagesList);
+
+    /**
+     * @brief Match the language to the supported language.
+     *
+     * @param language Indicates language code to be matched.
+     * @return string Return matching result.
+     */
+    static std::string GetMatchedLanguage(const std::string& language);
+
+    /**
      * @brief Normalize index to target range [0, max].
      *
      * @param index Indicates value to normalize.
@@ -134,6 +150,7 @@ private:
     static const char *PREFERRED_LANGUAGES;
     static const char *APP_LANGUAGE_KEY;
     static const char *I18N_PREFERENCES_FILE_NAME;
+    static const char *DEFAULT_PREFERRED_LANGUAGE;
     static constexpr int CONFIG_LEN = 128;
     static constexpr uint32_t LANGUAGE_LEN = 2;
 };

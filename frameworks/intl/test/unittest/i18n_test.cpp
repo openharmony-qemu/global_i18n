@@ -26,7 +26,6 @@
 #include "measure_data.h"
 #include "phone_number_format_mock.h"
 #include "preferred_language.h"
-#include "preferred_language_migrate.h"
 
 using namespace OHOS::Global::I18n;
 using testing::ext::TestSize;
@@ -1449,20 +1448,6 @@ HWTEST_F(I18nTest, I18nFuncTest062, TestSize.Level1)
     EXPECT_EQ(country, "");
     country = GetISO3Country("sdfsdf");
     EXPECT_EQ(country, "");
-}
-
-/**
- * @tc.name: I18nFuncTest063
- * @tc.desc: Test I18n preferred language migrate
- * @tc.type: FUNC
- */
-HWTEST_F(I18nTest, I18nFuncTest063, TestSize.Level1)
-{
-    const char* lang = "ug,en-GB,pt-PT,zh-TW,zh-Hans-GB";
-    char* res = ConvertPreferredLanguage(lang);
-    std::string result = res;
-    EXPECT_EQ(result, "ug;en-Latn-US;zh-Hant;zh-Hans");
-    delete[] res;
 }
 } // namespace I18n
 } // namespace Global

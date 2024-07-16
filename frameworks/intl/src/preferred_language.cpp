@@ -23,8 +23,10 @@
 #include "i18n_hilog.h"
 #include "locale_config.h"
 #include "locale_info.h"
+#include "locale_matcher.h"
 #include "parameter.h"
 #include "preferred_language.h"
+#include "utils.h"
 #include "vector"
 
 namespace OHOS {
@@ -36,6 +38,7 @@ const char *PreferredLanguage::RESOURCE_PATH_SPLITOR = "/";
 const char *PreferredLanguage::PREFERRED_LANGUAGES = "persist.global.preferredLanguages";
 const char *PreferredLanguage::APP_LANGUAGE_KEY = "app_language";
 const char *PreferredLanguage::I18N_PREFERENCES_FILE_NAME = "/i18n";
+const char *PreferredLanguage::DEFAULT_PREFERRED_LANGUAGE = "en-Latn-US";
 
 std::vector<std::string> PreferredLanguage::GetPreferredLanguageList()
 {
@@ -44,6 +47,7 @@ std::vector<std::string> PreferredLanguage::GetPreferredLanguageList()
     std::string systemLanguage = LocaleConfig::GetSystemLanguage();
     std::vector<std::string> list;
     Split(preferredLanguageValue, ";", list);
+    list = FilterLanguages(list);
     if (!list.size()) {
         if (systemLanguage != "") {
             list.push_back(systemLanguage);
@@ -68,6 +72,62 @@ std::vector<std::string> PreferredLanguage::GetPreferredLanguageList()
         list[0] = systemLanguage;
     }
     return list;
+}
+
+std::vector<std::string> PreferredLanguage::FilterLanguages(std::vector<std::string>& preferredLanguagesList)
+{
+    std::vector<std::string> matchedLanguagesList;
+    std::unordered_set<std::string> matchedSet;
+    for (auto& preferredLanguage : preferredLanguagesList) {
+        std::string matchedLanguage = GetMatchedLanguage(preferredLanguage);
+        if (matchedLanguage.empty()) {
+            HILOG_ERROR_I18N("FilterLanguages: the matching result of %{public}s is empty.",
+                preferredLanguage.c_str());
+            matchedLanguage = DEFAULT_PREFERRED_LANGUAGE;
+        }
+        if (matchedSet.find(matchedLanguage) == matchedSet.end()) {
+            matchedLanguagesList.push_back(matchedLanguage);
+            matchedSet.insert(matchedLanguage);
+            HILOG_ERROR_I18N("FilterLanguages: the matching result is %{public}s.", matchedLanguage.c_str());
+        }
+    }
+    return matchedLanguagesList;
+}
+
+std::string PreferredLanguage::GetMatchedLanguage(const std::string& language)
+{
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(language.c_str(), status);
+    if (U_FAILURE(status) || !IsValidLocaleTag(locale)) {
+        HILOG_ERROR_I18N("GetMatchedLanguage: %{public}s is an invalid locale.", language.c_str());
+        return "";
+    }
+    LocaleInfo* requestLocale = new LocaleInfo(language);
+    if (requestLocale == nullptr) {
+        HILOG_ERROR_I18N("GetMatchedLanguage: %{public}s failed to construct LocaleInfo.", language.c_str());
+        return "";
+    }
+    std::vector<LocaleInfo*> candidateLocales;
+    std::vector<std::string> supportLanguageList;
+    LocaleConfig::GetSystemLanguages(supportLanguageList);
+    for (auto& supportLanguage : supportLanguageList) {
+        LocaleInfo* supportLocaleInfo = new LocaleInfo(supportLanguage);
+        if (supportLocaleInfo == nullptr) {
+            HILOG_ERROR_I18N("GetMatchedLanguage: %{public}s failed to construct LocaleInfo.",
+                supportLanguage.c_str());
+            continue;
+        }
+        if (LocaleMatcher::Match(requestLocale, supportLocaleInfo)) {
+            candidateLocales.push_back(supportLocaleInfo);
+        } else {
+            delete supportLocaleInfo;
+        }
+    }
+    std::string matchedLanguage = LocaleMatcher::GetBestMatchedLocale(requestLocale, candidateLocales);
+    for (LocaleInfo* supportLocaleInfo : candidateLocales) {
+        delete supportLocaleInfo;
+    }
+    return matchedLanguage;
 }
 
 std::string PreferredLanguage::GetFirstPreferredLanguage()
