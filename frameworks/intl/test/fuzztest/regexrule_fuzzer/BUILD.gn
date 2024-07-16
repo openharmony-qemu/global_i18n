@@ -40,7 +40,6 @@ ohos_fuzztest("RegexRuleFuzzTest") {
     "icu:shared_icui18n",
     "icu:shared_icuuc",
     "libphonenumber:phonenumber_standard",
-    "protobuf:protobuf",
   ]
 
   subsystem_name = "global"

@@ -71,7 +71,6 @@
                 "napi",
                 "openssl",
                 "preferences",
-                "protobuf",
                 "resource_management",
                 "safwk",
                 "samgr"

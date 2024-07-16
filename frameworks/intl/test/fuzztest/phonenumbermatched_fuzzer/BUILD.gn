@@ -35,13 +35,7 @@ ohos_fuzztest("PhoneNumberMatchedFuzzTest") {
   configs = []
 
   deps = [ "../../../../intl:intl_util" ]
-
-  external_deps = [
-    "icu:shared_icui18n",
-    "icu:shared_icuuc",
-    "libphonenumber:phonenumber_standard",
-    "protobuf:protobuf",
-  ]
+  external_deps = [ "libphonenumber:phonenumber_standard" ]
 
   subsystem_name = "global"
   part_name = "i18n"

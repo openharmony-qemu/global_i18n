@@ -49,7 +49,6 @@ ohos_unittest("intl_test") {
     "libphonenumber:phonenumber_standard",
     "libpng:libpng",
     "openssl:libssl_shared",
-    "protobuf:protobuf",
   ]
   if (i18n_testonly) {
     external_deps += [ "googletest:gtest" ]
