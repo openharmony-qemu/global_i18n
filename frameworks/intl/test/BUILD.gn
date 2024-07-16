@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//base/global/i18n/i18n.gni")
 import("//build/test.gni")
 
 module_output_path = "i18n/intl_test"
@@ -36,9 +37,6 @@ ohos_unittest("intl_test") {
     "//base/global/i18n/interfaces/native/inner_api/i18n/include",
     "//base/global/i18n/interfaces/native/inner_api/preferred_language/include",
     "//base/global/i18n/services/include",
-    "//third_party/libphonenumber/cpp/src",
-    "//third_party/libphonenumber",
-    "//third_party/protobuf/src",
   ]
 
   external_deps = [
@@ -48,15 +46,17 @@ ohos_unittest("intl_test") {
     "icu:shared_icui18n",
     "icu:shared_icuuc",
     "init:libbegetutil",
+    "libphonenumber:phonenumber_standard",
+    "libpng:libpng",
     "openssl:libssl_shared",
   ]
+  if (i18n_testonly) {
+    external_deps += [ "googletest:gtest" ]
+  }
 
   deps = [
     "//base/global/i18n/frameworks/intl:build_module",
     "//base/global/i18n/services:i18n_sa_client",
-    "//third_party/googletest:gtest_main",
-    "//third_party/libphonenumber/cpp:phonenumber_standard",
-    "//third_party/libpng:libpng",
   ]
 }
 

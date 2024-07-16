@@ -24,12 +24,7 @@ ohos_fuzztest("PhoneNumberFormatFuzzTest") {
 
   fuzz_config_file = "//base/global/i18n/frameworks/intl/test/fuzztest/phonenumberformat_fuzzer"
 
-  include_dirs = [
-    "//base/global/i18n/frameworks/intl/include",
-    "//third_party/libphonenumber",
-    "//third_party/libphonenumber/cpp/src",
-    "//third_party/protobuf/src",
-  ]
+  include_dirs = [ "//base/global/i18n/frameworks/intl/include" ]
   cflags = [
     "-g",
     "-O0",
@@ -41,10 +36,7 @@ ohos_fuzztest("PhoneNumberFormatFuzzTest") {
 
   deps = [ "//base/global/i18n/frameworks/intl:intl_util" ]
 
-  external_deps = [
-    "icu:shared_icui18n",
-    "icu:shared_icuuc",
-  ]
+  external_deps = [ "libphonenumber:phonenumber_standard" ]
 
   subsystem_name = "global"
   part_name = "i18n"

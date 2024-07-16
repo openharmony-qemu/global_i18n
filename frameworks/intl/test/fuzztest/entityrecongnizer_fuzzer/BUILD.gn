@@ -24,12 +24,7 @@ ohos_fuzztest("EntityRecongnizerFuzzTest") {
 
   fuzz_config_file = "."
 
-  include_dirs = [
-    "../../../include",
-    "//third_party/libphonenumber/cpp/src",
-    "//third_party/libphonenumber",
-    "//third_party/protobuf/src",
-  ]
+  include_dirs = [ "../../../include" ]
   cflags = [
     "-g",
     "-O0",
@@ -39,15 +34,12 @@ ohos_fuzztest("EntityRecongnizerFuzzTest") {
   sources = [ "entityrecongnizer_fuzzer.cpp" ]
   configs = []
 
-  deps = [
-    "../../../../intl:intl_util",
-    "//third_party/libphonenumber/cpp:phonenumber_standard",
-    "//third_party/libxml2:xml2",
-  ]
+  deps = [ "../../../../intl:intl_util" ]
 
   external_deps = [
     "icu:shared_icui18n",
     "icu:shared_icuuc",
+    "libphonenumber:phonenumber_standard",
   ]
 
   subsystem_name = "global"

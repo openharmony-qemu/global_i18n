@@ -24,12 +24,7 @@ ohos_fuzztest("RegexRuleFuzzTest") {
 
   fuzz_config_file = "."
 
-  include_dirs = [
-    "../../../include",
-    "//third_party/libphonenumber/cpp/src",
-    "//third_party/libphonenumber",
-    "//third_party/protobuf/src",
-  ]
+  include_dirs = [ "../../../include" ]
   cflags = [
     "-g",
     "-O0",
@@ -39,14 +34,12 @@ ohos_fuzztest("RegexRuleFuzzTest") {
   sources = [ "regexrule_fuzzer.cpp" ]
   configs = []
 
-  deps = [
-    "../../../../intl:intl_util",
-    "//third_party/libphonenumber/cpp:phonenumber_standard",
-  ]
+  deps = [ "../../../../intl:intl_util" ]
 
   external_deps = [
     "icu:shared_icui18n",
     "icu:shared_icuuc",
+    "libphonenumber:phonenumber_standard",
   ]
 
   subsystem_name = "global"

@@ -34,15 +34,7 @@ ohos_fuzztest("RulesEngineFuzzTest") {
   sources = [ "rulesengine_fuzzer.cpp" ]
   configs = []
 
-  deps = [
-    "../../../../intl:intl_util",
-    "//third_party/libxml2:xml2",
-  ]
-
-  external_deps = [
-    "icu:shared_icui18n",
-    "icu:shared_icuuc",
-  ]
+  deps = [ "../../../../intl:intl_util" ]
 
   subsystem_name = "global"
   part_name = "i18n"
