@@ -172,7 +172,11 @@ ohos_shared_library("intl_util") {
   public_external_deps = []
   defines = []
   if (i18n_support_ui) {
-    public_external_deps += [ "ability_base:configuration" ]
+    public_external_deps += [
+      "ability_base:configuration",
+      "ability_base:want",
+      "ability_base:base",
+    ]
     external_deps += [
       "ability_base:configuration",
       "ability_base:want",
