@@ -822,7 +822,7 @@ void I18nTimeZone::GetTimezoneIDFromZoneInfo(std::set<std::string> &availableIDs
 
 std::set<std::string> I18nTimeZone::GetAvailableIDs(I18nErrorCode &errorCode)
 {
-    return GetAvailableIDs(errorCode);
+    return GetTimeZoneAvailableIDs(errorCode);
 }
 
 std::set<std::string> I18nTimeZone::GetAvailableZoneCityIDs()

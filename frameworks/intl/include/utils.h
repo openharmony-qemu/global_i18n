@@ -52,7 +52,7 @@ std::string PseudoLocalizationProcessor(const std::string &input);
 std::string PseudoLocalizationProcessor(const std::string &input, bool ifEnforce);
 bool CheckSystemPermission();
 size_t ConvertBytesToSizeT(const char *byteArray);
-std::set<std::string> GetAvailableIDs(I18nErrorCode &errorCode);
+std::set<std::string> GetTimeZoneAvailableIDs(I18nErrorCode &errorCode);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

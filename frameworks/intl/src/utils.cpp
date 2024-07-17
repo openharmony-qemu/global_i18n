@@ -308,7 +308,7 @@ size_t ConvertBytesToSizeT(const char *byteArray)
     return num0 + num1 + num2 + static_cast<size_t>(byteArray[BYTE_ARRAY_INDEX_THIRD]);
 }
 
-std::set<std::string> GetAvailableIDs(I18nErrorCode &errorCode)
+std::set<std::string> GetTimeZoneAvailableIDs(I18nErrorCode &errorCode)
 {
     if (availableIDs.size() != 0) {
         return availableIDs;
