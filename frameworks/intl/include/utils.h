@@ -19,6 +19,7 @@
 #include <vector>
 #include <unordered_set>
 #include <unicode/locid.h>
+#include "set"
 #include "i18n_types.h"
 
 namespace OHOS {
