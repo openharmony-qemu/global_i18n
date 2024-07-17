@@ -39,6 +39,7 @@ const char *PreferredLanguage::PREFERRED_LANGUAGES = "persist.global.preferredLa
 const char *PreferredLanguage::APP_LANGUAGE_KEY = "app_language";
 const char *PreferredLanguage::I18N_PREFERENCES_FILE_NAME = "/i18n";
 const char *PreferredLanguage::DEFAULT_PREFERRED_LANGUAGE = "en-Latn-US";
+std::vector<std::string> supportLanguageListExt = { "it", "ko", "th", "zz" };
 
 std::vector<std::string> PreferredLanguage::GetPreferredLanguageList()
 {
@@ -110,6 +111,8 @@ std::string PreferredLanguage::GetMatchedLanguage(const std::string& language)
     std::vector<LocaleInfo*> candidateLocales;
     std::vector<std::string> supportLanguageList;
     LocaleConfig::GetSystemLanguages(supportLanguageList);
+    supportLanguageList.insert(supportLanguageList.end(), supportLanguageListExt.begin(),
+        supportLanguageListExt.end());
     for (auto& supportLanguage : supportLanguageList) {
         LocaleInfo* supportLocaleInfo = new LocaleInfo(supportLanguage);
         if (supportLocaleInfo == nullptr) {
