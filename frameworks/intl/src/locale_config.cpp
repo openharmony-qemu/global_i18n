@@ -302,7 +302,7 @@ string LocaleConfig::GetCountry(const string& parameter)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale origin = icu::Locale::forLanguageTag(systemRegion, status);
     if (U_SUCCESS(status)) {
-        country = origin.getCountry();
+        const char* country = origin.getCountry();
         if (country != nullptr) {
             return country;
         }
