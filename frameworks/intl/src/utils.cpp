@@ -37,6 +37,8 @@ using namespace std;
 static const std::string PSEUDO_LOCALE_TAG = "en-XA";
 static const std::string PSEUDO_START_TAG = "{";
 static const std::string PSEUDO_END_TAG = "}";
+static const char *TZDATA_PATH = "/system/etc/zoneinfo/tzdata";
+static const char *DISTRO_TZDATA_PATH = "/system/etc/tzdata_distro/hos/tzdata";
 
 void Split(const string &src, const string &sep, vector<string> &dest)
 {
@@ -296,6 +298,51 @@ bool CheckSystemPermission()
         return false;
     }
     return true;
+}
+
+size_t ConvertBytesToSizeT(const char *byteArray)
+{
+    size_t num0 = static_cast<size_t>(byteArray[0]) << BYTE_ARRAY_OFFSET_FIRST;
+    size_t num1 = static_cast<size_t>(byteArray[1]) << BYTE_ARRAY_OFFSET_SECOND;
+    size_t num2 = static_cast<size_t>(byteArray[2]) << BYTE_ARRAY_OFFSET_THIRD;
+    return num0 + num1 + num2 + static_cast<size_t>(byteArray[BYTE_ARRAY_INDEX_THIRD]);
+}
+
+std::set<std::string> GetAvailableIDs(I18nErrorCode &errorCode)
+{
+    if (availableIDs.size() != 0) {
+        return availableIDs;
+    }
+    struct stat s;
+    const char *tzdataFilePath = stat(DISTRO_TZDATA_PATH, &s) == 0 ? DISTRO_TZDATA_PATH : TZDATA_PATH;
+    std::ifstream tzdataFile(tzdataFilePath, std::ios::in | std::ios::binary);
+    if (!tzdataFile.is_open()) {
+        HILOG_ERROR_I18N("Open tzdata failed");
+        return availableIDs;
+    }
+    const size_t versionLength = 12;
+    tzdataFile.ignore(versionLength);
+    // offset means indexOffset or dataOffset.
+    const size_t offsetSize = 4;
+    const size_t maxTZIDLength = 40;
+    // tempSize is the length of one index, include tz id length, data offset and tz file length.
+    const size_t tempSize = 48;
+    char *temp = new char[tempSize];
+    const size_t offsetSizeTwice = 2;
+    tzdataFile.read(temp, offsetSize * offsetSizeTwice);
+    size_t indexOffset = ConvertBytesToSizeT(temp);
+    size_t dataOffset = ConvertBytesToSizeT(temp + offsetSize);
+    // ignore final offset.
+    tzdataFile.ignore(offsetSize);
+    while (indexOffset < dataOffset) {
+        tzdataFile.read(temp, tempSize);
+        indexOffset += tempSize;
+        std::string tzid(temp, maxTZIDLength);
+        availableIDs.insert(tzid);
+    }
+    tzdataFile.close();
+    delete[] temp;
+    return availableIDs;
 }
 } // namespace I18n
 } // namespace Global

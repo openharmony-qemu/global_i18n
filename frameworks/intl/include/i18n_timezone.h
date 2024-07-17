@@ -18,6 +18,7 @@
 #include <cstdint>
 #include <map>
 #include <mutex>
+#include <png.h>
 #include <set>
 #include <string>
 #include "i18n_types.h"
@@ -70,18 +71,11 @@ private:
     static const char *TIMEZONE_SECOND_ROOT_TAG;
     static const char *CITY_DISPLAYNAME_ROOT_TAG;
     static const char *CITY_DISPLAYNAME_SECOND_ROOT_TAG;
-    static const char *TZDATA_PATH;
-    static const char *DISTRO_TZDATA_PATH;
     static const uint32_t ELEMENT_NUM = 2;
     static const uint32_t TZ_X_PLUS = 180;
     static const uint32_t TZ_HALF_OF_SIZE = 2;
     static const uint32_t TZ_MAX_PIXEL_VALUE = 255;
     static constexpr double NUM_PRECISION = 0.1;
-    static const uint32_t BYTE_ARRAY_OFFSET_FIRST = 24;
-    static const uint32_t BYTE_ARRAY_OFFSET_SECOND = 16;
-    static const uint32_t BYTE_ARRAY_OFFSET_THIRD = 8;
-    static const uint32_t BYTE_ARRAY_INDEX_THIRD = 3;
-    static std::set<std::string> availableIDs;
     static std::set<std::string> supportedLocales;
     static std::set<std::string> availableZoneCityIDs;
     static std::map<std::string, std::string> city2TimeZoneID;
@@ -106,9 +100,7 @@ private:
         std::string &parentName);
     static std::vector<int> GetColorData(const uint16_t x, const uint16_t y,
                                          uint16_t actualHeight, std::string preferredPath);
-    static int InitPngptr(FILE **fp, std::string preferredPath);
-    static std::vector<int> ReadPngPixelData(const uint16_t x, const uint16_t y,
-                                             FILE **fp, uint16_t actualHeight);
+    static int InitPngptr(png_structp &png_ptr, png_infop &info_ptr, FILE **fp, std::string preferredPath);
     static std::vector<std::string> FindTzData();
     static bool ParamExceedScope(const int x, const int y, int fixedX, int fixedY);
     static std::string GetPreferredPath(const double x, const std::vector<std::string> &filePaths);
@@ -122,7 +114,6 @@ private:
     static void SetCity2TimeZoneID(const char* key, const char* value);
     static void SetBestMatchLocale(const std::string& key, const std::string& value);
     static const char *GetDeviceCityDisplayNamePath();
-    static size_t ConvertBytesToSizeT(const char *byteArray);
 };
 } // namespace I18n
 } // namespace Global
