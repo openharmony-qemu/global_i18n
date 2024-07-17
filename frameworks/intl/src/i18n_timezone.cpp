@@ -42,6 +42,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <regex>
+#include <png.h>
 
 namespace OHOS {
 namespace Global {
@@ -1210,14 +1211,14 @@ std::vector<int> I18nTimeZone::ReadPngPixelData(const uint16_t x, const uint16_t
         return result;
     }
     try {
-        rewind(fp);
-        png_init_io(png_ptr, fp);
+        rewind(*fp);
+        png_init_io(png_ptr, *fp);
         png_read_info(png_ptr, info_ptr);
         unsigned int rowbytes = png_get_rowbytes(png_ptr, info_ptr);
         row_pointers = (png_bytep)png_malloc(png_ptr, rowbytes);
         if (row_pointers == nullptr) {
             png_destroy_read_struct(&png_ptr, &info_ptr, 0);
-            CloseFile(fp);
+            CloseFile(*fp);
             HILOG_ERROR_I18N("malloc rowbytes failed.");
             return result;
         }
@@ -1230,10 +1231,10 @@ std::vector<int> I18nTimeZone::ReadPngPixelData(const uint16_t x, const uint16_t
             result.push_back(atoi(pixel.c_str()));
         }
         png_free(png_ptr, row_pointers);
-        CloseFile(fp);
+        CloseFile(*fp);
     } catch (...) {
         png_destroy_read_struct(&png_ptr, &info_ptr, 0);
-        CloseFile(fp);
+        CloseFile(*fp);
     }
     return result;
 }
