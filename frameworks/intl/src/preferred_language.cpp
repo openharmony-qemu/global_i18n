@@ -44,7 +44,7 @@ std::vector<std::string> PreferredLanguage::GetPreferredLanguageList()
 {
     char preferredLanguageValue[CONFIG_LEN];
     GetParameter(PREFERRED_LANGUAGES, "", preferredLanguageValue, CONFIG_LEN);
-    std::string systemLanguage = LocaleConfig::GetSystemLanguage();
+    std::string systemLanguage = GetMatchedLanguage(LocaleConfig::GetSystemLanguage());
     std::vector<std::string> list;
     Split(preferredLanguageValue, ";", list);
     list = FilterLanguages(list);
