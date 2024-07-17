@@ -160,7 +160,7 @@ private:
     static void LoadRegionsLanguages(std::unordered_set<std::string>& forbiddenRegions);
     static void Expunge(std::unordered_set<std::string> &src, const std::unordered_set<std::string> &another);
     static std::string GetMainLanguage(const std::string &language);
-    static std::string GetCountry(const string& parameter);
+    static std::string GetCountry(const std::string& parameter);
     static std::string GetDsiplayLanguageWithDialect(const std::string &language, const std::string &displayLocale);
     static std::string GetDisplayOverrideRegion(const std::string &region, const std::string &displayLocale);
     static std::string ComputeLocale(const std::string &displayLocale);
