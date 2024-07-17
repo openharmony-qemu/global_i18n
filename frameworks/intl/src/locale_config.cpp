@@ -285,28 +285,30 @@ string LocaleConfig::GetSystemLanguage()
 
 string LocaleConfig::GetSystemRegion()
 {
-    UErrorCode status = U_ZERO_ERROR;
-    const char *country = nullptr;
-    std::string systemRegion = ReadSystemParameter(LOCALE_KEY, CONFIG_LEN);
-    if (!systemRegion.empty()) {
-        icu::Locale origin = icu::Locale::forLanguageTag(systemRegion, status);
-        if (U_SUCCESS(status)) {
-            country = origin.getCountry();
-            if (country != nullptr) {
-                return country;
-            }
-        }
+    std::string systemRegion = GetCountry(LOCALE_KEY);
+    if (systemRegion.empty()) {
+        systemRegion = GetCountry(DEFAULT_LOCALE_KEY);
     }
-    systemRegion = ReadSystemParameter(DEFAULT_LOCALE_KEY, CONFIG_LEN);
-    if (!systemRegion.empty()) {
-        status = U_ZERO_ERROR;
-        icu::Locale origin = icu::Locale::forLanguageTag(systemRegion, status);
-        if (U_SUCCESS(status)) {
-            country = origin.getCountry();
-            if (country != nullptr) {
-                return country;
-            }
+    return systemRegion;
+}
+
+string LocaleConfig::GetCountry(const string& parameter)
+{
+    std::string systemRegion = ReadSystemParameter(parameter.c_str(), CONFIG_LEN);
+    if (systemRegion.empty()) {
+        HILOG_INFO_I18N("GetCountry: ReadSystemParameter %{public}s failed", parameter.c_str());
+        return systemRegion;
+    }
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale origin = icu::Locale::forLanguageTag(systemRegion, status);
+    if (U_SUCCESS(status)) {
+        const char* country = origin.getCountry();
+        if (country != nullptr) {
+            return country;
         }
+        HILOG_INFO_I18N("GetCountry: %{public}s get failed, country is nullptr", parameter.c_str());
+    } else {
+        HILOG_INFO_I18N("GetCountry: %{public}s get failed, U_SUCCESS is false", parameter.c_str());
     }
     return "";
 }
