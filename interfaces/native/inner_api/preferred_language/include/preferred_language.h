@@ -151,6 +151,7 @@ private:
     static const char *APP_LANGUAGE_KEY;
     static const char *I18N_PREFERENCES_FILE_NAME;
     static const char *DEFAULT_PREFERRED_LANGUAGE;
+    static std::vector<std::string> supportLanguageListExt;
     static constexpr int CONFIG_LEN = 128;
     static constexpr uint32_t LANGUAGE_LEN = 2;
 };
