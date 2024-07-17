@@ -102,6 +102,7 @@
                     "name": "//base/global/i18n/frameworks/intl:intl_util",
                     "header": {
                         "header_files": [
+                            "i18n_timezone.h",
                             "locale_config.h",
                             "locale_info.h"
                         ],
