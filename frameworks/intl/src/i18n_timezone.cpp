@@ -65,7 +65,8 @@ const char *I18nTimeZone::TIMEZONE_ROOT_TAG = "timezones";
 const char *I18nTimeZone::TIMEZONE_SECOND_ROOT_TAG = "timezone";
 const char *I18nTimeZone::CITY_DISPLAYNAME_ROOT_TAG = "display_names";
 const char *I18nTimeZone::CITY_DISPLAYNAME_SECOND_ROOT_TAG = "display_name";
-const char *I18nTimeZone::ZONEINFO_PATH = "/system/etc/zoneinfo";
+const char *I18nTimeZone::TZDATA_PATH = "/system/etc/zoneinfo/tzdata";
+const char *I18nTimeZone::DISTRO_TZDATA_PATH = "/system/etc/tzdata_distro/hos/tzdata";
 
 std::set<std::string> I18nTimeZone::availableIDs {};
 std::set<std::string> I18nTimeZone::supportedLocales {};
@@ -822,28 +823,47 @@ void I18nTimeZone::GetTimezoneIDFromZoneInfo(std::set<std::string> &availableIDs
     }
 }
 
-std::set<std::string> I18nTimeZone::GetAvailableIDs(I18nErrorCode &errorCode)
+size_t ConvertBytesToSizeT(const char *byteArray)
 {
     using std::filesystem::directory_iterator;
+    return ((size_t)byteArray[0] << 24) + ((size_t)byteArray[1] << 16) + ((size_t)byteArray[2] << 8) +
+        (size_t)byteArray[3];
+}
 
+
+std::set<std::string> I18nTimeZone::GetAvailableIDs(I18nErrorCode &errorCode)
+{
     if (availableIDs.size() != 0) {
         return availableIDs;
     }
     struct stat s;
-    for (const auto &dirEntry : directory_iterator{ZONEINFO_PATH}) {
-        std::string parentPath = dirEntry.path();
-        if (stat(parentPath.c_str(), &s) != 0) {
-            HILOG_ERROR_I18N("GetAvailableIDs: zoneinfo path %{public}s not exist.", parentPath.c_str());
-            errorCode = I18nErrorCode::FAILED;
-            return availableIDs;
-        }
-        std::string parentName = parentPath.substr(strlen(ZONEINFO_PATH) + 1);
-        if (s.st_mode & S_IFDIR) {
-            GetTimezoneIDFromZoneInfo(availableIDs, parentPath, parentName);
-        } else {
-            availableIDs.insert(parentName);
-        }
+    const char *tzdataFilePath = stat(DISTRO_TZDATA_PATH, &s) == 0 ? DISTRO_TZDATA_PATH : TZDATA_PATH;
+    std::ifstream tzdataFile(tzdataFilePath, std::ios::in | std::ios::binary);
+    if (!tzdataFile.is_open()) {
+        HILOG_ERROR_I18N("Open tzdata failed");
+        return availableIDs;
     }
+    const size_t versionLength = 12;
+    tzdataFile.ignore(versionLength);
+    // offset means indexOffset or dataOffset.
+    const size_t offsetSize = 4;
+    const size_t maxTZIDLength = 40;
+    // tempSize is the length of one index, include tz id length, data offset and tz file length.
+    const size_t tempSize = 48;
+    char *temp = new char[tempSize];
+    tzdataFile.read(temp, offsetSize * 2);
+    size_t indexOffset = ConvertBytesToSizeT(temp);
+    size_t dataOffset = ConvertBytesToSizeT(temp + offsetSize);
+    // ignore final offset.
+    tzdataFile.ignore(offsetSize);
+    while (indexOffset < dataOffset) {
+        tzdataFile.read(temp, tempSize);
+        indexOffset += tempSize;
+        std::string tzid(temp, maxTZIDLength);
+        availableIDs.insert(tzid);
+    }
+    tzdataFile.close();
+    delete[] temp;
     return availableIDs;
 }
 
@@ -1159,13 +1179,34 @@ bool I18nTimeZone::CheckLatitudeAndLongitude(const double x, const double y)
 std::vector<int> I18nTimeZone::GetColorData(const uint16_t x, const uint16_t y,
                                             uint16_t actualHeight, std::string preferredPath)
 {
-    std::vector<int> result;
     FILE *fp;
+    int code = InitPngptr(&fp, preferredPath);
+    if (code != 0) {
+        std::vector<int> result;
+        return result;
+    }
+    return ReadPngPixelData(x, y, &fp, actualHeight);
+}
+
+std::vector<int> I18nTimeZone::ReadPngPixelData(const uint16_t x, const uint16_t y,
+                                                FILE **fp, uint16_t actualHeight)
+{
+    std::vector<int> result;
     png_structp png_ptr;
     png_infop info_ptr;
     png_bytep row_pointers;
-    int code = InitPngptr(png_ptr, info_ptr, &fp, preferredPath);
-    if (code != 0) {
+    png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    if (!png_ptr) {
+        png_destroy_read_struct(&png_ptr, &info_ptr, 0);
+        CloseFile(*fp);
+        HILOG_ERROR_I18N("create read_struct failed.");
+        return result;
+    }
+    info_ptr = png_create_info_struct(png_ptr);
+    if (!info_ptr) {
+        png_destroy_read_struct(&png_ptr, &info_ptr, 0);
+        CloseFile(*fp);
+        HILOG_ERROR_I18N("create info_struct failed.");
         return result;
     }
     try {
@@ -1229,8 +1270,7 @@ void I18nTimeZone::GetTzDataWidth(std::vector<std::string> filePaths, uint32_t *
     }
 }
 
-int I18nTimeZone::InitPngptr(png_structp &png_ptr, png_infop &info_ptr, FILE **fp,
-                             std::string preferredPath)
+int I18nTimeZone::InitPngptr(FILE **fp, std::string preferredPath)
 {
     bool validFilePath = CheckTzDataFilePath(preferredPath);
     if (!validFilePath) {
@@ -1240,20 +1280,6 @@ int I18nTimeZone::InitPngptr(png_structp &png_ptr, png_infop &info_ptr, FILE **f
     *fp = fopen(preferredPath.c_str(), "rb");
     if (*fp == NULL) {
         HILOG_ERROR_I18N("timezone data resource file not exists.");
-        return 1;
-    }
-    png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-    if (!png_ptr) {
-        png_destroy_read_struct(&png_ptr, &info_ptr, 0);
-        CloseFile(*fp);
-        HILOG_ERROR_I18N("create read_struct failed.");
-        return 1;
-    }
-    info_ptr = png_create_info_struct(png_ptr);
-    if (!info_ptr) {
-        png_destroy_read_struct(&png_ptr, &info_ptr, 0);
-        CloseFile(*fp);
-        HILOG_ERROR_I18N("create info_struct failed.");
         return 1;
     }
     return 0;
