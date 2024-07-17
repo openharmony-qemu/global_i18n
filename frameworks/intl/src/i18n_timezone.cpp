@@ -824,11 +824,13 @@ void I18nTimeZone::GetTimezoneIDFromZoneInfo(std::set<std::string> &availableIDs
     }
 }
 
-size_t ConvertBytesToSizeT(const char *byteArray)
+size_t I18nTimeZone::ConvertBytesToSizeT(const char *byteArray)
 {
     using std::filesystem::directory_iterator;
-    return ((size_t)byteArray[0] << 24) + ((size_t)byteArray[1] << 16) + ((size_t)byteArray[2] << 8) +
-        (size_t)byteArray[3];
+    size_t num0 = static_cast<size_t>(byteArray[0]) << BYTE_ARRAY_OFFSET_FIRST;
+    size_t num1 = static_cast<size_t>(byteArray[1]) << BYTE_ARRAY_OFFSET_SECOND;
+    size_t num2 = static_cast<size_t>(byteArray[2]) << BYTE_ARRAY_OFFSET_THIRD;
+    return num0 + num1 + num2 + static_cast<size_t>(byteArray[BYTE_ARRAY_INDEX_THIRD]);
 }
 
 
@@ -852,7 +854,8 @@ std::set<std::string> I18nTimeZone::GetAvailableIDs(I18nErrorCode &errorCode)
     // tempSize is the length of one index, include tz id length, data offset and tz file length.
     const size_t tempSize = 48;
     char *temp = new char[tempSize];
-    tzdataFile.read(temp, offsetSize * 2);
+    const size_t offsetSizeTwice = 2;
+    tzdataFile.read(temp, offsetSize * offsetSizeTwice);
     size_t indexOffset = ConvertBytesToSizeT(temp);
     size_t dataOffset = ConvertBytesToSizeT(temp + offsetSize);
     // ignore final offset.

@@ -71,12 +71,16 @@ private:
     static const char *CITY_DISPLAYNAME_ROOT_TAG;
     static const char *CITY_DISPLAYNAME_SECOND_ROOT_TAG;
     static const char *TZDATA_PATH;
-    static const char * DISTRO_TZDATA_PATH;
+    static const char *DISTRO_TZDATA_PATH;
     static const uint32_t ELEMENT_NUM = 2;
     static const uint32_t TZ_X_PLUS = 180;
     static const uint32_t TZ_HALF_OF_SIZE = 2;
     static const uint32_t TZ_MAX_PIXEL_VALUE = 255;
     static constexpr double NUM_PRECISION = 0.1;
+    static const uint32_t BYTE_ARRAY_OFFSET_FIRST = 24;
+    static const uint32_t BYTE_ARRAY_OFFSET_SECOND = 16;
+    static const uint32_t BYTE_ARRAY_OFFSET_THIRD = 8;
+    static const uint32_t BYTE_ARRAY_INDEX_THIRD = 3;
     static std::set<std::string> availableIDs;
     static std::set<std::string> supportedLocales;
     static std::set<std::string> availableZoneCityIDs;
@@ -118,6 +122,7 @@ private:
     static void SetCity2TimeZoneID(const char* key, const char* value);
     static void SetBestMatchLocale(const std::string& key, const std::string& value);
     static const char *GetDeviceCityDisplayNamePath();
+    static size_t ConvertBytesToSizeT(const char *byteArray);
 };
 } // namespace I18n
 } // namespace Global
