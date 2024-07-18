@@ -324,7 +324,6 @@ std::set<std::string> GetTimeZoneAvailableIDs(I18nErrorCode &errorCode)
     tzdataFile.ignore(versionLength);
     // offset means indexOffset or dataOffset.
     const size_t offsetSize = 4;
-    const size_t maxTZIDLength = 40;
     // tempSize is the length of one index, include tz id length, data offset and tz file length.
     const size_t tempSize = 48;
     char *temp = new char[tempSize];
@@ -337,7 +336,7 @@ std::set<std::string> GetTimeZoneAvailableIDs(I18nErrorCode &errorCode)
     while (indexOffset < dataOffset) {
         tzdataFile.read(temp, tempSize);
         indexOffset += tempSize;
-        std::string tzid(temp, maxTZIDLength);
+        std::string tzid(temp);
         availableIDs.insert(tzid);
     }
     tzdataFile.close();
