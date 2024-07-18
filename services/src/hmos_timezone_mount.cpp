@@ -47,7 +47,7 @@ bool Init()
     if (file.is_open()) {
         std::string line;
         while (std::getline(file, line)) {
-            if (line.starts_with("Name: ")) {
+            if (line.find("Name: ") == 0) {
                 g_dataFiles.push_back(line.substr(FILE_NAME_INDEX));
             }
         }
