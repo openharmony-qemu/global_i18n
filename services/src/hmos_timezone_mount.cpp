@@ -44,10 +44,10 @@ std::vector<std::string> g_dataFiles = {};
 bool Init()
 {
     std::ifstream file(CFG_PATH + MANIFEST_FILE);
-    std::string line;
     if (file.is_open()) {
+        std::string line;
         while (std::getline(file, line)) {
-            if (line.find("Name: " == 0)) {
+            if (line.starts_with("Name: ")) {
                 g_dataFiles.push_back(line.substr(FILE_NAME_INDEX));
             }
         }
