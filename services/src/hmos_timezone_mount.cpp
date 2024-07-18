@@ -75,7 +75,7 @@ bool Mount()
         return false;
     }
 
-    if (mount(NULL, custOpkeyVersionDir.c_str(), nullptr, MS_REMOUNT | MS_BIND | MS_RDONLY, nullptr) != 0) {
+    if (mount(nullptr, custOpkeyVersionDir.c_str(), nullptr, MS_REMOUNT | MS_BIND | MS_RDONLY, nullptr) != 0) {
         HILOG_ERROR_I18N("Mount: fail to mount read only: opkey(%{public}s) errno(%{public}s)",
             cotaOpkeyVersionDir.c_str(), strerror(errno));
         if (umount(custOpkeyVersionDir.c_str()) != 0) {
