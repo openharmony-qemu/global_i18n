@@ -331,7 +331,6 @@ std::set<std::string> GetTimeZoneAvailableIDs(I18nErrorCode &errorCode)
     tzdataFile.read(temp, offsetSize * offsetSizeTwice);
     size_t indexOffset = ConvertBytesToSizeT(temp);
     size_t dataOffset = ConvertBytesToSizeT(temp + offsetSize);
-    // ignore final offset.
     tzdataFile.ignore(offsetSize);
     while (indexOffset < dataOffset) {
         tzdataFile.read(temp, tempSize);
