@@ -65,9 +65,7 @@ const char *I18nTimeZone::TIMEZONE_ROOT_TAG = "timezones";
 const char *I18nTimeZone::TIMEZONE_SECOND_ROOT_TAG = "timezone";
 const char *I18nTimeZone::CITY_DISPLAYNAME_ROOT_TAG = "display_names";
 const char *I18nTimeZone::CITY_DISPLAYNAME_SECOND_ROOT_TAG = "display_name";
-const char *I18nTimeZone::ZONEINFO_PATH = "/system/etc/zoneinfo";
 
-std::set<std::string> I18nTimeZone::availableIDs {};
 std::set<std::string> I18nTimeZone::supportedLocales {};
 std::set<std::string> I18nTimeZone::availableZoneCityIDs {};
 std::map<std::string, std::string> I18nTimeZone::city2TimeZoneID {};
@@ -824,27 +822,7 @@ void I18nTimeZone::GetTimezoneIDFromZoneInfo(std::set<std::string> &availableIDs
 
 std::set<std::string> I18nTimeZone::GetAvailableIDs(I18nErrorCode &errorCode)
 {
-    using std::filesystem::directory_iterator;
-
-    if (availableIDs.size() != 0) {
-        return availableIDs;
-    }
-    struct stat s;
-    for (const auto &dirEntry : directory_iterator{ZONEINFO_PATH}) {
-        std::string parentPath = dirEntry.path();
-        if (stat(parentPath.c_str(), &s) != 0) {
-            HILOG_ERROR_I18N("GetAvailableIDs: zoneinfo path %{public}s not exist.", parentPath.c_str());
-            errorCode = I18nErrorCode::FAILED;
-            return availableIDs;
-        }
-        std::string parentName = parentPath.substr(strlen(ZONEINFO_PATH) + 1);
-        if (s.st_mode & S_IFDIR) {
-            GetTimezoneIDFromZoneInfo(availableIDs, parentPath, parentName);
-        } else {
-            availableIDs.insert(parentName);
-        }
-    }
-    return availableIDs;
+    return GetTimeZoneAvailableIDs(errorCode);
 }
 
 std::set<std::string> I18nTimeZone::GetAvailableZoneCityIDs()

@@ -71,13 +71,11 @@ private:
     static const char *TIMEZONE_SECOND_ROOT_TAG;
     static const char *CITY_DISPLAYNAME_ROOT_TAG;
     static const char *CITY_DISPLAYNAME_SECOND_ROOT_TAG;
-    static const char *ZONEINFO_PATH;
     static const uint32_t ELEMENT_NUM = 2;
     static const uint32_t TZ_X_PLUS = 180;
     static const uint32_t TZ_HALF_OF_SIZE = 2;
     static const uint32_t TZ_MAX_PIXEL_VALUE = 255;
     static constexpr double NUM_PRECISION = 0.1;
-    static std::set<std::string> availableIDs;
     static std::set<std::string> supportedLocales;
     static std::set<std::string> availableZoneCityIDs;
     static std::map<std::string, std::string> city2TimeZoneID;

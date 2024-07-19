@@ -102,8 +102,10 @@
                     "name": "//base/global/i18n/frameworks/intl:intl_util",
                     "header": {
                         "header_files": [
+                            "i18n_types.h",
                             "locale_config.h",
-                            "locale_info.h"
+                            "locale_info.h",
+                            "utils.h"
                         ],
                         "header_base": "//base/global/i18n/frameworks/intl/include"
                     }
