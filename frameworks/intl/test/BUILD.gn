@@ -11,7 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//base/global/i18n/i18n.gni")
 import("//build/test.gni")
 
 module_output_path = "i18n/intl_test"
@@ -50,13 +49,11 @@ ohos_unittest("intl_test") {
     "libpng:libpng",
     "openssl:libssl_shared",
   ]
-  if (i18n_testonly) {
-    external_deps += [ "googletest:gtest" ]
-  }
 
   deps = [
     "//base/global/i18n/frameworks/intl:build_module",
     "//base/global/i18n/services:i18n_sa_client",
+    "//third_party/googletest:gtest_main"
   ]
 }
 

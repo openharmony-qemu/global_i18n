@@ -11,7 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//base/global/i18n/i18n.gni")
 import("//build/test.gni")
 
 module_output_path = "i18n/zone_util_test"
@@ -22,12 +21,12 @@ ohos_unittest("zone_util_test") {
   sources = [ "unittest/zone_util_test.cpp" ]
   include_dirs =
       [ "//base/global/i18n/interfaces/native/inner_api/zone/include" ]
-  deps = [ "//base/global/i18n/frameworks/zone:zone_util" ]
+  deps = [
+    "//base/global/i18n/frameworks/zone:zone_util",
+    "//third_party/googletest:gtest_main"
+  ]
   external_deps = [
     "c_utils:utils",
     "libphonenumber:phonenumber_standard",
   ]
-  if (i18n_testonly) {
-    external_deps += [ "googletest:gtest" ]
-  }
 }
