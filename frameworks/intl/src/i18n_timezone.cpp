@@ -1286,7 +1286,7 @@ std::vector<std::string> I18nTimeZone::FindTzData()
     std::regex regVersion("_[0-9]{7}");
     const std::vector<std::filesystem::path> pixelPaths = {TZ_PIXEL_PATH, DISTRO_TZ_PIXEL_PATH};
     for (const auto& pixelPath : pixelPaths) {
-        if (!std::filesystem::exists(pixelPath)) {
+        if (!FileExist(pixelPath)) {
             HILOG_INFO_I18N("pixelPaths does not exists: %{public}s.", pixelPath.c_str());
             continue;
         }
