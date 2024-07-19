@@ -19,31 +19,46 @@
 #include "i18n_break_iterator.h"
 
 namespace OHOS {
+    const int VALUE_NUMBER = 3;
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
         using namespace Global::I18n;
-        if (size < 1) {
+
+        if (size < sizeof(int32_t) * VALUE_NUMBER) {
             return false;
         }
+
         uint32_t offset = 0;
-        std::string text(reinterpret_cast<const char*>(data), size - 1);
+
+        std::string text(reinterpret_cast<const char*>(data + offset), size - sizeof(int32_t) * 3);
+        offset += size - sizeof(int32_t) * VALUE_NUMBER;
+
         int32_t number = *(reinterpret_cast<const int32_t*>(data + offset));
+        offset += sizeof(int32_t);
+
+        int32_t next = *(reinterpret_cast<const int32_t*>(data + offset));
+        offset += sizeof(int32_t);
+
+        int32_t following = *(reinterpret_cast<const int32_t*>(data + offset));
+        offset += sizeof(int32_t);
+
         I18nBreakIterator iterator(text);
         iterator.SetText(text.c_str());
+
         std::string str;
         iterator.GetText(str);
+
         iterator.IsBoundary(number);
         iterator.Current();
         iterator.First();
         iterator.Last();
-        offset += sizeof(int32_t);
-        int32_t next = *(reinterpret_cast<const int32_t*>(data + offset));
+
         iterator.Next(next);
         iterator.Next();
         iterator.Previous();
-        offset += sizeof(int32_t);
-        int32_t following = *(reinterpret_cast<const int32_t*>(data + offset));
+
         iterator.Following(following);
+
         return true;
     }
 }
