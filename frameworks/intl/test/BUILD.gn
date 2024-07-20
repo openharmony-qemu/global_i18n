@@ -53,7 +53,7 @@ ohos_unittest("intl_test") {
   deps = [
     "//base/global/i18n/frameworks/intl:build_module",
     "//base/global/i18n/services:i18n_sa_client",
-    "//third_party/googletest:gtest_main"
+    "//third_party/googletest:gtest_main",
   ]
 }
 
