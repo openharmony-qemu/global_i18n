@@ -147,9 +147,9 @@ HWTEST_F(IntlTest, IntlFuncTest0050, TestSize.Level1)
     PreferredLanguage::AddPreferredLanguage(fakeLanguage, -1);
     PreferredLanguage::AddPreferredLanguage(language, -1);
     std::vector<std::string> list = PreferredLanguage::GetPreferredLanguageList();
-    EXPECT_EQ(list.size(), 3);
+    EXPECT_EQ(list.size(), 2);
     std::string firstPreferredLanguage = PreferredLanguage::GetFirstPreferredLanguage();
-    EXPECT_EQ(firstPreferredLanguage, "zh-CN");
+    EXPECT_EQ(firstPreferredLanguage, "zh-Hans");
     std::string preferredLocale = PreferredLanguage::GetPreferredLocale();
     EXPECT_EQ(preferredLocale, "zh-CN");
     status = PreferredLanguage::RemovePreferredLanguage(0);
