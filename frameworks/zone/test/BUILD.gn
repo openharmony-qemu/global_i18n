@@ -23,7 +23,7 @@ ohos_unittest("zone_util_test") {
       [ "//base/global/i18n/interfaces/native/inner_api/zone/include" ]
   deps = [
     "//base/global/i18n/frameworks/zone:zone_util",
-    "//third_party/googletest:gtest_main"
+    "//third_party/googletest:gtest_main",
   ]
   external_deps = [
     "c_utils:utils",
