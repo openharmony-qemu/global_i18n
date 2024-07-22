@@ -59,7 +59,6 @@
                 "config_policy",
                 "c_utils",
                 "eventhandler",
-                "googletest",
                 "hilog",
                 "icu",
                 "init",
