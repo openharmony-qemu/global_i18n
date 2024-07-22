@@ -63,6 +63,7 @@ private:
     static std::mutex AS_YOU_TYPE_FORMAT_MUTEX;
     static size_t MAX_NUMBER_LENGTH;
     std::string lastFormatNumber;
+    bool withOptions = false;
 };
 } // namespace I18n
 } // namespace Global
