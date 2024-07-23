@@ -64,6 +64,7 @@ PhoneNumberFormat::PhoneNumberFormat(const std::string &countryTag,
 
     std::set<std::string> validType = {"E164", "RFC3966", "INTERNATIONAL", "NATIONAL"};
     if (validType.find(type) != validType.end()) {
+        withOptions = true;
         phoneNumberFormat = type2PhoneNumberFormat[type];
     } else {
         phoneNumberFormat = PhoneNumberUtil::PhoneNumberFormat::NATIONAL;
@@ -123,7 +124,11 @@ std::string PhoneNumberFormat::format(const std::string &number)
     if (type != PhoneNumberUtil::ErrorType::NO_PARSING_ERROR) {
         return PseudoLocalizationProcessor("");
     }
-    util->Format(phoneNumber, phoneNumberFormat, &formatted_number);
+    if (!withOptions) {
+        util->FormatInOriginalFormat(phoneNumber, country, &formatted_number);
+    } else {
+        util->Format(phoneNumber, phoneNumberFormat, &formatted_number);
+    }
     return PseudoLocalizationProcessor(formatted_number);
 }
 
