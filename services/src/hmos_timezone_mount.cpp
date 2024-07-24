@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <climits>
 #include <filesystem>
 #include <fstream>
 #include <string>
@@ -43,7 +44,13 @@ std::vector<std::string> g_dataFiles = {};
 
 bool Init()
 {
-    std::ifstream file(CFG_PATH + MANIFEST_FILE);
+    std::string manifestPath = CFG_PATH + MANIFEST_FILE;
+    std::unique_ptr<char[]> resolvedPath = std::make_unique<char[]>(PATH_MAX);
+    if (realpath(manifestPath.c_str(), resolvedPath.get()) == nullptr) {
+        HILOG_ERROR_I18N("MANIFEST_FILE file path isn't exists.");
+        return false;
+    }
+    std::ifstream file(resolvedPath.get());
     if (file.is_open()) {
         std::string line;
         while (std::getline(file, line)) {

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <climits>
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
@@ -61,6 +62,7 @@ void Merge(const std::vector<std::string>& src, const std::string& sep, std::str
 {
     if (src.size() == 0) {
         dest = "";
+        return;
     }
     dest = src[0];
     for (size_t i = 1; i < src.size(); ++i) {
@@ -315,7 +317,12 @@ std::set<std::string> GetTimeZoneAvailableIDs(I18nErrorCode &errorCode)
     }
     struct stat s;
     const char *tzdataFilePath = stat(DISTRO_TZDATA_PATH, &s) == 0 ? DISTRO_TZDATA_PATH : TZDATA_PATH;
-    std::ifstream tzdataFile(tzdataFilePath, std::ios::in | std::ios::binary);
+    std::unique_ptr<char[]> resolvedPath = std::make_unique<char[]>(PATH_MAX);
+    if (realpath(tzdataFilePath, resolvedPath.get()) == nullptr) {
+        HILOG_ERROR_I18N("GetTimeZoneAvailableIDs tzdata file path isn't exists.");
+        return availableIDs;
+    }
+    std::ifstream tzdataFile(resolvedPath.get(), std::ios::in | std::ios::binary);
     if (!tzdataFile.is_open()) {
         HILOG_ERROR_I18N("Open tzdata failed");
         return availableIDs;

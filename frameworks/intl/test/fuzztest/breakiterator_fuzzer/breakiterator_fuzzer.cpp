@@ -40,7 +40,6 @@ namespace OHOS {
         offset += sizeof(int32_t);
 
         int32_t following = *(reinterpret_cast<const int32_t*>(data + offset));
-        offset += sizeof(int32_t);
 
         I18nBreakIterator iterator(text);
         iterator.SetText(text.c_str());
