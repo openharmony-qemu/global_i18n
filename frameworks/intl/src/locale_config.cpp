@@ -30,6 +30,7 @@
 #include "unicode/localebuilder.h"
 #include "unicode/locdspnm.h"
 #include "unicode/locid.h"
+#include "unicode/smpdtfmt.h"
 #include "ohos/init_data.h"
 #include "parameter.h"
 #include "securec.h"
@@ -1048,14 +1049,73 @@ std::string LocaleConfig::GetValidLocale(const std::string &localeTag)
     }
 }
 
+bool LocaleConfig::IsEmpty24HourClock()
+{
+    std::string is24Hour = ReadSystemParameter(HOUR_KEY, CONFIG_LEN);
+    return is24Hour.empty();
+}
+
 bool LocaleConfig::Is24HourClock()
 {
     std::string is24Hour = ReadSystemParameter(HOUR_KEY, CONFIG_LEN);
     if (is24Hour.empty()) {
-        return false;
+        std::string systemLocale = GetSystemLocale();
+        return Is24HourLocale(systemLocale);
     }
     if (is24Hour.compare("true") == 0) {
         return true;
+    }
+    return false;
+}
+
+bool LocaleConfig::Is24HourLocale(const std::string& systemLocale)
+{
+    static std::unordered_map<std::string, bool> is24HourLocaleMap;
+    if (is24HourLocaleMap.find(systemLocale) != is24HourLocaleMap.end()) {
+        return is24HourLocaleMap[systemLocale];
+    }
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(icu::StringPiece(systemLocale), status);
+    if (U_FAILURE(status)) {
+        HILOG_INFO_I18N("Is24HourLocale: %{public}s create locale failed", systemLocale.c_str());
+        return false;
+    }
+
+    icu::UnicodeString formatPattern;
+    icu::DateFormat* dateFormat = icu::DateFormat::createTimeInstance(icu::DateFormat::EStyle::kLong, locale);
+    if (dateFormat == nullptr) {
+        HILOG_INFO_I18N("Is24HourLocale: createTimeInstance failed");
+        return false;
+    }
+    icu::SimpleDateFormat* simDateFormat = static_cast<icu::SimpleDateFormat*>(dateFormat);
+    if (simDateFormat == nullptr) {
+        HILOG_INFO_I18N("Is24HourLocale: failed to convert dateFormat");
+        return false;
+    }
+    simDateFormat->toPattern(formatPattern);
+    delete dateFormat;
+    std::string pattern;
+    formatPattern.toUTF8String(pattern);
+    bool result = HasDesignator(pattern, 'H');
+    is24HourLocaleMap[systemLocale] = result;
+    return result;
+}
+
+bool LocaleConfig::HasDesignator(const std::string& pattern, const char designator)
+{
+    if (pattern.empty()) {
+        HILOG_INFO_I18N("HasDesignator: pattern is empty");
+        return false;
+    }
+    bool insideQuote = false;
+    for (auto& c : pattern) {
+        if (c == '\'') {
+            insideQuote = !insideQuote;
+        } else if (!insideQuote) {
+            if (c == designator) {
+                return true;
+            }
+        }
     }
     return false;
 }

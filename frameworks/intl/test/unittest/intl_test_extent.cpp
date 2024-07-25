@@ -673,15 +673,15 @@ HWTEST_F(IntlTest, IntlFuncTest0066, TestSize.Level1)
     if (deviceType == "wearable" || deviceType == "liteWearable" || deviceType == "watch") {
         EXPECT_EQ(defaultRes, "12/01/1970");
         EXPECT_EQ(dateRes, "12/01/1970");
-        EXPECT_EQ(timeRes, "18:20");
+        EXPECT_EQ(timeRes, "06:20");
     } else if (deviceType == "tablet" || deviceType == "2in1" || deviceType == "tv" || deviceType == "pc") {
         EXPECT_EQ(defaultRes, "12 Jan 1970");
         EXPECT_EQ(dateRes, "12 Jan 1970");
-        EXPECT_EQ(timeRes, "18:20:54");
+        EXPECT_EQ(timeRes, "06:20:54");
     } else {
         EXPECT_EQ(defaultRes, "12/01/1970");
         EXPECT_EQ(dateRes, "12/01/1970");
-        EXPECT_EQ(timeRes, "18:20");
+        EXPECT_EQ(timeRes, "06:20");
     }
 }
 
@@ -774,13 +774,13 @@ HWTEST_F(IntlTest, IntlFuncTest0068, TestSize.Level1)
 
     if (deviceType == "wearable" || deviceType == "liteWearable" || deviceType == "watch") {
         EXPECT_EQ(dayPeriodRes, "10 mat.");
-        EXPECT_EQ(timeZoneNameRes, "18 h UTC+8");
+        EXPECT_EQ(timeZoneNameRes, "6\xE2\x80\xAFPM UTC+8");
     } else if (deviceType == "tablet" || deviceType == "2in1" || deviceType == "tv" || deviceType == "pc") {
         EXPECT_EQ(dayPeriodRes, "10\xE2\x80\xAF" "du matin");
-        EXPECT_EQ(timeZoneNameRes, "18 h heure normale de la Chine");
+        EXPECT_EQ(timeZoneNameRes, "6\xE2\x80\xAFPM heure normale de la Chine");
     } else {
         EXPECT_EQ(dayPeriodRes, "10\xE2\x80\xAFmatin");
-        EXPECT_EQ(timeZoneNameRes, "18 h UTC+8");
+        EXPECT_EQ(timeZoneNameRes, "6\xE2\x80\xAFPM UTC+8");
     }
 }
 

@@ -27,6 +27,7 @@
 #include <common_event_data.h>
 #endif
 #include "i18n_types.h"
+#include "unicode/locid.h"
 
 namespace OHOS {
 namespace Global {
@@ -94,6 +95,7 @@ public:
 #ifdef SUPPORT_GRAPHICS
     static bool Is24HourClock(sptr<IRemoteObject> &proxy);
 #endif
+    static bool IsEmpty24HourClock();
     static bool Is24HourClock();
     static bool GetUsingLocalDigit();
     static std::unordered_set<std::string> GetBlockedLanguages();
@@ -170,6 +172,8 @@ private:
     static void SetSupportedDialectLocales(const char* key, const char* value);
     static void SetRegion2DisplayName(const char* key, const char* value);
     static void SetLocale2DisplayName(const char* key, const char* value);
+    static bool Is24HourLocale(const std::string& systemLocale);
+    static bool HasDesignator(const std::string& inFormat, const char designator);
 
 #ifdef SUPPORT_GRAPHICS
     /**
