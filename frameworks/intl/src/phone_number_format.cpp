@@ -154,8 +154,8 @@ std::string PhoneNumberFormat::GetAsYouTypeFormatResult(const std::string &numbe
     return FormatAllInputNumber(number, phoneNumber);
 }
 
-std::string PhoneNumberFormat::FormatAllInputNumber(std::string &originalNumber,
-                                                    const std::string &replacedNumber)
+std::string PhoneNumberFormat::FormatAllInputNumber(const std::string &originalNumber,
+                                                    std::string &replacedNumber)
 {
     formatter->Clear();
     this->lastFormatNumber = replacedNumber;
