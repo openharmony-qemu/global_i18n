@@ -53,7 +53,7 @@ private:
     PhoneNumberUtil* GetPhoneNumberUtil();
     void OpenHandler();
     std::string GetAsYouTypeFormatResult(const std::string &number);
-    std::string FormatAllInputNumber(std::string &number);
+    std::string FormatAllInputNumber(const std::string &originalNumber, std::string &replacedNumber);
     PhoneNumberUtil *util;
     std::unique_ptr<AsYouTypeFormatter> formatter = nullptr;
     std::string country;
@@ -63,6 +63,7 @@ private:
     static std::mutex AS_YOU_TYPE_FORMAT_MUTEX;
     static size_t MAX_NUMBER_LENGTH;
     std::string lastFormatNumber;
+    bool withOptions = false;
 };
 } // namespace I18n
 } // namespace Global

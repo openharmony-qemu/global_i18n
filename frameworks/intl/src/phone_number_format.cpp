@@ -64,6 +64,7 @@ PhoneNumberFormat::PhoneNumberFormat(const std::string &countryTag,
 
     std::set<std::string> validType = {"E164", "RFC3966", "INTERNATIONAL", "NATIONAL"};
     if (validType.find(type) != validType.end()) {
+        withOptions = true;
         phoneNumberFormat = type2PhoneNumberFormat[type];
     } else {
         phoneNumberFormat = PhoneNumberUtil::PhoneNumberFormat::NATIONAL;
@@ -123,7 +124,11 @@ std::string PhoneNumberFormat::format(const std::string &number)
     if (type != PhoneNumberUtil::ErrorType::NO_PARSING_ERROR) {
         return PseudoLocalizationProcessor("");
     }
-    util->Format(phoneNumber, phoneNumberFormat, &formatted_number);
+    if (!withOptions) {
+        util->FormatInOriginalFormat(phoneNumber, country, &formatted_number);
+    } else {
+        util->Format(phoneNumber, phoneNumberFormat, &formatted_number);
+    }
     return PseudoLocalizationProcessor(formatted_number);
 }
 
@@ -138,27 +143,26 @@ std::string PhoneNumberFormat::GetAsYouTypeFormatResult(const std::string &numbe
     size_t len = phoneNumber.length();
     if (len == lastFormatNumber.length() + 1) {
         if (phoneNumber.compare(0, lastFormatNumber.length(), lastFormatNumber) != 0) {
-            return FormatAllInputNumber(phoneNumber);
+            return FormatAllInputNumber(number, phoneNumber);
         }
         char lastChar = phoneNumber.at(len - 1);
         std::string result;
         this->lastFormatNumber = phoneNumber;
         return formatter->InputDigit(lastChar, &result);
     }
-    return FormatAllInputNumber(phoneNumber);
+
+    return FormatAllInputNumber(number, phoneNumber);
 }
 
-std::string PhoneNumberFormat::FormatAllInputNumber(std::string &number)
+std::string PhoneNumberFormat::FormatAllInputNumber(const std::string &originalNumber,
+                                                    std::string &replacedNumber)
 {
     formatter->Clear();
-    this->lastFormatNumber = number;
+    this->lastFormatNumber = replacedNumber;
     std::string result;
     std::string formattedNumber;
-    for (size_t i = 0; i < number.length(); i++) {
-        char c = number.at(i);
-        if (!isdigit(c)) {
-            continue;
-        }
+    for (size_t i = 0; i < originalNumber.length(); i++) {
+        char c = originalNumber.at(i);
         formattedNumber = formatter->InputDigit(c, &result);
     }
     return formattedNumber;

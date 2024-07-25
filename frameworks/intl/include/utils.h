@@ -19,10 +19,18 @@
 #include <vector>
 #include <unordered_set>
 #include <unicode/locid.h>
+#include "set"
+#include "i18n_types.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
+static const uint32_t BYTE_ARRAY_OFFSET_FIRST = 24;
+static const uint32_t BYTE_ARRAY_OFFSET_SECOND = 16;
+static const uint32_t BYTE_ARRAY_OFFSET_THIRD = 8;
+static const uint32_t BYTE_ARRAY_INDEX_THIRD = 3;
+static std::set<std::string> availableIDs;
+
 void Split(const std::string &src, const std::string &sep, std::vector<std::string> &dest);
 void Merge(const std::vector<std::string>& src, const std::string& sep, std::string& dest);
 std::string ReadSystemParameter(const char *paramKey, const int paramLength);
@@ -44,6 +52,8 @@ bool GetPseudoLocalizationEnforce();
 std::string PseudoLocalizationProcessor(const std::string &input);
 std::string PseudoLocalizationProcessor(const std::string &input, bool ifEnforce);
 bool CheckSystemPermission();
+size_t ConvertBytesToSizeT(const char *byteArray);
+std::set<std::string> GetTimeZoneAvailableIDs(I18nErrorCode &errorCode);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

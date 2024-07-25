@@ -35,6 +35,10 @@ ohos_fuzztest("RulesEngineFuzzTest") {
   configs = []
 
   deps = [ "../../../../intl:intl_util" ]
+  external_deps = [
+    "icu:shared_icui18n",
+    "icu:shared_icuuc",
+  ]
 
   subsystem_name = "global"
   part_name = "i18n"
