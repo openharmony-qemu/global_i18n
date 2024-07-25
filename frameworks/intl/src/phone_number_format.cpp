@@ -161,9 +161,6 @@ std::string PhoneNumberFormat::FormatAllInputNumber(std::string &number)
     std::string formattedNumber;
     for (size_t i = 0; i < number.length(); i++) {
         char c = number.at(i);
-        if (!isdigit(c)) {
-            continue;
-        }
         formattedNumber = formatter->InputDigit(c, &result);
     }
     return formattedNumber;
