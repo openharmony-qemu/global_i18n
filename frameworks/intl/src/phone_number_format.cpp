@@ -125,22 +125,11 @@ std::string PhoneNumberFormat::format(const std::string &number)
         return PseudoLocalizationProcessor("");
     }
     if (!withOptions) {
-        util->FormatInOriginalFormat(phoneNumber, country, &formattedNumber);
+        util->FormatInOriginalFormat(phoneNumber, country, &formatted_number);
     } else {
         util->Format(phoneNumber, phoneNumberFormat, &formatted_number);
     }
     return PseudoLocalizationProcessor(formatted_number);
-}
-
-void PhoneNumberFormat::FormatWithoutOptions(const std::string &number, std::string &formattedNumber)
-{
-    i18n::phonenumbers::PhoneNumber phoneNumber;
-    PhoneNumberUtil::ErrorType type = util->ParseAndKeepRawInput(number, country, &phoneNumber);
-    if (type != PhoneNumberUtil::ErrorType::NO_PARSING_ERROR) {
-        formattedNumber = "";
-        return;
-    }
-    util->FormatInOriginalFormat(phoneNumber, country, &formattedNumber);
 }
 
 std::string PhoneNumberFormat::GetAsYouTypeFormatResult(const std::string &number)
