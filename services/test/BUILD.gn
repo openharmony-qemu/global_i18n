@@ -32,13 +32,13 @@ ohos_unittest("i18n_service_test") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "googletest:gtest",
   ]
 
   deps = [
     "../../frameworks/intl:build_module",
     "../../services:i18n_sa",
-    "../../services:i18n_sa_client",
-    "//third_party/googletest:gtest_main",
+    "../../services:i18n_sa_client"
   ]
 
   defines = [ "SUPPORT_GRAPHICS" ]
