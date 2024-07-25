@@ -38,7 +38,7 @@ ohos_unittest("i18n_service_test") {
   deps = [
     "../../frameworks/intl:build_module",
     "../../services:i18n_sa",
-    "../../services:i18n_sa_client"
+    "../../services:i18n_sa_client",
   ]
 
   defines = [ "SUPPORT_GRAPHICS" ]
