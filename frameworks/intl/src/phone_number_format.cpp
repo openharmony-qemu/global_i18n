@@ -119,20 +119,29 @@ std::string PhoneNumberFormat::format(const std::string &number)
         formatted_number = GetAsYouTypeFormatResult(number);
         return PseudoLocalizationProcessor(formatted_number);
     }
-    i18n::phonenumbers::PhoneNumber phoneNumber;
-    PhoneNumberUtil::ErrorType type = util->ParseAndKeepRawInput(number, country, &phoneNumber);
-    if (type != PhoneNumberUtil::ErrorType::NO_PARSING_ERROR) {
-        return PseudoLocalizationProcessor("");
-    }
-        HILOG_ERROR_I18N("zdd-111----");
+
     if (!withOptions) {
-        HILOG_ERROR_I18N("zdd-000--");
-        util->FormatInOriginalFormat(phoneNumber, country, &formatted_number);
+        FormatWithoutOptions(number, formatted_number);
     } else {
-        HILOG_ERROR_I18N("zdd-222----");
+        i18n::phonenumbers::PhoneNumber phoneNumber;
+        PhoneNumberUtil::ErrorType type = util->Parse(number, country, &phoneNumber);
+        if (type != PhoneNumberUtil::ErrorType::NO_PARSING_ERROR) {
+            return PseudoLocalizationProcessor("");
+        }
         util->Format(phoneNumber, phoneNumberFormat, &formatted_number);
     }
     return PseudoLocalizationProcessor(formatted_number);
+}
+
+void PhoneNumberFormat::FormatWithoutOptions(const std::string &number, std::string &formattedNumber)
+{
+    i18n::phonenumbers::PhoneNumber phoneNumber;
+    PhoneNumberUtil::ErrorType type = util->ParseAndKeepRawInput(number, country, &phoneNumber);
+    if (type != PhoneNumberUtil::ErrorType::NO_PARSING_ERROR) {
+        formattedNumber = "";
+        return;
+    }
+    util->FormatInOriginalFormat(phoneNumber, country, &formattedNumber);
 }
 
 std::string PhoneNumberFormat::GetAsYouTypeFormatResult(const std::string &number)
