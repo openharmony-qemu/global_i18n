@@ -130,6 +130,7 @@ std::string PreferredLanguage::GetMatchedLanguage(const std::string& language)
     for (LocaleInfo* supportLocaleInfo : candidateLocales) {
         delete supportLocaleInfo;
     }
+    delete requestLocale;
     return matchedLanguage;
 }
 
