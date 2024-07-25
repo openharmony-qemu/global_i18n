@@ -54,7 +54,6 @@ private:
     void OpenHandler();
     std::string GetAsYouTypeFormatResult(const std::string &number);
     std::string FormatAllInputNumber(const std::string &originalNumber, std::string &replacedNumber);
-    void FormatWithoutOptions(const std::string &number, std::string &formattedNumber);
     PhoneNumberUtil *util;
     std::unique_ptr<AsYouTypeFormatter> formatter = nullptr;
     std::string country;

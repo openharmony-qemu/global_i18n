@@ -228,7 +228,7 @@ HWTEST_F(IntlTest, IntlFuncTest0052, TestSize.Level1)
 HWTEST_F(IntlTest, IntlFuncTest0053, TestSize.Level1)
 {
     map<string, string> options = {
-        { "type", "national" }
+        { "type", "NATIONAL" }
     };
     std::unique_ptr<PhoneNumberFormat> phoneNumberFormat =
         std::make_unique<PhoneNumberFormat>("zh-CN", options);

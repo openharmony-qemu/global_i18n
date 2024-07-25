@@ -119,15 +119,14 @@ std::string PhoneNumberFormat::format(const std::string &number)
         formatted_number = GetAsYouTypeFormatResult(number);
         return PseudoLocalizationProcessor(formatted_number);
     }
-
+    i18n::phonenumbers::PhoneNumber phoneNumber;
+    PhoneNumberUtil::ErrorType type = util->ParseAndKeepRawInput(number, country, &phoneNumber);
+    if (type != PhoneNumberUtil::ErrorType::NO_PARSING_ERROR) {
+        return PseudoLocalizationProcessor("");
+    }
     if (!withOptions) {
-        FormatWithoutOptions(number, formatted_number);
+        util->FormatInOriginalFormat(phoneNumber, country, &formattedNumber);
     } else {
-        i18n::phonenumbers::PhoneNumber phoneNumber;
-        PhoneNumberUtil::ErrorType type = util->Parse(number, country, &phoneNumber);
-        if (type != PhoneNumberUtil::ErrorType::NO_PARSING_ERROR) {
-            return PseudoLocalizationProcessor("");
-        }
         util->Format(phoneNumber, phoneNumberFormat, &formatted_number);
     }
     return PseudoLocalizationProcessor(formatted_number);
