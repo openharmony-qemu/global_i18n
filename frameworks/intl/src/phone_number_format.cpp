@@ -38,6 +38,69 @@ void* PhoneNumberFormat::dynamicHandler = nullptr;
 std::mutex PhoneNumberFormat::phoneMutex;
 std::mutex PhoneNumberFormat::AS_YOU_TYPE_FORMAT_MUTEX;
 size_t PhoneNumberFormat::MAX_NUMBER_LENGTH = 30;
+std::map<char, char> PhoneNumberFormat::VALID_PHONE_NUMBER_CHARS {
+    { '+', '+' },
+    { ' ', ' ' },
+    { '*', '*' },
+    { '-', '-' },
+    { '#', '#' },
+    { '(', '(' },
+    { ')', ')' },
+    { ';', ';' },
+    { ',', ',' },
+    { 'A', '2' },
+    { 'B', '2' },
+    { 'C', '2' },
+    { 'D', '3' },
+    { 'E', '3' },
+    { 'F', '3' },
+    { 'G', '4' },
+    { 'H', '4' },
+    { 'I', '4' },
+    { 'J', '5' },
+    { 'K', '5' },
+    { 'L', '5' },
+    { 'M', '6' },
+    { 'N', '6' },
+    { 'O', '6' },
+    { 'P', '7' },
+    { 'Q', '7' },
+    { 'R', '7' },
+    { 'S', '7' },
+    { 'T', '8' },
+    { 'U', '8' },
+    { 'V', '8' },
+    { 'W', '9' },
+    { 'X', '9' },
+    { 'Y', '9' },
+    { 'Z', '9' },
+    { 'a', '2' },
+    { 'b', '2' },
+    { 'c', '2' },
+    { 'd', '3' },
+    { 'e', '3' },
+    { 'f', '3' },
+    { 'g', '4' },
+    { 'h', '4' },
+    { 'i', '4' },
+    { 'j', '5' },
+    { 'k', '5' },
+    { 'l', '5' },
+    { 'm', '6' },
+    { 'n', '6' },
+    { 'o', '6' },
+    { 'p', '7' },
+    { 'q', '7' },
+    { 'r', '7' },
+    { 's', '7' },
+    { 't', '8' },
+    { 'u', '8' },
+    { 'v', '8' },
+    { 'w', '9' },
+    { 'x', '9' },
+    { 'y', '9' },
+    { 'z', '9' },
+};
 
 PhoneNumberFormat::PhoneNumberFormat(const std::string &countryTag,
                                      const std::map<std::string, std::string> &options)
@@ -163,7 +226,13 @@ std::string PhoneNumberFormat::FormatAllInputNumber(const std::string &originalN
     std::string formattedNumber;
     for (size_t i = 0; i < originalNumber.length(); i++) {
         char c = originalNumber.at(i);
-        formattedNumber = formatter->InputDigit(c, &result);
+        auto iter = VALID_PHONE_NUMBER_CHARS.find(c);
+        if (isdigit(c)) {
+            formattedNumber = formatter->InputDigit(c, &result);
+        } else if (iter != VALID_PHONE_NUMBER_CHARS.end()) {
+            char replacedChar = VALID_PHONE_NUMBER_CHARS[c];
+            formattedNumber = formatter->InputDigit(replacedChar, &result);
+        }
     }
     return formattedNumber;
 }
