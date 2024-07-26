@@ -64,6 +64,7 @@ private:
     static size_t MAX_NUMBER_LENGTH;
     std::string lastFormatNumber;
     bool withOptions = false;
+    static std::map<char, char> VALID_PHONE_NUMBER_CHARS;
 };
 } // namespace I18n
 } // namespace Global
