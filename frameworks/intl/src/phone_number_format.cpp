@@ -120,7 +120,7 @@ std::string PhoneNumberFormat::format(const std::string &number)
         return PseudoLocalizationProcessor(formatted_number);
     }
     i18n::phonenumbers::PhoneNumber phoneNumber;
-    PhoneNumberUtil::ErrorType type = util->Parse(number, country, &phoneNumber);
+    PhoneNumberUtil::ErrorType type = util->ParseAndKeepRawInput(number, country, &phoneNumber);
     if (type != PhoneNumberUtil::ErrorType::NO_PARSING_ERROR) {
         return PseudoLocalizationProcessor("");
     }
