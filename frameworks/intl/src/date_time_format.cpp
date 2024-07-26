@@ -128,10 +128,12 @@ bool DateTimeFormat::InitWithLocale(const std::string &curLocale, std::map<std::
     if (hourCycle.empty()) {
         hourCycle = localeInfo->GetHourCycle();
     }
-    if (hour12.empty() && hourCycle.empty()) {
+    if (hour12.empty() && hourCycle.empty() && !LocaleConfig::IsEmpty24HourClock()) {
         bool is24HourClock = LocaleConfig::Is24HourClock();
         if (is24HourClock) {
             hour12 = "false";
+        } else {
+            hour12 = "true";
         }
     }
     ComputeHourCycleChars();
