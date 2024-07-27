@@ -290,6 +290,9 @@ string LocaleConfig::GetSystemRegion()
     if (systemRegion.empty()) {
         systemRegion = GetCountry(DEFAULT_LOCALE_KEY);
     }
+    if (systemRegion.empty()) {
+        return "CN";
+    }
     return systemRegion;
 }
 
