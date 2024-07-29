@@ -187,7 +187,8 @@ std::string PhoneNumberFormat::format(const std::string &number)
     if (type != PhoneNumberUtil::ErrorType::NO_PARSING_ERROR) {
         return PseudoLocalizationProcessor("");
     }
-    if (!withOptions) {
+    const std::string prefix = "10";
+    if (number.compare(0, prefix.length(), prefix) == 0) {
         util->FormatInOriginalFormat(phoneNumber, country, &formatted_number);
     } else {
         util->Format(phoneNumber, phoneNumberFormat, &formatted_number);
