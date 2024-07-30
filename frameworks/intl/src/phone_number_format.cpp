@@ -205,7 +205,7 @@ std::string PhoneNumberFormat::GetAsYouTypeFormatResult(const std::string &numbe
     std::regex pattern("[^\\d]");
     std::string phoneNumber = std::regex_replace(number, pattern, "");
     size_t len = phoneNumber.length();
-    if (len == lastFormatNumber.length() + 1) {
+    if (lastFormatNumber.length() > 0 && len == lastFormatNumber.length() + 1) {
         if (phoneNumber.compare(0, lastFormatNumber.length(), lastFormatNumber) != 0) {
             return FormatAllInputNumber(number, phoneNumber);
         }
