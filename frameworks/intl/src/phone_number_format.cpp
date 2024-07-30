@@ -187,7 +187,8 @@ std::string PhoneNumberFormat::format(const std::string &number)
     if (type != PhoneNumberUtil::ErrorType::NO_PARSING_ERROR) {
         return PseudoLocalizationProcessor("");
     }
-    if (!withOptions) {
+    const std::string prefix = "106";
+    if (number.compare(0, prefix.length(), prefix) == 0) {
         util->FormatInOriginalFormat(phoneNumber, country, &formatted_number);
     } else {
         util->Format(phoneNumber, phoneNumberFormat, &formatted_number);
@@ -204,7 +205,7 @@ std::string PhoneNumberFormat::GetAsYouTypeFormatResult(const std::string &numbe
     std::regex pattern("[^\\d]");
     std::string phoneNumber = std::regex_replace(number, pattern, "");
     size_t len = phoneNumber.length();
-    if (len == lastFormatNumber.length() + 1) {
+    if (lastFormatNumber.length() > 0 && len == lastFormatNumber.length() + 1) {
         if (phoneNumber.compare(0, lastFormatNumber.length(), lastFormatNumber) != 0) {
             return FormatAllInputNumber(number, phoneNumber);
         }
