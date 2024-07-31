@@ -379,31 +379,31 @@ napi_value I18nSystemAddon::GetDisplayCountryImpl(napi_env env, napi_callback_in
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
-        return nullptr;
+        return VariableConvertor::CreateString(env, "");
     } else if (argc < FUNC_ARGS_COUNT) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "country or locale", "", throwError);
-        return nullptr;
+        return VariableConvertor::CreateString(env, "");
     }
     size_t len = 0;
     VariableConvertor::VerifyType(env, "country", "string", argv[0]);
     napi_get_value_string_utf8(env, argv[0], nullptr, 0, &len);
     std::vector<char> localeBuf(len + 1);
     if (!GetCountryNapiValueWithError(env, argv[0], len, localeBuf.data(), "0")) {
-        return nullptr;
+        return VariableConvertor::CreateString(env, "");
     }
     VariableConvertor::VerifyType(env, "locale", "string", argv[1]);
     napi_get_value_string_utf8(env, argv[1], nullptr, 0, &len);
     std::vector<char> displayLocaleBuf(len + 1);
     if (!GetCountryNapiValueWithError(env, argv[1], len, displayLocaleBuf.data(), "1")) {
-        return nullptr;
+        return VariableConvertor::CreateString(env, "");
     }
     LocaleInfo localeInfo(localeBuf.data());
     if (!LocaleConfig::IsValidRegion(localeBuf.data()) && localeInfo.GetRegion() == "") {
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "country", "a valid region", throwError);
-        return nullptr;
+        return VariableConvertor::CreateString(env, "");
     } else if (!LocaleConfig::IsValidTag(displayLocaleBuf.data())) {
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "locale", "a valid locale", throwError);
-        return nullptr;
+        return VariableConvertor::CreateString(env, "");
     }
     bool sentenceCase = true;
     if (argc > FUNC_ARGS_COUNT) {
@@ -412,13 +412,13 @@ napi_value I18nSystemAddon::GetDisplayCountryImpl(napi_env env, napi_callback_in
     std::string value = LocaleConfig::GetDisplayRegion(localeBuf.data(), displayLocaleBuf.data(), sentenceCase);
     if (value.length() == 0) {
         HILOG_ERROR_I18N("GetDisplayCountryImpl: result is empty.");
-        return nullptr;
+        return VariableConvertor::CreateString(env, "");
     }
     napi_value result = nullptr;
     status = napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &result);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("GetDisplayCountryImpl: Failed to create string item");
-        return nullptr;
+        return VariableConvertor::CreateString(env, "");
     }
     return result;
 }
