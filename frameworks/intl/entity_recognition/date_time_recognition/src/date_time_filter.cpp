@@ -125,7 +125,7 @@ std::vector<MatchedDateTimeInfo> DateTimeFilter::FilterByPast(icu::UnicodeString
             if ((key < 200 && pastMatch.GetEnd() == match.GetBegin()) ||
                 // fields with number >= 200 are placed after the time.
                 (key >= 200 && pastMatch.GetBegin() == match.GetEnd())) {
-                matches.erase(matchIterator);
+                matchIterator = matches.erase(matchIterator);
                 break;
             }
             matchIterator++;
@@ -160,7 +160,7 @@ std::vector<MatchedDateTimeInfo> DateTimeFilter::FilterOverlayFirst(std::vector<
                 valid = false;
                 matchIterator++;
             } else {
-                matchList.erase(matchIterator);
+                matchIterator = matchList.erase(matchIterator);
             }
         }
         if (valid) {
