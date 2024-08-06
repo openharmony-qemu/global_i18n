@@ -115,6 +115,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest004, TestSize.Level1)
     EXPECT_EQ(status, I18nErrorCode::SUCCESS);
     LocaleConfig::SetSystemLanguage("zh-Hans");
     EXPECT_EQ(status, I18nErrorCode::SUCCESS);
+    LocaleConfig::SetSystemLanguage("%$=");
 }
 
 /**
@@ -145,6 +146,8 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest006, TestSize.Level1)
     EXPECT_EQ(status, I18nErrorCode::SUCCESS);
     status = LocaleConfig::SetSystemLocale("zh-Hans-CN");
     EXPECT_EQ(status, I18nErrorCode::SUCCESS);
+    status = LocaleConfig::SetSystemRegion("@*%");
+    EXPECT_EQ(status, I18nErrorCode::INVALID_REGION_TAG);
 }
 
 /**
@@ -307,6 +310,9 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest014, TestSize.Level1)
     EXPECT_EQ(status, I18nErrorCode::SUCCESS);
     current = LocaleConfig::Is24HourClock();
     EXPECT_TRUE(current);
+    status = LocaleConfig::Set24HourClock("abc");
+    EXPECT_EQ(status, I18nErrorCode::INVALID_24_HOUR_CLOCK_TAG);
+    LocaleConfig::Set24HourClock("");
 }
 
 /**
@@ -400,6 +406,9 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest020, TestSize.Level1)
     vector<string> languages;
     LocaleConfig::GetSystemLanguages(languages);
     EXPECT_EQ(languages.size(), 5);
+    LocaleConfig::SetSystemLocale("ur-Latn-PK");
+    LocaleConfig::SetUsingLocalDigit(true);
+    LocaleConfig::SetUsingLocalDigit(false);
 }
 
 /**
@@ -421,6 +430,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest021, TestSize.Level1)
     EXPECT_TRUE(flag);
     flag = LocaleConfig::IsValidTag(fakeTag);
     EXPECT_TRUE(!flag);
+    EXPECT_FALSE(LocaleConfig::IsValidTag(""));
 }
 } // namespace I18n
 } // namespace Global

@@ -1111,7 +1111,7 @@ bool LocaleConfig::HasDesignator(const std::string& pattern, const char designat
         return false;
     }
     bool insideQuote = false;
-    for (auto& c : pattern) {
+    for (const auto& c : pattern) {
         if (c == '\'') {
             insideQuote = !insideQuote;
         } else if (!insideQuote) {
