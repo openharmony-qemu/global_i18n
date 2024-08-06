@@ -1120,10 +1120,13 @@ HWTEST_F(IntlTest, IntlFuncTest0077, TestSize.Level1)
     PhoneNumberUtil* phoneNumberUtil = i18n::phonenumbers::PhoneNumberUtil::GetInstance();
     std::string input = "(010)86753564";
     std::string country = "CN";
-    //size_t size = input.length();
     phoneNumberUtil->ParseAndKeepRawInput(input, country, &phoneNumber);
-    std::unique_ptr<PhoneNumberMatch> possibleNumber = std::make_unique<PhoneNumberMatch>();
-    std::unique_ptr<RegexRule> regexRule = std::make_unique<RegexRule>(regex, isValidType, handleType, insensitive, type);
+    size_t start = 10;
+    std::string rawString = "1 800 234 45 67";
+    std::unique_ptr<PhoneNumberMatch> possibleNumber =
+        std::make_unique<PhoneNumberMatch>(start, rawString, phoneNumber);
+    std::unique_ptr<RegexRule> regexRule =
+        std::make_unique<RegexRule>(regex, isValidType, handleType, insensitive, type);
     if (possibleNumber.get() != nullptr) {
         PhoneNumberMatch* phoneNumMatch = regexRule->IsValid(possibleNumber.get(), message);
         if (phoneNumMatch != nullptr) {
@@ -1192,6 +1195,7 @@ HWTEST_F(IntlTest, IntlFuncTest0080, TestSize.Level1)
     std::string type = "xxx";
     std::string input = "(010)86753564";
     size_t start = 10;
+    std::string rawStr = "1 800 234 45 67";
     i18n::phonenumbers::PhoneNumber phoneNumber;
     std::unique_ptr<PhoneNumberMatch> possibleNumber =
         std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber);
@@ -1220,6 +1224,7 @@ HWTEST_F(IntlTest, IntlFuncTest0081, TestSize.Level1)
     std::string type = "xxx";
     std::string input = "(010)86753564";
     size_t start = 10;
+    std::string rawStr = "1 800 234 45 67";
     i18n::phonenumbers::PhoneNumber phoneNumber;
     std::unique_ptr<PhoneNumberMatch> possibleNumber =
         std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber);
