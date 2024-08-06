@@ -1092,7 +1092,7 @@ HWTEST_F(IntlTest, IntlFuncTest0076, TestSize.Level1)
     const std::vector<std::string> src = {"a", "b", "c"};
     const std::string sep = "-";
     std::string dest;
-    Merge(src, sep, dest);
+    OHOS::Global::I18n::Merge(src, sep, dest);
     EXPECT_EQ(dest, "a-b-c");
     EXPECT_FALSE(IsDirExist(nullptr));
     std::string strForTrim;
