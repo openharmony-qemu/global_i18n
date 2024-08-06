@@ -39,6 +39,7 @@
 #include "number_format.h"
 #include "parameter.h"
 #include "phone_number_format.h"
+#include "phone_number_rule.h"
 #include "plural_rules.h"
 #include "positive_rule.h"
 #include "preferred_language.h"
@@ -1150,6 +1151,8 @@ HWTEST_F(IntlTest, IntlFuncTest0078, TestSize.Level1)
     if (possibleNumber != nullptr) {
         codeRule->IsValid(possibleNumber.get(), message);
     }
+    std::string country = "../supported_locales";
+    std::unique_ptr<PhoneNumberRule> phoneNumberRule = std::make_unique<PhoneNumberRule>(country);
 }
 
 /**

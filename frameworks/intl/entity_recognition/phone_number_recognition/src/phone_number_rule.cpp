@@ -85,18 +85,6 @@ PhoneNumberRule::~PhoneNumberRule()
     }
 }
 
-void PhoneNumberRule::FreePointer(std::vector<RegexRule*> &ruleList)
-{
-    std::vector<RegexRule*>::iterator iter;
-    for (iter = ruleList.begin(); iter != ruleList.end(); ++iter) {
-        if (*iter != nullptr) {
-            delete *iter;
-        }
-        *iter = nullptr;
-    }
-    ruleList.clear();
-}
-
 void PhoneNumberRule::Init()
 {
     if (isFixed) {
