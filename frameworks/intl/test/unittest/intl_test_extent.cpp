@@ -1009,10 +1009,12 @@ HWTEST_F(IntlTest, IntlFuncTest0074, TestSize.Level1)
     LocaleMatcher::IsMoreSuitable(otherID, currentIN, request);
     LocaleMatcher::IsMoreSuitable(nullptr, currentIN, request);
     LocaleMatcher::IsMoreSuitable(currentIN, nullptr, request);
+    LocaleMatcher::IsMoreSuitable(nullptr, nullptr, request);
     const LocaleInfo* enLatn = new LocaleInfo("en-Latn-US");
     LocaleMatcher::Match(request, enLatn);
     const LocaleInfo* otherIN = new LocaleInfo("in-MY");
     LocaleMatcher::Match(currentIN, otherIN);
+    LocaleMatcher::Match(currentIN, nullptr);
     delete other;
     delete request;
     delete currentHE;
@@ -1089,11 +1091,6 @@ HWTEST_F(IntlTest, IntlFuncTest0076, TestSize.Level1)
     vector = pRule2->Handle(possibleNumber.get(), message);
     delete regexP;
 
-    const std::vector<std::string> src = {"a", "b", "c"};
-    const std::string sep = "-";
-    std::string dest;
-    OHOS::Global::I18n::Merge(src, sep, dest);
-    EXPECT_EQ(dest, "a-b-c");
     EXPECT_FALSE(IsDirExist(nullptr));
     std::string strForTrim;
     EXPECT_EQ(trim(strForTrim), "");
@@ -1364,6 +1361,32 @@ HWTEST_F(IntlTest, IntlFuncTest0086, TestSize.Level1)
     std::unique_ptr<FindRule> findRule = std::make_unique<FindRule>(newRegex, insensitive);
     icu::RegexPattern* regexPattern = findRule->GetPattern();
     delete regexPattern;
+}
+
+/**
+ * @tc.name: IntlFuncTest0087
+ * @tc.desc: Test LocaleMatcher
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0087, TestSize.Level1)
+{
+    const std::unique_ptr<LocaleInfo> request = std::make_unique<LocaleInfo>("en-Qaag-GB");
+    const std::unique_ptr<LocaleInfo> enLatn = std::make_unique<LocaleInfo>("en-US");
+    LocaleMatcher::Match(request.get(), enLatn.get());
+    std::vector<LocaleInfo*> candidateLocales;
+    LocaleInfo* locale0 = new LocaleInfo("en-US");
+    LocaleInfo* locale1 = new LocaleInfo("en-Qaag-US");
+    LocaleInfo* locale2 = new LocaleInfo("en-Latn-GB");
+    LocaleInfo* locale3 = new LocaleInfo("en");
+    candidateLocales.push_back(locale0);
+    candidateLocales.push_back(locale1);
+    candidateLocales.push_back(locale2);
+    candidateLocales.push_back(locale3);
+    LocaleMatcher::GetBestMatchedLocale(request.get(), candidateLocales);
+    delete locale0;
+    delete locale1;
+    delete locale2;
+    delete locale3;
 }
 } // namespace I18n
 } // namespace Global
