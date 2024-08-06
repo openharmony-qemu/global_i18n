@@ -339,7 +339,7 @@ HWTEST_F(IntlTest, IntlFuncTest0056, TestSize.Level1)
     I18nErrorCode status;
     std::vector<LocaleItem> languageInfos = systemLocaleManager->GetLanguageInfoArray(languages, sortOptions, status);
     EXPECT_EQ(languageInfos.size(), 4);
-    const std::vector<std::string> countries = {"US", "GB", "DE", "CA"};
+    const std::vector<std::string> countries = {"US", "GB", "DE", "CN"};
     std::vector<LocaleItem> countryInfos = systemLocaleManager->GetCountryInfoArray(countries, sortOptions, status);
     EXPECT_EQ(countryInfos.size(), 4);
     std::vector<TimeZoneCityItem> timezoneCityItemList = SystemLocaleManager::GetTimezoneCityInfoArray(status);
