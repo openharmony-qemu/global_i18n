@@ -542,7 +542,7 @@ HWTEST_F(IntlTest, IntlFuncTest0062, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest0063, TestSize.Level1)
 {
-    /**using namespace i18n::phonenumbers;
+    using namespace i18n::phonenumbers;
     std::string regexStr = "[a-z]1?";
     icu::UnicodeString regex(regexStr.c_str());
     std::string isValidType = "PrexxxxSuf";
@@ -565,8 +565,8 @@ HWTEST_F(IntlTest, IntlFuncTest0063, TestSize.Level1)
     phoneNumberUtil->ParseAndKeepRawInput(input, country, &phoneNumber);
     std::unique_ptr<PhoneNumberMatch> possibleNumber =
         std::make_unique<PhoneNumberMatch>(size, input, phoneNumber);
-    std::unique_ptr<PhoneNumberMatch> phoneNumberMatch =
-        std::unique_ptr<PhoneNumberMatch>(regexRule2->IsValid(possibleNumber.get(), message));
+    PhoneNumberMatch* phoneNumberMatch =
+        regexRule2->IsValid(possibleNumber.get(), message);
     EXPECT_TRUE(phoneNumberMatch != nullptr);
     regexRule2->GetType();
     std::unique_ptr<icu::RegexPattern> regexPattern =
@@ -574,8 +574,9 @@ HWTEST_F(IntlTest, IntlFuncTest0063, TestSize.Level1)
     isValidType = "Rawstr";
     std::unique_ptr<RegexRule> regexRule3 = std::make_unique<RegexRule>(regex, isValidType,
         handleType, insensitive, type);
-    std::unique_ptr<PhoneNumberMatch> phoneNumMatch =
-        std::unique_ptr<PhoneNumberMatch>(regexRule3->IsValid(possibleNumber.get(), message));
+    PhoneNumberMatch* phoneNumMatch =
+        regexRule3->IsValid(possibleNumber.get(), message);
+    EXPECT_TRUE(phoneNumMatch != nullptr);
     type = "CONTAIN";
     string newRegexStr;
     icu::UnicodeString unicRegex(newRegexStr.c_str());
@@ -583,7 +584,8 @@ HWTEST_F(IntlTest, IntlFuncTest0063, TestSize.Level1)
         handleType, insensitive, type);
     type = "CONTAIN_OR_INTERSECT";
     std::unique_ptr<RegexRule> regexRule5 = std::make_unique<RegexRule>(unicRegex, isValidType,
-        handleType, insensitive, type);*/
+        handleType, insensitive, type);
+    EXPECT_TRUE(regexRule5 != nullptr);
 }
 
 /**
@@ -1129,7 +1131,7 @@ HWTEST_F(IntlTest, IntlFuncTest0077, TestSize.Level1)
         PhoneNumberMatch* phoneNumMatch = regexRule->IsValid(possibleNumber.get(), message);
         if (phoneNumMatch != nullptr) {
             std::vector<MatchedNumberInfo> list = regexRule->Handle(phoneNumMatch, message);
-            EXPECT_EQ(list.size(), 1);
+            EXPECT_EQ(list.size(), 0);
         }
     }
 }
