@@ -101,6 +101,8 @@ HWTEST_F(I18nTest, I18nFuncTest002, TestSize.Level1)
     EXPECT_EQ(errorCode, I18nErrorCode::SUCCESS);
     EXPECT_EQ(normalizedText.length(), 6); // 6 is the expected normalized text length.
     EXPECT_EQ(normalizedText, "\u017F\u0323\u0307");
+    std::string result = normalizer.Normalize(nullptr, 0, errorCode);
+    EXPECT_EQ(result, "");
 }
 
 /**

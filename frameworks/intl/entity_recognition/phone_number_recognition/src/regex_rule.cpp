@@ -97,11 +97,13 @@ PhoneNumberMatch* RegexRule::IsValid(PhoneNumberMatch* possibleNumber, icu::Unic
 // Check the preifx or suffix of possibleNumber
 PhoneNumberMatch* RegexRule::IsValidPreSuf(PhoneNumberMatch* possibleNumber, icu::UnicodeString& message)
 {
-    if (possibleNumber->start() - 1 >= 0) {
-        return IsValidStart(possibleNumber, message);
-    }
-    if (possibleNumber->end() <= message.length() - 1) {
-        return IsValidEnd(possibleNumber, message);
+    if (possibleNumber != nullptr) {
+        if (possibleNumber->start() - 1 >= 0) {
+            return IsValidStart(possibleNumber, message);
+        }
+        if (possibleNumber->end() <= message.length() - 1) {
+            return IsValidEnd(possibleNumber, message);
+        }
     }
     return possibleNumber;
 }

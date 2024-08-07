@@ -105,6 +105,18 @@ int IntlFuncTest0072(void);
 int IntlFuncTest0073(void);
 int IntlFuncTest0074(void);
 int IntlFuncTest0075(void);
+int IntlFuncTest0076(void);
+int IntlFuncTest0077(void);
+int IntlFuncTest0078(void);
+int IntlFuncTest0079(void);
+int IntlFuncTest0080(void);
+int IntlFuncTest0081(void);
+int IntlFuncTest0082(void);
+int IntlFuncTest0083(void);
+int IntlFuncTest0084(void);
+int IntlFuncTest0085(void);
+int IntlFuncTest0086(void);
+int IntlFuncTest0087(void);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
