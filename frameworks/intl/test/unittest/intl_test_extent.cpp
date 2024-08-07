@@ -1172,7 +1172,8 @@ HWTEST_F(IntlTest, IntlFuncTest0079, TestSize.Level1)
         std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber);
     std::unique_ptr<CodeRule> codeRule = std::make_unique<CodeRule>(isValidType);
     if (possibleNumber != nullptr) {
-        codeRule->IsValid(possibleNumber.get(), message);
+        PhoneNumberMatch* match = codeRule->IsValid(possibleNumber.get(), message);
+        EXPECT_TRUE(match != nullptr);
     }
 }
 
@@ -1201,6 +1202,7 @@ HWTEST_F(IntlTest, IntlFuncTest0080, TestSize.Level1)
     icu::UnicodeString message(msg.c_str());
     if (possibleNumber != nullptr) {
         std::vector<MatchedNumberInfo> list = regexRule->Handle(possibleNumber.get(), message);
+        EXPECT_EQ(list.size(), 1);
     }
     delete regexRule;
 }
@@ -1230,6 +1232,7 @@ HWTEST_F(IntlTest, IntlFuncTest0081, TestSize.Level1)
     icu::UnicodeString message(msg.c_str());
     if (possibleNumber != nullptr) {
         std::vector<MatchedNumberInfo> list = regexRule->Handle(possibleNumber.get(), message);
+        EXPECT_EQ(list.size(), 0);
     }
     delete regexRule;
 }
@@ -1258,6 +1261,7 @@ HWTEST_F(IntlTest, IntlFuncTest0082, TestSize.Level1)
     icu::UnicodeString message(msg.c_str());
     if (possibleNumber != nullptr) {
         std::vector<MatchedNumberInfo> list = regexRule->Handle(possibleNumber.get(), message);
+        EXPECT_EQ(list.size(), 0);
     }
     delete regexRule;
 }
@@ -1286,6 +1290,7 @@ HWTEST_F(IntlTest, IntlFuncTest0083, TestSize.Level1)
     icu::UnicodeString message(msg.c_str());
     if (possibleNumber != nullptr) {
         std::vector<MatchedNumberInfo> list = regexRule->Handle(possibleNumber.get(), message);
+        EXPECT_EQ(list.size(), 0);
     }
     delete regexRule;
 }
@@ -1314,6 +1319,7 @@ HWTEST_F(IntlTest, IntlFuncTest0084, TestSize.Level1)
     icu::UnicodeString message(msg.c_str());
     if (possibleNumber != nullptr) {
         std::vector<MatchedNumberInfo> list = regexRule->Handle(possibleNumber.get(), message);
+        EXPECT_EQ(list.size(), 1);
     }
     delete regexRule;
 }
@@ -1339,7 +1345,8 @@ HWTEST_F(IntlTest, IntlFuncTest0085, TestSize.Level1)
     icu::UnicodeString message(msg.c_str());
     std::unique_ptr<PhoneNumberMatch> match =
         std::make_unique<PhoneNumberMatch>(start, input, phoneNumber);
-    borderRule->Handle(match.get(), message);
+    bool flag = borderRule->Handle(match.get(), message);
+    EXPECT_TRUE(flag);
     delete regexPattern;
 }
 
@@ -1360,6 +1367,7 @@ HWTEST_F(IntlTest, IntlFuncTest0086, TestSize.Level1)
     insensitive = "True";
     std::unique_ptr<FindRule> findRule = std::make_unique<FindRule>(newRegex, insensitive);
     icu::RegexPattern* regexPattern = findRule->GetPattern();
+    EXPECT_TRUE(regexPattern != nullptr);
     delete regexPattern;
 }
 
@@ -1382,7 +1390,8 @@ HWTEST_F(IntlTest, IntlFuncTest0087, TestSize.Level1)
     candidateLocales.push_back(locale1);
     candidateLocales.push_back(locale2);
     candidateLocales.push_back(locale3);
-    LocaleMatcher::GetBestMatchedLocale(request.get(), candidateLocales);
+    std::string bestMatch = LocaleMatcher::GetBestMatchedLocale(request.get(), candidateLocales);
+    EXPECT_EQ(bestMatch, "en-Latn-GB");
     delete locale0;
     delete locale1;
     delete locale2;
