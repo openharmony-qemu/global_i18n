@@ -1094,7 +1094,8 @@ HWTEST_F(IntlTest, IntlFuncTest0076, TestSize.Level1)
     EXPECT_FALSE(IsDirExist(nullptr));
     std::string strForTrim;
     EXPECT_EQ(trim(strForTrim), "");
-    FileCopy("/data/123/abc.txt", "/data/456/abc.txt");
+    bool copyResult = FileCopy("/data/123/abc.txt", "/data/456/abc.txt");
+    EXPECT_FALSE(copyResult);
 }
 
 /**
@@ -1127,7 +1128,8 @@ HWTEST_F(IntlTest, IntlFuncTest0077, TestSize.Level1)
     if (possibleNumber.get() != nullptr) {
         PhoneNumberMatch* phoneNumMatch = regexRule->IsValid(possibleNumber.get(), message);
         if (phoneNumMatch != nullptr) {
-            regexRule->Handle(phoneNumMatch, message);
+            std::vector<MatchedNumberInfo> list = regexRule->Handle(phoneNumMatch, message);
+            EXPECT_EQ(list.size(), 1);
         }
     }
 }
@@ -1153,6 +1155,7 @@ HWTEST_F(IntlTest, IntlFuncTest0078, TestSize.Level1)
     }
     std::string country = "../supported_locales";
     std::unique_ptr<PhoneNumberRule> phoneNumberRule = std::make_unique<PhoneNumberRule>(country);
+    EXPECT_TRUE(phoneNumberRule != nullptr);
 }
 
 /**
