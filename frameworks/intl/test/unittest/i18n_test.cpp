@@ -1341,7 +1341,7 @@ HWTEST_F(I18nTest, I18nFuncTest057, TestSize.Level1)
     EXPECT_FALSE(isNumeric);
     std::string locale = "ug-CN";
     bool rtl = LocaleUtil::IsRTL(locale);
-    EXPECT_TRUE(rtl); 
+    EXPECT_TRUE(rtl);
 }
 
 /**
