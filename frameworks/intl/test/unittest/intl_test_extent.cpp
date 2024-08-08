@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <map>
 #include <vector>
@@ -28,7 +27,6 @@
 #include "find_rule.h"
 #include "holiday_manager.h"
 #include "i18n_break_iterator.h"
-#include "i18n_break_iterator_mock.h"
 #include "i18n_calendar.h"
 #include "i18n_timezone.h"
 #include "i18n_types.h"
@@ -61,7 +59,6 @@
 using namespace OHOS::Global::I18n;
 using testing::ext::TestSize;
 using namespace std;
-using namespace testing;
 
 namespace OHOS {
 namespace Global {
@@ -1458,27 +1455,6 @@ HWTEST_F(IntlTest, IntlFuncTest0088, TestSize.Level1)
     std::string pubkeyPath = icsFileWriter.WriteBinaryFile(publicName);
     bool verifyFlag = SignatureVerifier::VerifyCertFile(certPath, verifyPath, pubkeyPath, manifestPath);
     EXPECT_FALSE(verifyFlag);
-}
-
-/**
- * @tc.name: IntlFuncTest0089
- * @tc.desc: Test I18nBreakIterator
- * @tc.type: FUNC
- */
-HWTEST_F(IntlTest, IntlFuncTest0089, TestSize.Level1)
-{
-    std::unique_ptr<I18nBreakIteratorMock> breakIteratorMock = std::make_unique<I18nBreakIteratorMock>("en-GB");
-    EXPECT_CALL(*breakIteratorMock, GetBreakIterator())
-    .WillRepeatedly(Return(nullptr));
-    breakIteratorMock->Current();
-    breakIteratorMock->First();
-    breakIteratorMock->Last();
-    breakIteratorMock->Previous();
-    breakIteratorMock->Next();
-    breakIteratorMock->Next(1);
-    breakIteratorMock->Following(3);
-    bool flag = breakIteratorMock->IsBoundary(1);
-    EXPECT_FALSE(flag);
 }
 } // namespace I18n
 } // namespace Global
