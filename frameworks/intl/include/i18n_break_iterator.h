@@ -27,7 +27,6 @@ namespace I18n {
 class I18nBreakIterator {
 public:
     explicit I18nBreakIterator(std::string lcoaleTag);
-    explicit I18nBreakIterator(icu::BreakIterator *breakIterator);
     virtual ~I18nBreakIterator();
     int32_t Current();
     int32_t First();
