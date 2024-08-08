@@ -24,10 +24,10 @@ namespace I18n {
 class I18nBreakIteratorMock : public I18nBreakIterator {
 public:
     I18nBreakIteratorMock(std::string lcoaleTag) : I18nBreakIterator(lcoaleTag) {
-        
+
     };
     ~I18nBreakIteratorMock() override = default;
-    MOCK_METHOD0(GetBreakIterator, icu::BreakIterator*());
+    MOCK_METHOD0(GetBreakIterator, icu::RuleBasedBreakIterator*());
 };
 } // namespace I18n
 } // namespace Global

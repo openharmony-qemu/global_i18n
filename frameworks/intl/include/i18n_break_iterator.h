@@ -19,6 +19,7 @@
 
 #include "iosfwd"
 #include "unicode/brkiter.h"
+#include "unicode/rbbi.h"
 #include "unicode/unistr.h"
 
 namespace OHOS {
@@ -40,7 +41,7 @@ public:
     bool IsBoundary(int32_t offset);
 
 protected:
-    virtual icu::BreakIterator* GetBreakIterator();
+    virtual icu::RuleBasedBreakIterator* GetBreakIterator();
 
 private:
     icu::BreakIterator *iter = nullptr;
