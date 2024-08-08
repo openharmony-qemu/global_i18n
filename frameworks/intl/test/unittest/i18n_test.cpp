@@ -72,11 +72,11 @@ HWTEST_F(I18nTest, I18nFuncTest001, TestSize.Level1)
     EXPECT_EQ(preferredLocale, "en-CN");
     PreferredLanguage::RemovePreferredLanguage(0);
 #ifdef SUPPORT_APP_PREFERRED_LANGUAGE
-    std::string appPreferLanguage = PreferredLanguage::GetAppPreferredLanguage();
-    EXPECT_EQ(appPreferLanguage, "en-US");
     I18nErrorCode errCode = I18nErrorCode::SUCCESS;
     PreferredLanguage::SetAppPreferredLanguage("en-US", errCode);
     EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    std::string appPreferLanguage = PreferredLanguage::GetAppPreferredLanguage();
+    EXPECT_EQ(appPreferLanguage, "en-US");
 #endif
 }
 
