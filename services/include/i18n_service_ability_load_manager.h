@@ -38,7 +38,7 @@ public:
      * @param systemAbilityId i18n system ability id.
      * @return sptr<IRemoteObject> i18n service proxy.
      */
-    sptr<IRemoteObject> GetI18nServiceAbility(int32_t systemAbilityId);
+    virtual sptr<IRemoteObject> GetI18nServiceAbility(int32_t systemAbilityId);
     bool UnloadI18nService(int32_t systemAbilityId);
 
     /**

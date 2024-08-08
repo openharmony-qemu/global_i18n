@@ -27,6 +27,7 @@ namespace I18n {
 class I18nBreakIterator {
 public:
     explicit I18nBreakIterator(std::string lcoaleTag);
+    explicit I18nBreakIterator(icu::BreakIterator *breakIterator);
     virtual ~I18nBreakIterator();
     int32_t Current();
     int32_t First();
@@ -38,6 +39,10 @@ public:
     void SetText(const char* text);
     void GetText(std::string &str);
     bool IsBoundary(int32_t offset);
+
+protected:
+    virtual icu::BreakIterator* GetBreakIterator();
+
 private:
     icu::BreakIterator *iter = nullptr;
     icu::UnicodeString ftext = "";
