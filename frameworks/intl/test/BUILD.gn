@@ -43,8 +43,6 @@ ohos_unittest("intl_test") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
-    "c_utils:utils",
-    "googletest:gmock",
     "googletest:gtest",
     "icu:shared_icui18n",
     "icu:shared_icuuc",

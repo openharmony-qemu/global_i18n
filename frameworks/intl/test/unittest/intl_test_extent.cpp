@@ -1455,7 +1455,7 @@ HWTEST_F(IntlTest, IntlFuncTest0088, TestSize.Level1)
     std::string certName = "CERT.ENC";
     std::string certPath = icsFileWriter.WriteBinaryFile(certName);
     std::string publicName = "123.pem";
-    std::string pubkeyPath = icsFileWriter.WriteBinaryFile(publicName); 
+    std::string pubkeyPath = icsFileWriter.WriteBinaryFile(publicName);
     bool verifyFlag = SignatureVerifier::VerifyCertFile(certPath, verifyPath, pubkeyPath, manifestPath);
     EXPECT_FALSE(verifyFlag);
 }
