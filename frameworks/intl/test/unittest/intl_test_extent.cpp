@@ -1057,6 +1057,13 @@ HWTEST_F(IntlTest, IntlFuncTest0075, TestSize.Level1)
     std::string newVersion = SignatureVerifier::LoadFileVersion(newFilePath);
     int res = SignatureVerifier::CompareVersion(oldVersion, newVersion);
     EXPECT_EQ(res, 1);
+    res = SignatureVerifier::CompareVersion(newVersion, oldVersion);
+    EXPECT_EQ(res, -1);
+    std::string fakeVersion = "1.10.4";
+    res = SignatureVerifier::CompareVersion(fakeVersion, oldVersion);
+    EXPECT_EQ(res, -1);
+    res = SignatureVerifier::CompareVersion(oldVersion, oldVersion);
+    EXPECT_EQ(res, 0);
     FileExist(oldFilePath);
     trim(locale);
     const std::string destPath = "/data/log/copy.txt";
@@ -1401,6 +1408,53 @@ HWTEST_F(IntlTest, IntlFuncTest0087, TestSize.Level1)
     delete locale1;
     delete locale2;
     delete locale3;
+}
+
+/**
+ * @tc.name: IntlFuncTest0088
+ * @tc.desc: Test SignatureVerifier
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0088, TestSize.Level1)
+{
+    std::vector<std::string> list;
+    list.push_back("Name: version.txt");
+    list.push_back("SHA-256-Digest: ZI5bXA19r7Zc9THhWCuoSaSvg+mvdX9ztQNocDvlej4=");
+    list.push_back("");
+    IcsFileWriter icsFileWriter;
+    std::string manifestName = "MANIFEST.MF";
+    std::string manifestPath = icsFileWriter.WriteManifest(list, manifestName);
+    const std::string filePath = "/data/log/";
+    const std::string fileName = "version.txt";
+    std::vector<std::string> versonList;
+    versonList.push_back("version=1.10.25.100");
+    versonList.push_back("type=TIMEZONE");
+    versonList.push_back("subtype=generic");
+    versonList.push_back("compatibleVersion=1");
+    versonList.push_back("classify=2");
+    versonList.push_back("displayVersion=TB.GENC.1.10.25.100");
+    icsFileWriter.WriteManifest(versonList, fileName);
+    bool flag = SignatureVerifier::VerifyParamFile(fileName, filePath, manifestPath);
+    EXPECT_FALSE(flag);
+    std::string fakePath = "/data/log/123.txt";
+    std::string resultVersion = SignatureVerifier::LoadFileVersion(fakePath);
+    EXPECT_EQ(resultVersion, "");
+    resultVersion = SignatureVerifier::LoadFileVersion(manifestPath);
+    EXPECT_EQ(resultVersion, "");
+
+    std::vector<std::string> verifyList;
+    list.push_back("SHA-256-Digest-Manifest: digRIFiRRqEetuyxz6QSRpPePWxaCvAqWgBSnB42Cwc=");
+    list.push_back("Name: version.txt");
+    list.push_back("SHA-256-Digest: UkBz6aVlhyCe1tHdxZOvwg8y2pODSmbJSgMTurmeNN0");
+    list.push_back("");
+    std::string verifyName = "CERT.SF";
+    std::string verifyPath = icsFileWriter.WriteManifest(verifyList, verifyName);
+    std::string certName = "CERT.ENC";
+    std::string certPath = icsFileWriter.WriteBinaryFile(certName);
+    std::string publicName = "123.pem";
+    std::string pubkeyPath = icsFileWriter.WriteBinaryFile(publicName);
+    bool verifyFlag = SignatureVerifier::VerifyCertFile(certPath, verifyPath, pubkeyPath, manifestPath);
+    EXPECT_FALSE(verifyFlag);
 }
 } // namespace I18n
 } // namespace Global

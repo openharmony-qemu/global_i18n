@@ -76,6 +76,37 @@ std::string IcsFileWriter::WriteVersionFile(const std::string& verison, std::str
     fstream.close();
     return filePath;
 }
+
+std::string IcsFileWriter::WriteManifest(const std::vector<std::string>& list, std::string fileName)
+{
+    std::string filePath = "/data/log/" + fileName;
+    std::ofstream fstream(filePath);
+    if (!fstream.is_open()) {
+        printf("file can't access.\r\n");
+        return filePath;
+    }
+    for (size_t i = 0; i < list.size(); i++) {
+        fstream << list[i] << std::endl;
+    }
+    fstream.close();
+    return filePath;
+}
+
+std::string IcsFileWriter::WriteBinaryFile(std::string fileName)
+{
+    std::string filePath = "/data/log/" + fileName;
+    std::ofstream fstream(filePath, std::ios_base::out | std::ios_base::binary);
+    if (!fstream.is_open()) {
+        printf("file can't access.\r\n");
+        return filePath;
+    }
+    if (fstream.is_open()) {
+        IcsFileWriter fileWriter;
+        fstream.write(reinterpret_cast<const char*>(&fileWriter), sizeof(IcsFileWriter));
+    }
+    fstream.close();
+    return filePath;
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
