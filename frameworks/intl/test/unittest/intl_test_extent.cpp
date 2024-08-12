@@ -1151,7 +1151,7 @@ HWTEST_F(IntlTest, IntlFuncTest0077, TestSize.Level1)
         PhoneNumberMatch* phoneNumMatch = regexRule->IsValid(possibleNumber.get(), message);
         if (phoneNumMatch != nullptr) {
             std::vector<MatchedNumberInfo> list = regexRule->Handle(phoneNumMatch, message);
-            EXPECT_EQ(list.size(), 0);
+            EXPECT_EQ(list.size(), 1);
         }
     }
 }
@@ -1626,6 +1626,19 @@ HWTEST_F(IntlTest, IntlFuncTest0093, TestSize.Level1)
         PhoneNumberMatch* match = regexRule->IsValid(possibleNumber.get(), message);
         EXPECT_TRUE(match != nullptr);
     }
+
+    isValidType = "Code";
+    rawStr = "119";
+    start = 0;
+    i18n::phonenumbers::PhoneNumber phoneNumber2;
+    std::unique_ptr<PhoneNumberMatch> possibleNum =
+        std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber2);
+    std::unique_ptr<RegexRule> regexRule2 =
+        std::make_unique<RegexRule>(regex, isValidType, handleType, insensitive, type);
+    if (possibleNum != nullptr) {
+        PhoneNumberMatch* pnMatch = regexRule2->IsValid(possibleNum.get(), message);
+        EXPECT_TRUE(pnMatch == nullptr);
+    }
 }
 
 /**
@@ -1654,6 +1667,19 @@ HWTEST_F(IntlTest, IntlFuncTest0094, TestSize.Level1)
     if (possibleNumber != nullptr) {
         PhoneNumberMatch* match = regexRule->IsValid(possibleNumber.get(), message);
         EXPECT_TRUE(match != nullptr);
+    }
+
+    isValidType = "Code";
+    rawStr = "106857628100000001";
+    start = 0;
+    i18n::phonenumbers::PhoneNumber phoneNumber2;
+    std::unique_ptr<PhoneNumberMatch> possibleNum =
+        std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber2);
+    std::unique_ptr<RegexRule> regexRule2 =
+        std::make_unique<RegexRule>(regex, isValidType, handleType, insensitive, type);
+    if (possibleNum != nullptr) {
+        PhoneNumberMatch* pnMatch = regexRule2->IsValid(possibleNum.get(), message);
+        EXPECT_TRUE(pnMatch == nullptr);
     }
 }
 
@@ -1684,6 +1710,19 @@ HWTEST_F(IntlTest, IntlFuncTest0095, TestSize.Level1)
         PhoneNumberMatch* match = regexRule->IsValid(possibleNumber.get(), message);
         EXPECT_TRUE(match != nullptr);
     }
+
+    isValidType = "Code";
+    rawStr = "0106857628100000001";
+    start = 0;
+    i18n::phonenumbers::PhoneNumber phoneNumber2;
+    std::unique_ptr<PhoneNumberMatch> possibleNum =
+        std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber2);
+    std::unique_ptr<RegexRule> regexRule2 =
+        std::make_unique<RegexRule>(regex, isValidType, handleType, insensitive, type);
+    if (possibleNum != nullptr) {
+        PhoneNumberMatch* pnMatch = regexRule2->IsValid(possibleNum.get(), message);
+        EXPECT_TRUE(pnMatch == nullptr);
+    }
 }
 /**
  * @tc.name: IntlFuncTest0096
@@ -1711,6 +1750,32 @@ HWTEST_F(IntlTest, IntlFuncTest0096, TestSize.Level1)
     if (possibleNumber != nullptr) {
         PhoneNumberMatch* match = regexRule->IsValid(possibleNumber.get(), message);
         EXPECT_TRUE(match != nullptr);
+    }
+
+    isValidType = "Rawstr";
+    rawStr = "10645656";
+    start = 0;
+    i18n::phonenumbers::PhoneNumber phoneNumber2;
+    std::unique_ptr<PhoneNumberMatch> possibleNum =
+        std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber2);
+    std::unique_ptr<RegexRule> regexRule2 =
+        std::make_unique<RegexRule>(regex, isValidType, handleType, insensitive, type);
+    if (possibleNum != nullptr) {
+        PhoneNumberMatch* pnMatch = regexRule2->IsValid(possibleNum.get(), message);
+        EXPECT_TRUE(pnMatch == nullptr);
+    }
+
+    isValidType = "Rawstr";
+    rawStr = "119";
+    start = 0;
+    i18n::phonenumbers::PhoneNumber phoneNumber3;
+    std::unique_ptr<PhoneNumberMatch> posibleNumber =
+        std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber3);
+    std::unique_ptr<RegexRule> regexRule3 =
+        std::make_unique<RegexRule>(regex, isValidType, handleType, insensitive, type);
+    if (posibleNumber != nullptr) {
+        PhoneNumberMatch* pMatch = regexRule3->IsValid(posibleNumber.get(), message);
+        EXPECT_TRUE(pMatch == nullptr);
     }
 }
 
