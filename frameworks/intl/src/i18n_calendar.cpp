@@ -161,9 +161,10 @@ I18nCalendar::~I18nCalendar()
 
 void I18nCalendar::SetTime(double value)
 {
-    if (calendar_ != nullptr) {
+    icu::Calendar* icuCalendar = GetIcuCalendar();
+    if (icuCalendar != nullptr) {
         UErrorCode status = U_ZERO_ERROR;
-        calendar_->setTime(value, status);
+        icuCalendar->setTime(value, status);
         return;
     }
 }
@@ -172,21 +173,22 @@ void I18nCalendar::SetTimeZone(std::string id)
 {
     icu::UnicodeString zone = icu::UnicodeString::fromUTF8(id);
     icu::TimeZone *timezone = icu::TimeZone::createTimeZone(zone);
-    if (!timezone) {
-        return;
+    if (timezone != nullptr) {
+        icu::Calendar* icuCalendar = GetIcuCalendar();
+        if (icuCalendar != nullptr) {
+            icuCalendar->setTimeZone(*timezone);
+        }
+        delete(timezone);
     }
-    if (calendar_ != nullptr) {
-        calendar_->setTimeZone(*timezone);
-    }
-    delete(timezone);
 }
 
 std::string I18nCalendar::GetTimeZone(void)
 {
     std::string ret;
-    if (calendar_) {
+    icu::Calendar* icuCalendar = GetIcuCalendar();
+    if (icuCalendar) {
         icu::UnicodeString unistr;
-        calendar_->getTimeZone().getID(unistr);
+        icuCalendar->getTimeZone().getID(unistr);
         unistr.toUTF8String<std::string>(ret);
     }
     return ret;
@@ -194,41 +196,46 @@ std::string I18nCalendar::GetTimeZone(void)
 
 void I18nCalendar::Set(int32_t year, int32_t month, int32_t date)
 {
-    if (calendar_ != nullptr) {
-        calendar_->set(year, month, date);
+    icu::Calendar* icuCalendar = GetIcuCalendar();
+    if (icuCalendar != nullptr) {
+        icuCalendar->set(year, month, date);
         return;
     }
 }
 
 void I18nCalendar::Set(UCalendarDateFields field, int32_t value)
 {
-    if (calendar_ != nullptr) {
-        calendar_->set(field, value);
+    icu::Calendar* icuCalendar = GetIcuCalendar();
+    if (icuCalendar != nullptr) {
+        icuCalendar->set(field, value);
         return;
     }
 }
 
 int32_t I18nCalendar::Get(UCalendarDateFields field) const
 {
-    if (calendar_ != nullptr) {
+    icu::Calendar* icuCalendar = GetIcuCalendar();
+    if (icuCalendar != nullptr) {
         UErrorCode status = U_ZERO_ERROR;
-        return calendar_->get(field, status);
+        return icuCalendar->get(field, status);
     }
     return 0;
 }
 
 void I18nCalendar::Add(UCalendarDateFields field, int32_t amount)
 {
-    if (calendar_ != nullptr) {
+    icu::Calendar* icuCalendar = GetIcuCalendar();
+    if (icuCalendar != nullptr) {
         UErrorCode status = U_ZERO_ERROR;
-        calendar_->add(field, amount, status);
+        icuCalendar->add(field, amount, status);
     }
 }
 
 void I18nCalendar::SetMinimalDaysInFirstWeek(int32_t value)
 {
-    if (calendar_ != nullptr) {
-        calendar_->setMinimalDaysInFirstWeek((uint8_t)value);
+    icu::Calendar* icuCalendar = GetIcuCalendar();
+    if (icuCalendar != nullptr) {
+        icuCalendar->setMinimalDaysInFirstWeek((uint8_t)value);
         return;
     }
 }
@@ -238,59 +245,66 @@ void I18nCalendar::SetFirstDayOfWeek(int32_t value)
     if (value < UCalendarDaysOfWeek::UCAL_SUNDAY || value > UCAL_SATURDAY) {
         return;
     }
-    if (calendar_ != nullptr) {
-        calendar_->setFirstDayOfWeek(UCalendarDaysOfWeek(value));
+    icu::Calendar* icuCalendar = GetIcuCalendar();
+    if (icuCalendar != nullptr) {
+        icuCalendar->setFirstDayOfWeek(UCalendarDaysOfWeek(value));
         return;
     }
 }
 
 UDate I18nCalendar::GetTimeInMillis(void)
 {
-    if (calendar_ != nullptr) {
+    icu::Calendar* icuCalendar = GetIcuCalendar();
+    if (icuCalendar != nullptr) {
         UErrorCode status = U_ZERO_ERROR;
-        return calendar_->getTime(status);
+        return icuCalendar->getTime(status);
     }
     return 0;
 }
 
 int32_t I18nCalendar::GetMinimalDaysInFirstWeek(void)
 {
-    if (calendar_ != nullptr) {
-        return calendar_->getMinimalDaysInFirstWeek();
+    icu::Calendar* icuCalendar = GetIcuCalendar();
+    if (icuCalendar != nullptr) {
+        return icuCalendar->getMinimalDaysInFirstWeek();
     }
     return 1;
 }
 
 int32_t I18nCalendar::GetFirstDayOfWeek(void)
 {
-    if (calendar_ != nullptr) {
-        return static_cast<int>(calendar_->getFirstDayOfWeek());
+    icu::Calendar* icuCalendar = GetIcuCalendar();
+    if (icuCalendar != nullptr) {
+        return static_cast<int>(icuCalendar->getFirstDayOfWeek());
     }
     return UCAL_SUNDAY;
 }
 
 bool I18nCalendar::IsWeekend(int64_t date, UErrorCode &status)
 {
-    if (calendar_ != nullptr) {
-        return calendar_->isWeekend(date, status);
+    icu::Calendar* icuCalendar = GetIcuCalendar();
+    if (icuCalendar != nullptr) {
+        return icuCalendar->isWeekend(date, status);
     }
     return false;
 }
 
 bool I18nCalendar::IsWeekend(void)
 {
-    if (calendar_ != nullptr) {
-        return calendar_->isWeekend();
+    icu::Calendar* icuCalendar = GetIcuCalendar();
+    if (icuCalendar != nullptr) {
+        return icuCalendar->isWeekend();
     }
     return false;
 }
 
 std::string I18nCalendar::GetDisplayName(std::string &displayLocaleTag)
 {
-    if (calendar_ == nullptr) {
+    icu::Calendar* icuCalendar = GetIcuCalendar();
+    if (icuCalendar == nullptr) {
         return PseudoLocalizationProcessor("");
     }
-    const char *type = calendar_->getType();
+    const char *type = icuCalendar->getType();
     if (type == nullptr) {
         return PseudoLocalizationProcessor("");
     }
@@ -312,13 +326,19 @@ std::string I18nCalendar::GetDisplayName(std::string &displayLocaleTag)
 
 int32_t I18nCalendar::CompareDays(UDate date)
 {
-    if (calendar_ != nullptr) {
+    icu::Calendar* icuCalendar = GetIcuCalendar();
+    if (icuCalendar != nullptr) {
         UErrorCode status = U_ZERO_ERROR;
-        UDate nowMs = calendar_->getTime(status);
+        UDate nowMs = icuCalendar->getTime(status);
         double ret = (date - nowMs) / (24 * 60 * 60 * 1000); // Convert 24 hours into milliseconds
         return ret > 0 ? std::ceil(ret) : std::floor(ret);
     }
     return 0;
+}
+
+icu::Calendar* I18nCalendar::GetIcuCalendar() const
+{
+return this->calendar_;
 }
 } // namespace I18n
 } // namespace Global
