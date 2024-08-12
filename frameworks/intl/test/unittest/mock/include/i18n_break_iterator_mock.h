@@ -23,8 +23,7 @@ namespace Global {
 namespace I18n {
 class I18nBreakIteratorMock : public I18nBreakIterator {
 public:
-    I18nBreakIteratorMock(std::string lcoaleTag) : I18nBreakIterator(lcoaleTag) {
-
+    I18nBreakIteratorMock(std::string localeTag) : I18nBreakIterator(localeTag) {
     };
     ~I18nBreakIteratorMock() override = default;
     MOCK_METHOD0(GetBreakIterator, icu::BreakIterator*());

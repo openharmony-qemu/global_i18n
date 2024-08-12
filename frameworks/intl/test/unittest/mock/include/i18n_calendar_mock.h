@@ -23,8 +23,7 @@ namespace Global {
 namespace I18n {
 class I18nCalendarMock : public I18nCalendar {
 public:
-    I18nCalendarMock(std::string lcoaleTag) : I18nCalendar(lcoaleTag) {
-
+    I18nCalendarMock(std::string localeTag) : I18nCalendar(localeTag) {
     };
     ~I18nCalendarMock() override = default;
     MOCK_METHOD0(GetIcuCalendar, icu::Calendar*());

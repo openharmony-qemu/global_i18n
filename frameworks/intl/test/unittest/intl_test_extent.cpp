@@ -994,9 +994,9 @@ HWTEST_F(IntlTest, IntlFuncTest0074, TestSize.Level1)
     LocaleMatcher::IsMoreSuitable(nullptr, other, nullptr);
     LocaleMatcher::IsMoreSuitable(nullptr, nullptr, nullptr);
     const LocaleInfo* request = new LocaleInfo("en-Qaag-GB");
-    const LocaleInfo* currentHE = new LocaleInfo("he");
-    const LocaleInfo* otherIW = new LocaleInfo("iw");
-    LocaleMatcher::IsMoreSuitable(currentHE, otherIW, request);
+    std::unique_ptr<LocaleInfo> currentHE = std::make_unique<LocaleInfo>("he");
+    std::unique_ptr<LocaleInfo> otherIW = std::make_unique<LocaleInfo>("iw");
+    LocaleMatcher::IsMoreSuitable(currentHE.get(), otherIW.get(), request);
     const LocaleInfo* currentTL = new LocaleInfo("tl");
     LocaleMatcher::IsMoreSuitable(currentTL, other, request);
     LocaleMatcher::IsMoreSuitable(other, currentTL, request);
@@ -1004,10 +1004,10 @@ HWTEST_F(IntlTest, IntlFuncTest0074, TestSize.Level1)
     const LocaleInfo* otherYI = new LocaleInfo("yi");
     LocaleMatcher::IsMoreSuitable(currentJI, otherYI, request);
     LocaleMatcher::IsMoreSuitable(otherYI, currentJI, request);
-    const LocaleInfo* currentJW = new LocaleInfo("jw");
-    const LocaleInfo* otherJV = new LocaleInfo("jv");
-    LocaleMatcher::IsMoreSuitable(currentJW, otherJV, request);
-    LocaleMatcher::IsMoreSuitable(otherJV, currentJW, request);
+    std::unique_ptr<LocaleInfo> currentJW = std::make_unique<LocaleInfo>("jw");
+    std::unique_ptr<LocaleInfo> otherJV = std::make_unique<LocaleInfo>("jv");
+    LocaleMatcher::IsMoreSuitable(currentJW.get(), otherJV.get(), request);
+    LocaleMatcher::IsMoreSuitable(otherJV.get(), currentJW.get(), request);
     const LocaleInfo* currentIN = new LocaleInfo("in-PH");
     const LocaleInfo* otherID = new LocaleInfo("id-MY");
     LocaleMatcher::IsMoreSuitable(currentIN, otherID, request);
@@ -1017,8 +1017,8 @@ HWTEST_F(IntlTest, IntlFuncTest0074, TestSize.Level1)
     LocaleMatcher::IsMoreSuitable(nullptr, nullptr, request);
     const LocaleInfo* enLatn = new LocaleInfo("en-Latn-US");
     LocaleMatcher::Match(request, enLatn);
-    const LocaleInfo* otherIN = new LocaleInfo("in-MY");
-    LocaleMatcher::Match(currentIN, otherIN);
+    std::unique_ptr<LocaleInfo> otherIN = std::make_unique<LocaleInfo>("in-MY");
+    LocaleMatcher::Match(currentIN, otherIN.get());
     LocaleMatcher::Match(currentIN, nullptr);
     std::unique_ptr<LocaleInfo> newRequest = std::make_unique<LocaleInfo>("en-Latn");
     std::unique_ptr<LocaleInfo> currentEn = std::make_unique<LocaleInfo>("en-GB");
@@ -1028,17 +1028,12 @@ HWTEST_F(IntlTest, IntlFuncTest0074, TestSize.Level1)
     EXPECT_EQ(result, -1);
     delete other;
     delete request;
-    delete currentHE;
-    delete otherIW;
     delete currentTL;
     delete currentJI;
     delete otherYI;
-    delete currentJW;
-    delete otherJV;
     delete currentIN;
     delete otherID;
     delete enLatn;
-    delete otherIN;
 }
 
 /**
@@ -1806,7 +1801,6 @@ HWTEST_F(IntlTest, IntlFuncTest0097, TestSize.Level1)
     calendarMock->CompareDays(1684742124650);
     bool isWeekend = calendarMock->IsWeekend();
     EXPECT_FALSE(isWeekend);
-
 }
 } // namespace I18n
 } // namespace Global
