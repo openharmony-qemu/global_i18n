@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_GLOBAL_I18N_I18N_SERVICE_ABILITY_LOAD_MANAGER_MOCK_H
-#define OHOS_GLOBAL_I18N_I18N_SERVICE_ABILITY_LOAD_MANAGER_MOCK_H
+#ifndef OHOS_GLOBAL_I18N_I18N_BREAK_ITERATOR_MOCK_H
+#define OHOS_GLOBAL_I18N_I18N_BREAK_ITERATOR_MOCK_H
 
 #include <gmock/gmock.h>
 #include "i18n_break_iterator.h"

@@ -1410,7 +1410,8 @@ HWTEST_F(IntlTest, IntlFuncTest0086, TestSize.Level1)
     icu::RegexPattern* regexPattern = findRule->GetPattern();
     EXPECT_TRUE(regexPattern != nullptr);
     delete regexPattern;
-    icu::UnicodeString emptyRegex;
+    std::string emptyStr = "";
+    icu::UnicodeString emptyRegex(emptyStr.c_str());
     std::unique_ptr<BorderRule> emptyBorderRule =
         std::make_unique<BorderRule>(emptyRegex, insensitive, type);
 }
@@ -1524,9 +1525,9 @@ HWTEST_F(IntlTest, IntlFuncTest0089, TestSize.Level1)
         icu::UnicodeString message4(msg.c_str());
         PhoneNumberMatch* match4 = codeRule->IsValid(possibleNumber.get(), message4);
         EXPECT_TRUE(match4 != nullptr);
-        PhoneNumberMatch* match5 = codeRule->Handle(nullptr, message4);
-        EXPECT_TRUE(match5 == nullptr);
     }
+    PhoneNumberMatch* match5 = codeRule->Handle(nullptr, message4);
+    EXPECT_TRUE(match5 == nullptr);
 }
 
 /**
@@ -1564,13 +1565,21 @@ HWTEST_F(IntlTest, IntlFuncTest0091, TestSize.Level1)
     icu::UnicodeString message(msg.c_str());
     std::string rawStr = "(0755)36661888";
     std::unique_ptr<PhoneNumberMatch> possibleNum = std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber);
-    std::string regexStr = "\\(\\d{4}\\)";
+    std::string regexStr = "\\d{4}";
     icu::UnicodeString regex(regexStr.c_str());
     std::string handleType = "Operator";
     std::string insensitive = "True";
     std::unique_ptr<PositiveRule> pRule = std::make_unique<PositiveRule>(regex, handleType, insensitive);
     std::vector<MatchedNumberInfo> list = pRule->HandleInner(possibleNum.get(), message);
     EXPECT_EQ(list.size(), 1);
+    handleType = "Blank";
+    start = 0;
+    rawStr = "0755 36661888";
+    i18n::phonenumbers::PhoneNumber phoneNumber2;
+    std::unique_ptr<PhoneNumberMatch> maybeNumber = std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber2);
+    std::unique_ptr<PositiveRule> posiRule = std::make_unique<PositiveRule>(regex, handleType, insensitive);
+    std::vector<MatchedNumberInfo> list2 = posiRule->HandleInner(maybeNumber.get(), message);
+    EXPECT_EQ(list2.size(), 1);
 }
 
 /**
@@ -1602,7 +1611,7 @@ HWTEST_F(IntlTest, IntlFuncTest0092, TestSize.Level1)
 HWTEST_F(IntlTest, IntlFuncTest0093, TestSize.Level1)
 {
     using namespace i18n::phonenumbers;
-    std::string regexStr = "[234]{3}";
+    std::string regexStr = "\\d{3}";
     icu::UnicodeString regex(regexStr.c_str());
     std::string isValidType = "PreSuf";
     std::string insensitive = "False";
@@ -1644,7 +1653,7 @@ HWTEST_F(IntlTest, IntlFuncTest0093, TestSize.Level1)
 HWTEST_F(IntlTest, IntlFuncTest0094, TestSize.Level1)
 {
     using namespace i18n::phonenumbers;
-    std::string regexStr = "[234]{3}";
+    std::string regexStr = "\\d{3}";
     icu::UnicodeString regex(regexStr.c_str());
     std::string isValidType = "PreSuf";
     std::string insensitive = "False";
@@ -1699,7 +1708,7 @@ HWTEST_F(IntlTest, IntlFuncTest0094, TestSize.Level1)
 HWTEST_F(IntlTest, IntlFuncTest0095, TestSize.Level1)
 {
     using namespace i18n::phonenumbers;
-    std::string regexStr = "[234]{3}";
+    std::string regexStr = "\\d{3}";
     icu::UnicodeString regex(regexStr.c_str());
     std::string isValidType = "PreSuf";
     std::string insensitive = "False";
@@ -1740,7 +1749,7 @@ HWTEST_F(IntlTest, IntlFuncTest0095, TestSize.Level1)
 HWTEST_F(IntlTest, IntlFuncTest0096, TestSize.Level1)
 {
     using namespace i18n::phonenumbers;
-    std::string regexStr = "[234]{3}";
+    std::string regexStr = "\\d{3}";
     icu::UnicodeString regex(regexStr.c_str());
     std::string isValidType = "PreSuf";
     std::string insensitive = "False";
