@@ -77,7 +77,7 @@ std::string IcsFileWriter::WriteVersionFile(const std::string& verison, std::str
     return filePath;
 }
 
-std::string IcsFileWriter::WriteManifest(const std::vector<std::string>& list, std::string fileName)
+std::string IcsFileWriter::WriteManifest(const std::vector<std::string>& list, std::string& fileName)
 {
     std::string filePath = "/data/log/" + fileName;
     std::ofstream fstream(filePath);
@@ -92,7 +92,7 @@ std::string IcsFileWriter::WriteManifest(const std::vector<std::string>& list, s
     return filePath;
 }
 
-std::string IcsFileWriter::WriteBinaryFile(std::string fileName)
+std::string IcsFileWriter::WriteBinaryFile(std::string& fileName)
 {
     std::string filePath = "/data/log/" + fileName;
     std::ofstream fstream(filePath, std::ios_base::out | std::ios_base::binary);
