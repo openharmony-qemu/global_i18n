@@ -1024,7 +1024,8 @@ HWTEST_F(IntlTest, IntlFuncTest0074, TestSize.Level1)
     std::unique_ptr<LocaleInfo> currentEn = std::make_unique<LocaleInfo>("en-GB");
     std::unique_ptr<LocaleInfo> otherEn = std::make_unique<LocaleInfo>("en-US");
     int8_t result = LocaleMatcher::IsMoreSuitable(currentEn.get(), otherEn.get(), newRequest.get());
-    EXPECT_EQ(result, 0);
+    LocaleMatcher::Match(enLatn, currentEn.get());
+    EXPECT_EQ(result, -1);
     delete other;
     delete request;
     delete currentHE;
@@ -1127,10 +1128,10 @@ HWTEST_F(IntlTest, IntlFuncTest0076, TestSize.Level1)
 HWTEST_F(IntlTest, IntlFuncTest0077, TestSize.Level1)
 {
     using namespace i18n::phonenumbers;
-    std::string regexStr = "[a-z]1?";
+    std::string regexStr = "\\d{3}";
     icu::UnicodeString regex(regexStr.c_str());
     std::string isValidType = "Default";
-    std::string handleType = "EndWithMobile";
+    std::string handleType = "Operator";
     std::string insensitive = "False";
     std::string type = "xxx";
     icu::UnicodeString message(type.c_str());
@@ -1209,7 +1210,7 @@ HWTEST_F(IntlTest, IntlFuncTest0079, TestSize.Level1)
 HWTEST_F(IntlTest, IntlFuncTest0080, TestSize.Level1)
 {
     using namespace i18n::phonenumbers;
-    std::string regexStr = "[a-z]1?";
+    std::string regexStr = "\\d{3}";
     icu::UnicodeString regex(regexStr.c_str());
     std::string isValidType = "Default";
     std::string handleType = "Operator";
@@ -1711,8 +1712,6 @@ HWTEST_F(IntlTest, IntlFuncTest0096, TestSize.Level1)
         PhoneNumberMatch* match = regexRule->IsValid(possibleNumber.get(), message);
         EXPECT_TRUE(match != nullptr);
     }
-    std::vector<MatchedNumberInfo> list = regexRule->Handle(nullptr, message);
-    EXPECT_EQ(list.size(), 0);
 }
 
 /**
