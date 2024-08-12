@@ -1458,7 +1458,7 @@ HWTEST_F(IntlTest, IntlFuncTest0088, TestSize.Level1)
     std::string manifestName = "MANIFEST.MF";
     std::string manifestPath = icsFileWriter.WriteManifest(list, manifestName);
     const std::string filePath = "/data/log/";
-    const std::string fileName = "version.txt";
+    std::string fileName = "version.txt";
     std::vector<std::string> versonList;
     versonList.push_back("version=1.10.25.100");
     versonList.push_back("type=TIMEZONE");
