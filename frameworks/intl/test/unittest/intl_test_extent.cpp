@@ -1665,7 +1665,7 @@ HWTEST_F(IntlTest, IntlFuncTest0094, TestSize.Level1)
     }
 
     isValidType = "Code";
-    rawStr = "106857628100000001";
+    rawStr = "118057628100000001";
     start = 0;
     i18n::phonenumbers::PhoneNumber phoneNumber2;
     std::unique_ptr<PhoneNumberMatch> possibleNum =
@@ -1674,6 +1674,19 @@ HWTEST_F(IntlTest, IntlFuncTest0094, TestSize.Level1)
         std::make_unique<RegexRule>(regex, isValidType, handleType, insensitive, type);
     if (possibleNum != nullptr) {
         PhoneNumberMatch* pnMatch = regexRule2->IsValid(possibleNum.get(), message);
+        EXPECT_TRUE(pnMatch == nullptr);
+    }
+
+    isValidType = "Code";
+    rawStr = "40082088201";
+    start = 0;
+    i18n::phonenumbers::PhoneNumber phoneNumber3;
+    std::unique_ptr<PhoneNumberMatch> maybeNumber =
+        std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber3);
+    std::unique_ptr<RegexRule> regexRule3 =
+        std::make_unique<RegexRule>(regex, isValidType, handleType, insensitive, type);
+    if (maybeNumber != nullptr) {
+        PhoneNumberMatch* pnMatch = regexRule3->IsValid(maybeNumber.get(), message);
         EXPECT_TRUE(pnMatch == nullptr);
     }
 }
