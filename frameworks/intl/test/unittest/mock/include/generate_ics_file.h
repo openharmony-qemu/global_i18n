@@ -24,8 +24,8 @@ public:
     ~IcsFileWriter();
     std::string GenerateFile();
     std::string WriteVersionFile(const std::string& verison, std::string fileName);
-    std::string WriteManifest(const std::vector<std::string>& list, std::string fileName);
-    std::string WriteBinaryFile(std::string fileName);
+    std::string WriteManifest(const std::vector<std::string>& list, std::string& fileName);
+    std::string WriteBinaryFile(std::string& fileName);
 };
 } // namespace I18n
 } // namespace Global
