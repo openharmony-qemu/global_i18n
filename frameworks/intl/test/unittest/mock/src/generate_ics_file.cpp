@@ -108,8 +108,8 @@ std::string IcsFileWriter::WriteBinaryFile(std::string& fileName)
         return filePath;
     }
     if (fstream.is_open()) {
-        IcsFileWriter fileWriter;
-        fstream.write(reinterpret_cast<const char*>(&fileWriter), sizeof(IcsFileWriter));
+        const char* data = "0101010100010100101010";
+        fstream.write(data, sizeof(data));
     }
     fstream.close();
     return filePath;
