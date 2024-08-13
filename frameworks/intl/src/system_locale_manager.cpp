@@ -176,29 +176,25 @@ std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray(I18n
     std::map<std::string, icu::TimeZone*> tzMap;
     bool ifEnforce = GetPseudoLocalizationEnforce();
     for (auto it = zoneCityIds.begin(); it != zoneCityIds.end(); ++it) {
-        std::string cityId = *it;
-        std::string cityDisplayName = "";
+        std::string cityId = *it, cityDisplayName = "";
         if (displayNameMap.find(cityId) != displayNameMap.end()) {
             cityDisplayName = displayNameMap.find(cityId)->second;
         }
-        int32_t rawOffset = 0;
-        int32_t dstOffset = 0;
+        int32_t rawOffset = 0, dstOffset = 0;
         bool local = false;
         UErrorCode status = U_ZERO_ERROR;
         UDate date = icu::Calendar::getNow();
         std::string timezoneId = I18nTimeZone::GetTimezoneIdByCityId(cityId);
-        if (timezoneId.length() == 0) {
+        if (timezoneId.length() == 0)
             continue;
-        }
         if (tzMap.find(timezoneId) != tzMap.end()) {
             icu::TimeZone *icuTimeZone = tzMap.find(timezoneId)->second;
             icuTimeZone->getOffset(date, (UBool)local, rawOffset, dstOffset, status);
         } else {
             icu::UnicodeString unicodeString = icu::UnicodeString::fromUTF8(timezoneId);
             icu::TimeZone *icuTimeZone = icu::TimeZone::createTimeZone(unicodeString);
-            if (icuTimeZone == nullptr) {
+            if (icuTimeZone == nullptr)
                 continue;
-            }
             icuTimeZone->getOffset(date, (UBool)local, rawOffset, dstOffset, status);
             tzMap.insert({timezoneId, icuTimeZone});
         }
