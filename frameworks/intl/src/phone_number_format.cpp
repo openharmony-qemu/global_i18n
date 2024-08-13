@@ -339,6 +339,7 @@ bool PhoneNumberFormat::getBlockedRegionName(
         ret = getBlockedRegionName(language.c_str(), regionCode.c_str());
     }
     dlclose(i18nUtilHandle);
+    i18nUtilHandle = nullptr;
     return ret;
 }
 
@@ -371,6 +372,7 @@ std::string PhoneNumberFormat::getCityName(
         getReplacedPhoneLocationName(language.c_str(), phonenumber.c_str(), recvArr);
     }
     dlclose(i18nUtilHandle);
+    i18nUtilHandle = nullptr;
     std::string ret(recvArr);
     return ret;
 }

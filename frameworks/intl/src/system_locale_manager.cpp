@@ -169,6 +169,13 @@ std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray(I18n
         status = I18nErrorCode::NOT_SYSTEM_APP;
         return result;
     }
+    result = GetTimezoneCityInfoArray();
+    SortTimezoneCityItemList(LocaleConfig::GetSystemLocale(), result);
+    return result;
+}
+
+std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray() {
+    std::vector<TimeZoneCityItem> result;
     std::set<std::string> zoneCityIds = I18nTimeZone::GetAvailableZoneCityIDs();
     std::string locale = LocaleConfig::GetSystemLocale();
     std::string localeBaseName = I18nTimeZone::GetLocaleBaseName(locale);
@@ -185,16 +192,18 @@ std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray(I18n
         UErrorCode status = U_ZERO_ERROR;
         UDate date = icu::Calendar::getNow();
         std::string timezoneId = I18nTimeZone::GetTimezoneIdByCityId(cityId);
-        if (timezoneId.length() == 0)
+        if (timezoneId.length() == 0) {
             continue;
+        }
         if (tzMap.find(timezoneId) != tzMap.end()) {
             icu::TimeZone *icuTimeZone = tzMap.find(timezoneId)->second;
             icuTimeZone->getOffset(date, (UBool)local, rawOffset, dstOffset, status);
         } else {
             icu::UnicodeString unicodeString = icu::UnicodeString::fromUTF8(timezoneId);
             icu::TimeZone *icuTimeZone = icu::TimeZone::createTimeZone(unicodeString);
-            if (icuTimeZone == nullptr)
+            if (icuTimeZone == nullptr) {
                 continue;
+            }
             icuTimeZone->getOffset(date, (UBool)local, rawOffset, dstOffset, status);
             tzMap.insert({timezoneId, icuTimeZone});
         }
@@ -208,7 +217,6 @@ std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray(I18n
         delete it->second;
         it->second = nullptr;
     }
-    SortTimezoneCityItemList(locale, result);
     return result;
 }
 
