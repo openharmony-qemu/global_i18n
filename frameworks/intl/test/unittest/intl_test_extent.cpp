@@ -1526,7 +1526,7 @@ HWTEST_F(IntlTest, IntlFuncTest0089, TestSize.Level1)
         PhoneNumberMatch* match4 = codeRule->IsValid(possibleNumber.get(), message4);
         EXPECT_TRUE(match4 != nullptr);
     }
-    PhoneNumberMatch* match5 = codeRule->Handle(nullptr, message4);
+    PhoneNumberMatch* match5 = codeRule->Handle(nullptr, message);
     EXPECT_TRUE(match5 == nullptr);
 }
 
