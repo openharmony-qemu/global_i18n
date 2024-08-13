@@ -174,7 +174,8 @@ std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray(I18n
     return result;
 }
 
-std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray() {
+std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray()
+{
     std::vector<TimeZoneCityItem> result;
     std::set<std::string> zoneCityIds = I18nTimeZone::GetAvailableZoneCityIDs();
     std::string locale = LocaleConfig::GetSystemLocale();
