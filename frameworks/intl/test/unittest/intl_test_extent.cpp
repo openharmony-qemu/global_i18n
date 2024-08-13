@@ -480,7 +480,7 @@ HWTEST_F(IntlTest, IntlFuncTest0060, TestSize.Level1)
     EXPECT_TRUE(!flag);
     std::unique_ptr<HolidayManager> holidayManager = std::make_unique<HolidayManager>(nullptr);
     std::string fakePath = "/data/log/fake.ics";
-    std::unique_ptr<HolidayManager> fakeManager = std::make_unique<HolidayManager>(fakePath.c_str());    
+    std::unique_ptr<HolidayManager> fakeManager = std::make_unique<HolidayManager>(fakePath.c_str());
     delete holiday_manager;
 }
 
