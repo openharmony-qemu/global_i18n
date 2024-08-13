@@ -126,6 +126,9 @@ void SystemLocaleManager::SortLocaleItemList(std::vector<LocaleItem> &localeItem
     std::vector<std::string> collatorLocaleTags { options.localeTag };
     std::map<std::string, std::string> collatorOptions {};
     Collator *collator = new Collator(collatorLocaleTags, collatorOptions);
+    if (collator == nullptr) {
+        return;
+    }
     auto compareFunc = [collator, options](LocaleItem item1, LocaleItem item2) {
         if (options.isSuggestedFirst) {
             if (item1.suggestionType < item2.suggestionType) {
@@ -193,6 +196,9 @@ std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray(I18n
         } else {
             icu::UnicodeString unicodeString = icu::UnicodeString::fromUTF8(timezoneId);
             icu::TimeZone *icuTimeZone = icu::TimeZone::createTimeZone(unicodeString);
+            if (icuTimeZone == nullptr) {
+                continue;
+            }
             icuTimeZone->getOffset(date, (UBool)local, rawOffset, dstOffset, status);
             tzMap.insert({timezoneId, icuTimeZone});
         }
@@ -201,6 +207,10 @@ std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray(I18n
             PseudoLocalizationProcessor("", ifEnforce), rawOffset
         };
         result.push_back(tzCityItem);
+    }
+    for (auto it = tzMap.begin(); it != tzMap.end(); ++it) {
+        delete it->second;
+        it->second = nullptr;
     }
     SortTimezoneCityItemList(locale, result);
     return result;
@@ -212,6 +222,9 @@ void SystemLocaleManager::SortTimezoneCityItemList(const std::string &locale,
     std::vector<std::string> collatorLocaleTags { locale };
     std::map<std::string, std::string> collatorOptions {};
     Collator *collator = new Collator(collatorLocaleTags, collatorOptions);
+    if (collator == nullptr) {
+        return;
+    }
     auto sortFunc = [collator](TimeZoneCityItem item1, TimeZoneCityItem item2) {
         CompareResult result = CompareResult::INVALID;
         result = collator->Compare(item1.cityDisplayName, item2.cityDisplayName);
