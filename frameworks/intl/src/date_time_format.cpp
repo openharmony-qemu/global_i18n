@@ -553,18 +553,6 @@ void DateTimeFormat::ComputeEraOfPattern(std::string option, char16_t character,
     }
 }
 
-int64_t DateTimeFormat::GetArrayValue(int64_t *dateArray, size_t index, size_t size)
-{
-    if (dateArray == nullptr) {
-        return 0;
-    }
-    if (index < size) {
-        return dateArray[index];
-    } else {
-        return 0;
-    }
-}
-
 std::string DateTimeFormat::GetSystemTimezone()
 {
     std::string systemTimezone = ReadSystemParameter(TIMEZONE_KEY, SYS_PARAM_LEN);

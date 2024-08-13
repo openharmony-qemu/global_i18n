@@ -54,6 +54,13 @@ std::string IcsFileWriter::GenerateFile()
         "SUMMARY:The Second Day of Sacrifice Feast\r\n",
         "RESOURCES;LANGUAGE=TR:Kurban Bayrami 2. Günü\r\n"
         "END:VEVENT\r\n",
+        "BEGIN:VEVENT\r\n",
+        "UID:3\r\n",
+        "DTSTART;VALUE=DATE:20220625\r\n",
+        "DTEND;VALUE=DATE:20220625\r\n",
+        "SUMMARY:Test Holiday\r\n",
+        "RESOURCES;LANGUAGE=TR:test holiday\r\n"
+        "END:VEVENT\r\n",
         "END:VCALENDAR\r\n"
     };
     for (size_t i = 0; i < list.size(); i++) {

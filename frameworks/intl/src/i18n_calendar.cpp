@@ -338,7 +338,7 @@ int32_t I18nCalendar::CompareDays(UDate date)
 
 icu::Calendar* I18nCalendar::GetIcuCalendar() const
 {
-return this->calendar_;
+    return this->calendar_;
 }
 } // namespace I18n
 } // namespace Global

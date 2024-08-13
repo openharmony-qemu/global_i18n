@@ -512,21 +512,19 @@ HWTEST_F(IntlTest, IntlFuncTest0012, TestSize.Level1)
     delete dateFormatH23;
     delete dateFormatH24;
     locales.clear();
-    DateTimeFormat *dateFormatEmpty = new (std::nothrow) DateTimeFormat(locales, options);
+    std::unique_ptr<DateTimeFormat> dateFormatEmpty = std::make_unique<DateTimeFormat>(locales, options);
     locales.push_back("@@@&&");
-    options = { { "dayPeriod", "short" } };
-    DateTimeFormat *dateFormatFake = new (std::nothrow) DateTimeFormat(locales, options);
+    options = {
+        { "dateStyle", "long" },
+        { "dayPeriod", "short" }
+    };
+    std::unique_ptr<DateTimeFormat> dateFormatFake = std::make_unique<DateTimeFormat>(locales, options);
     options.insert({ "dayPeriod", "long" });
-    DateTimeFormat *dateFormatDayPeriod = new (std::nothrow) DateTimeFormat(locales, options);
-    delete dateFormatDayPeriod;
+    std::unique_ptr<DateTimeFormat> dateFormatDayPeriod = std::make_unique<DateTimeFormat>(locales, options);
     options.insert({ "dayPeriod", "narrow" });
-    DateTimeFormat *dateFormatDayPeriod2 = new (std::nothrow) DateTimeFormat(locales, options);
-    delete dateFormatDayPeriod2;
+    std::unique_ptr<DateTimeFormat> dateFormatDayPeriod2 = std::make_unique<DateTimeFormat>(locales, options);
     options.insert({ "dateStyle", "long" });
-    DateTimeFormat *dateFormatFake2 = new (std::nothrow) DateTimeFormat(locales, options);
-    delete dateFormatEmpty;
-    delete dateFormatFake;
-    delete dateFormatFake2;
+    std::unique_ptr<DateTimeFormat> dateFormatFake2 = std::make_unique<DateTimeFormat>(locales, options);
     delete dateFormat;
 }
 
