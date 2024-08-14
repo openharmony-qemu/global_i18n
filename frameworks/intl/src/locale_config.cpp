@@ -206,6 +206,7 @@ set<std::string> LocaleConfig::validHcTag {
 
 static unordered_map<string, string> g_languageMap = {
     { "zh-Hans", "zh-Hans" },
+    { "zh-Hant-HK", "zh-Hant-HK" },
     { "zh-Hant", "zh-Hant" },
     { "my-Qaag", "my-Qaag" },
     { "es-Latn-419", "es-419" },
@@ -223,7 +224,11 @@ static unordered_map<string, string> g_languageMap = {
 
 string Adjust(const string &origin)
 {
-    for (auto iter = g_languageMap.begin(); iter != g_languageMap.end(); ++iter) {
+    auto iter = g_languageMap.find(origin);
+    if (iter != g_languageMap.end()) {
+        return iter->second;
+    }
+    for (iter = g_languageMap.begin(); iter != g_languageMap.end(); ++iter) {
         string key = iter->first;
         if (!origin.compare(0, key.length(), key)) {
             return iter->second;
@@ -642,6 +647,7 @@ string LocaleConfig::GetMainLanguage(const string &language)
 
 string LocaleConfig::GetDisplayLanguage(const string &language, const string &displayLocale, bool sentenceCase)
 {
+    std::string result;
     string adjust = Adjust(language);
     if (adjust == language) {
         UErrorCode status = U_ZERO_ERROR;
@@ -655,20 +661,21 @@ string LocaleConfig::GetDisplayLanguage(const string &language, const string &di
         }
         icu::UnicodeString unistr;
         std::string lang(locale.getLanguage());
-        std::string result;
         if (dialectLang.find(lang) != dialectLang.end()) {
-            result = GetDsiplayLanguageWithDialect(language, displayLocale);
-        } else {
-            locale.getDisplayLanguage(displayLoc, unistr);
-            unistr.toUTF8String(result);
-        }
-        if (sentenceCase) {
-            char ch = static_cast<char>(toupper(result[0]));
-            return PseudoLocalizationProcessor(result.replace(0, 1, 1, ch));
-        }
-        return PseudoLocalizationProcessor(result);
+            result = GetDisplayLanguageWithDialect(language, displayLocale);
+        } 
     }
-    return PseudoLocalizationProcessor(GetDisplayLanguageInner(adjust, displayLocale, sentenceCase));
+    if (result.empty()) {
+
+        //locale.getDisplayLanguage(displayLoc, unistr);
+        //unistr.toUTF8String(result);
+        result = GetDisplayLanguageInner(adjust, displayLocale, sentenceCase);
+    }
+    if (sentenceCase && !result.empty()) {
+        char ch = static_cast<char>(toupper(result[0]));
+        return PseudoLocalizationProcessor(result.replace(0, 1, 1, ch));
+    }
+    return PseudoLocalizationProcessor(result);
 }
 
 std::string LocaleConfig::ComputeLocale(const std::string &displayLocale)
@@ -694,11 +701,7 @@ std::string LocaleConfig::ComputeLocale(const std::string &displayLocale)
             }
             std::map<std::string, std::string> localeInfoConfigs = {};
             LocaleInfo localeinfo(reinterpret_cast<const char*>(content), localeInfoConfigs);
-            std::string language = localeinfo.GetLanguage();
-            std::string script = localeinfo.GetScript();
-            std::string languageAndScript = (script.length() == 0) ? language : language + "-" + script;
-            LocaleInfo newLocaleInfo(languageAndScript, localeInfoConfigs);
-            std::string maximizeLocale = newLocaleInfo.Maximize();
+            std::string maximizeLocale = localeinfo.Maximize();
             const char* key = maximizeLocale.c_str();
             const char* value = reinterpret_cast<const char*>(content);
             SetSupportedDialectLocales(key, value);
@@ -709,11 +712,7 @@ std::string LocaleConfig::ComputeLocale(const std::string &displayLocale)
     }
     std::map<std::string, std::string> configs = {};
     LocaleInfo localeinfo(displayLocale, configs);
-    std::string language = localeinfo.GetLanguage();
-    std::string script = localeinfo.GetScript();
-    std::string languageAndScript = (script.length() == 0) ? language : language + "-" + script;
-    LocaleInfo newLocaleInfo(languageAndScript, configs);
-    std::string maximizeLocale = newLocaleInfo.Maximize();
+    std::string maximizeLocale = localeinfo.Maximize();
     if (supportedDialectLocales.find(maximizeLocale) != supportedDialectLocales.end()) {
         return supportedDialectLocales.at(maximizeLocale);
     }
@@ -834,7 +833,7 @@ void LocaleConfig::ReadRegionData(const char *regionDataPath)
     xmlFreeDoc(doc);
 }
 
-string LocaleConfig::GetDsiplayLanguageWithDialect(const std::string &localeStr, const std::string &displayLocale)
+string LocaleConfig::GetDisplayLanguageWithDialect(const std::string &localeStr, const std::string &displayLocale)
 {
     std::string finalLocale = ComputeLocale(displayLocale);
     if (finalLocale.compare(currentDialectLocale) != 0) {
@@ -864,7 +863,8 @@ string LocaleConfig::GetDsiplayLanguageWithDialect(const std::string &localeStr,
         }
     }
     if (locale2DisplayName.find(language) != locale2DisplayName.end()) {
-        return locale2DisplayName.at(language);
+        string result = locale2DisplayName.at(language);
+        return result;
     }
     return "";
 }

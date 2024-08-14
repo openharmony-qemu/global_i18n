@@ -14,8 +14,12 @@
 -->
 <languages>
     <lang>
-        <id>zh</id>
-        <display_name>خەنزۇچە</display_name>
+        <id>zh-Hant</id>
+        <display_name>ئەنئەنىۋىي خەنزۇچە</display_name>
+    </lang>
+    <lang>
+        <id>zh-Hant-HK</id>
+        <display_name>ئەنئەنىۋىي خەنزۇچە (جۇڭگو شياڭگاڭ)</display_name>
     </lang>
     <lang>
         <id>ro</id>
