@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <map>
 #include <vector>
@@ -27,7 +28,9 @@
 #include "find_rule.h"
 #include "holiday_manager.h"
 #include "i18n_break_iterator.h"
+#include "i18n_break_iterator_mock.h"
 #include "i18n_calendar.h"
+#include "i18n_calendar_mock.h"
 #include "i18n_timezone.h"
 #include "i18n_types.h"
 #include "index_util.h"
@@ -55,10 +58,12 @@
 #include "generate_ics_file.h"
 #include "signature_verifier.h"
 #include <unistd.h>
+#include "unicode/utypes.h"
 
 using namespace OHOS::Global::I18n;
 using testing::ext::TestSize;
 using namespace std;
+using namespace testing;
 
 namespace OHOS {
 namespace Global {
@@ -473,6 +478,9 @@ HWTEST_F(IntlTest, IntlFuncTest0060, TestSize.Level1)
     EXPECT_TRUE(flag);
     flag = holiday_manager->IsHoliday();
     EXPECT_TRUE(!flag);
+    std::unique_ptr<HolidayManager> holidayManager = std::make_unique<HolidayManager>(nullptr);
+    std::string fakePath = "/data/log/fake.ics";
+    std::unique_ptr<HolidayManager> fakeManager = std::make_unique<HolidayManager>(fakePath.c_str());
     delete holiday_manager;
 }
 
@@ -985,15 +993,13 @@ HWTEST_F(IntlTest, IntlFuncTest0073, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest0074, TestSize.Level1)
 {
-    const LocaleInfo* current = nullptr;
     const LocaleInfo* other = new LocaleInfo("fil");
-    const LocaleInfo* other2 = nullptr;
-    LocaleMatcher::IsMoreSuitable(current, other, nullptr);
-    LocaleMatcher::IsMoreSuitable(current, other2, nullptr);
+    LocaleMatcher::IsMoreSuitable(nullptr, other, nullptr);
+    LocaleMatcher::IsMoreSuitable(nullptr, nullptr, nullptr);
     const LocaleInfo* request = new LocaleInfo("en-Qaag-GB");
-    const LocaleInfo* currentHE = new LocaleInfo("he");
-    const LocaleInfo* otherIW = new LocaleInfo("iw");
-    LocaleMatcher::IsMoreSuitable(currentHE, otherIW, request);
+    std::unique_ptr<LocaleInfo> currentHE = std::make_unique<LocaleInfo>("he");
+    std::unique_ptr<LocaleInfo> otherIW = std::make_unique<LocaleInfo>("iw");
+    LocaleMatcher::IsMoreSuitable(currentHE.get(), otherIW.get(), request);
     const LocaleInfo* currentTL = new LocaleInfo("tl");
     LocaleMatcher::IsMoreSuitable(currentTL, other, request);
     LocaleMatcher::IsMoreSuitable(other, currentTL, request);
@@ -1001,10 +1007,10 @@ HWTEST_F(IntlTest, IntlFuncTest0074, TestSize.Level1)
     const LocaleInfo* otherYI = new LocaleInfo("yi");
     LocaleMatcher::IsMoreSuitable(currentJI, otherYI, request);
     LocaleMatcher::IsMoreSuitable(otherYI, currentJI, request);
-    const LocaleInfo* currentJW = new LocaleInfo("jw");
-    const LocaleInfo* otherJV = new LocaleInfo("jv");
-    LocaleMatcher::IsMoreSuitable(currentJW, otherJV, request);
-    LocaleMatcher::IsMoreSuitable(otherJV, currentJW, request);
+    std::unique_ptr<LocaleInfo> currentJW = std::make_unique<LocaleInfo>("jw");
+    std::unique_ptr<LocaleInfo> otherJV = std::make_unique<LocaleInfo>("jv");
+    LocaleMatcher::IsMoreSuitable(currentJW.get(), otherJV.get(), request);
+    LocaleMatcher::IsMoreSuitable(otherJV.get(), currentJW.get(), request);
     const LocaleInfo* currentIN = new LocaleInfo("in-PH");
     const LocaleInfo* otherID = new LocaleInfo("id-MY");
     LocaleMatcher::IsMoreSuitable(currentIN, otherID, request);
@@ -1014,22 +1020,23 @@ HWTEST_F(IntlTest, IntlFuncTest0074, TestSize.Level1)
     LocaleMatcher::IsMoreSuitable(nullptr, nullptr, request);
     const LocaleInfo* enLatn = new LocaleInfo("en-Latn-US");
     LocaleMatcher::Match(request, enLatn);
-    const LocaleInfo* otherIN = new LocaleInfo("in-MY");
-    LocaleMatcher::Match(currentIN, otherIN);
+    std::unique_ptr<LocaleInfo> otherIN = std::make_unique<LocaleInfo>("in-MY");
+    LocaleMatcher::Match(currentIN, otherIN.get());
     LocaleMatcher::Match(currentIN, nullptr);
+    std::unique_ptr<LocaleInfo> newRequest = std::make_unique<LocaleInfo>("en-Latn");
+    std::unique_ptr<LocaleInfo> currentEn = std::make_unique<LocaleInfo>("en-GB");
+    std::unique_ptr<LocaleInfo> otherEn = std::make_unique<LocaleInfo>("en-US");
+    int8_t result = LocaleMatcher::IsMoreSuitable(currentEn.get(), otherEn.get(), newRequest.get());
+    LocaleMatcher::Match(enLatn, currentEn.get());
+    EXPECT_EQ(result, -1);
     delete other;
     delete request;
-    delete currentHE;
-    delete otherIW;
     delete currentTL;
     delete currentJI;
     delete otherYI;
-    delete currentJW;
-    delete otherJV;
     delete currentIN;
     delete otherID;
     delete enLatn;
-    delete otherIN;
 }
 
 /**
@@ -1098,6 +1105,10 @@ HWTEST_F(IntlTest, IntlFuncTest0076, TestSize.Level1)
     std::unique_ptr<PositiveRule> pRule2 = std::make_unique<PositiveRule>(regex, handleType, insensitive);
     vector = pRule2->HandleInner(possibleNumber.get(), message);
     vector = pRule2->Handle(possibleNumber.get(), message);
+    handleType = "default";
+    std::unique_ptr<PositiveRule> pRule3 = std::make_unique<PositiveRule>(regex, handleType, insensitive);
+    vector = pRule3->HandleInner(possibleNumber.get(), message);
+    vector = pRule3->Handle(possibleNumber.get(), message);
     delete regexP;
 
     EXPECT_FALSE(IsDirExist(nullptr));
@@ -1115,10 +1126,10 @@ HWTEST_F(IntlTest, IntlFuncTest0076, TestSize.Level1)
 HWTEST_F(IntlTest, IntlFuncTest0077, TestSize.Level1)
 {
     using namespace i18n::phonenumbers;
-    std::string regexStr = "[a-z]1?";
+    std::string regexStr = "\\d{3}";
     icu::UnicodeString regex(regexStr.c_str());
     std::string isValidType = "Default";
-    std::string handleType = "EndWithMobile";
+    std::string handleType = "Operator";
     std::string insensitive = "False";
     std::string type = "xxx";
     icu::UnicodeString message(type.c_str());
@@ -1138,7 +1149,7 @@ HWTEST_F(IntlTest, IntlFuncTest0077, TestSize.Level1)
         PhoneNumberMatch* phoneNumMatch = regexRule->IsValid(possibleNumber.get(), message);
         if (phoneNumMatch != nullptr) {
             std::vector<MatchedNumberInfo> list = regexRule->Handle(phoneNumMatch, message);
-            EXPECT_EQ(list.size(), 0);
+            EXPECT_EQ(list.size(), 1);
         }
     }
 }
@@ -1169,7 +1180,7 @@ HWTEST_F(IntlTest, IntlFuncTest0078, TestSize.Level1)
 
 /**
  * @tc.name: IntlFuncTest0079
- * @tc.desc: Test RegexRule
+ * @tc.desc: Test CodeRule
  * @tc.type: FUNC
  */
 HWTEST_F(IntlTest, IntlFuncTest0079, TestSize.Level1)
@@ -1197,11 +1208,11 @@ HWTEST_F(IntlTest, IntlFuncTest0079, TestSize.Level1)
 HWTEST_F(IntlTest, IntlFuncTest0080, TestSize.Level1)
 {
     using namespace i18n::phonenumbers;
-    std::string regexStr = "[a-z]1?";
+    std::string regexStr = "\\d{3}";
     icu::UnicodeString regex(regexStr.c_str());
     std::string isValidType = "Default";
     std::string handleType = "Operator";
-    std::string insensitive = "False";
+    std::string insensitive = "True";
     std::string type = "xxx";
     std::string input = "(010)86753564";
     size_t start = 10;
@@ -1210,6 +1221,8 @@ HWTEST_F(IntlTest, IntlFuncTest0080, TestSize.Level1)
     std::unique_ptr<PhoneNumberMatch> possibleNumber =
         std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber);
     RegexRule* regexRule = new RegexRule(regex, isValidType, handleType, insensitive, type);
+    std::unique_ptr<icu::RegexPattern> regexPattern =
+        std::unique_ptr<icu::RegexPattern>(regexRule->GetPattern());
     std::string msg = "00222a-86753564A-";
     icu::UnicodeString message(msg.c_str());
     if (possibleNumber != nullptr) {
@@ -1227,9 +1240,9 @@ HWTEST_F(IntlTest, IntlFuncTest0080, TestSize.Level1)
 HWTEST_F(IntlTest, IntlFuncTest0081, TestSize.Level1)
 {
     using namespace i18n::phonenumbers;
-    std::string regexStr = "[a-z]1?";
+    std::string regexStr = "\\d{3}";
     icu::UnicodeString regex(regexStr.c_str());
-    std::string isValidType = "Default";
+    std::string isValidType = "PreSuf";
     std::string handleType = "Blank";
     std::string insensitive = "False";
     std::string type = "xxx";
@@ -1244,6 +1257,17 @@ HWTEST_F(IntlTest, IntlFuncTest0081, TestSize.Level1)
     icu::UnicodeString message(msg.c_str());
     if (possibleNumber != nullptr) {
         std::vector<MatchedNumberInfo> list = regexRule->Handle(possibleNumber.get(), message);
+        EXPECT_EQ(list.size(), 1);
+        PhoneNumberMatch* match = regexRule->IsValid(possibleNumber.get(), message);
+        EXPECT_TRUE(match != nullptr);
+        PhoneNumberMatch* match2 = regexRule->IsValid(nullptr, message);
+        EXPECT_TRUE(match2 == nullptr);
+    }
+    rawStr = "5201314";
+    std::unique_ptr<PhoneNumberMatch> possibleNum =
+        std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber);
+    if (possibleNum != nullptr) {
+        std::vector<MatchedNumberInfo> list = regexRule->Handle(possibleNum.get(), message);
         EXPECT_EQ(list.size(), 0);
     }
     delete regexRule;
@@ -1257,13 +1281,13 @@ HWTEST_F(IntlTest, IntlFuncTest0081, TestSize.Level1)
 HWTEST_F(IntlTest, IntlFuncTest0082, TestSize.Level1)
 {
     using namespace i18n::phonenumbers;
-    std::string regexStr = "[a-z]1?";
+    std::string regexStr = "\\d{3}";
     icu::UnicodeString regex(regexStr.c_str());
-    std::string isValidType = "Default";
+    std::string isValidType = "Code";
     std::string handleType = "Slant";
     std::string insensitive = "False";
     std::string type = "xxx";
-    std::string input = "(010)86753564";
+    std::string input = "(010)120/110";
     size_t start = 10;
     i18n::phonenumbers::PhoneNumber phoneNumber;
     std::unique_ptr<PhoneNumberMatch> possibleNumber =
@@ -1273,7 +1297,9 @@ HWTEST_F(IntlTest, IntlFuncTest0082, TestSize.Level1)
     icu::UnicodeString message(msg.c_str());
     if (possibleNumber != nullptr) {
         std::vector<MatchedNumberInfo> list = regexRule->Handle(possibleNumber.get(), message);
-        EXPECT_EQ(list.size(), 0);
+        EXPECT_EQ(list.size(), 1);
+        PhoneNumberMatch* match = regexRule->IsValid(possibleNumber.get(), message);
+        EXPECT_TRUE(match != nullptr);
     }
     delete regexRule;
 }
@@ -1286,9 +1312,9 @@ HWTEST_F(IntlTest, IntlFuncTest0082, TestSize.Level1)
 HWTEST_F(IntlTest, IntlFuncTest0083, TestSize.Level1)
 {
     using namespace i18n::phonenumbers;
-    std::string regexStr = "[a-z]1?";
+    std::string regexStr = "\\d{3}";
     icu::UnicodeString regex(regexStr.c_str());
-    std::string isValidType = "Default";
+    std::string isValidType = "PreSuf";
     std::string handleType = "StartWithMobile";
     std::string insensitive = "False";
     std::string type = "xxx";
@@ -1301,6 +1327,7 @@ HWTEST_F(IntlTest, IntlFuncTest0083, TestSize.Level1)
     std::string msg = "00222a-86753564A-";
     icu::UnicodeString message(msg.c_str());
     if (possibleNumber != nullptr) {
+        regexRule->IsValid(possibleNumber.get(), message);
         std::vector<MatchedNumberInfo> list = regexRule->Handle(possibleNumber.get(), message);
         EXPECT_EQ(list.size(), 0);
     }
@@ -1315,7 +1342,7 @@ HWTEST_F(IntlTest, IntlFuncTest0083, TestSize.Level1)
 HWTEST_F(IntlTest, IntlFuncTest0084, TestSize.Level1)
 {
     using namespace i18n::phonenumbers;
-    std::string regexStr = "[a-z]1?";
+    std::string regexStr = "\\d{3}";
     icu::UnicodeString regex(regexStr.c_str());
     std::string isValidType = "Default";
     std::string handleType = "Default";
@@ -1359,6 +1386,11 @@ HWTEST_F(IntlTest, IntlFuncTest0085, TestSize.Level1)
         std::make_unique<PhoneNumberMatch>(start, input, phoneNumber);
     bool flag = borderRule->Handle(match.get(), message);
     EXPECT_TRUE(flag);
+
+    type = "CONTAIN";
+    std::unique_ptr<BorderRule> bRule = std::make_unique<BorderRule>(regex, insensitive, type);
+    flag = bRule->Handle(match.get(), message);
+    EXPECT_TRUE(flag);
     delete regexPattern;
 }
 
@@ -1381,6 +1413,10 @@ HWTEST_F(IntlTest, IntlFuncTest0086, TestSize.Level1)
     icu::RegexPattern* regexPattern = findRule->GetPattern();
     EXPECT_TRUE(regexPattern != nullptr);
     delete regexPattern;
+    std::string emptyStr = "";
+    icu::UnicodeString emptyRegex(emptyStr.c_str());
+    std::unique_ptr<BorderRule> emptyBorderRule =
+        std::make_unique<BorderRule>(emptyRegex, insensitive, type);
 }
 
 /**
@@ -1425,7 +1461,7 @@ HWTEST_F(IntlTest, IntlFuncTest0088, TestSize.Level1)
     std::string manifestName = "MANIFEST.MF";
     std::string manifestPath = icsFileWriter.WriteManifest(list, manifestName);
     const std::string filePath = "/data/log/";
-    const std::string fileName = "version.txt";
+    std::string fileName = "version.txt";
     std::vector<std::string> versonList;
     versonList.push_back("version=1.10.25.100");
     versonList.push_back("type=TIMEZONE");
@@ -1436,6 +1472,10 @@ HWTEST_F(IntlTest, IntlFuncTest0088, TestSize.Level1)
     icsFileWriter.WriteManifest(versonList, fileName);
     bool flag = SignatureVerifier::VerifyParamFile(fileName, filePath, manifestPath);
     EXPECT_FALSE(flag);
+    std::string fakeManifestPath = "/data/54321.MF";
+    flag = SignatureVerifier::VerifyParamFile(fileName, filePath, fakeManifestPath);
+    std::string fakeFileName = "version0.txt";
+    flag = SignatureVerifier::VerifyParamFile(fakeFileName, filePath, manifestPath);
     std::string fakePath = "/data/log/123.txt";
     std::string resultVersion = SignatureVerifier::LoadFileVersion(fakePath);
     EXPECT_EQ(resultVersion, "");
@@ -1455,6 +1495,337 @@ HWTEST_F(IntlTest, IntlFuncTest0088, TestSize.Level1)
     std::string pubkeyPath = icsFileWriter.WriteBinaryFile(publicName);
     bool verifyFlag = SignatureVerifier::VerifyCertFile(certPath, verifyPath, pubkeyPath, manifestPath);
     EXPECT_FALSE(verifyFlag);
+}
+
+/**
+ * @tc.name: IntlFuncTest0089
+ * @tc.desc: Test CodeRule
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0089, TestSize.Level1)
+{
+    std::string isValidType = "PreSuf";
+    std::string msg = "00222a-1 800 234 45 67A-";
+    icu::UnicodeString message(msg.c_str());
+    i18n::phonenumbers::PhoneNumber phoneNumber;
+    size_t start = 10;
+    std::string rawStr = "1 800 234 45 67";
+    std::unique_ptr<PhoneNumberMatch> possibleNumber =
+        std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber);
+    std::unique_ptr<CodeRule> codeRule = std::make_unique<CodeRule>(isValidType);
+    if (possibleNumber != nullptr) {
+        PhoneNumberMatch* match = codeRule->IsValid(possibleNumber.get(), message);
+        EXPECT_TRUE(match != nullptr);
+        msg = "00222a-1 800 234 45 67a1";
+        icu::UnicodeString message2(msg.c_str());
+        PhoneNumberMatch* match2 = codeRule->IsValid(possibleNumber.get(), message2);
+        EXPECT_TRUE(match2 != nullptr);
+        msg = "00222a-1 800 234 45 67a@";
+        icu::UnicodeString message3(msg.c_str());
+        PhoneNumberMatch* match3 = codeRule->IsValid(possibleNumber.get(), message3);
+        EXPECT_TRUE(match3 != nullptr);
+        msg = "00222a-1 800 234 45 67ab";
+        icu::UnicodeString message4(msg.c_str());
+        PhoneNumberMatch* match4 = codeRule->IsValid(possibleNumber.get(), message4);
+        EXPECT_TRUE(match4 != nullptr);
+    }
+    PhoneNumberMatch* match5 = codeRule->Handle(nullptr, message);
+    EXPECT_TRUE(match5 == nullptr);
+}
+
+/**
+ * @tc.name: IntlFuncTest0090
+ * @tc.desc: Test CodeRule
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0090, TestSize.Level1)
+{
+    std::string isValidType = "Code";
+    std::string msg = "00222a-1 800 234 45 67A-";
+    icu::UnicodeString message(msg.c_str());
+    i18n::phonenumbers::PhoneNumber phoneNumber;
+    size_t start = 10;
+    std::string rawStr = "[17777]8;ext=123";
+    std::unique_ptr<PhoneNumberMatch> possibleNumber =
+        std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber);
+    std::unique_ptr<CodeRule> codeRule = std::make_unique<CodeRule>(isValidType);
+    if (possibleNumber != nullptr) {
+        PhoneNumberMatch* match = codeRule->IsValid(possibleNumber.get(), message);
+        EXPECT_TRUE(match == nullptr);
+    }
+}
+
+/**
+ * @tc.name: IntlFuncTest0091
+ * @tc.desc: Test CodeRule
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0091, TestSize.Level1)
+{
+    size_t start = 10;
+    i18n::phonenumbers::PhoneNumber phoneNumber;
+    std::string msg = "00222a-(0755)36661888A-";
+    icu::UnicodeString message(msg.c_str());
+    std::string rawStr = "(0755)36661888";
+    std::unique_ptr<PhoneNumberMatch> possibleNum = std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber);
+    std::string regexStr = "\\d{4}";
+    icu::UnicodeString regex(regexStr.c_str());
+    std::string handleType = "Operator";
+    std::string insensitive = "True";
+    std::unique_ptr<PositiveRule> pRule = std::make_unique<PositiveRule>(regex, handleType, insensitive);
+    std::vector<MatchedNumberInfo> list = pRule->HandleInner(possibleNum.get(), message);
+    EXPECT_EQ(list.size(), 1);
+    handleType = "Blank";
+    start = 0;
+    rawStr = "0755 36661888";
+    i18n::phonenumbers::PhoneNumber phoneNumber2;
+    std::unique_ptr<PhoneNumberMatch> maybeNumber = std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber2);
+    std::unique_ptr<PositiveRule> posiRule = std::make_unique<PositiveRule>(regex, handleType, insensitive);
+    std::vector<MatchedNumberInfo> list2 = posiRule->HandleInner(maybeNumber.get(), message);
+    EXPECT_EQ(list2.size(), 1);
+}
+
+/**
+ * @tc.name: IntlFuncTest0092
+ * @tc.desc: Test I18nBreakIterator
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0092, TestSize.Level1)
+{
+    std::unique_ptr<I18nBreakIteratorMock> breakIteratorMock = std::make_unique<I18nBreakIteratorMock>("en-GB");
+    EXPECT_CALL(*breakIteratorMock, GetBreakIterator())
+    .WillRepeatedly(Return(nullptr));
+    breakIteratorMock->Current();
+    breakIteratorMock->First();
+    breakIteratorMock->Last();
+    breakIteratorMock->Previous();
+    breakIteratorMock->Next();
+    breakIteratorMock->Next(1);
+    breakIteratorMock->Following(3);
+    bool flag = breakIteratorMock->IsBoundary(1);
+    EXPECT_FALSE(flag);
+}
+
+/**
+ * @tc.name: IntlFuncTest0093
+ * @tc.desc: Test RegexRule
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0093, TestSize.Level1)
+{
+    using namespace i18n::phonenumbers;
+    std::string regexStr = "\\d{3}";
+    icu::UnicodeString regex(regexStr.c_str());
+    std::string isValidType = "PreSuf";
+    std::string insensitive = "False";
+    std::string handleType = "EndWithMobile";
+    std::string type = "xxx";
+    std::string msg = "00222a-1 800 234 45 67A-";
+    icu::UnicodeString message(msg.c_str());
+    i18n::phonenumbers::PhoneNumber phoneNumber;
+    size_t start = 10;
+    std::string rawStr = "1 800 234 45 67";
+    std::unique_ptr<PhoneNumberMatch> possibleNumber =
+        std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber);
+    std::unique_ptr<RegexRule> regexRule =
+        std::make_unique<RegexRule>(regex, isValidType, handleType, insensitive, type);
+    if (possibleNumber != nullptr) {
+        PhoneNumberMatch* match = regexRule->IsValid(possibleNumber.get(), message);
+        EXPECT_TRUE(match != nullptr);
+    }
+
+    isValidType = "Code";
+    rawStr = "119";
+    start = 0;
+    i18n::phonenumbers::PhoneNumber phoneNumber2;
+    std::unique_ptr<PhoneNumberMatch> possibleNum =
+        std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber2);
+    std::unique_ptr<RegexRule> regexRule2 =
+        std::make_unique<RegexRule>(regex, isValidType, handleType, insensitive, type);
+    if (possibleNum != nullptr) {
+        PhoneNumberMatch* pnMatch = regexRule2->IsValid(possibleNum.get(), message);
+        EXPECT_TRUE(pnMatch == nullptr);
+    }
+}
+
+/**
+ * @tc.name: IntlFuncTest0094
+ * @tc.desc: Test RegexRule
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0094, TestSize.Level1)
+{
+    using namespace i18n::phonenumbers;
+    std::string regexStr = "\\d{3}";
+    icu::UnicodeString regex(regexStr.c_str());
+    std::string isValidType = "PreSuf";
+    std::string insensitive = "False";
+    std::string handleType = "EndWithMobile";
+    std::string type = "xxx";
+    std::string msg = "00222a-1 800 234 45 67a1";
+    icu::UnicodeString message(msg.c_str());
+    i18n::phonenumbers::PhoneNumber phoneNumber;
+    size_t start = 10;
+    std::string rawStr = "1 800 234 45 67";
+    std::unique_ptr<PhoneNumberMatch> possibleNumber =
+        std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber);
+    std::unique_ptr<RegexRule> regexRule =
+        std::make_unique<RegexRule>(regex, isValidType, handleType, insensitive, type);
+    if (possibleNumber != nullptr) {
+        PhoneNumberMatch* match = regexRule->IsValid(possibleNumber.get(), message);
+        EXPECT_TRUE(match != nullptr);
+    }
+
+    isValidType = "Code";
+    rawStr = "118057628100000001";
+    start = 0;
+    i18n::phonenumbers::PhoneNumber phoneNumber2;
+    std::unique_ptr<PhoneNumberMatch> possibleNum =
+        std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber2);
+    std::unique_ptr<RegexRule> regexRule2 =
+        std::make_unique<RegexRule>(regex, isValidType, handleType, insensitive, type);
+    if (possibleNum != nullptr) {
+        PhoneNumberMatch* pnMatch = regexRule2->IsValid(possibleNum.get(), message);
+        EXPECT_TRUE(pnMatch == nullptr);
+    }
+
+    isValidType = "Code";
+    rawStr = "40082088201";
+    start = 0;
+    i18n::phonenumbers::PhoneNumber phoneNumber3;
+    std::unique_ptr<PhoneNumberMatch> maybeNumber =
+        std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber3);
+    std::unique_ptr<RegexRule> regexRule3 =
+        std::make_unique<RegexRule>(regex, isValidType, handleType, insensitive, type);
+    if (maybeNumber != nullptr) {
+        PhoneNumberMatch* pnMatch = regexRule3->IsValid(maybeNumber.get(), message);
+        EXPECT_TRUE(pnMatch == nullptr);
+    }
+}
+
+/**
+ * @tc.name: IntlFuncTest0095
+ * @tc.desc: Test RegexRule
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0095, TestSize.Level1)
+{
+    using namespace i18n::phonenumbers;
+    std::string regexStr = "\\d{3}";
+    icu::UnicodeString regex(regexStr.c_str());
+    std::string isValidType = "PreSuf";
+    std::string insensitive = "False";
+    std::string handleType = "EndWithMobile";
+    std::string type = "xxx";
+    std::string msg = "00222a-1 800 234 45 67a@";
+    icu::UnicodeString message(msg.c_str());
+    i18n::phonenumbers::PhoneNumber phoneNumber;
+    size_t start = 10;
+    std::string rawStr = "1 800 234 45 67";
+    std::unique_ptr<PhoneNumberMatch> possibleNumber =
+        std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber);
+    std::unique_ptr<RegexRule> regexRule =
+        std::make_unique<RegexRule>(regex, isValidType, handleType, insensitive, type);
+    if (possibleNumber != nullptr) {
+        PhoneNumberMatch* match = regexRule->IsValid(possibleNumber.get(), message);
+        EXPECT_TRUE(match != nullptr);
+    }
+
+    isValidType = "Code";
+    rawStr = "0106857628100000001";
+    start = 0;
+    i18n::phonenumbers::PhoneNumber phoneNumber2;
+    std::unique_ptr<PhoneNumberMatch> possibleNum =
+        std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber2);
+    std::unique_ptr<RegexRule> regexRule2 =
+        std::make_unique<RegexRule>(regex, isValidType, handleType, insensitive, type);
+    if (possibleNum != nullptr) {
+        PhoneNumberMatch* pnMatch = regexRule2->IsValid(possibleNum.get(), message);
+        EXPECT_TRUE(pnMatch == nullptr);
+    }
+}
+/**
+ * @tc.name: IntlFuncTest0096
+ * @tc.desc: Test RegexRule
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0096, TestSize.Level1)
+{
+    using namespace i18n::phonenumbers;
+    std::string regexStr = "\\d{3}";
+    icu::UnicodeString regex(regexStr.c_str());
+    std::string isValidType = "PreSuf";
+    std::string insensitive = "False";
+    std::string handleType = "EndWithMobile";
+    std::string type = "xxx";
+    std::string msg = "00222a-1 800 234 45 67ab";
+    icu::UnicodeString message(msg.c_str());
+    i18n::phonenumbers::PhoneNumber phoneNumber;
+    size_t start = 10;
+    std::string rawStr = "1 800 234 45 67";
+    std::unique_ptr<PhoneNumberMatch> possibleNumber =
+        std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber);
+    std::unique_ptr<RegexRule> regexRule =
+        std::make_unique<RegexRule>(regex, isValidType, handleType, insensitive, type);
+    if (possibleNumber != nullptr) {
+        PhoneNumberMatch* match = regexRule->IsValid(possibleNumber.get(), message);
+        EXPECT_TRUE(match != nullptr);
+    }
+
+    isValidType = "Rawstr";
+    rawStr = "10645656";
+    start = 0;
+    i18n::phonenumbers::PhoneNumber phoneNumber2;
+    std::unique_ptr<PhoneNumberMatch> possibleNum =
+        std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber2);
+    std::unique_ptr<RegexRule> regexRule2 =
+        std::make_unique<RegexRule>(regex, isValidType, handleType, insensitive, type);
+    if (possibleNum != nullptr) {
+        PhoneNumberMatch* pnMatch = regexRule2->IsValid(possibleNum.get(), message);
+        EXPECT_TRUE(pnMatch == nullptr);
+    }
+
+    isValidType = "Rawstr";
+    rawStr = "119";
+    start = 0;
+    i18n::phonenumbers::PhoneNumber phoneNumber3;
+    std::unique_ptr<PhoneNumberMatch> posibleNumber =
+        std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber3);
+    std::unique_ptr<RegexRule> regexRule3 =
+        std::make_unique<RegexRule>(regex, isValidType, handleType, insensitive, type);
+    if (posibleNumber != nullptr) {
+        PhoneNumberMatch* pMatch = regexRule3->IsValid(posibleNumber.get(), message);
+        EXPECT_TRUE(pMatch == nullptr);
+    }
+}
+
+/**
+ * @tc.name: IntlFuncTest0097
+ * @tc.desc: Test Intl I18nCalendarMock
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest0097, TestSize.Level1)
+{
+    std::unique_ptr<I18nCalendarMock> calendarMock = std::make_unique<I18nCalendarMock>("zh-Hans-CN");
+    EXPECT_CALL(*calendarMock, GetIcuCalendar())
+    .WillRepeatedly(Return(nullptr));
+
+    calendarMock->SetTime(1684742124645);
+    calendarMock->Get(UCalendarDateFields::UCAL_YEAR);
+    calendarMock->SetFirstDayOfWeek(-1);
+    calendarMock->GetTimeInMillis();
+
+    calendarMock->GetMinimalDaysInFirstWeek();
+    int32_t minimalDaysInFirstWeek = calendarMock->GetMinimalDaysInFirstWeek();
+    EXPECT_EQ(minimalDaysInFirstWeek, 1);
+    int32_t firstDayOfWeek = calendarMock->GetFirstDayOfWeek();
+    EXPECT_EQ(firstDayOfWeek, 1);
+    calendarMock->Set(2023, 5, 28);
+    UErrorCode status = U_ZERO_ERROR;
+    calendarMock->IsWeekend(168473854645, status);
+    calendarMock->CompareDays(1684742124650);
+    bool isWeekend = calendarMock->IsWeekend();
+    EXPECT_FALSE(isWeekend);
 }
 } // namespace I18n
 } // namespace Global
