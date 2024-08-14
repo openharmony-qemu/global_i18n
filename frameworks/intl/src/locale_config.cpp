@@ -663,12 +663,9 @@ string LocaleConfig::GetDisplayLanguage(const string &language, const string &di
         std::string lang(locale.getLanguage());
         if (dialectLang.find(lang) != dialectLang.end()) {
             result = GetDisplayLanguageWithDialect(language, displayLocale);
-        } 
+        }
     }
     if (result.empty()) {
-
-        //locale.getDisplayLanguage(displayLoc, unistr);
-        //unistr.toUTF8String(result);
         result = GetDisplayLanguageInner(adjust, displayLocale, sentenceCase);
     }
     if (sentenceCase && !result.empty()) {
