@@ -363,6 +363,7 @@ std::string PhoneNumberFormat::getCityName(
     }
     if (locationName.compare(recvArr) != 0) {
         dlclose(i18nUtilHandle);
+        i18nUtilHandle = 0;
         return "";
     }
 
