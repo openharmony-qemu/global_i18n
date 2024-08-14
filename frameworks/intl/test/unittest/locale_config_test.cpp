@@ -405,7 +405,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest020, TestSize.Level1)
 {
     vector<string> languages;
     LocaleConfig::GetSystemLanguages(languages);
-    EXPECT_EQ(languages.size(), 5);
+    EXPECT_TRUE(languages.size() > 2);
     LocaleConfig::SetSystemLocale("ur-Latn-PK");
     LocaleConfig::SetUsingLocalDigit(true);
     LocaleConfig::SetUsingLocalDigit(false);

@@ -307,7 +307,7 @@ ohos_prebuilt_etc("zh_Hans_timezone_xml") {
 }
 
 ohos_prebuilt_etc("en_Latn_lang_xml") {
-  source = "//base/global/i18n/frameworks/intl/etc/lang/en-Latn.xml"
+  source = "//base/global/i18n/frameworks/intl/etc/lang/en.xml"
   module_install_dir = "etc/ohos_lang_config/"
   part_name = "i18n"
   subsystem_name = "global"
