@@ -334,11 +334,13 @@ bool PhoneNumberFormat::getBlockedRegionName(
         return false;
     }
     GetBlockedRegionName getBlockedRegionName = (GetBlockedRegionName)dlsym(i18nUtilHandle, "GetBlockedRegionName");
+    bool ret = false;
     if (getBlockedRegionName) {
-        return getBlockedRegionName(language.c_str(), regionCode.c_str());
-    } else {
-        return false;
+        ret = getBlockedRegionName(language.c_str(), regionCode.c_str());
     }
+    dlclose(i18nUtilHandle);
+    i18nUtilHandle = nullptr;
+    return ret;
 }
 
 std::string PhoneNumberFormat::getCityName(
@@ -360,6 +362,8 @@ std::string PhoneNumberFormat::getCityName(
         getBlockedPhoneLocationName(language.c_str(), phonenumber.c_str(), recvArr);
     }
     if (locationName.compare(recvArr) != 0) {
+        dlclose(i18nUtilHandle);
+        i18nUtilHandle = 0;
         return "";
     }
 
@@ -368,6 +372,8 @@ std::string PhoneNumberFormat::getCityName(
     if (getReplacedPhoneLocationName) {
         getReplacedPhoneLocationName(language.c_str(), phonenumber.c_str(), recvArr);
     }
+    dlclose(i18nUtilHandle);
+    i18nUtilHandle = nullptr;
     std::string ret(recvArr);
     return ret;
 }
