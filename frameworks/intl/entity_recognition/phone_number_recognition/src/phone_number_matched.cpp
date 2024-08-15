@@ -142,6 +142,7 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::FindShortNumbers(std::string&
     }
     icu::RegexMatcher* shortMatch = shortPattern->matcher(message, status);
     if (shortMatch == nullptr) {
+        delete shortPattern;
         HILOG_ERROR_I18N("shortPattern matcher failed.");
         return matchedNumberInfoList;
     }
@@ -214,6 +215,7 @@ std::vector<PhoneNumberMatch*> PhoneNumberMatched::FindNumbers(std::string& coun
     icu::RegexMatcher* numberMatcher = numberPattern->matcher(filteredString, status);
     if (numberMatcher == nullptr) {
         HILOG_ERROR_I18N("numberPattern matcher failed.");
+        delete numberPattern;
         return matchList;
     }
     while (numberMatcher->find(status)) {
@@ -273,6 +275,7 @@ bool PhoneNumberMatched::HandleWithShortAndShort(std::vector<MatchedNumberInfo>&
         }
         icu::RegexMatcher* matcher = pattern->matcher(str, status);
         if (matcher == nullptr) {
+            delete pattern;
             HILOG_ERROR_I18N("pattern matcher failed.");
             return flag;
         }
