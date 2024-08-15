@@ -89,6 +89,7 @@ unordered_set<string> LocaleConfig::blockedLanguages;
 unordered_set<string> LocaleConfig::blockedRegions;
 unordered_map<string, unordered_set<string>> LocaleConfig::blockedLanguageRegions;
 unordered_set<string> LocaleConfig::whiteLanguages;
+std::set<std::string> LocaleConfig::extendWhiteLanguageList;
 unordered_map<string, string> LocaleConfig::dialectMap {
     { "es-Latn-419", "es-Latn-419" },
     { "es-Latn-BO", "es-Latn-419" },
@@ -427,9 +428,8 @@ bool LocaleConfig::IsSuggested(const string &language)
     vector<string> simCountries;
     GetCountriesFromSim(simCountries);
     GetRelatedLocales(relatedLocales, simCountries);
-    std::set<std::string> extendWhiteLanguage = ExtendAllowLanguages();
     for (auto iter = relatedLocales.begin(); iter != relatedLocales.end();) {
-        if (extendWhiteLanguage.find(*iter) == extendWhiteLanguage.end()) {
+        if (extendWhiteLanguageList.find(*iter) == extendWhiteLanguageList.end()) {
             iter = relatedLocales.erase(iter);
         } else {
             ++iter;
@@ -444,9 +444,8 @@ bool LocaleConfig::IsSuggested(const std::string &language, const std::string &r
     unordered_set<string> relatedLocales;
     vector<string> countries { region };
     GetRelatedLocales(relatedLocales, countries);
-    std::set<std::string> extendWhiteLanguage = ExtendAllowLanguages();
     for (auto iter = relatedLocales.begin(); iter != relatedLocales.end();) {
-        if (extendWhiteLanguage.find(*iter) == extendWhiteLanguage.end()) {
+        if (extendWhiteLanguageList.find(*iter) == extendWhiteLanguageList.end()) {
             iter = relatedLocales.erase(iter);
         } else {
             ++iter;
@@ -456,21 +455,20 @@ bool LocaleConfig::IsSuggested(const std::string &language, const std::string &r
     return relatedLocales.find(mainLanguage) != relatedLocales.end();
 }
 
-std::set<std::string> LocaleConfig::ExtendAllowLanguages()
+void LocaleConfig::ExtendWhiteLanguages()
 {
-    std::set<std::string> result;
     UErrorCode status = U_ZERO_ERROR;
     for (auto iter = whiteLanguages.begin(); iter != whiteLanguages.end(); ++iter) {
+        extendWhiteLanguageList.insert(*iter);
         icu::Locale locale = icu::Locale::forLanguageTag((*iter).c_str(), status);
         locale.addLikelySubtags(status);
         const char* baseName = locale.getBaseName();
         if (baseName != nullptr) {
             std::string baseNameStr(baseName);
             std::replace(baseNameStr.begin(), baseNameStr.end(), '_', '-');
-            result.insert(baseNameStr);
+            extendWhiteLanguageList.insert(baseNameStr);
         }
     }
-    return result;
 }
 
 void LocaleConfig::GetRelatedLocales(unordered_set<string> &relatedLocales, vector<string> countries)
@@ -584,6 +582,7 @@ bool LocaleConfig::InitializeLists()
     GetListFromFile(SUPPORT_LOCALES_PATH, SUPPORT_LOCALES_NAME, supportLocales);
     GetListFromFile(OVERRIDE_SUPPORTED_REGIONS_PATH, OVERRIDE_SUPPORTED_REGIONS_NAME, overrideSupportedRegions);
     GetListFromFile(DIALECT_LANGS_PATH, DIALECT_LANGS_NAME, dialectLang);
+    ExtendWhiteLanguages();
     return true;
 }
 

@@ -253,7 +253,7 @@ private:
      * @return std::string Return locale Tag.
      */
     static std::string RemoveLocalDigitFromLocale(const std::string &localDigitTag);
-    static std::set<std::string> ExtendAllowLanguages();
+    static void ExtendWhiteLanguages();
     static std::unordered_set<std::string> supportedLocales;
     static std::unordered_set<std::string> supportedRegions;
     static std::unordered_set<std::string> supportLocales;
@@ -263,6 +263,7 @@ private:
     static std::unordered_set<std::string> blockedRegions;
     static std::unordered_map<std::string, std::unordered_set<std::string>> blockedLanguageRegions;
     static std::unordered_set<std::string> whiteLanguages;
+    static std::set<std::string> extendWhiteLanguageList;
     static std::map<std::string, std::string> supportedDialectLocales;
     static std::unordered_map<std::string, std::string> dialectMap;
     static std::unordered_map<std::string, std::string> localDigitMap;
