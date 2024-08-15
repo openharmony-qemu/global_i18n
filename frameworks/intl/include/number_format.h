@@ -95,7 +95,6 @@ private:
     static const int DEFAULT_FRACTION_DIGITS = 3;
     static const char *DEVICE_TYPE_NAME;
     static const int BUFFER_LEN = 10;
-    static const char *NUM_TO_CCY_PATH;
     static std::unordered_map<std::string, std::string> num2Ccy;
     icu::MeasureUnit unitArray[MAX_UNIT_NUM];
     static bool icuInitialized;
@@ -108,7 +107,7 @@ private:
     static std::unordered_map<std::string, UNumberUnitWidth> defaultUnitStyle;
     static std::unordered_map<std::string, UNumberUnitWidth> defaultCurrencyStyle;
     static std::map<std::string, std::string> RelativeTimeFormatConfigs;
-    static bool ReadISO4217Ddatas(const char *xmlPath);
+    static bool ReadISO4217Ddatas();
     std::string GetCurrency(const std::string& currency);
     void CreateRelativeTimeFormat(const std::string& locale);
     void ParseConfigs(std::map<std::string, std::string> &configs);

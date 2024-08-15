@@ -14,9 +14,6 @@
  */
 #include "locale_config.h"
 
-#include "libxml/globals.h"
-#include "libxml/tree.h"
-#include "libxml/parser.h"
 #include "ohos/init_data.h"
 #include "parameter.h"
 #include "unicode/uenum.h"
@@ -29,7 +26,6 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 const char* NumberFormat::DEVICE_TYPE_NAME = "const.product.devicetype";
-const char* NumberFormat::NUM_TO_CCY_PATH = "/system/usr/ohos_locale_config/iso_4217.xml";
 std::unordered_map<std::string, std::string> NumberFormat::num2Ccy = {};
 bool NumberFormat::icuInitialized = NumberFormat::Init();
 
@@ -556,13 +552,13 @@ void NumberFormat::SetDefaultStyle()
     }
 }
 
-bool NumberFormat::ReadISO4217Ddatas(const char *xmlPath)
+bool NumberFormat::ReadISO4217Ddatas()
 {
     UErrorCode status = U_ZERO_ERROR;
     const char *currentCurrency;
-    UEnumeration *currencies = ucurr_openISOCurrencies_72(UCURR_COMMON, &status);
+    UEnumeration *currencies = ucurr_openISOCurrencies_72(UCURR_ALL, &status);
     if (U_FAILURE(status)) {
-       return false;
+        return false;
     }
 
     while ((currentCurrency = uenum_next(currencies, NULL, &status)) != NULL) {
@@ -574,8 +570,8 @@ bool NumberFormat::ReadISO4217Ddatas(const char *xmlPath)
             continue;
         }
         std::stringstream ss;
-        ss << std::setw(3) << std::setfill('0') << numCode;
-        num2Ccy.insert(std::make_pair<std::string, std::string>(ss.str().c_str(), currentCurrency));
+        ss << std::setw(3) << std::setfill('0') << numCode; // 3-digit code
+        num2Ccy.insert(std::make_pair<std::string, std::string>(ss.str(), currentCurrency));
     }
     uenum_close(currencies);
     return !num2Ccy.empty();
@@ -584,7 +580,7 @@ bool NumberFormat::ReadISO4217Ddatas(const char *xmlPath)
 std::string NumberFormat::GetCurrency(const std::string& currency)
 {
     if (num2Ccy.empty()) {
-        if (!ReadISO4217Ddatas(NUM_TO_CCY_PATH)) {
+        if (!ReadISO4217Ddatas()) {
             return currency;
         }
     }
