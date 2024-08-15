@@ -427,8 +427,9 @@ bool LocaleConfig::IsSuggested(const string &language)
     vector<string> simCountries;
     GetCountriesFromSim(simCountries);
     GetRelatedLocales(relatedLocales, simCountries);
+    std::set<std::string> extendWhiteLanguage = ExtendAllowLanguages();
     for (auto iter = relatedLocales.begin(); iter != relatedLocales.end();) {
-        if (whiteLanguages.find(*iter) == whiteLanguages.end()) {
+        if (extendWhiteLanguage.find(*iter) == extendWhiteLanguage.end()) {
             iter = relatedLocales.erase(iter);
         } else {
             ++iter;
@@ -443,8 +444,9 @@ bool LocaleConfig::IsSuggested(const std::string &language, const std::string &r
     unordered_set<string> relatedLocales;
     vector<string> countries { region };
     GetRelatedLocales(relatedLocales, countries);
+    std::set<std::string> extendWhiteLanguage = ExtendAllowLanguages();
     for (auto iter = relatedLocales.begin(); iter != relatedLocales.end();) {
-        if (whiteLanguages.find(*iter) == whiteLanguages.end()) {
+        if (extendWhiteLanguage.find(*iter) == extendWhiteLanguage.end()) {
             iter = relatedLocales.erase(iter);
         } else {
             ++iter;
@@ -452,6 +454,23 @@ bool LocaleConfig::IsSuggested(const std::string &language, const std::string &r
     }
     string mainLanguage = GetMainLanguage(language);
     return relatedLocales.find(mainLanguage) != relatedLocales.end();
+}
+
+std::set<std::string> LocaleConfig::ExtendAllowLanguages()
+{
+    std::set<std::string> result;
+    UErrorCode status = U_ZERO_ERROR;
+    for (auto iter = whiteLanguages.begin(); iter != whiteLanguages.end(); ++iter) {
+        icu::Locale locale = icu::Locale::forLanguageTag((*iter).c_str(), status);
+        locale.addLikelySubtags(status);
+        const char* baseName = locale.getBaseName();
+        if (baseName != nullptr) {
+            std::string baseNameStr(baseName);
+            std::replace(baseNameStr.begin(), baseNameStr.end(), '_', '-');
+            result.insert(baseNameStr);
+        }
+    }
+    return result;
 }
 
 void LocaleConfig::GetRelatedLocales(unordered_set<string> &relatedLocales, vector<string> countries)
