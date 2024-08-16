@@ -13,9 +13,10 @@
      limitations under the License.
 -->
 <supported_locales>
-    <item>en-Latn</item>
+    <item>en</item>
     <item>zh-Hans</item>
     <item>zh-Hant</item>
+    <item>zh-Hant-HK</item>
     <item>bo</item>
     <item>ug</item>
 </supported_locales>

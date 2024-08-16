@@ -15,30 +15,26 @@
 <languages>
     <lang>
         <id>zh</id>
-        <display_name>Chinese</display_name>
+        <display_name>中文</display_name>
     </lang>
     <lang>
         <id>zh-Hans</id>
-        <display_name>Simplified Chinese</display_name>
+        <display_name>簡體中文</display_name>
     </lang>
     <lang>
         <id>zh-Hant</id>
-        <display_name>Traditional Chinese</display_name>
+        <display_name>繁體中文</display_name>
+    </lang>
+    <lang>
+        <id>zh-Hant-HK</id>
+        <display_name>繁體中文（中國香港）</display_name>
     </lang>
     <lang>
         <id>ro</id>
-        <display_name>Romanian</display_name>
-    </lang>
-    <lang>
-        <id>ro-MD</id>
-        <display_name>Moldavian</display_name>
+        <display_name>羅馬尼亞文</display_name>
     </lang>
     <lang>
         <id>fa</id>
-        <display_name>Persian</display_name>
-    </lang>
-    <lang>
-        <id>fa-AF</id>
-        <display_name>Dari</display_name>
+        <display_name>波斯文</display_name>
     </lang>
 </languages>
