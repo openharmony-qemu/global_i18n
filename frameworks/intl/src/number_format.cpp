@@ -13,8 +13,15 @@
  * limitations under the License.
  */
 #include "locale_config.h"
+
+#include "cctype"
+#include "i18n_hilog.h"
 #include "ohos/init_data.h"
 #include "parameter.h"
+#include "sstream"
+#include "unicode/ucurr.h"
+#include "unicode/uenum.h"
+#include "unicode/utypes.h"
 #include "utils.h"
 #include "number_format.h"
 
@@ -22,6 +29,7 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 const char* NumberFormat::DEVICE_TYPE_NAME = "const.product.devicetype";
+std::unordered_map<std::string, std::string> NumberFormat::numToCurrency = {};
 bool NumberFormat::icuInitialized = NumberFormat::Init();
 
 std::unordered_map<std::string, UNumberUnitWidth> NumberFormat::unitStyle = {
@@ -246,7 +254,7 @@ void NumberFormat::ParseConfigs(std::map<std::string, std::string> &configs)
         }
     }
     if (styleString == "currency" && configs.count("currency") > 0) {
-        currency = configs["currency"];
+        currency = GetCurrencyFromConfig(configs["currency"]);
         if (configs.count("currencySign") > 0) {
             currencySign = configs["currencySign"];
         }
@@ -545,6 +553,57 @@ void NumberFormat::SetDefaultStyle()
             currencyDisplay = defaultCurrencyStyle[deviceType];
         }
     }
+}
+
+bool NumberFormat::ReadISO4217Ddatas()
+{
+    if (numToCurrency.size()) {
+        return true;
+    }
+    UErrorCode status = U_ZERO_ERROR;
+    const char *currentCurrency;
+    UEnumeration *currencies = ucurr_openISOCurrencies(UCURR_ALL, &status);
+    if (U_FAILURE(status)) {
+        return false;
+    }
+
+    while ((currentCurrency = uenum_next(currencies, NULL, &status)) != NULL) {
+        UChar code[4];  // 3 letters + 1 NUL
+        int32_t length = (int32_t)uprv_strlen(currentCurrency);
+        u_charsToUChars(currentCurrency, code, length + 1);  // +1 includes the NUL
+        int32_t numCode = ucurr_getNumericCode(code);
+        if (numCode == 0) {
+            continue;
+        }
+        std::stringstream ss;
+        ss << std::setw(3) << std::setfill('0') << numCode; // 3-digit code
+        numToCurrency.insert(std::make_pair<std::string, std::string>(ss.str(), currentCurrency));
+    }
+    uenum_close(currencies);
+    return !numToCurrency.empty();
+}
+
+std::string NumberFormat::GetCurrencyFromConfig(const std::string& currency)
+{
+    if (currency.size() != 3) { // 3-digit code
+        HILOG_ERROR_I18N("Invalid currency code : %{public}s", currency.c_str());
+        return "";
+    }
+    bool isAlpha = true;
+    for (auto c : currency) {
+        isAlpha = std::isalpha(c);
+        if (!isAlpha) {
+            break;
+        }
+    }
+    if (isAlpha) {
+        return currency;
+    }
+    if (ReadISO4217Ddatas() && numToCurrency.find(currency) != numToCurrency.end()) {
+        return numToCurrency[currency];
+    }
+    HILOG_ERROR_I18N("Invalid currency code : %{public}s", currency.c_str());
+    return "";
 }
 } // namespace I18n
 } // namespace Global
