@@ -562,7 +562,7 @@ bool NumberFormat::ReadISO4217Ddatas()
     }
 
     while ((currentCurrency = uenum_next(currencies, NULL, &status)) != NULL) {
-        UChar code[8];
+        UChar code[4];  // 3 letters + 1 NUL
         int32_t length = (int32_t)uprv_strlen(currentCurrency);
         u_charsToUChars(currentCurrency, code, length + 1);  // +1 includes the NUL
         int32_t numCode = ucurr_getNumericCode_72(code);
