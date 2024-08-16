@@ -39,6 +39,7 @@
 #include "locale_info.h"
 #include "locale_matcher.h"
 #include "measure_data.h"
+#include "multi_users.h"
 #include "number_format.h"
 #include "parameter.h"
 #include "phone_number_format.h"
@@ -1826,6 +1827,40 @@ HWTEST_F(IntlTest, IntlFuncTest0097, TestSize.Level1)
     calendarMock->CompareDays(1684742124650);
     bool isWeekend = calendarMock->IsWeekend();
     EXPECT_FALSE(isWeekend);
+}
+
+/**
+ * @tc.name: IntlFuncTest00103
+ * @tc.desc: Test Intl multi users
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest00103, TestSize.Level1)
+{
+    std::string path = "/data/service/el1/public/i18n/global/GlobalParamData";
+    OHOS::NativePreferences::Options opt(path);
+    int status;
+    std::shared_ptr<NativePreferences::Preferences> preferences =
+        NativePreferences::PreferencesHelper::GetPreferences(opt, status);
+    MultiUsers::AddUser("101");
+    MultiUsers::SwitchUser("101");
+    MultiUsers::RemoveUser("100");
+    if (preferences != nullptr) {
+        std::string language = preferences->GetString("languageData", "");
+        std::string locale = preferences->GetString("localeData", "");
+        std::string is24Hour = preferences->GetString("is24HourData", "");
+        EXPECT_EQ(language, "101:zh-Hans");
+        EXPECT_EQ(locale, "101:zh-Hans-CN");
+        EXPECT_EQ(is24Hour, "101:false");
+    }
+    MultiUsers::RemoveUser("101");
+    if (preferences != nullptr) {
+        std::string language = preferences->GetString("languageData", "");
+        std::string locale = preferences->GetString("localeData", "");
+        std::string is24Hour = preferences->GetString("is24HourData", "");
+        EXPECT_EQ(language, "");
+        EXPECT_EQ(locale, "");
+        EXPECT_EQ(is24Hour, "");
+    }
 }
 } // namespace I18n
 } // namespace Global

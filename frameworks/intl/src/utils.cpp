@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include <climits>
 #include <algorithm>
+#include <climits>
 #include <filesystem>
 #include <fstream>
 #include <dirent.h>
@@ -55,6 +55,19 @@ void Split(const string &src, const string &sep, vector<string> &dest)
     }
     if (begin != src.size()) {
         dest.push_back(src.substr(begin));
+    }
+}
+
+void Merge(const std::vector<std::string>& src, const std::string& sep, std::string& dest)
+{
+    if (src.size() == 0) {
+        dest = "";
+        return;
+    }
+    dest = src[0];
+    for (size_t i = 1; i < src.size(); ++i) {
+        dest += sep;
+        dest += src[i];
     }
 }
 

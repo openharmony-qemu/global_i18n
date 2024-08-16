@@ -52,6 +52,7 @@ ohos_unittest("intl_test") {
     "libphonenumber:phonenumber_standard",
     "libpng:libpng",
     "openssl:libssl_shared",
+    "preferences:native_preferences",
   ]
   if (i18n_support_app_preferred_language) {
     defines = [ "SUPPORT_APP_PREFERRED_LANGUAGE" ]

@@ -27,6 +27,7 @@
 #include "ipc_skeleton.h"
 #include "libxml/parser.h"
 #include "locale_info.h"
+#include "multi_users.h"
 #include "unicode/localebuilder.h"
 #include "unicode/locdspnm.h"
 #include "unicode/locid.h"
@@ -1076,7 +1077,7 @@ bool LocaleConfig::IsEmpty24HourClock()
 bool LocaleConfig::Is24HourClock()
 {
     std::string is24Hour = ReadSystemParameter(HOUR_KEY, CONFIG_LEN);
-    if (is24Hour.empty()) {
+    if (is24Hour.compare("default") == 0) {
         std::string systemLocale = GetSystemLocale();
         return Is24HourLocale(systemLocale);
     }
@@ -1188,6 +1189,7 @@ I18nErrorCode LocaleConfig::SetSystemLanguage(const std::string &languageTag)
     }
     std::string newLocaleTag = UpdateLanguageOfLocale(languageTag);
     if (SetSystemLocale(newLocaleTag) == I18nErrorCode::SUCCESS) {
+        MultiUsers::SaveLanguage("", languageTag);
         return I18nErrorCode::SUCCESS;
     }
     // reset system language to old language in case that system language is inconsist with system locale's lanuage.
@@ -1214,6 +1216,7 @@ I18nErrorCode LocaleConfig::SetSystemLocale(const std::string &localeTag)
     if (SetParameter(LOCALE_KEY, localeTag.data()) != 0) {
         return I18nErrorCode::UPDATE_SYSTEM_LOCALE_FAILED;
     }
+    MultiUsers::SaveLocale("", localeTag);
 #ifdef SUPPORT_GRAPHICS
     UpdateConfiguration(AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE, localeTag);
     return PublishCommonEvent(EventFwk::CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED);
@@ -1224,7 +1227,7 @@ I18nErrorCode LocaleConfig::SetSystemLocale(const std::string &localeTag)
 
 bool LocaleConfig::IsValid24HourClockValue(const std::string &tag)
 {
-    if (tag.compare("true") == 0 || tag.compare("false") == 0 || tag.length() == 0) {
+    if (tag.compare("true") == 0 || tag.compare("false") == 0 || tag.compare("default") == 0) {
         return true;
     }
     return false;
@@ -1241,6 +1244,7 @@ I18nErrorCode LocaleConfig::Set24HourClock(const std::string &option)
             option.c_str());
         return I18nErrorCode::UPDATE_24_HOUR_CLOCK_FAILED;
     }
+    MultiUsers::SaveIs24Hour("", option);
 #ifdef SUPPORT_GRAPHICS
     UpdateConfiguration(AAFwk::GlobalConfigurationKey::SYSTEM_HOUR, option);
     return PublishCommonEvent(EventFwk::CommonEventSupport::COMMON_EVENT_TIME_CHANGED);
@@ -1424,6 +1428,21 @@ std::string LocaleConfig::CreateLocaleFromRegion(const std::string &regionTag)
         return "";
     }
     return localeTag;
+}
+
+std::string LocaleConfig::GetLanguageKey()
+{
+    return LANGUAGE_KEY;
+}
+
+std::string LocaleConfig::GetLocaleKey()
+{
+    return LOCALE_KEY;
+}
+
+std::string LocaleConfig::GetHourKey()
+{
+    return HOUR_KEY;
 }
 } // namespace I18n
 } // namespace Global

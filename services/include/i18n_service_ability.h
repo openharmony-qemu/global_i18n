@@ -18,6 +18,7 @@
 
 #include "event_handler.h"
 #include "i18n_service_ability_stub.h"
+#include "i18n_service_event.h"
 #include "system_ability.h"
 
 namespace OHOS {
@@ -48,7 +49,7 @@ protected:
     /**
      * @brief Called when i18n service start.
      */
-    void OnStart() override;
+    void OnStart(const SystemAbilityOnDemandReason& startReason) override;
 
     /**
      * @brief Called when i18n service stop.
@@ -58,6 +59,7 @@ protected:
 private:
     // i18n service unload event handler.
     std::shared_ptr<AppExecFwk::EventHandler> handler;
+    I18nServiceEvent* i18nServiceEvent = nullptr;
 };
 } // namespace I18n
 } // namespace Global
