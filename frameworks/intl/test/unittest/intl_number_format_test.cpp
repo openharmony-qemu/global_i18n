@@ -117,6 +117,76 @@ HWTEST_F(IntlTest, IntlFuncTest00100, TestSize.Level1)
     string minimumIntegerDigits = "7";
     string maximumFractionDigits = "2";
     string style = "currency";
+    string currency = "a1b";
+    map<string, string> options = { { "useGrouping", useGrouping },
+                                    { "style", style },
+                                    { "currency", currency },
+                                    { "currencyDisplay", "name" },
+                                    { "currencySign", "accounting" },
+                                    { "signDisplay", "always" } };
+    NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
+    if (!numFmt) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    string out = numFmt->Format(123456.789);
+    EXPECT_EQ(out, expects);
+    EXPECT_EQ(numFmt->GetUseGrouping(), useGrouping);
+    EXPECT_EQ(numFmt->GetStyle(), style);
+    EXPECT_EQ(numFmt->GetCurrency(), "");
+    delete numFmt;
+}
+
+/**
+ * @tc.name: IntlFuncTest00101
+ * @tc.desc: Test Intl NumberFormat.format
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest00101, TestSize.Level1)
+{
+    string locale = "en-IN";
+    string expects = "+1,23,456.789";
+    vector<string> locales;
+    locales.push_back(locale);
+    string useGrouping = "true";
+    string minimumIntegerDigits = "7";
+    string maximumFractionDigits = "2";
+    string style = "currency";
+    string currency = "a#b";
+    map<string, string> options = { { "useGrouping", useGrouping },
+                                    { "style", style },
+                                    { "currency", currency },
+                                    { "currencyDisplay", "name" },
+                                    { "currencySign", "accounting" },
+                                    { "signDisplay", "always" } };
+    NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
+    if (!numFmt) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    string out = numFmt->Format(123456.789);
+    EXPECT_EQ(out, expects);
+    EXPECT_EQ(numFmt->GetUseGrouping(), useGrouping);
+    EXPECT_EQ(numFmt->GetStyle(), style);
+    EXPECT_EQ(numFmt->GetCurrency(), "");
+    delete numFmt;
+}
+
+/**
+ * @tc.name: IntlFuncTest00102
+ * @tc.desc: Test Intl NumberFormat.format
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest00102, TestSize.Level1)
+{
+    string locale = "en-IN";
+    string expects = "+1,23,456.789";
+    vector<string> locales;
+    locales.push_back(locale);
+    string useGrouping = "true";
+    string minimumIntegerDigits = "7";
+    string maximumFractionDigits = "2";
+    string style = "currency";
     string currency = "ab";
     map<string, string> options = { { "useGrouping", useGrouping },
                                     { "style", style },

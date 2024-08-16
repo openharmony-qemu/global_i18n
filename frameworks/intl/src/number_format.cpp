@@ -589,11 +589,14 @@ std::string NumberFormat::GetCurrencyFromConfig(const std::string& currency)
         HILOG_ERROR_I18N("Invalid currency code : %{public}s", currency.c_str());
         return "";
     }
-    bool isDigit = false;
+    bool isAlpha = true;
     for (auto c : currency) {
-        isDigit = std::isdigit(c);
+        isAlpha = std::isalpha(c);
+        if (!isAlpha) {
+            break;
+        }
     }
-    if (!isDigit) {
+    if (isAlpha) {
         return currency;
     }
     if (ReadISO4217Ddatas() && numToCurrency.find(currency) != numToCurrency.end()) {
