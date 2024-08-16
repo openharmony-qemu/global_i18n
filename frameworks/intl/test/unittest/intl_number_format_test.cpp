@@ -75,7 +75,7 @@ HWTEST_F(IntlTest, IntlFuncTest0098, TestSize.Level1)
 HWTEST_F(IntlTest, IntlFuncTest0099, TestSize.Level1)
 {
     string locale = "en-IN";
-    string expects = "+1,23,456.79";
+    string expects = "+1,23,456.789";
     vector<string> locales;
     locales.push_back(locale);
     string useGrouping = "true";
@@ -110,7 +110,7 @@ HWTEST_F(IntlTest, IntlFuncTest0099, TestSize.Level1)
 HWTEST_F(IntlTest, IntlFuncTest00100, TestSize.Level1)
 {
     string locale = "en-IN";
-    string expects = "+1,23,456.79";
+    string expects = "+1,23,456.789";
     vector<string> locales;
     locales.push_back(locale);
     string useGrouping = "true";
