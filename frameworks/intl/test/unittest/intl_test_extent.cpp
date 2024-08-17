@@ -1745,6 +1745,7 @@ HWTEST_F(IntlTest, IntlFuncTest0095, TestSize.Level1)
         EXPECT_TRUE(pnMatch == nullptr);
     }
 }
+
 /**
  * @tc.name: IntlFuncTest0096
  * @tc.desc: Test RegexRule
