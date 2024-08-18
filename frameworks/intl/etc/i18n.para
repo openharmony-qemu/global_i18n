@@ -12,7 +12,7 @@
 # limitations under the License.
 persist.global.language=zh-Hans
 persist.global.locale=zh-Hans-CN
-persist.global.is24Hour=
+persist.global.is24Hour=default
 persist.global.preferredLanguages=
 const.global.language=zh-Hans
 const.global.locale=zh-Hans-CN

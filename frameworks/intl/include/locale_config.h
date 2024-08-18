@@ -105,6 +105,9 @@ public:
     static bool IsValidRegion(const std::string &region);
     static bool IsValidTag(const std::string &tag);
     static bool IsValid24HourClockValue(const std::string &tag);
+    static std::string GetLanguageKey();
+    static std::string GetLocaleKey();
+    static std::string GetHourKey();
 
 private:
     static void Split(const std::string &src, const std::string &sep, std::vector<std::string> &dest);

@@ -67,6 +67,7 @@ ohos_shared_library("i18n_sa") {
   sources = [
     "./src/i18n_service_ability.cpp",
     "./src/i18n_service_ability_stub.cpp",
+    "./src/i18n_service_event.cpp",
   ]
   include_dirs = [
     "./include",
@@ -79,6 +80,7 @@ ohos_shared_library("i18n_sa") {
     "../frameworks/intl:preferred_language",
   ]
   external_deps = [
+    "ability_base:want",
     "ability_runtime:ability_manager",
     "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",

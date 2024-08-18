@@ -108,6 +108,7 @@ ohos_shared_library("intl_util") {
     "src/locale_matcher.cpp",
     "src/locale_util.cpp",
     "src/measure_data.cpp",
+    "src/multi_users.cpp",
     "src/number_format.cpp",
     "src/phone_number_format.cpp",
     "src/plural_rules.cpp",
@@ -168,6 +169,7 @@ ohos_shared_library("intl_util") {
     "libxml2:libxml2",
     "openssl:libcrypto_shared",
     "openssl:libssl_shared",
+    "os_account:os_account_innerkits",
     "preferences:native_preferences",
   ]
   public_external_deps = []

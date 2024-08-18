@@ -18,6 +18,7 @@
 #include "locale_config.h"
 #include "mem_mgr_client.h"
 #include "mem_mgr_proxy.h"
+#include "multi_users.h"
 #include "preferred_language.h"
 #include "preferences.h"
 #include "preferences_helper.h"
@@ -93,9 +94,15 @@ void I18nServiceAbility::UnloadI18nServiceAbility()
     }
 }
 
-void I18nServiceAbility::OnStart()
+void I18nServiceAbility::OnStart(const SystemAbilityOnDemandReason& startReason)
 {
     HILOG_INFO_I18N("I18nServiceAbility start.");
+    i18nServiceEvent = new I18nServiceEvent();
+    if (i18nServiceEvent != nullptr) {
+        i18nServiceEvent->SubscriberEvent();
+        i18nServiceEvent->CheckStartReason(startReason);
+    }
+    MultiUsers::InitMultiUser();
     bool status = Publish(this);
     if (status) {
         HILOG_INFO_I18N("I18nServiceAbility Publish success.");
@@ -112,6 +119,10 @@ void I18nServiceAbility::OnStop()
 {
     int pid = getpid();
     Memory::MemMgrClient::GetInstance().NotifyProcessStatus(pid, 1, 0, I18N_SA_ID);
+    if (i18nServiceEvent != nullptr) {
+        delete i18nServiceEvent;
+        i18nServiceEvent = nullptr;
+    }
     HILOG_INFO_I18N("I18nServiceAbility Stop.");
 }
 } // namespace I18n
