@@ -256,12 +256,25 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest009, TestSize.Level1)
 
 /**
  * @tc.name: LocaleConfigFuncTest010
- * @tc.desc: Test LocaleConfig GetDisplayRegion
+ * @tc.desc: Test LocaleConfig GetDisplayLanguage
  * @tc.type: FUNC
  */
 HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest010, TestSize.Level1)
 {
-    EXPECT_EQ(LocaleConfig::GetDisplayRegion("zh-Hans-CN", "en-US", true), "China");
+    std::string languageTag = "zh-Hant-HK";
+    std::string localeTag = "zh-Hant";
+    std::string displayName = LocaleConfig::GetDisplayLanguage(languageTag, localeTag, true);
+    EXPECT_EQ(displayName, "繁體中文（中國香港）");
+
+    languageTag = "zh-Hant-HK";
+    localeTag = "zh-Hans";
+    displayName = LocaleConfig::GetDisplayLanguage(languageTag, localeTag, true);
+    EXPECT_EQ(displayName, "繁体中文（中国香港）");
+
+    languageTag = "zh-Hant-HK";
+    localeTag = "en-US";
+    displayName = LocaleConfig::GetDisplayLanguage(languageTag, localeTag, true);
+    EXPECT_EQ(displayName, "Traditional Chinese(Hong Kong, China)");
 }
 
 /**
@@ -272,6 +285,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest010, TestSize.Level1)
 HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest011, TestSize.Level1)
 {
     EXPECT_EQ(LocaleConfig::GetDisplayRegion("zh", "en-US", true), "");
+    EXPECT_EQ(LocaleConfig::GetDisplayRegion("zh-Hans-CN", "en-US", true), "China");
 }
 
 /**
