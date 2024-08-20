@@ -1248,7 +1248,7 @@ HWTEST_F(IntlTest, IntlFuncTest0081, TestSize.Level1)
     std::string insensitive = "False";
     std::string type = "xxx";
     std::string input = "(010)86753564";
-    size_t start = 10;
+    size_t start = 0;
     std::string rawStr = "1 800 234 45 67";
     i18n::phonenumbers::PhoneNumber phoneNumber;
     std::unique_ptr<PhoneNumberMatch> possibleNumber =
