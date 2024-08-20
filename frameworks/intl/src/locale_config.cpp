@@ -700,13 +700,13 @@ std::string LocaleConfig::ComputeLocale(const std::string &displayLocale)
         xmlKeepBlanksDefault(0);
         xmlDocPtr doc = xmlParseFile(SUPPORT_LOCALES_PATH);
         if (!doc) {
-            return DEFAULT_LOCALE;
+            return "";
         }
         xmlNodePtr cur = xmlDocGetRootElement(doc);
         if (!cur || xmlStrcmp(cur->name, reinterpret_cast<const xmlChar *>(supportLocalesTag))) {
             xmlFreeDoc(doc);
             HILOG_INFO_I18N("can not parse language supported locale file");
-            return DEFAULT_LOCALE;
+            return "";
         }
         cur = cur->xmlChildrenNode;
         while (cur != nullptr) {
@@ -732,7 +732,7 @@ std::string LocaleConfig::ComputeLocale(const std::string &displayLocale)
     if (supportedDialectLocales.find(maximizeLocale) != supportedDialectLocales.end()) {
         return supportedDialectLocales.at(maximizeLocale);
     }
-    return DEFAULT_LOCALE;
+    return "";
 }
 
 void LocaleConfig::SetSupportedDialectLocales(const char* key, const char* value)
@@ -852,6 +852,9 @@ void LocaleConfig::ReadRegionData(const char *regionDataPath)
 string LocaleConfig::GetDisplayLanguageWithDialect(const std::string &localeStr, const std::string &displayLocale)
 {
     std::string finalLocale = ComputeLocale(displayLocale);
+    if (finalLocale.empty()) {
+        return "";
+    }
     if (finalLocale.compare(currentDialectLocale) != 0) {
         std::string xmlPath = LANG_PATH + finalLocale + ".xml";
         locale2DisplayName.clear();
@@ -879,8 +882,7 @@ string LocaleConfig::GetDisplayLanguageWithDialect(const std::string &localeStr,
         }
     }
     if (locale2DisplayName.find(language) != locale2DisplayName.end()) {
-        string result = locale2DisplayName.at(language);
-        return result;
+        return locale2DisplayName.at(language);
     }
     return "";
 }

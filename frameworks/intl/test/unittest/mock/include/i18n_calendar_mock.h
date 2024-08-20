@@ -27,8 +27,6 @@ public:
     };
     ~I18nCalendarMock() override = default;
     MOCK_METHOD0(GetIcuCalendar, icu::Calendar*());
-private:
-    using I18nCalendar::GetIcuCalendar;
 };
 } // namespace I18n
 } // namespace Global
