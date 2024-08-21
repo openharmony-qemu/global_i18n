@@ -125,7 +125,7 @@ void SystemLocaleManager::SortLocaleItemList(std::vector<LocaleItem> &localeItem
 {
     std::vector<std::string> collatorLocaleTags { options.localeTag };
     std::map<std::string, std::string> collatorOptions {};
-    Collator *collator = new Collator(collatorLocaleTags, collatorOptions);
+    Collator *collator = new (std::nothrow) Collator(collatorLocaleTags, collatorOptions);
     if (collator == nullptr) {
         return;
     }
@@ -226,7 +226,7 @@ void SystemLocaleManager::SortTimezoneCityItemList(const std::string &locale,
 {
     std::vector<std::string> collatorLocaleTags { locale };
     std::map<std::string, std::string> collatorOptions {};
-    Collator *collator = new Collator(collatorLocaleTags, collatorOptions);
+    Collator *collator = new (std::nothrow) Collator(collatorLocaleTags, collatorOptions);
     if (collator == nullptr) {
         return;
     }

@@ -212,7 +212,7 @@ void I18nCalendar::Set(UCalendarDateFields field, int32_t value)
     }
 }
 
-int32_t I18nCalendar::Get(UCalendarDateFields field)
+int32_t I18nCalendar::Get(UCalendarDateFields field) const
 {
     icu::Calendar* icuCalendar = GetIcuCalendar();
     if (icuCalendar != nullptr) {
@@ -336,7 +336,7 @@ int32_t I18nCalendar::CompareDays(UDate date)
     return 0;
 }
 
-icu::Calendar* I18nCalendar::GetIcuCalendar()
+icu::Calendar* I18nCalendar::GetIcuCalendar() const
 {
     return this->calendar_;
 }
