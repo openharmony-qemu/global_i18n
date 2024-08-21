@@ -53,7 +53,7 @@ public:
     void Set(UCalendarDateFields field, int32_t value);
     std::string GetTimeZone(void);
     void SetTimeZone(std::string timezoneId);
-    int32_t Get(UCalendarDateFields field);
+    int32_t Get(UCalendarDateFields field) const;
     void Add(UCalendarDateFields field, int32_t amount);
     void SetMinimalDaysInFirstWeek(int32_t value);
     void SetFirstDayOfWeek(int32_t value);
@@ -66,7 +66,7 @@ public:
     int32_t CompareDays(UDate date);
 
 protected:
-    virtual icu::Calendar* GetIcuCalendar();
+    virtual icu::Calendar* GetIcuCalendar() const;
   
 private:
     icu::Calendar *calendar_;

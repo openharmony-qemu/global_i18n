@@ -26,7 +26,7 @@ public:
     I18nCalendarMock(std::string localeTag) : I18nCalendar(localeTag) {
     };
     ~I18nCalendarMock() override = default;
-    MOCK_METHOD0(GetIcuCalendar, icu::Calendar*());
+    MOCK_CONST_METHOD0(GetIcuCalendar, icu::Calendar*());
 };
 } // namespace I18n
 } // namespace Global
