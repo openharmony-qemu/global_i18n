@@ -95,6 +95,7 @@ private:
     static const int DEFAULT_FRACTION_DIGITS = 3;
     static const char *DEVICE_TYPE_NAME;
     static const int BUFFER_LEN = 10;
+    static const int CURRENCY_LEN = 3;
     static std::unordered_map<std::string, std::string> numToCurrency;
     icu::MeasureUnit unitArray[MAX_UNIT_NUM];
     static bool icuInitialized;

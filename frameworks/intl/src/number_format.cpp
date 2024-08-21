@@ -14,11 +14,11 @@
  */
 #include "locale_config.h"
 
-#include "cctype"
+#include <cctype>
+#include <sstream>
 #include "i18n_hilog.h"
 #include "ohos/init_data.h"
 #include "parameter.h"
-#include "sstream"
 #include "unicode/ucurr.h"
 #include "unicode/uenum.h"
 #include "unicode/utypes.h"
@@ -567,16 +567,16 @@ bool NumberFormat::ReadISO4217Ddatas()
         return false;
     }
 
-    while ((currentCurrency = uenum_next(currencies, NULL, &status)) != NULL) {
-        UChar code[4];  // 3 letters + 1 NUL
-        int32_t length = (int32_t)uprv_strlen(currentCurrency);
+    UChar code[CURRENCY_LEN + 1];  // +1 includes the NUL
+    int32_t length = 0;
+    while ((currentCurrency = uenum_next(currencies, &length, &status)) != NULL) {
         u_charsToUChars(currentCurrency, code, length + 1);  // +1 includes the NUL
         int32_t numCode = ucurr_getNumericCode(code);
         if (numCode == 0) {
             continue;
         }
         std::stringstream ss;
-        ss << std::setw(3) << std::setfill('0') << numCode; // 3-digit code
+        ss << std::setw(CURRENCY_LEN) << std::setfill('0') << numCode; // fill with '0'
         numToCurrency.insert(std::make_pair<std::string, std::string>(ss.str(), currentCurrency));
     }
     uenum_close(currencies);
@@ -585,7 +585,7 @@ bool NumberFormat::ReadISO4217Ddatas()
 
 std::string NumberFormat::GetCurrencyFromConfig(const std::string& currency)
 {
-    if (currency.size() != 3) { // 3-digit code
+    if (currency.size() != CURRENCY_LEN) {
         HILOG_ERROR_I18N("Invalid currency code : %{public}s", currency.c_str());
         return "";
     }
