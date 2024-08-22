@@ -84,6 +84,7 @@ private:
     std::string unitType;
     std::string unitMeasSys;
     bool createSuccess = false;
+    bool isSetFraction = false;
     std::unique_ptr<LocaleInfo> localeInfo = nullptr;
     std::unique_ptr<RelativeTimeFormat> relativeTimeFormat = nullptr;
     icu::number::LocalizedNumberFormatter numberFormat;

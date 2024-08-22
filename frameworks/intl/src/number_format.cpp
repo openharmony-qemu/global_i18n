@@ -217,6 +217,9 @@ void NumberFormat::InitDigitsProperties()
         int32_t minFractionDigits = ConvertString2Int(minimumFractionDigits, minFdStatus);
         int32_t maxFdStatus = 0;
         int32_t maxFractionDigits = ConvertString2Int(maximumFractionDigits, maxFdStatus);
+        if (minFdStatus == 0 || maxFdStatus == 0) {
+            isSetFraction = true;
+        }
         if (minFdStatus == 0 && maxFdStatus != 0) {
             numberFormat =
                 numberFormat.precision(icu::number::Precision::minFraction(minFractionDigits));
@@ -451,6 +454,9 @@ void NumberFormat::GetDigitsResolvedOptions(std::map<std::string, std::string> &
 
 void NumberFormat::SetPrecisionWithByte(double number, const std::string& finalUnit)
 {
+    if (isSetFraction) {
+        return;
+    }
     int32_t FractionDigits = -1;
     // 100 is the threshold between different decimal
     if (finalUnit == "byte" || number >= 100) {
