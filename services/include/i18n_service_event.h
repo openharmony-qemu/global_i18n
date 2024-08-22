@@ -35,6 +35,7 @@ public:
 
     void CheckStartReason(const SystemAbilityOnDemandReason& startReason);
     void SubscriberEvent();
+    void OnReceiveEvent(const EventFwk::CommonEventData& data);
 
 private:
     class I18nServiceSubscriber : public EventFwk::CommonEventSubscriber {
@@ -54,21 +55,9 @@ private:
         I18nServiceEvent& registry_;
     };
 
-    void UnSubscriberEvent();
-    void OnReceiveEvent(const EventFwk::CommonEventData& data);
-    
-    void HandleSwitchUser(const EventFwk::CommonEventData& data) const;
-    void HandleAddUser(const EventFwk::CommonEventData& data) const;
-    void HandleRemoveUser(const EventFwk::CommonEventData& data) const;
+    void HandleMultiUser(const std::string& action, const std::string& localId);
 
-    using EventHandle = std::function<void(const EventFwk::CommonEventData&)>;
-    typedef void (I18nServiceEvent::*HandleEventFunc)(const EventFwk::CommonEventData&) const;
-    std::unordered_map<std::string, EventHandle> eventHandles;
-    std::unordered_map<std::string, HandleEventFunc> handleEventFunc;
     std::shared_ptr<I18nServiceSubscriber> subscriber = nullptr;
-    std::string userSwitchKey;
-    std::string userAdded;
-    std::string userRemoved;
     static const int RETRY;
 };
 } // namespace I18n

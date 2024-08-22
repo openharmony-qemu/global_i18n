@@ -51,7 +51,7 @@ void MultiUsers::InitMultiUser()
         AddUser(localId);
         preferences->PutBool(INIT_KEY, true);
         preferences->Flush();
-        HILOG_ERROR_I18N("InitMultiUser: init multi user data success");
+        HILOG_INFO_I18N("InitMultiUser: init multi user data success");
     }
 }
 
@@ -70,7 +70,7 @@ void MultiUsers::SwitchUser(const std::string& curLocalId)
 void MultiUsers::AddUser(const std::string& localId)
 {
     if (!IsValidLocalId(localId)) {
-        HILOG_ERROR_I18N("AddUser: %{public}s is invalid local id", localId.c_str());
+        HILOG_ERROR_I18N("AddUser: localId is invalid");
         return;
     }
     I18nErrorCode errCode = SaveGlobalParam(localId);
@@ -82,7 +82,7 @@ void MultiUsers::AddUser(const std::string& localId)
 void MultiUsers::RemoveUser(const std::string& localId)
 {
     if (!IsValidLocalId(localId)) {
-        HILOG_ERROR_I18N("RemoveUser: %{public}s is invalid local id", localId.c_str());
+        HILOG_ERROR_I18N("RemoveUser: localId is invalid");
         return;
     }
     I18nErrorCode errCode = RemoveGlobalParam(localId);
@@ -118,7 +118,7 @@ I18nErrorCode MultiUsers::SaveLanguage(const std::string& localId, const std::st
     errCode =
         WriteMultiUsersParameter(MULTI_USERS_LANGUAGE_KEY, language, foregroundLocalId, false);
     if (errCode != I18nErrorCode::SUCCESS) {
-        HILOG_ERROR_I18N("SaveLanguage: save language of user %{public}s failed", foregroundLocalId.c_str());
+        HILOG_ERROR_I18N("SaveLanguage: save language failed");
         return I18nErrorCode::FAILED;
     }
     return I18nErrorCode::SUCCESS;
@@ -139,7 +139,7 @@ I18nErrorCode MultiUsers::SaveLocale(const std::string& localId, const std::stri
     errCode =
         WriteMultiUsersParameter(MULTI_USERS_LOCALE_KEY, locale, foregroundLocalId, false);
     if (errCode != I18nErrorCode::SUCCESS) {
-        HILOG_ERROR_I18N("SaveLocale: save locale of user %{public}s failed", foregroundLocalId.c_str());
+        HILOG_ERROR_I18N("SaveLocale: save locale failed");
         return I18nErrorCode::FAILED;
     }
     return I18nErrorCode::SUCCESS;
@@ -147,23 +147,19 @@ I18nErrorCode MultiUsers::SaveLocale(const std::string& localId, const std::stri
 
 I18nErrorCode MultiUsers::SaveIs24Hour(const std::string& localId, const std::string& is24Hour)
 {
-    HILOG_ERROR_I18N("TestLog: SaveIs24Hour start");
     std::string foregroundLocalId = localId;
     I18nErrorCode errCode = I18nErrorCode::SUCCESS;
     if (localId.empty()) {
-        HILOG_ERROR_I18N("TestLog: localId");
         errCode = MultiUsers::GetForegroundLocalId(foregroundLocalId);
     }
     if (errCode != I18nErrorCode::SUCCESS) {
-        HILOG_ERROR_I18N("TestLog: get foreground locale Id failed");
         HILOG_ERROR_I18N("SaveLanguage: get foreground locale Id failed");
         return I18nErrorCode::FAILED;
     }
-    HILOG_ERROR_I18N("TestLog: foregroundLocalId is %{public}s", foregroundLocalId.c_str());
     errCode =
         WriteMultiUsersParameter(MULTI_USERS_HOUR_KEY, is24Hour, foregroundLocalId, false);
     if (errCode != I18nErrorCode::SUCCESS) {
-        HILOG_ERROR_I18N("SaveIs24Hour: save is24Hour of user %{public}s failed", foregroundLocalId.c_str());
+        HILOG_ERROR_I18N("SaveIs24Hour: save is24Hour failed");
         return I18nErrorCode::FAILED;
     }
     return I18nErrorCode::SUCCESS;
@@ -176,17 +172,17 @@ I18nErrorCode MultiUsers::SaveGlobalParam(const std::string& localId)
     std::string is24Hour = ReadSystemParameter(LocaleConfig::GetHourKey().data(), CONFIG_LEN);
     I18nErrorCode errCode = SaveLanguage(localId, language);
     if (errCode != I18nErrorCode::SUCCESS) {
-        HILOG_ERROR_I18N("SaveGlobalParam: save language of user %{public}s failed", localId.c_str());
+        HILOG_ERROR_I18N("SaveGlobalParam: save language failed");
         return I18nErrorCode::FAILED;
     }
     errCode = SaveLocale(localId, locale);
     if (errCode != I18nErrorCode::SUCCESS) {
-        HILOG_ERROR_I18N("SaveGlobalParam: save locale of user %{public}s failed", localId.c_str());
+        HILOG_ERROR_I18N("SaveGlobalParam: save locale failed");
         return I18nErrorCode::FAILED;
     }
     errCode = SaveIs24Hour(localId, is24Hour);
     if (errCode != I18nErrorCode::SUCCESS) {
-        HILOG_ERROR_I18N("SaveGlobalParam: save is24Hour of user %{public}s failed", localId.c_str());
+        HILOG_ERROR_I18N("SaveGlobalParam: save is24Hour failed");
         return I18nErrorCode::FAILED;
     }
     return I18nErrorCode::SUCCESS;
@@ -196,19 +192,19 @@ I18nErrorCode MultiUsers::LoadGlobalParam(const std::string& localId)
 {
     std::string newLocale = ReadMultiUsersParameter(MULTI_USERS_LOCALE_KEY, localId);
     if (!newLocale.empty() && SetParameter(LocaleConfig::GetLocaleKey().data(), newLocale.data()) != 0) {
-        HILOG_ERROR_I18N("LoadGlobalParam: set locale %{public}s failed", newLocale.c_str());
+        HILOG_ERROR_I18N("LoadGlobalParam: set locale failed");
         return I18nErrorCode::FAILED;
     }
 
     std::string newLanguage = ReadMultiUsersParameter(MULTI_USERS_LANGUAGE_KEY, localId);
     if (!newLanguage.empty() && LocaleConfig::SetSystemLanguage(newLanguage) != 0) {
-        HILOG_ERROR_I18N("LoadGlobalParam: set language %{public}s failed", newLanguage.c_str());
+        HILOG_ERROR_I18N("LoadGlobalParam: set language failed");
         return I18nErrorCode::FAILED;
     }
 
     std::string newIs24Hour = ReadMultiUsersParameter(MULTI_USERS_HOUR_KEY, localId);
     if (!newIs24Hour.empty() && LocaleConfig::Set24HourClock(newIs24Hour) != 0) {
-        HILOG_ERROR_I18N("LoadGlobalParam: set is24Hour %{public}s failed", newIs24Hour.c_str());
+        HILOG_ERROR_I18N("LoadGlobalParam: set is24Hour failed");
         return I18nErrorCode::FAILED;
     }
     return I18nErrorCode::SUCCESS;
@@ -218,19 +214,19 @@ I18nErrorCode MultiUsers::RemoveGlobalParam(const std::string& localId)
 {
     I18nErrorCode errCode = WriteMultiUsersParameter(MULTI_USERS_LANGUAGE_KEY, "", localId, true);
     if (errCode != I18nErrorCode::SUCCESS) {
-        HILOG_ERROR_I18N("RemoveGlobalParam: remove language of user %{public}s failed", localId.c_str());
+        HILOG_ERROR_I18N("RemoveGlobalParam: remove language failed");
         return I18nErrorCode::FAILED;
     }
 
     errCode = WriteMultiUsersParameter(MULTI_USERS_LOCALE_KEY, "", localId, true);
     if (errCode != I18nErrorCode::SUCCESS) {
-        HILOG_ERROR_I18N("RemoveGlobalParam: remove locale of user %{public}s failed", localId.c_str());
+        HILOG_ERROR_I18N("RemoveGlobalParam: remove locale failed");
         return I18nErrorCode::FAILED;
     }
 
     errCode = WriteMultiUsersParameter(MULTI_USERS_HOUR_KEY, "", localId, true);
     if (errCode != I18nErrorCode::SUCCESS) {
-        HILOG_ERROR_I18N("RemoveGlobalParam: remove is24Hour of user %{public}s failed", localId.c_str());
+        HILOG_ERROR_I18N("RemoveGlobalParam: remove is24Hour failed");
         return I18nErrorCode::FAILED;
     }
     return I18nErrorCode::SUCCESS;
@@ -299,7 +295,7 @@ I18nErrorCode MultiUsers::WriteMultiUsersParameter(const std::string& paramKey, 
 bool MultiUsers::IsValidLocalId(const std::string& localId)
 {
     if (std::atoi(localId.c_str()) < DEFAULT_LOCAL_ID) {
-        HILOG_ERROR_I18N("IsValidLocalId: %{public}s is an invalid local ID", localId.c_str());
+        HILOG_ERROR_I18N("IsValidLocalId: invalid local ID");
         return false;
     }
     return true;
@@ -308,7 +304,7 @@ bool MultiUsers::IsValidLocalId(const std::string& localId)
 void MultiUsers::InitPreferences()
 {
     if (preferences == nullptr) {
-        HILOG_ERROR_I18N("InitPreferences: preferences Init");
+        HILOG_INFO_I18N("InitPreferences: preferences Init");
         OHOS::NativePreferences::Options opt(PREFERENCE_PATH);
         int status;
         preferences = NativePreferences::PreferencesHelper::GetPreferences(opt, status);
