@@ -463,6 +463,10 @@ void LocaleConfig::ExtendWhiteLanguages()
         extendWhiteLanguageList.insert(*iter);
         icu::Locale locale = icu::Locale::forLanguageTag((*iter).c_str(), status);
         locale.addLikelySubtags(status);
+        if (U_FAILURE(status)) {
+            HILOG_INFO_I18N("create Locale object for %{public}s failed.", (*iter).c_str());
+            continue;
+        }
         const char* baseName = locale.getBaseName();
         if (baseName != nullptr) {
             std::string baseNameStr(baseName);
