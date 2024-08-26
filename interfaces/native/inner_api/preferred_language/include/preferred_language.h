@@ -56,6 +56,14 @@ public:
     static std::string GetAppPreferredLanguage();
 
     /**
+     * @brief check App Language.
+     * Check whether the preferred language is set for the app.
+     *
+     * @return bool return whether preferred language is set.
+     */
+    static bool IsSetAppPreferredLanguage();
+
+    /**
      * @brief Set App Language.
      * The application interface will be refreshed in real time after call this method. And the language will be saved
      * to app preferences data which will be used the next time the application starts.
