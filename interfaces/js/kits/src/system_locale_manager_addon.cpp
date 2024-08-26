@@ -16,6 +16,7 @@
 #include "error_util.h"
 #include "i18n_hilog.h"
 #include "locale_config.h"
+#include "utils.h"
 #include "variable_convertor.h"
 #include "system_locale_manager_addon.h"
 
@@ -64,6 +65,10 @@ napi_value SystemLocaleManagerAddon::InitSystemLocaleManager(napi_env env, napi_
 
 napi_value SystemLocaleManagerAddon::SystemLocaleManagerConstructor(napi_env env, napi_callback_info info)
 {
+    if (!CheckSystemPermission()) {
+        HILOG_ERROR_I18N("Permission verification failed. A non-system application calls a system API.");
+        return nullptr;
+    }
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
