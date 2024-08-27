@@ -571,7 +571,8 @@ bool NumberFormat::ReadISO4217Ddatas()
         UChar code[4];  // 3 letters + 1 NUL
         int32_t length = (int32_t)uprv_strlen(currentCurrency);
         u_charsToUChars(currentCurrency, code, length + 1);  // +1 includes the NUL
-        int32_t numCode = ucurr_getNumericCode(code);
+        const UChar* currencyCode = code;
+        int32_t numCode = ucurr_getNumericCode(currencyCode);
         if (numCode == 0) {
             continue;
         }
