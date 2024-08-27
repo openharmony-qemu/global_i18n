@@ -32,7 +32,7 @@ ohos_shared_library("i18n_sa_client") {
     cfi_cross_dso = true
     debug = false
   }
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
 
   sources = [
     "./src/i18n_service_ability_client.cpp",
@@ -62,7 +62,7 @@ ohos_shared_library("i18n_sa") {
     cfi_cross_dso = true
     debug = false
   }
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
 
   sources = [
     "./src/i18n_service_ability.cpp",
