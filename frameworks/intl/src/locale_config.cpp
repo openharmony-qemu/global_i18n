@@ -1078,7 +1078,10 @@ std::string LocaleConfig::GetValidLocale(const std::string &localeTag)
 bool LocaleConfig::IsEmpty24HourClock()
 {
     std::string is24Hour = ReadSystemParameter(HOUR_KEY, CONFIG_LEN);
-    return is24Hour.empty();
+    if (is24Hour.compare("default") == 0) {
+        return true;
+    }
+    return false;
 }
 
 bool LocaleConfig::Is24HourClock()
