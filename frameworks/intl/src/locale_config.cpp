@@ -1199,9 +1199,6 @@ I18nErrorCode LocaleConfig::SetSystemLanguage(const std::string &languageTag)
     }
     std::string newLocaleTag = UpdateLanguageOfLocale(languageTag);
     if (SetSystemLocale(newLocaleTag) == I18nErrorCode::SUCCESS) {
-#ifdef SUPPORT_GRAPHICS
-        UpdateConfiguration(AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE, languageTag);
-#endif
         MultiUsers::SaveLanguage("", languageTag);
         return I18nErrorCode::SUCCESS;
     }
@@ -1231,6 +1228,7 @@ I18nErrorCode LocaleConfig::SetSystemLocale(const std::string &localeTag)
     }
     MultiUsers::SaveLocale("", localeTag);
 #ifdef SUPPORT_GRAPHICS
+    UpdateConfiguration(AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE, localeTag);
     return PublishCommonEvent(EventFwk::CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED);
 #else
     return I18nErrorCode::SUCCESS;
