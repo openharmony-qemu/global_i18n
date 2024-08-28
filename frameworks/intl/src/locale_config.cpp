@@ -289,6 +289,9 @@ string LocaleConfig::GetSystemLanguage()
     if (systemLanguage.empty()) {
         systemLanguage = ReadSystemParameter(DEFAULT_LANGUAGE_KEY, CONFIG_LEN);
     }
+    if (systemLanguage == "zh-Hant" && GetSystemRegion() == "HK") {
+        return "zh-Hant-HK";
+    }
     return systemLanguage;
 }
 
