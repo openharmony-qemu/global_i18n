@@ -317,7 +317,7 @@ napi_value I18nSystemAddon::SetAppPreferredLanguage(napi_env env, napi_callback_
     }
     UErrorCode icuStatus = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeTag.data(), icuStatus);
-    if (U_FAILURE(icuStatus) || !IsValidLocaleTag(locale)) {
+    if (U_FAILURE(icuStatus) || !(IsValidLocaleTag(locale) || localeTag.compare("default") == 0)) {
         HILOG_ERROR_I18N("SetAppPreferredLanguage does not support this locale");
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "language", "a valid language", true);
         return nullptr;
