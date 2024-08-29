@@ -39,6 +39,7 @@ ohos_fuzztest("DateTimeFilterFuzzTest") {
   external_deps = [
     "icu:shared_icui18n",
     "icu:shared_icuuc",
+    "libxml2:libxml2",
   ]
 
   subsystem_name = "global"
