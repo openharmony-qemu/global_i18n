@@ -157,6 +157,21 @@ std::shared_ptr<NativePreferences::Preferences> PreferredLanguage::GetI18nAppPre
     return preferences;
 }
 
+bool PreferredLanguage::IsSetAppPreferredLanguage()
+{
+    std::shared_ptr<NativePreferences::Preferences> preferences = GetI18nAppPreferences();
+    if (preferences == nullptr) {
+        HILOG_ERROR_I18N(
+            "PreferredLanguage::IsSetAppPreferredLanguage get i18n preferences failed, return system language.");
+        return false;
+    }
+    std::string res = preferences->GetString(PreferredLanguage::APP_LANGUAGE_KEY, "");
+    if (res.length() == 0 || res.compare("default") == 0) {
+        return false;
+    }
+    return true;
+}
+
 std::string PreferredLanguage::GetAppPreferredLanguage()
 {
     std::shared_ptr<NativePreferences::Preferences> preferences = GetI18nAppPreferences();
@@ -166,7 +181,7 @@ std::string PreferredLanguage::GetAppPreferredLanguage()
         return LocaleConfig::GetSystemLocale();
     }
     std::string res = preferences->GetString(PreferredLanguage::APP_LANGUAGE_KEY, "");
-    if (res.length() == 0) {
+    if (res.length() == 0 || res.compare("default") == 0) {
         return LocaleConfig::GetSystemLocale();
     }
     return res;
@@ -175,7 +190,9 @@ std::string PreferredLanguage::GetAppPreferredLanguage()
 void PreferredLanguage::SetAppPreferredLanguage(const std::string &language, I18nErrorCode &errCode)
 {
     std::shared_ptr<AbilityRuntime::ApplicationContext> appContext = AbilityRuntime::ApplicationContext::GetInstance();
-    appContext->SetLanguage(language);
+    if (language.compare("default") != 0) {
+        appContext->SetLanguage(language);
+    }
     std::shared_ptr<NativePreferences::Preferences> preferences = GetI18nAppPreferences();
     if (preferences == nullptr) {
         errCode = I18nErrorCode::FAILED;
