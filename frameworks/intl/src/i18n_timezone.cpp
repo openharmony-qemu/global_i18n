@@ -864,12 +864,17 @@ std::string I18nTimeZone::FindCityDisplayNameFromXml(std::string &cityID, std::s
         xmlNodePtr value = cur->xmlChildrenNode;
         xmlChar *contents[ELEMENT_NUM] = { 0 }; // 2 represent cityid, displayName;
         bool xmlNodeIsNull = false;
-        for (size_t i = 0; i < ELEMENT_NUM && value != nullptr; i++) {
+        for (size_t i = 0; i < ELEMENT_NUM; i++) {
+            if (value == nullptr) {
+                xmlNodeIsNull = true;
+                break;
+            }
             contents[i] = xmlNodeGetContent(value);
-            value = value->next;
             if (contents[i] == nullptr) {
                 xmlNodeIsNull = true;
+                break;
             }
+            value = value->next;
         }
         if (!xmlNodeIsNull && strcmp(cityID.c_str(), reinterpret_cast<const char *>(contents[0])) == 0) {
             displayName = reinterpret_cast<const char *>(contents[1]);
@@ -974,12 +979,12 @@ std::string I18nTimeZone::GetFallBack(std::string &requestLocaleStr)
         return iter->second;
     }
     std::vector<LocaleInfo*> matchLocaleList;
-    LocaleInfo* requestLocale = new LocaleInfo(requestLocaleStr);
+    std::unique_ptr<LocaleInfo> requestLocale = std::make_unique<LocaleInfo>(requestLocaleStr);
     for (auto it = supportedLocales.begin(); it != supportedLocales.end(); ++it) {
         std::string tempLocaleStr = it->data();
         tempLocaleStr = StrReplaceAll(tempLocaleStr, "_", "-");
         LocaleInfo* tempLocale = new LocaleInfo(tempLocaleStr);
-        if (LocaleMatcher::Match(requestLocale, tempLocale)) {
+        if (LocaleMatcher::Match(requestLocale.get(), tempLocale)) {
             matchLocaleList.push_back(tempLocale);
         } else {
             delete tempLocale;
@@ -987,12 +992,11 @@ std::string I18nTimeZone::GetFallBack(std::string &requestLocaleStr)
     }
     std::string bestMatchLocaleTag = DEFAULT_LOCALE;
     if (matchLocaleList.size() == 0) {
-        delete requestLocale;
         return bestMatchLocaleTag;
     }
     LocaleInfo *bestMatch = matchLocaleList[0];
     for (size_t i = 1; i < matchLocaleList.size(); ++i) {
-        if (LocaleMatcher::IsMoreSuitable(bestMatch, matchLocaleList[i], requestLocale) < 0) {
+        if (LocaleMatcher::IsMoreSuitable(bestMatch, matchLocaleList[i], requestLocale.get()) < 0) {
             bestMatch = matchLocaleList[i];
         }
     }
