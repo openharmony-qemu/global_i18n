@@ -89,6 +89,7 @@ unordered_set<string> LocaleConfig::blockedLanguages;
 unordered_set<string> LocaleConfig::blockedRegions;
 unordered_map<string, unordered_set<string>> LocaleConfig::blockedLanguageRegions;
 unordered_set<string> LocaleConfig::whiteLanguages;
+std::set<std::string> LocaleConfig::extendWhiteLanguageList;
 unordered_map<string, string> LocaleConfig::dialectMap {
     { "es-Latn-419", "es-Latn-419" },
     { "es-Latn-BO", "es-Latn-419" },
@@ -212,6 +213,7 @@ static unordered_map<string, string> g_languageMap = {
     { "es-Latn-US", "es-419" },
     { "az-Latn", "az-Latn" },
     { "bs-Latn", "bs-Latn" },
+    { "en-Latn-US", "en" },
     { "en-Qaag", "en-Qaag" },
     { "uz-Latn", "uz-Latn" },
     { "sr-Latn", "sr-Latn" },
@@ -223,7 +225,11 @@ static unordered_map<string, string> g_languageMap = {
 
 string Adjust(const string &origin)
 {
-    for (auto iter = g_languageMap.begin(); iter != g_languageMap.end(); ++iter) {
+    auto iter = g_languageMap.find(origin);
+    if (iter != g_languageMap.end()) {
+        return iter->second;
+    }
+    for (iter = g_languageMap.begin(); iter != g_languageMap.end(); ++iter) {
         string key = iter->first;
         if (!origin.compare(0, key.length(), key)) {
             return iter->second;
@@ -423,7 +429,7 @@ bool LocaleConfig::IsSuggested(const string &language)
     GetCountriesFromSim(simCountries);
     GetRelatedLocales(relatedLocales, simCountries);
     for (auto iter = relatedLocales.begin(); iter != relatedLocales.end();) {
-        if (whiteLanguages.find(*iter) == whiteLanguages.end()) {
+        if (extendWhiteLanguageList.find(*iter) == extendWhiteLanguageList.end()) {
             iter = relatedLocales.erase(iter);
         } else {
             ++iter;
@@ -439,7 +445,7 @@ bool LocaleConfig::IsSuggested(const std::string &language, const std::string &r
     vector<string> countries { region };
     GetRelatedLocales(relatedLocales, countries);
     for (auto iter = relatedLocales.begin(); iter != relatedLocales.end();) {
-        if (whiteLanguages.find(*iter) == whiteLanguages.end()) {
+        if (extendWhiteLanguageList.find(*iter) == extendWhiteLanguageList.end()) {
             iter = relatedLocales.erase(iter);
         } else {
             ++iter;
@@ -447,6 +453,26 @@ bool LocaleConfig::IsSuggested(const std::string &language, const std::string &r
     }
     string mainLanguage = GetMainLanguage(language);
     return relatedLocales.find(mainLanguage) != relatedLocales.end();
+}
+
+void LocaleConfig::ExtendWhiteLanguages()
+{
+    UErrorCode status = U_ZERO_ERROR;
+    for (auto iter = whiteLanguages.begin(); iter != whiteLanguages.end(); ++iter) {
+        extendWhiteLanguageList.insert(*iter);
+        icu::Locale locale = icu::Locale::forLanguageTag((*iter).c_str(), status);
+        locale.addLikelySubtags(status);
+        if (U_FAILURE(status)) {
+            HILOG_INFO_I18N("create Locale object for %{public}s failed.", (*iter).c_str());
+            continue;
+        }
+        const char* baseName = locale.getBaseName();
+        if (baseName != nullptr) {
+            std::string baseNameStr(baseName);
+            std::replace(baseNameStr.begin(), baseNameStr.end(), '_', '-');
+            extendWhiteLanguageList.insert(baseNameStr);
+        }
+    }
 }
 
 void LocaleConfig::GetRelatedLocales(unordered_set<string> &relatedLocales, vector<string> countries)
@@ -560,6 +586,7 @@ bool LocaleConfig::InitializeLists()
     GetListFromFile(SUPPORT_LOCALES_PATH, SUPPORT_LOCALES_NAME, supportLocales);
     GetListFromFile(OVERRIDE_SUPPORTED_REGIONS_PATH, OVERRIDE_SUPPORTED_REGIONS_NAME, overrideSupportedRegions);
     GetListFromFile(DIALECT_LANGS_PATH, DIALECT_LANGS_NAME, dialectLang);
+    ExtendWhiteLanguages();
     return true;
 }
 
@@ -642,6 +669,7 @@ string LocaleConfig::GetMainLanguage(const string &language)
 
 string LocaleConfig::GetDisplayLanguage(const string &language, const string &displayLocale, bool sentenceCase)
 {
+    std::string result;
     string adjust = Adjust(language);
     if (adjust == language) {
         UErrorCode status = U_ZERO_ERROR;
@@ -655,20 +683,18 @@ string LocaleConfig::GetDisplayLanguage(const string &language, const string &di
         }
         icu::UnicodeString unistr;
         std::string lang(locale.getLanguage());
-        std::string result;
         if (dialectLang.find(lang) != dialectLang.end()) {
-            result = GetDsiplayLanguageWithDialect(language, displayLocale);
-        } else {
-            locale.getDisplayLanguage(displayLoc, unistr);
-            unistr.toUTF8String(result);
+            result = GetDisplayLanguageWithDialect(language, displayLocale);
         }
-        if (sentenceCase) {
-            char ch = static_cast<char>(toupper(result[0]));
-            return PseudoLocalizationProcessor(result.replace(0, 1, 1, ch));
-        }
-        return PseudoLocalizationProcessor(result);
     }
-    return PseudoLocalizationProcessor(GetDisplayLanguageInner(adjust, displayLocale, sentenceCase));
+    if (result.empty()) {
+        result = GetDisplayLanguageInner(adjust, displayLocale, sentenceCase);
+    }
+    if (sentenceCase && !result.empty()) {
+        char ch = static_cast<char>(toupper(result[0]));
+        return PseudoLocalizationProcessor(result.replace(0, 1, 1, ch));
+    }
+    return PseudoLocalizationProcessor(result);
 }
 
 std::string LocaleConfig::ComputeLocale(const std::string &displayLocale)
@@ -677,13 +703,13 @@ std::string LocaleConfig::ComputeLocale(const std::string &displayLocale)
         xmlKeepBlanksDefault(0);
         xmlDocPtr doc = xmlParseFile(SUPPORT_LOCALES_PATH);
         if (!doc) {
-            return DEFAULT_LOCALE;
+            return "";
         }
         xmlNodePtr cur = xmlDocGetRootElement(doc);
         if (!cur || xmlStrcmp(cur->name, reinterpret_cast<const xmlChar *>(supportLocalesTag))) {
             xmlFreeDoc(doc);
             HILOG_INFO_I18N("can not parse language supported locale file");
-            return DEFAULT_LOCALE;
+            return "";
         }
         cur = cur->xmlChildrenNode;
         while (cur != nullptr) {
@@ -694,11 +720,7 @@ std::string LocaleConfig::ComputeLocale(const std::string &displayLocale)
             }
             std::map<std::string, std::string> localeInfoConfigs = {};
             LocaleInfo localeinfo(reinterpret_cast<const char*>(content), localeInfoConfigs);
-            std::string language = localeinfo.GetLanguage();
-            std::string script = localeinfo.GetScript();
-            std::string languageAndScript = (script.length() == 0) ? language : language + "-" + script;
-            LocaleInfo newLocaleInfo(languageAndScript, localeInfoConfigs);
-            std::string maximizeLocale = newLocaleInfo.Maximize();
+            std::string maximizeLocale = localeinfo.Maximize();
             const char* key = maximizeLocale.c_str();
             const char* value = reinterpret_cast<const char*>(content);
             SetSupportedDialectLocales(key, value);
@@ -709,15 +731,11 @@ std::string LocaleConfig::ComputeLocale(const std::string &displayLocale)
     }
     std::map<std::string, std::string> configs = {};
     LocaleInfo localeinfo(displayLocale, configs);
-    std::string language = localeinfo.GetLanguage();
-    std::string script = localeinfo.GetScript();
-    std::string languageAndScript = (script.length() == 0) ? language : language + "-" + script;
-    LocaleInfo newLocaleInfo(languageAndScript, configs);
-    std::string maximizeLocale = newLocaleInfo.Maximize();
+    std::string maximizeLocale = localeinfo.Maximize();
     if (supportedDialectLocales.find(maximizeLocale) != supportedDialectLocales.end()) {
         return supportedDialectLocales.at(maximizeLocale);
     }
-    return DEFAULT_LOCALE;
+    return "";
 }
 
 void LocaleConfig::SetSupportedDialectLocales(const char* key, const char* value)
@@ -834,9 +852,12 @@ void LocaleConfig::ReadRegionData(const char *regionDataPath)
     xmlFreeDoc(doc);
 }
 
-string LocaleConfig::GetDsiplayLanguageWithDialect(const std::string &localeStr, const std::string &displayLocale)
+string LocaleConfig::GetDisplayLanguageWithDialect(const std::string &localeStr, const std::string &displayLocale)
 {
     std::string finalLocale = ComputeLocale(displayLocale);
+    if (finalLocale.empty()) {
+        return "";
+    }
     if (finalLocale.compare(currentDialectLocale) != 0) {
         std::string xmlPath = LANG_PATH + finalLocale + ".xml";
         locale2DisplayName.clear();
@@ -1111,7 +1132,7 @@ bool LocaleConfig::HasDesignator(const std::string& pattern, const char designat
         return false;
     }
     bool insideQuote = false;
-    for (auto& c : pattern) {
+    for (const auto& c : pattern) {
         if (c == '\'') {
             insideQuote = !insideQuote;
         } else if (!insideQuote) {
