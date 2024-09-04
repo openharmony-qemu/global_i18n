@@ -25,10 +25,6 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static const uint32_t BYTE_ARRAY_OFFSET_FIRST = 24;
-static const uint32_t BYTE_ARRAY_OFFSET_SECOND = 16;
-static const uint32_t BYTE_ARRAY_OFFSET_THIRD = 8;
-static const uint32_t BYTE_ARRAY_INDEX_THIRD = 3;
 static std::set<std::string> availableIDs;
 
 void Split(const std::string &src, const std::string &sep, std::vector<std::string> &dest);
