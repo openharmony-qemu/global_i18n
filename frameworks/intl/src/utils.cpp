@@ -18,6 +18,7 @@
 #include <filesystem>
 #include <fstream>
 #include <dirent.h>
+#include <mutex>
 #include <stdexcept>
 #include <string>
 #include <sys/stat.h>
@@ -40,6 +41,7 @@ static const std::string PSEUDO_START_TAG = "{";
 static const std::string PSEUDO_END_TAG = "}";
 static const char *TZDATA_PATH = "/system/etc/zoneinfo/tzdata";
 static const char *DISTRO_TZDATA_PATH = "/system/etc/tzdata_distro/hos/tzdata";
+static std::mutex validLocaleMutex;
 
 void Split(const string &src, const string &sep, vector<string> &dest)
 {
@@ -117,6 +119,7 @@ bool IsValidLocaleTag(icu::Locale &locale)
 
 void GetAllValidLocalesTag(std::unordered_set<std::string>& allValidLocalesLanguageTag)
 {
+    std::lock_guard<std::mutex> matchLocaleLock(validLocaleMutex);
     static bool init = false;
     if (init) {
         return;
