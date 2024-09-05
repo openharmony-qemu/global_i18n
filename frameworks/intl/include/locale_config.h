@@ -163,7 +163,7 @@ private:
     static void Expunge(std::unordered_set<std::string> &src, const std::unordered_set<std::string> &another);
     static std::string GetMainLanguage(const std::string &language);
     static std::string GetCountry(const std::string& parameter);
-    static std::string GetDsiplayLanguageWithDialect(const std::string &language, const std::string &displayLocale);
+    static std::string GetDisplayLanguageWithDialect(const std::string &language, const std::string &displayLocale);
     static std::string GetDisplayOverrideRegion(const std::string &region, const std::string &displayLocale);
     static std::string ComputeLocale(const std::string &displayLocale);
     static void ReadLangData(const char *langDataPath);
@@ -253,6 +253,7 @@ private:
      * @return std::string Return locale Tag.
      */
     static std::string RemoveLocalDigitFromLocale(const std::string &localDigitTag);
+    static void ExtendWhiteLanguages();
     static std::unordered_set<std::string> supportedLocales;
     static std::unordered_set<std::string> supportedRegions;
     static std::unordered_set<std::string> supportLocales;
@@ -262,6 +263,7 @@ private:
     static std::unordered_set<std::string> blockedRegions;
     static std::unordered_map<std::string, std::unordered_set<std::string>> blockedLanguageRegions;
     static std::unordered_set<std::string> whiteLanguages;
+    static std::set<std::string> extendWhiteLanguageList;
     static std::map<std::string, std::string> supportedDialectLocales;
     static std::unordered_map<std::string, std::string> dialectMap;
     static std::unordered_map<std::string, std::string> localDigitMap;
