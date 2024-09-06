@@ -19,6 +19,7 @@
 #include <filesystem>
 #include <fstream>
 #include <dirent.h>
+#include <mutex>
 #include <stdexcept>
 #include <string>
 #include <sys/stat.h>
@@ -41,6 +42,7 @@ static const std::string PSEUDO_START_TAG = "{";
 static const std::string PSEUDO_END_TAG = "}";
 constexpr const char *TIMEZONE_LIST_CONFIG_PATH = "/system/etc/zoneinfo/timezone_list.cfg";
 constexpr const char *DISTRO_TIMEZONE_LIST_CONFIG = "/system/etc/tzdata_distro/timezone_list.cfg";
+static std::mutex validLocaleMutex;
 
 void Split(const string &src, const string &sep, vector<string> &dest)
 {
@@ -118,6 +120,7 @@ bool IsValidLocaleTag(icu::Locale &locale)
 
 void GetAllValidLocalesTag(std::unordered_set<std::string>& allValidLocalesLanguageTag)
 {
+    std::lock_guard<std::mutex> matchLocaleLock(validLocaleMutex);
     static bool init = false;
     if (init) {
         return;
