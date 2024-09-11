@@ -18,6 +18,7 @@
 #include <filesystem>
 #include <fstream>
 #include <dirent.h>
+#include <mutex>
 #include <stdexcept>
 #include <string>
 #include <sys/stat.h>
@@ -40,6 +41,7 @@ static const std::string PSEUDO_START_TAG = "{";
 static const std::string PSEUDO_END_TAG = "}";
 static const char *TZDATA_PATH = "/system/etc/zoneinfo/tzdata";
 static const char *DISTRO_TZDATA_PATH = "/system/etc/tzdata_distro/hos/tzdata";
+static std::mutex validLocaleMutex;
 
 void Split(const string &src, const string &sep, vector<string> &dest)
 {
@@ -107,7 +109,7 @@ bool IsValidLocaleTag(icu::Locale &locale)
 {
     static std::unordered_set<std::string> allValidLocalesLanguageTag;
     GetAllValidLocalesTag(allValidLocalesLanguageTag);
-    std::string languageTag = locale.getLanguage();
+    std::string languageTag = locale.getLanguage() == nullptr ? "" : locale.getLanguage();
     if (allValidLocalesLanguageTag.find(languageTag) == allValidLocalesLanguageTag.end()) {
         HILOG_ERROR_I18N("GetTimePeriodName does not support this languageTag: %{public}s", languageTag.c_str());
         return false;
@@ -121,10 +123,17 @@ void GetAllValidLocalesTag(std::unordered_set<std::string>& allValidLocalesLangu
     if (init) {
         return;
     }
+    std::lock_guard<std::mutex> matchLocaleLock(validLocaleMutex);
+    if (init) {
+        return;
+    }
     int32_t validCount = 1;
     const icu::Locale *validLocales = icu::Locale::getAvailableLocales(validCount);
     for (int i = 0; i < validCount; i++) {
-        allValidLocalesLanguageTag.insert(validLocales[i].getLanguage());
+        const char* language = validLocales[i].getLanguage();
+        if (language != nullptr) {
+            allValidLocalesLanguageTag.insert(language);
+        }
     }
     init = true;
 }
