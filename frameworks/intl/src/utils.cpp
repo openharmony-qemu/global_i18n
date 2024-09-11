@@ -119,8 +119,11 @@ bool IsValidLocaleTag(icu::Locale &locale)
 
 void GetAllValidLocalesTag(std::unordered_set<std::string>& allValidLocalesLanguageTag)
 {
-    std::lock_guard<std::mutex> matchLocaleLock(validLocaleMutex);
     static bool init = false;
+    if (init) {
+        return;
+    }
+    std::lock_guard<std::mutex> matchLocaleLock(validLocaleMutex);
     if (init) {
         return;
     }
