@@ -235,6 +235,8 @@ HWTEST_F(IntlTest, IntlFuncTest003, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest004, TestSize.Level1)
 {
+    AddTokenAndPermissions();
+    I18nServiceAbilityClient::Set24HourClock("true");
     string locale = "en-GB";
     string expects = "2 January 1970, 18:17 – 12 January 1970, 18:20";
     vector<string> locales;
@@ -255,6 +257,8 @@ HWTEST_F(IntlTest, IntlFuncTest004, TestSize.Level1)
     EXPECT_EQ(dateFormat->GetDateStyle(), dateStyle);
     EXPECT_EQ(dateFormat->GetTimeStyle(), timeStyle);
     delete dateFormat;
+    I18nServiceAbilityClient::Set24HourClock("false");
+    RemoveTokenAndPermissions();
 }
 
 /**

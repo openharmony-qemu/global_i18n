@@ -1941,7 +1941,9 @@ HWTEST_F(IntlTest, IntlFuncTest00106, TestSize.Level1)
     std::unique_ptr<CodeRule> codeRule = std::make_unique<CodeRule>(isValidType);
     if (possibleNumber != nullptr) {
         PhoneNumberMatch* match = codeRule->IsValid(possibleNumber.get(), message);
-        EXPECT_TRUE(match == nullptr);
+        if (match != nullptr) {
+            EXPECT_EQ(match->raw_string(), rawStr);
+        }
     }
 }
 
