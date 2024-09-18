@@ -32,7 +32,10 @@ ohos_shared_library("cj_i18n_ffi") {
   }
 
   if (!build_ohos_sdk) {
-    deps = [ "../../frameworks/intl:preferred_language" ]
+    deps = [
+      "../../frameworks/intl:intl_util",
+      "../../frameworks/intl:preferred_language",
+    ]
     external_deps = [
       "c_utils:utils",
       "hilog:libhilog",

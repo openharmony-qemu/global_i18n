@@ -15,6 +15,7 @@
 
 #include "hilog/log.h"
 #include "preferred_language.h"
+#include "locale_config.h"
 #include "i18n_ffi.h"
  
 namespace OHOS {
@@ -41,6 +42,17 @@ char* FfiOHOSGetAppPreferredLanguage()
     std::string language = PreferredLanguage::GetFirstPreferredLanguage();
     char* res = MallocCString(language);
     return res;
+}
+
+char* FfiI18nSystemGetSystemLanguage()
+{
+    std::string language = OHOS::Global::I18n::LocaleConfig::GetSystemLanguage();
+    return MallocCString(language);
+}
+char* FfiI18nSystemGetSystemRegion()
+{
+    std::string region = OHOS::Global::I18n::LocaleConfig::GetSystemRegion();
+    return MallocCString(region);
 }
 }
 }
