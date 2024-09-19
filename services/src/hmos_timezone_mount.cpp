@@ -18,6 +18,7 @@
 #include <string>
 #include <sys/mount.h>
 #include "i18n_hilog.h"
+#include "parameter.h"
 #include "signature_verifier.h"
 #include "utils.h"
 
@@ -38,6 +39,7 @@ const std::string LOCALE_PATH = "/system/etc/TIMEZONE/generic/current/";
 const std::string SAFE_PATH = "/data/service/el1/public/i18n/timezone/";
 const std::string PUBKEY_PATH = "/system/etc/LIBPHONENUMBER/generic/";
 const std::string PUBKEY_NAME = "hota_i18n_upgrade_v1.pem";
+const std::string COTA_PARAM_TIMEZONE_KEY = "persist.global.tz_override";
 const int FILE_NAME_INDEX = 6;
 
 std::vector<std::string> g_dataFiles = {};
@@ -213,26 +215,32 @@ bool CheckFileIntegrity()
 void UpdateTimeZone()
 {
     if (!Init()) {
+        SetParameter(COTA_PARAM_TIMEZONE_KEY.c_str(), "false");
         HILOG_INFO_I18N("UpdateTimeZone: init error");
         return;
     }
     if (!Mount()) {
+        SetParameter(COTA_PARAM_TIMEZONE_KEY.c_str(), "false");
         HILOG_INFO_I18N("UpdateTimeZone: mount error");
         return;
     }
     if (!CheckIfUpdateNecessary()) {
+        SetParameter(COTA_PARAM_TIMEZONE_KEY.c_str(), "false");
         HILOG_INFO_I18N("UpdateTimeZone: CheckIfUpdateNecessary error, no need to update");
         return;
     }
     if (!CheckFileIntegrity()) {
+        SetParameter(COTA_PARAM_TIMEZONE_KEY.c_str(), "false");
         HILOG_INFO_I18N("UpdateTimeZone: CheckFileIntegrity error, no need to update");
         return;
     }
     if (!CopyDataFile()) {
+        SetParameter(COTA_PARAM_TIMEZONE_KEY.c_str(), "false");
         HILOG_INFO_I18N("UpdateTimeZone: CopyDataFile error");
         return;
     }
 
+    SetParameter(COTA_PARAM_TIMEZONE_KEY.c_str(), "true");
     HILOG_INFO_I18N("UpdateTimeZone: UpdateTimeZone");
 }
 
