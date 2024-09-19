@@ -21,6 +21,8 @@
 
 extern "C" {
     FFI_EXPORT char* FfiOHOSGetAppPreferredLanguage();
+    FFI_EXPORT char* FfiI18nSystemGetSystemLanguage();
+    FFI_EXPORT char* FfiI18nSystemGetSystemRegion();
 }
 
 #endif
