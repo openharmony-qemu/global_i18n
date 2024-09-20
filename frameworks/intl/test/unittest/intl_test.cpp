@@ -241,7 +241,11 @@ HWTEST_F(IntlTest, IntlFuncTest004, TestSize.Level1)
     locales.push_back(locale);
     string dateStyle = "long";
     string timeStyle = "short";
+    string hourCycle = "h24";
+    string hour12 = "false";
     map<string, string> options = { { "dateStyle", dateStyle },
+                                    { "hour12", hour12 },
+                                    { "hourCycle", hourCycle },
                                     { "timeStyle", timeStyle } };
     DateTimeFormat *dateFormat = new (std::nothrow) DateTimeFormat(locales, options);
     if (!dateFormat) {
