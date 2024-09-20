@@ -364,7 +364,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0011, TestSize.Level1)
     vector<string> locales_cn{locale_cn};
     string locale_us = "en-US";
     vector<string> locales_us{locale_us};
-    string locale_gb = "en-US";
+    string locale_gb = "en-GB";
     vector<string> locales_gb{locale_gb};
     string style = "unit";
     string unit = "jump-rope-speed";
