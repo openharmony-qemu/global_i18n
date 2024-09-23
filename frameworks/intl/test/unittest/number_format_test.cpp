@@ -384,9 +384,9 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0011, TestSize.Level1)
     EXPECT_EQ(out, "1 jump/minute");
     std::unique_ptr<NumberFormat> numFmt_gb = std::make_unique<NumberFormat>(locales_gb, options);
     ASSERT_TRUE(numFmt_gb != nullptr);
-    out = numFmt_us->Format(1234567.89);
+    out = numFmt_gb->Format(1234567.89);
     EXPECT_EQ(out, "1,234,567.89 skips/minute");
-    out = numFmt_us->Format(1);
+    out = numFmt_gb->Format(1);
     EXPECT_EQ(out, "1 skip/minute");
 }
 
