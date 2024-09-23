@@ -194,7 +194,7 @@ void HolidayManager::ParseFileLine(const std::string &line, HolidayInfoItem *hol
     }
     std::regex reg("([A-Z]+)[:;](.+)");
     std::smatch match;
-    bool found = std::regex_search(line, match, reg);
+    bool found = RegexSearchNoExcept(line, match, reg);
     if (found) {
         std::string tag = match[1].str();
         std::string value = line.substr(line.find_last_of(":") + 1, line.length());

@@ -21,6 +21,7 @@
 #include "i18n_hilog.h"
 #include "js_utils.h"
 #include "node_api.h"
+#include "utils.h"
 
 namespace OHOS {
 namespace Global {
@@ -1008,14 +1009,17 @@ void SetIntegerOptionProperties(napi_env env, napi_value &result, std::map<std::
     if (options.count(option) > 0) {
         std::string optionValue = options[option];
         napi_value optionJsValue = nullptr;
-        int64_t integerValue = std::stoi(optionValue);
-        napi_create_int64(env, integerValue, &optionJsValue);
-        napi_set_named_property(env, result, option.c_str(), optionJsValue);
-    } else {
-        napi_value undefined = nullptr;
-        napi_get_undefined(env, &undefined);
-        napi_set_named_property(env, result, option.c_str(), undefined);
+        int32_t status = 0;
+        int64_t integerValue = ConvertString2Int(optionValue, status);
+        if (status != -1) {
+            napi_create_int64(env, integerValue, &optionJsValue);
+            napi_set_named_property(env, result, option.c_str(), optionJsValue);
+            return;
+        }
     }
+    napi_value undefined = nullptr;
+    napi_get_undefined(env, &undefined);
+    napi_set_named_property(env, result, option.c_str(), undefined);
 }
 
 void SetBooleanOptionProperties(napi_env env, napi_value &result, std::map<std::string, std::string> &options,
@@ -1589,8 +1593,9 @@ void GetPluralRulesInteger(napi_env env, napi_value options, std::map<std::strin
     auto it = map.find("minimumIntegerDigits");
     if (it != map.end()) {
         std::string minimumIntegerDigits = it->second;
-        int n = std::stoi(minimumIntegerDigits);
-        if (n < 1 || n > 21) {  // the valid range of minimumIntegerDigits is [1, 21]
+        int32_t status = 0;
+        int n = ConvertString2Int(minimumIntegerDigits, status);
+        if (status == -1 || n < 1 || n > 21) {  // the valid range of minimumIntegerDigits is [1, 21]
             HILOG_ERROR_I18N("invalid minimumIntegerDigits");
             return;
         }
@@ -1605,8 +1610,9 @@ void GetPluralRulesFractions(napi_env env, napi_value options, std::map<std::str
     auto it = map.find("minimumFractionDigits");
     if (it != map.end()) {
         std::string minimumFractionDigits = it->second;
-        int n = std::stoi(minimumFractionDigits);
-        if (n < 0 || n > 20) {  // the valid range of minimumFractionDigits is [0, 20]
+        int32_t status = 0;
+        int n = ConvertString2Int(minimumFractionDigits, status);
+        if (status == -1 || n < 0 || n > 20) {  // the valid range of minimumFractionDigits is [0, 20]
             HILOG_ERROR_I18N("invalid minimumFractionDigits");
             return;
         }
@@ -1616,8 +1622,9 @@ void GetPluralRulesFractions(napi_env env, napi_value options, std::map<std::str
     it = map.find("maximumFractionDigits");
     if (it != map.end()) {
         std::string maximumFractionDigits = it->second;
-        int n = std::stoi(maximumFractionDigits);
-        if (n < 0 || n > 20) {  // the valid range of maximumFractionDigits is [0, 20]
+        int32_t status = 0;
+        int n = ConvertString2Int(maximumFractionDigits, status);
+        if (status == -1 || n < 0 || n > 20) {  // the valid range of maximumFractionDigits is [0, 20]
             HILOG_ERROR_I18N("invalid maximumFractionDigits");
             return;
         }
@@ -1631,9 +1638,10 @@ void GetPluralRulesSignificant(napi_env env, napi_value options, std::map<std::s
     auto it = map.find("minimumSignificantDigits");
     if (it != map.end()) {
         std::string minSignificantStr = it->second;
-        int minSignificantInt = std::stoi(minSignificantStr);
+        int32_t status = 0;
+        int minSignificantInt = ConvertString2Int(minSignificantStr, status);
         // the valid range of minSignificantInt is [1, 21]
-        if (minSignificantInt < 1 || minSignificantInt > 21) {
+        if (status == -1 || minSignificantInt < 1 || minSignificantInt > 21) {
             HILOG_ERROR_I18N("invalid minimumSignificantDigits");
             return;
         }
@@ -1646,9 +1654,10 @@ void GetPluralRulesSignificant(napi_env env, napi_value options, std::map<std::s
     it = map.find("maximumSignificantDigits");
     if (it != map.end()) {
         std::string maxSignificantStr = it->second;
-        int maxSignificant = std::stoi(maxSignificantStr);
+        int32_t status = 0;
+        int maxSignificant = ConvertString2Int(maxSignificantStr, status);
         // the valid range of minSignificant is [minSignificant, 21]
-        if (maxSignificant < minSignificant || maxSignificant > 21) {
+        if (status == -1 || maxSignificant < minSignificant || maxSignificant > 21) {
             HILOG_ERROR_I18N("invalid maximumSignificantDigits");
             return;
         }
