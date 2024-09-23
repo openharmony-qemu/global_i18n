@@ -15,7 +15,7 @@
 #ifndef OHOS_GLOBAL_I18N_UTILS_H
 #define OHOS_GLOBAL_I18N_UTILS_H
 
-#incude <regex>
+#include <regex>
 #include <string>
 #include <vector>
 #include <unordered_set>
