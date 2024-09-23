@@ -342,7 +342,8 @@ std::set<std::string> GetTimeZoneAvailableIDs(I18nErrorCode &errorCode)
     return availableIDs;
 }
 
-bool RegexSearchNoExcept(const std::string& str, std::smatch& match, const std::regex& regex) {
+bool RegexSearchNoExcept(const std::string& str, std::smatch& match, const std::regex& regex)
+{
     try {
         return std::regex_search(str, match, regex);
     } catch (const std::regex_error &except) {
