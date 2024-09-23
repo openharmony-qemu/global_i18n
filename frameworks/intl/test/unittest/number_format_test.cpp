@@ -505,8 +505,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0015, TestSize.Level1)
  * @tc.desc: Test Intl NumberFormat.format
  * @tc.type: FUNC
  */
-HWTEST_F(NumberFormatTest, NumberFormatFuncTest0016, TestSize.Level1)
-{
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0016, TestSize.Level1) {
     string locale_cn = "zh-CN";
     vector<string> locales_cn{locale_cn};
     string locale_us = "en-US";
