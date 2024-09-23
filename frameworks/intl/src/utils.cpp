@@ -348,9 +348,6 @@ bool RegexSearchNoExcept(const std::string& str, std::smatch& match, const std::
         return std::regex_search(str, match, regex);
     } catch (const std::regex_error &except) {
         return false;
-    } catch (...) {
-        HILOG_ERROR_I18N("RegexSearchNoExcept: unknow error.");
-        return false;
     }
 }
 } // namespace I18n
