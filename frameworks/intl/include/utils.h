@@ -31,7 +31,7 @@ static std::set<std::string> availableIDs;
 void Split(const std::string &src, const std::string &sep, std::vector<std::string> &dest);
 void Merge(const std::vector<std::string>& src, const std::string& sep, std::string& dest);
 std::string ReadSystemParameter(const char *paramKey, const int paramLength);
-int32_t ConvertString2Int(const std::string &numberStr, int32_t& status) noexcept;
+int32_t ConvertString2Int(const std::string &numberStr, int32_t& status);
 bool IsValidLocaleTag(icu::Locale &locale);
 void GetAllValidLocalesTag(std::unordered_set<std::string>& allValidLocalesLanguageTag);
 bool CheckTzDataFilePath(const std::string &filePath);
@@ -51,7 +51,7 @@ std::string PseudoLocalizationProcessor(const std::string &input, bool ifEnforce
 bool CheckSystemPermission();
 size_t ConvertBytesToSizeT(const char *byteArray);
 std::set<std::string> GetTimeZoneAvailableIDs(I18nErrorCode &errorCode);
-bool RegexSearchNoExcept(const std::string& str, std::smatch& match, const std::regex& regex) noexcept;
+bool RegexSearchNoExcept(const std::string& str, std::smatch& match, const std::regex& regex);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
