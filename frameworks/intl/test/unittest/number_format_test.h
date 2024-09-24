@@ -35,6 +35,26 @@ int NumberFormatFuncTest0013(void);
 int NumberFormatFuncTest0014(void);
 int NumberFormatFuncTest0015(void);
 int NumberFormatFuncTest0016(void);
+int NumberFormatFuncTest0017(void);
+int NumberFormatFuncTest0018(void);
+int NumberFormatFuncTest0019(void);
+int NumberFormatFuncTest0020(void);
+int NumberFormatFuncTest0021(void);
+int NumberFormatFuncTest0022(void);
+int NumberFormatFuncTest0023(void);
+int NumberFormatFuncTest0024(void);
+int NumberFormatFuncTest0025(void);
+int NumberFormatFuncTest0026(void);
+int NumberFormatFuncTest0027(void);
+int NumberFormatFuncTest0028(void);
+int NumberFormatFuncTest0029(void);
+int NumberFormatFuncTest0030(void);
+int NumberFormatFuncTest0031(void);
+int NumberFormatFuncTest0032(void);
+int NumberFormatFuncTest0033(void);
+int NumberFormatFuncTest0034(void);
+int NumberFormatFuncTest0035(void);
+int NumberFormatFuncTest0036(void);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
