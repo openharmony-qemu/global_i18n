@@ -251,7 +251,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest009, TestSize.Level1)
 
     regionTag = "HK";
     displayName = LocaleConfig::GetDisplayRegion(regionTag, localeTag, false);
-    EXPECT_EQ(displayName, "Hong Kong, China");
+    EXPECT_EQ(displayName, "Hong Kong (China)");
 }
 
 /**
@@ -274,7 +274,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest010, TestSize.Level1)
     languageTag = "zh-Hant-HK";
     localeTag = "en-US";
     displayName = LocaleConfig::GetDisplayLanguage(languageTag, localeTag, true);
-    EXPECT_EQ(displayName, "Traditional Chinese(Hong Kong, China)");
+    EXPECT_EQ(displayName, "Traditional Chinese(Hong Kong (China))");
 }
 
 /**
