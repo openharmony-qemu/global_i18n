@@ -270,6 +270,7 @@ private:
     static std::map<std::string, std::string> supportedDialectLocales;
     static std::unordered_map<std::string, std::string> dialectMap;
     static std::unordered_map<std::string, std::string> localDigitMap;
+    static std::unordered_map<std::string, std::string> convertLanguage;
     static std::map<std::string, std::string> locale2DisplayName;
     static std::map<std::string, std::string> region2DisplayName;
     static std::string currentDialectLocale;
