@@ -102,7 +102,9 @@ void I18nServiceAbility::OnStart(const SystemAbilityOnDemandReason& startReason)
         i18nServiceEvent->SubscriberEvent();
         i18nServiceEvent->CheckStartReason(startReason);
     }
+#ifdef SUPPORT_MULTI_USER
     MultiUsers::InitMultiUser();
+#endif
     bool status = Publish(this);
     if (status) {
         HILOG_INFO_I18N("I18nServiceAbility Publish success.");

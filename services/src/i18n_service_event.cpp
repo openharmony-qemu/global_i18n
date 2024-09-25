@@ -87,6 +87,7 @@ void I18nServiceEvent::OnReceiveEvent(const EventFwk::CommonEventData& data)
 
 void I18nServiceEvent::HandleMultiUser(const std::string& action, const std::string& localId)
 {
+#ifdef SUPPORT_MULTI_USER
     if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
         MultiUsers::SwitchUser(localId);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_ADDED) {
@@ -94,6 +95,7 @@ void I18nServiceEvent::HandleMultiUser(const std::string& action, const std::str
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED) {
         MultiUsers::RemoveUser(localId);
     }
+#endif
 }
 } // namespace I18n
 } // namespace Global

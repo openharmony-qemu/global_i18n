@@ -1840,6 +1840,7 @@ HWTEST_F(IntlTest, IntlFuncTest0097, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest00103, TestSize.Level1)
 {
+#ifdef SUPPORT_MULTI_USER
     std::string path = "/data/service/el1/public/i18n/global/GlobalParamData";
     OHOS::NativePreferences::Options opt(path);
     int status;
@@ -1852,15 +1853,9 @@ HWTEST_F(IntlTest, IntlFuncTest00103, TestSize.Level1)
         std::string language = preferences->GetString("languageData", "");
         std::string locale = preferences->GetString("localeData", "");
         std::string is24Hour = preferences->GetString("is24HourData", "");
-#ifdef SUPPORT_MULTI_USER
         EXPECT_EQ(language, "101:zh-Hans");
         EXPECT_EQ(locale, "101:zh-Hans-CN");
         EXPECT_EQ(is24Hour, "101:false");
-#else
-        EXPECT_EQ(language, "");
-        EXPECT_EQ(locale, "");
-        EXPECT_EQ(is24Hour, "");
-#endif
     }
     MultiUsers::RemoveUser("101");
     if (preferences != nullptr) {
@@ -1871,6 +1866,7 @@ HWTEST_F(IntlTest, IntlFuncTest00103, TestSize.Level1)
         EXPECT_EQ(locale, "");
         EXPECT_EQ(is24Hour, "");
     }
+#endif
 }
 
 /**
