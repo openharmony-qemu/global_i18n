@@ -35,6 +35,7 @@ std::shared_ptr<NativePreferences::Preferences> MultiUsers::preferences = nullpt
 
 void MultiUsers::InitMultiUser()
 {
+#ifdef SUPPORT_MULTI_USER
     InitPreferences();
     if (preferences == nullptr) {
         HILOG_ERROR_I18N("InitMultiUser: InitPreferences failed");
@@ -53,10 +54,14 @@ void MultiUsers::InitMultiUser()
         preferences->Flush();
         HILOG_INFO_I18N("InitMultiUser: init multi user data success");
     }
+#else
+    HILOG_ERROR_I18N("InitMultiUser: MultiUser only supports PC platforms");
+#endif
 }
 
 void MultiUsers::SwitchUser(const std::string& curLocalId)
 {
+#ifdef SUPPORT_MULTI_USER
     if (!IsValidLocalId(curLocalId)) {
         HILOG_ERROR_I18N("SwitchUser: curLocalId is an invalid LocalId");
         return;
@@ -65,10 +70,14 @@ void MultiUsers::SwitchUser(const std::string& curLocalId)
     if (errCode != I18nErrorCode::SUCCESS) {
         HILOG_ERROR_I18N("SwitchUser: load global params failed");
     }
+#else
+    HILOG_ERROR_I18N("SwitchUser: MultiUser only supports PC platforms");
+#endif
 }
 
 void MultiUsers::AddUser(const std::string& localId)
 {
+#ifdef SUPPORT_MULTI_USER
     if (!IsValidLocalId(localId)) {
         HILOG_ERROR_I18N("AddUser: localId is invalid");
         return;
@@ -77,10 +86,14 @@ void MultiUsers::AddUser(const std::string& localId)
     if (errCode != I18nErrorCode::SUCCESS) {
         HILOG_ERROR_I18N("AddUser: add global param failed");
     }
+#else
+    HILOG_ERROR_I18N("AddUser: MultiUser only supports PC platforms");
+#endif
 }
 
 void MultiUsers::RemoveUser(const std::string& localId)
 {
+#ifdef SUPPORT_MULTI_USER
     if (!IsValidLocalId(localId)) {
         HILOG_ERROR_I18N("RemoveUser: localId is invalid");
         return;
@@ -89,6 +102,9 @@ void MultiUsers::RemoveUser(const std::string& localId)
     if (errCode != I18nErrorCode::SUCCESS) {
         HILOG_ERROR_I18N("RemoveUser: remove global param failed");
     }
+#else
+    HILOG_ERROR_I18N("RemoveUser: MultiUser only supports PC platforms");
+#endif
 }
 
 I18nErrorCode MultiUsers::GetForegroundLocalId(std::string& localId)
@@ -105,6 +121,7 @@ I18nErrorCode MultiUsers::GetForegroundLocalId(std::string& localId)
 
 I18nErrorCode MultiUsers::SaveLanguage(const std::string& localId, const std::string& language)
 {
+#ifdef SUPPORT_MULTI_USER
     std::string foregroundLocalId = localId;
     I18nErrorCode errCode = I18nErrorCode::SUCCESS;
     if (localId.empty()) {
@@ -122,10 +139,15 @@ I18nErrorCode MultiUsers::SaveLanguage(const std::string& localId, const std::st
         return I18nErrorCode::FAILED;
     }
     return I18nErrorCode::SUCCESS;
+#else
+    HILOG_ERROR_I18N("SaveLanguage: MultiUser only supports PC platforms");
+    return I18nErrorCode::FAILED;
+#endif
 }
 
 I18nErrorCode MultiUsers::SaveLocale(const std::string& localId, const std::string& locale)
 {
+#ifdef SUPPORT_MULTI_USER
     std::string foregroundLocalId = localId;
     I18nErrorCode errCode = I18nErrorCode::SUCCESS;
     if (localId.empty()) {
@@ -143,10 +165,15 @@ I18nErrorCode MultiUsers::SaveLocale(const std::string& localId, const std::stri
         return I18nErrorCode::FAILED;
     }
     return I18nErrorCode::SUCCESS;
+#else
+    HILOG_ERROR_I18N("SaveLocale: MultiUser only supports PC platforms");
+    return I18nErrorCode::FAILED;
+#endif
 }
 
 I18nErrorCode MultiUsers::SaveIs24Hour(const std::string& localId, const std::string& is24Hour)
 {
+#ifdef SUPPORT_MULTI_USER
     std::string foregroundLocalId = localId;
     I18nErrorCode errCode = I18nErrorCode::SUCCESS;
     if (localId.empty()) {
@@ -163,6 +190,10 @@ I18nErrorCode MultiUsers::SaveIs24Hour(const std::string& localId, const std::st
         return I18nErrorCode::FAILED;
     }
     return I18nErrorCode::SUCCESS;
+#else
+    HILOG_ERROR_I18N("SaveIs24Hour: MultiUser only supports PC platforms");
+    return I18nErrorCode::FAILED;
+#endif
 }
 
 I18nErrorCode MultiUsers::SaveGlobalParam(const std::string& localId)
