@@ -1852,9 +1852,15 @@ HWTEST_F(IntlTest, IntlFuncTest00103, TestSize.Level1)
         std::string language = preferences->GetString("languageData", "");
         std::string locale = preferences->GetString("localeData", "");
         std::string is24Hour = preferences->GetString("is24HourData", "");
+#ifdef SUPPORT_MULTI_USER
         EXPECT_EQ(language, "101:zh-Hans");
         EXPECT_EQ(locale, "101:zh-Hans-CN");
         EXPECT_EQ(is24Hour, "101:false");
+#else
+        EXPECT_EQ(language, "");
+        EXPECT_EQ(locale, "");
+        EXPECT_EQ(is24Hour, "");
+#endif
     }
     MultiUsers::RemoveUser("101");
     if (preferences != nullptr) {

@@ -62,6 +62,9 @@ ohos_unittest("intl_test") {
   if (i18n_support_app_preferred_language) {
     defines = [ "SUPPORT_APP_PREFERRED_LANGUAGE" ]
   }
+  if (target_platform == "pc") {
+    defines += [ "SUPPORT_MULTI_USER" ]
+  }
 
   deps = [
     "//base/global/i18n/frameworks/intl:build_module",
