@@ -80,7 +80,7 @@ ohos_shared_library("i18n_sa") {
     "../frameworks/intl:preferred_language",
   ]
   if (target_platform == "pc") {
-    defines += [ "SUPPORT_MULTI_USER" ]
+    defines = [ "SUPPORT_MULTI_USER" ]
   }
   external_deps = [
     "ability_base:want",
