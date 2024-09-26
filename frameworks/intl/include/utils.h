@@ -15,6 +15,7 @@
 #ifndef OHOS_GLOBAL_I18N_UTILS_H
 #define OHOS_GLOBAL_I18N_UTILS_H
 
+#include <regex>
 #include <string>
 #include <vector>
 #include <unordered_set>
@@ -50,6 +51,7 @@ std::string PseudoLocalizationProcessor(const std::string &input, bool ifEnforce
 bool CheckSystemPermission();
 size_t ConvertBytesToSizeT(const char *byteArray);
 std::set<std::string> GetTimeZoneAvailableIDs(I18nErrorCode &errorCode);
+bool RegexSearchNoExcept(const std::string& str, std::smatch& match, const std::regex& regex);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

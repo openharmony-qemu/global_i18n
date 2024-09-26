@@ -1276,8 +1276,8 @@ std::vector<std::string> I18nTimeZone::FindTzData()
         for (const auto& entry : directory_iterator{pixelPath}) {
             const std::string path = entry.path();
             std::smatch match;
-            bool found = std::regex_search(path, match, reg);
-            bool hasVerison = std::regex_search(path, match, regVersion);
+            bool found = RegexSearchNoExcept(path, match, reg);
+            bool hasVerison = RegexSearchNoExcept(path, match, regVersion);
             if (found && hasVerison) {
                 std::string version = match[0].str();
                 SetVersionPathMap(version, path, &pathMap);
