@@ -1840,6 +1840,7 @@ HWTEST_F(IntlTest, IntlFuncTest0097, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest00103, TestSize.Level1)
 {
+#ifdef SUPPORT_MULTI_USER
     std::string path = "/data/service/el1/public/i18n/global/GlobalParamData";
     OHOS::NativePreferences::Options opt(path);
     int status;
@@ -1865,6 +1866,7 @@ HWTEST_F(IntlTest, IntlFuncTest00103, TestSize.Level1)
         EXPECT_EQ(locale, "");
         EXPECT_EQ(is24Hour, "");
     }
+#endif
 }
 
 /**

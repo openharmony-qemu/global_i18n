@@ -1214,7 +1214,9 @@ I18nErrorCode LocaleConfig::SetSystemLanguage(const std::string &languageTag)
     }
     std::string newLocaleTag = UpdateLanguageOfLocale(languageTag);
     if (SetSystemLocale(newLocaleTag) == I18nErrorCode::SUCCESS) {
+#ifdef SUPPORT_MULTI_USER
         MultiUsers::SaveLanguage("", languageTag);
+#endif
         return I18nErrorCode::SUCCESS;
     }
     // reset system language to old language in case that system language is inconsist with system locale's lanuage.
@@ -1241,7 +1243,9 @@ I18nErrorCode LocaleConfig::SetSystemLocale(const std::string &localeTag)
     if (SetParameter(LOCALE_KEY, localeTag.data()) != 0) {
         return I18nErrorCode::UPDATE_SYSTEM_LOCALE_FAILED;
     }
+#ifdef SUPPORT_MULTI_USER
     MultiUsers::SaveLocale("", localeTag);
+#endif
 #ifdef SUPPORT_GRAPHICS
     UpdateConfiguration(AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE, localeTag);
     return PublishCommonEvent(EventFwk::CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED);
@@ -1269,7 +1273,9 @@ I18nErrorCode LocaleConfig::Set24HourClock(const std::string &option)
             option.c_str());
         return I18nErrorCode::UPDATE_24_HOUR_CLOCK_FAILED;
     }
+#ifdef SUPPORT_MULTI_USER
     MultiUsers::SaveIs24Hour("", option);
+#endif
 #ifdef SUPPORT_GRAPHICS
     UpdateConfiguration(AAFwk::GlobalConfigurationKey::SYSTEM_HOUR, option);
     return PublishCommonEvent(EventFwk::CommonEventSupport::COMMON_EVENT_TIME_CHANGED);
