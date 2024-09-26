@@ -129,14 +129,6 @@ unordered_map<string, string> LocaleConfig::localDigitMap {
     { "ur", "latn" }
 };
 
-unordered_map<string, string> LocaleConfig::convertLanguage {
-    { "ug", "ug" },
-    { "bo", "bo" },
-    { "en", "en-Latn-US" },
-    { "zh-Hans", "zh-Hans" },
-    { "zh-Hant", "zh-Hant" }
-};
-
 std::map<std::string, std::string> LocaleConfig::supportedDialectLocales;
 std::map<string, string> LocaleConfig::locale2DisplayName {};
 std::map<string, string> LocaleConfig::region2DisplayName {};
@@ -296,13 +288,6 @@ string LocaleConfig::GetSystemLanguage()
     std::string systemLanguage = ReadSystemParameter(LANGUAGE_KEY, CONFIG_LEN);
     if (systemLanguage.empty()) {
         systemLanguage = ReadSystemParameter(DEFAULT_LANGUAGE_KEY, CONFIG_LEN);
-    }
-    for (auto language : convertLanguage) {
-        std::string prefix = language.first;
-        if (prefix.length() <= systemLanguage.length() && systemLanguage.find(prefix, 0) == 0) {
-            systemLanguage = language.second;
-            break;
-        }
     }
     return systemLanguage;
 }
