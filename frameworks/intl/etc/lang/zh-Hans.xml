@@ -26,6 +26,10 @@
         <display_name>繁体中文</display_name>
     </lang>
     <lang>
+        <id>zh-Hant-HK</id>
+        <display_name>繁体中文（中国香港）</display_name>
+    </lang>
+    <lang>
         <id>ro</id>
         <display_name>罗马尼亚文</display_name>
     </lang>
