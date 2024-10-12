@@ -95,7 +95,7 @@ NumberFormat::NumberFormat(const std::vector<std::string> &localeTags, std::map<
     for (size_t i = 0; i < localeTags.size(); i++) {
         std::string curLocale = localeTags[i];
         locale = icu::Locale::forLanguageTag(icu::StringPiece(curLocale), status);
-        if (status != U_ZERO_ERROR) {
+        if (U_FAILURE(status)) {
             status = U_ZERO_ERROR;
             continue;
         }
