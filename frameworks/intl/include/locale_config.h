@@ -97,6 +97,7 @@ public:
 #endif
     static bool IsEmpty24HourClock();
     static bool Is24HourClock();
+    static std::string GetSystemHour();
     static bool GetUsingLocalDigit();
     static std::unordered_set<std::string> GetBlockedLanguages();
     static std::unordered_set<std::string> GetBlockedRegions();
