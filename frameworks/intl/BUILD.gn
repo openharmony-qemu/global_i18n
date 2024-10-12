@@ -108,6 +108,7 @@ ohos_shared_library("intl_util") {
     "src/locale_info.cpp",
     "src/locale_matcher.cpp",
     "src/locale_util.cpp",
+    "src/lunar_calendar.cpp",
     "src/measure_data.cpp",
     "src/multi_users.cpp",
     "src/number_format.cpp",
