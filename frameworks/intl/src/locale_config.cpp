@@ -1097,6 +1097,12 @@ bool LocaleConfig::Is24HourClock()
     return false;
 }
 
+std::string LocaleConfig::GetSystemHour()
+{
+    bool is24Hour = Is24HourClock();
+    return is24Hour ? "true" : "false";
+}
+
 bool LocaleConfig::Is24HourLocale(const std::string& systemLocale)
 {
     static std::unordered_map<std::string, bool> is24HourLocaleMap;
