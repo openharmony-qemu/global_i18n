@@ -15,14 +15,14 @@
 <regions>
     <region>
         <id>HK</id>
-        <display_name>Hong Kong (China)</display_name>
+        <display_name>Hong Kong, China</display_name>
     </region>
     <region>
         <id>MO</id>
-        <display_name>Macao (China)</display_name>
+        <display_name>Macao, China</display_name>
     </region>
     <region>
         <id>TW</id>
-        <display_name>Taiwan (China)</display_name>
+        <display_name>Taiwan, China</display_name>
     </region>
 </regions>
