@@ -656,7 +656,7 @@ int32_t I18nTimeZone::GetOffset(double date)
         return 0;
     }
     timezone->getOffset(date, (UBool)local, rawOffset, dstOffset, status);
-    if (status != U_ZERO_ERROR) {
+    if (U_FAILURE(status)) {
         return 0;
     }
     return rawOffset + dstOffset;

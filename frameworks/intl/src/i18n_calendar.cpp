@@ -43,7 +43,7 @@ I18nCalendar::I18nCalendar(std::string localeTag)
 {
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale tempLocale = icu::Locale::forLanguageTag(localeTag, status);
-    if (status != U_ZERO_ERROR) {
+    if (U_FAILURE(status)) {
         calendar_ = new icu::GregorianCalendar(status);
         if (!U_SUCCESS(status)) {
             if (calendar_ != nullptr) {
@@ -54,7 +54,7 @@ I18nCalendar::I18nCalendar(std::string localeTag)
         return;
     }
     calendar_ = icu::Calendar::createInstance(tempLocale, status);
-    if (status != U_ZERO_ERROR) {
+    if (U_FAILURE(status)) {
         if (calendar_ != nullptr) {
             delete calendar_;
         }
@@ -66,7 +66,7 @@ I18nCalendar::I18nCalendar(std::string localeTag, CalendarType type)
 {
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale tempLocale = icu::Locale::forLanguageTag(localeTag, status);
-    if (status != U_ZERO_ERROR) {
+    if (U_FAILURE(status)) {
         calendar_ = new icu::GregorianCalendar(status);
         if (!U_SUCCESS(status)) {
             if (calendar_ != nullptr) {
@@ -310,7 +310,7 @@ std::string I18nCalendar::GetDisplayName(std::string &displayLocaleTag)
     }
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale displayLocale = icu::Locale::forLanguageTag(displayLocaleTag, status);
-    if (status != U_ZERO_ERROR) {
+    if (U_FAILURE(status)) {
         return PseudoLocalizationProcessor("");
     }
     icu::LocaleDisplayNames *dspName = icu::LocaleDisplayNames::createInstance(displayLocale);

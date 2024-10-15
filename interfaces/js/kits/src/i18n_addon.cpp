@@ -563,7 +563,7 @@ bool I18nAddon::InitTransliteratorContext(napi_env env, napi_callback_info info,
     UErrorCode status = U_ZERO_ERROR;
     icu::UnicodeString unistr = icu::UnicodeString::fromUTF8(idTag);
     icu::Transliterator *trans = icu::Transliterator::createInstance(unistr, UTransDirection::UTRANS_FORWARD, status);
-    if ((status != U_ZERO_ERROR) || (trans == nullptr)) {
+    if (U_FAILURE(status) || (trans == nullptr)) {
         return false;
     }
     transliterator_ = std::unique_ptr<icu::Transliterator>(trans);
@@ -629,7 +629,7 @@ napi_value I18nAddon::GetAvailableIDs(napi_env env, napi_callback_info info)
     }
     UErrorCode icuStatus = U_ZERO_ERROR;
     icu::StringEnumeration *strenum = icu::Transliterator::getAvailableIDs(icuStatus);
-    if (icuStatus != U_ZERO_ERROR) {
+    if (U_FAILURE(icuStatus)) {
         HILOG_ERROR_I18N("Failed to get available ids");
         if (strenum) {
             delete strenum;
@@ -645,7 +645,7 @@ napi_value I18nAddon::GetAvailableIDs(napi_env env, napi_callback_info info)
         return nullptr;
     }
     while ((temp = strenum->next(nullptr, icuStatus)) != nullptr) {
-        if (icuStatus != U_ZERO_ERROR) {
+        if (U_FAILURE(icuStatus)) {
             break;
         }
         napi_value val = nullptr;

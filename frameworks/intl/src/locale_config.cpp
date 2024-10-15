@@ -247,13 +247,13 @@ string GetDisplayLanguageInner(const string &language, const string &displayLoca
     if (!language.compare(0, 2, "zh") || !language.compare(0, 2, "fa") || !language.compare(0, 2, "ro")) {
         UErrorCode status = U_ZERO_ERROR;
         icu::Locale displayLocale = icu::Locale::forLanguageTag(displayLocaleTag.c_str(), status);
-        if (status != U_ZERO_ERROR) {
+        if (U_FAILURE(status)) {
             return "";
         }
         icu::LocaleDisplayNames *dspNames = icu::LocaleDisplayNames::createInstance(displayLocale,
             UDialectHandling::ULDN_DIALECT_NAMES);
         icu::Locale tempLocale = icu::Locale::forLanguageTag(language.c_str(), status);
-        if (status != U_ZERO_ERROR) {
+        if (U_FAILURE(status)) {
             return "";
         }
         if (dspNames != nullptr) {
@@ -263,11 +263,11 @@ string GetDisplayLanguageInner(const string &language, const string &displayLoca
     } else {
         UErrorCode status = U_ZERO_ERROR;
         icu::Locale displayLoc = icu::Locale::forLanguageTag(displayLocaleTag, status);
-        if (status != U_ZERO_ERROR) {
+        if (U_FAILURE(status)) {
             return "";
         }
         icu::Locale locale = icu::Locale::forLanguageTag(language, status);
-        if (status != U_ZERO_ERROR) {
+        if (U_FAILURE(status)) {
             return "";
         }
         locale.getDisplayName(displayLoc, unistr);
@@ -637,21 +637,21 @@ string LocaleConfig::GetMainLanguage(const string &language)
 {
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale origin = icu::Locale::forLanguageTag(language, status);
-    if (status != U_ZERO_ERROR) {
+    if (U_FAILURE(status)) {
         return "";
     }
     origin.addLikelySubtags(status);
-    if (status != U_ZERO_ERROR) {
+    if (U_FAILURE(status)) {
         return "";
     }
     icu::LocaleBuilder builder = icu::LocaleBuilder().setLanguage(origin.getLanguage()).
         setScript(origin.getScript()).setRegion(origin.getCountry());
     icu::Locale temp = builder.setExtension('u', "").build(status);
-    if (status != U_ZERO_ERROR) {
+    if (U_FAILURE(status)) {
         return "";
     }
     string fullLanguage = temp.toLanguageTag<string>(status);
-    if (status != U_ZERO_ERROR) {
+    if (U_FAILURE(status)) {
         return "";
     }
     if (dialectMap.find(fullLanguage) != dialectMap.end()) {
@@ -659,11 +659,11 @@ string LocaleConfig::GetMainLanguage(const string &language)
     }
     builder.setRegion("");
     temp = builder.build(status);
-    if (status != U_ZERO_ERROR) {
+    if (U_FAILURE(status)) {
         return "";
     }
     fullLanguage = temp.toLanguageTag<string>(status);
-    if (status != U_ZERO_ERROR) {
+    if (U_FAILURE(status)) {
         return "";
     }
     return fullLanguage;
@@ -676,11 +676,11 @@ string LocaleConfig::GetDisplayLanguage(const string &language, const string &di
     if (adjust == language) {
         UErrorCode status = U_ZERO_ERROR;
         icu::Locale displayLoc = icu::Locale::forLanguageTag(displayLocale, status);
-        if (status != U_ZERO_ERROR) {
+        if (U_FAILURE(status)) {
             return PseudoLocalizationProcessor("");
         }
         icu::Locale locale = icu::Locale::forLanguageTag(language, status);
-        if (status != U_ZERO_ERROR) {
+        if (U_FAILURE(status)) {
             return PseudoLocalizationProcessor("");
         }
         icu::UnicodeString unistr;
@@ -907,7 +907,7 @@ string LocaleConfig::GetDisplayOverrideRegion(const std::string &region, const s
         return region2DisplayName.at(region);
     } else {
         icu::Locale locale = icu::Locale::forLanguageTag(displayLocale, status);
-        if (status != U_ZERO_ERROR) {
+        if (U_FAILURE(status)) {
             return "";
         }
         if (IsValidRegion(region)) {
@@ -937,11 +937,11 @@ string LocaleConfig::GetDisplayRegion(const string &region, const string &displa
     if (country.length() == 0) {
         return PseudoLocalizationProcessor("");
     }
-    if (status != U_ZERO_ERROR) {
+    if (U_FAILURE(status)) {
         return PseudoLocalizationProcessor("");
     }
     icu::Locale locale = icu::Locale::forLanguageTag(displayLocale, status);
-    if (status != U_ZERO_ERROR) {
+    if (U_FAILURE(status)) {
         return PseudoLocalizationProcessor("");
     }
     icu::UnicodeString unistr;
