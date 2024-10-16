@@ -19,11 +19,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include "unicode/locid.h"
-#include "unicode/calendar.h"
-#include "unicode/ucal.h"
-#include "unicode/utypes.h"
-
 namespace OHOS {
 namespace Global {
 namespace I18n {
@@ -73,8 +68,6 @@ private:
     bool isLeapMonth = false;
     bool isGregorianLeapYear = false;
     bool isValidDate = false;
-
-    // icu::Calendar* gregorianCalendar;
 };
 } // namespace I18n
 } // namespace Global
