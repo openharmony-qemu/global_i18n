@@ -69,13 +69,9 @@ const char *LocaleConfig::SUPPORT_LOCALES_PATH = "/etc/ohos_lang_config/supporte
 const char *LocaleConfig::SUPPORT_LOCALES_NAME = "supported_locales";
 const char *LocaleConfig::DIALECT_LANGS_PATH = "/system/usr/ohos_locale_config/dialect_languages.xml";
 const char *LocaleConfig::DIALECT_LANGS_NAME = "dialect_langs";
-const char *LocaleConfig::OVERRIDE_SUPPORTED_REGIONS_NAME = "supported_regions";
-const char *LocaleConfig::OVERRIDE_SUPPORTED_REGIONS_PATH =
-    "/system/usr/ohos_locale_config/region/supported_regions.xml";
 const char *LocaleConfig::DEFAULT_LOCALE = "en-Latn";
 const char *LocaleConfig::supportLocalesTag = "supported_locales";
 const char *LocaleConfig::LANG_PATH = "/etc/ohos_lang_config/";
-const char *LocaleConfig::REGION_PATH = "/system/usr/ohos_locale_config/region/";
 const char *LocaleConfig::rootTag = "languages";
 const char *LocaleConfig::secondRootTag = "lang";
 const char *LocaleConfig::rootRegion = "regions";
@@ -84,7 +80,6 @@ const char *LocaleConfig::NUMBER_SYSTEM_KEY = "-nu-";
 unordered_set<string> LocaleConfig::supportedLocales;
 unordered_set<string> LocaleConfig::supportLocales;
 unordered_set<string> LocaleConfig::supportedRegions;
-unordered_set<string> LocaleConfig::overrideSupportedRegions;
 unordered_set<string> LocaleConfig::dialectLang;
 unordered_set<string> LocaleConfig::blockedLanguages;
 unordered_set<string> LocaleConfig::blockedRegions;
@@ -131,11 +126,9 @@ unordered_map<string, string> LocaleConfig::localDigitMap {
 
 std::map<std::string, std::string> LocaleConfig::supportedDialectLocales;
 std::map<string, string> LocaleConfig::locale2DisplayName {};
-std::map<string, string> LocaleConfig::region2DisplayName {};
 std::string LocaleConfig::currentDialectLocale = "";
 std::string LocaleConfig::currentOverrideRegion = "";
 std::mutex LocaleConfig::dialectLocaleMutex;
-std::mutex LocaleConfig::region2DisplayNameMutex;
 std::mutex LocaleConfig::locale2DisplayNameMutex;
 
 set<std::string> LocaleConfig::validCaTag {
@@ -586,7 +579,6 @@ bool LocaleConfig::InitializeLists()
     Expunge(whiteLanguages, blockedLanguages);
     GetListFromFile(SUPPORTED_LOCALES_PATH, SUPPORTED_LOCALES_NAME, supportedLocales);
     GetListFromFile(SUPPORT_LOCALES_PATH, SUPPORT_LOCALES_NAME, supportLocales);
-    GetListFromFile(OVERRIDE_SUPPORTED_REGIONS_PATH, OVERRIDE_SUPPORTED_REGIONS_NAME, overrideSupportedRegions);
     GetListFromFile(DIALECT_LANGS_PATH, DIALECT_LANGS_NAME, dialectLang);
     ExtendWhiteLanguages();
     return true;
@@ -792,66 +784,11 @@ void LocaleConfig::ReadLangData(const char *langDataPath)
     xmlFreeDoc(doc);
 }
 
-void LocaleConfig::SetRegion2DisplayName(const char* key, const char* value)
-{
-    std::lock_guard<std::mutex> regionDisplayLock(region2DisplayNameMutex);
-    region2DisplayName.insert(
-        std::make_pair<std::string, std::string>(key, value));
-}
-
 void LocaleConfig::SetLocale2DisplayName(const char* key, const char* value)
 {
     std::lock_guard<std::mutex> localeDisplayLock(locale2DisplayNameMutex);
     locale2DisplayName.insert(
         std::make_pair<std::string, std::string>(key, value));
-}
-
-void LocaleConfig::ReadRegionData(const char *regionDataPath)
-{
-    xmlKeepBlanksDefault(0);
-    if (regionDataPath == nullptr) {
-        return;
-    }
-    xmlDocPtr doc = xmlParseFile(regionDataPath);
-    if (!doc) {
-        HILOG_INFO_I18N("can not open region data file");
-        return;
-    }
-    xmlNodePtr cur = xmlDocGetRootElement(doc);
-    if (cur) {
-        HILOG_INFO_I18N("cur pointer is true");
-    }
-    if (!cur || xmlStrcmp(cur->name, reinterpret_cast<const xmlChar *>(rootRegion))) {
-        xmlFreeDoc(doc);
-        HILOG_INFO_I18N("parse region data file failed");
-        return;
-    }
-    cur = cur->xmlChildrenNode;
-    while (cur != nullptr && !xmlStrcmp(cur->name, reinterpret_cast<const xmlChar *>(secondRootRegion))) {
-        xmlChar *regionContents[ELEMENT_NUM] = { 0 };
-        xmlNodePtr regionValue = cur->xmlChildrenNode;
-        bool xmlNodeNull = false;
-        for (size_t i = 0; i < ELEMENT_NUM && regionValue != nullptr; i++) {
-            regionContents[i] = xmlNodeGetContent(regionValue);
-            regionValue = regionValue->next;
-            if (regionContents[i] == nullptr) {
-                xmlNodeNull = true;
-            }
-        }
-        if (!xmlNodeNull) {
-            // 0 represents langid index, 1 represents displayname index
-            const char* regionKey = reinterpret_cast<const char *>(regionContents[0]);
-            const char* regionVal = reinterpret_cast<const char *>(regionContents[1]);
-            SetRegion2DisplayName(regionKey, regionVal);
-        }
-        for (size_t i = 0; i < ELEMENT_NUM; i++) {
-            if (regionContents[i] != nullptr) {
-                xmlFree(regionContents[i]);
-            }
-        }
-        cur = cur->next;
-    }
-    xmlFreeDoc(doc);
 }
 
 string LocaleConfig::GetDisplayLanguageWithDialect(const std::string &localeStr, const std::string &displayLocale)
@@ -892,37 +829,6 @@ string LocaleConfig::GetDisplayLanguageWithDialect(const std::string &localeStr,
     return "";
 }
 
-string LocaleConfig::GetDisplayOverrideRegion(const std::string &region, const std::string &displayLocale)
-{
-    UErrorCode status = U_ZERO_ERROR;
-    icu::Locale originLocale;
-    icu::UnicodeString displayRegion;
-    if (displayLocale.compare(currentOverrideRegion) != 0) {
-        std::string xmlPath = REGION_PATH + displayLocale + ".xml";
-        region2DisplayName.clear();
-        ReadRegionData(xmlPath.c_str());
-        currentOverrideRegion = displayLocale;
-    }
-    if (region2DisplayName.find(region) != region2DisplayName.end()) {
-        return region2DisplayName.at(region);
-    } else {
-        icu::Locale locale = icu::Locale::forLanguageTag(displayLocale, status);
-        if (U_FAILURE(status)) {
-            return "";
-        }
-        if (IsValidRegion(region)) {
-            icu::LocaleBuilder builder = icu::LocaleBuilder().setRegion(region);
-            originLocale = builder.build(status);
-        } else {
-            originLocale = icu::Locale::forLanguageTag(region, status);
-        }
-        originLocale.getDisplayCountry(locale, displayRegion);
-        std::string result;
-        displayRegion.toUTF8String(result);
-        return result;
-    }
-}
-
 string LocaleConfig::GetDisplayRegion(const string &region, const string &displayLocale, bool sentenceCase)
 {
     UErrorCode status = U_ZERO_ERROR;
@@ -947,12 +853,10 @@ string LocaleConfig::GetDisplayRegion(const string &region, const string &displa
     icu::UnicodeString unistr;
     icu::UnicodeString displayRegion;
     std::string result;
-    if (overrideSupportedRegions.find(displayLocale) != overrideSupportedRegions.end()) {
-        result = GetDisplayOverrideRegion(region, displayLocale);
-    } else {
-        originLocale.getDisplayCountry(locale, displayRegion);
-        displayRegion.toUTF8String(result);
-    }
+  
+    originLocale.getDisplayCountry(locale, displayRegion);
+    displayRegion.toUTF8String(result);
+    
     if (sentenceCase) {
         char ch = static_cast<char>(toupper(result[0]));
         return PseudoLocalizationProcessor(result.replace(0, 1, 1, ch));

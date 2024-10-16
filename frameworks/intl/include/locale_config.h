@@ -151,9 +151,7 @@ private:
     static const char *OVERRIDE_SUPPORTED_REGIONS_PATH;
     static const char *DIALECT_LANGS_PATH;
     static const char *DIALECT_LANGS_NAME;
-    static const char *REGION_PATH;
     static std::mutex dialectLocaleMutex;
-    static std::mutex region2DisplayNameMutex;
     static std::mutex locale2DisplayNameMutex;
 
     static const std::unordered_set<std::string>& GetSupportedLocales();
@@ -174,7 +172,6 @@ private:
     static void ReadRegionData(const char *regionDataPath);
     static void ProcessForbiddenRegions(const std::unordered_set<std::string> &forbiddenRegions);
     static void SetSupportedDialectLocales(const char* key, const char* value);
-    static void SetRegion2DisplayName(const char* key, const char* value);
     static void SetLocale2DisplayName(const char* key, const char* value);
     static bool Is24HourLocale(const std::string& systemLocale);
     static bool HasDesignator(const std::string& inFormat, const char designator);
@@ -262,7 +259,6 @@ private:
     static std::unordered_set<std::string> supportedRegions;
     static std::unordered_set<std::string> supportLocales;
     static std::unordered_set<std::string> dialectLang;
-    static std::unordered_set<std::string> overrideSupportedRegions;
     static std::unordered_set<std::string> blockedLanguages;
     static std::unordered_set<std::string> blockedRegions;
     static std::unordered_map<std::string, std::unordered_set<std::string>> blockedLanguageRegions;
@@ -272,7 +268,6 @@ private:
     static std::unordered_map<std::string, std::string> dialectMap;
     static std::unordered_map<std::string, std::string> localDigitMap;
     static std::map<std::string, std::string> locale2DisplayName;
-    static std::map<std::string, std::string> region2DisplayName;
     static std::string currentDialectLocale;
     static std::string currentOverrideRegion;
     static std::set<std::string> validCaTag;

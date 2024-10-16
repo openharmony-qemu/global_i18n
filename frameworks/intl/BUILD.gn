@@ -146,7 +146,6 @@ ohos_shared_library("intl_util") {
       ":i18n.para.dac",
       ":i18n_param_config_xml",
       ":lang_supported_locales",
-      ":region_supported_locales_xml",
       ":root_timezone_xml",
       ":timezones_xml",
       ":ug_lang_xml",
@@ -340,13 +339,6 @@ ohos_prebuilt_etc("root_timezone_xml") {
 ohos_prebuilt_etc("timezones_xml") {
   source = "//base/global/i18n/frameworks/intl/etc/timezone/ohos_timezones.xml"
   module_install_dir = "usr/ohos_timezone/"
-  part_name = "i18n"
-  subsystem_name = "global"
-}
-
-ohos_prebuilt_etc("region_supported_locales_xml") {
-  source = "//base/global/i18n/frameworks/intl/etc/region/supported_regions.xml"
-  module_install_dir = "usr/ohos_locale_config/region/"
   part_name = "i18n"
   subsystem_name = "global"
 }
