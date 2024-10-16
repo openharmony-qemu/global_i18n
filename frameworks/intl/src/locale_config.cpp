@@ -857,7 +857,7 @@ string LocaleConfig::GetDisplayRegion(const string &region, const string &displa
     originLocale.getDisplayCountry(locale, displayRegion);
     displayRegion.toUTF8String(result);
     
-    if (sentenceCase) {
+    if (sentenceCase && !result.empty()) {
         char ch = static_cast<char>(toupper(result[0]));
         return PseudoLocalizationProcessor(result.replace(0, 1, 1, ch));
     }
