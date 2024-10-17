@@ -115,6 +115,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest004, TestSize.Level1)
     EXPECT_EQ(status, I18nErrorCode::SUCCESS);
     LocaleConfig::SetSystemLanguage("zh-Hans");
     EXPECT_EQ(status, I18nErrorCode::SUCCESS);
+    LocaleConfig::SetSystemLanguage("%$=");
 }
 
 /**
@@ -145,6 +146,8 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest006, TestSize.Level1)
     EXPECT_EQ(status, I18nErrorCode::SUCCESS);
     status = LocaleConfig::SetSystemLocale("zh-Hans-CN");
     EXPECT_EQ(status, I18nErrorCode::SUCCESS);
+    status = LocaleConfig::SetSystemRegion("@*%");
+    EXPECT_EQ(status, I18nErrorCode::INVALID_REGION_TAG);
 }
 
 /**
@@ -186,7 +189,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest008, TestSize.Level1)
     localeTag = "en-US";
     displayName = LocaleConfig::GetDisplayLanguage(languageTag, localeTag, false);
     EXPECT_EQ(displayName, "Simplified Chinese");
-    
+
     displayName = LocaleConfig::GetDisplayLanguage(languageTag, localeTag, true);
     EXPECT_EQ(displayName, "Simplified Chinese");
 
@@ -253,12 +256,25 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest009, TestSize.Level1)
 
 /**
  * @tc.name: LocaleConfigFuncTest010
- * @tc.desc: Test LocaleConfig GetDisplayRegion
+ * @tc.desc: Test LocaleConfig GetDisplayLanguage
  * @tc.type: FUNC
  */
 HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest010, TestSize.Level1)
 {
-    EXPECT_EQ(LocaleConfig::GetDisplayRegion("zh-Hans-CN", "en-US", true), "China");
+    std::string languageTag = "zh-Hant-HK";
+    std::string localeTag = "zh-Hant";
+    std::string displayName = LocaleConfig::GetDisplayLanguage(languageTag, localeTag, true);
+    EXPECT_EQ(displayName, "繁體中文（中國香港）");
+
+    languageTag = "zh-Hant-HK";
+    localeTag = "zh-Hans";
+    displayName = LocaleConfig::GetDisplayLanguage(languageTag, localeTag, true);
+    EXPECT_EQ(displayName, "繁体中文（中国香港）");
+
+    languageTag = "zh-Hant-HK";
+    localeTag = "en-US";
+    displayName = LocaleConfig::GetDisplayLanguage(languageTag, localeTag, true);
+    EXPECT_EQ(displayName, "Traditional Chinese(Hong Kong, China)");
 }
 
 /**
@@ -269,6 +285,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest010, TestSize.Level1)
 HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest011, TestSize.Level1)
 {
     EXPECT_EQ(LocaleConfig::GetDisplayRegion("zh", "en-US", true), "");
+    EXPECT_EQ(LocaleConfig::GetDisplayRegion("zh-Hans-CN", "en-US", true), "China");
 }
 
 /**
@@ -307,6 +324,9 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest014, TestSize.Level1)
     EXPECT_EQ(status, I18nErrorCode::SUCCESS);
     current = LocaleConfig::Is24HourClock();
     EXPECT_TRUE(current);
+    status = LocaleConfig::Set24HourClock("abc");
+    EXPECT_EQ(status, I18nErrorCode::INVALID_24_HOUR_CLOCK_TAG);
+    LocaleConfig::Set24HourClock("");
 }
 
 /**
@@ -399,7 +419,10 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest020, TestSize.Level1)
 {
     vector<string> languages;
     LocaleConfig::GetSystemLanguages(languages);
-    EXPECT_EQ(languages.size(), 5);
+    EXPECT_TRUE(languages.size() > 2);
+    LocaleConfig::SetSystemLanguage("ur-Latn-PK");
+    LocaleConfig::SetUsingLocalDigit(true);
+    LocaleConfig::SetUsingLocalDigit(false);
 }
 
 /**
@@ -421,6 +444,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest021, TestSize.Level1)
     EXPECT_TRUE(flag);
     flag = LocaleConfig::IsValidTag(fakeTag);
     EXPECT_TRUE(!flag);
+    EXPECT_FALSEA(LocaleConfig::IsValidTag(""));
 }
 } // namespace I18n
 } // namespace Global

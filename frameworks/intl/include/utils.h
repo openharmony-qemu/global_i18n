@@ -32,7 +32,6 @@ static const uint32_t BYTE_ARRAY_INDEX_THIRD = 3;
 static std::set<std::string> availableIDs;
 
 void Split(const std::string &src, const std::string &sep, std::vector<std::string> &dest);
-void Merge(const std::vector<std::string>& src, const std::string& sep, std::string& dest);
 std::string ReadSystemParameter(const char *paramKey, const int paramLength);
 int32_t ConvertString2Int(const std::string &numberStr, int32_t& status);
 bool IsValidLocaleTag(icu::Locale &locale);

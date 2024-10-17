@@ -26,6 +26,10 @@
         <display_name>Traditional Chinese</display_name>
     </lang>
     <lang>
+        <id>zh-Hant-HK</id>
+        <display_name>Traditional Chinese(Hong Kong, China)</display_name>
+    </lang>
+    <lang>
         <id>ro</id>
         <display_name>Romanian</display_name>
     </lang>

@@ -13,8 +13,15 @@
  * limitations under the License.
  */
 #include "locale_config.h"
+
+#include <cctype>
+#include <sstream>
+#include "i18n_hilog.h"
 #include "ohos/init_data.h"
 #include "parameter.h"
+#include "unicode/ucurr.h"
+#include "unicode/uenum.h"
+#include "unicode/utypes.h"
 #include "utils.h"
 #include "number_format.h"
 
@@ -22,6 +29,7 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 const char* NumberFormat::DEVICE_TYPE_NAME = "const.product.devicetype";
+std::unordered_map<std::string, std::string> NumberFormat::numToCurrency = {};
 bool NumberFormat::icuInitialized = NumberFormat::Init();
 
 std::unordered_map<std::string, UNumberUnitWidth> NumberFormat::unitStyle = {
@@ -87,7 +95,7 @@ NumberFormat::NumberFormat(const std::vector<std::string> &localeTags, std::map<
     for (size_t i = 0; i < localeTags.size(); i++) {
         std::string curLocale = localeTags[i];
         locale = icu::Locale::forLanguageTag(icu::StringPiece(curLocale), status);
-        if (status != U_ZERO_ERROR) {
+        if (U_FAILURE(status)) {
             status = U_ZERO_ERROR;
             continue;
         }
@@ -209,6 +217,9 @@ void NumberFormat::InitDigitsProperties()
         int32_t minFractionDigits = ConvertString2Int(minimumFractionDigits, minFdStatus);
         int32_t maxFdStatus = 0;
         int32_t maxFractionDigits = ConvertString2Int(maximumFractionDigits, maxFdStatus);
+        if (minFdStatus == 0 || maxFdStatus == 0) {
+            isSetFraction = true;
+        }
         if (minFdStatus == 0 && maxFdStatus != 0) {
             numberFormat =
                 numberFormat.precision(icu::number::Precision::minFraction(minFractionDigits));
@@ -246,7 +257,7 @@ void NumberFormat::ParseConfigs(std::map<std::string, std::string> &configs)
         }
     }
     if (styleString == "currency" && configs.count("currency") > 0) {
-        currency = configs["currency"];
+        currency = GetCurrencyFromConfig(configs["currency"]);
         if (configs.count("currencySign") > 0) {
             currencySign = configs["currencySign"];
         }
@@ -443,6 +454,9 @@ void NumberFormat::GetDigitsResolvedOptions(std::map<std::string, std::string> &
 
 void NumberFormat::SetPrecisionWithByte(double number, const std::string& finalUnit)
 {
+    if (isSetFraction) {
+        return;
+    }
     int32_t FractionDigits = -1;
     // 100 is the threshold between different decimal
     if (finalUnit == "byte" || number >= 100) {
@@ -545,6 +559,57 @@ void NumberFormat::SetDefaultStyle()
             currencyDisplay = defaultCurrencyStyle[deviceType];
         }
     }
+}
+
+bool NumberFormat::ReadISO4217Ddatas()
+{
+    if (numToCurrency.size()) {
+        return true;
+    }
+    UErrorCode status = U_ZERO_ERROR;
+    const char *currentCurrency;
+    UEnumeration *currencies = ucurr_openISOCurrencies(UCURR_ALL, &status);
+    if (U_FAILURE(status)) {
+        return false;
+    }
+
+    UChar code[CURRENCY_LEN + 1];  // +1 includes the NUL
+    int32_t length = 0;
+    while ((currentCurrency = uenum_next(currencies, &length, &status)) != NULL) {
+        u_charsToUChars(currentCurrency, code, length + 1);  // +1 includes the NUL
+        int32_t numCode = ucurr_getNumericCode(code);
+        if (numCode == 0) {
+            continue;
+        }
+        std::stringstream ss;
+        ss << std::setw(CURRENCY_LEN) << std::setfill('0') << numCode; // fill with '0'
+        numToCurrency.insert(std::make_pair<std::string, std::string>(ss.str(), currentCurrency));
+    }
+    uenum_close(currencies);
+    return !numToCurrency.empty();
+}
+
+std::string NumberFormat::GetCurrencyFromConfig(const std::string& currency)
+{
+    if (currency.size() != CURRENCY_LEN) {
+        HILOG_ERROR_I18N("Invalid currency code : %{public}s", currency.c_str());
+        return "";
+    }
+    bool isAlpha = true;
+    for (auto c : currency) {
+        isAlpha = std::isalpha(c);
+        if (!isAlpha) {
+            break;
+        }
+    }
+    if (isAlpha) {
+        return currency;
+    }
+    if (ReadISO4217Ddatas() && numToCurrency.find(currency) != numToCurrency.end()) {
+        return numToCurrency[currency];
+    }
+    HILOG_ERROR_I18N("Invalid currency code : %{public}s", currency.c_str());
+    return "";
 }
 } // namespace I18n
 } // namespace Global

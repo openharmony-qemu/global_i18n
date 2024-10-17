@@ -125,7 +125,10 @@ void SystemLocaleManager::SortLocaleItemList(std::vector<LocaleItem> &localeItem
 {
     std::vector<std::string> collatorLocaleTags { options.localeTag };
     std::map<std::string, std::string> collatorOptions {};
-    Collator *collator = new Collator(collatorLocaleTags, collatorOptions);
+    Collator *collator = new (std::nothrow) Collator(collatorLocaleTags, collatorOptions);
+    if (collator == nullptr) {
+        return;
+    }
     auto compareFunc = [collator, options](LocaleItem item1, LocaleItem item2) {
         if (options.isSuggestedFirst) {
             if (item1.suggestionType < item2.suggestionType) {
@@ -166,6 +169,14 @@ std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray(I18n
         status = I18nErrorCode::NOT_SYSTEM_APP;
         return result;
     }
+    result = GetTimezoneCityInfoArray();
+    SortTimezoneCityItemList(LocaleConfig::GetSystemLocale(), result);
+    return result;
+}
+
+std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray()
+{
+    std::vector<TimeZoneCityItem> result;
     std::set<std::string> zoneCityIds = I18nTimeZone::GetAvailableZoneCityIDs();
     std::string locale = LocaleConfig::GetSystemLocale();
     std::string localeBaseName = I18nTimeZone::GetLocaleBaseName(locale);
@@ -173,13 +184,11 @@ std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray(I18n
     std::map<std::string, icu::TimeZone*> tzMap;
     bool ifEnforce = GetPseudoLocalizationEnforce();
     for (auto it = zoneCityIds.begin(); it != zoneCityIds.end(); ++it) {
-        std::string cityId = *it;
-        std::string cityDisplayName = "";
+        std::string cityId = *it, cityDisplayName = "";
         if (displayNameMap.find(cityId) != displayNameMap.end()) {
             cityDisplayName = displayNameMap.find(cityId)->second;
         }
-        int32_t rawOffset = 0;
-        int32_t dstOffset = 0;
+        int32_t rawOffset = 0, dstOffset = 0;
         bool local = false;
         UErrorCode status = U_ZERO_ERROR;
         UDate date = icu::Calendar::getNow();
@@ -193,6 +202,9 @@ std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray(I18n
         } else {
             icu::UnicodeString unicodeString = icu::UnicodeString::fromUTF8(timezoneId);
             icu::TimeZone *icuTimeZone = icu::TimeZone::createTimeZone(unicodeString);
+            if (icuTimeZone == nullptr) {
+                continue;
+            }
             icuTimeZone->getOffset(date, (UBool)local, rawOffset, dstOffset, status);
             tzMap.insert({timezoneId, icuTimeZone});
         }
@@ -202,7 +214,10 @@ std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray(I18n
         };
         result.push_back(tzCityItem);
     }
-    SortTimezoneCityItemList(locale, result);
+    for (auto it = tzMap.begin(); it != tzMap.end(); ++it) {
+        delete it->second;
+        it->second = nullptr;
+    }
     return result;
 }
 
@@ -211,7 +226,10 @@ void SystemLocaleManager::SortTimezoneCityItemList(const std::string &locale,
 {
     std::vector<std::string> collatorLocaleTags { locale };
     std::map<std::string, std::string> collatorOptions {};
-    Collator *collator = new Collator(collatorLocaleTags, collatorOptions);
+    Collator *collator = new (std::nothrow) Collator(collatorLocaleTags, collatorOptions);
+    if (collator == nullptr) {
+        return;
+    }
     auto sortFunc = [collator](TimeZoneCityItem item1, TimeZoneCityItem item2) {
         CompareResult result = CompareResult::INVALID;
         result = collator->Compare(item1.cityDisplayName, item2.cityDisplayName);

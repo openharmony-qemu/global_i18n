@@ -207,6 +207,7 @@ set<std::string> LocaleConfig::validHcTag {
 
 static unordered_map<string, string> g_languageMap = {
     { "zh-Hans", "zh-Hans" },
+    { "zh-Hant-HK", "zh-Hant-HK" },
     { "zh-Hant", "zh-Hant" },
     { "my-Qaag", "my-Qaag" },
     { "es-Latn-419", "es-419" },
