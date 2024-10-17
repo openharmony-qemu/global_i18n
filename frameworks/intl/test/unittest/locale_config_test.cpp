@@ -420,7 +420,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest020, TestSize.Level1)
     vector<string> languages;
     LocaleConfig::GetSystemLanguages(languages);
     EXPECT_TRUE(languages.size() > 2);
-    LocaleConfig::SetSystemLanguage("ur-Latn-PK");
+    LocaleConfig::SetSystemLocale("ur-Latn-PK");
     LocaleConfig::SetUsingLocalDigit(true);
     LocaleConfig::SetUsingLocalDigit(false);
 }
@@ -444,7 +444,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest021, TestSize.Level1)
     EXPECT_TRUE(flag);
     flag = LocaleConfig::IsValidTag(fakeTag);
     EXPECT_TRUE(!flag);
-    EXPECT_FALSEA(LocaleConfig::IsValidTag(""));
+    EXPECT_FALSE(LocaleConfig::IsValidTag(""));
 }
 } // namespace I18n
 } // namespace Global

@@ -1304,7 +1304,7 @@ HWTEST_F(I18nTest, I18nFuncTest055, TestSize.Level1)
     LocaleUtil::DecodeScript(encodedScript, decodedScript);
     std::string originScript = "Hans";
     EXPECT_EQ(originScript.compare(decodedScript), 0);
-    LocaleUtil::DecodeScript(encodeScript, nullptr);
+    LocaleUtil::DecodeScript(encodedScript, nullptr);
 }
 
 /**

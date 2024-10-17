@@ -104,7 +104,7 @@ ohos_executable("hmos_cust_timezone_mount") {
   deps = [ "../frameworks/intl:intl_util" ]
   external_deps = [
     "hilog:libhilog",
-    "init:libbegtutil",
+    "init:libbegetutil",
     "openssl:libcrypto_shared",
     "openssl:libssl_shared",
   ]
