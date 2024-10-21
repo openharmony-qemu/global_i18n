@@ -302,9 +302,6 @@ std::string PhoneNumberFormat::getPhoneLocationName(
             locName = recvArr;
         }
     }
-    if (locName.empty()) {
-        locName = LocaleConfig::GetDisplayRegion(regionCode, displayLocale, false);
-    }
     return locName;
 }
 
