@@ -64,7 +64,10 @@ public:
     bool IsWeekend(void);
     std::string GetDisplayName(std::string &displayLocaleTag);
     int32_t CompareDays(UDate date);
-    
+
+protected:
+    virtual icu::Calendar* GetIcuCalendar() const;
+
 private:
     icu::Calendar *calendar_;
     void InitCalendar(const icu::Locale &locale, CalendarType type);

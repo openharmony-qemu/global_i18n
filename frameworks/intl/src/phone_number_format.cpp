@@ -204,12 +204,11 @@ std::string PhoneNumberFormat::GetAsYouTypeFormatResult(const std::string &numbe
     }
     std::regex pattern("[^\\d]");
     std::string phoneNumber = std::regex_replace(number, pattern, "");
-    size_t len = phoneNumber.length();
-    if (lastFormatNumber.length() > 0 && len == lastFormatNumber.length() + 1) {
+    if (lastFormatNumber.length() > 0 && phoneNumber.length() == lastFormatNumber.length() + 1) {
         if (phoneNumber.compare(0, lastFormatNumber.length(), lastFormatNumber) != 0) {
             return FormatAllInputNumber(number, phoneNumber);
         }
-        char lastChar = phoneNumber.at(len - 1);
+        char lastChar = *(phoneNumber.rbegin());
         std::string result;
         this->lastFormatNumber = phoneNumber;
         return formatter->InputDigit(lastChar, &result);
@@ -335,11 +334,13 @@ bool PhoneNumberFormat::getBlockedRegionName(
         return false;
     }
     GetBlockedRegionName getBlockedRegionName = (GetBlockedRegionName)dlsym(i18nUtilHandle, "GetBlockedRegionName");
+    bool ret = false;
     if (getBlockedRegionName) {
-        return getBlockedRegionName(language.c_str(), regionCode.c_str());
-    } else {
-        return false;
+        ret = getBlockedRegionName(language.c_str(), regionCode.c_str());
     }
+    dlclose(i18nUtilHandle);
+    i18nUtilHandle = nullptr;
+    return ret;
 }
 
 std::string PhoneNumberFormat::getCityName(
@@ -361,6 +362,8 @@ std::string PhoneNumberFormat::getCityName(
         getBlockedPhoneLocationName(language.c_str(), phonenumber.c_str(), recvArr);
     }
     if (locationName.compare(recvArr) != 0) {
+        dlclose(i18nUtilHandle);
+        i18nUtilHandle = nullptr;
         return "";
     }
 
@@ -369,6 +372,8 @@ std::string PhoneNumberFormat::getCityName(
     if (getReplacedPhoneLocationName) {
         getReplacedPhoneLocationName(language.c_str(), phonenumber.c_str(), recvArr);
     }
+    dlclose(i18nUtilHandle);
+    i18nUtilHandle = nullptr;
     std::string ret(recvArr);
     return ret;
 }

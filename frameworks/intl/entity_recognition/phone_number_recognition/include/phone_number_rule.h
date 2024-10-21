@@ -36,7 +36,7 @@ public:
     PhoneNumberRule(std::string& country);
     ~PhoneNumberRule();
     void Init();
-    
+
     std::vector<BorderRule*> GetBorderRules();
     std::vector<CodeRule*> GetCodesRules();
     std::vector<PositiveRule*> GetPositiveRules();
@@ -47,7 +47,6 @@ public:
 
 private:
     void InitRule(std::string& xmlPath);
-    void FreePointer(std::vector<RegexRule*> &ruleList);
     void SetRules(std::string& category, icu::UnicodeString& content, std::string& valid,
         std::string& handle, std::string& insensitive, std::string& type);
     void ParseXmlNode(xmlNodePtr cur, std::string& category);

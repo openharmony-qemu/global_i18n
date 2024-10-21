@@ -71,6 +71,13 @@ HWTEST_F(I18nTest, I18nFuncTest001, TestSize.Level1)
     preferredLocale = PreferredLanguage::GetPreferredLocale();
     EXPECT_EQ(preferredLocale, "en-CN");
     PreferredLanguage::RemovePreferredLanguage(0);
+#ifdef SUPPORT_APP_PREFERRED_LANGUAGE
+    I18nErrorCode errCode = I18nErrorCode::SUCCESS;
+    PreferredLanguage::SetAppPreferredLanguage("en-US", errCode);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    std::string appPreferLanguage = PreferredLanguage::GetAppPreferredLanguage();
+    EXPECT_EQ(appPreferLanguage, "en-US");
+#endif
 }
 
 /**
@@ -101,6 +108,8 @@ HWTEST_F(I18nTest, I18nFuncTest002, TestSize.Level1)
     EXPECT_EQ(errorCode, I18nErrorCode::SUCCESS);
     EXPECT_EQ(normalizedText.length(), 6); // 6 is the expected normalized text length.
     EXPECT_EQ(normalizedText, "\u017F\u0323\u0307");
+    std::string result = normalizer.Normalize(nullptr, 0, errorCode);
+    EXPECT_EQ(result, "");
 }
 
 /**
@@ -1213,6 +1222,8 @@ HWTEST_F(I18nTest, I18nFuncTest049, TestSize.Level1)
     LocaleInfo *locale = new LocaleInfo("zh-Hans-CN");
     uint16_t encodedRegion = LocaleUtil::EncodeRegionByLocaleInfo(locale);
     EXPECT_EQ(encodedRegion, 17230);
+    uint16_t result = LocaleUtil::EncodeRegionByLocaleInfo(nullptr);
+    EXPECT_EQ(result, 0);
     delete locale;
 }
 
@@ -1293,6 +1304,7 @@ HWTEST_F(I18nTest, I18nFuncTest055, TestSize.Level1)
     LocaleUtil::DecodeScript(encodedScript, decodedScript);
     std::string originScript = "Hans";
     EXPECT_EQ(originScript.compare(decodedScript), 0);
+    LocaleUtil::DecodeScript(encodedScript, nullptr);
 }
 
 /**
@@ -1307,6 +1319,8 @@ HWTEST_F(I18nTest, I18nFuncTest056, TestSize.Level1)
     bool isAlpha = LocaleUtil::IsAlphaString(alphaString.c_str(), alphaString.length());
     EXPECT_TRUE(isAlpha);
     isAlpha = LocaleUtil::IsAlphaString(nonAlphaString.c_str(), nonAlphaString.length());
+    EXPECT_FALSE(isAlpha);
+    isAlpha = LocaleUtil::IsAlphaString(nullptr, nonAlphaString.length());
     EXPECT_FALSE(isAlpha);
 }
 
@@ -1323,6 +1337,11 @@ HWTEST_F(I18nTest, I18nFuncTest057, TestSize.Level1)
     EXPECT_TRUE(isNumeric);
     isNumeric = LocaleUtil::IsNumericString(nonNumericString.c_str(), nonNumericString.length());
     EXPECT_FALSE(isNumeric);
+    isNumeric = LocaleUtil::IsNumericString(nullptr, nonNumericString.length());
+    EXPECT_FALSE(isNumeric);
+    std::string locale = "ug-CN";
+    bool rtl = LocaleUtil::IsRTL(locale);
+    EXPECT_TRUE(rtl);
 }
 
 /**
@@ -1383,7 +1402,7 @@ HWTEST_F(I18nTest, I18nFuncTest059, TestSize.Level1)
     current = new LocaleInfo("en-AU");
     res = LocaleMatcher::IsMoreSuitable(current, other, request);
     EXPECT_TRUE(res > 0);
-    
+
     other = new LocaleInfo("en-GB");
     res = LocaleMatcher::IsMoreSuitable(current, other, request);
     EXPECT_TRUE(res < 0);
