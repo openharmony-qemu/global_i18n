@@ -60,19 +60,6 @@ void Split(const string &src, const string &sep, vector<string> &dest)
     }
 }
 
-void Merge(const std::vector<std::string>& src, const std::string& sep, std::string& dest)
-{
-    if (src.size() == 0) {
-        dest = "";
-        return;
-    }
-    dest = src[0];
-    for (size_t i = 1; i < src.size(); ++i) {
-        dest += sep;
-        dest += src[i];
-    }
-}
-
 std::string ReadSystemParameter(const char *paramKey, const int paramLength)
 {
     char param[paramLength];
@@ -245,7 +232,7 @@ bool IsLegalPath(const std::string& path)
     }
     return true;
 }
- 
+
 bool IsDirExist(const char *path)
 {
     if (!(path && *path)) {
@@ -262,7 +249,7 @@ bool IsDirExist(const char *path)
     struct stat buf;
     return stat(resolvedPath, &buf) == 0 && S_ISDIR(buf.st_mode);
 }
- 
+
 std::string trim(std::string &s)
 {
     if (s.empty()) {

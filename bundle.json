@@ -69,6 +69,7 @@
                 "memmgr",
                 "napi",
                 "openssl",
+                "os_account",
                 "preferences",
                 "resource_management",
                 "safwk",

@@ -42,81 +42,96 @@ I18nBreakIterator::~I18nBreakIterator()
 
 int32_t I18nBreakIterator::Current()
 {
-    if (iter != nullptr) {
-        return iter->current();
+    icu::BreakIterator* breakIter = GetBreakIterator();
+    if (breakIter != nullptr) {
+        return breakIter->current();
     }
     return OFF_BOUND;
 }
 
 int32_t I18nBreakIterator::First()
 {
-    if (iter != nullptr) {
-        return iter->first();
+    icu::BreakIterator* breakIter = GetBreakIterator();
+    if (breakIter != nullptr) {
+        return breakIter->first();
     }
     return OFF_BOUND;
 }
 
 int32_t I18nBreakIterator::Last()
 {
-    if (iter != nullptr) {
-        return iter->last();
+    icu::BreakIterator* breakIter = GetBreakIterator();
+    if (breakIter != nullptr) {
+        return breakIter->last();
     }
     return OFF_BOUND;
 }
 
 int32_t I18nBreakIterator::Previous()
 {
-    if (iter != nullptr) {
-        return iter->previous();
+    icu::BreakIterator* breakIter = GetBreakIterator();
+    if (breakIter != nullptr) {
+        return breakIter->previous();
     }
     return OFF_BOUND;
 }
 
 int32_t I18nBreakIterator::Next(int32_t number)
 {
-    if (iter != nullptr) {
-        return iter->next(number);
+    icu::BreakIterator* breakIter = GetBreakIterator();
+    if (breakIter != nullptr) {
+        return breakIter->next(number);
     }
     return OFF_BOUND;
 }
 
 int32_t I18nBreakIterator::Next()
 {
-    if (iter != nullptr) {
-        return iter->next();
+    icu::BreakIterator* breakIter = GetBreakIterator();
+    if (breakIter != nullptr) {
+        return breakIter->next();
     }
     return OFF_BOUND;
 }
 
 int32_t I18nBreakIterator::Following(int32_t offset)
 {
-    if (iter != nullptr) {
-        return iter->following(offset);
+    icu::BreakIterator* breakIter = GetBreakIterator();
+    if (breakIter != nullptr) {
+        return breakIter->following(offset);
     }
     return OFF_BOUND;
 }
 
 void I18nBreakIterator::SetText(const char *text)
 {
-    if (iter != nullptr) {
+    icu::BreakIterator* breakIter = GetBreakIterator();
+    if (breakIter != nullptr) {
         ftext = text;
-        iter->setText(ftext);
+        breakIter->setText(ftext);
     }
 }
 
 void I18nBreakIterator::GetText(std::string &str)
 {
-    if (iter != nullptr) {
+    icu::BreakIterator* breakIter = GetBreakIterator();
+    if (breakIter != nullptr) {
         ftext.toUTF8String(str);
     }
 }
 
 bool I18nBreakIterator::IsBoundary(int32_t offset)
 {
-    if (iter != nullptr) {
-        return iter->isBoundary(offset);
+    icu::BreakIterator* breakIter = GetBreakIterator();
+    if (breakIter != nullptr) {
+        return breakIter->isBoundary(offset);
     }
     return false;
+}
+
+icu::BreakIterator* I18nBreakIterator::GetBreakIterator()
+{
+    return this->iter;
 }
 } // namespace I18n
 } // namespace Global

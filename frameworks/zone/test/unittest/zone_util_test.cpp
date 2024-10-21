@@ -181,6 +181,9 @@ HWTEST_F(ZoneUtilTest, ZoneUtilFuncTest007, TestSize.Level1)
     ZoneUtil util;
     string out = util.GetDefaultZone(number);
     EXPECT_EQ(expects[0], out);
+    int32_t fakeNum = 2233;
+    out = util.GetDefaultZone(fakeNum);
+    EXPECT_EQ("", out);
 }
 
 /**
@@ -195,6 +198,9 @@ HWTEST_F(ZoneUtilTest, ZoneUtilFuncTest008, TestSize.Level1)
     ZoneUtil util;
     string out = util.GetDefaultZone(number, 8 * 3600 * 1000);
     EXPECT_EQ(expects[0], out);
+    int32_t fakeNum = 2233;
+    out = util.GetDefaultZone(fakeNum, 8 * 3600 * 1000);
+    EXPECT_EQ("", out);
 }
 
 /**

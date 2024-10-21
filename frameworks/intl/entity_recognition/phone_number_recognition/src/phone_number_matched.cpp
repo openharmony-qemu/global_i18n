@@ -136,9 +136,14 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::FindShortNumbers(std::string&
     // 1 indicates the last position.
     FindRule* shortRegexRule = phoneNumberRule->GetFindRules()[pos - 1];
     icu::RegexPattern* shortPattern = shortRegexRule->GetPattern();
+    if (shortPattern == nullptr) {
+        HILOG_ERROR_I18N("shortPattern getPattern failed.");
+        return matchedNumberInfoList;
+    }
     icu::RegexMatcher* shortMatch = shortPattern->matcher(message, status);
     if (shortMatch == nullptr) {
-        HILOG_ERROR_I18N("shortPattern  matcher failed.");
+        delete shortPattern;
+        HILOG_ERROR_I18N("shortPattern matcher failed.");
         return matchedNumberInfoList;
     }
     while (shortMatch->find(status)) {
@@ -203,7 +208,16 @@ std::vector<PhoneNumberMatch*> PhoneNumberMatched::FindNumbers(std::string& coun
     // 2 indicates the penultimate position.
     FindRule* numberRegexRule = phoneNumberRule->GetFindRules()[pos - 2];
     icu::RegexPattern* numberPattern = numberRegexRule->GetPattern();
+    if (numberPattern == nullptr) {
+        HILOG_ERROR_I18N("numberRegexRule getPattern failed.");
+        return matchList;
+    }
     icu::RegexMatcher* numberMatcher = numberPattern->matcher(filteredString, status);
+    if (numberMatcher == nullptr) {
+        HILOG_ERROR_I18N("numberPattern matcher failed.");
+        delete numberPattern;
+        return matchList;
+    }
     while (numberMatcher->find(status)) {
         int32_t start = numberMatcher->start(status);
         int32_t end = numberMatcher->end(status);
@@ -249,6 +263,10 @@ bool PhoneNumberMatched::HandleWithShortAndShort(std::vector<MatchedNumberInfo>&
         UErrorCode status = U_ZERO_ERROR;
         FindRule* regexRule = phoneNumberRule->GetFindRules()[0];
         icu::RegexPattern* pattern = regexRule->GetPattern();
+        if (pattern == nullptr) {
+            HILOG_ERROR_I18N("regexRule getPattern failed.");
+            return flag;
+        }
         icu::UnicodeString str = "";
         if (info.GetContent()[0] == '(' || info.GetContent()[0] == '[') {
             str = info.GetContent().tempSubString(1);
@@ -256,6 +274,11 @@ bool PhoneNumberMatched::HandleWithShortAndShort(std::vector<MatchedNumberInfo>&
             str = info.GetContent();
         }
         icu::RegexMatcher* matcher = pattern->matcher(str, status);
+        if (matcher == nullptr) {
+            delete pattern;
+            HILOG_ERROR_I18N("pattern matcher failed.");
+            return flag;
+        }
         if (!matcher->find(status)) {
             result.push_back(info);
             ReplaceSpecifiedPos(filteredString, pos.first, pos.second);
@@ -380,6 +403,9 @@ std::vector<int> PhoneNumberMatched::DealResult(std::vector<MatchedNumberInfo>& 
 // Filter result based on Border rule
 bool PhoneNumberMatched::HandleBorderRule(PhoneNumberMatch* match, icu::UnicodeString& message)
 {
+    if (match == nullptr) {
+        return false;
+    }
     std::vector<BorderRule*> rules = phoneNumberRule->GetBorderRules();
     if (rules.size() == 0) {
         return true;

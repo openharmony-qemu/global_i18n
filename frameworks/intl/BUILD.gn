@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//base/global/i18n/i18n.gni")
-import("//base/startup/init/services/etc/param/param_fixer.gni")
+import("//build/config/components/init/param/param_fixer.gni")
 import("//build/ohos.gni")
 
 group("build_module") {
@@ -197,12 +197,14 @@ ohos_shared_library("intl_util") {
 ohos_prebuilt_para("i18n.para") {
   source = "//base/global/i18n/frameworks/intl/etc/i18n.para"
   part_name = "i18n"
+  subsystem_name = "global"
   module_install_dir = "etc/param"
 }
 
 ohos_prebuilt_para("i18n.para.dac") {
   source = "//base/global/i18n/frameworks/intl/etc/i18n.para.dac"
   part_name = "i18n"
+  subsystem_name = "global"
   module_install_dir = "etc/param"
 }
 
@@ -278,6 +280,13 @@ ohos_prebuilt_etc("zh_Hans_lang_xml") {
 
 ohos_prebuilt_etc("zh_Hant_lang_xml") {
   source = "//base/global/i18n/frameworks/intl/etc/lang/zh-Hant.xml"
+  module_install_dir = "etc/ohos_lang_config/"
+  part_name = "i18n"
+  subsystem_name = "global"
+}
+
+ohos_prebuilt_etc("zh_Hant_HK_lang_xml") {
+  source = "//base/global/i18n/frameworks/intl/etc/lang/zh-Hant-HK.xml"
   module_install_dir = "etc/ohos_lang_config/"
   part_name = "i18n"
   subsystem_name = "global"

@@ -54,6 +54,13 @@ std::string IcsFileWriter::GenerateFile()
         "SUMMARY:The Second Day of Sacrifice Feast\r\n",
         "RESOURCES;LANGUAGE=TR:Kurban Bayrami 2. Günü\r\n"
         "END:VEVENT\r\n",
+        "BEGIN:VEVENT\r\n",
+        "UID:3\r\n",
+        "DTSTART;VALUE=DATE:20220625\r\n",
+        "DTEND;VALUE=DATE:20220625\r\n",
+        "SUMMARY:Test Holiday\r\n",
+        "RESOURCES;LANGUAGE=TR:test holiday\r\n"
+        "END:VEVENT\r\n",
         "END:VCALENDAR\r\n"
     };
     for (size_t i = 0; i < list.size(); i++) {
@@ -73,6 +80,38 @@ std::string IcsFileWriter::WriteVersionFile(const std::string& verison, std::str
     }
     std::string content = "version=" + verison;
     fstream << content << std::endl;
+    fstream.close();
+    return filePath;
+}
+
+std::string IcsFileWriter::WriteManifest(const std::vector<std::string>& list, std::string& fileName)
+{
+    std::string filePath = "/data/log/" + fileName;
+    std::ofstream fstream(filePath);
+    if (!fstream.is_open()) {
+        printf("file can't access.\r\n");
+        return filePath;
+    }
+    for (size_t i = 0; i < list.size(); i++) {
+        fstream << list[i] << std::endl;
+    }
+    fstream.close();
+    return filePath;
+}
+
+std::string IcsFileWriter::WriteBinaryFile(std::string& fileName)
+{
+    std::string filePath = "/data/log/" + fileName;
+    std::ofstream fstream(filePath, std::ios_base::out | std::ios_base::binary);
+    if (!fstream.is_open()) {
+        printf("file can't access.\r\n");
+        return filePath;
+    }
+    if (fstream.is_open()) {
+        const char* data = "01010101000101001010";
+        const size_t len = 20;
+        fstream.write(data, len);
+    }
     fstream.close();
     return filePath;
 }

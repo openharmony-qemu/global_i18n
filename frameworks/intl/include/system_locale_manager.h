@@ -117,6 +117,7 @@ private:
     void SortLocaleItemList(std::vector<LocaleItem> &localeItemList, const SortOptions &options);
     static void SortTimezoneCityItemList(const std::string &locale,
                                          std::vector<TimeZoneCityItem> &timezoneCityItemList);
+    static std::vector<TimeZoneCityItem> GetTimezoneCityInfoArray();
     std::unique_ptr<TabooUtils> tabooUtils;
     static const char* SIM_COUNTRY_CODE_KEY;
     static constexpr int CONFIG_LEN = 128;

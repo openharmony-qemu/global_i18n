@@ -84,6 +84,7 @@ private:
     std::string unitType;
     std::string unitMeasSys;
     bool createSuccess = false;
+    bool isSetFraction = false;
     std::unique_ptr<LocaleInfo> localeInfo = nullptr;
     std::unique_ptr<RelativeTimeFormat> relativeTimeFormat = nullptr;
     icu::number::LocalizedNumberFormatter numberFormat;
@@ -95,6 +96,8 @@ private:
     static const int DEFAULT_FRACTION_DIGITS = 3;
     static const char *DEVICE_TYPE_NAME;
     static const int BUFFER_LEN = 10;
+    static const int CURRENCY_LEN = 3;
+    static std::unordered_map<std::string, std::string> numToCurrency;
     icu::MeasureUnit unitArray[MAX_UNIT_NUM];
     static bool icuInitialized;
     static bool Init();
@@ -106,6 +109,8 @@ private:
     static std::unordered_map<std::string, UNumberUnitWidth> defaultUnitStyle;
     static std::unordered_map<std::string, UNumberUnitWidth> defaultCurrencyStyle;
     static std::map<std::string, std::string> RelativeTimeFormatConfigs;
+    static bool ReadISO4217Ddatas();
+    std::string GetCurrencyFromConfig(const std::string& currency);
     void CreateRelativeTimeFormat(const std::string& locale);
     void ParseConfigs(std::map<std::string, std::string> &configs);
     void ParseDigitsConfigs(std::map<std::string, std::string> &configs);

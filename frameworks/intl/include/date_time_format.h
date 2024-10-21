@@ -152,7 +152,6 @@ private:
     void FixPatternPartOne();
     void FixPatternPartTwo();
     void RemoveAmPmChar();
-    int64_t GetArrayValue(int64_t *dateArray, size_t index, size_t size);
     bool CheckInitSuccess();
     void FreeDateTimeFormat();
     std::string GetSystemTimezone();
