@@ -150,6 +150,7 @@ ohos_shared_library("intl_util") {
       ":zh_Hans_lang_xml",
       ":zh_Hans_region_xml",
       ":zh_Hans_timezone_xml",
+      ":zh_Hant_HK_lang_xml",
       ":zh_Hant_lang_xml",
       ":zh_datetime_xml",
     ]
