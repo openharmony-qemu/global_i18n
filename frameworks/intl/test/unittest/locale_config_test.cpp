@@ -189,7 +189,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest008, TestSize.Level1)
     localeTag = "en-US";
     displayName = LocaleConfig::GetDisplayLanguage(languageTag, localeTag, false);
     EXPECT_EQ(displayName, "Simplified Chinese");
-
+    
     displayName = LocaleConfig::GetDisplayLanguage(languageTag, localeTag, true);
     EXPECT_EQ(displayName, "Simplified Chinese");
 

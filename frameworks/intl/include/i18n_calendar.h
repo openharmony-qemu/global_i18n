@@ -67,7 +67,7 @@ public:
 
 protected:
     virtual icu::Calendar* GetIcuCalendar() const;
-
+  
 private:
     icu::Calendar *calendar_;
     void InitCalendar(const icu::Locale &locale, CalendarType type);
