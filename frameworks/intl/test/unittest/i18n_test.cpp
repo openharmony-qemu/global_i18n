@@ -1403,7 +1403,7 @@ HWTEST_F(I18nTest, I18nFuncTest059, TestSize.Level1)
     current = new LocaleInfo("en-AU");
     res = LocaleMatcher::IsMoreSuitable(current, other, request);
     EXPECT_TRUE(res > 0);
-
+    
     other = new LocaleInfo("en-GB");
     res = LocaleMatcher::IsMoreSuitable(current, other, request);
     EXPECT_TRUE(res < 0);

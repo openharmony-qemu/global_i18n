@@ -619,7 +619,7 @@ HWTEST_F(IntlTest, IntlFuncTest0016, TestSize.Level1)
     const string param2 = "cba";
     CompareResult result = collator->Compare(param1, param2);
     EXPECT_EQ(result, CompareResult::SMALLER);
-
+    
     map<string, string> options;
     collator->ResolvedOptions(options);
     EXPECT_EQ(options.size(), 8);
@@ -781,7 +781,7 @@ HWTEST_F(IntlTest, IntlFuncTest0019, TestSize.Level1)
     const string param2 = "cba";
     CompareResult result = collator->Compare(param1, param2);
     EXPECT_EQ(result, CompareResult::SMALLER);
-
+    
     map<string, string> options;
     collator->ResolvedOptions(options);
     EXPECT_EQ(options.size(), 8);
@@ -1000,7 +1000,7 @@ HWTEST_F(IntlTest, IntlFuncTest0025, TestSize.Level1)
     locales.push_back("en-US");
     map<string, string> options;
     RelativeTimeFormat *formatter = new RelativeTimeFormat(locales, options);
-
+    
     double number = 2022;
     string unit = "year";
     string res = formatter->Format(number, unit);
@@ -1050,7 +1050,7 @@ HWTEST_F(IntlTest, IntlFuncTest0026, TestSize.Level1)
     locales.push_back("en-US");
     map<string, string> options;
     RelativeTimeFormat *formatter = new RelativeTimeFormat(locales, options);
-
+    
     double number = 23;
     string unit = "hour";
     string res = formatter->Format(number, unit);
@@ -1091,7 +1091,7 @@ HWTEST_F(IntlTest, IntlFuncTest0027, TestSize.Level1)
         { "style", "long" }
     };
     RelativeTimeFormat *formatter = new RelativeTimeFormat(locales, options);
-
+    
     double number = 2022;
     string unit = "year";
     string res = formatter->Format(number, unit);
@@ -1142,7 +1142,7 @@ HWTEST_F(IntlTest, IntlFuncTest0028, TestSize.Level1)
         { "style", "long" }
     };
     RelativeTimeFormat *formatter = new RelativeTimeFormat(locales, options);
-
+    
     double number = 18;
     string unit = "day";
     string res = formatter->Format(number, unit);
@@ -1227,7 +1227,7 @@ HWTEST_F(IntlTest, IntlFuncTest0030, TestSize.Level1)
         { "unitUsage", "default" }
     };
     NumberFormat *formatter = new NumberFormat(locales, options);
-
+    
     string res = formatter->Format(123);
     EXPECT_EQ(res, "123");
     res = formatter->Format(123.456);
@@ -1272,12 +1272,12 @@ HWTEST_F(IntlTest, IntlFuncTest0031, TestSize.Level1)
         { "maximumSignificantDigits", "20" }
     };
     NumberFormat *formatter = new NumberFormat(locales, options);
-
+    
     string formatRes = formatter->Format(123);
     EXPECT_EQ(formatRes, "+123");
     formatRes = formatter->Format(123.456);
     EXPECT_EQ(formatRes, "+123.456");
-
+    
     map<string, string> res;
     formatter->GetResolvedOptions(res);
     EXPECT_EQ(res.size(), 12);
@@ -1509,7 +1509,7 @@ HWTEST_F(IntlTest, IntlFuncTest0036, TestSize.Level1)
     int64_t milliseconds = 123456789;
     string res = formatter->Format(milliseconds);
     EXPECT_EQ(res, "1/2/70");
-
+    
     int64_t milliseconds2 = 987654321;
     res = formatter->FormatRange(milliseconds, milliseconds2);
     EXPECT_EQ(res, "1/2/70 \xE2\x80\x93 1/12/70");
@@ -1552,7 +1552,7 @@ HWTEST_F(IntlTest, IntlFuncTest0037, TestSize.Level1)
     string res = formatter->Format(milliseconds);
     // 2022年12月19日 GMT+8 15:18:24
     EXPECT_TRUE(res.length() > 0);
-
+    
     int64_t milliseconds2 = 987654321;
     res = formatter->FormatRange(milliseconds, milliseconds2);
     // 2022/12/19 GMT+8 15:18:24 \xE2\x80\x93 2023/11/18 GMT+8 14:17:23

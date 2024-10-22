@@ -36,7 +36,7 @@ public:
     PhoneNumberRule(std::string& country);
     ~PhoneNumberRule();
     void Init();
-
+    
     std::vector<BorderRule*> GetBorderRules();
     std::vector<CodeRule*> GetCodesRules();
     std::vector<PositiveRule*> GetPositiveRules();

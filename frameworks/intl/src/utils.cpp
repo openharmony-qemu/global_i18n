@@ -232,7 +232,7 @@ bool IsLegalPath(const std::string& path)
     }
     return true;
 }
-
+ 
 bool IsDirExist(const char *path)
 {
     if (!(path && *path)) {
@@ -249,7 +249,7 @@ bool IsDirExist(const char *path)
     struct stat buf;
     return stat(resolvedPath, &buf) == 0 && S_ISDIR(buf.st_mode);
 }
-
+ 
 std::string trim(std::string &s)
 {
     if (s.empty()) {
