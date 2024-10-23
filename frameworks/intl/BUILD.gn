@@ -140,7 +140,6 @@ ohos_shared_library("intl_util") {
       ":config_locales_xml",
       ":dialect_languages_xml",
       ":en_Latn_lang_xml",
-      ":en_Latn_region_xml",
       ":en_datetime_xml",
       ":i18n.para",
       ":i18n.para.dac",
@@ -151,7 +150,6 @@ ohos_shared_library("intl_util") {
       ":timezones_xml",
       ":ug_lang_xml",
       ":zh_Hans_lang_xml",
-      ":zh_Hans_region_xml",
       ":zh_Hans_timezone_xml",
       ":zh_Hant_HK_lang_xml",
       ":zh_Hant_lang_xml",
@@ -346,20 +344,6 @@ ohos_prebuilt_etc("timezones_xml") {
 
 ohos_prebuilt_etc("region_supported_locales_xml") {
   source = "//base/global/i18n/frameworks/intl/etc/region/supported_regions.xml"
-  module_install_dir = "usr/ohos_locale_config/region/"
-  part_name = "i18n"
-  subsystem_name = "global"
-}
-
-ohos_prebuilt_etc("zh_Hans_region_xml") {
-  source = "//base/global/i18n/frameworks/intl/etc/region/zh-Hans.xml"
-  module_install_dir = "usr/ohos_locale_config/region/"
-  part_name = "i18n"
-  subsystem_name = "global"
-}
-
-ohos_prebuilt_etc("en_Latn_region_xml") {
-  source = "//base/global/i18n/frameworks/intl/etc/region/en-Latn-US.xml"
   module_install_dir = "usr/ohos_locale_config/region/"
   part_name = "i18n"
   subsystem_name = "global"
