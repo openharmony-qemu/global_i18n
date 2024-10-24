@@ -335,7 +335,7 @@ std::set<std::string> GetTimeZoneAvailableIDs(I18nErrorCode &errorCode)
         if (line.length() == 0) {
             break;
         }
-        line = line.substr(0, line.find_last_not_of("\r\n") + 1);
+        line.resize(line.find_last_not_of("\r\n") + 1);
         availableIDs.insert(line);
     }
     file.close();
