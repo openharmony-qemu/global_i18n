@@ -59,8 +59,9 @@ ohos_unittest("intl_test") {
     "openssl:libssl_shared",
     "preferences:native_preferences",
   ]
+  defines = []
   if (i18n_support_app_preferred_language) {
-    defines = [ "SUPPORT_APP_PREFERRED_LANGUAGE" ]
+    defines += [ "SUPPORT_APP_PREFERRED_LANGUAGE" ]
   }
   if (target_platform == "pc") {
     defines += [ "SUPPORT_MULTI_USER" ]
