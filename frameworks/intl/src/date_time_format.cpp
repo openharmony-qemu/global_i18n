@@ -60,7 +60,7 @@ DateTimeFormat::DateTimeFormat(const std::vector<std::string> &localeTags, std::
     for (size_t i = 0; i < localeTags.size(); i++) {
         std::string curLocale = localeTags[i];
         locale = Locale::forLanguageTag(StringPiece(curLocale), status);
-        if (U_FAILURE(status)) {
+        if (status != U_ZERO_ERROR) {
             status = U_ZERO_ERROR;
             continue;
         }
@@ -601,7 +601,7 @@ std::string DateTimeFormat::FormatRange(int64_t fromMilliseconds, int64_t toMill
     calendar->setTime((UDate)fromMilliseconds, status);
 
     auto toCalendar = std::unique_ptr<Calendar>(Calendar::createInstance(locale, status));
-    if (U_FAILURE(status) || toCalendar == nullptr) {
+    if (status != U_ZERO_ERROR || toCalendar == nullptr) {
         return PseudoLocalizationProcessor("");
     }
     toCalendar->clear();
@@ -652,7 +652,7 @@ void DateTimeFormat::GetResolvedOptions(std::map<std::string, std::string> &map)
     } else {
         UErrorCode status = U_ZERO_ERROR;
         auto numSys = std::unique_ptr<NumberingSystem>(NumberingSystem::createInstance(locale, status));
-        if (U_SUCCESS(status)) {
+        if (status != U_ZERO_ERROR) {
             map.insert(std::make_pair("numberingSystem", numSys->getName()));
         }
     }
