@@ -76,7 +76,11 @@ ohos_shared_library("intl_util") {
   public_configs = [ ":intl_util_config" ]
   include_dirs = []
   sources = [ "src/lunar_calendar.cpp" ]
-  external_deps = [ "hilog:libhilog" ]
+  external_deps = [
+    "hilog:libhilog",
+    "icu:shared_icui18n",
+    "icu:shared_icuuc",
+  ]
   cflags_cc = [
     "-Wall",
     "-fPIC",
@@ -160,8 +164,6 @@ ohos_shared_library("intl_util") {
       "c_utils:utils",
       "config_policy:configpolicy_util",
       "icu:icundk",
-      "icu:shared_icui18n",
-      "icu:shared_icuuc",
       "init:libbegetutil",
       "ipc:ipc_core",
       "libphonenumber:phonenumber_standard",
