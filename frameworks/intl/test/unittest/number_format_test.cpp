@@ -288,8 +288,8 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest007, TestSize.Level1)
     EXPECT_EQ(numFmtBO->Format(1234567.89), "སྐར་མ་རེར་ཐེངས་ 1,234,567.89");
     std::unique_ptr<NumberFormat> numFmtUG = std::make_unique<NumberFormat>(localesUG, options);
     ASSERT_TRUE(numFmtUG != nullptr);
-    EXPECT_EQ(numFmtUG->Format(1), "ق/م 1");
-    EXPECT_EQ(numFmtUG->Format(1234567.89), "ق/م 1,234,567.89");
+    EXPECT_EQ(numFmtUG->Format(1), "1 ق/م");
+    EXPECT_EQ(numFmtUG->Format(1234567.89), "1,234,567.89 ق/م");
     std::unique_ptr<NumberFormat> numFmtHK = std::make_unique<NumberFormat>(localesHK, options);
     ASSERT_TRUE(numFmtHK != nullptr);
     EXPECT_EQ(numFmtHK->Format(1234567.89), "1,234,567.89 下/分鐘");
@@ -341,8 +341,8 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest008, TestSize.Level1)
     EXPECT_EQ(numFmtBO->Format(1234567.89), "སྐར་མ་རེར་ཐེངས་ 1,234,567.89");
     std::unique_ptr<NumberFormat> numFmtUG = std::make_unique<NumberFormat>(localesUG, options);
     ASSERT_TRUE(numFmtUG != nullptr);
-    EXPECT_EQ(numFmtUG->Format(1), "ق/م 1");
-    EXPECT_EQ(numFmtUG->Format(1234567.89), "ق/م 1,234,567.89");
+    EXPECT_EQ(numFmtUG->Format(1), "1 ق/م");
+    EXPECT_EQ(numFmtUG->Format(1234567.89), "1,234,567.89 ق/م");
     std::unique_ptr<NumberFormat> numFmtHK = std::make_unique<NumberFormat>(localesHK, options);
     ASSERT_TRUE(numFmtHK != nullptr);
     EXPECT_EQ(numFmtHK->Format(1234567.89), "1,234,567.89 下/分鐘");
@@ -394,8 +394,8 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest009, TestSize.Level1)
     EXPECT_EQ(numFmtBO->Format(1234567.89), "སྐར་མ་རེར་ཐེངས་ 1,234,567.89");
     std::unique_ptr<NumberFormat> numFmtUG = std::make_unique<NumberFormat>(localesUG, options);
     ASSERT_TRUE(numFmtUG != nullptr);
-    EXPECT_EQ(numFmtUG->Format(1), "ق/م 1");
-    EXPECT_EQ(numFmtUG->Format(1234567.89), "ق/م 1,234,567.89");
+    EXPECT_EQ(numFmtUG->Format(1), "1 ق/م");
+    EXPECT_EQ(numFmtUG->Format(1234567.89), "1,234,567.89 ق/م");
     std::unique_ptr<NumberFormat> numFmtHK = std::make_unique<NumberFormat>(localesHK, options);
     ASSERT_TRUE(numFmtHK != nullptr);
     EXPECT_EQ(numFmtHK->Format(1234567.89), "1,234,567.89 下/分鐘");
@@ -448,7 +448,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0010, TestSize.Level1)
     std::unique_ptr<NumberFormat> numFmtUG = std::make_unique<NumberFormat>(localesUG, options);
     ASSERT_TRUE(numFmtUG != nullptr);
     EXPECT_EQ(numFmtUG->Format(1), "1 BW/s");
-    EXPECT_EQ(numFmtUG->Format(1234567.89), "1234567.89 BW/s");
+    EXPECT_EQ(numFmtUG->Format(1234567.89), "1,234,567.89 BW/s");
     std::unique_ptr<NumberFormat> numFmtHK = std::make_unique<NumberFormat>(localesHK, options);
     ASSERT_TRUE(numFmtHK != nullptr);
     EXPECT_EQ(numFmtHK->Format(1234567.89), "1,234,567.89 體重/秒");
@@ -501,7 +501,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0011, TestSize.Level1)
     std::unique_ptr<NumberFormat> numFmtUG = std::make_unique<NumberFormat>(localesUG, options);
     ASSERT_TRUE(numFmtUG != nullptr);
     EXPECT_EQ(numFmtUG->Format(1), "1 BW/s");
-    EXPECT_EQ(numFmtUG->Format(1234567.89), "1234567.89 BW/s");
+    EXPECT_EQ(numFmtUG->Format(1234567.89), "1,234,567.89 BW/s");
     std::unique_ptr<NumberFormat> numFmtHK = std::make_unique<NumberFormat>(localesHK, options);
     ASSERT_TRUE(numFmtHK != nullptr);
     EXPECT_EQ(numFmtHK->Format(1234567.89), "1,234,567.89 體重/秒");
@@ -554,7 +554,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0012, TestSize.Level1)
     std::unique_ptr<NumberFormat> numFmtUG = std::make_unique<NumberFormat>(localesUG, options);
     ASSERT_TRUE(numFmtUG != nullptr);
     EXPECT_EQ(numFmtUG->Format(1), "1 BW/s");
-    EXPECT_EQ(numFmtUG->Format(1234567.89), "1234567.89 BW/s");
+    EXPECT_EQ(numFmtUG->Format(1234567.89), "1,234,567.89 BW/s");
     std::unique_ptr<NumberFormat> numFmtHK = std::make_unique<NumberFormat>(localesHK, options);
     ASSERT_TRUE(numFmtHK != nullptr);
     EXPECT_EQ(numFmtHK->Format(1234567.89), "1,234,567.89 體重/秒");
@@ -607,7 +607,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0013, TestSize.Level1)
     std::unique_ptr<NumberFormat> numFmtUG = std::make_unique<NumberFormat>(localesUG, options);
     ASSERT_TRUE(numFmtUG != nullptr);
     EXPECT_EQ(numFmtUG->Format(1), "1 ق/م");
-    EXPECT_EQ(numFmtUG->Format(1234567.89), "1234567.89 ق/م");
+    EXPECT_EQ(numFmtUG->Format(1234567.89), "1,234,567.89 ق/م");
     std::unique_ptr<NumberFormat> numFmtHK = std::make_unique<NumberFormat>(localesHK, options);
     ASSERT_TRUE(numFmtHK != nullptr);
     EXPECT_EQ(numFmtHK->Format(1234567.89), "1,234,567.89 下/分鐘");
@@ -660,7 +660,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0014, TestSize.Level1)
     std::unique_ptr<NumberFormat> numFmtUG = std::make_unique<NumberFormat>(localesUG, options);
     ASSERT_TRUE(numFmtUG != nullptr);
     EXPECT_EQ(numFmtUG->Format(1), "1 ق/م");
-    EXPECT_EQ(numFmtUG->Format(1234567.89), "1234567.89 ق/م");
+    EXPECT_EQ(numFmtUG->Format(1234567.89), "1,234,567.89 ق/م");
     std::unique_ptr<NumberFormat> numFmtHK = std::make_unique<NumberFormat>(localesHK, options);
     ASSERT_TRUE(numFmtHK != nullptr);
     EXPECT_EQ(numFmtHK->Format(1234567.89), "1,234,567.89 下/分鐘");
@@ -713,7 +713,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0015, TestSize.Level1)
     std::unique_ptr<NumberFormat> numFmtUG = std::make_unique<NumberFormat>(localesUG, options);
     ASSERT_TRUE(numFmtUG != nullptr);
     EXPECT_EQ(numFmtUG->Format(1), "1 ق/م");
-    EXPECT_EQ(numFmtUG->Format(1234567.89), "1234567.89 ق/م");
+    EXPECT_EQ(numFmtUG->Format(1234567.89), "1,234,567.89 ق/م");
     std::unique_ptr<NumberFormat> numFmtHK = std::make_unique<NumberFormat>(localesHK, options);
     ASSERT_TRUE(numFmtHK != nullptr);
     EXPECT_EQ(numFmtHK->Format(1234567.89), "1,234,567.89 下/分鐘");
@@ -925,7 +925,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0019, TestSize.Level1)
     std::unique_ptr<NumberFormat> numFmtUG = std::make_unique<NumberFormat>(localesUG, options);
     ASSERT_TRUE(numFmtUG != nullptr);
     EXPECT_EQ(numFmtUG->Format(1), "1 ئاتلام/مىنۇت");
-    EXPECT_EQ(numFmtUG->Format(1234567.89), "1234567.89 ئاتلام/مىنۇت");
+    EXPECT_EQ(numFmtUG->Format(1234567.89), "1,234,567.89 ئاتلام/مىنۇت");
     std::unique_ptr<NumberFormat> numFmtHK = std::make_unique<NumberFormat>(localesHK, options);
     ASSERT_TRUE(numFmtHK != nullptr);
     EXPECT_EQ(numFmtHK->Format(1234567.89), "1,234,567.89 下/分鐘");
@@ -978,7 +978,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0020, TestSize.Level1)
     std::unique_ptr<NumberFormat> numFmtUG = std::make_unique<NumberFormat>(localesUG, options);
     ASSERT_TRUE(numFmtUG != nullptr);
     EXPECT_EQ(numFmtUG->Format(1), "1 ئاتلام/مىنۇت");
-    EXPECT_EQ(numFmtUG->Format(1234567.89), "1234567.89 ئاتلام/مىنۇت");
+    EXPECT_EQ(numFmtUG->Format(1234567.89), "1,234,567.89 ئاتلام/مىنۇت");
     std::unique_ptr<NumberFormat> numFmtHK = std::make_unique<NumberFormat>(localesHK, options);
     ASSERT_TRUE(numFmtHK != nullptr);
     EXPECT_EQ(numFmtHK->Format(1234567.89), "1,234,567.89 下/分鐘");
@@ -1031,7 +1031,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0021, TestSize.Level1)
     std::unique_ptr<NumberFormat> numFmtUG = std::make_unique<NumberFormat>(localesUG, options);
     ASSERT_TRUE(numFmtUG != nullptr);
     EXPECT_EQ(numFmtUG->Format(1), "1 ئاتلام/مىنۇت");
-    EXPECT_EQ(numFmtUG->Format(1234567.89), "1234567.89 ئاتلام/مىنۇت");
+    EXPECT_EQ(numFmtUG->Format(1234567.89), "1,234,567.89 ئاتلام/مىنۇت");
     std::unique_ptr<NumberFormat> numFmtHK = std::make_unique<NumberFormat>(localesHK, options);
     ASSERT_TRUE(numFmtHK != nullptr);
     EXPECT_EQ(numFmtHK->Format(1234567.89), "1,234,567.89 下/分鐘");
@@ -1084,7 +1084,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0022, TestSize.Level1)
     std::unique_ptr<NumberFormat> numFmtUG = std::make_unique<NumberFormat>(localesUG, options);
     ASSERT_TRUE(numFmtUG != nullptr);
     EXPECT_EQ(numFmtUG->Format(1), "1 m/h");
-    EXPECT_EQ(numFmtUG->Format(1234567.89), "1234567.89 m/h");
+    EXPECT_EQ(numFmtUG->Format(1234567.89), "1,234,567.89 m/h");
     std::unique_ptr<NumberFormat> numFmtHK = std::make_unique<NumberFormat>(localesHK, options);
     ASSERT_TRUE(numFmtHK != nullptr);
     EXPECT_EQ(numFmtHK->Format(1234567.89), "1,234,567.89 米/小時");
@@ -1137,7 +1137,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0023, TestSize.Level1)
     std::unique_ptr<NumberFormat> numFmtUG = std::make_unique<NumberFormat>(localesUG, options);
     ASSERT_TRUE(numFmtUG != nullptr);
     EXPECT_EQ(numFmtUG->Format(1), "1 m/h");
-    EXPECT_EQ(numFmtUG->Format(1234567.89), "1234567.89 m/h");
+    EXPECT_EQ(numFmtUG->Format(1234567.89), "1,234,567.89 m/h");
     std::unique_ptr<NumberFormat> numFmtHK = std::make_unique<NumberFormat>(localesHK, options);
     ASSERT_TRUE(numFmtHK != nullptr);
     EXPECT_EQ(numFmtHK->Format(1234567.89), "1,234,567.89 米/小時");
@@ -1190,7 +1190,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0024, TestSize.Level1)
     std::unique_ptr<NumberFormat> numFmtUG = std::make_unique<NumberFormat>(localesUG, options);
     ASSERT_TRUE(numFmtUG != nullptr);
     EXPECT_EQ(numFmtUG->Format(1), "1 m/h");
-    EXPECT_EQ(numFmtUG->Format(1234567.89), "1234567.89 m/h");
+    EXPECT_EQ(numFmtUG->Format(1234567.89), "1,234,567.89 m/h");
     std::unique_ptr<NumberFormat> numFmtHK = std::make_unique<NumberFormat>(localesHK, options);
     ASSERT_TRUE(numFmtHK != nullptr);
     EXPECT_EQ(numFmtHK->Format(1234567.89), "1,234,567.89 米/小時");
@@ -1243,7 +1243,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0025, TestSize.Level1)
     std::unique_ptr<NumberFormat> numFmtUG = std::make_unique<NumberFormat>(localesUG, options);
     ASSERT_TRUE(numFmtUG != nullptr);
     EXPECT_EQ(numFmtUG->Format(1), "1 ml/kg/min");
-    EXPECT_EQ(numFmtUG->Format(1234567.89), "1234567.89 ml/kg/min");
+    EXPECT_EQ(numFmtUG->Format(1234567.89), "1,234,567.89 ml/kg/min");
     std::unique_ptr<NumberFormat> numFmtHK = std::make_unique<NumberFormat>(localesHK, options);
     ASSERT_TRUE(numFmtHK != nullptr);
     EXPECT_EQ(numFmtHK->Format(1234567.89), "1,234,567.89 ml/kg/min");
@@ -1296,7 +1296,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0026, TestSize.Level1)
     std::unique_ptr<NumberFormat> numFmtUG = std::make_unique<NumberFormat>(localesUG, options);
     ASSERT_TRUE(numFmtUG != nullptr);
     EXPECT_EQ(numFmtUG->Format(1), "1 ml/kg/min");
-    EXPECT_EQ(numFmtUG->Format(1234567.89), "1234567.89 ml/kg/min");
+    EXPECT_EQ(numFmtUG->Format(1234567.89), "1,234,567.89 ml/kg/min");
     std::unique_ptr<NumberFormat> numFmtHK = std::make_unique<NumberFormat>(localesHK, options);
     ASSERT_TRUE(numFmtHK != nullptr);
     EXPECT_EQ(numFmtHK->Format(1234567.89), "1,234,567.89 ml/kg/min");
@@ -1349,7 +1349,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0027, TestSize.Level1)
     std::unique_ptr<NumberFormat> numFmtUG = std::make_unique<NumberFormat>(localesUG, options);
     ASSERT_TRUE(numFmtUG != nullptr);
     EXPECT_EQ(numFmtUG->Format(1), "1 ml/kg/min");
-    EXPECT_EQ(numFmtUG->Format(1234567.89), "1234567.89 ml/kg/min");
+    EXPECT_EQ(numFmtUG->Format(1234567.89), "1,234,567.89 ml/kg/min");
     std::unique_ptr<NumberFormat> numFmtHK = std::make_unique<NumberFormat>(localesHK, options);
     ASSERT_TRUE(numFmtHK != nullptr);
     EXPECT_EQ(numFmtHK->Format(1234567.89), "1,234,567.89 ml/kg/min");
@@ -1402,7 +1402,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0028, TestSize.Level1)
     std::unique_ptr<NumberFormat> numFmtUG = std::make_unique<NumberFormat>(localesUG, options);
     ASSERT_TRUE(numFmtUG != nullptr);
     EXPECT_EQ(numFmtUG->Format(1), "1 ق/م");
-    EXPECT_EQ(numFmtUG->Format(1234567.89), "1234567.89 ق/م");
+    EXPECT_EQ(numFmtUG->Format(1234567.89), "1,234,567.89 ق/م");
     std::unique_ptr<NumberFormat> numFmtHK = std::make_unique<NumberFormat>(localesHK, options);
     ASSERT_TRUE(numFmtHK != nullptr);
     EXPECT_EQ(numFmtHK->Format(1234567.89), "1,234,567.89 轉/分鐘");
@@ -1455,7 +1455,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0029, TestSize.Level1)
     std::unique_ptr<NumberFormat> numFmtUG = std::make_unique<NumberFormat>(localesUG, options);
     ASSERT_TRUE(numFmtUG != nullptr);
     EXPECT_EQ(numFmtUG->Format(1), "1 ق/م");
-    EXPECT_EQ(numFmtUG->Format(1234567.89), "1234567.89 ق/م");
+    EXPECT_EQ(numFmtUG->Format(1234567.89), "1,234,567.89 ق/م");
     std::unique_ptr<NumberFormat> numFmtHK = std::make_unique<NumberFormat>(localesHK, options);
     ASSERT_TRUE(numFmtHK != nullptr);
     EXPECT_EQ(numFmtHK->Format(1234567.89), "1,234,567.89 轉/分鐘");
@@ -1508,7 +1508,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0030, TestSize.Level1)
     std::unique_ptr<NumberFormat> numFmtUG = std::make_unique<NumberFormat>(localesUG, options);
     ASSERT_TRUE(numFmtUG != nullptr);
     EXPECT_EQ(numFmtUG->Format(1), "1 ق/م");
-    EXPECT_EQ(numFmtUG->Format(1234567.89), "1234567.89 ق/م");
+    EXPECT_EQ(numFmtUG->Format(1234567.89), "1,234,567.89 ق/م");
     std::unique_ptr<NumberFormat> numFmtHK = std::make_unique<NumberFormat>(localesHK, options);
     ASSERT_TRUE(numFmtHK != nullptr);
     EXPECT_EQ(numFmtHK->Format(1234567.89), "1,234,567.89 轉/分鐘");
@@ -1560,8 +1560,8 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0031, TestSize.Level1)
     EXPECT_EQ(numFmtBO->Format(1234567.89), "སྐར་མ་རེར་གོམ་པ་ 1,234,567.89");
     std::unique_ptr<NumberFormat> numFmtUG = std::make_unique<NumberFormat>(localesUG, options);
     ASSERT_TRUE(numFmtUG != nullptr);
-    EXPECT_EQ(numFmtUG->Format(1), "%1 ق/م");
-    EXPECT_EQ(numFmtUG->Format(1234567.89), "1234567.89 ق/م");
+    EXPECT_EQ(numFmtUG->Format(1), "1 قەدەم/مىنۇت");
+    EXPECT_EQ(numFmtUG->Format(1234567.89), "1,234,567.89 قەدەم/مىنۇت");
     std::unique_ptr<NumberFormat> numFmtHK = std::make_unique<NumberFormat>(localesHK, options);
     ASSERT_TRUE(numFmtHK != nullptr);
     EXPECT_EQ(numFmtHK->Format(1234567.89), "1,234,567.89 步/分鐘");
@@ -1613,8 +1613,8 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0032, TestSize.Level1)
     EXPECT_EQ(numFmtBO->Format(1234567.89), "སྐར་མ་རེར་གོམ་པ་ 1,234,567.89");
     std::unique_ptr<NumberFormat> numFmtUG = std::make_unique<NumberFormat>(localesUG, options);
     ASSERT_TRUE(numFmtUG != nullptr);
-    EXPECT_EQ(numFmtUG->Format(1), "%1 ق/م");
-    EXPECT_EQ(numFmtUG->Format(1234567.89), "1234567.89 ق/م");
+    EXPECT_EQ(numFmtUG->Format(1), "1 قەدەم/مىنۇت");
+    EXPECT_EQ(numFmtUG->Format(1234567.89), "1,234,567.89 قەدەم/مىنۇت");
     std::unique_ptr<NumberFormat> numFmtHK = std::make_unique<NumberFormat>(localesHK, options);
     ASSERT_TRUE(numFmtHK != nullptr);
     EXPECT_EQ(numFmtHK->Format(1234567.89), "1,234,567.89 步/分鐘");
@@ -1666,8 +1666,8 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0033, TestSize.Level1)
     EXPECT_EQ(numFmtBO->Format(1234567.89), "སྐར་མ་རེར་གོམ་པ་ 1,234,567.89");
     std::unique_ptr<NumberFormat> numFmtUG = std::make_unique<NumberFormat>(localesUG, options);
     ASSERT_TRUE(numFmtUG != nullptr);
-    EXPECT_EQ(numFmtUG->Format(1), "%1 ق/م");
-    EXPECT_EQ(numFmtUG->Format(1234567.89), "1234567.89 ق/م");
+    EXPECT_EQ(numFmtUG->Format(1), "1 قەدەم/مىنۇت");
+    EXPECT_EQ(numFmtUG->Format(1234567.89), "1,234,567.89 قەدەم/مىنۇت");
     std::unique_ptr<NumberFormat> numFmtHK = std::make_unique<NumberFormat>(localesHK, options);
     ASSERT_TRUE(numFmtHK != nullptr);
     EXPECT_EQ(numFmtHK->Format(1234567.89), "1,234,567.89 步/分鐘");
@@ -1720,7 +1720,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0034, TestSize.Level1)
     std::unique_ptr<NumberFormat> numFmtUG = std::make_unique<NumberFormat>(localesUG, options);
     ASSERT_TRUE(numFmtUG != nullptr);
     EXPECT_EQ(numFmtUG->Format(1), "1 پالاق/مىنۇت");
-    EXPECT_EQ(numFmtUG->Format(1234567.89), "1234567.89 پالاق/مىنۇت");
+    EXPECT_EQ(numFmtUG->Format(1234567.89), "1,234,567.89 پالاق/مىنۇت");
     std::unique_ptr<NumberFormat> numFmtHK = std::make_unique<NumberFormat>(localesHK, options);
     ASSERT_TRUE(numFmtHK != nullptr);
     EXPECT_EQ(numFmtHK->Format(1234567.89), "1,234,567.89 下/分鐘");
@@ -1773,7 +1773,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0035, TestSize.Level1)
     std::unique_ptr<NumberFormat> numFmtUG = std::make_unique<NumberFormat>(localesUG, options);
     ASSERT_TRUE(numFmtUG != nullptr);
     EXPECT_EQ(numFmtUG->Format(1), "1 پالاق/مىنۇت");
-    EXPECT_EQ(numFmtUG->Format(1234567.89), "1234567.89 پالاق/مىنۇت");
+    EXPECT_EQ(numFmtUG->Format(1234567.89), "1,234,567.89 پالاق/مىنۇت");
     std::unique_ptr<NumberFormat> numFmtHK = std::make_unique<NumberFormat>(localesHK, options);
     ASSERT_TRUE(numFmtHK != nullptr);
     EXPECT_EQ(numFmtHK->Format(1234567.89), "1,234,567.89 下/分鐘");
@@ -1826,7 +1826,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0036, TestSize.Level1)
     std::unique_ptr<NumberFormat> numFmtUG = std::make_unique<NumberFormat>(localesUG, options);
     ASSERT_TRUE(numFmtUG != nullptr);
     EXPECT_EQ(numFmtUG->Format(1), "1 پالاق/مىنۇت");
-    EXPECT_EQ(numFmtUG->Format(1234567.89), "1234567.89 پالاق/مىنۇت");
+    EXPECT_EQ(numFmtUG->Format(1234567.89), "1,234,567.89 پالاق/مىنۇت");
     std::unique_ptr<NumberFormat> numFmtHK = std::make_unique<NumberFormat>(localesHK, options);
     ASSERT_TRUE(numFmtHK != nullptr);
     EXPECT_EQ(numFmtHK->Format(1234567.89), "1,234,567.89 下/分鐘");
