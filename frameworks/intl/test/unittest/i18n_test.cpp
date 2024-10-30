@@ -356,7 +356,7 @@ HWTEST_F(I18nTest, I18nFuncTest009, TestSize.Level1)
     for (size_t i = 0; i < sizeof(regionTags) / sizeof(std::string); ++i) {
         GetDefaultPreferredUnit(regionTags[i], usage, units);
         EXPECT_EQ(units.size(), 3);
-        units.clear(); //test
+        units.clear();
     }
 }
 
