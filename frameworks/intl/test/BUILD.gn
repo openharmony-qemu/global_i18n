@@ -19,8 +19,6 @@ module_output_path = "i18n/intl_test"
 ohos_unittest("intl_test") {
   module_out_path = module_output_path
 
-  cflags_cc = [ "-Wno-inconsistent-missing-override" ]
-
   sources = [
     "unittest/i18n_test.cpp",
     "unittest/intl_number_format_test.cpp",
@@ -52,19 +50,12 @@ ohos_unittest("intl_test") {
     "icu:shared_icui18n",
     "icu:shared_icuuc",
     "init:libbegetutil",
-    "ipc:ipc_core",
     "libphonenumber:phonenumber_standard",
     "libpng:libpng",
-    "libxml2:libxml2",
     "openssl:libssl_shared",
-    "preferences:native_preferences",
   ]
-  defines = []
   if (i18n_support_app_preferred_language) {
-    defines += [ "SUPPORT_APP_PREFERRED_LANGUAGE" ]
-  }
-  if (target_platform == "pc") {
-    defines += [ "SUPPORT_MULTI_USER" ]
+    defines = [ "SUPPORT_APP_PREFERRED_LANGUAGE" ]
   }
 
   deps = [
@@ -73,7 +64,31 @@ ohos_unittest("intl_test") {
   ]
 }
 
+ohos_unittest("intl_translit_test") {
+  module_out_path = module_output_path
+
+  sources = [
+    "unittest/intl_translit_test.cpp",
+  ]
+  include_dirs = [
+    "//base/global/i18n/frameworks/intl/include",
+  ]
+
+  deps = [
+    "//base/global/i18n/frameworks/intl:build_module",
+  ]
+
+  external_deps = [
+    "googletest:gtest",
+    "icu:shared_icui18n",
+    "icu:shared_icuuc",
+  ]
+}
+
 group("unittest") {
   testonly = true
-  deps = [ ":intl_test" ]
+  deps = [
+    ":intl_test",
+    ":intl_translit_test",
+  ]
 }
