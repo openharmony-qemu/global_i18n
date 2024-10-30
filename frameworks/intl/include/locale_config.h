@@ -152,6 +152,7 @@ private:
     static const char *DIALECT_LANGS_PATH;
     static const char *DIALECT_LANGS_NAME;
     static const char *REGION_PATH;
+    static const std::string HOUR_EVENT_DATA;
     static std::mutex dialectLocaleMutex;
     static std::mutex region2DisplayNameMutex;
     static std::mutex locale2DisplayNameMutex;
