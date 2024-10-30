@@ -76,16 +76,10 @@ ohos_unittest("intl_test") {
 ohos_unittest("intl_translit_test") {
   module_out_path = module_output_path
 
-  sources = [
-    "unittest/intl_translit_test.cpp",
-  ]
-  include_dirs = [
-    "//base/global/i18n/frameworks/intl/include",
-  ]
+  sources = [ "unittest/intl_translit_test.cpp" ]
+  include_dirs = [ "//base/global/i18n/frameworks/intl/include" ]
 
-  deps = [
-    "//base/global/i18n/frameworks/intl:build_module",
-  ]
+  deps = [ "//base/global/i18n/frameworks/intl:build_module" ]
 
   external_deps = [
     "googletest:gtest",
