@@ -1351,6 +1351,9 @@ I18nErrorCode LocaleConfig::PublishCommonEvent(const std::string &eventType)
     OHOS::AAFwk::Want localeChangeWant;
     localeChangeWant.SetAction(eventType);
     OHOS::EventFwk::CommonEventData event(localeChangeWant);
+    if (EventFwk::CommonEventSupport::COMMON_EVENT_TIME_CHANGED.compare(eventType) == 0) {
+        event.SetData("24Hour");
+    }
     if (!OHOS::EventFwk::CommonEventManager::PublishCommonEvent(event)) {
         HILOG_ERROR_I18N("LocaleConfig::PublishCommonEvent Failed to Publish event %{public}s",
             localeChangeWant.GetAction().c_str());
