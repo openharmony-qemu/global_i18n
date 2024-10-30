@@ -81,6 +81,7 @@ const char *LocaleConfig::secondRootTag = "lang";
 const char *LocaleConfig::rootRegion = "regions";
 const char *LocaleConfig::secondRootRegion = "region";
 const char *LocaleConfig::NUMBER_SYSTEM_KEY = "-nu-";
+const std::string LocaleConfig::HOUR_EVENT_DATA = "24HourChange";
 unordered_set<string> LocaleConfig::supportedLocales;
 unordered_set<string> LocaleConfig::supportLocales;
 unordered_set<string> LocaleConfig::supportedRegions;
@@ -1352,7 +1353,7 @@ I18nErrorCode LocaleConfig::PublishCommonEvent(const std::string &eventType)
     localeChangeWant.SetAction(eventType);
     OHOS::EventFwk::CommonEventData event(localeChangeWant);
     if (EventFwk::CommonEventSupport::COMMON_EVENT_TIME_CHANGED.compare(eventType) == 0) {
-        event.SetData("24Hour");
+        event.SetData(HOUR_EVENT_DATA);
     }
     if (!OHOS::EventFwk::CommonEventManager::PublishCommonEvent(event)) {
         HILOG_ERROR_I18N("LocaleConfig::PublishCommonEvent Failed to Publish event %{public}s",
