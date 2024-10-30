@@ -903,7 +903,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0019, TestSize.Level1)
     string localeTW = "zh-TW";
     vector<string> localesTW{localeTW};
     string style = "unit";
-    string unit = "jump-rope-speed";
+    string unit = "jump-rope-per-minute";
     string unitStyle = "long";
     map<string, string> options = { { "style", style},
                                     { "unit", unit },
@@ -956,7 +956,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0020, TestSize.Level1)
     string localeTW = "zh-TW";
     vector<string> localesTW{localeTW};
     string style = "unit";
-    string unit = "jump-rope-speed";
+    string unit = "jump-rope-per-minute";
     string unitStyle = "short";
     map<string, string> options = { { "style", style},
                                     { "unit", unit },
@@ -1009,7 +1009,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0021, TestSize.Level1)
     string localeTW = "zh-TW";
     vector<string> localesTW{localeTW};
     string style = "unit";
-    string unit = "jump-rope-speed";
+    string unit = "jump-rope-per-minute";
     string unitStyle = "narrow";
     map<string, string> options = { { "style", style},
                                     { "unit", unit },
