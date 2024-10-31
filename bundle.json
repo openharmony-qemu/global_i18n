@@ -122,6 +122,7 @@
             ],
             "test": [
                 "//base/global/i18n/frameworks/intl/test:intl_test",
+                "//base/global/i18n/frameworks/intl/test:intl_translit_test",
                 "//base/global/i18n/frameworks/zone/test:zone_util_test",
                 "//base/global/i18n/frameworks/intl/test/fuzztest:fuzztest",
                 "//base/global/i18n/services/test:i18n_service_test"
