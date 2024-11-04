@@ -1198,6 +1198,8 @@ I18nErrorCode LocaleConfig::SetSystemLanguage(const std::string &languageTag)
             languageTag.c_str());
         return I18nErrorCode::INVALID_LANGUAGE_TAG;
     }
+    std::string languageCode = LocaleEncode(languageTag);
+    HILOG_ERROR_I18N("LocaleConfig::SetSystemLanguage: set language %{public}s.", languageCode.c_str());
     // save old language, reset system language to old language if update locale failed.
     std::string oldLanguageTag = GetSystemLanguage();
     if (SetParameter(LANGUAGE_KEY, languageTag.data()) != 0) {
@@ -1223,6 +1225,8 @@ I18nErrorCode LocaleConfig::SetSystemRegion(const std::string &regionTag)
         HILOG_ERROR_I18N("LocaleConfig::SetSystemRegion %{public}s is not valid region tag.", regionTag.c_str());
         return I18nErrorCode::INVALID_REGION_TAG;
     }
+    std::string resionCode = LocaleEncode(regionTag);
+    HILOG_ERROR_I18N("LocaleConfig::SetSystemRegion: set region %{public}s.", resionCode.c_str());
     return SetSystemLocale(UpdateRegionOfLocale(regionTag));
 }
 
@@ -1232,6 +1236,8 @@ I18nErrorCode LocaleConfig::SetSystemLocale(const std::string &localeTag)
         HILOG_ERROR_I18N("LocaleConfig::SetSystemLocale %{public}s is not a valid locale tag.", localeTag.c_str());
         return I18nErrorCode::INVALID_LOCALE_TAG;
     }
+    std::string localeCode = LocaleEncode(localeTag);
+    HILOG_ERROR_I18N("LocaleConfig::SetSystemRegion: set locale %{public}s.", localeCode.c_str());
     if (SetParameter(LOCALE_KEY, localeTag.data()) != 0) {
         return I18nErrorCode::UPDATE_SYSTEM_LOCALE_FAILED;
     }

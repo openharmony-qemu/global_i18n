@@ -13,13 +13,14 @@
  * limitations under the License.
  */
 
-#include <cerrno>
 #include <algorithm>
+#include <cerrno>
 #include <climits>
 #include <filesystem>
 #include <fstream>
-#include <dirent.h>
+#include <iomanip>
 #include <mutex>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <sys/stat.h>
@@ -40,6 +41,8 @@ using namespace std;
 static const std::string PSEUDO_LOCALE_TAG = "en-XA";
 static const std::string PSEUDO_START_TAG = "{";
 static const std::string PSEUDO_END_TAG = "}";
+static const char CHAR_A = 'A';
+static const int32_t CHAR2INT_SIZE = 2;
 constexpr const char *TIMEZONE_LIST_CONFIG_PATH = "/system/etc/zoneinfo/timezone_list.cfg";
 constexpr const char *DISTRO_TIMEZONE_LIST_CONFIG = "/system/etc/tzdata_distro/timezone_list.cfg";
 static std::mutex validLocaleMutex;
@@ -349,6 +352,16 @@ bool RegexSearchNoExcept(const std::string& str, std::smatch& match, const std::
     } catch (const std::regex_error &except) {
         return false;
     }
+}
+
+std::string LocaleEncode(const std::string& locale)
+{
+    std::stringstream ss;
+    for (auto& c : locale) {
+        int32_t number = (c == '-') ? 0 : static_cast<int32_t>(c) - static_cast<int32_t>(CHAR_A) + 1;
+        ss << std::setw(CHAR2INT_SIZE) << std::setfill('0') << number;
+    }
+    return ss.str();
 }
 } // namespace I18n
 } // namespace Global
