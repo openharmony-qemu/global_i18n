@@ -26,6 +26,7 @@ ohos_unittest("intl_test") {
     "unittest/intl_number_format_test.cpp",
     "unittest/intl_test.cpp",
     "unittest/intl_test_extent.cpp",
+    "unittest/intl_translit_test.cpp",
     "unittest/locale_config_test.cpp",
     "unittest/mock/src/generate_ics_file.cpp",
     "unittest/mock/src/i18n_timezone_mock.cpp",
@@ -73,25 +74,7 @@ ohos_unittest("intl_test") {
   ]
 }
 
-ohos_unittest("intl_translit_test") {
-  module_out_path = module_output_path
-
-  sources = [ "unittest/intl_translit_test.cpp" ]
-  include_dirs = [ "//base/global/i18n/frameworks/intl/include" ]
-
-  deps = [ "//base/global/i18n/frameworks/intl:build_module" ]
-
-  external_deps = [
-    "googletest:gtest",
-    "icu:shared_icui18n",
-    "icu:shared_icuuc",
-  ]
-}
-
 group("unittest") {
   testonly = true
-  deps = [
-    ":intl_test",
-    ":intl_translit_test",
-  ]
+  deps = [ ":intl_test" ]
 }

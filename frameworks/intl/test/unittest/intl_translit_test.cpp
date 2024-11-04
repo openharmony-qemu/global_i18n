@@ -16,11 +16,10 @@
 #include <gtest/gtest.h>
 #include <map>
 #include <vector>
-#include "intl_translit_test.h"
+#include "intl_test.h"
 #include <unistd.h>
 #include "unicode/utypes.h"
 #include "unicode/translit.h"
-#include "ohos/init_data.h"
 
 using namespace OHOS::Global::I18n;
 using testing::ext::TestSize;
@@ -31,7 +30,7 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 
-std::map<std::string, std::string> IntlTranslitTest::testcases {
+std::map<std::string, std::string> IntlTest::translitTestCases {
     {"阿胶", "ē jiāo"},
     {"挨打", "ái dǎ"},
     {"扒手", "pá shǒu"},
@@ -235,26 +234,12 @@ std::map<std::string, std::string> IntlTranslitTest::testcases {
     {"处理", "chǔ lǐ"},
 };
 
-void IntlTranslitTest::SetUpTestCase(void)
-{
-    SetHwIcuDirectory();
-}
-
-void IntlTranslitTest::TearDownTestCase(void)
-{
-}
-
-void IntlTranslitTest::SetUp(void)
-{}
-
-void IntlTranslitTest::TearDown(void)
-{}
 /**
- * @tc.name: IntlTranslitTest0001
+ * @tc.name: IntlFuncTest00110
  * @tc.desc: Test icu::Transliterator
  * @tc.type: FUNC
  */
-HWTEST_F(IntlTranslitTest, IntlTranslitTest0001, TestSize.Level1)
+HWTEST_F(IntlTest, IntlFuncTest00110, TestSize.Level1)
 {
     const std::string transId = "Any-Latn";
     UErrorCode status = U_ZERO_ERROR;
@@ -266,7 +251,7 @@ HWTEST_F(IntlTranslitTest, IntlTranslitTest0001, TestSize.Level1)
     if (trans == nullptr) {
         return;
     }
-    for (auto iter = testcases.begin(); iter != testcases.end(); ++iter) {
+    for (auto iter = translitTestCases.begin(); iter != translitTestCases.end(); ++iter) {
         std::string word = iter->first;
         std::string expect = iter->second;
         icu::UnicodeString uniWord = icu::UnicodeString::fromUTF8(word.data());
