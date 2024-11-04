@@ -28,6 +28,7 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
+    static std::map<std::string, std::string> translitTestCases;
 };
 
 int IntlFuncTest001(void);
