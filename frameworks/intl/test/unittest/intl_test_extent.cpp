@@ -538,7 +538,7 @@ HWTEST_F(IntlTest, IntlFuncTest0062, TestSize.Level1)
     StrReplaceAll(str, target, replace);
 
     std::string localeTag = "zh-Hans-CN";
-    std::string localeCode = LocaleEncode(zh-Hans-CN);
+    std::string localeCode = LocaleEncode(localeTag);
     std::string targetCode = "58400008334651000314";
     EXPECT_TRUE(localeCode, targetCode);
 
