@@ -235,11 +235,11 @@ std::map<std::string, std::string> IntlTest::translitTestCases {
 };
 
 /**
- * @tc.name: IntlFuncTest00110
+ * @tc.name: IntlFuncTest00103
  * @tc.desc: Test icu::Transliterator
  * @tc.type: FUNC
  */
-HWTEST_F(IntlTest, IntlFuncTest00110, TestSize.Level1)
+HWTEST_F(IntlTest, IntlFuncTest00103, TestSize.Level1)
 {
     const std::string transId = "Any-Latn";
     UErrorCode status = U_ZERO_ERROR;
