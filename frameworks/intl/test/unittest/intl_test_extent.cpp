@@ -1834,11 +1834,11 @@ HWTEST_F(IntlTest, IntlFuncTest0097, TestSize.Level1)
 }
 
 /**
- * @tc.name: IntlFuncTest00103
+ * @tc.name: IntlFuncTest0098
  * @tc.desc: Test Intl multi users
  * @tc.type: FUNC
  */
-HWTEST_F(IntlTest, IntlFuncTest00103, TestSize.Level1)
+HWTEST_F(IntlTest, IntlFuncTest0098, TestSize.Level1)
 {
 #ifdef SUPPORT_MULTI_USER
     std::string path = "/data/service/el1/public/i18n/global/GlobalParamData";
@@ -1870,11 +1870,11 @@ HWTEST_F(IntlTest, IntlFuncTest00103, TestSize.Level1)
 }
 
 /**
- * @tc.name: IntlFuncTest00104
+ * @tc.name: IntlFuncTest0099
  * @tc.desc: Test CodeRule
  * @tc.type: FUNC
  */
-HWTEST_F(IntlTest, IntlFuncTest00104, TestSize.Level1)
+HWTEST_F(IntlTest, IntlFuncTest0099, TestSize.Level1)
 {
     std::string isValidType = "PreSuf";
     std::string msg = "1 800 234 45";
@@ -1892,11 +1892,11 @@ HWTEST_F(IntlTest, IntlFuncTest00104, TestSize.Level1)
 }
 
 /**
- * @tc.name: IntlFuncTest00105
+ * @tc.name: IntlFuncTest00100
  * @tc.desc: Test CodeRule
  * @tc.type: FUNC
  */
-HWTEST_F(IntlTest, IntlFuncTest00105, TestSize.Level1)
+HWTEST_F(IntlTest, IntlFuncTest00100, TestSize.Level1)
 {
     std::string isValidType = "PreSuf";
     std::string msg = "A-1 800 234 45 67";
@@ -1926,11 +1926,11 @@ HWTEST_F(IntlTest, IntlFuncTest00105, TestSize.Level1)
 }
 
 /**
- * @tc.name: IntlFuncTest00106
+ * @tc.name: IntlFuncTest00101
  * @tc.desc: Test CodeRule
  * @tc.type: FUNC
  */
-HWTEST_F(IntlTest, IntlFuncTest00106, TestSize.Level1)
+HWTEST_F(IntlTest, IntlFuncTest00101, TestSize.Level1)
 {
     std::string isValidType = "Rawstr";
     std::string msg = "13649372A-";
@@ -1950,11 +1950,11 @@ HWTEST_F(IntlTest, IntlFuncTest00106, TestSize.Level1)
 }
 
 /**
- * @tc.name: IntlFuncTest00107
+ * @tc.name: IntlFuncTest00102
  * @tc.desc: Test CodeRule
  * @tc.type: FUNC
  */
-HWTEST_F(IntlTest, IntlFuncTest00107, TestSize.Level1)
+HWTEST_F(IntlTest, IntlFuncTest00102, TestSize.Level1)
 {
     std::string isValidType = "Rawstr";
     std::string msg = "400A-";
