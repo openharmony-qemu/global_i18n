@@ -12,17 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef I18N_FFI_H
-#define I18N_FFI_H
-
-#include <cstdint>
+#ifndef INTERFACES_CJ_INCLUDE_I18N_ENTITY_FFI_H_
+#define INTERFACES_CJ_INCLUDE_I18N_ENTITY_FFI_H_
 
 #define FFI_EXPORT __attribute__((visibility("default")))
 
 extern "C" {
-    FFI_EXPORT char* FfiOHOSGetAppPreferredLanguage();
-    FFI_EXPORT char* FfiI18nSystemGetSystemLanguage();
-    FFI_EXPORT char* FfiI18nSystemGetSystemRegion();
+    FFI_EXPORT int64_t FfiOHOSEntityImplConstructor(char* locale, int32_t* errcode);
+    FFI_EXPORT CEntityInfoItemArr FfiOHOSEntityFindEntityInfo(int64_t id, char* text);
 }
 
-#endif
+#endif  // INTERFACES_CJ_INCLUDE_I18N_ENTITY_FFI_H_
