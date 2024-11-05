@@ -1225,8 +1225,8 @@ I18nErrorCode LocaleConfig::SetSystemRegion(const std::string &regionTag)
         HILOG_ERROR_I18N("LocaleConfig::SetSystemRegion %{public}s is not valid region tag.", regionTag.c_str());
         return I18nErrorCode::INVALID_REGION_TAG;
     }
-    std::string resionCode = LocaleEncode(regionTag);
-    HILOG_ERROR_I18N("LocaleConfig::SetSystemRegion: set region %{public}s.", resionCode.c_str());
+    std::string regionCode = LocaleEncode(regionTag);
+    HILOG_ERROR_I18N("LocaleConfig::SetSystemRegion: set region %{public}s.", regionCode.c_str());
     return SetSystemLocale(UpdateRegionOfLocale(regionTag));
 }
 
@@ -1266,6 +1266,7 @@ I18nErrorCode LocaleConfig::Set24HourClock(const std::string &option)
         HILOG_ERROR_I18N("LocaleConfig::Set24HourClock invalid 24 Hour clock tag: %{public}s", option.c_str());
         return I18nErrorCode::INVALID_24_HOUR_CLOCK_TAG;
     }
+    HILOG_ERROR_I18N("LocaleConfig::Set24HourClock: update 24 hour clock %{public}s", option.c_str());
     if (SetParameter(HOUR_KEY, option.data()) != 0) {
         HILOG_ERROR_I18N("LocaleConfig::Set24HourClock update 24 hour clock failed with option=%{public}s",
             option.c_str());
