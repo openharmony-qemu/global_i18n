@@ -102,6 +102,7 @@ std::vector<LocaleItem> SystemLocaleManager::GetCountryInfoArray(const std::vect
     std::unordered_set<std::string> blockedRegions = LocaleConfig::GetBlockedRegions();
     std::unordered_set<std::string> blockedLanguageRegions = LocaleConfig::GetLanguageBlockedRegions();
     std::string pseudoProcessedRegion = PseudoLocalizationProcessor("");
+    std::string simRegion = ReadSystemParameter(SIM_COUNTRY_CODE_KEY, CONFIG_LEN);
     for (auto it = countries.begin(); it != countries.end(); ++it) {
         if (blockedRegions.find(*it) != blockedRegions.end() || blockedLanguageRegions.find(*it) !=
             blockedLanguageRegions.end()) {
@@ -111,7 +112,9 @@ std::vector<LocaleItem> SystemLocaleManager::GetCountryInfoArray(const std::vect
         regionDisplayName = tabooUtils->ReplaceCountryName(*it, options.localeTag, regionDisplayName);
         bool isSuggestedRegion = LocaleConfig::IsSuggested(LocaleConfig::GetSystemLanguage(), *it);
         SuggestionType suggestionType = SuggestionType::SUGGESTION_TYPE_NONE;
-        if (isSuggestedRegion) {
+        if (simRegion.compare(*it) == 0) {
+            suggestionType = SuggestionType::SUGGESTION_TYPE_SIM;
+        } else if (isSuggestedRegion) {
             suggestionType = SuggestionType::SUGGESTION_TYPE_RELATED;
         }
         LocaleItem item { *it, suggestionType, regionDisplayName, pseudoProcessedRegion };
