@@ -95,7 +95,7 @@ std::vector<MatchedDateTimeInfo> DateTimeFilter::FilterByRules(icu::UnicodeStrin
         for (auto& clearMatch : clears) {
             // remove the time within the filter range.
             if (match.GetBegin() >= clearMatch.GetBegin() && match.GetEnd() <= clearMatch.GetEnd()) {
-                matches.erase(matchIterator);
+                matchIterator = matches.erase(matchIterator);
                 isDelete = true;
                 break;
             }
@@ -181,7 +181,7 @@ std::vector<MatchedDateTimeInfo> DateTimeFilter::FilterOverlaySecond(std::vector
             // if one time within another time, the larger one is retained.
             if ((currentMatch.GetBegin() > match.GetBegin() && currentMatch.GetEnd() <= match.GetEnd()) ||
                 (currentMatch.GetBegin() == match.GetBegin() && currentMatch.GetEnd() < match.GetEnd())) {
-                matchList.erase(matchIterator);
+                matchIterator = matchList.erase(matchIterator);
                 continue;
             } else if (currentMatch.GetBegin() <= match.GetBegin() && currentMatch.GetEnd() >= match.GetEnd()) {
                 valid = false;
