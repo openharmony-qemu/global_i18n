@@ -112,10 +112,10 @@ std::vector<LocaleItem> SystemLocaleManager::GetCountryInfoArray(const std::vect
         regionDisplayName = tabooUtils->ReplaceCountryName(*it, options.localeTag, regionDisplayName);
         bool isSuggestedRegion = LocaleConfig::IsSuggested(LocaleConfig::GetSystemLanguage(), *it);
         SuggestionType suggestionType = SuggestionType::SUGGESTION_TYPE_NONE;
-        if (simRegion.compare(*it) == 0) {
-            suggestionType = SuggestionType::SUGGESTION_TYPE_SIM;
-        } else if (isSuggestedRegion) {
+        if (isSuggestedRegion) {
             suggestionType = SuggestionType::SUGGESTION_TYPE_RELATED;
+        } else if (simRegion.compare(*it) == 0) {
+            suggestionType = SuggestionType::SUGGESTION_TYPE_SIM;
         }
         LocaleItem item { *it, suggestionType, regionDisplayName, pseudoProcessedRegion };
         localeItemList.push_back(item);

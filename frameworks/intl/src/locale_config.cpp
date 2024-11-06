@@ -115,8 +115,7 @@ unordered_map<string, string> LocaleConfig::dialectMap {
     { "es-Latn-US", "es-Latn-419" },
     { "es-Latn-UY", "es-Latn-419" },
     { "es-Latn-VE", "es-Latn-419" },
-    { "pt-Latn-PT", "pt-Latn-PT" },
-    { "en-Latn-US", "en-Latn-US" }
+    { "pt-Latn-PT", "pt-Latn-PT" }
 };
 
 unordered_map<string, string> LocaleConfig::localDigitMap {
@@ -474,6 +473,19 @@ void LocaleConfig::ExtendWhiteLanguages()
             std::string baseNameStr(baseName);
             std::replace(baseNameStr.begin(), baseNameStr.end(), '_', '-');
             extendWhiteLanguageList.insert(baseNameStr);
+        }
+        const char* language = locale.getLanguage();
+        ExtendLanguageWithScript(language);
+    }
+}
+
+void LocaleConfig::ExtendLanguageWithScript(const char* language)
+{
+    if (language != nullptr) {
+        std::string languageStr(language);
+        string mainLanguage = GetMainLanguage(languageStr);
+        if (!mainLanguage.empty()) {
+            extendWhiteLanguageList.insert(mainLanguage);
         }
     }
 }

@@ -29,11 +29,11 @@ enum SuggestionType {
     // language or region is not suggested with system region or system language.
     SUGGESTION_TYPE_NONE = 0,
 
-    // language is suggested with system region or region is suggested with system language.
-    SUGGESTION_TYPE_RELATED = 1,
-
     // language is suggested with sim card region.
-    SUGGESTION_TYPE_SIM = 2,
+    SUGGESTION_TYPE_SIM = 1,
+
+    // language is suggested with system region or region is suggested with system language.
+    SUGGESTION_TYPE_RELATED = 2,
 };
 
 struct LocaleItem {

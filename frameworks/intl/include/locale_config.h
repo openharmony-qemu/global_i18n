@@ -259,6 +259,7 @@ private:
      */
     static std::string RemoveLocalDigitFromLocale(const std::string &localDigitTag);
     static void ExtendWhiteLanguages();
+    static void ExtendLanguageWithScript(const char* language);
     static std::unordered_set<std::string> supportedLocales;
     static std::unordered_set<std::string> supportedRegions;
     static std::unordered_set<std::string> supportLocales;
