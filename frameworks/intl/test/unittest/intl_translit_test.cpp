@@ -245,12 +245,8 @@ HWTEST_F(IntlTest, IntlFuncTest00103, TestSize.Level1)
     UErrorCode status = U_ZERO_ERROR;
     icu::UnicodeString unistr = icu::UnicodeString::fromUTF8(transId);
     icu::Transliterator *trans = icu::Transliterator::createInstance(unistr, UTransDirection::UTRANS_FORWARD, status);
-    if (U_FAILURE(status)) {
-        return;
-    }
-    if (trans == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(U_SUCCESS(status));
+    ASSERT_TRUE(trans != nullptr);
     for (auto iter = translitTestCases.begin(); iter != translitTestCases.end(); ++iter) {
         std::string word = iter->first;
         std::string expect = iter->second;
