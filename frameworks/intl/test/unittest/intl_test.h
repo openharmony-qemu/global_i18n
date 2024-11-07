@@ -28,7 +28,6 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static std::map<std::string, std::string> translitTestCases;
 };
 
 int IntlFuncTest001(void);
@@ -133,7 +132,6 @@ int IntlFuncTest0099(void);
 int IntlFuncTest00100(void);
 int IntlFuncTest00101(void);
 int IntlFuncTest00102(void);
-int IntlFuncTest00103(void);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
