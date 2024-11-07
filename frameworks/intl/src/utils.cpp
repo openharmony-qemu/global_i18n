@@ -320,6 +320,10 @@ std::set<std::string> GetTimeZoneAvailableIDs(I18nErrorCode &errorCode)
     struct stat s;
     const char *tzIdConfigPath = stat(DISTRO_TIMEZONE_LIST_CONFIG, &s) == 0 ?
         DISTRO_TIMEZONE_LIST_CONFIG : TIMEZONE_LIST_CONFIG_PATH;
+    if (!CheckTzDataFilePath(tzIdConfigPath)) {
+        HILOG_ERROR_I18N("GetTimeZoneAvailableIDs: check file %{public}s failed.", tzIdConfigPath);
+        return availableIDs;
+    }
     std::unique_ptr<char[]> resolvedPath = std::make_unique<char[]>(PATH_MAX + 1);
     if (realpath(tzIdConfigPath, resolvedPath.get()) == nullptr) {
         HILOG_ERROR_I18N("Get realpath failed, errno: %{public}d.", errno);
@@ -347,6 +351,7 @@ bool RegexSearchNoExcept(const std::string& str, std::smatch& match, const std::
     try {
         return std::regex_search(str, match, regex);
     } catch (const std::regex_error &except) {
+        HILOG_ERROR_I18N("RegexSearchNoExcept: regex_error caught %{public}s.", except.what());
         return false;
     }
 }

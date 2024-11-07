@@ -35,6 +35,10 @@ int DateTimeFilter::GetType(std::string& name)
 {
     int32_t status = 0;
     int key = ConvertString2Int(name, status);
+    if (status == -1) {
+        HILOG_ERROR_I18N("DateTimeFilter::GetType: convert %{public}s to Int failed.", name.c_str());
+        return FilterType::TYPE_NULL;
+    }
     int type;
     // 19999 and 30000 are the matching rule numbers.
     if (key > 19999 && key < 30000) {

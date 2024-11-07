@@ -199,7 +199,11 @@ napi_value I18nUnicodeAddon::IsRTLCharacterAddon(napi_env env, napi_callback_inf
         return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("I18nUnicodeAddon::IsRTLCharacterAddon: get argv[0] type failed.");
+        return nullptr;
+    }
     if (valueType != napi_valuetype::napi_string) {
         HILOG_ERROR_I18N("IsRTLCharacterAddon: Parameter type does not match");
         return nullptr;
@@ -230,7 +234,11 @@ napi_value I18nUnicodeAddon::IsIdeoGraphicAddon(napi_env env, napi_callback_info
         return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("I18nUnicodeAddon::IsIdeoGraphicAddon: get argv[0] type failed.");
+        return nullptr;
+    }
     if (valueType != napi_valuetype::napi_string) {
         HILOG_ERROR_I18N("IsIdeoGraphicAddon: Parameter type does not match");
         return nullptr;
@@ -261,7 +269,11 @@ napi_value I18nUnicodeAddon::IsLetterAddon(napi_env env, napi_callback_info info
         return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("I18nUnicodeAddon::IsLetterAddon: get argv[0] type failed.");
+        return nullptr;
+    }
     if (valueType != napi_valuetype::napi_string) {
         HILOG_ERROR_I18N("IsLetterAddon: Parameter type does not match");
         return nullptr;
@@ -292,7 +304,11 @@ napi_value I18nUnicodeAddon::IsLowerCaseAddon(napi_env env, napi_callback_info i
         return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("I18nUnicodeAddon::IsLowerCaseAddon: get argv[0] type failed.");
+        return nullptr;
+    }
     if (valueType != napi_valuetype::napi_string) {
         HILOG_ERROR_I18N("IsLowerCaseAddon: Parameter type does not match");
         return nullptr;
@@ -323,7 +339,11 @@ napi_value I18nUnicodeAddon::IsUpperCaseAddon(napi_env env, napi_callback_info i
         return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("I18nUnicodeAddon::IsUpperCaseAddon: get argv[0] type failed.");
+        return nullptr;
+    }
     if (valueType != napi_valuetype::napi_string) {
         HILOG_ERROR_I18N("IsUpperCaseAddon: Parameter type does not match");
         return nullptr;
@@ -354,7 +374,11 @@ napi_value I18nUnicodeAddon::GetTypeAddon(napi_env env, napi_callback_info info)
         return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("I18nUnicodeAddon::GetTypeAddon: get argv[0] type failed.");
+        return nullptr;
+    }
     if (valueType != napi_valuetype::napi_string) {
         HILOG_ERROR_I18N("GetTypeAddon: Parameter type does not match");
         return nullptr;

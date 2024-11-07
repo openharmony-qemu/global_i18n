@@ -16,6 +16,7 @@
 
 #include <string>
 #include <unordered_map>
+#include "i18n_hilog.h"
 
 namespace OHOS {
 namespace Global {
@@ -37,8 +38,11 @@ void ErrorUtil::NapiThrow(napi_env env, int32_t errCode, const std::string& valu
         return;
     }
     napi_value code = nullptr;
-    napi_create_string_latin1(env, std::to_string(errCode).c_str(), NAPI_AUTO_LENGTH, &code);
-
+    napi_status status = napi_create_string_latin1(env, std::to_string(errCode).c_str(), NAPI_AUTO_LENGTH, &code);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("ErrorUtil::NapiThrow: create string %{public}d failed", errCode);
+        return;
+    }
     napi_value message = nullptr;
     auto iter = ErrorCodeToMsg.find(errCode);
     std::string errMsg = iter != ErrorCodeToMsg.end() ? iter->second : "";
@@ -54,10 +58,17 @@ void ErrorUtil::NapiThrow(napi_env env, int32_t errCode, const std::string& valu
         allErrMsg = errMsg + ", the type of " + valueName + " must be " + valueContent + ".";
     }
 
-    napi_create_string_latin1(env, allErrMsg.c_str(), NAPI_AUTO_LENGTH, &message);
-
+    status = napi_create_string_latin1(env, allErrMsg.c_str(), NAPI_AUTO_LENGTH, &message);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("ErrorUtil::NapiThrow: create string %{public}s failed", allErrMsg.c_str());
+        return;
+    }
     napi_value error = nullptr;
-    napi_create_error(env, code, message, &error);
+    status = napi_create_error(env, code, message, &error);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("ErrorUtil::NapiThrow: create error failed");
+        return;
+    }
     napi_throw(env, error);
 }
 } // namespace I18n

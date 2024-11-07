@@ -19,13 +19,17 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
+const std::string BorderRule::CONTAIN_STR = "CONTAIN";
+const std::string BorderRule::CONTAIN_OR_INTERSECT_STR = "CONTAIN_OR_INTERSECT";
+const std::string BorderRule::TRUE_STR = "True";
+
 BorderRule::BorderRule(icu::UnicodeString& regex, std::string& insensitive, std::string& type)
 {
     this->regex = regex;
-    if (type == "CONTAIN") {
+    if (type.compare(CONTAIN_STR) == 0) {
         // 9 indicates a certain execution logic of the border rule.
         this->type = 9;
-    } else if (type == "CONTAIN_OR_INTERSECT") {
+    } else if (type.compare(CONTAIN_OR_INTERSECT_STR) == 0) {
         // 8 indicates a certain execution logic of the border rule.
         this->type = 8;
     } else {
@@ -49,7 +53,7 @@ int BorderRule::GetType()
 icu::RegexPattern* BorderRule::GetPattern()
 {
     // Sets whether regular expression matching is case sensitive
-    if (insensitive == "True") {
+    if (insensitive.compare(TRUE_STR) == 0) {
         return icu::RegexPattern::compile(this->regex, URegexpFlag::UREGEX_CASE_INSENSITIVE, this->status);
     } else {
         return icu::RegexPattern::compile(this->regex, 0, this->status);

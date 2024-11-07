@@ -45,7 +45,11 @@ napi_value I18nTimeZoneAddon::GetI18nTimeZone(napi_env env, napi_callback_info i
     void *data = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (!VariableConvertor::CheckNapiValueType(env, argv[0])) {
-        napi_create_string_utf8(env, "", NAPI_AUTO_LENGTH, &argv[0]);
+        napi_status status = napi_create_string_utf8(env, "", NAPI_AUTO_LENGTH, &argv[0]);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("I18nTimeZoneAddon::GetI18nTimeZone: create string failed.");
+            return nullptr;
+        }
     }
     return StaticGetTimeZone(env, argv, true);
 }

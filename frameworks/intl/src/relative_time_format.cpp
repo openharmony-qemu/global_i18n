@@ -223,8 +223,8 @@ void RelativeTimeFormat::GetResolvedOptions(std::map<std::string, std::string> &
 
 void RelativeTimeFormat::SetDefaultStyle()
 {
-    char value[BUFFER_LEN];
-    int code = GetParameter(DEVICE_TYPE_NAME, "", value, BUFFER_LEN);
+    char value[CONFIG_LEN];
+    int code = GetParameter(DEVICE_TYPE_NAME, "", value, CONFIG_LEN);
     if (code > 0) {
         std::string deviceType = value;
         if (defaultFormatStyle.find(deviceType) != defaultFormatStyle.end()) {
