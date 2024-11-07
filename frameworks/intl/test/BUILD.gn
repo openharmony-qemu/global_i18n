@@ -25,7 +25,7 @@ ohos_unittest("intl_test") {
     "unittest/i18n_test.cpp",
     "unittest/intl_test.cpp",
     "unittest/intl_test_extent.cpp",
-    "unittest/intl_translit_test.cpp",
+    "unittest/translit_test.cpp",
     "unittest/locale_config_test.cpp",
     "unittest/mock/src/generate_ics_file.cpp",
     "unittest/mock/src/i18n_timezone_mock.cpp",

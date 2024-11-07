@@ -16,10 +16,11 @@
 #include <gtest/gtest.h>
 #include <map>
 #include <vector>
-#include "intl_test.h"
+#include "translit_test.h"
 #include <unistd.h>
 #include "unicode/utypes.h"
 #include "unicode/translit.h"
+#include "ohos/init_data.h"
 
 using namespace OHOS::Global::I18n;
 using testing::ext::TestSize;
@@ -30,7 +31,7 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 
-std::map<std::string, std::string> IntlTest::translitTestCases {
+std::map<std::string, std::string> TranslitTest::translitTestCases {
     {"阿胶", "ē jiāo"},
     {"挨打", "ái dǎ"},
     {"扒手", "pá shǒu"},
@@ -234,12 +235,27 @@ std::map<std::string, std::string> IntlTest::translitTestCases {
     {"处理", "chǔ lǐ"},
 };
 
+void TranslitTest::SetUpTestCase(void)
+{
+    SetHwIcuDirectory();
+}
+
+void TranslitTest::TearDownTestCase(void)
+{
+}
+
+void TranslitTest::SetUp(void)
+{}
+
+void TranslitTest::TearDown(void)
+{}
+
 /**
- * @tc.name: IntlFuncTest00103
+ * @tc.name: TranslitTest0001
  * @tc.desc: Test icu::Transliterator
  * @tc.type: FUNC
  */
-HWTEST_F(IntlTest, IntlFuncTest00103, TestSize.Level1)
+HWTEST_F(TranslitTest, TranslitTest0001, TestSize.Level1)
 {
     const std::string transId = "Any-Latn";
     UErrorCode status = U_ZERO_ERROR;
