@@ -537,6 +537,11 @@ HWTEST_F(IntlTest, IntlFuncTest0062, TestSize.Level1)
     const std::string replace = "";
     StrReplaceAll(str, target, replace);
 
+    std::string localeTag = "zh-Hans-CN";
+    std::string localeCode = LocaleEncode(localeTag);
+    std::string targetCode = "58400008334651000314";
+    EXPECT_EQ(localeCode, targetCode);
+
     std::string localeRule = "zh-Hans";
     DateTimeRule* dateTimeRule = new DateTimeRule(localeRule);
     DateTimeFilter* dateTimeFilter = new DateTimeFilter(localeRule, dateTimeRule);
