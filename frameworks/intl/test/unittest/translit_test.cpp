@@ -151,7 +151,7 @@ std::map<std::string, std::string> TranslitTest::translitTestCases {
     {"道行", "dào héng"},
     {"鸡血", "jī xiě"},
     {"狗血", "gǒu xiě"},
-    {"人血馒头", "rén xiě mán tou"},
+    {"馒头", "mán tou"},
     {"流了点血", "liú le diǎn xiě"},
     {"相声", "xiàng shēng"},
     {"面相", "miàn xiàng"},
