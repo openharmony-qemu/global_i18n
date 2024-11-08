@@ -509,11 +509,15 @@ napi_value I18nSystemAddon::GetSystemCountriesImpl(napi_env env, napi_callback_i
     }
     VariableConvertor::VerifyType(env, "language", "string", argv[0]);
     size_t len = 0;
-    napi_get_value_string_utf8(env, argv[0], nullptr, 0, &len);
+    status = napi_get_value_string_utf8(env, argv[0], nullptr, 0, &len);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("GetSystemCountriesImpl: Failed to get string len argv[0].");
+        return nullptr;
+    }
     std::vector<char> localeBuf(len + 1);
     status = napi_get_value_string_utf8(env, argv[0], localeBuf.data(), len + 1, &len);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("GetSystemCountriesImpl: Failed to get string item.");
+        HILOG_ERROR_I18N("GetSystemCountriesImpl: Failed to get string item argv[0].");
         return nullptr;
     }
     std::vector<std::string> systemCountries;
@@ -556,7 +560,11 @@ napi_value I18nSystemAddon::IsSuggestedImpl(napi_env env, napi_callback_info inf
     }
     VariableConvertor::VerifyType(env, "language", "string", argv[0]);
     size_t len = 0;
-    napi_get_value_string_utf8(env, argv[0], nullptr, 0, &len);
+    status = napi_get_value_string_utf8(env, argv[0], nullptr, 0, &len);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("IsSuggestedImpl: Failed to get string len argv[0].");
+        return nullptr;
+    }
     std::vector<char> languageBuf(len + 1);
     status = napi_get_value_string_utf8(env, argv[0], languageBuf.data(), len + 1, &len);
     if (status != napi_ok) {
@@ -565,7 +573,11 @@ napi_value I18nSystemAddon::IsSuggestedImpl(napi_env env, napi_callback_info inf
     }
     bool isSuggested = false;
     if (VariableConvertor::CheckNapiValueType(env, argv[1])) {
-        napi_get_value_string_utf8(env, argv[1], nullptr, 0, &len);
+        status = napi_get_value_string_utf8(env, argv[1], nullptr, 0, &len);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("IsSuggestedImpl: Failed to get string len argv[1].");
+            return nullptr;
+        }
         std::vector<char> regionBuf(len + 1);
         status = napi_get_value_string_utf8(env, argv[1], regionBuf.data(), len + 1, &len);
         if (status != napi_ok) {
@@ -601,7 +613,11 @@ napi_value I18nSystemAddon::SetSystemLanguageImpl(napi_env env, napi_callback_in
         return nullptr;
     }
     size_t len = 0;
-    napi_get_value_string_utf8(env, argv[0], nullptr, 0, &len);
+    status = napi_get_value_string_utf8(env, argv[0], nullptr, 0, &len);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("SetSystemLanguageImpl: Failed to get string len argv[0].");
+        return nullptr;
+    }
     std::vector<char> languageBuf(len + 1);
     status = napi_get_value_string_utf8(env, argv[0], languageBuf.data(), len + 1, &len);
     if (status != napi_ok) {

@@ -16,6 +16,7 @@
 #include <string>
 #include <unordered_map>
 #include <cmath>
+#include "i18n_hilog.h"
 #include "utils.h"
 
 namespace OHOS {
@@ -33,6 +34,7 @@ const int BASE_VALUE_SIZE = 2;
 const int FACTOR_SIZE = 2;
 const int CHAR_OFFSET = 48;
 const int MAX_UNIT_NUM = 500;
+const size_t REGION_SIZE = 2;
 
 const std::unordered_map<std::string, std::vector<std::string>> USAGE_001 {
     { "area-land-agricult", { "hectare" } },
@@ -308,6 +310,10 @@ const std::unordered_map<std::string, double> POWER_VALUE {
 
 uint32_t GetMask(const string &region)
 {
+    if (region.length() < REGION_SIZE) {
+        HILOG_ERROR_I18N("GetMask: region is invalid.");
+        return 0;
+    }
     uint32_t firstChar = (region.c_str()[0] - CHAR_OFFSET);
     uint32_t secondChar = (region.c_str()[1] - CHAR_OFFSET);
     return (firstChar << REGION_OFFSET) | secondChar;

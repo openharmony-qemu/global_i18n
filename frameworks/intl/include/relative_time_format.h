@@ -64,7 +64,7 @@ private:
     UDateRelativeDateTimeFormatterStyle style = UDAT_STYLE_LONG;
     bool createSuccess = false;
     static const char *DEVICE_TYPE_NAME;
-    static const int BUFFER_LEN = 10;
+    static constexpr int CONFIG_LEN = 128;
     static std::unordered_map<std::string, URelativeDateTimeUnit> relativeUnits;
     static std::unordered_map<std::string, UDateRelativeDateTimeFormatterStyle> relativeFormatStyle;
     static std::unordered_map<std::string, std::string> defaultFormatStyle;
