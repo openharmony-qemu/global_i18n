@@ -21,6 +21,8 @@ ohos_shared_library("cj_intl_ffi") {
     "include",
   ]
 
+  defines = []
+
   deps = [ "../../../frameworks/intl:intl_util" ]
   external_deps = [
     "c_utils:utils",
