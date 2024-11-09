@@ -43,8 +43,8 @@ ohos_shared_library("cj_intl_ffi") {
     "samgr:samgr_proxy",
   ]
   sources = [
-    "intl_ffi.cpp",
-    "intl_impl.cpp",
+    "src/intl_ffi.cpp",
+    "src/intl_impl.cpp",
   ]
 
   if (i18n_support_app_preferred_language) {
