@@ -14,20 +14,12 @@
 import("//base/global/i18n/i18n.gni")
 import("//build/ohos.gni")
 
-group("build_module") {
-  deps = [ ":cj_intl_ffi" ]
-}
-
 ohos_shared_library("cj_intl_ffi") {
   include_dirs = [
     "../../../frameworks/intl/include",
     "../../js/kits/include",
-    "../../cj/include",
+    "include",
   ]
-
-  if (!defined(defines)) {
-    defines = []
-  }
 
   deps = [ "../../../frameworks/intl:intl_util" ]
   external_deps = [
@@ -52,14 +44,6 @@ ohos_shared_library("cj_intl_ffi") {
     "intl_ffi.cpp",
     "intl_impl.cpp",
   ]
-
-  if (current_os == "ohos") {
-    defines += [ "OHOS_PLATFORM" ]
-  }
-
-  if (current_os == "mingw") {
-    defines += [ "WINDOWS_PLATFORM" ]
-  }
 
   if (i18n_support_app_preferred_language) {
     defines += [ "SUPPORT_APP_PREFERRED_LANGUAGE" ]
