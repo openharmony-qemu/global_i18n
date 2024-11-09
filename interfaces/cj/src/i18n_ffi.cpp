@@ -12,16 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "hilog/log.h"
-#include "preferred_language.h"
-#include "locale_config.h"
+#include <cstdint>
 #include "i18n_ffi.h"
+#include "i18n_struct.h"
+#include "locale_config.h"
  
 namespace OHOS {
 namespace Global {
 namespace I18n {
-using namespace OHOS::HiviewDFX;
 extern "C"
 {
 char* MallocCString(const std::string& origin)
@@ -37,24 +35,26 @@ char* MallocCString(const std::string& origin)
     return std::char_traits<char>::copy(res, origin.c_str(), length);
 }
 
-char* FfiOHOSGetAppPreferredLanguage()
+CArrStr VectorStringToCArr(const std::vector<std::string>& vectorString)
 {
-    std::string language = PreferredLanguage::GetFirstPreferredLanguage();
-    char* res = MallocCString(language);
-    return res;
+    CArrStr strArray;
+    strArray.length = static_cast<int64_t>(vectorString.size());
+    strArray.data = static_cast<char**>(malloc(strArray.length * sizeof(char*)));
+    if (strArray.data == nullptr) {
+        return CArrStr{0};
+    }
+    for (int64_t i = 0; i < strArray.length; i++) {
+        strArray.data[i] = MallocCString(vectorString[i]);
+    }
+    return strArray;
 }
 
-char* FfiI18nSystemGetSystemLanguage()
+bool FfiOHOSIsRTL(char* locale)
 {
-    std::string language = OHOS::Global::I18n::LocaleConfig::GetSystemLanguage();
-    return MallocCString(language);
-}
-char* FfiI18nSystemGetSystemRegion()
-{
-    std::string region = OHOS::Global::I18n::LocaleConfig::GetSystemRegion();
-    return MallocCString(region);
+    bool isRTL = LocaleConfig::IsRTL(std::string(locale));
+    return isRTL;
 }
 }
-}
-}
-}
+}  // namespace I18n
+}  // namespace Global
+}  // namespace OHOS
