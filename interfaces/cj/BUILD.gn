@@ -15,7 +15,10 @@ import("//base/global/i18n/i18n.gni")
 import("//build/ohos.gni")
 
 group("build_module") {
-  deps = [ ":cj_i18n_ffi" ]
+  deps = [
+    ":cj_i18n_ffi",
+    "intl:cj_intl_ffi",
+  ]
 }
 
 ohos_shared_library("cj_i18n_ffi") {
