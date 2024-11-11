@@ -266,7 +266,7 @@ CArrArrString RelativeTimeFormatImpl::FormatToParts(double number, char *unit)
     for (size_t i = 0; i < timeVectorStr.size(); i++) {
         std::vector<std::string> timeVector = timeVectorStr[i];
         CArrString retime = {.head = nullptr, .size = 0};
-        char **time = reinterpret_cast<char **>(malloc(sizeof(char *) * timeVector.size()));
+        char **time = static_cast<char **>(malloc(sizeof(char *) * timeVector.size()));
         if (time == nullptr) {
             HILOG_ERROR_I18N("The char** is nullptr");
             return ret;
