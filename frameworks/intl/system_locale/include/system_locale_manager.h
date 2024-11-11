@@ -119,6 +119,8 @@ private:
                                          std::vector<TimeZoneCityItem> &timezoneCityItemList);
     static std::vector<TimeZoneCityItem> GetTimezoneCityInfoArray();
     static std::string GetCountryCodeFromSimCard();
+    static bool IsSuggestRegion(const std::string &language, const std::string &region);
+    static const std::unordered_set<std::string> supportLocales;
     std::unique_ptr<TabooUtils> tabooUtils;
     static const char* SIM_COUNTRY_CODE_KEY;
     static constexpr int CONFIG_LEN = 128;
