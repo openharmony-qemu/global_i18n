@@ -256,14 +256,15 @@ void SystemLocaleManager::SortTimezoneCityItemList(const std::string &locale,
 
 std::string SystemLocaleManager::GetCountryCodeFromSimCard()
 {
+    std::string result;
 #if defined(TEL_CORE_SERVICE_ENABLE) && defined(TEL_CELLULAR_DATA_ENABLE)
     int slotId = Telephony::CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
     std::u16string countryCodeForSim;
     DelayedRefSingleton<Telephony::CoreServiceClient>::GetInstance().GetISOCountryCodeForSim(
-            slotId, countryCodeForSim);
-    return Str16ToStr8(countryCodeForSim);
+        slotId, countryCodeForSim);
+    result = Str16ToStr8(countryCodeForSim);
 #endif
-    return "";
+    return result;
 }
 } // I18n
 } // Global

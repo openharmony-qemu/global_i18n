@@ -211,9 +211,9 @@ ohos_shared_library("system_locale") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
-    "libpng:libpng",
     "icu:shared_icui18n",
     "icu:shared_icuuc",
+    "libpng:libpng",
   ]
   cflags_cc = [
     "-Wall",
@@ -222,9 +222,7 @@ ohos_shared_library("system_locale") {
   ]
   remove_configs = [ "//build/config/compiler:no_rtti" ]
   use_exceptions = true
-  deps = [
-    ":intl_util",
-  ]
+  deps = [ ":intl_util" ]
   public_external_deps = []
   defines = []
   if (is_asan) {
