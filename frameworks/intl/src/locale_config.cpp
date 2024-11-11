@@ -81,6 +81,7 @@ const char *LocaleConfig::secondRootTag = "lang";
 const char *LocaleConfig::rootRegion = "regions";
 const char *LocaleConfig::secondRootRegion = "region";
 const char *LocaleConfig::NUMBER_SYSTEM_KEY = "-nu-";
+const std::string LocaleConfig::HOUR_EVENT_DATA = "24HourChange";
 unordered_set<string> LocaleConfig::supportedLocales;
 unordered_set<string> LocaleConfig::supportLocales;
 unordered_set<string> LocaleConfig::supportedRegions;
@@ -213,6 +214,7 @@ static unordered_map<string, string> g_languageMap = {
     { "my-Qaag", "my-Qaag" },
     { "es-Latn-419", "es-419" },
     { "es-Latn-US", "es-419" },
+    { "es-US", "es-419" },
     { "az-Latn", "az-Latn" },
     { "bs-Latn", "bs-Latn" },
     { "en-Latn-US", "en" },
@@ -247,13 +249,13 @@ string GetDisplayLanguageInner(const string &language, const string &displayLoca
     if (!language.compare(0, 2, "zh") || !language.compare(0, 2, "fa") || !language.compare(0, 2, "ro")) {
         UErrorCode status = U_ZERO_ERROR;
         icu::Locale displayLocale = icu::Locale::forLanguageTag(displayLocaleTag.c_str(), status);
-        if (status != U_ZERO_ERROR) {
+        if (U_FAILURE(status)) {
             return "";
         }
         icu::LocaleDisplayNames *dspNames = icu::LocaleDisplayNames::createInstance(displayLocale,
             UDialectHandling::ULDN_DIALECT_NAMES);
         icu::Locale tempLocale = icu::Locale::forLanguageTag(language.c_str(), status);
-        if (status != U_ZERO_ERROR) {
+        if (U_FAILURE(status)) {
             return "";
         }
         if (dspNames != nullptr) {
@@ -263,11 +265,11 @@ string GetDisplayLanguageInner(const string &language, const string &displayLoca
     } else {
         UErrorCode status = U_ZERO_ERROR;
         icu::Locale displayLoc = icu::Locale::forLanguageTag(displayLocaleTag, status);
-        if (status != U_ZERO_ERROR) {
+        if (U_FAILURE(status)) {
             return "";
         }
         icu::Locale locale = icu::Locale::forLanguageTag(language, status);
-        if (status != U_ZERO_ERROR) {
+        if (U_FAILURE(status)) {
             return "";
         }
         locale.getDisplayName(displayLoc, unistr);
@@ -637,21 +639,21 @@ string LocaleConfig::GetMainLanguage(const string &language)
 {
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale origin = icu::Locale::forLanguageTag(language, status);
-    if (status != U_ZERO_ERROR) {
+    if (U_FAILURE(status)) {
         return "";
     }
     origin.addLikelySubtags(status);
-    if (status != U_ZERO_ERROR) {
+    if (U_FAILURE(status)) {
         return "";
     }
     icu::LocaleBuilder builder = icu::LocaleBuilder().setLanguage(origin.getLanguage()).
         setScript(origin.getScript()).setRegion(origin.getCountry());
     icu::Locale temp = builder.setExtension('u', "").build(status);
-    if (status != U_ZERO_ERROR) {
+    if (U_FAILURE(status)) {
         return "";
     }
     string fullLanguage = temp.toLanguageTag<string>(status);
-    if (status != U_ZERO_ERROR) {
+    if (U_FAILURE(status)) {
         return "";
     }
     if (dialectMap.find(fullLanguage) != dialectMap.end()) {
@@ -659,11 +661,11 @@ string LocaleConfig::GetMainLanguage(const string &language)
     }
     builder.setRegion("");
     temp = builder.build(status);
-    if (status != U_ZERO_ERROR) {
+    if (U_FAILURE(status)) {
         return "";
     }
     fullLanguage = temp.toLanguageTag<string>(status);
-    if (status != U_ZERO_ERROR) {
+    if (U_FAILURE(status)) {
         return "";
     }
     return fullLanguage;
@@ -676,11 +678,11 @@ string LocaleConfig::GetDisplayLanguage(const string &language, const string &di
     if (adjust == language) {
         UErrorCode status = U_ZERO_ERROR;
         icu::Locale displayLoc = icu::Locale::forLanguageTag(displayLocale, status);
-        if (status != U_ZERO_ERROR) {
+        if (U_FAILURE(status)) {
             return PseudoLocalizationProcessor("");
         }
         icu::Locale locale = icu::Locale::forLanguageTag(language, status);
-        if (status != U_ZERO_ERROR) {
+        if (U_FAILURE(status)) {
             return PseudoLocalizationProcessor("");
         }
         icu::UnicodeString unistr;
@@ -907,7 +909,7 @@ string LocaleConfig::GetDisplayOverrideRegion(const std::string &region, const s
         return region2DisplayName.at(region);
     } else {
         icu::Locale locale = icu::Locale::forLanguageTag(displayLocale, status);
-        if (status != U_ZERO_ERROR) {
+        if (U_FAILURE(status)) {
             return "";
         }
         if (IsValidRegion(region)) {
@@ -937,11 +939,11 @@ string LocaleConfig::GetDisplayRegion(const string &region, const string &displa
     if (country.length() == 0) {
         return PseudoLocalizationProcessor("");
     }
-    if (status != U_ZERO_ERROR) {
+    if (U_FAILURE(status)) {
         return PseudoLocalizationProcessor("");
     }
     icu::Locale locale = icu::Locale::forLanguageTag(displayLocale, status);
-    if (status != U_ZERO_ERROR) {
+    if (U_FAILURE(status)) {
         return PseudoLocalizationProcessor("");
     }
     icu::UnicodeString unistr;
@@ -1197,6 +1199,8 @@ I18nErrorCode LocaleConfig::SetSystemLanguage(const std::string &languageTag)
             languageTag.c_str());
         return I18nErrorCode::INVALID_LANGUAGE_TAG;
     }
+    std::string languageCode = LocaleEncode(languageTag);
+    HILOG_ERROR_I18N("LocaleConfig::SetSystemLanguage: set language %{public}s.", languageCode.c_str());
     // save old language, reset system language to old language if update locale failed.
     std::string oldLanguageTag = GetSystemLanguage();
     if (SetParameter(LANGUAGE_KEY, languageTag.data()) != 0) {
@@ -1222,6 +1226,8 @@ I18nErrorCode LocaleConfig::SetSystemRegion(const std::string &regionTag)
         HILOG_ERROR_I18N("LocaleConfig::SetSystemRegion %{public}s is not valid region tag.", regionTag.c_str());
         return I18nErrorCode::INVALID_REGION_TAG;
     }
+    std::string regionCode = LocaleEncode(regionTag);
+    HILOG_ERROR_I18N("LocaleConfig::SetSystemRegion: set region %{public}s.", regionCode.c_str());
     return SetSystemLocale(UpdateRegionOfLocale(regionTag));
 }
 
@@ -1231,6 +1237,8 @@ I18nErrorCode LocaleConfig::SetSystemLocale(const std::string &localeTag)
         HILOG_ERROR_I18N("LocaleConfig::SetSystemLocale %{public}s is not a valid locale tag.", localeTag.c_str());
         return I18nErrorCode::INVALID_LOCALE_TAG;
     }
+    std::string localeCode = LocaleEncode(localeTag);
+    HILOG_ERROR_I18N("LocaleConfig::SetSystemRegion: set locale %{public}s.", localeCode.c_str());
     if (SetParameter(LOCALE_KEY, localeTag.data()) != 0) {
         return I18nErrorCode::UPDATE_SYSTEM_LOCALE_FAILED;
     }
@@ -1259,6 +1267,7 @@ I18nErrorCode LocaleConfig::Set24HourClock(const std::string &option)
         HILOG_ERROR_I18N("LocaleConfig::Set24HourClock invalid 24 Hour clock tag: %{public}s", option.c_str());
         return I18nErrorCode::INVALID_24_HOUR_CLOCK_TAG;
     }
+    HILOG_ERROR_I18N("LocaleConfig::Set24HourClock: update 24 hour clock %{public}s", option.c_str());
     if (SetParameter(HOUR_KEY, option.data()) != 0) {
         HILOG_ERROR_I18N("LocaleConfig::Set24HourClock update 24 hour clock failed with option=%{public}s",
             option.c_str());
@@ -1351,6 +1360,9 @@ I18nErrorCode LocaleConfig::PublishCommonEvent(const std::string &eventType)
     OHOS::AAFwk::Want localeChangeWant;
     localeChangeWant.SetAction(eventType);
     OHOS::EventFwk::CommonEventData event(localeChangeWant);
+    if (EventFwk::CommonEventSupport::COMMON_EVENT_TIME_CHANGED.compare(eventType) == 0) {
+        event.SetData(HOUR_EVENT_DATA);
+    }
     if (!OHOS::EventFwk::CommonEventManager::PublishCommonEvent(event)) {
         HILOG_ERROR_I18N("LocaleConfig::PublishCommonEvent Failed to Publish event %{public}s",
             localeChangeWant.GetAction().c_str());

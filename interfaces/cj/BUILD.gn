@@ -24,11 +24,8 @@ group("build_module") {
 ohos_shared_library("cj_i18n_ffi") {
   include_dirs = [
     "../../frameworks/intl/include",
-    "../js/kits/include",
+    "include",
   ]
-
-  cflags_cc = [ "-frtti" ]
-  remove_configs = [ "//build/config/compiler:no_rtti" ]
 
   if (!defined(defines)) {
     defines = []
@@ -41,14 +38,44 @@ ohos_shared_library("cj_i18n_ffi") {
     ]
     external_deps = [
       "c_utils:utils",
+      "common_event_service:cesfwk_innerkits",
       "hilog:libhilog",
       "icu:shared_icui18n",
       "icu:shared_icuuc",
+      "ipc:ipc_core",
+      "libphonenumber:phonenumber_standard",
+      "libpng:libpng",
+      "libxml2:libxml2",
       "napi:ace_napi",
       "napi:cj_bind_ffi",
       "napi:cj_bind_native",
+      "preferences:native_preferences",
+      "samgr:samgr_proxy",
     ]
-    sources = [ "i18n_ffi.cpp" ]
+    sources = [
+      "src/i18n_breakIterator_ffi.cpp",
+      "src/i18n_breakIterator_impl.cpp",
+      "src/i18n_calendar_ffi.cpp",
+      "src/i18n_calendar_impl.cpp",
+      "src/i18n_entity_ffi.cpp",
+      "src/i18n_entity_impl.cpp",
+      "src/i18n_ffi.cpp",
+      "src/i18n_holiday_ffi.cpp",
+      "src/i18n_holiday_impl.cpp",
+      "src/i18n_index_util_ffi.cpp",
+      "src/i18n_index_util_impl.cpp",
+      "src/i18n_normalizer_ffi.cpp",
+      "src/i18n_normalizer_impl.cpp",
+      "src/i18n_phone_number_format_ffi.cpp",
+      "src/i18n_phone_number_format_impl.cpp",
+      "src/i18n_system_ffi.cpp",
+      "src/i18n_timezone_ffi.cpp",
+      "src/i18n_timezone_impl.cpp",
+      "src/i18n_transliterator_ffi.cpp",
+      "src/i18n_transliterator_impl.cpp",
+      "src/i18n_unicode_ffi.cpp",
+      "src/i18n_util_ffi.cpp",
+    ]
   } else {
     defines += [ "PREVIEWER" ]
     sources = [ "cj_i18n_mock.cpp" ]
@@ -61,6 +88,10 @@ ohos_shared_library("cj_i18n_ffi") {
 
   if (current_os == "mingw") {
     defines += [ "WINDOWS_PLATFORM" ]
+  }
+
+  if (i18n_support_app_preferred_language) {
+    defines += [ "SUPPORT_APP_PREFERRED_LANGUAGE" ]
   }
 
   innerapi_tags = [ "platformsdk" ]

@@ -35,6 +35,9 @@ private:
     icu::UnicodeString regex;
     UErrorCode status;
     std::string insensitive;
+    static const std::string CONTAIN_STR;
+    static const std::string CONTAIN_OR_INTERSECT_STR;
+    static const std::string TRUE_STR;
 };
 } // namespace I18n
 } // namespace Global

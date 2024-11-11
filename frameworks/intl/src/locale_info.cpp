@@ -63,14 +63,14 @@ void LocaleInfo::InitLocaleInfo(const std::string &localeTag, std::map<std::stri
         ComputeFinalLocaleTag(localeTag);
         locale = icu::Locale::forLanguageTag(icu::StringPiece(finalLocaleTag), status);
     }
-    if (localeTag == "" || status != U_ZERO_ERROR) {
+    if (localeTag == "" || U_FAILURE(status)) {
         std::string defaultLocaleTag = LocaleConfig::GetSystemLocale();
         ResetFinalLocaleStatus();
         ComputeFinalLocaleTag(defaultLocaleTag);
         status = U_ZERO_ERROR;
         locale = icu::Locale::forLanguageTag(icu::StringPiece(finalLocaleTag), status);
     }
-    if (status == U_ZERO_ERROR) {
+    if (U_SUCCESS(status)) {
         localeStatus = true;
         language = locale.getLanguage();
         script = locale.getScript();
@@ -260,7 +260,7 @@ std::string LocaleInfo::Maximize()
     UErrorCode status = U_ZERO_ERROR;
     Locale curLocale = locale;
     curLocale.addLikelySubtags(status);
-    if (status == U_ZERO_ERROR) {
+    if (U_SUCCESS(status)) {
         std::string restConfigs = "";
         if (finalLocaleTag.find("-u-") != std::string::npos) {
             restConfigs = finalLocaleTag.substr(finalLocaleTag.find("-u-"));
@@ -281,7 +281,7 @@ std::string LocaleInfo::Minimize()
     UErrorCode status = U_ZERO_ERROR;
     Locale curLocale = locale;
     curLocale.minimizeSubtags(status);
-    if (status == U_ZERO_ERROR) {
+    if (U_SUCCESS(status)) {
         std::string restConfigs = "";
         if (finalLocaleTag.find("-u-") != std::string::npos) {
             restConfigs = finalLocaleTag.substr(finalLocaleTag.find("-u-"));

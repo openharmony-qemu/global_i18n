@@ -13,12 +13,17 @@
  * limitations under the License.
  */
 #include "locale_util.h"
+#include "i18n_hilog.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
 bool LocaleUtil::IsRTL(const std::string &locale)
 {
+    if (locale.empty()) {
+        HILOG_ERROR_I18N("LocaleUtil::IsRTL: locale is empty.");
+        return false;
+    }
     icu::Locale curLocale(locale.c_str());
     return curLocale.isRightToLeft();
 }

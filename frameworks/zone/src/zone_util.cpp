@@ -116,7 +116,7 @@ string ZoneUtil::GetDefaultZone(const string country, const int32_t offset)
     UErrorCode status = U_ZERO_ERROR;
     StringEnumeration *strEnum =
         TimeZone::createTimeZoneIDEnumeration(UCAL_ZONE_TYPE_ANY, country.c_str(), &offset, status);
-    if (status != U_ZERO_ERROR) {
+    if (U_FAILURE(status)) {
         return "";
     }
     string ret;
@@ -160,7 +160,7 @@ void ZoneUtil::GetZoneList(const string country, const int32_t offset, vector<st
     UErrorCode status = U_ZERO_ERROR;
     StringEnumeration *strEnum =
         TimeZone::createTimeZoneIDEnumeration(UCAL_ZONE_TYPE_ANY, country.c_str(), &offset, status);
-    if (status != U_ZERO_ERROR) {
+    if (U_FAILURE(status)) {
         delete strEnum;
         strEnum = nullptr;
         return;
@@ -180,16 +180,16 @@ void ZoneUtil::GetString(StringEnumeration *strEnum, string& ret)
         return;
     }
     int32_t count = strEnum->count(status);
-    if ((status != U_ZERO_ERROR) || count <= 0) {
+    if (U_FAILURE(status) || count <= 0) {
         return;
     }
     const UnicodeString *uniStr = strEnum->snext(status);
-    if ((status != U_ZERO_ERROR) || (!uniStr)) {
+    if (U_FAILURE(status) || (!uniStr)) {
         return;
     }
     UnicodeString canonicalUnistring;
     TimeZone::getCanonicalID(*uniStr, canonicalUnistring, status);
-    if (status != U_ZERO_ERROR) {
+    if (U_FAILURE(status)) {
         return;
     }
     canonicalUnistring.toUTF8String(ret);
@@ -203,18 +203,18 @@ void ZoneUtil::GetList(StringEnumeration *strEnum, vector<string> &retVec)
     }
     UErrorCode status = U_ZERO_ERROR;
     int32_t count = strEnum->count(status);
-    if (count <= 0 || status != U_ZERO_ERROR) {
+    if (count <= 0 || U_FAILURE(status)) {
         return;
     }
     while (count > 0) {
         const UnicodeString *uniStr = strEnum->snext(status);
-        if ((!uniStr) || (status != U_ZERO_ERROR)) {
+        if ((!uniStr) || U_FAILURE(status)) {
             retVec.clear();
             break;
         }
         UnicodeString canonicalUnistring;
         TimeZone::getCanonicalID(*uniStr, canonicalUnistring, status);
-        if (status != U_ZERO_ERROR) {
+        if (U_FAILURE(status)) {
             retVec.clear();
             break;
         }

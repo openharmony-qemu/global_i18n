@@ -19,7 +19,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include "unicode/locid.h"
 #include "unicode/calendar.h"
 #include "unicode/ucal.h"
 #include "unicode/utypes.h"
@@ -39,6 +38,7 @@ public:
 
 private:
     bool VerifyDate(int32_t year, int32_t month, int32_t day);
+    void ConvertDate(int32_t& year, int32_t& month, int32_t& day);
     void CalcDaysFromBaseDate();
     void SolorDateToLunarDate();
     void AdjustLeapMonth(int32_t& i, int32_t tempDaysCounts, int32_t leapMonth);
@@ -46,7 +46,7 @@ private:
     bool IsGregorianLeapYear(int32_t year);
     static std::unordered_map<int32_t, int32_t> daysOfMonth;
     static std::unordered_map<int32_t, int32_t> accDaysOfMonth;
-    static std::vector<int> lunarDateInfo;
+    static std::vector<uint32_t> lunarDateInfo;
     static const int32_t VALID_START_YEAR = 1900;
     static const int32_t VALID_END_YEAR = 2100;
     static const int32_t VALID_START_MONTH = 1;
@@ -73,8 +73,7 @@ private:
     bool isLeapMonth = false;
     bool isGregorianLeapYear = false;
     bool isValidDate = false;
-
-    // icu::Calendar* gregorianCalendar;
+    icu::Calendar* calendar_;
 };
 } // namespace I18n
 } // namespace Global

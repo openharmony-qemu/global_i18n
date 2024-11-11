@@ -14,6 +14,7 @@
  */
 #include "index_util.h"
 
+#include "i18n_hilog.h"
 #include "locale_config.h"
 #include "unicode/locid.h"
 #include "string"
@@ -27,8 +28,13 @@ namespace I18n {
 IndexUtil::IndexUtil(const std::string &localeTag)
 {
     UErrorCode status = U_ZERO_ERROR;
-    if (localeTag == "") {
-        icu::Locale locale(LocaleConfig::GetSystemLocale().c_str());
+    if (localeTag.empty()) {
+        std::string sysLocale = LocaleConfig::GetSystemLocale();
+        if (sysLocale.empty()) {
+            HILOG_ERROR_I18N("IndexUtil::IndexUtil: get system locale failed.");
+            return;
+        }
+        icu::Locale locale(sysLocale.c_str());
         index = std::make_unique<icu::AlphabeticIndex>(locale, status);
     } else {
         icu::Locale locale(localeTag.c_str());

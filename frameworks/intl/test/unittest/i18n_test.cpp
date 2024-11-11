@@ -1568,6 +1568,35 @@ HWTEST_F(I18nTest, I18nFuncTest064, TestSize.Level1)
     EXPECT_EQ(day, 25);
     EXPECT_EQ(isLeap, false);
 }
+
+/**
+ * @tc.name: I18nFuncTest065
+ * @tc.desc: Test I18n lunar calendar
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest065, TestSize.Level1)
+{
+    std::unique_ptr<LunarCalendar> ptr = std::make_unique<LunarCalendar>();
+    ptr->SetGregorianDate(2024, 8, 51);
+    int32_t year = ptr->GetLunarYear();
+    int32_t month = ptr->GetLunarMonth();
+    int32_t day = ptr->GetLunarDay();
+    bool isLeap = ptr->IsLeapMonth();
+    EXPECT_EQ(year, 2024);
+    EXPECT_EQ(month, 8);
+    EXPECT_EQ(day, 18);
+    EXPECT_EQ(isLeap, false);
+
+    ptr->SetGregorianDate(2024, 12, 43);
+    year = ptr->GetLunarYear();
+    month = ptr->GetLunarMonth();
+    day = ptr->GetLunarDay();
+    isLeap = ptr->IsLeapMonth();
+    EXPECT_EQ(year, 2024);
+    EXPECT_EQ(month, 12);
+    EXPECT_EQ(day, 13);
+    EXPECT_EQ(isLeap, false);
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

@@ -192,7 +192,10 @@ void GetOptionValue(napi_env env, napi_value options, const std::string &optionN
             if (status != napi_ok) {
                 return;
             }
-            map.insert(make_pair(optionName, optionBuf.data()));
+            auto ret = map.insert(make_pair(optionName, optionBuf.data()));
+            if (!ret.second) {
+                HILOG_ERROR_I18N("GetOptionValue: map insert failed");
+            }
         }
     }
 }
@@ -240,7 +243,10 @@ void GetBoolOptionValue(napi_env env, napi_value options, const std::string &opt
             bool boolValue = false;
             napi_get_value_bool(env, optionValue, &boolValue);
             std::string value = boolValue ? "true" : "false";
-            map.insert(make_pair(optionName, value));
+            auto ret = map.insert(make_pair(optionName, value));
+            if (!ret.second) {
+                HILOG_ERROR_I18N("GetBoolOptionValue: map insert failed");
+            }
         }
     }
 }

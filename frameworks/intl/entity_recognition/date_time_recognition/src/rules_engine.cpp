@@ -53,7 +53,7 @@ std::vector<MatchedDateTimeInfo> RulesEngine::Match(icu::UnicodeString& message)
         icu::UnicodeString regex = this->patterns[key];
         icu::RegexPattern* pattern = icu::RegexPattern::compile(regex,
             URegexpFlag::UREGEX_CASE_INSENSITIVE, status);
-        if (pattern == nullptr) {
+        if (pattern == nullptr || U_FAILURE(status)) {
             HILOG_ERROR_I18N("Match failed because pattern is nullptr.");
             return matches;
         }

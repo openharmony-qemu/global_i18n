@@ -242,18 +242,26 @@ RelativeTimeFormatImpl::RelativeTimeFormatImpl(
     }
 }
 
-    CArrArrString RelativeTimeFormatImpl::FormatToParts(double number, char *unit)
-    {
-        std::string unitStr = unit;
-        std::vector<std::vector<std::string>> timeVectorStr;
+char *RelativeTimeFormatImpl::Format(double number, char *unit)
+{
+    std::string unitStr = unit;
+    std::string value = relativeTimeFmt_->Format(number, unitStr);
+    char *res = IMallocCString(value);
+    return res;
+}
 
-        CArrArrString ret = {.head = nullptr, .size = 0};
-        relativeTimeFmt_->FormatToParts(number, unitStr, timeVectorStr);
-        CArrString *res = static_cast<CArrString *>(malloc(sizeof(char ***) * timeVectorStr.size()));
-        if (res == nullptr) {
-            HILOG_ERROR_I18N("The CArrString is nullptr");
-            return ret;
-        }
+CArrArrString RelativeTimeFormatImpl::FormatToParts(double number, char *unit)
+{
+    std::string unitStr = unit;
+    std::vector<std::vector<std::string>> timeVectorStr;
+
+    CArrArrString ret = {.head = nullptr, .size = 0};
+    relativeTimeFmt_->FormatToParts(number, unitStr, timeVectorStr);
+    CArrString *res = static_cast<CArrString *>(malloc(sizeof(char ***) * timeVectorStr.size()));
+    if (res == nullptr) {
+        HILOG_ERROR_I18N("The CArrString is nullptr");
+        return ret;
+    }
 
     for (size_t i = 0; i < timeVectorStr.size(); i++) {
         std::vector<std::string> timeVector = timeVectorStr[i];

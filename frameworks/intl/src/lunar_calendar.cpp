@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "i18n_hilog.h"
+#include "unicode/gregocal.h"
 #include "lunar_calendar.h"
 
 namespace OHOS {
@@ -48,7 +49,7 @@ std::unordered_map<int32_t, int32_t> LunarCalendar::accDaysOfMonth {
     { 12, 334 }
 };
 
-std::vector<int32_t> LunarCalendar::lunarDateInfo {
+std::vector<uint32_t> LunarCalendar::lunarDateInfo {
     0x4bd8, 0x4ae0, 0xa570, 0x54d5, 0xd260, 0xd950, 0x5554, 0x56af, 0x9ad0, 0x55d2,
     0x4ae0, 0xa5b6, 0xa4d0, 0xd250, 0xd295, 0xb54f, 0xd6a0, 0xada2, 0x95b0, 0x4977,
     0x497f, 0xa4b0, 0xb4b5, 0x6a50, 0x6d40, 0xab54, 0x2b6f, 0x9570, 0x52f2, 0x4970,
@@ -74,14 +75,28 @@ std::vector<int32_t> LunarCalendar::lunarDateInfo {
 
 LunarCalendar::LunarCalendar()
 {
+    UErrorCode status = U_ZERO_ERROR;
+    calendar_ = new icu::GregorianCalendar(status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("LunarCalendar: create GregorianCalendar failed");
+        if (calendar_ != nullptr) {
+            delete calendar_;
+        }
+        calendar_ = nullptr;
+    }
 }
 
 LunarCalendar::~LunarCalendar()
 {
+    if (calendar_ != nullptr) {
+        delete calendar_;
+    }
+    calendar_ = nullptr;
 }
 
 bool LunarCalendar::SetGregorianDate(int32_t year, int32_t month, int32_t day)
 {
+    ConvertDate(year, month, day);
     isGregorianLeapYear = false;
     isValidDate = VerifyDate(year, month, day);
     if (!isValidDate) {
@@ -93,6 +108,33 @@ bool LunarCalendar::SetGregorianDate(int32_t year, int32_t month, int32_t day)
     CalcDaysFromBaseDate();
     SolorDateToLunarDate();
     return true;
+}
+
+void LunarCalendar::ConvertDate(int32_t& year, int32_t& month, int32_t& day)
+{
+    if (calendar_ == nullptr) {
+        return;
+    }
+    calendar_->set(year, month - 1, day);
+    UErrorCode status = U_ZERO_ERROR;
+    int32_t tempYear = calendar_->get(UCAL_YEAR, status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("ConvertDate: get year failed");
+        return;
+    }
+    int32_t tempMonth = calendar_->get(UCAL_MONTH, status) + 1;
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("ConvertDate: get month failed");
+        return;
+    }
+    int32_t tempDay = calendar_->get(UCAL_DATE, status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("ConvertDate: get day failed");
+        return;
+    }
+    year = tempYear;
+    month = tempMonth;
+    day = tempDay;
 }
 
 void LunarCalendar::CalcDaysFromBaseDate()
@@ -177,7 +219,7 @@ int32_t LunarCalendar::GetDaysPerLunarYear(int32_t lunarYear)
         return 0;
     }
     daysPerLunarYear += BASE_DAYS_PER_LUNAR_YEAR;
-    for (int32_t i = 0x8000; i > 0x8; i = i >> 1) {
+    for (uint32_t i = 0x8000; i > 0x8; i = i >> 1) {
         daysPerLunarYear += ((lunarDateInfo[lunarYear - START_YEAR] & i) == i) ? 1 : 0;
     }
     if (((lunarDateInfo[lunarYear - START_YEAR] & 0xf) != 0) &&

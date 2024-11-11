@@ -13,13 +13,14 @@
  * limitations under the License.
  */
 
-#include <cerrno>
 #include <algorithm>
+#include <cerrno>
 #include <climits>
 #include <filesystem>
 #include <fstream>
-#include <dirent.h>
+#include <iomanip>
 #include <mutex>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <sys/stat.h>
@@ -40,6 +41,8 @@ using namespace std;
 static const std::string PSEUDO_LOCALE_TAG = "en-XA";
 static const std::string PSEUDO_START_TAG = "{";
 static const std::string PSEUDO_END_TAG = "}";
+static const char CHAR_A = 'A';
+static const int32_t CHAR2INT_SIZE = 2;
 constexpr const char *TIMEZONE_LIST_CONFIG_PATH = "/system/etc/zoneinfo/timezone_list.cfg";
 constexpr const char *DISTRO_TIMEZONE_LIST_CONFIG = "/system/etc/tzdata_distro/timezone_list.cfg";
 static std::mutex validLocaleMutex;
@@ -320,6 +323,10 @@ std::set<std::string> GetTimeZoneAvailableIDs(I18nErrorCode &errorCode)
     struct stat s;
     const char *tzIdConfigPath = stat(DISTRO_TIMEZONE_LIST_CONFIG, &s) == 0 ?
         DISTRO_TIMEZONE_LIST_CONFIG : TIMEZONE_LIST_CONFIG_PATH;
+    if (!CheckTzDataFilePath(tzIdConfigPath)) {
+        HILOG_ERROR_I18N("GetTimeZoneAvailableIDs: check file %{public}s failed.", tzIdConfigPath);
+        return availableIDs;
+    }
     std::unique_ptr<char[]> resolvedPath = std::make_unique<char[]>(PATH_MAX + 1);
     if (realpath(tzIdConfigPath, resolvedPath.get()) == nullptr) {
         HILOG_ERROR_I18N("Get realpath failed, errno: %{public}d.", errno);
@@ -335,7 +342,7 @@ std::set<std::string> GetTimeZoneAvailableIDs(I18nErrorCode &errorCode)
         if (line.length() == 0) {
             break;
         }
-        line = line.substr(0, line.find_last_not_of("\r\n") + 1);
+        line.resize(line.find_last_not_of("\r\n") + 1);
         availableIDs.insert(line);
     }
     file.close();
@@ -347,8 +354,19 @@ bool RegexSearchNoExcept(const std::string& str, std::smatch& match, const std::
     try {
         return std::regex_search(str, match, regex);
     } catch (const std::regex_error &except) {
+        HILOG_ERROR_I18N("RegexSearchNoExcept: regex_error caught %{public}s.", except.what());
         return false;
     }
+}
+
+std::string LocaleEncode(const std::string& locale)
+{
+    std::stringstream ss;
+    for (auto& c : locale) {
+        int32_t number = (c == '-') ? 0 : static_cast<int32_t>(c) - static_cast<int32_t>(CHAR_A) + 1;
+        ss << std::setw(CHAR2INT_SIZE) << std::setfill('0') << number;
+    }
+    return ss.str();
 }
 } // namespace I18n
 } // namespace Global

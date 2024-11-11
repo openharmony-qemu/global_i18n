@@ -264,17 +264,17 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest010, TestSize.Level1)
     std::string languageTag = "zh-Hant-HK";
     std::string localeTag = "zh-Hant";
     std::string displayName = LocaleConfig::GetDisplayLanguage(languageTag, localeTag, true);
-    EXPECT_EQ(displayName, "繁體中文");
+    EXPECT_EQ(displayName, "繁體中文（中國香港）");
 
     languageTag = "zh-Hant-HK";
     localeTag = "zh-Hans";
     displayName = LocaleConfig::GetDisplayLanguage(languageTag, localeTag, true);
-    EXPECT_EQ(displayName, "繁体中文");
+    EXPECT_EQ(displayName, "繁体中文（中国香港）");
 
     languageTag = "zh-Hant-HK";
     localeTag = "en-US";
     displayName = LocaleConfig::GetDisplayLanguage(languageTag, localeTag, true);
-    EXPECT_EQ(displayName, "Traditional Chinese");
+    EXPECT_EQ(displayName, "Traditional Chinese(Hong Kong, China)");
 }
 
 /**
