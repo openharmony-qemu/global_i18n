@@ -20,6 +20,12 @@
 #include "unicode/timezone.h"
 #include "utils.h"
 #include "i18n_timezone.h"
+#ifdef TEL_CELLULAR_DATA_ENABLE
+#include "cellular_data_client.h"
+#endif
+#ifdef TEL_CORE_SERVICE_ENABLE
+#include "core_service_client.h"
+#endif
 
 namespace OHOS {
 namespace Global {
@@ -53,6 +59,7 @@ std::vector<LocaleItem> SystemLocaleManager::GetLanguageInfoArray(const std::vec
         return localeItemList;
     }
     std::unordered_set<std::string> blockedLanguages = LocaleConfig::GetBlockedLanguages();
+    std::string simRegion = GetCountryCodeFromSimCard();
     for (auto it = languages.begin(); it != languages.end(); ++it) {
         if (blockedLanguages.find(*it) != blockedLanguages.end()) {
             continue;
@@ -65,7 +72,6 @@ std::vector<LocaleItem> SystemLocaleManager::GetLanguageInfoArray(const std::vec
             languageNativeName = tabooUtils->ReplaceLanguageName(*it, *it, languageNativeName);
         }
         bool isSuggestedWithSystemRegion = LocaleConfig::IsSuggested(*it, LocaleConfig::GetSystemRegion());
-        std::string simRegion = ReadSystemParameter(SIM_COUNTRY_CODE_KEY, CONFIG_LEN);
         bool isSuggestedWithSimRegion = false;
         if (simRegion.length() > 0) {
             isSuggestedWithSimRegion = LocaleConfig::IsSuggested(*it, simRegion);
@@ -102,7 +108,7 @@ std::vector<LocaleItem> SystemLocaleManager::GetCountryInfoArray(const std::vect
     std::unordered_set<std::string> blockedRegions = LocaleConfig::GetBlockedRegions();
     std::unordered_set<std::string> blockedLanguageRegions = LocaleConfig::GetLanguageBlockedRegions();
     std::string pseudoProcessedRegion = PseudoLocalizationProcessor("");
-    std::string simRegion = ReadSystemParameter(SIM_COUNTRY_CODE_KEY, CONFIG_LEN);
+    std::string simRegion = GetCountryCodeFromSimCard();
     for (auto it = countries.begin(); it != countries.end(); ++it) {
         if (blockedRegions.find(*it) != blockedRegions.end() || blockedLanguageRegions.find(*it) !=
             blockedLanguageRegions.end()) {
@@ -246,6 +252,18 @@ void SystemLocaleManager::SortTimezoneCityItemList(const std::string &locale,
     };
     std::sort(timezoneCityItemList.begin(), timezoneCityItemList.end(), sortFunc);
     delete collator;
+}
+
+std::string SystemLocaleManager::GetCountryCodeFromSimCard()
+{
+#if defined(TEL_CORE_SERVICE_ENABLE) && defined(TEL_CELLULAR_DATA_ENABLE)
+    int slotId = Telephony::CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
+    std::u16string countryCodeForSim;
+    DelayedRefSingleton<Telephony::CoreServiceClient>::GetInstance().GetISOCountryCodeForSim(
+            slotId, countryCodeForSim);
+    return Str16ToStr8(countryCodeForSim);
+#endif
+    return "";
 }
 } // I18n
 } // Global
