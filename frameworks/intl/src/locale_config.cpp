@@ -214,6 +214,7 @@ static unordered_map<string, string> g_languageMap = {
     { "my-Qaag", "my-Qaag" },
     { "es-Latn-419", "es-419" },
     { "es-Latn-US", "es-419" },
+    { "es-US", "es-419" },
     { "az-Latn", "az-Latn" },
     { "bs-Latn", "bs-Latn" },
     { "en-Latn-US", "en" },
