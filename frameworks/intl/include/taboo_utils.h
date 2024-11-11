@@ -33,7 +33,7 @@ public:
 private:
     std::shared_ptr<Taboo> GetLatestTaboo();
     std::shared_ptr<Taboo> systemTaboo;
-    std::string systemTabooDataPath = "/system/etc/taboo/";
+    std::string systemTabooDataPath = "/system/etc/taboo_res/";
 };
 } // namespace I18n
 } // namespace Global
