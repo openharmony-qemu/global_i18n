@@ -212,12 +212,9 @@ std::vector<LocaleItem> SystemLocaleManager::GetCountryInfoArray(const std::vect
     }
     std::string systemLanguage = LocaleConfig::GetSystemLanguage();
     std::string onlyRegion = GetSpecialSuggestRegion(systemLanguage);
-    std::string pseudoProcessedRegion = PseudoLocalizationProcessor("");
     if (!onlyRegion.empty()) {
-        std::string regionName = LocaleConfig::GetDisplayRegion(onlyRegion, options.localeTag, true);
-        regionName = tabooUtils->ReplaceCountryName(onlyRegion, options.localeTag, regionName);
         SuggestionType suggestionType = SuggestionType::SUGGESTION_TYPE_RELATED;
-        LocaleItem item { onlyRegion, suggestionType, regionName, pseudoProcessedRegion };
+        LocaleItem item = GetLocaleItem(onlyRegion, suggestionType, options.localeTag);
         localeItemList.push_back(item);
         return localeItemList;
     }
@@ -229,8 +226,6 @@ std::vector<LocaleItem> SystemLocaleManager::GetCountryInfoArray(const std::vect
             blockedLanguageRegions.end()) {
             continue;
         }
-        std::string regionDisplayName = LocaleConfig::GetDisplayRegion(*it, options.localeTag, true);
-        regionDisplayName = tabooUtils->ReplaceCountryName(*it, options.localeTag, regionDisplayName);
         bool isSuggestedRegion = IsSuggestRegion(systemLanguage, *it);
         SuggestionType suggestionType = SuggestionType::SUGGESTION_TYPE_NONE;
         if (isSuggestedRegion) {
@@ -238,11 +233,23 @@ std::vector<LocaleItem> SystemLocaleManager::GetCountryInfoArray(const std::vect
         } else if (simRegion.compare(*it) == 0) {
             suggestionType = SuggestionType::SUGGESTION_TYPE_SIM;
         }
-        LocaleItem item { *it, suggestionType, regionDisplayName, pseudoProcessedRegion };
+        LocaleItem item = GetLocaleItem(*it, suggestionType, options.localeTag);
         localeItemList.push_back(item);
     }
     SortLocaleItemList(localeItemList, options);
     return localeItemList;
+}
+
+LocaleItem SystemLocaleManager::GetLocaleItem(const std::string& region,
+    SuggestionType& suggestionType, const std::string& localeTag)
+{
+    std::string pseudoProcessedRegion = PseudoLocalizationProcessor("");
+    std::string regionName = LocaleConfig::GetDisplayRegion(region, localeTag, true);
+    if (this->tabooUtils != nullptr) {
+        regionName = this->tabooUtils->ReplaceCountryName(region, localeTag, regionName);
+    }
+    LocaleItem item { region, suggestionType, regionName, pseudoProcessedRegion };
+    return item;
 }
 
 void SystemLocaleManager::SortLocaleItemList(std::vector<LocaleItem> &localeItemList, const SortOptions &options)
