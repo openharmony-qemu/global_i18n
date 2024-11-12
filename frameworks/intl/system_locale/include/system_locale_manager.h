@@ -120,7 +120,9 @@ private:
     static std::vector<TimeZoneCityItem> GetTimezoneCityInfoArray();
     static std::string GetCountryCodeFromSimCard();
     static bool IsSuggestRegion(const std::string &language, const std::string &region);
+    static std::string GetSpecialSuggestRegion(const std::string& language);
     static const std::unordered_set<std::string> supportLocales;
+    static const std::map<std::string, std::string> SPECIAL_SUGGEST_REGION_MAP;
     std::unique_ptr<TabooUtils> tabooUtils;
     static const char* SIM_COUNTRY_CODE_KEY;
     static constexpr int CONFIG_LEN = 128;

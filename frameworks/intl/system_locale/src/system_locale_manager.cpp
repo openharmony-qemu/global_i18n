@@ -33,6 +33,12 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 const char* SystemLocaleManager::SIM_COUNTRY_CODE_KEY = "telephony.sim.countryCode0";
+const std::map<std::string, std::string> SystemLocaleManager::SPECIAL_SUGGEST_REGION_MAP {
+    {"pt", "BR"},
+    {"pt-BR", "BR"},
+    {"es-419", "US"},
+    {"es-US", "US"},
+};
 const std::unordered_set<std::string> SystemLocaleManager::supportLocales {
     "ar-Arab-EG",
     "az-Cyrl-AZ",
@@ -60,7 +66,6 @@ const std::unordered_set<std::string> SystemLocaleManager::supportLocales {
     "en-Latn-US",
     "en-Qaag-US",
     "es-Latn-ES",
-    "es-Latn-US",
     "et-Latn-EE",
     "eu-Latn-ES",
     "fa-Arab-IR",
@@ -108,7 +113,6 @@ const std::unordered_set<std::string> SystemLocaleManager::supportLocales {
     "pa-Arab-PK",
     "pa-Guru-IN",
     "pl-Latn-PL",
-    "pt-Latn-BR",
     "pt-Latn-PT",
     "ro-Latn-RO",
     "ru-Cyrl-RU",
@@ -206,11 +210,20 @@ std::vector<LocaleItem> SystemLocaleManager::GetCountryInfoArray(const std::vect
         status = I18nErrorCode::NOT_SYSTEM_APP;
         return localeItemList;
     }
+    std::string systemLanguage = LocaleConfig::GetSystemLanguage();
+    std::string suggestOnlyOneRegion = GetSpecialSuggestRegion(systemLanguage);
+    std::string pseudoProcessedRegion = PseudoLocalizationProcessor("");
+    if (!suggestOnlyOneRegion.empty()) {
+        std::string regionDisplayName = LocaleConfig::GetDisplayRegion(suggestOnlyOneRegion, options.localeTag, true);
+        regionDisplayName = tabooUtils->ReplaceCountryName(suggestOnlyOneRegion, options.localeTag, regionDisplayName);
+        SuggestionType suggestionType = SuggestionType::SUGGESTION_TYPE_RELATED;
+        LocaleItem item { suggestOnlyOneRegion, suggestionType, regionDisplayName, pseudoProcessedRegion };
+        localeItemList.push_back(item);
+        return localeItemList;
+    }
     std::unordered_set<std::string> blockedRegions = LocaleConfig::GetBlockedRegions();
     std::unordered_set<std::string> blockedLanguageRegions = LocaleConfig::GetLanguageBlockedRegions();
-    std::string pseudoProcessedRegion = PseudoLocalizationProcessor("");
     std::string simRegion = GetCountryCodeFromSimCard();
-    std::string systemLanguage = LocaleConfig::GetSystemLanguage();
     for (auto it = countries.begin(); it != countries.end(); ++it) {
         if (blockedRegions.find(*it) != blockedRegions.end() || blockedLanguageRegions.find(*it) !=
             blockedLanguageRegions.end()) {
@@ -294,6 +307,15 @@ bool SystemLocaleManager::IsSuggestRegion(const std::string &language, const std
         return false;
     }
     return supportLocales.find(fullLanguage) != supportLocales.end();
+}
+
+std::string SystemLocaleManager::GetSpecialSuggestRegion(const std::string& language)
+{
+    auto iter = SPECIAL_SUGGEST_REGION_MAP.find(language);
+    if (iter != SPECIAL_SUGGEST_REGION_MAP.end()) {
+        return iter->second;
+    }
+    return "";
 }
 
 std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray(I18nErrorCode& status)
