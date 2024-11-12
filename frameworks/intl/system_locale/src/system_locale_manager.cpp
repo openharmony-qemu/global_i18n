@@ -240,8 +240,8 @@ std::vector<LocaleItem> SystemLocaleManager::GetCountryInfoArray(const std::vect
     return localeItemList;
 }
 
-LocaleItem SystemLocaleManager::GetLocaleItem(const std::string& region,
-    SuggestionType& suggestionType, const std::string& localeTag)
+LocaleItem SystemLocaleManager::GetLocaleItem(const std::string &region,
+    SuggestionType &suggestionType, const std::string &localeTag)
 {
     std::string pseudoProcessedRegion = PseudoLocalizationProcessor("");
     std::string regionName = LocaleConfig::GetDisplayRegion(region, localeTag, true);

@@ -121,7 +121,7 @@ private:
     std::string GetCountryCodeFromSimCard();
     bool IsSuggestRegion(const std::string &language, const std::string &region);
     std::string GetSpecialSuggestRegion(const std::string& language);
-    LocaleItem GetLocaleItem(const std::string& region, SuggestionType suggestionType, const std::string& localeTag);
+    LocaleItem GetLocaleItem(const std::string &region, SuggestionType &suggestionType, const std::string &localeTag);
     static const std::unordered_set<std::string> supportLocales;
     static const std::map<std::string, std::string> SPECIAL_SUGGEST_REGION_MAP;
     std::unique_ptr<TabooUtils> tabooUtils;
