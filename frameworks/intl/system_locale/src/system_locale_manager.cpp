@@ -211,13 +211,13 @@ std::vector<LocaleItem> SystemLocaleManager::GetCountryInfoArray(const std::vect
         return localeItemList;
     }
     std::string systemLanguage = LocaleConfig::GetSystemLanguage();
-    std::string suggestOnlyOneRegion = GetSpecialSuggestRegion(systemLanguage);
+    std::string onlyRegion = GetSpecialSuggestRegion(systemLanguage);
     std::string pseudoProcessedRegion = PseudoLocalizationProcessor("");
-    if (!suggestOnlyOneRegion.empty()) {
-        std::string regionDisplayName = LocaleConfig::GetDisplayRegion(suggestOnlyOneRegion, options.localeTag, true);
-        regionDisplayName = tabooUtils->ReplaceCountryName(suggestOnlyOneRegion, options.localeTag, regionDisplayName);
+    if (!onlyRegion.empty()) {
+        std::string regionName = LocaleConfig::GetDisplayRegion(onlyRegion, options.localeTag, true);
+        regionName = tabooUtils->ReplaceCountryName(onlyRegion, options.localeTag, regionName);
         SuggestionType suggestionType = SuggestionType::SUGGESTION_TYPE_RELATED;
-        LocaleItem item { suggestOnlyOneRegion, suggestionType, regionDisplayName, pseudoProcessedRegion };
+        LocaleItem item { onlyRegion, suggestionType, regionName, pseudoProcessedRegion };
         localeItemList.push_back(item);
         return localeItemList;
     }
