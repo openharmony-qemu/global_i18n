@@ -26,6 +26,8 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 const int I18nServiceEvent::RETRY = 3;
+const int32_t I18nServiceEvent::OS_ACCOUNT_UID = 3058;
+const std::string I18nServiceEvent::OS_ACCOUNT_PERMISSION = "ohos.permission.MANAGE_LOCAL_ACCOUNTS";
 
 I18nServiceEvent::I18nServiceEvent()
 {
@@ -53,6 +55,8 @@ void I18nServiceEvent::SubscriberEvent()
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_ADDED);
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED);
     EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
+    subscribeInfo.SetPublisherUid(OS_ACCOUNT_UID);
+    subscribeInfo.SetPermission(OS_ACCOUNT_PERMISSION);
     subscriber = std::make_shared<I18nServiceSubscriber>(subscribeInfo, *this);
 
     int32_t retry = RETRY;

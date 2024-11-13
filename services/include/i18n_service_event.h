@@ -59,6 +59,8 @@ private:
 
     std::shared_ptr<I18nServiceSubscriber> subscriber = nullptr;
     static const int RETRY;
+    static const int32_t OS_ACCOUNT_UID;
+    static const std::string OS_ACCOUNT_PERMISSION;
 };
 } // namespace I18n
 } // namespace Global
