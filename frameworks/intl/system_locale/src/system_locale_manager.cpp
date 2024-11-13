@@ -398,7 +398,11 @@ std::string SystemLocaleManager::GetCountryCodeFromSimCard()
 {
     std::string result;
 #if defined(TEL_CORE_SERVICE_ENABLE) && defined(TEL_CELLULAR_DATA_ENABLE)
-    int slotId = Telephony::CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
+    int32_t slotId =
+        DelayedRefSingleton<Telephony::CoreServiceClient>::GetInstance().GetDefaultVoiceSlotId();
+    if (slotId < 0) {
+        slotId = Telephony::CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
+    }
     std::u16string countryCodeForSim;
     DelayedRefSingleton<Telephony::CoreServiceClient>::GetInstance().GetISOCountryCodeForSim(
         slotId, countryCodeForSim);
