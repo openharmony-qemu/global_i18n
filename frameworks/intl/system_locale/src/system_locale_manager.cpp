@@ -33,12 +33,6 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 const char* SystemLocaleManager::SIM_COUNTRY_CODE_KEY = "telephony.sim.countryCode0";
-const std::map<std::string, std::string> SystemLocaleManager::SPECIAL_SUGGEST_REGION_MAP {
-    {"pt", "BR"},
-    {"pt-BR", "BR"},
-    {"es-419", "US"},
-    {"es-US", "US"},
-};
 const std::unordered_set<std::string> SystemLocaleManager::supportLocales {
     "ar-Arab-EG",
     "az-Cyrl-AZ",
@@ -66,6 +60,7 @@ const std::unordered_set<std::string> SystemLocaleManager::supportLocales {
     "en-Latn-US",
     "en-Qaag-US",
     "es-Latn-ES",
+    "es-Latn-US",
     "et-Latn-EE",
     "eu-Latn-ES",
     "fa-Arab-IR",
@@ -113,6 +108,7 @@ const std::unordered_set<std::string> SystemLocaleManager::supportLocales {
     "pa-Arab-PK",
     "pa-Guru-IN",
     "pl-Latn-PL",
+    "pt-Latn-BR",
     "pt-Latn-PT",
     "ro-Latn-RO",
     "ru-Cyrl-RU",
@@ -211,13 +207,6 @@ std::vector<LocaleItem> SystemLocaleManager::GetCountryInfoArray(const std::vect
         return localeItemList;
     }
     std::string systemLanguage = LocaleConfig::GetSystemLanguage();
-    std::string onlyRegion = GetSpecialSuggestRegion(systemLanguage);
-    if (!onlyRegion.empty()) {
-        SuggestionType suggestionType = SuggestionType::SUGGESTION_TYPE_RELATED;
-        LocaleItem item = GetLocaleItem(onlyRegion, suggestionType, options.localeTag);
-        localeItemList.push_back(item);
-        return localeItemList;
-    }
     std::unordered_set<std::string> blockedRegions = LocaleConfig::GetBlockedRegions();
     std::unordered_set<std::string> blockedLanguageRegions = LocaleConfig::GetLanguageBlockedRegions();
     std::string simRegion = GetCountryCodeFromSimCard();
@@ -297,32 +286,28 @@ bool SystemLocaleManager::IsSuggestRegion(const std::string &language, const std
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale origin = icu::Locale::forLanguageTag(language, status);
     if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("SystemLocaleManager: create locale for %{public}s failed.", language.c_str());
         return false;
     }
     origin.addLikelySubtags(status);
     if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("SystemLocaleManager: addLikelySubtags for %{public}s failed.", language.c_str());
         return false;
     }
     icu::LocaleBuilder builder = icu::LocaleBuilder().setLanguage(origin.getLanguage()).
         setScript(origin.getScript()).setRegion(region);
     icu::Locale temp = builder.setExtension('u', "").build(status);
     if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("SystemLocaleManager: LocaleBuilder for %{public}s, %{public}s failed.",
+            language.c_str(), region.c_str());
         return false;
     }
     std::string fullLanguage = temp.toLanguageTag<std::string>(status);
     if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("SystemLocaleManager: toLanguageTag for %{public}s failed.", language.c_str());
         return false;
     }
     return supportLocales.find(fullLanguage) != supportLocales.end();
-}
-
-std::string SystemLocaleManager::GetSpecialSuggestRegion(const std::string& language)
-{
-    auto iter = SPECIAL_SUGGEST_REGION_MAP.find(language);
-    if (iter != SPECIAL_SUGGEST_REGION_MAP.end()) {
-        return iter->second;
-    }
-    return "";
 }
 
 std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray(I18nErrorCode& status)
