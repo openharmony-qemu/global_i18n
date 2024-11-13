@@ -10,8 +10,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-persist.global.language=zh-Hans
-persist.global.locale=zh-Hans-CN
+persist.global.language=
+persist.global.locale=
 persist.global.is24Hour=default
 persist.global.preferredLanguages=
 persist.global.tz_override=false
