@@ -30,6 +30,7 @@ ohos_unittest("intl_test") {
     "unittest/mock/src/i18n_timezone_mock.cpp",
     "unittest/mock/src/phone_number_format_mock.cpp",
     "unittest/number_format_test.cpp",
+    "unittest/translit_test.cpp",
   ]
   include_dirs = [
     "//base/global/i18n/frameworks/intl/entity_recognition/include",
