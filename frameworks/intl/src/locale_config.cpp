@@ -223,6 +223,7 @@ static unordered_map<string, string> g_languageMap = {
     { "sr-Latn", "sr-Latn" },
     { "jv-Latn", "jv-Latn" },
     { "pt-Latn-BR", "pt-BR" },
+    { "pt-PT", "pt" },
     { "pa-Guru", "pa-Guru" },
     { "mai-Deva", "mai-Deva" }
 };
