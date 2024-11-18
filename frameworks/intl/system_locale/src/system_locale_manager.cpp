@@ -275,10 +275,10 @@ void SystemLocaleManager::SortLocaleItemList(std::vector<LocaleItem> &localeItem
 }
 
 bool SystemLocaleManager::IsLanguageSimRegionSuggest(const std::set<std::string> &simRegions,
-    const std::string &languge)
+    const std::string &language)
 {
     for (auto iter = simRegions.begin(); iter != simRegions.end(); ++iter) {
-        if (LocaleConfig::IsSuggested(languge, *iter)) {
+        if (LocaleConfig::IsSuggested(language, *iter)) {
             return true;
         }
     }
