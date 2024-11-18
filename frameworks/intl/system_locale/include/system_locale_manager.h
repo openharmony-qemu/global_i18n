@@ -119,7 +119,7 @@ private:
                                          std::vector<TimeZoneCityItem> &timezoneCityItemList);
     static std::vector<TimeZoneCityItem> GetTimezoneCityInfoArray();
     std::set<std::string> GetCountryCodeFromSimCard();
-    bool IsLangugeSimRegionSuggest(const std::set<std::string> &simRegions, const std::string &languge);
+    bool IsLanguageSimRegionSuggest(const std::set<std::string> &simRegions, const std::string &languge);
     void GetCountryCodeFromSimCardInner(std::set<std::string> &resultSet, size_t soltId);
     bool IsSuggestRegion(const std::string &language, const std::string &region);
     LocaleItem GetLocaleItem(const std::string &region, SuggestionType &suggestionType,

@@ -171,10 +171,10 @@ std::vector<LocaleItem> SystemLocaleManager::GetLanguageInfoArray(const std::vec
         }
         bool isSuggestedWithSystemRegion = LocaleConfig::IsSuggested(*it, LocaleConfig::GetSystemRegion());
         SuggestionType suggestionType = SuggestionType::SUGGESTION_TYPE_NONE;
-        if (IsLangugeSimRegionSuggest(simRegions, *it)) {
-            suggestionType = SuggestionType::SUGGESTION_TYPE_SIM;
-        } else if (isSuggestedWithSystemRegion) {
+        if (isSuggestedWithSystemRegion) {
             suggestionType = SuggestionType::SUGGESTION_TYPE_RELATED;
+        } else if (IsLanguageSimRegionSuggest(simRegions, *it)) {
+            suggestionType = SuggestionType::SUGGESTION_TYPE_SIM;
         }
         LocaleItem item { *it, suggestionType, languageDisplayName, languageNativeName };
         localeItemList.push_back(item);
@@ -274,7 +274,7 @@ void SystemLocaleManager::SortLocaleItemList(std::vector<LocaleItem> &localeItem
     delete collator;
 }
 
-bool SystemLocaleManager::IsLangugeSimRegionSuggest(const std::set<std::string> &simRegions,
+bool SystemLocaleManager::IsLanguageSimRegionSuggest(const std::set<std::string> &simRegions,
     const std::string &languge)
 {
     for (auto iter = simRegions.begin(); iter != simRegions.end(); ++iter) {
