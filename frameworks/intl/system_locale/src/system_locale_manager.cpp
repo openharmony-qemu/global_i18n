@@ -22,9 +22,6 @@
 #include "i18n_timezone.h"
 #include "unicode/localebuilder.h"
 #include "unicode/locid.h"
-#ifdef TEL_CELLULAR_DATA_ENABLE
-#include "cellular_data_client.h"
-#endif
 #ifdef TEL_CORE_SERVICE_ENABLE
 #include "core_service_client.h"
 #endif
@@ -160,7 +157,7 @@ std::vector<LocaleItem> SystemLocaleManager::GetLanguageInfoArray(const std::vec
         return localeItemList;
     }
     std::unordered_set<std::string> blockedLanguages = LocaleConfig::GetBlockedLanguages();
-    std::string simRegion = GetCountryCodeFromSimCard();
+    std::set<std::string> simRegions = GetCountryCodeFromSimCard();
     for (auto it = languages.begin(); it != languages.end(); ++it) {
         if (blockedLanguages.find(*it) != blockedLanguages.end()) {
             continue;
@@ -173,12 +170,8 @@ std::vector<LocaleItem> SystemLocaleManager::GetLanguageInfoArray(const std::vec
             languageNativeName = tabooUtils->ReplaceLanguageName(*it, *it, languageNativeName);
         }
         bool isSuggestedWithSystemRegion = LocaleConfig::IsSuggested(*it, LocaleConfig::GetSystemRegion());
-        bool isSuggestedWithSimRegion = false;
-        if (simRegion.length() > 0) {
-            isSuggestedWithSimRegion = LocaleConfig::IsSuggested(*it, simRegion);
-        }
         SuggestionType suggestionType = SuggestionType::SUGGESTION_TYPE_NONE;
-        if (isSuggestedWithSimRegion) {
+        if (IsLangugeSimRegionSuggest(simRegions, *it)) {
             suggestionType = SuggestionType::SUGGESTION_TYPE_SIM;
         } else if (isSuggestedWithSystemRegion) {
             suggestionType = SuggestionType::SUGGESTION_TYPE_RELATED;
@@ -209,7 +202,7 @@ std::vector<LocaleItem> SystemLocaleManager::GetCountryInfoArray(const std::vect
     std::string systemLanguage = LocaleConfig::GetSystemLanguage();
     std::unordered_set<std::string> blockedRegions = LocaleConfig::GetBlockedRegions();
     std::unordered_set<std::string> blockedLanguageRegions = LocaleConfig::GetLanguageBlockedRegions();
-    std::string simRegion = GetCountryCodeFromSimCard();
+    std::set<std::string> simRegions = GetCountryCodeFromSimCard();
     for (auto it = countries.begin(); it != countries.end(); ++it) {
         if (blockedRegions.find(*it) != blockedRegions.end() || blockedLanguageRegions.find(*it) !=
             blockedLanguageRegions.end()) {
@@ -219,7 +212,7 @@ std::vector<LocaleItem> SystemLocaleManager::GetCountryInfoArray(const std::vect
         SuggestionType suggestionType = SuggestionType::SUGGESTION_TYPE_NONE;
         if (isSuggestedRegion) {
             suggestionType = SuggestionType::SUGGESTION_TYPE_RELATED;
-        } else if (simRegion.compare(*it) == 0) {
+        } else if (simRegions.find(*it) != simRegions.end()) {
             suggestionType = SuggestionType::SUGGESTION_TYPE_SIM;
         }
         LocaleItem item = GetLocaleItem(*it, suggestionType, options.localeTag);
@@ -279,6 +272,17 @@ void SystemLocaleManager::SortLocaleItemList(std::vector<LocaleItem> &localeItem
     };
     std::sort(localeItemList.begin(), localeItemList.end(), compareFunc);
     delete collator;
+}
+
+bool SystemLocaleManager::IsLangugeSimRegionSuggest(const std::set<std::string> &simRegions,
+    const std::string &languge)
+{
+    for (auto iter = simRegions.begin(); iter != simRegions.end(); ++iter) {
+        if (LocaleConfig::IsSuggested(languge, *iter)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool SystemLocaleManager::IsSuggestRegion(const std::string &language, const std::string &region)
@@ -394,24 +398,31 @@ void SystemLocaleManager::SortTimezoneCityItemList(const std::string &locale,
     delete collator;
 }
 
-std::string SystemLocaleManager::GetCountryCodeFromSimCard()
+std::set<std::string> SystemLocaleManager::GetCountryCodeFromSimCard()
 {
-    std::string result;
-#if defined(TEL_CORE_SERVICE_ENABLE) && defined(TEL_CELLULAR_DATA_ENABLE)
-    std::u16string countryCode;
-    int32_t slotId =
-        DelayedRefSingleton<Telephony::CoreServiceClient>::GetInstance().GetDefaultVoiceSlotId();
-    if (slotId < 0) {
-        slotId = Telephony::CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
-        DelayedRefSingleton<Telephony::CoreServiceClient>::GetInstance()
-            .GetIsoCountryCodeForNetwork(slotId, countryCode);
-        return Str16ToStr8(countryCode);
+    std::set<std::string> resultSet;
+    std::vector<size_t> soltIds = {0, 1};
+    for (size_t i = 0; i < soltIds.size(); i++) {
+        GetCountryCodeFromSimCardInner(resultSet, soltIds[i]);
     }
-    DelayedRefSingleton<Telephony::CoreServiceClient>::GetInstance().GetISOCountryCodeForSim(
-        slotId, countryCode);
-    result = Str16ToStr8(countryCode);
+    return resultSet;
+}
+
+void SystemLocaleManager::GetCountryCodeFromSimCardInner(std::set<std::string> &resultSet, size_t soltId)
+{
+#if defined(TEL_CORE_SERVICE_ENABLE)
+    try {
+        std::u16string countryCode;
+        DelayedRefSingleton<Telephony::CoreServiceClient>::GetInstance().GetISOCountryCodeForSim(
+            soltId, countryCode);
+        std::string result = Str16ToStr8(countryCode);
+        if (!result.empty()) {
+            resultSet.insert(result);
+        }
+    } catch (...) {
+        HILOG_ERROR_I18N("SystemLocaleManager: getCountryCode for solt: %{public}zu failed.", soltId);
+    }
 #endif
-    return result;
 }
 } // I18n
 } // Global

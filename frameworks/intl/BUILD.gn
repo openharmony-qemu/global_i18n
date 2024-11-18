@@ -233,10 +233,6 @@ ohos_shared_library("system_locale") {
     public_external_deps += [ "core_service:tel_core_service_api" ]
     defines += [ "TEL_CORE_SERVICE_ENABLE" ]
   }
-  if (tel_cellular_data_enable) {
-    public_external_deps += [ "cellular_data:tel_cellular_data_api" ]
-    defines += [ "TEL_CELLULAR_DATA_ENABLE" ]
-  }
   install_images = [ system_base_dir ]
   relative_install_dir = "platformsdk"
   subsystem_name = "global"

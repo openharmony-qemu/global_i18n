@@ -118,7 +118,9 @@ private:
     static void SortTimezoneCityItemList(const std::string &locale,
                                          std::vector<TimeZoneCityItem> &timezoneCityItemList);
     static std::vector<TimeZoneCityItem> GetTimezoneCityInfoArray();
-    std::string GetCountryCodeFromSimCard();
+    std::set<std::string> GetCountryCodeFromSimCard();
+    bool IsLangugeSimRegionSuggest(const std::set<std::string> &simRegions, const std::string &languge);
+    void GetCountryCodeFromSimCardInner(std::set<std::string> &resultSet, size_t soltId);
     bool IsSuggestRegion(const std::string &language, const std::string &region);
     LocaleItem GetLocaleItem(const std::string &region, SuggestionType &suggestionType,
         const std::string &localeTag);
