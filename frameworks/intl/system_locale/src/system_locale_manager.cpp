@@ -417,6 +417,9 @@ void SystemLocaleManager::GetCountryCodeFromSimCardInner(std::set<std::string> &
             soltId, countryCode);
         std::string result = Str16ToStr8(countryCode);
         if (!result.empty()) {
+            for (size_t i = 0; i < result.length(); ++i) {
+                result[i] = toupper(result[i]);
+            }
             resultSet.insert(result);
         }
     } catch (...) {
