@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <cctype>
 #include "i18n_hilog.h"
 #include "locale_config.h"
 #include "system_locale_manager.h"
