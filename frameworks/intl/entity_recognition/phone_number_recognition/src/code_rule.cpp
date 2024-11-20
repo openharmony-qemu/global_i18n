@@ -179,6 +179,9 @@ bool CodeRule::PrefixValid(icu::UnicodeString& number, int length)
 
 bool CodeRule::NumberValid(icu::UnicodeString& number)
 {
+    if (number.length() < 1) {
+        return false;
+    }
     int lengthOne = 1;
     // 3 indicates the first three digits of a phone number.
     int lengthThree = 3;
@@ -209,6 +212,9 @@ bool CodeRule::NumberValid(icu::UnicodeString& number)
 
 PhoneNumberMatch* CodeRule::IsValidCode(PhoneNumberMatch* possibleNumber, icu::UnicodeString& message)
 {
+    if (possibleNumber == nullptr) {
+        return nullptr;
+    }
     bool isValid = true;
     icu::UnicodeString number = possibleNumber->raw_string().c_str();
     // Processes the ;ext= extention number format
@@ -229,6 +235,9 @@ PhoneNumberMatch* CodeRule::IsValidCode(PhoneNumberMatch* possibleNumber, icu::U
 
 PhoneNumberMatch* CodeRule::IsValidRawstr(PhoneNumberMatch* possibleNumber, icu::UnicodeString& message)
 {
+    if (possibleNumber == nullptr) {
+        return nullptr;
+    }
     bool isValid = true;
     icu::UnicodeString number = possibleNumber->raw_string().c_str();
     // Processes the ;ext= extention number format

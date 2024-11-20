@@ -82,8 +82,10 @@ std::vector<MatchedNumberInfo> PositiveRule::Handle(PhoneNumberMatch* match, icu
 {
     icu::UnicodeString rawString = match->raw_string().c_str();
     icu::UnicodeString str = DealStringWithOneBracket(rawString);
-
     icu::RegexPattern* pattern = this->GetPattern();
+    if (pattern == nullptr) {
+        return {};
+    }
     UErrorCode status = U_ZERO_ERROR;
     icu::RegexMatcher* mat1 = pattern->matcher(str, status);
     if (mat1 != nullptr && mat1->find(status)) {
@@ -152,11 +154,15 @@ std::vector<MatchedNumberInfo> PositiveRule::HandleOperator(PhoneNumberMatch* po
 
 std::vector<MatchedNumberInfo> PositiveRule::HandleBlank(PhoneNumberMatch* possibleNumber, icu::UnicodeString& message)
 {
+    std::vector<MatchedNumberInfo> matchedNumberInfoList;
     // exclude phone number 5201314
     icu::UnicodeString speString = "5201314";
     MatchedNumberInfo matchedNumberInfo;
     icu::UnicodeString number = possibleNumber->raw_string().c_str();
     icu::RegexPattern* pattern = GetPattern();
+    if (pattern == nullptr) {
+        return matchedNumberInfoList;
+    }  
     UErrorCode status;
     icu::RegexMatcher* matcher = pattern->matcher(number, status);
     UErrorCode negativeStatus = U_ZERO_ERROR;
@@ -164,9 +170,10 @@ std::vector<MatchedNumberInfo> PositiveRule::HandleBlank(PhoneNumberMatch* possi
     icu::UnicodeString negativeRegex = "(?<![-\\d])(23{6,7})(?![-\\d])";
     icu::RegexMatcher negativePattern(negativeRegex, 0, negativeStatus);
     negativePattern.reset(number);
-    std::vector<MatchedNumberInfo> matchedNumberInfoList;
     if (matcher != nullptr && matcher->find()) {
         if (negativePattern.find() || number == speString) {
+            delete matcher;
+            delete pattern;
             return matchedNumberInfoList;
         }
         if (possibleNumber->raw_string()[0] != '(' && possibleNumber->raw_string()[0] != '[') {
@@ -185,13 +192,16 @@ std::vector<MatchedNumberInfo> PositiveRule::HandleBlank(PhoneNumberMatch* possi
 
 std::vector<MatchedNumberInfo> PositiveRule::HandleSlant(PhoneNumberMatch* possibleNumber, icu::UnicodeString& message)
 {
+    std::vector<MatchedNumberInfo> matchedNumberInfoList;
     MatchedNumberInfo matchedNumberInfo;
     MatchedNumberInfo numberInfo;
     icu::UnicodeString number = possibleNumber->raw_string().c_str();
     icu::RegexPattern* pattern = GetPattern();
+    if (pattern == nullptr) {
+        return matchedNumberInfoList;
+    }
     UErrorCode status;
     icu::RegexMatcher* matcher = pattern->matcher(number, status);
-    std::vector<MatchedNumberInfo> matchedNumberInfoList;
     if (matcher != nullptr && matcher->find()) {
         int start = matcher->start(status);
         std::vector<MatchedNumberInfo> tempList = GetNumbersWithSlant(number);

@@ -253,12 +253,12 @@ string GetDisplayLanguageInner(const string &language, const string &displayLoca
         if (U_FAILURE(status)) {
             return "";
         }
-        icu::LocaleDisplayNames *dspNames = icu::LocaleDisplayNames::createInstance(displayLocale,
-            UDialectHandling::ULDN_DIALECT_NAMES);
         icu::Locale tempLocale = icu::Locale::forLanguageTag(language.c_str(), status);
         if (U_FAILURE(status)) {
             return "";
         }
+        icu::LocaleDisplayNames *dspNames = icu::LocaleDisplayNames::createInstance(displayLocale,
+            UDialectHandling::ULDN_DIALECT_NAMES);
         if (dspNames != nullptr) {
             dspNames->localeDisplayName(tempLocale, unistr);
             delete dspNames;

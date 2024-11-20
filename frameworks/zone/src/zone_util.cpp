@@ -344,6 +344,10 @@ void ZoneUtil::GetCountryZones(std::string &region, std::string &defaultTimzone,
     bool findCountry = false;
     while (cur != nullptr && xmlStrcmp(cur->name, reinterpret_cast<const xmlChar *>(SECOND_TAG)) == 0) {
         value = cur->xmlChildrenNode;
+        if (value == nullptr) {
+            cur = cur->next;
+            continue;
+        }
         if (xmlStrcmp(value->name, reinterpret_cast<const xmlChar*>(CODE_TAG)) != 0) {
             xmlFreeDoc(doc);
             HILOG_ERROR_I18N("ZoneUtil::GetCountryZones invalid code_tag");
@@ -354,7 +358,7 @@ void ZoneUtil::GetCountryZones(std::string &region, std::string &defaultTimzone,
             cur = cur->next;
             continue;
         }
-        if (strcmp(region.c_str(), reinterpret_cast<const char*>(codePtr)) == 0) {
+        if (strcmp_s(region.c_str(), reinterpret_cast<const char*>(codePtr)) == 0) {
             findCountry = true;
             xmlFree(codePtr);
             break;
@@ -429,7 +433,7 @@ void ZoneUtil::GetICUCountryZones(std::string &region, std::vector<std::string> 
     std::set<std::string> countryZoneIds;
     StringEnumeration *strEnum = TimeZone::createEnumeration(region.c_str());
     UErrorCode status = U_ZERO_ERROR;
-    const UnicodeString *timezoneIdUStr = strEnum->snext(status);
+    const UnicodeString *timezoneIdUStr = strEnum == nullptr ? nullptr : strEnum->snext(status);
     while (timezoneIdUStr != nullptr && U_SUCCESS(status)) {
         UnicodeString canonicalUnistring;
         TimeZone::getCanonicalID(*timezoneIdUStr, canonicalUnistring, status);

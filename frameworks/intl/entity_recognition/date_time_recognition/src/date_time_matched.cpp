@@ -20,7 +20,7 @@ namespace Global {
 namespace I18n {
 DateTimeMatched::DateTimeMatched(std::string& locale)
 {
-    dateRuleInit = new DateRuleInit(locale);
+    dateRuleInit = std::make_unique<DateRuleInit>(locale);
     if (dateRuleInit == nullptr) {
         HILOG_ERROR_I18N("DateRuleInit construct failed.");
     }
@@ -28,9 +28,6 @@ DateTimeMatched::DateTimeMatched(std::string& locale)
 
 DateTimeMatched::~DateTimeMatched()
 {
-    if (dateRuleInit != nullptr) {
-        delete dateRuleInit;
-    }
 }
 
 std::vector<int> DateTimeMatched::GetMatchedDateTime(icu::UnicodeString& message)

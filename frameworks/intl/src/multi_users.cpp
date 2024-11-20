@@ -306,7 +306,7 @@ void MultiUsers::InitPreferences()
     if (preferences == nullptr) {
         HILOG_INFO_I18N("InitPreferences: preferences Init");
         OHOS::NativePreferences::Options opt(PREFERENCE_PATH);
-        int status;
+        int status = 0;
         preferences = NativePreferences::PreferencesHelper::GetPreferences(opt, status);
         if (status != 0) {
             HILOG_ERROR_I18N("InitPreferences: get preferences failed");

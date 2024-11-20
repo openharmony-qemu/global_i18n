@@ -97,6 +97,7 @@ void DateTimeRule::InitRules(std::string& xmlPath)
     xmlDocPtr doc = xmlParseFile(xmlPath.c_str());
     if (doc == nullptr) return;
     xmlNodePtr root = xmlDocGetRootElement(doc);
+    if (root == nullptr) return;
     xmlNodePtr cur = root->xmlChildrenNode;
     while (cur != nullptr) {
         std::string category = reinterpret_cast<const char*>(cur->name);
@@ -398,6 +399,14 @@ std::unordered_map<std::string, std::string> DateTimeRule::GetParamBackup()
 std::unordered_map<std::string, icu::RegexPattern*> DateTimeRule::GetPatternsMap()
 {
     return patternsMap;
+}
+
+icu::RegexPattern* DateTimeRule::GetPatternByKey(const std::string& key)
+{
+    if (patternsMap.find(key) != patternsMap.end()) {
+        return patternsMap[key];
+    }
+    return nullptr;
 }
 } // namespace I18n
 } // namespace Global

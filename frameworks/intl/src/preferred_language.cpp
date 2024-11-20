@@ -146,7 +146,7 @@ std::shared_ptr<NativePreferences::Preferences> PreferredLanguage::GetI18nAppPre
     std::shared_ptr<AbilityRuntime::ApplicationContext> appContext = AbilityRuntime::ApplicationContext::GetInstance();
     std::string preferencesDirPath = appContext->GetPreferencesDir();
     std::string i18nPreferencesFilePath = preferencesDirPath + I18N_PREFERENCES_FILE_NAME;
-    int status;
+    int status = 0;
     NativePreferences::Options options(i18nPreferencesFilePath);
     std::shared_ptr<NativePreferences::Preferences> preferences =
         NativePreferences::PreferencesHelper::GetPreferences(options, status);

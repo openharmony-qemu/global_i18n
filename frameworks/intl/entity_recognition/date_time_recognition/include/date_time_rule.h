@@ -49,6 +49,7 @@ public:
     bool IsRelDates(icu::UnicodeString& hyphen, std::string& locale);
     static std::string trim(const std::string& src);
     static bool CompareBeginEnd(const std::string src, const std::string target, bool flag);
+    icu::RegexPattern* GetPatternByKey(const std::string& key);
 
 private:
     void Init(std::string& locale);

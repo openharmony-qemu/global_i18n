@@ -176,6 +176,7 @@ bool SignatureVerifier::VerifyFileSign(const std::string& pubkeyPath, const std:
         BIO* bio = BIO_new_file(pubkeyPath.c_str(), "r");
         if (PEM_read_bio_RSA_PUBKEY(bio, &pubkey, nullptr, nullptr) == nullptr) {
             BIO_free(bio);
+            RSA_free(pubkey);
             return false;
         }
         verify = VerifyRsa(pubkey, digestStr, signStr);
@@ -192,6 +193,7 @@ bool SignatureVerifier::VerifyRsa(RSA* pubkey, const std::string& digest, const 
         return false;
     }
     if (EVP_PKEY_set1_RSA(evpKey, pubkey) != 1) {
+        EVP_PKEY_free(evpKey);
         return false;
     }
     EVP_MD_CTX* ctx = EVP_MD_CTX_new();

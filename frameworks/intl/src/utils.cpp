@@ -49,7 +49,7 @@ static std::mutex validLocaleMutex;
 
 void Split(const string &src, const string &sep, vector<string> &dest)
 {
-    if (src == "") {
+    if (src.empty()) {
         return;
     }
     string::size_type begin = 0;
@@ -133,6 +133,9 @@ void GetAllValidLocalesTag(std::unordered_set<std::string>& allValidLocalesLangu
     }
     int32_t validCount = 1;
     const icu::Locale *validLocales = icu::Locale::getAvailableLocales(validCount);
+    if (validLocales == nullptr) {
+        return;
+    }
     for (int i = 0; i < validCount; i++) {
         const char* language = validLocales[i].getLanguage();
         if (language != nullptr) {

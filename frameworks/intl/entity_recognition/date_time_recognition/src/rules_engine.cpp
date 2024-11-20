@@ -98,7 +98,7 @@ bool RulesEngine::InitRules(std::string& rulesValue)
         HILOG_ERROR_I18N("InitRules failed because this->dateTimeRule is nullptr.");
         return false;
     }
-    icu::RegexPattern* pattern = dateTimeRule->GetPatternsMap()["rules"];
+    icu::RegexPattern* pattern = dateTimeRule->GetPatternByKey("rules");
     if (pattern == nullptr) {
         HILOG_ERROR_I18N("InitRules failed because pattern is nullptr.");
         return isVaild;
@@ -144,7 +144,7 @@ std::string RulesEngine::InitOptRules(std::string& rule)
         HILOG_ERROR_I18N("InitOptRules failed because this->dateTimeRule is nullptr.");
         return rulesValue;
     }
-    icu::RegexPattern* pattern = dateTimeRule->GetPatternsMap()["optrules"];
+    icu::RegexPattern* pattern = dateTimeRule->GetPatternByKey("optrules");
     if (pattern == nullptr) {
         HILOG_ERROR_I18N("InitOptRules failed because pattern is nullptr.");
         return rulesValue;
@@ -191,7 +191,7 @@ std::string RulesEngine::InitSubRules(std::string& rule)
     std::string rulesValue = rule;
     icu::UnicodeString matchedStr = rule.c_str();
     UErrorCode status = U_ZERO_ERROR;
-    icu::RegexPattern* pattern = dateTimeRule->GetPatternsMap()["subrules"];
+    icu::RegexPattern* pattern = dateTimeRule->GetPatternByKey("subrules");
     if (pattern == nullptr) {
         HILOG_ERROR_I18N("InitSubRules failed because pattern is nullptr.");
         return rulesValue;

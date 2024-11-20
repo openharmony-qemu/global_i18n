@@ -59,7 +59,6 @@ public:
     void SetHolidayData(std::map<std::string, std::vector<HolidayInfoItem>> holidayDataMap);
 
 private:
-    std::string ValidateHolidayFilePath(const char* path);
     std::vector<HolidayInfoItem> ReadHolidayFile(const char* path);
     void ParseFileLine(const std::string &line, HolidayInfoItem *holidayItem);
     std::string GetLanguageFromPath(const char* path);

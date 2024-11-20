@@ -736,6 +736,7 @@ std::string I18nTimeZone::GetDisplayNameByTaboo(
     char recvArr[RECV_CHAR_LEN];
     int err = strcpy_s(recvArr, RECV_CHAR_LEN, result.c_str());
     if (err != 0) {
+        dlclose(i18nUtilHandle);
         return result;
     }
     if (getReplacedTimezoneDisplayName) {
@@ -876,7 +877,7 @@ std::string I18nTimeZone::FindCityDisplayNameFromXml(std::string &cityID, std::s
             }
             value = value->next;
         }
-        if (!xmlNodeIsNull && strcmp(cityID.c_str(), reinterpret_cast<const char *>(contents[0])) == 0) {
+        if (!xmlNodeIsNull && strcmp_s(cityID.c_str(), reinterpret_cast<const char *>(contents[0])) == 0) {
             displayName = reinterpret_cast<const char *>(contents[1]);
         }
         for (size_t i = 0; i < ELEMENT_NUM; i++) {

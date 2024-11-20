@@ -44,6 +44,8 @@ private:
     void ParseTabooData(const std::string& path, DataFileType fileType, const std::string& Locale = "");
     void ProcessTabooConfigData(const std::string& name, const std::string& value);
     void ProcessTabooLocaleData(const std::string& locale, const std::string& name, const std::string& value);
+    void HandleTabooData(DataFileType fileType, const std::string& locale, const std::string& name,
+        const std::string& value);
     void SplitValue(const std::string& value, std::set<std::string>& collation);
     std::vector<std::string> QueryKeyFallBack(const std::string& key);
     std::tuple<std::string, std::string> LanguageFallBack(const std::string& language);
