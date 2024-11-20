@@ -873,8 +873,7 @@ std::string I18nTimeZone::FindCityDisplayNameFromXml(std::string &cityID, std::s
             }
             value = value->next;
         }
-        const char* xmlCityId = reinterpret_cast<const char *>(contents[0]);
-        if (!xmlNodeIsNull && cityID.compare(xmlCityId) == 0) {
+        if (!xmlNodeIsNull && cityID.compare(reinterpret_cast<const char *>(contents[0])) == 0) {
             displayName = reinterpret_cast<const char *>(contents[1]);
         }
         for (size_t i = 0; i < ELEMENT_NUM; i++) {
