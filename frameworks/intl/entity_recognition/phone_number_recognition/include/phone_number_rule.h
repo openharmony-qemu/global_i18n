@@ -34,6 +34,7 @@ namespace I18n {
 class PhoneNumberRule {
 public:
     PhoneNumberRule(std::string& country);
+    PhoneNumberRule();
     ~PhoneNumberRule();
     void Init();
     

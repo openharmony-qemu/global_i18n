@@ -35,11 +35,16 @@ PhoneNumberMatched::PhoneNumberMatched(std::string& country)
     phoneNumberUtil = PhoneNumberUtil::GetInstance();
     shortNumberInfo = new ShortNumberInfo();
     this->country = country;
-    phoneNumberRule->Init();
+    if (phoneNumberRule != nullptr) {
+        phoneNumberRule->Init();
+    }
 }
 
 PhoneNumberMatched::~PhoneNumberMatched()
 {
+    if (phoneNumberRule != nullptr) {
+        delete phoneNumberRule;
+    }
     if (shortNumberInfo != nullptr) {
         delete shortNumberInfo;
     }
@@ -48,7 +53,7 @@ PhoneNumberMatched::~PhoneNumberMatched()
 std::vector<int> PhoneNumberMatched::GetMatchedPhoneNumber(icu::UnicodeString& message)
 {
     icu::UnicodeString messageStr = message;
-    if (!phoneNumberRule.isFixed) {
+    if (phoneNumberRule != nullptr && !phoneNumberRule->isFixed) {
         return DealWithoutFixed(messageStr, country);
     }
     icu::UnicodeString filteredString = HandleNegativeRule(messageStr);
@@ -97,7 +102,7 @@ std::vector<int> PhoneNumberMatched::DealWithoutFixed(icu::UnicodeString& messag
 // Filtering text using negative rules
 icu::UnicodeString PhoneNumberMatched::HandleNegativeRule(icu::UnicodeString& src)
 {
-    std::vector<NegativeRule*> rules = phoneNumberRule.GetNegativeRules();
+    std::vector<NegativeRule*> rules = phoneNumberRule->GetNegativeRules();
     icu::UnicodeString ret = src;
     for (NegativeRule* rule : rules) {
         if (rule == nullptr) {
@@ -127,13 +132,13 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::FindShortNumbers(std::string&
 {
     std::vector<MatchedNumberInfo> matchedNumberInfoList;
     UErrorCode status = U_ZERO_ERROR;
-    size_t pos = phoneNumberRule.GetFindRules().size();
+    size_t pos = phoneNumberRule->GetFindRules().size();
     if (pos == 0) {
-        HILOG_ERROR_I18N("PhoneNumberRule.findRules is empty.");
+        HILOG_ERROR_I18N("phoneNumberRule.findRules is empty.");
         return matchedNumberInfoList;
     }
     // 1 indicates the last position.
-    FindRule* shortRegexRule = phoneNumberRule.GetFindRules()[pos - 1];
+    FindRule* shortRegexRule = phoneNumberRule->GetFindRules()[pos - 1];
     icu::RegexPattern* shortPattern = shortRegexRule->GetPattern();
     if (shortPattern == nullptr) {
         HILOG_ERROR_I18N("shortPattern getPattern failed.");
@@ -204,9 +209,9 @@ std::vector<PhoneNumberMatch*> PhoneNumberMatched::FindNumbers(std::string& coun
 {
     std::vector<PhoneNumberMatch*> matchList;
     UErrorCode status = U_ZERO_ERROR;
-    size_t pos = phoneNumberRule.GetFindRules().size();
+    size_t pos = phoneNumberRule->GetFindRules().size();
     // 2 indicates the penultimate position.
-    FindRule* numberRegexRule = phoneNumberRule.GetFindRules()[pos - 2];
+    FindRule* numberRegexRule = phoneNumberRule->GetFindRules()[pos - 2];
     icu::RegexPattern* numberPattern = numberRegexRule->GetPattern();
     if (numberPattern == nullptr) {
         HILOG_ERROR_I18N("numberRegexRule getPattern failed.");
@@ -259,9 +264,9 @@ bool PhoneNumberMatched::HandleWithShortAndShort(std::vector<MatchedNumberInfo>&
     bool flag = false;
     // 3 is the length of findRules.
     size_t length = 3;
-    if (phoneNumberRule.GetFindRules().size() == length) {
+    if (phoneNumberRule->GetFindRules().size() == length) {
         UErrorCode status = U_ZERO_ERROR;
-        FindRule* regexRule = phoneNumberRule.GetFindRules()[0];
+        FindRule* regexRule = phoneNumberRule->GetFindRules()[0];
         icu::RegexPattern* pattern = regexRule->GetPattern();
         if (pattern == nullptr) {
             HILOG_ERROR_I18N("regexRule getPattern failed.");
@@ -406,7 +411,7 @@ bool PhoneNumberMatched::HandleBorderRule(PhoneNumberMatch* match, icu::UnicodeS
     if (match == nullptr) {
         return false;
     }
-    std::vector<BorderRule*> rules = phoneNumberRule.GetBorderRules();
+    std::vector<BorderRule*> rules = phoneNumberRule->GetBorderRules();
     if (rules.size() == 0) {
         return true;
     }
@@ -422,7 +427,7 @@ bool PhoneNumberMatched::HandleBorderRule(PhoneNumberMatch* match, icu::UnicodeS
 PhoneNumberMatch* PhoneNumberMatched::HandleCodesRule(PhoneNumberMatch* phoneNumberMatch, icu::UnicodeString& message)
 {
     PhoneNumberMatch* match = phoneNumberMatch;
-    std::vector<CodeRule*> rules = phoneNumberRule.GetCodesRules();
+    std::vector<CodeRule*> rules = phoneNumberRule->GetCodesRules();
     if (rules.size() == 0) {
         return nullptr;
     }
@@ -437,7 +442,7 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::HandlePositiveRule(PhoneNumbe
     icu::UnicodeString& message)
 {
     std::vector<MatchedNumberInfo> infoList;
-    std::vector<PositiveRule*> rules = phoneNumberRule.GetPositiveRules();
+    std::vector<PositiveRule*> rules = phoneNumberRule->GetPositiveRules();
     for (PositiveRule* rule : rules) {
         infoList = rule->Handle(match, message);
         if (infoList.size() != 0) {

@@ -358,7 +358,8 @@ void ZoneUtil::GetCountryZones(std::string &region, std::string &defaultTimzone,
             cur = cur->next;
             continue;
         }
-        if (strcmp_s(region.c_str(), reinterpret_cast<const char*>(codePtr)) == 0) {
+        const char* xmlRegion = reinterpret_cast<const char*>(codePtr);
+        if (region.compare(xmlRegion) == 0) {
             findCountry = true;
             xmlFree(codePtr);
             break;

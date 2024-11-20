@@ -842,6 +842,41 @@ std::set<std::string> I18nTimeZone::GetAvailableZoneCityIDs()
     return availableZoneCityIDs;
 }
 
+void GetDisplayNameInner(xmlNodePtr &cur, std::string &displayName)
+{
+    while (cur != nullptr && !xmlStrcmp(cur->name,
+        reinterpret_cast<const xmlChar *>(CITY_DISPLAYNAME_SECOND_ROOT_TAG))) {
+        xmlNodePtr value = cur->xmlChildrenNode;
+        xmlChar *contents[ELEMENT_NUM] = { 0 }; // 2 represent cityid, displayName;
+        bool xmlNodeIsNull = false;
+        for (size_t i = 0; i < ELEMENT_NUM; i++) {
+            if (value == nullptr) {
+                xmlNodeIsNull = true;
+                break;
+            }
+            contents[i] = xmlNodeGetContent(value);
+            if (contents[i] == nullptr) {
+                xmlNodeIsNull = true;
+                break;
+            }
+            value = value->next;
+        }
+        const char* xmlCityId = reinterpret_cast<const char *>(contents[0]);
+        if (!xmlNodeIsNull && cityID.compare(xmlCityId) == 0) {
+            displayName = reinterpret_cast<const char *>(contents[1]);
+        }
+        for (size_t i = 0; i < ELEMENT_NUM; i++) {
+            if (contents[i] != nullptr) {
+                xmlFree(contents[i]);
+            }
+        }
+        if (displayName.length() != 0) {
+            break;
+        }
+        cur = cur->next;
+    }
+}
+
 std::string I18nTimeZone::FindCityDisplayNameFromXml(std::string &cityID, std::string &locale)
 {
     xmlKeepBlanksDefault(0);
@@ -860,36 +895,7 @@ std::string I18nTimeZone::FindCityDisplayNameFromXml(std::string &cityID, std::s
     }
     cur = cur->xmlChildrenNode;
     std::string displayName;
-    while (cur != nullptr && !xmlStrcmp(cur->name,
-        reinterpret_cast<const xmlChar *>(CITY_DISPLAYNAME_SECOND_ROOT_TAG))) {
-        xmlNodePtr value = cur->xmlChildrenNode;
-        xmlChar *contents[ELEMENT_NUM] = { 0 }; // 2 represent cityid, displayName;
-        bool xmlNodeIsNull = false;
-        for (size_t i = 0; i < ELEMENT_NUM; i++) {
-            if (value == nullptr) {
-                xmlNodeIsNull = true;
-                break;
-            }
-            contents[i] = xmlNodeGetContent(value);
-            if (contents[i] == nullptr) {
-                xmlNodeIsNull = true;
-                break;
-            }
-            value = value->next;
-        }
-        if (!xmlNodeIsNull && strcmp_s(cityID.c_str(), reinterpret_cast<const char *>(contents[0])) == 0) {
-            displayName = reinterpret_cast<const char *>(contents[1]);
-        }
-        for (size_t i = 0; i < ELEMENT_NUM; i++) {
-            if (contents[i] != nullptr) {
-                xmlFree(contents[i]);
-            }
-        }
-        if (displayName.length() != 0) {
-            break;
-        }
-        cur = cur->next;
-    }
+    GetDisplayNameInner(cur, displayName);
     xmlFreeDoc(doc);
     return displayName;
 }

@@ -61,7 +61,7 @@ private:
     void ReplaceSpecifiedPos(icu::UnicodeString& chs, int start, int end);
 
     static const UChar32 REPLACE_CHAR;
-    PhoneNumberRule phoneNumberRule;
+    PhoneNumberRule* phoneNumberRule;
     PhoneNumberUtil* phoneNumberUtil;
     ShortNumberInfo* shortNumberInfo;
     std::string country;
