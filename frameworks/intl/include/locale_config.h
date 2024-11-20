@@ -120,6 +120,7 @@ private:
     static const char *LANGUAGE_KEY;
     static const char *LOCALE_KEY;
     static const char *HOUR_KEY;
+    static const char *UPGRADE_LOCALE_KEY;
     static const char *DEFAULT_LOCALE_KEY;
     static const char *DEFAULT_LANGUAGE_KEY;
     static const char *DEFAULT_REGION_KEY;
@@ -179,6 +180,7 @@ private:
     static void SetLocale2DisplayName(const char* key, const char* value);
     static bool Is24HourLocale(const std::string& systemLocale);
     static bool HasDesignator(const std::string& inFormat, const char designator);
+    static void QueryUpgradeLocale();
 
 #ifdef SUPPORT_GRAPHICS
     /**
