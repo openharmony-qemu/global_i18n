@@ -134,7 +134,7 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::FindShortNumbers(std::string&
     UErrorCode status = U_ZERO_ERROR;
     size_t pos = phoneNumberRule->GetFindRules().size();
     if (pos == 0) {
-        HILOG_ERROR_I18N("phoneNumberRule.findRules is empty.");
+        HILOG_ERROR_I18N("PhoneNumberRule.findRules is empty.");
         return matchedNumberInfoList;
     }
     // 1 indicates the last position.
