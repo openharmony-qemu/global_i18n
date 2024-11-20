@@ -324,6 +324,38 @@ const char *ZoneUtil::GetTZLookupDataPath()
     }
 }
 
+bool ZoneUtil::IsFindCountry(xmlDocPtr &doc, xmlNodePtr &cur, xmlNodePtr &value,
+    std::string &region)
+{
+    while (cur != nullptr && xmlStrcmp(cur->name, reinterpret_cast<const xmlChar *>(SECOND_TAG)) == 0) {
+        value = cur->xmlChildrenNode;
+        if (value == nullptr) {
+            cur = cur->next;
+            continue;
+        }
+        if (xmlStrcmp(value->name, reinterpret_cast<const xmlChar*>(CODE_TAG)) != 0) {
+            xmlFreeDoc(doc);
+            HILOG_ERROR_I18N("ZoneUtil::GetCountryZones invalid code_tag");
+            return false;
+        }
+        xmlChar *codePtr = xmlNodeGetContent(value);
+        if (codePtr == nullptr) {
+            cur = cur->next;
+            continue;
+        }
+        const char* xmlRegion = reinterpret_cast<const char*>(codePtr);
+        if (region.compare(xmlRegion) == 0) {
+            xmlFree(codePtr);
+            return true;
+        } else {
+            xmlFree(codePtr);
+            cur = cur->next;
+            continue;
+        }
+    }
+    return false;
+}
+
 void ZoneUtil::GetCountryZones(std::string &region, std::string &defaultTimzone, bool &isBoosted,
     std::vector<std::string> &zones)
 {
@@ -341,34 +373,7 @@ void ZoneUtil::GetCountryZones(std::string &region, std::string &defaultTimzone,
     }
     cur = cur->xmlChildrenNode;
     xmlNodePtr value;
-    bool findCountry = false;
-    while (cur != nullptr && xmlStrcmp(cur->name, reinterpret_cast<const xmlChar *>(SECOND_TAG)) == 0) {
-        value = cur->xmlChildrenNode;
-        if (value == nullptr) {
-            cur = cur->next;
-            continue;
-        }
-        if (xmlStrcmp(value->name, reinterpret_cast<const xmlChar*>(CODE_TAG)) != 0) {
-            xmlFreeDoc(doc);
-            HILOG_ERROR_I18N("ZoneUtil::GetCountryZones invalid code_tag");
-            return;
-        }
-        xmlChar *codePtr = xmlNodeGetContent(value);
-        if (codePtr == nullptr) {
-            cur = cur->next;
-            continue;
-        }
-        const char* xmlRegion = reinterpret_cast<const char*>(codePtr);
-        if (region.compare(xmlRegion) == 0) {
-            findCountry = true;
-            xmlFree(codePtr);
-            break;
-        } else {
-            xmlFree(codePtr);
-            cur = cur->next;
-            continue;
-        }
-    }
+    bool findCountry = IsFindCountry(doc, cur, value, region);
     if (findCountry) {
         value = value->next;
         GetDefaultAndBoost(value, defaultTimzone, isBoosted, zones);

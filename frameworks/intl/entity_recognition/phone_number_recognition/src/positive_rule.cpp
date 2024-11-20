@@ -162,7 +162,7 @@ std::vector<MatchedNumberInfo> PositiveRule::HandleBlank(PhoneNumberMatch* possi
     icu::RegexPattern* pattern = GetPattern();
     if (pattern == nullptr) {
         return matchedNumberInfoList;
-    }  
+    }
     UErrorCode status;
     icu::RegexMatcher* matcher = pattern->matcher(number, status);
     UErrorCode negativeStatus = U_ZERO_ERROR;

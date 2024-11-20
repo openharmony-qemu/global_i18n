@@ -842,18 +842,30 @@ std::set<std::string> I18nTimeZone::GetAvailableZoneCityIDs()
     return availableZoneCityIDs;
 }
 
-void GetDisplayNameInner(xmlNodePtr &cur, std::string &displayName)
+std::string I18nTimeZone::FindCityDisplayNameFromXml(std::string &cityID, std::string &locale)
 {
+    xmlKeepBlanksDefault(0);
+    std::string xmlPath = GetCityDisplayNameXmlPath(locale);
+    xmlDocPtr doc = xmlParseFile(xmlPath.c_str());
+    if (!doc) {
+        HILOG_ERROR_I18N("FindCityDisplayNameFromXml: can't parse city displayname: %{public}s", xmlPath.c_str());
+        return "";
+    }
+    xmlNodePtr cur = xmlDocGetRootElement(doc);
+    if (!cur || xmlStrcmp(cur->name, reinterpret_cast<const xmlChar *>(CITY_DISPLAYNAME_ROOT_TAG))) {
+        xmlFreeDoc(doc);
+        HILOG_ERROR_I18N(
+            "FindCityDisplayNameFromXml: city displayname file %{public}s has wrong root tag.", xmlPath.c_str());
+        return "";
+    }
+    cur = cur->xmlChildrenNode;
+    std::string displayName;
     while (cur != nullptr && !xmlStrcmp(cur->name,
         reinterpret_cast<const xmlChar *>(CITY_DISPLAYNAME_SECOND_ROOT_TAG))) {
         xmlNodePtr value = cur->xmlChildrenNode;
         xmlChar *contents[ELEMENT_NUM] = { 0 }; // 2 represent cityid, displayName;
         bool xmlNodeIsNull = false;
-        for (size_t i = 0; i < ELEMENT_NUM; i++) {
-            if (value == nullptr) {
-                xmlNodeIsNull = true;
-                break;
-            }
+        for (size_t i = 0; i < ELEMENT_NUM && value != nullptr; i++) {
             contents[i] = xmlNodeGetContent(value);
             if (contents[i] == nullptr) {
                 xmlNodeIsNull = true;
@@ -875,27 +887,6 @@ void GetDisplayNameInner(xmlNodePtr &cur, std::string &displayName)
         }
         cur = cur->next;
     }
-}
-
-std::string I18nTimeZone::FindCityDisplayNameFromXml(std::string &cityID, std::string &locale)
-{
-    xmlKeepBlanksDefault(0);
-    std::string xmlPath = GetCityDisplayNameXmlPath(locale);
-    xmlDocPtr doc = xmlParseFile(xmlPath.c_str());
-    if (!doc) {
-        HILOG_ERROR_I18N("FindCityDisplayNameFromXml: can't parse city displayname: %{public}s", xmlPath.c_str());
-        return "";
-    }
-    xmlNodePtr cur = xmlDocGetRootElement(doc);
-    if (!cur || xmlStrcmp(cur->name, reinterpret_cast<const xmlChar *>(CITY_DISPLAYNAME_ROOT_TAG))) {
-        xmlFreeDoc(doc);
-        HILOG_ERROR_I18N(
-            "FindCityDisplayNameFromXml: city displayname file %{public}s has wrong root tag.", xmlPath.c_str());
-        return "";
-    }
-    cur = cur->xmlChildrenNode;
-    std::string displayName;
-    GetDisplayNameInner(cur, displayName);
     xmlFreeDoc(doc);
     return displayName;
 }
