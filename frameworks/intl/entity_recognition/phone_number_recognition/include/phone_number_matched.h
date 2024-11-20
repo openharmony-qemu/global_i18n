@@ -59,6 +59,10 @@ private:
     std::vector<MatchedNumberInfo> HandlePositiveRule(PhoneNumberMatch* match, icu::UnicodeString& message);
     bool HandleBorderRule(PhoneNumberMatch* match, icu::UnicodeString& message);
     void ReplaceSpecifiedPos(icu::UnicodeString& chs, int start, int end);
+    std::vector<FindRule*> GetFindRulesInside();
+    std::vector<BorderRule*> GetBorderRulesInside();
+    std::vector<CodeRule*> GetCodesRulesInside();
+    std::vector<PositiveRule*> GetPositiveRulesInside();
 
     static const UChar32 REPLACE_CHAR;
     PhoneNumberRule* phoneNumberRule;
