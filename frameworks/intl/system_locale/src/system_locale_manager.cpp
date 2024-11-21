@@ -412,20 +412,17 @@ std::set<std::string> SystemLocaleManager::GetCountryCodeFromSimCard()
 void SystemLocaleManager::GetCountryCodeFromSimCardInner(std::set<std::string> &resultSet, size_t soltId)
 {
 #if defined(TEL_CORE_SERVICE_ENABLE)
-    try {
-        std::u16string countryCode;
-        DelayedRefSingleton<Telephony::CoreServiceClient>::GetInstance().GetISOCountryCodeForSim(
-            soltId, countryCode);
-        std::string result = Str16ToStr8(countryCode);
-        if (!result.empty()) {
-            for (size_t i = 0; i < result.length(); ++i) {
-                result[i] = toupper(result[i]);
-            }
-            resultSet.insert(result);
-        }
-    } catch (...) {
-        HILOG_ERROR_I18N("SystemLocaleManager: getCountryCode for solt: %{public}zu failed.", soltId);
+    std::u16string countryCode;
+    DelayedRefSingleton<Telephony::CoreServiceClient>::GetInstance().GetISOCountryCodeForSim(
+        soltId, countryCode);
+    std::string result = Str16ToStr8(countryCode);
+    if (result.empty()) {
+        return;
     }
+    for (size_t i = 0; i < result.length(); ++i) {
+        result[i] = toupper(result[i]);
+    }
+    resultSet.insert(result);
 #endif
 }
 } // I18n
