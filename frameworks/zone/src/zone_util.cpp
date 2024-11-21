@@ -378,6 +378,8 @@ void ZoneUtil::GetCountryZones(std::string &region, std::string &defaultTimzone,
         value = value->next;
         GetDefaultAndBoost(value, defaultTimzone, isBoosted, zones);
     }
+    xmlUnlinkNode(cur);
+    xmlFreeNode(cur);
     xmlFreeDoc(doc);
     return;
 }
