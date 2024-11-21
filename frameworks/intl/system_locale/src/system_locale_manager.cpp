@@ -413,8 +413,9 @@ void SystemLocaleManager::GetCountryCodeFromSimCardInner(std::set<std::string> &
 {
 #if defined(TEL_CORE_SERVICE_ENABLE)
     std::u16string countryCode;
-    DelayedRefSingleton<Telephony::CoreServiceClient>::GetInstance().GetISOCountryCodeForSim(
+    int32_t errorCode = DelayedRefSingleton<Telephony::CoreServiceClient>::GetInstance().GetISOCountryCodeForSim(
         soltId, countryCode);
+    HILOG_INFO_I18N("SystemLocaleManager: getCountryCodeForSim errorCode:%{public}d.", errorCode);
     std::string result = Str16ToStr8(countryCode);
     if (result.empty()) {
         return;
