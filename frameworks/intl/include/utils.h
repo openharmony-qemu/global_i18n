@@ -49,7 +49,6 @@ bool GetPseudoLocalizationEnforce();
 std::string PseudoLocalizationProcessor(const std::string &input);
 std::string PseudoLocalizationProcessor(const std::string &input, bool ifEnforce);
 bool CheckSystemPermission();
-size_t ConvertBytesToSizeT(const char *byteArray);
 std::set<std::string> GetTimeZoneAvailableIDs(I18nErrorCode &errorCode);
 bool RegexSearchNoExcept(const std::string& str, std::smatch& match, const std::regex& regex);
 std::string LocaleEncode(const std::string& locale);

@@ -445,6 +445,12 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest021, TestSize.Level1)
     flag = LocaleConfig::IsValidTag(fakeTag);
     EXPECT_TRUE(!flag);
     EXPECT_FALSE(LocaleConfig::IsValidTag(""));
+    std::string langaugeKey = LocaleConfig::GetLanguageKey();
+    EXPECT_EQ(langaugeKey, "persist.global.language");
+    std::string localeKey = LocaleConfig::GetLocaleKey();
+    EXPECT_EQ(localeKey, "persist.global.locale");
+    std::string hourKey = LocaleConfig::GetHourKey();
+    EXPECT_EQ(hourKey, "persist.global.is24Hour");
 }
 } // namespace I18n
 } // namespace Global
