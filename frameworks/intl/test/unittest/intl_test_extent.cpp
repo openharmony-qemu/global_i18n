@@ -541,6 +541,11 @@ HWTEST_F(IntlTest, IntlFuncTest0062, TestSize.Level1)
     std::string localeCode = LocaleEncode(localeTag);
     std::string targetCode = "58400008334651000314";
     EXPECT_EQ(localeCode, targetCode);
+    std::vector<std::string> resultVec = {"zh", "en", "fr", "de", "zh-Hant", "fil"};
+    const std::string separator = ",";
+    std::string source;
+    Merge(resultVec, separator, source);
+    EXPECT_EQ(source, "zh,en,fr,de,zh-Hant,fil");
 
     std::string localeRule = "zh-Hans";
     DateTimeRule* dateTimeRule = new DateTimeRule(localeRule);
