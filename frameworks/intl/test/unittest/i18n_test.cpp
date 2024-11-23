@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1596,6 +1596,23 @@ HWTEST_F(I18nTest, I18nFuncTest065, TestSize.Level1)
     EXPECT_EQ(month, 12);
     EXPECT_EQ(day, 13);
     EXPECT_EQ(isLeap, false);
+}
+
+/**
+ * @tc.name: I18nFuncTest066
+ * @tc.desc: Test I18n set temperate type
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest066, TestSize.Level1)
+{
+    I18nErrorCode err = LocaleConfig::SetTemperatureType(TemperatureType::KELVIN);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+
+    TemperatureType type = LocaleConfig::GetTemperatureType();
+    EXPECT_EQ(type, TemperatureType::KELVIN);
+
+    std::string typeName = LocaleConfig::GetTemperatureName(type);
+    EXPECT_EQ(typeName, "kelvin");
 }
 } // namespace I18n
 } // namespace Global

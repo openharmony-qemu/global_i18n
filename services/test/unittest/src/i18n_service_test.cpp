@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -464,6 +464,19 @@ HWTEST_F(I18nServiceTest, I18nServiceFuncTest028, TestSize.Level1)
     I18nErrorCode err = I18nServiceAbilityClient::AddPreferredLanguage("fr", 0);
     EXPECT_EQ(err, I18nErrorCode::SUCCESS);
     err = I18nServiceAbilityClient::RemovePreferredLanguage(-1);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+}
+
+/**
+ * @tc.name: I18nServiceFuncTest029
+ * @tc.desc: Test I18nServiceAbilityClient SetTemperatureType: set temperature type kelvin.
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nServiceTest, I18nServiceFuncTest029, TestSize.Level1)
+{
+    InitTestEnvironment();
+    AddNativeTokenTypeAndPermissions();
+    I18nErrorCode err = I18nServiceAbilityClient::SetTemperatureType(TemperatureType::KELVIN);
     EXPECT_EQ(err, I18nErrorCode::SUCCESS);
 }
 } // namespace I18n

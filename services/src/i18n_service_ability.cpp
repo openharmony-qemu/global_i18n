@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -75,6 +75,11 @@ I18nErrorCode I18nServiceAbility::AddPreferredLanguage(const std::string &langua
 I18nErrorCode I18nServiceAbility::RemovePreferredLanguage(int32_t index)
 {
     return PreferredLanguage::RemovePreferredLanguage(index);
+}
+
+I18nErrorCode I18nServiceAbility::SetTemperatureType(TemperatureType type)
+{
+    return LocaleConfig::SetTemperatureType(type);
 }
 
 void I18nServiceAbility::UnloadI18nServiceAbility()

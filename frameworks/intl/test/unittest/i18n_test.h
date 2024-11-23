@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -83,6 +83,7 @@ int I18nFuncTest062(void);
 int I18nFuncTest063(void);
 int I18nFuncTest064(void);
 int I18nFuncTest065(void);
+int I18nFuncTest066(void);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

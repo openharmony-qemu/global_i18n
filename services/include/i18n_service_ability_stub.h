@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -70,6 +70,7 @@ private:
     int32_t SetUsingLocalDigitInner(MessageParcel &data, MessageParcel &reply);
     int32_t AddPreferredLanguageInner(MessageParcel &data, MessageParcel &reply);
     int32_t RemovePreferredLanguageInner(MessageParcel &data, MessageParcel &reply);
+    int32_t SetTemperatureTypeInner(MessageParcel &data, MessageParcel &reply);
 };
 } // namespace I18n
 } // namespace Global
