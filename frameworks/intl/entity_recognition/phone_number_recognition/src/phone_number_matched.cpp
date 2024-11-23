@@ -262,7 +262,7 @@ std::vector<PhoneNumberMatch*> PhoneNumberMatched::FindNumbers(std::string& coun
 }
 
 void PhoneNumberMatched::FindNumbersFromInputString(std::vector<PhoneNumberMatch*> &matchList,
-    const icu::RegexMatcher* numberMatcher, std::string& country, icu::UnicodeString& filteredString)
+    icu::RegexMatcher* numberMatcher, std::string& country, icu::UnicodeString& filteredString)
 {
     UErrorCode status = U_ZERO_ERROR;
     while (numberMatcher->find(status)) {

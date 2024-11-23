@@ -60,7 +60,7 @@ private:
     bool HandleBorderRule(PhoneNumberMatch* match, icu::UnicodeString& message);
     void ReplaceSpecifiedPos(icu::UnicodeString& chs, int start, int end);
     void FindNumbersFromInputString(std::vector<PhoneNumberMatch*> &matchList,
-        const icu::RegexMatcher* numberMatcher, std::string& country, icu::UnicodeString& filteredString);
+        icu::RegexMatcher* numberMatcher, std::string& country, icu::UnicodeString& filteredString);
     std::vector<FindRule*> GetFindRulesInside();
     std::vector<BorderRule*> GetBorderRulesInside();
     std::vector<CodeRule*> GetCodesRulesInside();

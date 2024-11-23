@@ -147,20 +147,16 @@ void GetAllValidLocalesTag(std::unordered_set<std::string>& allValidLocalesLangu
 
 bool CheckFilePath(const std::string &filePath)
 {
-    char *realpathRes = nullptr;
-    realpathRes = realpath(filePath.c_str(), nullptr);
-    if (realpathRes == nullptr) {
+    std::unique_ptr<char[]> resolvedPath = std::make_unique<char[]>(PATH_MAX + 1);
+    if (realpath(filePath.c_str(), resolvedPath.get()) == nullptr) {
         return false;
     }
-    std::ifstream file(filePath.c_str());
+    std::ifstream file(resolvedPath.get());
     if (!file.good()) {
         file.close();
-        free(realpathRes);
         return false;
     }
     file.close();
-    free(realpathRes);
-    realpathRes = nullptr;
     return true;
 }
 
