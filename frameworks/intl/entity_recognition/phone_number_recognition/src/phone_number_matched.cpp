@@ -236,7 +236,6 @@ std::vector<PhoneNumberMatch*> PhoneNumberMatched::FindNumbers(std::string& coun
     icu::UnicodeString& filteredString)
 {
     std::vector<PhoneNumberMatch*> matchList;
-    UErrorCode status = U_ZERO_ERROR;
     size_t pos = GetFindRulesInside().size();
     if (pos < 2) { // 2 indicates the penultimate position.
         HILOG_ERROR_I18N("numberRegexRule size less then 2.");
@@ -249,6 +248,7 @@ std::vector<PhoneNumberMatch*> PhoneNumberMatched::FindNumbers(std::string& coun
         HILOG_ERROR_I18N("numberRegexRule getPattern failed.");
         return matchList;
     }
+    UErrorCode status = U_ZERO_ERROR;
     icu::RegexMatcher* numberMatcher = numberPattern->matcher(filteredString, status);
     if (numberMatcher == nullptr) {
         HILOG_ERROR_I18N("numberPattern matcher failed.");
