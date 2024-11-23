@@ -50,7 +50,7 @@ void DateTimeRule::Init(std::string& locale)
 {
     InitRules(xmlCommonPath);
     std::string xmlPath = "/system/usr/ohos_locale_config/datetime/" + locale + ".xml";
-    if (!CheckTzDataFilePath(xmlPath)) {
+    if (!CheckFilePath(xmlPath)) {
         this->locale = this->localeMap["locale"];
     } else {
         this->locale = locale;
@@ -90,7 +90,7 @@ void DateTimeRule::RuleLevel()
 
 void DateTimeRule::InitRules(std::string& xmlPath)
 {
-    if (!CheckTzDataFilePath(xmlPath)) {
+    if (!CheckFilePath(xmlPath)) {
         return;
     }
     xmlKeepBlanksDefault(0);
@@ -127,7 +127,7 @@ void DateTimeRule::InitRules(std::string& xmlPath)
 
 void DateTimeRule::InitRuleBackup(std::string& xmlPathBackup)
 {
-    if (!CheckTzDataFilePath(xmlPathBackup)) {
+    if (!CheckFilePath(xmlPathBackup)) {
         return;
     }
     xmlKeepBlanksDefault(0);

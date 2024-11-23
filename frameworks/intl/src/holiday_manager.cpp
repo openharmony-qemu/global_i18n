@@ -41,7 +41,7 @@ HolidayManager::HolidayManager(const char* path)
         HILOG_ERROR_I18N("Failed: parameter path is NULL.");
         return;
     }
-    if (!CheckTzDataFilePath(path)) {
+    if (!CheckFilePath(path)) {
         HILOG_ERROR_I18N("Failed: holiday file path: %{public}s invalid.", path);
         return;
     }

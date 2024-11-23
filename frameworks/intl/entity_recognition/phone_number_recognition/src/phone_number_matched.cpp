@@ -42,12 +42,8 @@ PhoneNumberMatched::PhoneNumberMatched(std::string& country)
 
 PhoneNumberMatched::~PhoneNumberMatched()
 {
-    if (phoneNumberRule != nullptr) {
-        delete phoneNumberRule;
-    }
-    if (shortNumberInfo != nullptr) {
-        delete shortNumberInfo;
-    }
+    delete phoneNumberRule;
+    delete shortNumberInfo;
 }
 
 std::vector<int> PhoneNumberMatched::GetMatchedPhoneNumber(icu::UnicodeString& message)
@@ -242,6 +238,10 @@ std::vector<PhoneNumberMatch*> PhoneNumberMatched::FindNumbers(std::string& coun
     std::vector<PhoneNumberMatch*> matchList;
     UErrorCode status = U_ZERO_ERROR;
     size_t pos = GetFindRulesInside().size();
+    if (pos < 2) { // 2 indicates the penultimate position.
+        HILOG_ERROR_I18N("numberRegexRule size less then 2.");
+        return matchList;
+    }
     // 2 indicates the penultimate position.
     FindRule* numberRegexRule = GetFindRulesInside()[pos - 2];
     icu::RegexPattern* numberPattern = numberRegexRule->GetPattern();
@@ -255,6 +255,16 @@ std::vector<PhoneNumberMatch*> PhoneNumberMatched::FindNumbers(std::string& coun
         delete numberPattern;
         return matchList;
     }
+    FindNumbersFromInputString(matchList, numberMatcher, country, filteredString);
+    delete numberMatcher;
+    delete numberPattern;
+    return matchList;
+}
+
+void PhoneNumberMatched::FindNumbersFromInputString(std::vector<PhoneNumberMatch*> &matchList,
+    const icu::RegexMatcher* numberMatcher, std::string& country, icu::UnicodeString& filteredString)
+{
+    UErrorCode status = U_ZERO_ERROR;
     while (numberMatcher->find(status)) {
         int32_t start = numberMatcher->start(status);
         int32_t end = numberMatcher->end(status);
@@ -284,9 +294,6 @@ std::vector<PhoneNumberMatch*> PhoneNumberMatched::FindNumbers(std::string& coun
             AddPhoneNumber(lastStr, searchStart + start, matchList, country);
         }
     }
-    delete numberMatcher;
-    delete numberPattern;
-    return matchList;
 }
 
 // Handing the situation of shortnumber/shortnumber.

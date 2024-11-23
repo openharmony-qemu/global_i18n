@@ -123,7 +123,7 @@ bool SignatureVerifier::VerifyParamFile(const std::string& fileName, const std::
         return false;
     }
     std::string absFilePath = filePath + fileName;
-    if (!CheckTzDataFilePath(absFilePath)) {
+    if (!CheckFilePath(absFilePath)) {
         return false;
     }
     std::string sha256Digest;

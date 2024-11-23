@@ -1178,7 +1178,7 @@ std::vector<int> I18nTimeZone::GetColorData(const uint16_t x, const uint16_t y,
 
 void I18nTimeZone::GetTzDataWidth(std::vector<std::string> filePaths, uint32_t *width, uint32_t *height)
 {
-    if (filePaths.size() == 0 || !CheckTzDataFilePath(filePaths.at(0))) {
+    if (filePaths.size() == 0 || !CheckFilePath(filePaths.at(0))) {
         return;
     } else {
         FILE* fp;
@@ -1211,7 +1211,7 @@ void I18nTimeZone::GetTzDataWidth(std::vector<std::string> filePaths, uint32_t *
 int I18nTimeZone::InitPngptr(png_structp &png_ptr, png_infop &info_ptr, FILE **fp,
                              std::string preferredPath)
 {
-    bool validFilePath = CheckTzDataFilePath(preferredPath);
+    bool validFilePath = CheckFilePath(preferredPath);
     if (!validFilePath) {
         HILOG_ERROR_I18N("timezone data filepath invalid.");
         return 1;

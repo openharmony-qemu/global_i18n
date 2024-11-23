@@ -145,7 +145,7 @@ void GetAllValidLocalesTag(std::unordered_set<std::string>& allValidLocalesLangu
     init = true;
 }
 
-bool CheckTzDataFilePath(const std::string &filePath)
+bool CheckFilePath(const std::string &filePath)
 {
     char *realpathRes = nullptr;
     realpathRes = realpath(filePath.c_str(), nullptr);
@@ -326,7 +326,7 @@ std::set<std::string> GetTimeZoneAvailableIDs(I18nErrorCode &errorCode)
     struct stat s;
     const char *tzIdConfigPath = stat(DISTRO_TIMEZONE_LIST_CONFIG, &s) == 0 ?
         DISTRO_TIMEZONE_LIST_CONFIG : TIMEZONE_LIST_CONFIG_PATH;
-    if (!CheckTzDataFilePath(tzIdConfigPath)) {
+    if (!CheckFilePath(tzIdConfigPath)) {
         HILOG_ERROR_I18N("GetTimeZoneAvailableIDs: check file %{public}s failed.", tzIdConfigPath);
         return availableIDs;
     }
