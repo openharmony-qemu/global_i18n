@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -44,6 +44,12 @@ namespace I18n {
 static thread_local napi_ref* g_brkConstructor = nullptr;
 static thread_local napi_ref g_indexUtilConstructor = nullptr;
 static thread_local napi_ref* g_transConstructor = nullptr;
+
+std::unordered_map<std::string, int32_t> I18nAddon::EnumTemperatureType {
+    { "CELSIUS", 1 },
+    { "FAHRENHEIT", 2 },
+    { "KELVIN", 3 }
+};
 
 I18nAddon::I18nAddon() : env_(nullptr) {}
 
@@ -107,7 +113,8 @@ napi_value I18nAddon::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("is24HourClock", I18nSystemAddon::Is24HourClock),
         DECLARE_NAPI_FUNCTION("set24HourClock", I18nSystemAddon::Set24HourClock),
         DECLARE_NAPI_FUNCTION("getTimeZone", I18nTimeZoneAddon::GetI18nTimeZone),
-        DECLARE_NAPI_PROPERTY("NormalizerMode", I18nNormalizerAddon::CreateI18NNormalizerModeEnum(env, initStatus))
+        DECLARE_NAPI_PROPERTY("NormalizerMode", I18nNormalizerAddon::CreateI18NNormalizerModeEnum(env)),
+        DECLARE_NAPI_PROPERTY("TemperatureType", CreateTemperatureTypeEnum(env))
     };
     initStatus = napi_define_properties(env, exports, sizeof(properties) / sizeof(napi_property_descriptor),
         properties);
@@ -1584,6 +1591,27 @@ napi_value I18nAddon::InitUtil(napi_env env, napi_value exports)
         return nullptr;
     }
     return exports;
+}
+
+napi_value I18nAddon::CreateTemperatureTypeEnum(napi_env env)
+{
+    napi_value temperatureType = nullptr;
+    napi_status status = napi_create_object(env, &temperatureType);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("I18nAddon::CreateTemperatureTypeEnum: Create temperatureType failed.");
+        return nullptr;
+    }
+    for (auto& nameToValue : EnumTemperatureType) {
+        std::string name = nameToValue.first;
+        int32_t value = static_cast<int32_t>(nameToValue.second);
+        status = VariableConvertor::SetEnumValue(env, temperatureType, name, value);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("I18nAddon::CreateTemperatureTypeEnum: set enum name %{public}s failed.",
+                name.c_str());
+            return nullptr;
+        }
+    }
+    return temperatureType;
 }
 
 napi_value Init(napi_env env, napi_value exports)

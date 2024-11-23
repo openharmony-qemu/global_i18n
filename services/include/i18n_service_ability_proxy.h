@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -90,6 +90,14 @@ public:
      * @return I18nErrorCode Return SUCCESS indicates that the request was successful.
      */
     I18nErrorCode RemovePreferredLanguage(int32_t index);
+
+    /**
+     * @brief Set user's preferrence for temperature type.
+     *
+     * @param type temperature type to set.
+     * @return I18nErrorCode Return SUCCESS indicates that the request was successful.
+     */
+    I18nErrorCode SetTemperatureType(TemperatureType type);
 
 private:
     static I18nErrorCode ProcessReply(int32_t reply);

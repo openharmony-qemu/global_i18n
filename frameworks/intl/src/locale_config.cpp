@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -81,7 +81,9 @@ const char *LocaleConfig::rootTag = "languages";
 const char *LocaleConfig::secondRootTag = "lang";
 const char *LocaleConfig::rootRegion = "regions";
 const char *LocaleConfig::secondRootRegion = "region";
-const char *LocaleConfig::NUMBER_SYSTEM_KEY = "-nu-";
+const std::string LocaleConfig::EXT_PARAM_KEY = "-u-";
+const std::string LocaleConfig::NUMBER_SYSTEM_KEY = "nu";
+const std::string LocaleConfig::TEMPERATURE_UNIT_KEY = "mu";
 const std::string LocaleConfig::HOUR_EVENT_DATA = "24HourChange";
 unordered_set<string> LocaleConfig::supportedLocales;
 unordered_set<string> LocaleConfig::supportLocales;
@@ -129,6 +131,26 @@ unordered_map<string, string> LocaleConfig::localDigitMap {
     { "my", "mymr" },
     { "ne", "deva" },
     { "ur", "latn" }
+};
+
+std::unordered_map<TemperatureType, std::string> LocaleConfig::temperatureTypeToName {
+    { TemperatureType::CELSIUS, "celsius" },
+    { TemperatureType::FAHRENHEIT, "fahrenhe" },
+    { TemperatureType::KELVIN, "kelvin" }
+};
+
+std::unordered_map<std::string, TemperatureType> LocaleConfig::nameToTemperatureType {
+    { "celsius", TemperatureType::CELSIUS },
+    { "fahrenhe", TemperatureType::FAHRENHEIT },
+    { "kelvin", TemperatureType::KELVIN }
+};
+
+std::unordered_set<std::string> LocaleConfig::fahrenheitUsingRegions {
+    "BS",
+    "BZ",
+    "KY",
+    "PW",
+    "US"
 };
 
 std::map<std::string, std::string> LocaleConfig::supportedDialectLocales;
@@ -1041,7 +1063,7 @@ std::string LocaleConfig::GetValidLocale(const std::string &localeTag)
 {
     std::string baseLocale = "";
     std::string extension = "";
-    std::size_t found = localeTag.find("-u-");
+    std::size_t found = localeTag.find(EXT_PARAM_KEY);
     baseLocale = localeTag.substr(0, found);
     if (found != std::string::npos) {
         extension = localeTag.substr(found);
@@ -1053,7 +1075,7 @@ std::string LocaleConfig::GetValidLocale(const std::string &localeTag)
 
     std::string systemLocaleTag = GetSystemLocale();
     std::string defaultExtension = "";
-    found = systemLocaleTag.find("-u-");
+    found = systemLocaleTag.find(EXT_PARAM_KEY);
     if (found != std::string::npos) {
         defaultExtension = systemLocaleTag.substr(found);
     }
@@ -1202,7 +1224,7 @@ I18nErrorCode LocaleConfig::SetSystemLanguage(const std::string &languageTag)
         return I18nErrorCode::INVALID_LANGUAGE_TAG;
     }
     std::string languageCode = LocaleEncode(languageTag);
-    HILOG_ERROR_I18N("LocaleConfig::SetSystemLanguage: set language %{public}s.", languageCode.c_str());
+    HILOG_INFO_I18N("LocaleConfig::SetSystemLanguage: set language %{public}s.", languageCode.c_str());
     // save old language, reset system language to old language if update locale failed.
     std::string oldLanguageTag = GetSystemLanguage();
     if (SetParameter(LANGUAGE_KEY, languageTag.data()) != 0) {
@@ -1230,7 +1252,7 @@ I18nErrorCode LocaleConfig::SetSystemRegion(const std::string &regionTag)
         return I18nErrorCode::INVALID_REGION_TAG;
     }
     std::string regionCode = LocaleEncode(regionTag);
-    HILOG_ERROR_I18N("LocaleConfig::SetSystemRegion: set region %{public}s.", regionCode.c_str());
+    HILOG_INFO_I18N("LocaleConfig::SetSystemRegion: set region %{public}s.", regionCode.c_str());
     return SetSystemLocale(UpdateRegionOfLocale(regionTag));
 }
 
@@ -1249,7 +1271,7 @@ I18nErrorCode LocaleConfig::SetSystemLocale(const std::string &localeTag)
         return I18nErrorCode::INVALID_LOCALE_TAG;
     }
     std::string localeCode = LocaleEncode(localeTag);
-    HILOG_ERROR_I18N("LocaleConfig::SetSystemRegion: set locale %{public}s.", localeCode.c_str());
+    HILOG_INFO_I18N("LocaleConfig::SetSystemRegion: set locale %{public}s.", localeCode.c_str());
     if (SetParameter(LOCALE_KEY, localeTag.data()) != 0) {
         return I18nErrorCode::UPDATE_SYSTEM_LOCALE_FAILED;
     }
@@ -1278,7 +1300,7 @@ I18nErrorCode LocaleConfig::Set24HourClock(const std::string &option)
         HILOG_ERROR_I18N("LocaleConfig::Set24HourClock invalid 24 Hour clock tag: %{public}s", option.c_str());
         return I18nErrorCode::INVALID_24_HOUR_CLOCK_TAG;
     }
-    HILOG_ERROR_I18N("LocaleConfig::Set24HourClock: update 24 hour clock %{public}s", option.c_str());
+    HILOG_INFO_I18N("LocaleConfig::Set24HourClock: update 24 hour clock %{public}s", option.c_str());
     if (SetParameter(HOUR_KEY, option.data()) != 0) {
         HILOG_ERROR_I18N("LocaleConfig::Set24HourClock update 24 hour clock failed with option=%{public}s",
             option.c_str());
@@ -1305,55 +1327,55 @@ I18nErrorCode LocaleConfig::SetUsingLocalDigit(bool flag)
         HILOG_ERROR_I18N("LocaleConfig::SetUsingLocalDigit current system doesn't support set local digit");
         return I18nErrorCode::UPDATE_LOCAL_DIGIT_FAILED;
     }
+    std::string localDigit = flag ? it->second : "";
     // update system locale.
-    return SetSystemLocale(UpdateNumberSystemOfLocale(it->second, flag));
+    return SetSystemLocale(ModifyExtParam(localeTag, NUMBER_SYSTEM_KEY, localDigit));
 }
 
-std::string LocaleConfig::UpdateNumberSystemOfLocale(const std::string &localDigitTag, bool flag)
+I18nErrorCode LocaleConfig::SetTemperatureType(const TemperatureType& type)
 {
-    if (flag) {
-        // add local digit tag to number system param of locale
-        return AddLocalDigitToLocale(localDigitTag);
+    if (temperatureTypeToName.find(type) == temperatureTypeToName.end()) {
+        HILOG_ERROR_I18N("LocaleConfig::SetTemperatureType: temperature type failed.");
+        return I18nErrorCode::INVALID_TEMPERATURE_TYPE;
     }
-    // remove local digit tag to number system param of locale
-    return RemoveLocalDigitFromLocale(localDigitTag);
+    std::string option = temperatureTypeToName[type];
+    std::string localeTag = GetSystemLocale();
+    if (localeTag.empty()) {
+        HILOG_ERROR_I18N("LocaleConfig::SetTemperatureType: get system locale failed.");
+        return I18nErrorCode::UPDATE_TEMPERATURE_TYPE_FAILED;
+    }
+    // update system locale.
+    return SetSystemLocale(ModifyExtParam(localeTag, TEMPERATURE_UNIT_KEY, option));
 }
 
-std::string LocaleConfig::AddLocalDigitToLocale(const std::string &localDigitTag)
+TemperatureType LocaleConfig::GetTemperatureType()
 {
     std::string localeTag = GetSystemLocale();
-    // Case: no extend param, add '-u-' and number system tag.
-    if (localeTag.find("-u-") == std::string::npos) {
-        localeTag += "-u" + std::string(NUMBER_SYSTEM_KEY) + localDigitTag;
-        return localeTag;
+    if (localeTag.empty()) {
+        return TemperatureType::CELSIUS;
     }
-    // Case: has extend param but doesn't hava number system param, add number system tag.
-    if (localeTag.find(NUMBER_SYSTEM_KEY) == std::string::npos) {
-        localeTag += std::string(NUMBER_SYSTEM_KEY) + localDigitTag;
-        return localeTag;
+    std::unordered_map<std::string, std::string> extParamMap = ParseExtParam(localeTag);
+    std::string type;
+    if (extParamMap.find(TEMPERATURE_UNIT_KEY) != extParamMap.end()) {
+        type = extParamMap[TEMPERATURE_UNIT_KEY];
     }
-    // Case: has number system param, replace local digit tag to localDigitTag.
-    LocaleInfo localeInfo(localeTag);
-    std::string oldNumberSystem = localeInfo.GetNumberingSystem();
-    localeTag.replace(localeTag.find(oldNumberSystem), oldNumberSystem.length(), localDigitTag);
-    return localeTag;
+    if (!type.empty() && nameToTemperatureType.find(type) != nameToTemperatureType.end()) {
+        return nameToTemperatureType[type];
+    }
+    std::string regionTag = GetSystemRegion();
+    if (fahrenheitUsingRegions.find(regionTag) != fahrenheitUsingRegions.end()) {
+        return TemperatureType::FAHRENHEIT;
+    }
+    return TemperatureType::CELSIUS;
 }
 
-std::string LocaleConfig::RemoveLocalDigitFromLocale(const std::string &localDigitTag)
+std::string LocaleConfig::GetTemperatureName(const TemperatureType& type)
 {
-    // remove number system tag from locale
-    std::string localeTag = GetSystemLocale();
-    std::string numberSystemTag = NUMBER_SYSTEM_KEY + localDigitTag;
-    size_t pos = localeTag.find(numberSystemTag);
-    if (pos != std::string::npos) {
-        localeTag.replace(pos, numberSystemTag.length(), "");
+    if (temperatureTypeToName.find(type) == temperatureTypeToName.end()) {
+        HILOG_ERROR_I18N("LocaleConfig::GetTemperatureName: temperature type failed.");
+        return "";
     }
-    // remove "-u" if localeTag ends with "-u"
-    size_t uLength = 2;
-    if (localeTag.find("-u") == (localeTag.length() - uLength)) {
-        localeTag.resize(localeTag.length() - uLength);
-    }
-    return localeTag;
+    return temperatureTypeToName[type];
 }
 
 #ifdef SUPPORT_GRAPHICS
@@ -1402,11 +1424,11 @@ std::string LocaleConfig::UpdateLanguageOfLocale(const std::string &languageTag)
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("LocaleConfig::UpdateSystemLocale init icu Locale for locale %{public}s failed.",
             systemLocaleTag.c_str());
-        return "";
+        return systemLocaleTag;
     }
     std::string regionTag = systemLocale.getCountry();
     std::string extendParamTag;
-    size_t pos = systemLocaleTag.find("-u-");
+    size_t pos = systemLocaleTag.find(EXT_PARAM_KEY);
     if (pos != std::string::npos) {
         extendParamTag = systemLocaleTag.substr(pos);
     }
@@ -1439,21 +1461,32 @@ std::string LocaleConfig::UpdateRegionOfLocale(const std::string &regionTag)
     if (localeTag.length() == 0) {
         return CreateLocaleFromRegion(regionTag);
     }
+    std::string extParam;
+    size_t pos = localeTag.find(EXT_PARAM_KEY);
+    if (pos != std::string::npos) {
+        extParam = localeTag.substr(pos);
+    }
     // combine locale with origin locale's language and script with regionTag.
     UErrorCode status = U_ZERO_ERROR;
     const icu::Locale origin = icu::Locale::forLanguageTag(localeTag, status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("LocaleConfig::UpdateRegionOfLocale init origin locale failed.");
-        return "";
+        return localeTag;
     }
     icu::LocaleBuilder builder = icu::LocaleBuilder().setLanguage(origin.getLanguage()).
         setScript(origin.getScript()).setRegion(regionTag);
-    icu::Locale temp = builder.setExtension('u', "").build(status);
+    icu::Locale temp = builder.build(status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("LocaleConfig::UpdateRegionOfLocale: build locale failed.");
+        return localeTag;
+    }
     string ret = temp.toLanguageTag<string>(status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("LocaleConfig::UpdateRegionOfLocale obtain new locale's tag failed.");
-        return "";
+        return localeTag;
     }
+    ret += extParam;
+    ret = ModifyExtParam(ret, NUMBER_SYSTEM_KEY, "");
     return ret;
 }
 
@@ -1473,6 +1506,82 @@ std::string LocaleConfig::CreateLocaleFromRegion(const std::string &regionTag)
         return "";
     }
     return localeTag;
+}
+
+std::string LocaleConfig::ModifyExtParam(const std::string& locale, const std::string& key, const std::string& value)
+{
+    if (locale.empty()) {
+        HILOG_ERROR_I18N("LocaleConfig::ModifyExtParam: locale is empty.");
+        return locale;
+    }
+    if (key.empty()) {
+        HILOG_ERROR_I18N("LocaleConfig::ParseExtParam: key is empty.");
+        return locale;
+    }
+    std::unordered_map<std::string, std::string> paramMap;
+    std::string localeBase = locale;
+    size_t pos = locale.find(EXT_PARAM_KEY);
+    if (pos != std::string::npos) {
+        localeBase = locale.substr(0, pos);
+        std::string param = locale.substr(pos);
+        paramMap = ParseExtParam(param);
+    }
+    paramMap[key] = value;
+    std::string result = localeBase + GenerateExtParam(paramMap);
+    return result;
+}
+
+std::unordered_map<std::string, std::string> LocaleConfig::ParseExtParam(const std::string& param)
+{
+    std::unordered_map<std::string, std::string> result;
+    size_t pos = param.find(EXT_PARAM_KEY);
+    if (pos == std::string::npos) {
+        HILOG_INFO_I18N("LocaleConfig::ParseExtParam: param is invalid.");
+        return result;
+    }
+    std::string extParam = param.substr(pos + EXT_PARAM_KEY.length());
+    std::vector<std::string> paramArray;
+    Split(extParam, "-", paramArray);
+    size_t pairLen = 2;
+    if (paramArray.size() % pairLen != 0) {
+        HILOG_ERROR_I18N("LocaleConfig::ParseExtParam: parse ext param failed.");
+        return result;
+    }
+    for (size_t pos = 0; pos + 1 < paramArray.size(); pos += pairLen) {
+        std::string key = paramArray[pos];
+        std::string value = paramArray[pos + 1];
+        if (key.empty() || value.empty()) {
+            HILOG_ERROR_I18N("LocaleConfig::ParseExtParam: key or value is empty.");
+            continue;
+        }
+        auto status = result.insert({key, value});
+        if (!status.second) {
+            HILOG_ERROR_I18N("LocaleConfig::ParseExtParam: insert key (%{public}s) and value (%{public}s) failed.",
+                key.c_str(), value.c_str());
+        }
+    }
+    return result;
+}
+
+std::string LocaleConfig::GenerateExtParam(const std::unordered_map<std::string, std::string>& paramMap)
+{
+    std::string result;
+    if (paramMap.size() == 0) {
+        return result;
+    }
+    for (auto& param : paramMap) {
+        std::string key = param.first;
+        std::string value = param.second;
+        if (value.empty()) {
+            HILOG_INFO_I18N("LocaleConfig::GenerateExtParam: erase key (%{public}s) ", key.c_str());
+            continue;
+        }
+        result += "-" + key + "-" + value;
+    }
+    if (!result.empty()) {
+        result = "-u" + result;
+    }
+    return result;
 }
 
 std::string LocaleConfig::GetLanguageKey()

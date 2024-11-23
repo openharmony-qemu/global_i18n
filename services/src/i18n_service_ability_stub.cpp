@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -84,6 +84,9 @@ int32_t I18nServiceAbilityStub::InvokeInnerFunc(uint32_t code, MessageParcel &da
         case static_cast<uint32_t>(ILocaleConfigAbilityCode::REMOVE_PREFERRED_LANGUAGE): {
             return I18nServiceAbilityStub::RemovePreferredLanguageInner(data, reply);
         }
+        case static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_TEMPERATURE_TYPE): {
+            return I18nServiceAbilityStub::SetTemperatureTypeInner(data, reply);
+        }
         default:
             break;
     }
@@ -104,7 +107,7 @@ I18nErrorCode I18nServiceAbilityStub::CheckPermission()
     bool isNative = tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE;
     if (!isSystemApp && !isShell && !isNative) {
         HILOG_ERROR_I18N("I18nServiceAbilityStub caller process is not System app, Shell or Native.");
-        return I18nErrorCode::NO_PERMISSION;
+        return I18nErrorCode::NOT_SYSTEM_APP;
     }
     int result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken,
         "ohos.permission.UPDATE_CONFIGURATION");
@@ -249,6 +252,26 @@ int32_t I18nServiceAbilityStub::RemovePreferredLanguageInner(MessageParcel &data
     err = RemovePreferredLanguage(index);
     if (err != I18nErrorCode::SUCCESS) {
         HILOG_ERROR_I18N("I18nServiceAbilityStub::RemovePreferredLanguageInner failed with errorCode=%{public}d",
+            static_cast<int32_t>(err));
+    }
+    reply.WriteInt32(static_cast<int32_t>(err));
+    Memory::MemMgrClient::GetInstance().SetCritical(pid, false, I18N_SA_ID);
+    return 0;
+}
+
+int32_t I18nServiceAbilityStub::SetTemperatureTypeInner(MessageParcel &data, MessageParcel &reply)
+{
+    int pid = getpid();
+    Memory::MemMgrClient::GetInstance().SetCritical(pid, true, I18N_SA_ID);
+    I18nErrorCode err = CheckPermission();
+    if (err != I18nErrorCode::SUCCESS) {
+        reply.WriteInt32(static_cast<int32_t>(err));
+        return 0;
+    }
+    int32_t type = data.ReadInt32();
+    err = SetTemperatureType(static_cast<TemperatureType>(type));
+    if (err != I18nErrorCode::SUCCESS) {
+        HILOG_ERROR_I18N("I18nServiceAbilityStub::SetTemperatureTypeInner failed with errorCode=%{public}d",
             static_cast<int32_t>(err));
     }
     reply.WriteInt32(static_cast<int32_t>(err));

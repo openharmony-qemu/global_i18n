@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -170,6 +170,34 @@ void VariableConvertor::VerifyType(napi_env env, const std::string& valueName, c
     } else if (type == "number" && valueType != napi_valuetype::napi_number) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, valueName, type, true);
     }
+}
+
+napi_status VariableConvertor::SetEnumValue(napi_env env, napi_value enumObj, const std::string& enumName,
+    int32_t enumVal)
+{
+    napi_value name = nullptr;
+    napi_status status = napi_create_string_utf8(env, enumName.c_str(), NAPI_AUTO_LENGTH, &name);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("VariableConvertor::SetEnumValue: create string %{public}s failed.", enumName.c_str());
+        return status;
+    }
+    napi_value value = nullptr;
+    status = napi_create_int32(env, enumVal, &value);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("VariableConvertor::SetEnumValue: create int32 %{public}d failed.", enumVal);
+        return status;
+    }
+    status = napi_set_property(env, enumObj, name, value);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("VariableConvertor::SetEnumValue: set property %{public}s failed.", enumName.c_str());
+        return status;
+    }
+    status = napi_set_property(env, enumObj, value, name);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("VariableConvertor::SetEnumValue: set property %{public}d failed.", enumVal);
+        return status;
+    }
+    return napi_ok;
 }
 } // namespace I18n
 } // namespace Global

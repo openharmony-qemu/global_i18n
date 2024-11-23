@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -79,6 +79,17 @@ public:
      * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
      */
     static I18nErrorCode SetUsingLocalDigit(bool flag);
+
+    /**
+     * @brief Set user's preferrence for temperature type.
+     *
+     * @param type temperature type to set.
+     * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
+     */
+    static I18nErrorCode SetTemperatureType(const TemperatureType& type);
+
+    static TemperatureType GetTemperatureType();
+    static std::string GetTemperatureName(const TemperatureType& type);
     static std::string GetSystemLanguage();
     static std::string GetSystemRegion();
     static std::string GetSystemLocale();
@@ -157,6 +168,9 @@ private:
     static std::mutex dialectLocaleMutex;
     static std::mutex region2DisplayNameMutex;
     static std::mutex locale2DisplayNameMutex;
+    static const std::string EXT_PARAM_KEY;
+    static const std::string NUMBER_SYSTEM_KEY;
+    static const std::string TEMPERATURE_UNIT_KEY;
 
     static const std::unordered_set<std::string>& GetSupportedLocales();
     static const std::unordered_set<std::string>& GetForbiddenRegions();
@@ -235,31 +249,9 @@ private:
      * @return std::string Return locale Tag.
      */
     static std::string UpdateRegionOfLocale(const std::string &regionTag);
-
-    /**
-     * @brief Change number system extend param part of locale.
-     *
-     * @param flag When flag is true, change number system extend param part to local digit of system language,
-     * when flag is false, remove number system extend param part.
-     * @return std::string Return locale Tag.
-     */
-    static std::string UpdateNumberSystemOfLocale(const std::string &localDigitTag, bool flag);
-
-    /**
-     * @brief Add local digit tag to number system extend param of locale.
-     *
-     * @param localDigitTag Indicats local digit tag which define in localDigitMap.
-     * @return std::string Return locale Tag.
-     */
-    static std::string AddLocalDigitToLocale(const std::string &localDigitTag);
-
-    /**
-     * @brief Remove local digit tag from number system extend param of locale.
-     *
-     * @param localDigitTag Indicats local digit tag which define in localDigitMap.
-     * @return std::string Return locale Tag.
-     */
-    static std::string RemoveLocalDigitFromLocale(const std::string &localDigitTag);
+    static std::string ModifyExtParam(const std::string& locale, const std::string& key, const std::string& value);;
+    static std::unordered_map<std::string, std::string> ParseExtParam(const std::string& param);
+    static std::string GenerateExtParam(const std::unordered_map<std::string, std::string>& paramMap);
     static void ExtendWhiteLanguages();
     static std::unordered_set<std::string> supportedLocales;
     static std::unordered_set<std::string> supportedRegions;
@@ -274,6 +266,9 @@ private:
     static std::map<std::string, std::string> supportedDialectLocales;
     static std::unordered_map<std::string, std::string> dialectMap;
     static std::unordered_map<std::string, std::string> localDigitMap;
+    static std::unordered_map<TemperatureType, std::string> temperatureTypeToName;
+    static std::unordered_map<std::string, TemperatureType> nameToTemperatureType;
+    static std::unordered_set<std::string> fahrenheitUsingRegions;
     static std::map<std::string, std::string> locale2DisplayName;
     static std::map<std::string, std::string> region2DisplayName;
     static std::string currentDialectLocale;
@@ -286,7 +281,6 @@ private:
     static std::set<std::string> validHcTag;
     static bool listsInitialized;
     static bool InitializeLists();
-    static const char *NUMBER_SYSTEM_KEY;
 };
 } // namespace I18n
 } // namespace Global
