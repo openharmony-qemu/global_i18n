@@ -52,6 +52,11 @@ sptr<ISystemAbilityManager> I18nServiceAbilityLoadManager::LoadI18nServiceAbilit
         return nullptr;
     }
     sptr<I18nServiceAbilityLoadCallback> i18nSaLoadCallback = new I18nServiceAbilityLoadCallback();
+    if (i18nSaLoadCallback == nullptr) {
+        HILOG_ERROR_I18N(
+            "I18nServiceAbilityLoadManager::LoadI18nServiceAbility create i18nSaLoadCallback failed.");
+        return nullptr;
+    }
     int32_t ret = samgr->LoadSystemAbility(systemAbilityId, i18nSaLoadCallback);
     if (ret != ERR_OK) {
         HILOG_ERROR_I18N(

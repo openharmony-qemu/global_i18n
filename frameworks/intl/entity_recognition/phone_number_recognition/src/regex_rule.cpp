@@ -343,9 +343,13 @@ std::vector<MatchedNumberInfo> RegexRule::HandleBlank(PhoneNumberMatch* possible
 {
     // exclude phone number 5201314
     icu::UnicodeString speString = "5201314";
+    std::vector<MatchedNumberInfo> matchedNumberInfoList;
     MatchedNumberInfo matchedNumberInfo;
     icu::UnicodeString number = possibleNumber->raw_string().c_str();
     icu::RegexPattern* pattern = GetPattern();
+    if (pattern == nullptr) {
+        return matchedNumberInfoList;
+    }
     UErrorCode status;
     icu::RegexMatcher* matcher = pattern->matcher(number, status);
     UErrorCode negativeStatus = U_ZERO_ERROR;
@@ -353,9 +357,10 @@ std::vector<MatchedNumberInfo> RegexRule::HandleBlank(PhoneNumberMatch* possible
     icu::UnicodeString negativeRegex = "(?<![-\\d])(23{6,7})(?![-\\d])";
     icu::RegexMatcher negativePattern(negativeRegex, 0, negativeStatus);
     negativePattern.reset(number);
-    std::vector<MatchedNumberInfo> matchedNumberInfoList;
     if (matcher != nullptr && matcher->find()) {
         if (negativePattern.find() || number == speString) {
+            delete matcher;
+            delete pattern;
             return matchedNumberInfoList;
         }
         if (possibleNumber->raw_string()[0] != '(' && possibleNumber->raw_string()[0] != '[') {

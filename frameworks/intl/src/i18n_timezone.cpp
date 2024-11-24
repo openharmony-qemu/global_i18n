@@ -736,6 +736,7 @@ std::string I18nTimeZone::GetDisplayNameByTaboo(
     char recvArr[RECV_CHAR_LEN];
     int err = strcpy_s(recvArr, RECV_CHAR_LEN, result.c_str());
     if (err != 0) {
+        dlclose(i18nUtilHandle);
         return result;
     }
     if (getReplacedTimezoneDisplayName) {
@@ -864,11 +865,7 @@ std::string I18nTimeZone::FindCityDisplayNameFromXml(std::string &cityID, std::s
         xmlNodePtr value = cur->xmlChildrenNode;
         xmlChar *contents[ELEMENT_NUM] = { 0 }; // 2 represent cityid, displayName;
         bool xmlNodeIsNull = false;
-        for (size_t i = 0; i < ELEMENT_NUM; i++) {
-            if (value == nullptr) {
-                xmlNodeIsNull = true;
-                break;
-            }
+        for (size_t i = 0; i < ELEMENT_NUM && value != nullptr; i++) {
             contents[i] = xmlNodeGetContent(value);
             if (contents[i] == nullptr) {
                 xmlNodeIsNull = true;
@@ -876,7 +873,7 @@ std::string I18nTimeZone::FindCityDisplayNameFromXml(std::string &cityID, std::s
             }
             value = value->next;
         }
-        if (!xmlNodeIsNull && strcmp(cityID.c_str(), reinterpret_cast<const char *>(contents[0])) == 0) {
+        if (!xmlNodeIsNull && cityID.compare(reinterpret_cast<const char *>(contents[0])) == 0) {
             displayName = reinterpret_cast<const char *>(contents[1]);
         }
         for (size_t i = 0; i < ELEMENT_NUM; i++) {
@@ -1181,7 +1178,7 @@ std::vector<int> I18nTimeZone::GetColorData(const uint16_t x, const uint16_t y,
 
 void I18nTimeZone::GetTzDataWidth(std::vector<std::string> filePaths, uint32_t *width, uint32_t *height)
 {
-    if (filePaths.size() == 0 || !CheckTzDataFilePath(filePaths.at(0))) {
+    if (filePaths.size() == 0 || !CheckFilePath(filePaths.at(0))) {
         return;
     } else {
         FILE* fp;
@@ -1214,7 +1211,7 @@ void I18nTimeZone::GetTzDataWidth(std::vector<std::string> filePaths, uint32_t *
 int I18nTimeZone::InitPngptr(png_structp &png_ptr, png_infop &info_ptr, FILE **fp,
                              std::string preferredPath)
 {
-    bool validFilePath = CheckTzDataFilePath(preferredPath);
+    bool validFilePath = CheckFilePath(preferredPath);
     if (!validFilePath) {
         HILOG_ERROR_I18N("timezone data filepath invalid.");
         return 1;

@@ -41,9 +41,8 @@ HolidayManager::HolidayManager(const char* path)
         HILOG_ERROR_I18N("Failed: parameter path is NULL.");
         return;
     }
-    std::string msg = ValidateHolidayFilePath(path);
-    if (msg.length() != 0) {
-        HILOG_ERROR_I18N("Failed: %{public}s .", msg.c_str());
+    if (!CheckFilePath(path)) {
+        HILOG_ERROR_I18N("Failed: holiday file path: %{public}s invalid.", path);
         return;
     }
     std::vector<HolidayInfoItem> items = ReadHolidayFile(path);
@@ -138,25 +137,6 @@ std::vector<HolidayInfoItem> HolidayManager::GetHolidayInfoItemArray(int32_t yea
         }
     }
     return vetor;
-}
-
-std::string HolidayManager::ValidateHolidayFilePath(const char* path)
-{
-    char *realpathRes = realpath(path, nullptr);
-    if (realpathRes == NULL) {
-        free(realpathRes);
-        return "the holiday resource file not exists.";
-    }
-    std::ifstream file(path);
-    if (!file.good()) {
-        free(realpathRes);
-        file.close();
-        return "the holiday resource file can't read.";
-    }
-    file.close();
-    free(realpathRes);
-    realpathRes = NULL;
-    return "";
 }
 
 std::vector<HolidayInfoItem> HolidayManager::ReadHolidayFile(const char* path)

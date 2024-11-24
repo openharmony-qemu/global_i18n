@@ -49,7 +49,7 @@ static std::mutex validLocaleMutex;
 
 void Split(const string &src, const string &sep, vector<string> &dest)
 {
-    if (src == "") {
+    if (src.empty()) {
         return;
     }
     string::size_type begin = 0;
@@ -133,6 +133,9 @@ void GetAllValidLocalesTag(std::unordered_set<std::string>& allValidLocalesLangu
     }
     int32_t validCount = 1;
     const icu::Locale *validLocales = icu::Locale::getAvailableLocales(validCount);
+    if (validLocales == nullptr) {
+        return;
+    }
     for (int i = 0; i < validCount; i++) {
         const char* language = validLocales[i].getLanguage();
         if (language != nullptr) {
@@ -142,22 +145,19 @@ void GetAllValidLocalesTag(std::unordered_set<std::string>& allValidLocalesLangu
     init = true;
 }
 
-bool CheckTzDataFilePath(const std::string &filePath)
+bool CheckFilePath(const std::string &filePath)
 {
-    char *realpathRes = nullptr;
-    realpathRes = realpath(filePath.c_str(), nullptr);
-    if (realpathRes == nullptr) {
+    std::unique_ptr<char[]> resolvedPath = std::make_unique<char[]>(PATH_MAX + 1);
+    char* result = realpath(filePath.c_str(), resolvedPath.get());
+    if (result == nullptr || strlen(result) >= PATH_MAX) {
         return false;
     }
-    std::ifstream file(filePath.c_str());
+    std::ifstream file(resolvedPath.get());
     if (!file.good()) {
         file.close();
-        free(realpathRes);
         return false;
     }
     file.close();
-    free(realpathRes);
-    realpathRes = nullptr;
     return true;
 }
 
@@ -323,7 +323,7 @@ std::set<std::string> GetTimeZoneAvailableIDs(I18nErrorCode &errorCode)
     struct stat s;
     const char *tzIdConfigPath = stat(DISTRO_TIMEZONE_LIST_CONFIG, &s) == 0 ?
         DISTRO_TIMEZONE_LIST_CONFIG : TIMEZONE_LIST_CONFIG_PATH;
-    if (!CheckTzDataFilePath(tzIdConfigPath)) {
+    if (!CheckFilePath(tzIdConfigPath)) {
         HILOG_ERROR_I18N("GetTimeZoneAvailableIDs: check file %{public}s failed.", tzIdConfigPath);
         return availableIDs;
     }

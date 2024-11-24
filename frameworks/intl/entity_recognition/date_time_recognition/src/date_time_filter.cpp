@@ -286,7 +286,7 @@ std::vector<MatchedDateTimeInfo> DateTimeFilter::FilterDateTime(icu::UnicodeStri
         return matches;
     }
     UErrorCode status = U_ZERO_ERROR;
-    icu::RegexPattern* pattern = dateTimeRule->GetPatternsMap()["datetime"];
+    icu::RegexPattern* pattern = dateTimeRule->GetPatternByKey("datetime");
     if (pattern == nullptr) {
         HILOG_ERROR_I18N("FilterDateTime failed because pattern is nullptr.");
         return matches;
@@ -342,7 +342,7 @@ std::vector<MatchedDateTimeInfo> DateTimeFilter::FilterPeriod(icu::UnicodeString
         return matches;
     }
     UErrorCode status = U_ZERO_ERROR;
-    icu::RegexPattern* pattern = dateTimeRule->GetPatternsMap()["period"];
+    icu::RegexPattern* pattern = dateTimeRule->GetPatternByKey("period");
     if (pattern == nullptr) {
         HILOG_ERROR_I18N("FilterPeriod failed because pattern is nullptr.");
         return matches;
@@ -434,7 +434,7 @@ bool DateTimeFilter::DealBrackets(icu::UnicodeString& content, std::vector<Match
         int add = 0;
         icu::UnicodeString endStr = content.tempSubString(lastMatch.GetEnd());
         UErrorCode status = U_ZERO_ERROR;
-        icu::RegexPattern* pattern = dateTimeRule->GetPatternsMap()["brackets"];
+        icu::RegexPattern* pattern = dateTimeRule->GetPatternByKey("brackets");
         if (pattern == nullptr) {
             HILOG_ERROR_I18N("DealBrackets failed because pattern is nullptr.");
             return false;
@@ -513,7 +513,7 @@ int DateTimeFilter::GetResult(icu::UnicodeString& content, MatchedDateTimeInfo& 
         if (ss.trim() == '(') {
             icu::UnicodeString endStr = content.tempSubString(current.GetEnd());
             UErrorCode status = U_ZERO_ERROR;
-            icu::RegexPattern* pattern = dateTimeRule->GetPatternsMap()["brackets"];
+            icu::RegexPattern* pattern = dateTimeRule->GetPatternByKey("brackets");
             if (pattern == nullptr) {
                 HILOG_ERROR_I18N("GetResult failed because pattern is nullptr.");
                 return result;

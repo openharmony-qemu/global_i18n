@@ -157,24 +157,34 @@ void Taboo::ParseTabooData(const std::string& path, DataFileType fileType, const
         xmlChar* value = xmlGetProp(cur, valueTag);
         if (name == nullptr || value == nullptr) {
             HILOG_ERROR_I18N("Taboo get name and value property failed: %{public}s", path.c_str());
+            xmlFree(name);
+            xmlFree(value);
             cur = cur->next;
             continue;
         }
         std::string nameStr = reinterpret_cast<const char*>(name);
         std::string valueStr = reinterpret_cast<const char*>(value);
-        switch (fileType) {
-            case DataFileType::CONFIG_FILE:
-                ProcessTabooConfigData(nameStr, valueStr);
-                break;
-            case DataFileType::DATA_FILE:
-                ProcessTabooLocaleData(locale, nameStr, valueStr);
-                break;
-        }
+        HandleTabooData(fileType, locale, nameStr, valueStr);
         xmlFree(name);
         xmlFree(value);
         cur = cur->next;
     }
     xmlFreeDoc(doc);
+}
+
+void Taboo::HandleTabooData(DataFileType fileType, const std::string& locale, const std::string& name,
+    const std::string& value)
+{
+    switch (fileType) {
+        case DataFileType::CONFIG_FILE:
+            ProcessTabooConfigData(name, value);
+            break;
+        case DataFileType::DATA_FILE:
+            ProcessTabooLocaleData(locale, name, value);
+            break;
+        default:
+            break;
+    }
 }
 
 void Taboo::ProcessTabooConfigData(const std::string& name, const std::string& value)

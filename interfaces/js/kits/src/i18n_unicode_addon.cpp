@@ -106,7 +106,10 @@ napi_value I18nUnicodeAddon::IsDigitAddon(napi_env env, napi_callback_info info)
         return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     if (valueType != napi_valuetype::napi_string) {
         HILOG_ERROR_I18N("IsDigitAddon: Parameter type does not match");
         return nullptr;
@@ -137,7 +140,10 @@ napi_value I18nUnicodeAddon::IsSpaceCharAddon(napi_env env, napi_callback_info i
         return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     if (valueType != napi_valuetype::napi_string) {
         HILOG_ERROR_I18N("IsSpaceCharAddon: Parameter type does not match");
         return nullptr;
@@ -168,7 +174,10 @@ napi_value I18nUnicodeAddon::IsWhiteSpaceAddon(napi_env env, napi_callback_info 
         return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     if (valueType != napi_valuetype::napi_string) {
         HILOG_ERROR_I18N("IsWhiteSpaceAddon: Parameter type does not match");
         return nullptr;

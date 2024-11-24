@@ -155,6 +155,7 @@ private:
     void GetTimezones(xmlNodePtr &value, std::vector<std::string> &zones);
     void GetDefaultAndBoost(xmlNodePtr &value, std::string &defaultTimezone, bool &isBoosted,
         std::vector<std::string> &zones);
+    bool IsFindCountry(xmlDocPtr &doc, xmlNodePtr &cur, xmlNodePtr &value, std::string &region);
     void GetCountryZones(std::string &region, std::string &defaultTimezone, bool &isBoosted,
         std::vector<std::string> &zones);
     void GetICUCountryZones(std::string &region, std::vector<std::string> &zones, std::string &defaultTimezone);

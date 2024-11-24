@@ -70,6 +70,9 @@ bool BorderRule::Handle(PhoneNumberMatch* match, icu::UnicodeString& message)
     icu::UnicodeString borderStr = message.tempSubString(beginSubTen, endAddTen - beginSubTen);
         
     icu::RegexPattern* pattern = this->GetPattern();
+    if (pattern == nullptr) {
+        return false;
+    }
     UErrorCode status;
     icu::RegexMatcher* mat = pattern->matcher(borderStr, status);
     int type = this->GetType();

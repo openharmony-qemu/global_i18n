@@ -30,7 +30,7 @@ public:
     std::vector<int> GetMatchedDateTime(icu::UnicodeString& message);
 
 private:
-    DateRuleInit* dateRuleInit;
+    std::unique_ptr<DateRuleInit> dateRuleInit;
 };
 } // namespace I18n
 } // namespace Global
