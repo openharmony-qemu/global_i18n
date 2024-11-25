@@ -24,7 +24,10 @@ ohos_fuzztest("SystemLocaleManagerFuzzTest") {
 
   fuzz_config_file = "."
 
-  include_dirs = [ "../../../include" ]
+  include_dirs = [
+    "../../../include",
+    "../../../system_locale/include",
+  ]
   cflags = [
     "-g",
     "-O0",
@@ -34,7 +37,10 @@ ohos_fuzztest("SystemLocaleManagerFuzzTest") {
   sources = [ "systemlocalemanager_fuzzer.cpp" ]
   configs = []
 
-  deps = [ "../../../../intl:intl_util" ]
+  deps = [
+    "../../../../intl:intl_util",
+    "../../../../intl:system_locale",
+  ]
 
   external_deps = [
     "icu:shared_icui18n",

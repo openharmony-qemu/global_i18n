@@ -19,6 +19,7 @@ group("build_module") {
   deps = [
     ":intl_util",
     ":preferred_language",
+    ":system_locale",
   ]
 }
 
@@ -129,7 +130,6 @@ ohos_shared_library("intl_util") {
       "src/plural_rules.cpp",
       "src/relative_time_format.cpp",
       "src/signature_verifier.cpp",
-      "src/system_locale_manager.cpp",
       "src/taboo.cpp",
       "src/taboo_utils.cpp",
       "src/utils.cpp",
@@ -196,6 +196,42 @@ ohos_shared_library("intl_util") {
     if (target_platform == "pc") {
       defines += [ "SUPPORT_MULTI_USER" ]
     }
+  }
+  install_images = [ system_base_dir ]
+  relative_install_dir = "platformsdk"
+  subsystem_name = "global"
+  innerapi_tags = [ "platformsdk" ]
+  part_name = "i18n"
+}
+
+ohos_shared_library("system_locale") {
+  branch_protector_ret = "pac_ret"
+  include_dirs = [ "//base/global/i18n/frameworks/intl/system_locale/include" ]
+  sources = [ "system_locale/src/system_locale_manager.cpp" ]
+  external_deps = [
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "hilog:libhilog",
+    "icu:shared_icui18n",
+    "icu:shared_icuuc",
+    "libpng:libpng",
+  ]
+  cflags_cc = [
+    "-Wall",
+    "-fPIC",
+    "-frtti",
+  ]
+  remove_configs = [ "//build/config/compiler:no_rtti" ]
+  use_exceptions = true
+  deps = [ ":intl_util" ]
+  public_external_deps = []
+  defines = []
+  if (is_asan) {
+    defines += [ "SUPPORT_ASAN" ]
+  }
+  if (tel_core_service_enable) {
+    public_external_deps += [ "core_service:tel_core_service_api" ]
+    defines += [ "TEL_CORE_SERVICE_ENABLE" ]
   }
   install_images = [ system_base_dir ]
   relative_install_dir = "platformsdk"
