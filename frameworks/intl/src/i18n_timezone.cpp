@@ -1107,9 +1107,9 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
 
 std::map<int, std::string> I18nTimeZone::GetTimeZoneCategoryMap(const double x, const double y)
 {
-    if (x < 0 && y >= 0) {
+    if (x < 0 && Geq(y, 0)) {
         return categoryNum2TimezoneWN;
-    } else if (x >= 0 && y >= 0) {
+    } else if (Geq(x, 0) && Geq(y, 0)) {
         return categoryNum2TimezoneEN;
     } else if (x < 0 && y < 0) {
         return categoryNum2TimezoneWS;
@@ -1123,13 +1123,13 @@ bool I18nTimeZone::CheckLatitudeAndLongitude(const double x, const double y)
     if (x < -1.0 * TZ_X_PLUS) {
         return false;
     }
-    if (x >= TZ_X_PLUS * 1.0 - NUM_PRECISION) {
+    if (Geq(x, TZ_X_PLUS * 1.0 - NUM_PRECISION)) {
         return false;
     }
     if (y < -1.0 * TZ_X_PLUS/TZ_HALF_OF_SIZE) {
         return false;
     }
-    if (y >= TZ_X_PLUS * 1.0/TZ_HALF_OF_SIZE - NUM_PRECISION) {
+    if (Geq(y, TZ_X_PLUS * 1.0/TZ_HALF_OF_SIZE - NUM_PRECISION)) {
         return false;
     }
     return true;
@@ -1244,7 +1244,7 @@ std::string I18nTimeZone::GetPreferredPath(const double x,
     if (filePaths.size() == 1) {
         return filePaths.at(0);
     } else {
-        int fixedX = (int)(x + TZ_X_PLUS);
+        int fixedX = static_cast<int>(x + TZ_X_PLUS);
         for (unsigned int i = 0; i < filePaths.size(); i++) {
             std::string path = filePaths.at(i);
             std::string left = path.substr(path.find("-") + 1, 3);
