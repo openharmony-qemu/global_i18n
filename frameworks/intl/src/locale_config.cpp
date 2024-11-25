@@ -52,6 +52,7 @@ using namespace std;
 const char *LocaleConfig::LANGUAGE_KEY = "persist.global.language";
 const char *LocaleConfig::LOCALE_KEY = "persist.global.locale";
 const char *LocaleConfig::HOUR_KEY = "persist.global.is24Hour";
+const char *LocaleConfig::UPGRADE_LOCALE_KEY = "persist.global.upgrade_locale";
 const char *LocaleConfig::DEFAULT_LOCALE_KEY = "const.global.locale";
 const char *LocaleConfig::DEFAULT_LANGUAGE_KEY = "const.global.language";
 const char *LocaleConfig::DEFAULT_REGION_KEY = "const.global.region";
