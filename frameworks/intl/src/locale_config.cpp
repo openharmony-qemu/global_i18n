@@ -1212,11 +1212,20 @@ I18nErrorCode LocaleConfig::SetSystemLanguage(const std::string &languageTag)
 
 I18nErrorCode LocaleConfig::SetSystemRegion(const std::string &regionTag)
 {
+    QueryUpgradeLocale();
     if (!IsValidRegion(regionTag)) {
         HILOG_ERROR_I18N("LocaleConfig::SetSystemRegion %{public}s is not valid region tag.", regionTag.c_str());
         return I18nErrorCode::INVALID_REGION_TAG;
     }
     return SetSystemLocale(UpdateRegionOfLocale(regionTag));
+}
+
+void LocaleConfig::QueryUpgradeLocale()
+{
+    std::string upgradeLocale = ReadSystemParameter(UPGRADE_LOCALE_KEY, CONFIG_LEN);
+    if (!upgradeLocale.empty()) {
+        HILOG_ERROR_I18N("LocaleConfig::QueryUpgradeLocale: upgrade locale is %{public}s.", upgradeLocale.c_str());
+    }
 }
 
 I18nErrorCode LocaleConfig::SetSystemLocale(const std::string &localeTag)
