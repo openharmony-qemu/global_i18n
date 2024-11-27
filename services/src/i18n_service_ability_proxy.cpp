@@ -36,7 +36,7 @@ I18nErrorCode I18nServiceAbilityProxy::SetSystemLanguage(const std::string &lang
     data.WriteString(language);
     auto remote = Remote();
     if (remote == nullptr) {
-        return I18nErrorCode::GET_SA_REMOTE_OBJECT_FAILED;
+        return I18nErrorCode::FAILED;
     }
     remote->SendRequest(static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_SYSTEM_LANGUAGE), data,
         reply, option);
@@ -52,7 +52,7 @@ I18nErrorCode I18nServiceAbilityProxy::SetSystemRegion(const std::string &region
     data.WriteString(region);
     auto remote = Remote();
     if (remote == nullptr) {
-        return I18nErrorCode::GET_SA_REMOTE_OBJECT_FAILED;
+        return I18nErrorCode::FAILED;
     }
     remote->SendRequest(static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_SYSTEM_REGION), data,
         reply, option);
@@ -68,7 +68,7 @@ I18nErrorCode I18nServiceAbilityProxy::SetSystemLocale(const std::string &locale
     data.WriteString(locale);
     auto remote = Remote();
     if (remote == nullptr) {
-        return I18nErrorCode::GET_SA_REMOTE_OBJECT_FAILED;
+        return I18nErrorCode::FAILED;
     }
     remote->SendRequest(static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_SYSTEM_LOCALE), data,
         reply, option);
@@ -84,7 +84,7 @@ I18nErrorCode I18nServiceAbilityProxy::Set24HourClock(const std::string &flag)
     data.WriteString(flag);
     auto remote = Remote();
     if (remote == nullptr) {
-        return I18nErrorCode::GET_SA_REMOTE_OBJECT_FAILED;
+        return I18nErrorCode::FAILED;
     }
     remote->SendRequest(static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_24_HOUR_CLOCK), data,
         reply, option);
@@ -100,7 +100,7 @@ I18nErrorCode I18nServiceAbilityProxy::SetUsingLocalDigit(bool flag)
     data.WriteBool(flag);
     auto remote = Remote();
     if (remote == nullptr) {
-        return I18nErrorCode::GET_SA_REMOTE_OBJECT_FAILED;
+        return I18nErrorCode::FAILED;
     }
     remote->SendRequest(static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_USING_LOCAL_DIGIT), data,
         reply, option);
@@ -117,7 +117,7 @@ I18nErrorCode I18nServiceAbilityProxy::AddPreferredLanguage(const std::string &l
     data.WriteInt32(index);
     auto remote = Remote();
     if (remote == nullptr) {
-        return I18nErrorCode::GET_SA_REMOTE_OBJECT_FAILED;
+        return I18nErrorCode::FAILED;
     }
     remote->SendRequest(static_cast<uint32_t>(ILocaleConfigAbilityCode::ADD_PREFERRED_LANGUAGE), data,
         reply, option);
@@ -133,7 +133,7 @@ I18nErrorCode I18nServiceAbilityProxy::RemovePreferredLanguage(int32_t index)
     data.WriteInt32(index);
     auto remote = Remote();
     if (remote == nullptr) {
-        return I18nErrorCode::GET_SA_REMOTE_OBJECT_FAILED;
+        return I18nErrorCode::FAILED;
     }
     remote->SendRequest(static_cast<uint32_t>(ILocaleConfigAbilityCode::REMOVE_PREFERRED_LANGUAGE),
         data, reply, option);
