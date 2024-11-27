@@ -484,12 +484,13 @@ void LocaleConfig::ExtendWhiteLanguages()
 
 void LocaleConfig::ExtendLanguageWithScript(const char* language)
 {
-    if (language != nullptr) {
-        std::string languageStr(language);
-        string mainLanguage = GetMainLanguage(languageStr);
-        if (!mainLanguage.empty()) {
-            extendWhiteLanguageList.insert(mainLanguage);
-        }
+    if (language == nullptr) {
+        return;
+    }
+    std::string languageStr(language);
+    string mainLanguage = GetMainLanguage(languageStr);
+    if (!mainLanguage.empty()) {
+        extendWhiteLanguageList.insert(mainLanguage);
     }
 }
 
