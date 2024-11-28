@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,6 +28,9 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
+const std::string I18nSystemAddon::NAME_OF_TEMPERATURE = "type";
+const std::string I18nSystemAddon::TYPE_OF_TEMPERATURE = "TemperatureType";
+
 I18nSystemAddon::I18nSystemAddon() {}
 
 I18nSystemAddon::~I18nSystemAddon() {}
@@ -64,7 +67,10 @@ napi_value I18nSystemAddon::InitI18nSystem(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getFirstPreferredLanguage", GetFirstPreferredLanguage),
         DECLARE_NAPI_STATIC_FUNCTION("getAppPreferredLanguage", GetAppPreferredLanguage),
         DECLARE_NAPI_STATIC_FUNCTION("setUsingLocalDigit", SetUsingLocalDigitAddonWithError),
-        DECLARE_NAPI_STATIC_FUNCTION("getUsingLocalDigit", GetUsingLocalDigitAddon)
+        DECLARE_NAPI_STATIC_FUNCTION("getUsingLocalDigit", GetUsingLocalDigitAddon),
+        DECLARE_NAPI_STATIC_FUNCTION("setTemperatureType", SetTemperatureType),
+        DECLARE_NAPI_STATIC_FUNCTION("getTemperatureType", GetTemperatureType),
+        DECLARE_NAPI_STATIC_FUNCTION("getTemperatureName", GetTemperatureName),
     };
     napi_value constructor = nullptr;
     napi_status status = napi_define_class(env, "System", NAPI_AUTO_LENGTH, JSUtils::DefaultConstructor, nullptr,
@@ -792,7 +798,7 @@ napi_value I18nSystemAddon::AddPreferredLanguageImpl(napi_env env, napi_callback
     I18nErrorCode err = I18nServiceAbilityClient::AddPreferredLanguage(language.data(), index);
     HILOG_INFO_I18N("I18nSystemAddon::AddPreferredLanguageImpl with code %{public}d", static_cast<int32_t>(err));
     if (throwError) {
-        if (err == I18nErrorCode::NO_PERMISSION) {
+        if (err == I18nErrorCode::NO_PERMISSION || err == I18nErrorCode::NOT_SYSTEM_APP) {
             ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, "", "", throwError);
         }
         if (err != I18nErrorCode::SUCCESS) {
@@ -936,6 +942,90 @@ bool I18nSystemAddon::ParseStringParam(napi_env env, napi_value argv, bool throw
         return false;
     }
     strParam = res.data();
+    return true;
+}
+
+napi_value I18nSystemAddon::SetTemperatureType(napi_env env, napi_callback_info info)
+{
+    TemperatureType type = TemperatureType::CELSIUS;
+    if (!ParseTemperatureType(env, info, type)) {
+        HILOG_ERROR_I18N("I18nSystemAddon::SetTemperatureType: parse temperature type failed.");
+        return nullptr;
+    }
+    I18nErrorCode err = I18nServiceAbilityClient::SetTemperatureType(type);
+    if (err == I18nErrorCode::SUCCESS) {
+        return nullptr;
+    }
+    switch (err) {
+        case I18nErrorCode::NOT_SYSTEM_APP:
+            ErrorUtil::NapiThrow(env, I18N_NOT_SYSTEM_APP, "", "", true);
+            break;
+        case I18nErrorCode::NO_PERMISSION:
+            ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, "", "", true);
+            break;
+        case I18nErrorCode::INVALID_TEMPERATURE_TYPE:
+            ErrorUtil::NapiThrow(env, I18N_NOT_VALID, NAME_OF_TEMPERATURE, TYPE_OF_TEMPERATURE, true);
+            break;
+        default:
+            HILOG_ERROR_I18N("I18nSystemAddon::SetTemperatureType: set temperature type failed.");
+    }
+    return nullptr;
+}
+
+napi_value I18nSystemAddon::GetTemperatureType(napi_env env, napi_callback_info info)
+{
+    TemperatureType type = LocaleConfig::GetTemperatureType();
+    int32_t value = static_cast<int32_t>(type);
+    return VariableConvertor::CreateNumber(env, value);
+}
+
+napi_value I18nSystemAddon::GetTemperatureName(napi_env env, napi_callback_info info)
+{
+    TemperatureType type = TemperatureType::CELSIUS;
+    if (!ParseTemperatureType(env, info, type)) {
+        HILOG_ERROR_I18N("I18nSystemAddon::GetTemperatureName: parse temperature type failed.");
+        return VariableConvertor::CreateString(env, "");
+    }
+    std::string temperatureName = LocaleConfig::GetTemperatureName(type);
+    if (temperatureName.empty()) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, NAME_OF_TEMPERATURE, TYPE_OF_TEMPERATURE, true);
+        return VariableConvertor::CreateString(env, "");
+    }
+    return VariableConvertor::CreateString(env, temperatureName);
+}
+
+bool I18nSystemAddon::ParseTemperatureType(napi_env env, napi_callback_info info, TemperatureType& type)
+{
+    size_t argc = 1;
+    napi_value argv[1] = { nullptr };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("I18nSystemAddon::ParseTemperatureType: get cb info failed.");
+        return false;
+    }
+    if (argc < 1) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, NAME_OF_TEMPERATURE, "", true);
+        return false;
+    }
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("I18nSystemAddon::ParseTemperatureType: get value type failed.");
+        return false;
+    }
+    if (valueType != napi_valuetype::napi_number) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, NAME_OF_TEMPERATURE, TYPE_OF_TEMPERATURE, true);
+        return false;
+    }
+    int32_t temperatureType = 0;
+    status = napi_get_value_int32(env, argv[0], &temperatureType);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("I18nSystemAddon::ParseTemperatureType: get temperature type failed.");
+        return false;
+    }
+    type = static_cast<TemperatureType>(temperatureType);
     return true;
 }
 } // namespace I18n

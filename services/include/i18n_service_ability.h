@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,6 +39,7 @@ public:
     I18nErrorCode SetUsingLocalDigit(bool flag) override;
     I18nErrorCode AddPreferredLanguage(const std::string &language, int32_t index) override;
     I18nErrorCode RemovePreferredLanguage(int32_t index) override;
+    I18nErrorCode SetTemperatureType(TemperatureType type) override;
     /**
      * @brief Trigger unload i18n service after one request finished, but service will not unload
      * until there no request in 10s.

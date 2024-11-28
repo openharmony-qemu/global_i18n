@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -105,6 +105,16 @@ I18nErrorCode I18nServiceAbilityClient::RemovePreferredLanguage(int32_t index)
         return err;
     }
     return i18nServiceAbilityObj->RemovePreferredLanguage(index);
+}
+
+I18nErrorCode I18nServiceAbilityClient::SetTemperatureType(TemperatureType type)
+{
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        return err;
+    }
+    return i18nServiceAbilityObj->SetTemperatureType(type);
 }
 } // namespace I18n
 } // namespace Global
