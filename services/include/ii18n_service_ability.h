@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,6 +33,7 @@ public:
     virtual I18nErrorCode SetUsingLocalDigit(bool flag) = 0;
     virtual I18nErrorCode AddPreferredLanguage(const std::string &language, int32_t index) = 0;
     virtual I18nErrorCode RemovePreferredLanguage(int32_t index) = 0;
+    virtual I18nErrorCode SetTemperatureType(TemperatureType type) = 0;
 
     // I18n service request code.
     enum class ILocaleConfigAbilityCode {
@@ -43,6 +44,7 @@ public:
         SET_USING_LOCAL_DIGIT = 4,
         ADD_PREFERRED_LANGUAGE = 5,
         REMOVE_PREFERRED_LANGUAGE = 6,
+        SET_TEMPERATURE_TYPE = 7,
     };
 
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.global.II18nServiceAbility");

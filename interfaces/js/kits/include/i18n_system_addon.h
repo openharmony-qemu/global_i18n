@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 
 #include <memory>
 #include "i18n_timezone.h"
+#include "i18n_types.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 
@@ -82,6 +83,13 @@ private:
         std::string index);
 
     static bool ParseStringParam(napi_env env, napi_value argv, bool throwError, std::string &strParam);
+    static napi_value SetTemperatureType(napi_env env, napi_callback_info info);
+    static napi_value GetTemperatureType(napi_env env, napi_callback_info info);
+    static napi_value GetTemperatureName(napi_env env, napi_callback_info info);
+    static bool ParseTemperatureType(napi_env env, napi_callback_info info, TemperatureType& type);
+
+    static const std::string NAME_OF_TEMPERATURE;
+    static const std::string TYPE_OF_TEMPERATURE;
 };
 } // namespace I18n
 } // namespace Global

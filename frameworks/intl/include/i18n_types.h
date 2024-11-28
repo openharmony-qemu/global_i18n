@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,7 +38,9 @@ enum I18nErrorCode {
     PUBLISH_COMMON_EVENT_FAILED = 15,
     LOAD_SA_FAILED = 16,
     INVALID_24_HOUR_CLOCK_TAG = 17,
-    NOT_SYSTEM_APP = 18
+    NOT_SYSTEM_APP = 18,
+    INVALID_TEMPERATURE_TYPE = 19,
+    UPDATE_TEMPERATURE_TYPE_FAILED = 20
 };
 
 enum I18nNormalizerMode {
@@ -46,6 +48,12 @@ enum I18nNormalizerMode {
     NFD,
     NFKC,
     NFKD
+};
+
+enum TemperatureType {
+    CELSIUS = 1,
+    FAHRENHEIT = 2,
+    KELVIN = 3,
 };
 }
 }

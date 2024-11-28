@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -186,55 +186,29 @@ napi_value I18nNormalizerAddon::Normalize(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_status I18nNormalizerAddon::SetEnumValue(napi_env env, napi_value enumObj, const char* enumName, int32_t enumVal)
-{
-    napi_value name = nullptr;
-    napi_status status = napi_create_string_utf8(env, enumName, NAPI_AUTO_LENGTH, &name);
-    if (status != napi_ok) {
-        return status;
-    }
-    napi_value value = nullptr;
-    status = napi_create_int32(env, enumVal, &value);
-    if (status != napi_ok) {
-        return status;
-    }
-    status = napi_set_property(env, enumObj, name, value);
-    if (status != napi_ok) {
-        return status;
-    }
-    status = napi_set_property(env, enumObj, value, name);
-    if (status != napi_ok) {
-        return status;
-    }
-    return napi_ok;
-}
-
-napi_value I18nNormalizerAddon::CreateI18NNormalizerModeEnum(napi_env env, napi_status &initStatus)
+napi_value I18nNormalizerAddon::CreateI18NNormalizerModeEnum(napi_env env)
 {
     napi_value i18nNormalizerModel = nullptr;
     napi_status status = napi_create_object(env, &i18nNormalizerModel);
     if (status != napi_ok) {
-        initStatus = napi_generic_failure;
         return nullptr;
     }
-    status = SetEnumValue(env, i18nNormalizerModel, NORMALIZER_MODE_NFC_NAME, NORMALIZER_MODE_NFC);
+    status = VariableConvertor::SetEnumValue(env, i18nNormalizerModel, NORMALIZER_MODE_NFC_NAME, NORMALIZER_MODE_NFC);
     if (status != napi_ok) {
-        initStatus = napi_generic_failure;
         return nullptr;
     }
-    status = SetEnumValue(env, i18nNormalizerModel, NORMALIZER_MODE_NFD_NAME, NORMALIZER_MODE_NFD);
+    status = VariableConvertor::SetEnumValue(env, i18nNormalizerModel, NORMALIZER_MODE_NFD_NAME, NORMALIZER_MODE_NFD);
     if (status != napi_ok) {
-        initStatus = napi_generic_failure;
         return nullptr;
     }
-    status = SetEnumValue(env, i18nNormalizerModel, NORMALIZER_MODE_NFKC_NAME, NORMALIZER_MODE_NFKC);
+    status =
+        VariableConvertor::SetEnumValue(env, i18nNormalizerModel, NORMALIZER_MODE_NFKC_NAME, NORMALIZER_MODE_NFKC);
     if (status != napi_ok) {
-        initStatus = napi_generic_failure;
         return nullptr;
     }
-    status = SetEnumValue(env, i18nNormalizerModel, NORMALIZER_MODE_NFKD_NAME, NORMALIZER_MODE_NFKD);
+    status =
+        VariableConvertor::SetEnumValue(env, i18nNormalizerModel, NORMALIZER_MODE_NFKD_NAME, NORMALIZER_MODE_NFKD);
     if (status != napi_ok) {
-        initStatus = napi_generic_failure;
         return nullptr;
     }
     return i18nNormalizerModel;

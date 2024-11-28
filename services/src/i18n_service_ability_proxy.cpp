@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -108,6 +108,18 @@ I18nErrorCode I18nServiceAbilityProxy::RemovePreferredLanguage(int32_t index)
     data.WriteInterfaceToken(DESCRIPTOR);
     data.WriteInt32(index);
     Remote()->SendRequest(static_cast<uint32_t>(ILocaleConfigAbilityCode::REMOVE_PREFERRED_LANGUAGE),
+        data, reply, option);
+    return ProcessReply(reply.ReadInt32());
+}
+
+I18nErrorCode I18nServiceAbilityProxy::SetTemperatureType(TemperatureType type)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    data.WriteInterfaceToken(DESCRIPTOR);
+    data.WriteInt32(static_cast<int32_t>(type));
+    Remote()->SendRequest(static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_TEMPERATURE_TYPE),
         data, reply, option);
     return ProcessReply(reply.ReadInt32());
 }

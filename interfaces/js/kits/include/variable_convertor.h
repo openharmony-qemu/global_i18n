@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,6 +39,7 @@ public:
     static napi_value CreateString(napi_env env, const std::string &str);
     static napi_value CreateNumber(napi_env env, const int32_t &num);
     static void VerifyType(napi_env env, const std::string& valueName, const std::string& type, napi_value argv);
+    static napi_status SetEnumValue(napi_env env, napi_value enumObj, const std::string& enumName, int32_t enumVal);
 };
 } // namespace I18n
 } // namespace Global
