@@ -40,7 +40,9 @@ enum I18nErrorCode {
     INVALID_24_HOUR_CLOCK_TAG = 17,
     NOT_SYSTEM_APP = 18,
     INVALID_TEMPERATURE_TYPE = 19,
-    UPDATE_TEMPERATURE_TYPE_FAILED = 20
+    UPDATE_TEMPERATURE_TYPE_FAILED = 20,
+    INVALID_WEEK_DAY = 21,
+    UPDATE_WEEK_DAY_FAILED = 22
 };
 
 enum I18nNormalizerMode {
@@ -54,6 +56,16 @@ enum TemperatureType {
     CELSIUS = 1,
     FAHRENHEIT = 2,
     KELVIN = 3,
+};
+
+enum WeekDay {
+    MON = 1,
+    TUE = 2,
+    WED = 3,
+    THU = 4,
+    FRI = 5,
+    SAT = 6,
+    SUN = 7,
 };
 }
 }

@@ -88,9 +88,12 @@ private:
     static napi_value GetTemperatureType(napi_env env, napi_callback_info info);
     static napi_value GetTemperatureName(napi_env env, napi_callback_info info);
     static bool ParseTemperatureType(napi_env env, napi_callback_info info, TemperatureType& type);
-
+    static napi_value SetFirstDayOfWeek(napi_env env, napi_callback_info info);
+    static napi_value GetFirstDayOfWeek(napi_env env, napi_callback_info info);
     static const std::string NAME_OF_TEMPERATURE;
     static const std::string TYPE_OF_TEMPERATURE;
+    static const std::string NAME_OF_WEEKDAY;
+    static const std::string TYPE_OF_WEEKDAY;
 };
 } // namespace I18n
 } // namespace Global

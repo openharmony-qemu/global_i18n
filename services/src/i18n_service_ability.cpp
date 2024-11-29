@@ -82,6 +82,11 @@ I18nErrorCode I18nServiceAbility::SetTemperatureType(TemperatureType type)
     return LocaleConfig::SetTemperatureType(type);
 }
 
+I18nErrorCode I18nServiceAbility::SetFirstDayOfWeek(WeekDay type)
+{
+    return LocaleConfig::SetFirstDayOfWeek(type);
+}
+
 void I18nServiceAbility::UnloadI18nServiceAbility()
 {
     if (handler != nullptr) {
