@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-bool VariableConvertor::CheckNapiValueType(napi_env env, napi_value value)
+bool VariableConvertor::CheckNapiIsNull(napi_env env, napi_value value)
 {
     if (value != nullptr) {
         napi_valuetype valueType = napi_valuetype::napi_undefined;
