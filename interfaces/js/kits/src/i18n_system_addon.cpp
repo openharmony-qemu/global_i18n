@@ -71,6 +71,7 @@ napi_value I18nSystemAddon::InitI18nSystem(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("setTemperatureType", SetTemperatureType),
         DECLARE_NAPI_STATIC_FUNCTION("getTemperatureType", GetTemperatureType),
         DECLARE_NAPI_STATIC_FUNCTION("getTemperatureName", GetTemperatureName),
+        DECLARE_NAPI_STATIC_FUNCTION("getSimplifiedLanguage", GetSimplifiedLanguage),
     };
     napi_value constructor = nullptr;
     napi_status status = napi_define_class(env, "System", NAPI_AUTO_LENGTH, JSUtils::DefaultConstructor, nullptr,
@@ -578,7 +579,7 @@ napi_value I18nSystemAddon::IsSuggestedImpl(napi_env env, napi_callback_info inf
         return nullptr;
     }
     bool isSuggested = false;
-    if (VariableConvertor::CheckNapiValueType(env, argv[1])) {
+    if (VariableConvertor::CheckNapiIsNull(env, argv[1])) {
         status = napi_get_value_string_utf8(env, argv[1], nullptr, 0, &len);
         if (status != napi_ok) {
             HILOG_ERROR_I18N("IsSuggestedImpl: Failed to get string len argv[1].");
@@ -788,7 +789,7 @@ napi_value I18nSystemAddon::AddPreferredLanguageImpl(napi_env env, napi_callback
     }
 
     int index = 1000000;
-    if (VariableConvertor::CheckNapiValueType(env, argc > 1 ? argv[1] : nullptr)) {
+    if (VariableConvertor::CheckNapiIsNull(env, argc > 1 ? argv[1] : nullptr)) {
         status = napi_get_value_int32(env, argv[1], &index);
         if (status != napi_ok) {
             HILOG_ERROR_I18N("addPreferrdLanguage: get index failed");
@@ -1027,6 +1028,52 @@ bool I18nSystemAddon::ParseTemperatureType(napi_env env, napi_callback_info info
     }
     type = static_cast<TemperatureType>(temperatureType);
     return true;
+}
+
+napi_value I18nSystemAddon::GetSimplifiedLanguage(napi_env env, napi_callback_info info)
+{
+    // Need to get one parameter
+    size_t argc = 1;
+    napi_value argv[1] = { nullptr };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("GetSimplifiedLanguage get parameter fail");
+        return nullptr;
+    }
+
+    std::string simplifiedLanguage = "";
+    if (VariableConvertor::CheckNapiIsNull(env, argv[0])) {
+        napi_valuetype valueType = napi_valuetype::napi_undefined;
+        napi_typeof(env, argv[0], &valueType);
+        if (valueType != napi_valuetype::napi_string) {
+            HILOG_ERROR_I18N("GetSimplifiedLanguage Parameter type is not string");
+            ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "language", "string", true);
+            return nullptr;
+        }
+        int code = 0;
+        std::string language = VariableConvertor::GetString(env, argv[0], code);
+        if (code == 1) {
+            HILOG_ERROR_I18N("GetSimplifiedLanguage can't get string from js param");
+            return nullptr;
+        }
+        code = 0;
+        simplifiedLanguage = LocaleConfig::GetSimplifiedLanguage(language, code);
+        if (code != 0) {
+            HILOG_ERROR_I18N("GetSimplifiedLanguage: language is not valid");
+            ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "language", "a valid language", true);
+            return nullptr;
+        }
+    } else {
+        simplifiedLanguage = LocaleConfig::GetSimplifiedSystemLanguage();
+    }
+
+    napi_value result = VariableConvertor::CreateString(env, simplifiedLanguage);
+    if (!result) {
+        HILOG_ERROR_I18N("GetSimplifiedLanguage: Failed to create string item");
+    }
+    return result;
 }
 } // namespace I18n
 } // namespace Global

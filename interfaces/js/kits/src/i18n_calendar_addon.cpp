@@ -624,7 +624,7 @@ napi_value I18nCalendarAddon::IsWeekend(napi_env env, napi_callback_info info)
             HILOG_ERROR_I18N("IsWeekend: Get calendar object failed");
             break;
         }
-        if (!VariableConvertor::CheckNapiValueType(env, argv[0])) {
+        if (!VariableConvertor::CheckNapiIsNull(env, argv[0])) {
             isWeekEnd = obj->calendar_->IsWeekend();
         } else {
             napi_value funcGetDateInfo = nullptr;
@@ -717,7 +717,7 @@ CalendarType I18nCalendarAddon::GetCalendarType(napi_env env, napi_value value)
 
 void I18nCalendarAddon::SetField(napi_env env, napi_value value, UCalendarDateFields field)
 {
-    if (!VariableConvertor::CheckNapiValueType(env, value)) {
+    if (!VariableConvertor::CheckNapiIsNull(env, value)) {
         return;
     }
     int32_t val = 0;
