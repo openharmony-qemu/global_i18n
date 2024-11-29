@@ -34,7 +34,11 @@ I18nErrorCode I18nServiceAbilityProxy::SetSystemLanguage(const std::string &lang
     MessageOption option;
     data.WriteInterfaceToken(DESCRIPTOR);
     data.WriteString(language);
-    Remote()->SendRequest(static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_SYSTEM_LANGUAGE), data,
+    auto remote = Remote();
+    if (remote == nullptr) {
+        return I18nErrorCode::FAILED;
+    }
+    remote->SendRequest(static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_SYSTEM_LANGUAGE), data,
         reply, option);
     return ProcessReply(reply.ReadInt32());
 }
@@ -46,7 +50,11 @@ I18nErrorCode I18nServiceAbilityProxy::SetSystemRegion(const std::string &region
     MessageOption option;
     data.WriteInterfaceToken(DESCRIPTOR);
     data.WriteString(region);
-    Remote()->SendRequest(static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_SYSTEM_REGION), data,
+    auto remote = Remote();
+    if (remote == nullptr) {
+        return I18nErrorCode::FAILED;
+    }
+    remote->SendRequest(static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_SYSTEM_REGION), data,
         reply, option);
     return ProcessReply(reply.ReadInt32());
 }
@@ -58,7 +66,11 @@ I18nErrorCode I18nServiceAbilityProxy::SetSystemLocale(const std::string &locale
     MessageOption option;
     data.WriteInterfaceToken(DESCRIPTOR);
     data.WriteString(locale);
-    Remote()->SendRequest(static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_SYSTEM_LOCALE), data,
+    auto remote = Remote();
+    if (remote == nullptr) {
+        return I18nErrorCode::FAILED;
+    }
+    remote->SendRequest(static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_SYSTEM_LOCALE), data,
         reply, option);
     return ProcessReply(reply.ReadInt32());
 }
@@ -70,7 +82,11 @@ I18nErrorCode I18nServiceAbilityProxy::Set24HourClock(const std::string &flag)
     MessageOption option;
     data.WriteInterfaceToken(DESCRIPTOR);
     data.WriteString(flag);
-    Remote()->SendRequest(static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_24_HOUR_CLOCK), data,
+    auto remote = Remote();
+    if (remote == nullptr) {
+        return I18nErrorCode::FAILED;
+    }
+    remote->SendRequest(static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_24_HOUR_CLOCK), data,
         reply, option);
     return ProcessReply(reply.ReadInt32());
 }
@@ -82,7 +98,11 @@ I18nErrorCode I18nServiceAbilityProxy::SetUsingLocalDigit(bool flag)
     MessageOption option;
     data.WriteInterfaceToken(DESCRIPTOR);
     data.WriteBool(flag);
-    Remote()->SendRequest(static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_USING_LOCAL_DIGIT), data,
+    auto remote = Remote();
+    if (remote == nullptr) {
+        return I18nErrorCode::FAILED;
+    }
+    remote->SendRequest(static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_USING_LOCAL_DIGIT), data,
         reply, option);
     return ProcessReply(reply.ReadInt32());
 }
@@ -95,7 +115,11 @@ I18nErrorCode I18nServiceAbilityProxy::AddPreferredLanguage(const std::string &l
     data.WriteInterfaceToken(DESCRIPTOR);
     data.WriteString(language);
     data.WriteInt32(index);
-    Remote()->SendRequest(static_cast<uint32_t>(ILocaleConfigAbilityCode::ADD_PREFERRED_LANGUAGE), data,
+    auto remote = Remote();
+    if (remote == nullptr) {
+        return I18nErrorCode::FAILED;
+    }
+    remote->SendRequest(static_cast<uint32_t>(ILocaleConfigAbilityCode::ADD_PREFERRED_LANGUAGE), data,
         reply, option);
     return ProcessReply(reply.ReadInt32());
 }
@@ -107,7 +131,11 @@ I18nErrorCode I18nServiceAbilityProxy::RemovePreferredLanguage(int32_t index)
     MessageOption option;
     data.WriteInterfaceToken(DESCRIPTOR);
     data.WriteInt32(index);
-    Remote()->SendRequest(static_cast<uint32_t>(ILocaleConfigAbilityCode::REMOVE_PREFERRED_LANGUAGE),
+    auto remote = Remote();
+    if (remote == nullptr) {
+        return I18nErrorCode::FAILED;
+    }
+    remote->SendRequest(static_cast<uint32_t>(ILocaleConfigAbilityCode::REMOVE_PREFERRED_LANGUAGE),
         data, reply, option);
     return ProcessReply(reply.ReadInt32());
 }

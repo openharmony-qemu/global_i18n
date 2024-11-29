@@ -52,6 +52,9 @@ bool CheckSystemPermission();
 std::set<std::string> GetTimeZoneAvailableIDs(I18nErrorCode &errorCode);
 bool RegexSearchNoExcept(const std::string& str, std::smatch& match, const std::regex& regex);
 std::string LocaleEncode(const std::string& locale);
+bool Eq(double a, double b);
+bool Geq(double a, double b);
+bool Leq(double a, double b);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

@@ -27,6 +27,7 @@
 #include "measure_data.h"
 #include "phone_number_format_mock.h"
 #include "preferred_language.h"
+#include "utils.h"
 
 using namespace OHOS::Global::I18n;
 using testing::ext::TestSize;
@@ -508,25 +509,25 @@ HWTEST_F(I18nTest, I18nFuncTest013, TestSize.Level1)
     toUnit = "hectare";
     status = Convert(value, fromUnit, fromMeasSys, toUnit, toMeasSys);
     EXPECT_EQ(status, 1);
-    EXPECT_TRUE(fabs(value - 4.0468564) < 1e-6);
+    EXPECT_TRUE(Eq(value, 4.0468564));
 
     std::string unit = "tablespoon";
     std::string measSys = "UK";
     std::vector<double> factors = {0.0, 0.0};
     ComputeFactorValue(unit, measSys, factors);
     EXPECT_EQ(factors.size(), 2);
-    EXPECT_TRUE(fabs(factors[0] - 1.77582e-05) < 1e-6);
+    EXPECT_TRUE(Eq(factors[0], 1.77582e-05));
     unit = "acre";
     factors = {0.0, 0.0};
     ComputeFactorValue(unit, measSys, factors);
     EXPECT_EQ(factors.size(), 2);
-    EXPECT_TRUE(fabs(factors[0] - 4046.856422) < 1e-6);
+    EXPECT_TRUE(Eq(factors[0], 4046.856422));
 
     double res = ComputeSIPrefixValue(unit);
-    EXPECT_TRUE(fabs(res - 0) < 1e-6);
+    EXPECT_TRUE(Eq(res, 0));
     unit = "deci";
     res = ComputeSIPrefixValue(unit);
-    EXPECT_TRUE(fabs(res - 0.1) < 1e-6);
+    EXPECT_TRUE(Eq(res, 0.1));
 
     unit = "square-acre";
     factors = {0.0, 0.0};

@@ -368,6 +368,21 @@ std::string LocaleEncode(const std::string& locale)
     }
     return ss.str();
 }
+
+bool Eq(double a, double b)
+{
+    return fabs(a - b) < 1e-6;
+}
+
+bool Geq(double a, double b)
+{
+    return a > b || Eq(a, b);
+}
+
+bool Leq(double a, double b)
+{
+    return a < b || Eq(a, b);
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
