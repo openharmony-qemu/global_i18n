@@ -223,7 +223,7 @@ HWTEST_F(IntlTest, IntlFuncTest0052, TestSize.Level1)
     delete indexUtil;
     delete idxUtil;
 
-    std::unque_ptr<IndexUtil> indexUtil3 = std::make_unique<IndexUtil>("");
+    std::unique_ptr<IndexUtil> indexUtil3 = std::make_unique<IndexUtil>("");
     indexUtil3->AddLocale("en-US");
     indexStr = indexUtil3->GetIndex("A");
     EXPECT_EQ(indexStr, "A");
