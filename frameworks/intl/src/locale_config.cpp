@@ -27,6 +27,7 @@
 #include "ipc_skeleton.h"
 #include "libxml/parser.h"
 #include "locale_info.h"
+#include "locale_matcher.h"
 #include "multi_users.h"
 #include "unicode/localebuilder.h"
 #include "unicode/locdspnm.h"
@@ -131,6 +132,13 @@ unordered_map<string, string> LocaleConfig::localDigitMap {
     { "my", "mymr" },
     { "ne", "deva" },
     { "ur", "latn" }
+};
+
+std::unordered_map<std::string, std::vector<std::string>> LocaleConfig::dialectLanguages {
+    { "en", { "en-US", "en-GB" } },
+    { "es", { "es-ES", "es-US" } },
+    { "pt", { "pt-PT", "pt-BR" } },
+    { "zh-Hant", { "zh-Hant-HK", "zh-Hant-TW" } },
 };
 
 std::unordered_map<TemperatureType, std::string> LocaleConfig::temperatureTypeToName {
@@ -1597,6 +1605,56 @@ std::string LocaleConfig::GetLocaleKey()
 std::string LocaleConfig::GetHourKey()
 {
     return HOUR_KEY;
+}
+
+std::string LocaleConfig::GetSimplifiedLanguage(const std::string& languageTag, int32_t &code)
+{
+    std::string simplifiedLanguage = "";
+    if (IsValidTag(languageTag)) {
+        LocaleInfo localeInfo(languageTag);
+        simplifiedLanguage = localeInfo.Minimize();
+    } else {
+        code = 1;
+    }
+    return simplifiedLanguage;
+}
+
+std::string LocaleConfig::GetSimplifiedSystemLanguage()
+{
+    std::string locale = GetSystemLanguage();
+    LocaleInfo localeInfo(locale);
+    std::string language = localeInfo.GetLanguage();
+    if (language.compare("zh") == 0) {
+        language = language + '-' + localeInfo.GetScript();
+    }
+    if (dialectLanguages.find(language) != dialectLanguages.end()) {
+        locale = GetSystemLocale();
+        LocaleInfo* requestLocale = new LocaleInfo(locale);
+        if (requestLocale == nullptr) {
+            HILOG_ERROR_I18N("GetSimplifiedLanguage: %{public}s failed to construct LocaleInfo.", locale.c_str());
+            return "";
+        }
+        std::vector<LocaleInfo*> candidateLocales;
+        for (auto& candidate : dialectLanguages[language]) {
+            LocaleInfo* candidateInfo = new LocaleInfo(candidate);
+            if (candidateInfo == nullptr) {
+                HILOG_ERROR_I18N("GetSimplifiedLanguage: %{public}s failed to construct LocaleInfo.",
+                    candidate.c_str());
+                continue;
+            }
+            candidateLocales.push_back(candidateInfo);
+        }
+        locale = LocaleMatcher::GetBestMatchedLocale(requestLocale, candidateLocales);
+
+        for (LocaleInfo* candidateInfo : candidateLocales) {
+            delete candidateInfo;
+            candidateInfo = nullptr;
+        }
+        delete requestLocale;
+        requestLocale = nullptr;
+    }
+    LocaleInfo simplifiedLocale(locale);
+    return simplifiedLocale.Minimize();
 }
 } // namespace I18n
 } // namespace Global

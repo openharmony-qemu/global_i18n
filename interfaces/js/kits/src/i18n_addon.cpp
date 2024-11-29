@@ -127,7 +127,7 @@ napi_value I18nAddon::Init(napi_env env, napi_value exports)
 
 void GetOptionMap(napi_env env, napi_value option, std::map<std::string, std::string> &map)
 {
-    if (VariableConvertor::CheckNapiValueType(env, option)) {
+    if (VariableConvertor::CheckNapiIsNull(env, option)) {
         size_t len;
         napi_get_value_string_utf8(env, option, nullptr, 0, &len);
         std::vector<char> styleBuf(len + 1);
@@ -1191,7 +1191,7 @@ napi_value I18nAddon::Next(napi_env env, napi_callback_info info)
         return nullptr;
     }
     int value = 1;
-    if (VariableConvertor::CheckNapiValueType(env, argv[0])) {
+    if (VariableConvertor::CheckNapiIsNull(env, argv[0])) {
         napi_valuetype valueType = napi_valuetype::napi_undefined;
         napi_typeof(env, argv[0], &valueType);
         if (valueType != napi_valuetype::napi_number) {
@@ -1426,7 +1426,7 @@ napi_value I18nAddon::GetIndexUtil(napi_env env, napi_callback_info info)
         return nullptr;
     }
     napi_value result = nullptr;
-    if (!VariableConvertor::CheckNapiValueType(env, argv[0])) {
+    if (!VariableConvertor::CheckNapiIsNull(env, argv[0])) {
         status = napi_new_instance(env, constructor, 0, argv, &result);
     } else {
         status = napi_new_instance(env, constructor, 1, argv, &result);

@@ -120,6 +120,8 @@ public:
     static std::string GetLanguageKey();
     static std::string GetLocaleKey();
     static std::string GetHourKey();
+    static std::string GetSimplifiedLanguage(const std::string& language, int32_t &code);
+    static std::string GetSimplifiedSystemLanguage();
 
 private:
     static void Split(const std::string &src, const std::string &sep, std::vector<std::string> &dest);
@@ -271,6 +273,7 @@ private:
     static std::unordered_set<std::string> fahrenheitUsingRegions;
     static std::map<std::string, std::string> locale2DisplayName;
     static std::map<std::string, std::string> region2DisplayName;
+    static std::unordered_map<std::string, std::vector<std::string>> dialectLanguages;
     static std::string currentDialectLocale;
     static std::string currentOverrideRegion;
     static std::set<std::string> validCaTag;
