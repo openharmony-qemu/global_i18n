@@ -59,6 +59,7 @@ protected:
     void OnStop() override;
 
 private:
+    int32_t GetCallingUserId();
     // i18n service unload event handler.
     std::shared_ptr<AppExecFwk::EventHandler> handler;
     I18nServiceEvent* i18nServiceEvent = nullptr;
