@@ -46,9 +46,6 @@ RegexRule::RegexRule(icu::UnicodeString& regex, std::string& isValidType, std::s
     if (regex.length() == 0) {
         return;
     }
-    if (U_FAILURE(this->status)) {
-        HILOG_ERROR_I18N("member pattern construct failed.");
-    }
 }
 
 RegexRule::~RegexRule()

@@ -30,9 +30,7 @@ I18nNormalizer::I18nNormalizer(I18nNormalizerMode mode, I18nErrorCode &errorCode
         // mode == I18nNormalizerMode::NFKD
         normalizer = icu::Normalizer2::getNFKDInstance(status);
     }
-    if (U_FAILURE(status)) {
-        errorCode = I18nErrorCode::FAILED;
-    }
+    errorCode = U_FAILURE(status) ? I18nErrorCode::FAILED : errorCode;
 }
 
 I18nNormalizer::~I18nNormalizer()

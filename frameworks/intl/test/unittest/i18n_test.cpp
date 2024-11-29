@@ -1596,6 +1596,17 @@ HWTEST_F(I18nTest, I18nFuncTest065, TestSize.Level1)
     EXPECT_EQ(month, 12);
     EXPECT_EQ(day, 13);
     EXPECT_EQ(isLeap, false);
+
+    ptr->SetGregorianDate(2000, 7, 13);
+    EXPECT_EQ(ptr->GetLunarDay(), -1);
+
+    ptr->SetGregorianDate(2024, 8, -11);
+    EXPECT_EQ(ptr->GetLunarDay(), -1);
+    ptr->SetGregorianDate(2024, -3, -11);
+    EXPECT_EQ(ptr->GetLunarMonth(), -1);
+    ptr->SetGregorianDate(-24, -3, -11);
+    EXPECT_EQ(ptr->GetLunarYear(), -1);
+    EXPECT_FALSE(ptr->IsLeapMonth());
 }
 
 /**

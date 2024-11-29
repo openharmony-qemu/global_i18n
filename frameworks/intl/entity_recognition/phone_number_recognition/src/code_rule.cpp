@@ -103,11 +103,7 @@ PhoneNumberMatch* CodeRule::IsValidEnd(PhoneNumberMatch* possibleNumber, icu::Un
             }
         }
     }
-    if (!isTwo) {
-        return possibleNumber;
-    } else {
-        return nullptr;
-    }
+    return isTwo ? nullptr : possibleNumber;
 }
 
 // check the prefix of possibleNumber
@@ -143,11 +139,7 @@ PhoneNumberMatch* CodeRule::IsValidStart(PhoneNumberMatch* possibleNumber, icu::
             break;
         }
     }
-    if (!isTwo) {
-        return possibleNumber;
-    } else {
-        return nullptr;
-    }
+    return isTwo ? nullptr : possibleNumber;
 }
 
 PhoneNumberMatch* CodeRule::IsValidDefault(PhoneNumberMatch* possibleNumber, icu::UnicodeString& message)

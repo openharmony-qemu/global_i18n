@@ -101,10 +101,8 @@ DateTimeFormat::~DateTimeFormat()
 
 bool DateTimeFormat::CheckInitSuccess()
 {
-    if (dateIntvFormat == nullptr || calendar == nullptr || dateFormat == nullptr || localeInfo == nullptr) {
-        return false;
-    }
-    return true;
+    return (dateIntvFormat == nullptr || calendar == nullptr || dateFormat == nullptr || localeInfo == nullptr) ?
+        false : true;
 }
 
 std::unique_ptr<DateTimeFormat> DateTimeFormat::CreateInstance(const std::vector<std::string> &localeTags,
@@ -130,11 +128,7 @@ bool DateTimeFormat::InitWithLocale(const std::string &curLocale, std::map<std::
     }
     if (hour12.empty() && hourCycle.empty() && !LocaleConfig::IsEmpty24HourClock()) {
         bool is24HourClock = LocaleConfig::Is24HourClock();
-        if (is24HourClock) {
-            hour12 = "false";
-        } else {
-            hour12 = "true";
-        }
+        hour12 = is24HourClock ? "false" : "true";
     }
     ComputeHourCycleChars();
     ComputeSkeleton();
@@ -556,10 +550,7 @@ void DateTimeFormat::ComputeEraOfPattern(std::string option, char16_t character,
 std::string DateTimeFormat::GetSystemTimezone()
 {
     std::string systemTimezone = ReadSystemParameter(TIMEZONE_KEY, SYS_PARAM_LEN);
-    if (systemTimezone.length() == 0) {
-        systemTimezone = DEFAULT_TIMEZONE;
-    }
-    return systemTimezone;
+    return systemTimezone.empty() ? DEFAULT_TIMEZONE : systemTimezone;
 }
 
 std::string DateTimeFormat::Format(int64_t milliseconds)

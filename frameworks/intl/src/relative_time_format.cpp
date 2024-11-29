@@ -227,9 +227,8 @@ void RelativeTimeFormat::SetDefaultStyle()
     int code = GetParameter(DEVICE_TYPE_NAME, "", value, CONFIG_LEN);
     if (code > 0) {
         std::string deviceType = value;
-        if (defaultFormatStyle.find(deviceType) != defaultFormatStyle.end()) {
-            styleString = defaultFormatStyle[deviceType];
-        }
+        auto iter = defaultFormatStyle.find(deviceType);
+        styleString = iter != defaultFormatStyle.end() ? defaultFormatStyle[deviceType] : styleString;
     }
 }
 } // namespace I18n

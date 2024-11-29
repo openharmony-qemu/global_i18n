@@ -117,6 +117,7 @@ HWTEST_F(IntlTest, IntlFuncTest0049, TestSize.Level1)
     EXPECT_TRUE(!isRTL);
     std::string validLocale = LocaleConfig::GetValidLocale(locale);
     EXPECT_EQ(validLocale, "zh-CN");
+    EXPECT_TRUE(!LocaleConfig::IsRTL(""));
 
     status = LocaleConfig::Set24HourClock("false");
     EXPECT_EQ(status, I18nErrorCode::SUCCESS);
@@ -216,17 +217,15 @@ HWTEST_F(IntlTest, IntlFuncTest0052, TestSize.Level1)
     indexUtil->AddLocale("en-US");
     std::string indexStr = indexUtil->GetIndex("A");
     EXPECT_EQ(indexStr, "A");
-    IndexUtil *indexUtil2 = new IndexUtil("");
     IndexUtil *idxUtil = new IndexUtil("@@#");
     idxUtil->GetIndexList();
     idxUtil->GetIndex("**");
     delete indexUtil;
-    delete indexUtil2;
     delete idxUtil;
 
-    IndexUtil indexUtil3("");
-    indexUtil3.AddLocale("en-US");
-    indexStr = indexUtil3.GetIndex("A");
+    std::unque_ptr<IndexUtil> indexUtil3 = std::make_unique<IndexUtil>("");
+    indexUtil3->AddLocale("en-US");
+    indexStr = indexUtil3->GetIndex("A");
     EXPECT_EQ(indexStr, "A");
 }
 
@@ -258,6 +257,16 @@ HWTEST_F(IntlTest, IntlFuncTest0053, TestSize.Level1)
     std::string number3 = "1068195561";
     std::string formatedStr = phoneNumberFormat->format(number3);
     EXPECT_EQ(formatedStr, "10 6819 5561");
+
+    map<string, string> options2 = {
+        { "type", "INTERNATIONAL" }
+    };
+    std::unique_ptr<PhoneNumberFormat> phoneNumberFmt =
+        std::make_unique<PhoneNumberFormat>("zh-CN", options2);
+    std::string loc = phoneNumberFmt->getLocationName("+12015550123", "en-US");
+    EXPECT_EQ(loc, "");
+    std::string loc2 = phoneNumberFmt->getLocationName("+38343201234", "en-US");
+    EXPECT_EQ(loc2, "");
 }
 
 /**
@@ -328,6 +337,7 @@ HWTEST_F(IntlTest, IntlFuncTest0055, TestSize.Level1)
     breakIterator->Next();
     breakIterator->Following(0);
     breakIterator->IsBoundary(6);
+    std::unique_ptr<I18nBreakIterator> brkIterator = std::make_unique<I18nBreakIterator>("");
     delete breakIterator;
     delete i18nBreakIterator;
 }
@@ -1120,6 +1130,10 @@ HWTEST_F(IntlTest, IntlFuncTest0076, TestSize.Level1)
     std::unique_ptr<PositiveRule> pRule3 = std::make_unique<PositiveRule>(regex, handleType, insensitive);
     vector = pRule3->HandleInner(possibleNumber.get(), message);
     vector = pRule3->Handle(possibleNumber.get(), message);
+    rawStr = "(1 800 234 45 67";
+    std::unique_ptr<PhoneNumberMatch> posbNumber = std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber);
+    vector = pRule3->Handle(posbNumber.get(), message);
+    EXPECT_EQ(vector.size(), 0);
     delete regexP;
 
     EXPECT_FALSE(IsDirExist(nullptr));
@@ -1516,7 +1530,7 @@ HWTEST_F(IntlTest, IntlFuncTest0088, TestSize.Level1)
 HWTEST_F(IntlTest, IntlFuncTest0089, TestSize.Level1)
 {
     std::string isValidType = "PreSuf";
-    std::string msg = "1 800 234 45 67A-";
+    std::string msg = "1 800 234 45 67a-";
     icu::UnicodeString message(msg.c_str());
     i18n::phonenumbers::PhoneNumber phoneNumber;
     size_t start = 0;
@@ -1527,21 +1541,33 @@ HWTEST_F(IntlTest, IntlFuncTest0089, TestSize.Level1)
     if (possibleNumber != nullptr) {
         PhoneNumberMatch* match = codeRule->IsValid(possibleNumber.get(), message);
         EXPECT_TRUE(match != nullptr);
-        msg = "1 800 234 45 67a1";
+        msg = "1 800 234 45 67A1";
         icu::UnicodeString message2(msg.c_str());
         PhoneNumberMatch* match2 = codeRule->IsValid(possibleNumber.get(), message2);
         EXPECT_TRUE(match2 != nullptr);
-        msg = "1 800 234 45 67a@";
+        msg = "1 800 234 45 67Aa";
         icu::UnicodeString message3(msg.c_str());
         PhoneNumberMatch* match3 = codeRule->IsValid(possibleNumber.get(), message3);
         EXPECT_TRUE(match3 != nullptr);
-        msg = "1 800 234 45 67ab";
+        msg = "1 800 234 45 67AA-";
         icu::UnicodeString message4(msg.c_str());
         PhoneNumberMatch* match4 = codeRule->IsValid(possibleNumber.get(), message4);
         EXPECT_TRUE(match4 != nullptr);
+        msg = "1 800 234 45 67AA2";
+        icu::UnicodeString message5(msg.c_str());
+        PhoneNumberMatch* match5 = codeRule->IsValid(possibleNumber.get(), message5);
+        EXPECT_TRUE(match5 != nullptr);
+        msg = "1 800 234 45 67AA@";
+        icu::UnicodeString message6(msg.c_str());
+        PhoneNumberMatch* match6 = codeRule->IsValid(possibleNumber.get(), message6);
+        EXPECT_TRUE(match6 != nullptr);
+        msg = "1 800 234 45 67AAc";
+        icu::UnicodeString message7(msg.c_str());
+        PhoneNumberMatch* match7 = codeRule->IsValid(possibleNumber.get(), message7);
+        EXPECT_TRUE(match7 != nullptr);
     }
-    PhoneNumberMatch* match5 = codeRule->Handle(nullptr, message);
-    EXPECT_TRUE(match5 == nullptr);
+    PhoneNumberMatch* match8 = codeRule->Handle(nullptr, message);
+    EXPECT_TRUE(match8 == nullptr);
 }
 
 /**
@@ -1909,7 +1935,7 @@ HWTEST_F(IntlTest, IntlFuncTest0099, TestSize.Level1)
 HWTEST_F(IntlTest, IntlFuncTest00100, TestSize.Level1)
 {
     std::string isValidType = "PreSuf";
-    std::string msg = "A-1 800 234 45 67";
+    std::string msg = "ca1 800 234 45 67";
     icu::UnicodeString message(msg.c_str());
     i18n::phonenumbers::PhoneNumber phoneNumber;
     size_t start = 2;
@@ -1920,18 +1946,30 @@ HWTEST_F(IntlTest, IntlFuncTest00100, TestSize.Level1)
     if (possibleNumber != nullptr) {
         PhoneNumberMatch* match = codeRule->IsValid(possibleNumber.get(), message);
         EXPECT_TRUE(match != nullptr);
-        msg = "a11 800 234 45 67";
+        msg = "A1 800 234 45 67";
         icu::UnicodeString message2(msg.c_str());
         PhoneNumberMatch* match2 = codeRule->IsValid(possibleNumber.get(), message2);
         EXPECT_TRUE(match2 != nullptr);
-        msg = "a@1 800 234 45 67";
+        msg = "aA1 800 234 45 67";
         icu::UnicodeString message3(msg.c_str());
         PhoneNumberMatch* match3 = codeRule->IsValid(possibleNumber.get(), message3);
         EXPECT_TRUE(match3 != nullptr);
-        msg = "ab1 800 234 45 67";
+        msg = "-AA1 800 234 45 67";
         icu::UnicodeString message4(msg.c_str());
         PhoneNumberMatch* match4 = codeRule->IsValid(possibleNumber.get(), message4);
         EXPECT_TRUE(match4 != nullptr);
+        msg = "3AA1 800 234 45 67";
+        icu::UnicodeString message5(msg.c_str());
+        PhoneNumberMatch* match5 = codeRule->IsValid(possibleNumber.get(), message5);
+        EXPECT_TRUE(match5 != nullptr);
+        msg = "$AA1 800 234 45 67";
+        icu::UnicodeString message6(msg.c_str());
+        PhoneNumberMatch* match6 = codeRule->IsValid(possibleNumber.get(), message6);
+        EXPECT_TRUE(match6 != nullptr);
+        msg = "vAA1 800 234 45 67";
+        icu::UnicodeString message7(msg.c_str());
+        PhoneNumberMatch* match7 = codeRule->IsValid(possibleNumber.get(), message7);
+        EXPECT_TRUE(match7 != nullptr);
     }
 }
 

@@ -33,9 +33,6 @@ PositiveRule::PositiveRule(icu::UnicodeString& regex, std::string& handleType, s
     if (regex.length() == 0) {
         return;
     }
-    if (U_FAILURE(this->status)) {
-        HILOG_ERROR_I18N("member pattern construct failed.");
-    }
 }
 
 icu::RegexPattern* PositiveRule::GetPattern()
