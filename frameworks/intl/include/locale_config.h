@@ -36,7 +36,7 @@ class LocaleConfig {
 public:
     LocaleConfig() = default;
     virtual ~LocaleConfig() = default;
-    
+
     /**
      * @brief Set the System Language to language Tag.
      *
@@ -44,7 +44,7 @@ public:
      * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
      */
     static I18nErrorCode SetSystemLanguage(const std::string &languageTag);
-    
+
     /**
      * @brief Set the System Region to region tag.
      *
@@ -108,6 +108,8 @@ public:
     static bool IsValidRegion(const std::string &region);
     static bool IsValidTag(const std::string &tag);
     static bool IsValid24HourClockValue(const std::string &tag);
+    static std::string GetSimplifiedLanguage(const std::string& language, int32_t &code);
+    static std::string GetSimplifiedSystemLanguage();
 
 private:
     static void Split(const std::string &src, const std::string &sep, std::vector<std::string> &dest);
@@ -223,7 +225,7 @@ private:
      */
     static std::string CreateLocale(const std::string &languageTag, const std::string &scriptTag,
         const std::string &regionTag, const std::string &extendParamTag);
-    
+
     /**
      * @brief Create a locale tag from region tag. Use icu to fill in missing parts.
      *
@@ -284,6 +286,7 @@ private:
     static std::unordered_map<std::string, std::string> localDigitMap;
     static std::map<std::string, std::string> locale2DisplayName;
     static std::map<std::string, std::string> region2DisplayName;
+    static std::unordered_map<std::string, std::vector<std::string>> dialectLanguages;
     static std::string currentDialectLocale;
     static std::string currentOverrideRegion;
     static std::set<std::string> validCaTag;

@@ -64,6 +64,7 @@ private:
     static napi_value SetUsingLocalDigitAddon(napi_env env, napi_callback_info info);
     static napi_value SetUsingLocalDigitAddonWithError(napi_env env, napi_callback_info info);
     static napi_value GetUsingLocalDigitAddon(napi_env env, napi_callback_info info);
+    static napi_value GetSimplifiedLanguage(napi_env env, napi_callback_info info);
 
     static napi_value GetDisplayCountryImpl(napi_env env, napi_callback_info info, bool throwError);
     static napi_value GetDisplayLanguageImpl(napi_env env, napi_callback_info info, bool throwError);

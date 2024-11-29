@@ -26,7 +26,7 @@ namespace I18n {
 class VariableConvertor {
 public:
     // Check napi variable is null
-    static bool CheckNapiValueType(napi_env env, napi_value value);
+    static bool CheckNapiIsNull(napi_env env, napi_value value);
 
     // Convert napi variable to c++ variable
     static void GetOptionValue(napi_env env, napi_value options, const std::string &optionName, std::string &value);
