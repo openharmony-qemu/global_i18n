@@ -116,6 +116,16 @@ I18nErrorCode I18nServiceAbilityClient::SetTemperatureType(TemperatureType type)
     }
     return i18nServiceAbilityObj->SetTemperatureType(type);
 }
+
+I18nErrorCode I18nServiceAbilityClient::SetFirstDayOfWeek(WeekDay type)
+{
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        return err;
+    }
+    return i18nServiceAbilityObj->SetFirstDayOfWeek(type);
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

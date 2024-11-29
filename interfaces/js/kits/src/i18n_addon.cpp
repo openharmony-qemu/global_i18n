@@ -51,6 +51,16 @@ std::unordered_map<std::string, int32_t> I18nAddon::EnumTemperatureType {
     { "KELVIN", 3 }
 };
 
+std::unordered_map<std::string, int32_t> I18nAddon::EnumWeekDay {
+    { "MON", 1 },
+    { "TUE", 2 },
+    { "WED", 3 },
+    { "THU", 4 },
+    { "FRI", 5 },
+    { "SAT", 6 },
+    { "SUN", 7 }
+};
+
 I18nAddon::I18nAddon() : env_(nullptr) {}
 
 I18nAddon::~I18nAddon()
@@ -114,7 +124,8 @@ napi_value I18nAddon::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("set24HourClock", I18nSystemAddon::Set24HourClock),
         DECLARE_NAPI_FUNCTION("getTimeZone", I18nTimeZoneAddon::GetI18nTimeZone),
         DECLARE_NAPI_PROPERTY("NormalizerMode", I18nNormalizerAddon::CreateI18NNormalizerModeEnum(env)),
-        DECLARE_NAPI_PROPERTY("TemperatureType", CreateTemperatureTypeEnum(env))
+        DECLARE_NAPI_PROPERTY("TemperatureType", CreateTemperatureTypeEnum(env)),
+        DECLARE_NAPI_PROPERTY("WeekDay", CreateWeekDayEnum(env))
     };
     initStatus = napi_define_properties(env, exports, sizeof(properties) / sizeof(napi_property_descriptor),
         properties);
@@ -1612,6 +1623,27 @@ napi_value I18nAddon::CreateTemperatureTypeEnum(napi_env env)
         }
     }
     return temperatureType;
+}
+
+napi_value I18nAddon::CreateWeekDayEnum(napi_env env)
+{
+    napi_value weekDay = nullptr;
+    napi_status status = napi_create_object(env, &weekDay);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("I18nAddon::CreateWeekDayEnum: Create weekDay failed.");
+        return nullptr;
+    }
+    for (auto& nameToValue : EnumWeekDay) {
+        std::string name = nameToValue.first;
+        int32_t value = static_cast<int32_t>(nameToValue.second);
+        status = VariableConvertor::SetEnumValue(env, weekDay, name, value);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("I18nAddon::CreateWeekDayEnum: set enum name %{public}s failed.",
+                name.c_str());
+            return nullptr;
+        }
+    }
+    return weekDay;
 }
 
 napi_value Init(napi_env env, napi_value exports)

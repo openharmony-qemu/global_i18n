@@ -87,6 +87,9 @@ int32_t I18nServiceAbilityStub::InvokeInnerFunc(uint32_t code, MessageParcel &da
         case static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_TEMPERATURE_TYPE): {
             return I18nServiceAbilityStub::SetTemperatureTypeInner(data, reply);
         }
+        case static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_WEEK_DAY): {
+            return I18nServiceAbilityStub::SetFirstDayOfWeekInner(data, reply);
+        }
         default:
             break;
     }
@@ -272,6 +275,26 @@ int32_t I18nServiceAbilityStub::SetTemperatureTypeInner(MessageParcel &data, Mes
     err = SetTemperatureType(static_cast<TemperatureType>(type));
     if (err != I18nErrorCode::SUCCESS) {
         HILOG_ERROR_I18N("I18nServiceAbilityStub::SetTemperatureTypeInner failed with errorCode=%{public}d",
+            static_cast<int32_t>(err));
+    }
+    reply.WriteInt32(static_cast<int32_t>(err));
+    Memory::MemMgrClient::GetInstance().SetCritical(pid, false, I18N_SA_ID);
+    return 0;
+}
+
+int32_t I18nServiceAbilityStub::SetFirstDayOfWeekInner(MessageParcel &data, MessageParcel &reply)
+{
+    int pid = getpid();
+    Memory::MemMgrClient::GetInstance().SetCritical(pid, true, I18N_SA_ID);
+    I18nErrorCode err = CheckPermission();
+    if (err != I18nErrorCode::SUCCESS) {
+        reply.WriteInt32(static_cast<int32_t>(err));
+        return 0;
+    }
+    int32_t type = data.ReadInt32();
+    err = SetFirstDayOfWeek(static_cast<WeekDay>(type));
+    if (err != I18nErrorCode::SUCCESS) {
+        HILOG_ERROR_I18N("I18nServiceAbilityStub::SetFirstDayOfWeekInner failed with errorCode=%{public}d",
             static_cast<int32_t>(err));
     }
     reply.WriteInt32(static_cast<int32_t>(err));

@@ -34,6 +34,7 @@ public:
     virtual I18nErrorCode AddPreferredLanguage(const std::string &language, int32_t index) = 0;
     virtual I18nErrorCode RemovePreferredLanguage(int32_t index) = 0;
     virtual I18nErrorCode SetTemperatureType(TemperatureType type) = 0;
+    virtual I18nErrorCode SetFirstDayOfWeek(WeekDay type) = 0;
 
     // I18n service request code.
     enum class ILocaleConfigAbilityCode {
@@ -45,6 +46,7 @@ public:
         ADD_PREFERRED_LANGUAGE = 5,
         REMOVE_PREFERRED_LANGUAGE = 6,
         SET_TEMPERATURE_TYPE = 7,
+        SET_WEEK_DAY = 8,
     };
 
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.global.II18nServiceAbility");

@@ -97,6 +97,14 @@ public:
      */
     static I18nErrorCode SetTemperatureType(TemperatureType type);
 
+    /**
+     * @brief Set user's preferrence for first day of week.
+     *
+     * @param type one of week days.
+     * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
+     */
+    static I18nErrorCode SetFirstDayOfWeek(WeekDay type);
+
 private:
     /**
      * @brief Get the proxy of i18n service to access service.
