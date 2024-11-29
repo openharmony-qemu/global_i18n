@@ -15,10 +15,12 @@
 
 #include "i18n_hilog.h"
 #include "i18n_service_ability_load_manager.h"
+#include "ipc_skeleton.h"
 #include "locale_config.h"
 #include "mem_mgr_client.h"
 #include "mem_mgr_proxy.h"
 #include "multi_users.h"
+#include "os_account_manager.h"
 #include "preferred_language.h"
 #include "preferences.h"
 #include "preferences_helper.h"
@@ -31,6 +33,8 @@ namespace I18n {
 REGISTER_SYSTEM_ABILITY_BY_ID(I18nServiceAbility, I18N_SA_ID, false);
 static const std::string UNLOAD_TASK = "i18n_service_unload";
 static const uint32_t DELAY_MILLISECONDS_FOR_UNLOAD_SA = 10000;
+static const int32_t UID_TRANSFORM_DIVISOR = 200000;
+static const int32_t USER_DEFAULT = 100;
 
 I18nServiceAbility::I18nServiceAbility(int32_t saId, bool runOnCreate) : SystemAbility(saId, runOnCreate)
 {
@@ -44,27 +48,32 @@ I18nServiceAbility::~I18nServiceAbility()
 
 I18nErrorCode I18nServiceAbility::SetSystemLanguage(const std::string &language)
 {
-    return LocaleConfig::SetSystemLanguage(language);
+    int32_t userId = GetCallingUserId();
+    return LocaleConfig::SetSystemLanguage(language, userId);
 }
 
 I18nErrorCode I18nServiceAbility::SetSystemRegion(const std::string &region)
 {
-    return LocaleConfig::SetSystemRegion(region);
+    int32_t userId = GetCallingUserId();
+    return LocaleConfig::SetSystemRegion(region, userId);
 }
 
 I18nErrorCode I18nServiceAbility::SetSystemLocale(const std::string &locale)
 {
-    return LocaleConfig::SetSystemLocale(locale);
+    int32_t userId = GetCallingUserId();
+    return LocaleConfig::SetSystemLocale(locale, userId);
 }
 
 I18nErrorCode I18nServiceAbility::Set24HourClock(const std::string &flag)
 {
-    return LocaleConfig::Set24HourClock(flag);
+    int32_t userId = GetCallingUserId();
+    return LocaleConfig::Set24HourClock(flag, userId);
 }
 
 I18nErrorCode I18nServiceAbility::SetUsingLocalDigit(bool flag)
 {
-    return LocaleConfig::SetUsingLocalDigit(flag);
+    int32_t userId = GetCallingUserId();
+    return LocaleConfig::SetUsingLocalDigit(flag, userId);
 }
 
 I18nErrorCode I18nServiceAbility::AddPreferredLanguage(const std::string &language, int32_t index)
@@ -79,12 +88,14 @@ I18nErrorCode I18nServiceAbility::RemovePreferredLanguage(int32_t index)
 
 I18nErrorCode I18nServiceAbility::SetTemperatureType(TemperatureType type)
 {
-    return LocaleConfig::SetTemperatureType(type);
+    int32_t userId = GetCallingUserId();
+    return LocaleConfig::SetTemperatureType(type, userId);
 }
 
 I18nErrorCode I18nServiceAbility::SetFirstDayOfWeek(WeekDay type)
 {
-    return LocaleConfig::SetFirstDayOfWeek(type);
+    int32_t userId = GetCallingUserId();
+    return LocaleConfig::SetFirstDayOfWeek(type, userId);
 }
 
 void I18nServiceAbility::UnloadI18nServiceAbility()
@@ -136,6 +147,19 @@ void I18nServiceAbility::OnStop()
         i18nServiceEvent = nullptr;
     }
     HILOG_INFO_I18N("I18nServiceAbility Stop.");
+}
+
+int32_t I18nServiceAbility::GetCallingUserId()
+{
+    int32_t userId = OHOS::IPCSkeleton::GetCallingUid() / UID_TRANSFORM_DIVISOR;
+    if (userId == 0) {
+        auto err = OHOS::AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(userId);
+        if (err != 0) {
+            HILOG_ERROR_I18N("I18nServiceAbility::GetCallingUserId: GetForegroundOsAccountLocalId failed.");
+            userId = USER_DEFAULT;
+        }
+    }
+    return userId;
 }
 } // namespace I18n
 } // namespace Global

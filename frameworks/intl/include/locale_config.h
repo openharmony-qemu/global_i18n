@@ -44,15 +44,16 @@ public:
      * @param languageTag language tag to set.
      * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
      */
-    static I18nErrorCode SetSystemLanguage(const std::string &languageTag);
-    
+    static I18nErrorCode SetSystemLanguage(const std::string &languageTag, const int32_t userId = -1,
+        const bool isSwitchUser = false);
+
     /**
      * @brief Set the System Region to region tag.
      *
      * @param regionTag region tag to set.
      * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
      */
-    static I18nErrorCode SetSystemRegion(const std::string &regionTag);
+    static I18nErrorCode SetSystemRegion(const std::string &regionTag, const int32_t userId = -1);
 
     /**
      * @brief Set the System Locale to locale tag.
@@ -60,7 +61,8 @@ public:
      * @param localeTag locale tag to set.
      * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
      */
-    static I18nErrorCode SetSystemLocale(const std::string &localeTag);
+    static I18nErrorCode SetSystemLocale(const std::string &localeTag, const int32_t userId = -1,
+        const bool isSwitchUser = false);
 
     /**
      * @brief Set system hour to 12 or 24-hour clock.
@@ -70,7 +72,8 @@ public:
      * system locale default behavior.
      * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
      */
-    static I18nErrorCode Set24HourClock(const std::string &option);
+    static I18nErrorCode Set24HourClock(const std::string &option, const int32_t userId = -1,
+        const bool isSwitchUser = false);
 
     /**
      * @brief Set system digit to local digit or Arbic digit.
@@ -79,7 +82,7 @@ public:
      * When flag is False, the system doesn't adopt local digit;
      * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
      */
-    static I18nErrorCode SetUsingLocalDigit(bool flag);
+    static I18nErrorCode SetUsingLocalDigit(bool flag, const int32_t userId = -1);
 
     /**
      * @brief Set user's preferrence for temperature type.
@@ -87,7 +90,7 @@ public:
      * @param type temperature type to set.
      * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
      */
-    static I18nErrorCode SetTemperatureType(const TemperatureType& type);
+    static I18nErrorCode SetTemperatureType(const TemperatureType& type, const int32_t userId = -1);
 
     /**
      * @brief Set user's preferrence for first day of week.
@@ -95,7 +98,7 @@ public:
      * @param type one of week days.
      * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
      */
-    static I18nErrorCode SetFirstDayOfWeek(const WeekDay& type);
+    static I18nErrorCode SetFirstDayOfWeek(const WeekDay& type, const int32_t userId = -1);
 
     static TemperatureType GetTemperatureType();
     static std::string GetTemperatureName(const TemperatureType& type);
@@ -215,8 +218,11 @@ private:
      *
      * @param key Indicats configuration key.
      * @param value Indicates configuration value.
+     * @param userId Indicats update user id.
+     * @param isSwitchUser Indicates whether user switch.
      */
-    static void UpdateConfiguration(const char *key, const std::string &value);
+    static void UpdateConfiguration(const char *key, const std::string &value, const int32_t userId,
+        const bool isSwitchUser);
 
     /**
      * @brief Provided for public i18n event include locale-change event and time-change event.
@@ -291,6 +297,7 @@ private:
     static std::unordered_map<std::string, std::vector<std::string>> dialectLanguages;
     static std::string currentDialectLocale;
     static std::string currentOverrideRegion;
+    static std::set<int32_t> userIds;
     static std::set<std::string> validCaTag;
     static std::set<std::string> validCoTag;
     static std::set<std::string> validKnTag;

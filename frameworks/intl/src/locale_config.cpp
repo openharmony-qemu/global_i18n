@@ -97,6 +97,7 @@ unordered_set<string> LocaleConfig::blockedRegions;
 unordered_map<string, unordered_set<string>> LocaleConfig::blockedLanguageRegions;
 unordered_set<string> LocaleConfig::whiteLanguages;
 std::set<std::string> LocaleConfig::extendWhiteLanguageList;
+std::set<int32_t> LocaleConfig::userIds;
 unordered_map<string, string> LocaleConfig::dialectMap {
     { "es-Latn-419", "es-Latn-419" },
     { "es-Latn-BO", "es-Latn-419" },
@@ -1268,7 +1269,8 @@ std::unordered_set<std::string> LocaleConfig::GetLanguageBlockedRegions()
     return emptyResult;
 }
 
-I18nErrorCode LocaleConfig::SetSystemLanguage(const std::string &languageTag)
+I18nErrorCode LocaleConfig::SetSystemLanguage(const std::string &languageTag, const int32_t userId,
+    const bool isSwitchUser)
 {
     if (!IsValidTag(languageTag)) {
         HILOG_ERROR_I18N("LocaleConfig::SetSystemLanguage %{public}s is not valid language tag.",
@@ -1284,9 +1286,13 @@ I18nErrorCode LocaleConfig::SetSystemLanguage(const std::string &languageTag)
         return I18nErrorCode::UPDATE_SYSTEM_LANGUAGE_FAILED;
     }
     std::string newLocaleTag = UpdateLanguageOfLocale(languageTag);
-    if (SetSystemLocale(newLocaleTag) == I18nErrorCode::SUCCESS) {
+    if (SetSystemLocale(newLocaleTag, userId, isSwitchUser) == I18nErrorCode::SUCCESS) {
 #ifdef SUPPORT_MULTI_USER
-        MultiUsers::SaveLanguage("", languageTag);
+        std::string localId;
+        if (userId != -1) {
+            localId = std::to_string(userId);
+        }
+        MultiUsers::SaveLanguage(localId, languageTag);
 #endif
         return I18nErrorCode::SUCCESS;
     }
@@ -1296,7 +1302,7 @@ I18nErrorCode LocaleConfig::SetSystemLanguage(const std::string &languageTag)
     return I18nErrorCode::UPDATE_SYSTEM_LANGUAGE_FAILED;
 }
 
-I18nErrorCode LocaleConfig::SetSystemRegion(const std::string &regionTag)
+I18nErrorCode LocaleConfig::SetSystemRegion(const std::string &regionTag, const int32_t userId)
 {
     QueryUpgradeLocale();
     if (!IsValidRegion(regionTag)) {
@@ -1305,7 +1311,7 @@ I18nErrorCode LocaleConfig::SetSystemRegion(const std::string &regionTag)
     }
     std::string regionCode = LocaleEncode(regionTag);
     HILOG_INFO_I18N("LocaleConfig::SetSystemRegion: set region %{public}s.", regionCode.c_str());
-    return SetSystemLocale(UpdateRegionOfLocale(regionTag));
+    return SetSystemLocale(UpdateRegionOfLocale(regionTag), userId);
 }
 
 void LocaleConfig::QueryUpgradeLocale()
@@ -1316,7 +1322,8 @@ void LocaleConfig::QueryUpgradeLocale()
     }
 }
 
-I18nErrorCode LocaleConfig::SetSystemLocale(const std::string &localeTag)
+I18nErrorCode LocaleConfig::SetSystemLocale(const std::string &localeTag, const int32_t userId,
+    const bool isSwitchUser)
 {
     if (!IsValidTag(localeTag)) {
         HILOG_ERROR_I18N("LocaleConfig::SetSystemLocale %{public}s is not a valid locale tag.", localeTag.c_str());
@@ -1328,10 +1335,14 @@ I18nErrorCode LocaleConfig::SetSystemLocale(const std::string &localeTag)
         return I18nErrorCode::UPDATE_SYSTEM_LOCALE_FAILED;
     }
 #ifdef SUPPORT_MULTI_USER
-    MultiUsers::SaveLocale("", localeTag);
+    std::string localId;
+    if (userId != -1) {
+        localId = std::to_string(userId);
+    }
+    MultiUsers::SaveLocale(localId, localeTag);
 #endif
 #ifdef SUPPORT_GRAPHICS
-    UpdateConfiguration(AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE, localeTag);
+    UpdateConfiguration(AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE, localeTag, userId, isSwitchUser);
     return PublishCommonEvent(EventFwk::CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED);
 #else
     return I18nErrorCode::SUCCESS;
@@ -1346,7 +1357,8 @@ bool LocaleConfig::IsValid24HourClockValue(const std::string &tag)
     return false;
 }
 
-I18nErrorCode LocaleConfig::Set24HourClock(const std::string &option)
+I18nErrorCode LocaleConfig::Set24HourClock(const std::string &option, const int32_t userId,
+    const bool isSwitchUser)
 {
     if (!IsValid24HourClockValue(option)) {
         HILOG_ERROR_I18N("LocaleConfig::Set24HourClock invalid 24 Hour clock tag: %{public}s", option.c_str());
@@ -1359,17 +1371,21 @@ I18nErrorCode LocaleConfig::Set24HourClock(const std::string &option)
         return I18nErrorCode::UPDATE_24_HOUR_CLOCK_FAILED;
     }
 #ifdef SUPPORT_MULTI_USER
-    MultiUsers::SaveIs24Hour("", option);
+    std::string localId;
+    if (userId != -1) {
+        localId = std::to_string(userId);
+    }
+    MultiUsers::SaveIs24Hour(localId, option);
 #endif
 #ifdef SUPPORT_GRAPHICS
-    UpdateConfiguration(AAFwk::GlobalConfigurationKey::SYSTEM_HOUR, option);
+    UpdateConfiguration(AAFwk::GlobalConfigurationKey::SYSTEM_HOUR, option, userId, isSwitchUser);
     return PublishCommonEvent(EventFwk::CommonEventSupport::COMMON_EVENT_TIME_CHANGED);
 #else
     return I18nErrorCode::SUCCESS;
 #endif
 }
 
-I18nErrorCode LocaleConfig::SetUsingLocalDigit(bool flag)
+I18nErrorCode LocaleConfig::SetUsingLocalDigit(bool flag, const int32_t userId)
 {
     // check whether current language support local digit.
     std::string localeTag = GetSystemLocale();
@@ -1381,10 +1397,10 @@ I18nErrorCode LocaleConfig::SetUsingLocalDigit(bool flag)
     }
     std::string localDigit = flag ? it->second : "";
     // update system locale.
-    return SetSystemLocale(ModifyExtParam(localeTag, NUMBER_SYSTEM_KEY, localDigit));
+    return SetSystemLocale(ModifyExtParam(localeTag, NUMBER_SYSTEM_KEY, localDigit), userId);
 }
 
-I18nErrorCode LocaleConfig::SetTemperatureType(const TemperatureType& type)
+I18nErrorCode LocaleConfig::SetTemperatureType(const TemperatureType& type, const int32_t userId)
 {
     if (temperatureTypeToName.find(type) == temperatureTypeToName.end()) {
         HILOG_ERROR_I18N("LocaleConfig::SetTemperatureType: temperature type failed.");
@@ -1397,7 +1413,7 @@ I18nErrorCode LocaleConfig::SetTemperatureType(const TemperatureType& type)
         return I18nErrorCode::UPDATE_TEMPERATURE_TYPE_FAILED;
     }
     // update system locale.
-    return SetSystemLocale(ModifyExtParam(localeTag, TEMPERATURE_UNIT_KEY, option));
+    return SetSystemLocale(ModifyExtParam(localeTag, TEMPERATURE_UNIT_KEY, option), userId);
 }
 
 TemperatureType LocaleConfig::GetTemperatureType()
@@ -1430,7 +1446,7 @@ std::string LocaleConfig::GetTemperatureName(const TemperatureType& type)
     return temperatureTypeToName[type];
 }
 
-I18nErrorCode LocaleConfig::SetFirstDayOfWeek(const WeekDay& type)
+I18nErrorCode LocaleConfig::SetFirstDayOfWeek(const WeekDay& type, const int32_t userId)
 {
     if (weekDayToName.find(type) == weekDayToName.end()) {
         HILOG_ERROR_I18N("LocaleConfig::SetFirstDayOfWeek: week day failed.");
@@ -1443,7 +1459,7 @@ I18nErrorCode LocaleConfig::SetFirstDayOfWeek(const WeekDay& type)
         return I18nErrorCode::UPDATE_WEEK_DAY_FAILED;
     }
     // update system locale.
-    return SetSystemLocale(ModifyExtParam(localeTag, WEEK_DAY_KEY, option));
+    return SetSystemLocale(ModifyExtParam(localeTag, WEEK_DAY_KEY, option), userId);
 }
 
 WeekDay LocaleConfig::GetFirstDayOfWeek()
@@ -1478,12 +1494,33 @@ WeekDay LocaleConfig::GetFirstDayOfWeek()
 }
 
 #ifdef SUPPORT_GRAPHICS
-void LocaleConfig::UpdateConfiguration(const char *key, const std::string &value)
+void LocaleConfig::UpdateConfiguration(const char *key, const std::string &value, const int32_t userId,
+    const bool isSwitchUser)
 {
     AppExecFwk::Configuration configuration;
     configuration.AddItem(key, value);
     auto appMgrClient = std::make_unique<AppExecFwk::AppMgrClient>();
-    appMgrClient->UpdateConfiguration(configuration);
+    if (isSwitchUser && userId != -1) {
+        if (userIds.find(userId) == userIds.end()) {
+            appMgrClient->UpdateConfiguration(configuration, userId);
+            HILOG_INFO_I18N("LocaleConfig::UpdateLanguageConfiguration: switch userId %{public}d.", userId);
+            auto status = userIds.insert(userId);
+            if (!status.second) {
+                HILOG_ERROR_I18N("LocaleConfig::UpdateLanguageConfiguration: insert userId %{public}d failed.",
+                    userId);
+            }
+        } else {
+            appMgrClient->UpdateConfiguration(configuration, 0);
+            HILOG_INFO_I18N("LocaleConfig::UpdateLanguageConfiguration: update userId 0.");
+        }
+    } else {
+        if (userId == -1) {
+            appMgrClient->UpdateConfiguration(configuration);
+        } else {
+            appMgrClient->UpdateConfiguration(configuration, userId);
+            HILOG_INFO_I18N("LocaleConfig::UpdateLanguageConfiguration: update userId %{public}d.", userId);
+        }
+    }
     HILOG_INFO_I18N("LocaleConfig::UpdateLanguageConfiguration update configuration finished.");
 }
 

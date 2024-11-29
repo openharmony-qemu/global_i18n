@@ -197,13 +197,19 @@ I18nErrorCode MultiUsers::LoadGlobalParam(const std::string& localId)
     }
 
     std::string newLanguage = ReadMultiUsersParameter(MULTI_USERS_LANGUAGE_KEY, localId);
-    if (!newLanguage.empty() && LocaleConfig::SetSystemLanguage(newLanguage) != 0) {
+    int32_t status = 0;
+    int32_t userId = ConvertString2Int(localId, status);
+    if (status == -1) {
+        HILOG_ERROR_I18N("LoadGlobalParam: convert userId failed");
+        return I18nErrorCode::FAILED;
+    }
+    if (!newLanguage.empty() && LocaleConfig::SetSystemLanguage(newLanguage, userId, true) != 0) {
         HILOG_ERROR_I18N("LoadGlobalParam: set language failed");
         return I18nErrorCode::FAILED;
     }
 
     std::string newIs24Hour = ReadMultiUsersParameter(MULTI_USERS_HOUR_KEY, localId);
-    if (!newIs24Hour.empty() && LocaleConfig::Set24HourClock(newIs24Hour) != 0) {
+    if (!newIs24Hour.empty() && LocaleConfig::Set24HourClock(newIs24Hour, userId, true) != 0) {
         HILOG_ERROR_I18N("LoadGlobalParam: set is24Hour failed");
         return I18nErrorCode::FAILED;
     }
