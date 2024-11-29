@@ -27,6 +27,7 @@
 #include <common_event_data.h>
 #endif
 #include "i18n_types.h"
+#include "unicode/calendar.h"
 #include "unicode/locid.h"
 
 namespace OHOS {
@@ -88,8 +89,17 @@ public:
      */
     static I18nErrorCode SetTemperatureType(const TemperatureType& type);
 
+    /**
+     * @brief Set user's preferrence for first day of week.
+     *
+     * @param type one of week days.
+     * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
+     */
+    static I18nErrorCode SetFirstDayOfWeek(const WeekDay& type);
+
     static TemperatureType GetTemperatureType();
     static std::string GetTemperatureName(const TemperatureType& type);
+    static WeekDay GetFirstDayOfWeek();
     static std::string GetSystemLanguage();
     static std::string GetSystemRegion();
     static std::string GetSystemLocale();
@@ -173,6 +183,7 @@ private:
     static const std::string EXT_PARAM_KEY;
     static const std::string NUMBER_SYSTEM_KEY;
     static const std::string TEMPERATURE_UNIT_KEY;
+    static const std::string WEEK_DAY_KEY;
 
     static const std::unordered_set<std::string>& GetSupportedLocales();
     static const std::unordered_set<std::string>& GetForbiddenRegions();
@@ -271,6 +282,9 @@ private:
     static std::unordered_map<TemperatureType, std::string> temperatureTypeToName;
     static std::unordered_map<std::string, TemperatureType> nameToTemperatureType;
     static std::unordered_set<std::string> fahrenheitUsingRegions;
+    static std::unordered_map<WeekDay, std::string> weekDayToName;
+    static std::unordered_map<std::string, WeekDay> nameToWeekDay;
+    static std::unordered_map<icu::Calendar::EDaysOfWeek, WeekDay> eDaysOfWeekToWeekDay;
     static std::map<std::string, std::string> locale2DisplayName;
     static std::map<std::string, std::string> region2DisplayName;
     static std::unordered_map<std::string, std::vector<std::string>> dialectLanguages;

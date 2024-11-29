@@ -85,6 +85,7 @@ const char *LocaleConfig::secondRootRegion = "region";
 const std::string LocaleConfig::EXT_PARAM_KEY = "-u-";
 const std::string LocaleConfig::NUMBER_SYSTEM_KEY = "nu";
 const std::string LocaleConfig::TEMPERATURE_UNIT_KEY = "mu";
+const std::string LocaleConfig::WEEK_DAY_KEY = "fw";
 const std::string LocaleConfig::HOUR_EVENT_DATA = "24HourChange";
 unordered_set<string> LocaleConfig::supportedLocales;
 unordered_set<string> LocaleConfig::supportLocales;
@@ -159,6 +160,36 @@ std::unordered_set<std::string> LocaleConfig::fahrenheitUsingRegions {
     "KY",
     "PW",
     "US"
+};
+
+std::unordered_map<WeekDay, std::string> LocaleConfig::weekDayToName {
+    { WeekDay::MON, "mon" },
+    { WeekDay::TUE, "tue" },
+    { WeekDay::WED, "wed" },
+    { WeekDay::THU, "thu" },
+    { WeekDay::FRI, "fri" },
+    { WeekDay::SAT, "sat" },
+    { WeekDay::SUN, "sun" }
+};
+
+std::unordered_map<std::string, WeekDay> LocaleConfig::nameToWeekDay {
+    { "mon", WeekDay::MON },
+    { "tue", WeekDay::TUE },
+    { "wed", WeekDay::WED },
+    { "thu", WeekDay::THU },
+    { "fri", WeekDay::FRI },
+    { "sat", WeekDay::SAT },
+    { "sun", WeekDay::SUN }
+};
+
+std::unordered_map<icu::Calendar::EDaysOfWeek, WeekDay> LocaleConfig::eDaysOfWeekToWeekDay {
+    { icu::Calendar::EDaysOfWeek::MONDAY, WeekDay::MON },
+    { icu::Calendar::EDaysOfWeek::TUESDAY, WeekDay::TUE },
+    { icu::Calendar::EDaysOfWeek::WEDNESDAY, WeekDay::WED },
+    { icu::Calendar::EDaysOfWeek::THURSDAY, WeekDay::THU },
+    { icu::Calendar::EDaysOfWeek::FRIDAY, WeekDay::FRI },
+    { icu::Calendar::EDaysOfWeek::SATURDAY, WeekDay::SAT },
+    { icu::Calendar::EDaysOfWeek::SUNDAY, WeekDay::SUN }
 };
 
 std::map<std::string, std::string> LocaleConfig::supportedDialectLocales;
@@ -1384,6 +1415,53 @@ std::string LocaleConfig::GetTemperatureName(const TemperatureType& type)
         return "";
     }
     return temperatureTypeToName[type];
+}
+
+I18nErrorCode LocaleConfig::SetFirstDayOfWeek(const WeekDay& type)
+{
+    if (weekDayToName.find(type) == weekDayToName.end()) {
+        HILOG_ERROR_I18N("LocaleConfig::SetFirstDayOfWeek: week day failed.");
+        return I18nErrorCode::INVALID_WEEK_DAY;
+    }
+    std::string option = weekDayToName[type];
+    std::string localeTag = GetSystemLocale();
+    if (localeTag.empty()) {
+        HILOG_ERROR_I18N("LocaleConfig::SetFirstDayOfWeek: get system locale failed.");
+        return I18nErrorCode::UPDATE_WEEK_DAY_FAILED;
+    }
+    // update system locale.
+    return SetSystemLocale(ModifyExtParam(localeTag, WEEK_DAY_KEY, option));
+}
+
+WeekDay LocaleConfig::GetFirstDayOfWeek()
+{
+    std::string localeTag = GetSystemLocale();
+    if (localeTag.empty()) {
+        HILOG_ERROR_I18N("LocaleConfig::GetFirstDayOfWeek: get system locale failed.");
+        return WeekDay::MON;
+    }
+    std::unordered_map<std::string, std::string> extParamMap = ParseExtParam(localeTag);
+    std::string type;
+    if (extParamMap.find(WEEK_DAY_KEY) != extParamMap.end()) {
+        type = extParamMap[WEEK_DAY_KEY];
+    }
+    if (!type.empty() && nameToWeekDay.find(type) != nameToWeekDay.end()) {
+        return nameToWeekDay[type];
+    }
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale tempLocale = icu::Locale::forLanguageTag(localeTag, status);
+    if ((U_FAILURE(status))) {
+        HILOG_ERROR_I18N("LocaleConfig::GetFirstDayOfWeek: create icu::Locale failed.");
+        return WeekDay::MON;
+    }
+    icu::Calendar* calendar = icu::Calendar::createInstance(tempLocale, status);
+    if ((U_FAILURE(status))) {
+        HILOG_ERROR_I18N("LocaleConfig::GetFirstDayOfWeek: create icu::Calendar failed.");
+        return WeekDay::MON;
+    }
+    icu::Calendar::EDaysOfWeek firstDay = calendar->getFirstDayOfWeek();
+    delete calendar;
+    return eDaysOfWeekToWeekDay[firstDay];
 }
 
 #ifdef SUPPORT_GRAPHICS

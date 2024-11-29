@@ -124,6 +124,18 @@ I18nErrorCode I18nServiceAbilityProxy::SetTemperatureType(TemperatureType type)
     return ProcessReply(reply.ReadInt32());
 }
 
+I18nErrorCode I18nServiceAbilityProxy::SetFirstDayOfWeek(WeekDay type)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    data.WriteInterfaceToken(DESCRIPTOR);
+    data.WriteInt32(static_cast<int32_t>(type));
+    Remote()->SendRequest(static_cast<uint32_t>(ILocaleConfigAbilityCode::SET_WEEK_DAY),
+        data, reply, option);
+    return ProcessReply(reply.ReadInt32());
+}
+
 I18nErrorCode I18nServiceAbilityProxy::ProcessReply(int32_t reply)
 {
     I18nErrorCode err = static_cast<I18nErrorCode>(reply);
