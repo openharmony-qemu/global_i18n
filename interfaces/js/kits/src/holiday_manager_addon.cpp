@@ -130,7 +130,7 @@ napi_value HolidayManagerAddon::IsHoliday(napi_env env, napi_callback_info info)
         return nullptr;
     }
     napi_value result = nullptr;
-    bool flag = VariableConvertor::CheckNapiValueType(env, argv[0]);
+    bool flag = VariableConvertor::CheckNapiIsNull(env, argv[0]);
     bool res = false;
     if (flag) {
         std::vector<int> list = ValidateParamDate(env, argv[0]);
@@ -161,7 +161,7 @@ napi_value HolidayManagerAddon::GetHolidayInfoItemArray(napi_env env, napi_callb
         HILOG_ERROR_I18N("GetHolidayInfoItemArray: Get HolidayManager object failed");
         return nullptr;
     }
-    bool flag = VariableConvertor::CheckNapiValueType(env, argv[0]);
+    bool flag = VariableConvertor::CheckNapiIsNull(env, argv[0]);
     if (flag) {
         int32_t year = ValidateParamNumber(env, argv[0]);
         std::vector<HolidayInfoItem> itemList = obj->holidayManager_->GetHolidayInfoItemArray(year);

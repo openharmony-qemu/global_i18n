@@ -44,7 +44,7 @@ napi_value I18nTimeZoneAddon::GetI18nTimeZone(napi_env env, napi_callback_info i
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
-    if (!VariableConvertor::CheckNapiValueType(env, argv[0])) {
+    if (!VariableConvertor::CheckNapiIsNull(env, argv[0])) {
         napi_status status = napi_create_string_utf8(env, "", NAPI_AUTO_LENGTH, &argv[0]);
         if (status != napi_ok) {
             HILOG_ERROR_I18N("I18nTimeZoneAddon::GetI18nTimeZone: create string failed.");
@@ -438,7 +438,7 @@ napi_value I18nTimeZoneAddon::GetOffset(napi_env env, napi_callback_info info)
     }
 
     double date = 0;
-    if (VariableConvertor::CheckNapiValueType(env, argv[0])) {
+    if (VariableConvertor::CheckNapiIsNull(env, argv[0])) {
         napi_valuetype valueType = napi_valuetype::napi_undefined;
         napi_typeof(env, argv[0], &valueType);
         if (valueType != napi_valuetype::napi_number) {
@@ -499,12 +499,12 @@ napi_value I18nTimeZoneAddon::StaticGetTimeZone(napi_env env, napi_value *argv, 
 int32_t I18nTimeZoneAddon::GetParameter(napi_env env, napi_value *argv, std::string &localeStr, bool &isDST)
 {
     napi_status status = napi_ok;
-    if (VariableConvertor::CheckNapiValueType(env, argv[1])) {
+    if (VariableConvertor::CheckNapiIsNull(env, argv[1])) {
         napi_valuetype valueType0 = napi_valuetype::napi_undefined;
         napi_valuetype valueType1 = napi_valuetype::napi_undefined;
         napi_typeof(env, argv[0], &valueType0);  // 0 represents first parameter
         napi_typeof(env, argv[1], &valueType1);  // 1 represents second parameter
-        bool firstParamFlag = VariableConvertor::CheckNapiValueType(env, argv[0]);
+        bool firstParamFlag = VariableConvertor::CheckNapiIsNull(env, argv[0]);
         if (valueType1 == napi_valuetype::napi_boolean) {
             status = napi_get_value_bool(env, argv[1], &isDST);
             if (status != napi_ok) {
@@ -542,7 +542,7 @@ bool I18nTimeZoneAddon::GetStringFromJS(napi_env env, napi_value argv, std::stri
 
 int32_t I18nTimeZoneAddon::GetFirstParameter(napi_env env, napi_value value, std::string &localeStr, bool &isDST)
 {
-    if (!VariableConvertor::CheckNapiValueType(env, value)) {
+    if (!VariableConvertor::CheckNapiIsNull(env, value)) {
         return 0;  // 0 represents no parameter.
     } else {
         napi_status status = napi_ok;
