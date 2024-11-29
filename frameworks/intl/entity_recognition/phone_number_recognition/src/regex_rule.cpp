@@ -142,11 +142,7 @@ PhoneNumberMatch* RegexRule::IsValidEnd(PhoneNumberMatch* possibleNumber, icu::U
             }
         }
     }
-    if (!isTwo) {
-        return possibleNumber;
-    } else {
-        return nullptr;
-    }
+    return isTwo ? nullptr : possibleNumber;
 }
 
 // check the prefix of possibleNumber
@@ -182,11 +178,7 @@ PhoneNumberMatch* RegexRule::IsValidStart(PhoneNumberMatch* possibleNumber, icu:
             break;
         }
     }
-    if (!isTwo) {
-        return possibleNumber;
-    } else {
-        return nullptr;
-    }
+    return isTwo ? nullptr : possibleNumber;
 }
 
 PhoneNumberMatch* RegexRule::IsValidDefault(PhoneNumberMatch* possibleNumber, icu::UnicodeString& message)

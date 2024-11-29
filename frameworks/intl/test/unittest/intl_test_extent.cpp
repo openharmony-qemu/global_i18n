@@ -1341,18 +1341,42 @@ HWTEST_F(IntlTest, IntlFuncTest0083, TestSize.Level1)
     std::string handleType = "StartWithMobile";
     std::string insensitive = "False";
     std::string type = "xxx";
-    std::string input = "(010)86753564";
-    size_t start = 10;
+    std::string input = "86753564";
+    size_t start = 0;
     i18n::phonenumbers::PhoneNumber phoneNumber;
     std::unique_ptr<PhoneNumberMatch> possibleNumber =
         std::make_unique<PhoneNumberMatch>(start, input, phoneNumber);
     RegexRule* regexRule = new RegexRule(regex, isValidType, handleType, insensitive, type);
-    std::string msg = "00222a-86753564A-";
+    std::string msg = "86753564a-";
     icu::UnicodeString message(msg.c_str());
     if (possibleNumber != nullptr) {
         regexRule->IsValid(possibleNumber.get(), message);
         std::vector<MatchedNumberInfo> list = regexRule->Handle(possibleNumber.get(), message);
         EXPECT_EQ(list.size(), 0);
+        msg = "86753564A1";
+        icu::UnicodeString message2(msg.c_str());
+        PhoneNumberMatch* match2 = regexRule->IsValid(possibleNumber.get(), message2);
+        EXPECT_TRUE(match2 == nullptr);
+        msg = "86753564Aa";
+        icu::UnicodeString message3(msg.c_str());
+        PhoneNumberMatch* match3 = regexRule->IsValid(possibleNumber.get(), message3);
+        EXPECT_TRUE(match3 != nullptr);
+        msg = "86753564AA-";
+        icu::UnicodeString message4(msg.c_str());
+        PhoneNumberMatch* match4 = regexRule->IsValid(possibleNumber.get(), message4);
+        EXPECT_TRUE(match4 != nullptr);
+        msg = "86753564AA2";
+        icu::UnicodeString message5(msg.c_str());
+        PhoneNumberMatch* match5 = regexRule->IsValid(possibleNumber.get(), message5);
+        EXPECT_TRUE(match5 == nullptr);
+        msg = "86753564AA@";
+        icu::UnicodeString message6(msg.c_str());
+        PhoneNumberMatch* match6 = regexRule->IsValid(possibleNumber.get(), message6);
+        EXPECT_TRUE(match6 == nullptr);
+        msg = "86753564AAc";
+        icu::UnicodeString message7(msg.c_str());
+        PhoneNumberMatch* match7 = regexRule->IsValid(possibleNumber.get(), message7);
+        EXPECT_TRUE(match7 != nullptr);
     }
     delete regexRule;
 }
