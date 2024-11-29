@@ -1620,7 +1620,7 @@ HWTEST_F(I18nTest, I18nFuncTest065, TestSize.Level1)
 
 /**
  * @tc.name: I18nFuncTest066
- * @tc.desc: Test I18n set temperate type
+ * @tc.desc: Test I18n set ext param
  * @tc.type: FUNC
  */
 HWTEST_F(I18nTest, I18nFuncTest066, TestSize.Level1)
@@ -1633,6 +1633,15 @@ HWTEST_F(I18nTest, I18nFuncTest066, TestSize.Level1)
 
     std::string typeName = LocaleConfig::GetTemperatureName(type);
     EXPECT_EQ(typeName, "kelvin");
+
+    WeekDay weekDayType = LocaleConfig::GetFirstDayOfWeek();
+    EXPECT_EQ(weekDayType, WeekDay::SUN);
+
+    err = LocaleConfig::SetFirstDayOfWeek(WeekDay::FRI);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+
+    weekDayType = LocaleConfig::GetFirstDayOfWeek();
+    EXPECT_EQ(weekDayType, WeekDay::FRI);
 }
 
 /**

@@ -479,6 +479,19 @@ HWTEST_F(I18nServiceTest, I18nServiceFuncTest029, TestSize.Level1)
     I18nErrorCode err = I18nServiceAbilityClient::SetTemperatureType(TemperatureType::KELVIN);
     EXPECT_EQ(err, I18nErrorCode::SUCCESS);
 }
+
+/**
+ * @tc.name: I18nServiceFuncTest030
+ * @tc.desc: Test I18nServiceAbilityClient SetFirstDayOfWeek: set first day of week SUN.
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nServiceTest, I18nServiceFuncTest030, TestSize.Level1)
+{
+    InitTestEnvironment();
+    AddNativeTokenTypeAndPermissions();
+    I18nErrorCode err = I18nServiceAbilityClient::SetFirstDayOfWeek(WeekDay::SUN);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

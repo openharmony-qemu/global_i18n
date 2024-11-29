@@ -48,6 +48,7 @@ int I18nServiceFuncTest026(void);
 int I18nServiceFuncTest027(void);
 int I18nServiceFuncTest028(void);
 int I18nServiceFuncTest029(void);
+int I18nServiceFuncTest030(void);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

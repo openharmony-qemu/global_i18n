@@ -30,6 +30,8 @@ namespace Global {
 namespace I18n {
 const std::string I18nSystemAddon::NAME_OF_TEMPERATURE = "type";
 const std::string I18nSystemAddon::TYPE_OF_TEMPERATURE = "TemperatureType";
+const std::string I18nSystemAddon::NAME_OF_WEEKDAY = "type";
+const std::string I18nSystemAddon::TYPE_OF_WEEKDAY = "WeekDay";
 
 I18nSystemAddon::I18nSystemAddon() {}
 
@@ -71,6 +73,8 @@ napi_value I18nSystemAddon::InitI18nSystem(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("setTemperatureType", SetTemperatureType),
         DECLARE_NAPI_STATIC_FUNCTION("getTemperatureType", GetTemperatureType),
         DECLARE_NAPI_STATIC_FUNCTION("getTemperatureName", GetTemperatureName),
+        DECLARE_NAPI_STATIC_FUNCTION("setFirstDayOfWeek", SetFirstDayOfWeek),
+        DECLARE_NAPI_STATIC_FUNCTION("getFirstDayOfWeek", GetFirstDayOfWeek),
         DECLARE_NAPI_STATIC_FUNCTION("getSimplifiedLanguage", GetSimplifiedLanguage),
     };
     napi_value constructor = nullptr;
@@ -1028,6 +1032,65 @@ bool I18nSystemAddon::ParseTemperatureType(napi_env env, napi_callback_info info
     }
     type = static_cast<TemperatureType>(temperatureType);
     return true;
+}
+
+napi_value I18nSystemAddon::SetFirstDayOfWeek(napi_env env, napi_callback_info info)
+{
+    size_t argc = 1;
+    napi_value argv[1] = { nullptr };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("I18nSystemAddon::SetFirstDayOfWeek: get cb info failed.");
+        return nullptr;
+    }
+    if (argc < 1) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, NAME_OF_WEEKDAY, "", true);
+        return nullptr;
+    }
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("I18nSystemAddon::SetFirstDayOfWeek: get value type failed.");
+        return nullptr;
+    }
+    if (valueType != napi_valuetype::napi_number) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, NAME_OF_WEEKDAY, TYPE_OF_WEEKDAY, true);
+        return nullptr;
+    }
+    int32_t weekDay = 0;
+    status = napi_get_value_int32(env, argv[0], &weekDay);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("I18nSystemAddon::SetFirstDayOfWeek: get week day failed.");
+        return nullptr;
+    }
+    WeekDay type = static_cast<WeekDay>(weekDay);
+    I18nErrorCode err = I18nServiceAbilityClient::SetFirstDayOfWeek(type);
+    if (err == I18nErrorCode::SUCCESS) {
+        return nullptr;
+    }
+    switch (err) {
+        case I18nErrorCode::NOT_SYSTEM_APP:
+            ErrorUtil::NapiThrow(env, I18N_NOT_SYSTEM_APP, "", "", true);
+            break;
+        case I18nErrorCode::NO_PERMISSION:
+            ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, "", "", true);
+            break;
+        case I18nErrorCode::INVALID_WEEK_DAY:
+            ErrorUtil::NapiThrow(env, I18N_NOT_VALID, NAME_OF_WEEKDAY, TYPE_OF_WEEKDAY, true);
+            break;
+        default:
+            HILOG_ERROR_I18N("I18nSystemAddon::SetFirstDayOfWeek: set first day of week failed.");
+    }
+    return nullptr;
+}
+
+napi_value I18nSystemAddon::GetFirstDayOfWeek(napi_env env, napi_callback_info info)
+{
+    WeekDay type = LocaleConfig::GetFirstDayOfWeek();
+    int32_t value = static_cast<int32_t>(type);
+    return VariableConvertor::CreateNumber(env, value);
 }
 
 napi_value I18nSystemAddon::GetSimplifiedLanguage(napi_env env, napi_callback_info info)

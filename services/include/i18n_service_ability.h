@@ -40,6 +40,7 @@ public:
     I18nErrorCode AddPreferredLanguage(const std::string &language, int32_t index) override;
     I18nErrorCode RemovePreferredLanguage(int32_t index) override;
     I18nErrorCode SetTemperatureType(TemperatureType type) override;
+    I18nErrorCode SetFirstDayOfWeek(WeekDay type) override;
     /**
      * @brief Trigger unload i18n service after one request finished, but service will not unload
      * until there no request in 10s.

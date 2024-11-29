@@ -99,6 +99,14 @@ public:
      */
     I18nErrorCode SetTemperatureType(TemperatureType type);
 
+    /**
+     * @brief Set user's preferrence for first day of week.
+     *
+     * @param type one of week days.
+     * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
+     */
+    I18nErrorCode SetFirstDayOfWeek(WeekDay type);
+
 private:
     static I18nErrorCode ProcessReply(int32_t reply);
     static inline BrokerDelegator<I18nServiceAbilityProxy> delegator_;
