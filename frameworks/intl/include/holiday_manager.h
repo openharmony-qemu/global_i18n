@@ -59,7 +59,7 @@ public:
     void SetHolidayData(std::map<std::string, std::vector<HolidayInfoItem>> holidayDataMap);
 
 private:
-    std::vector<HolidayInfoItem> ReadHolidayFile(const char* path);
+    std::vector<HolidayInfoItem> ReadHolidayFile(const std::string &path);
     void ParseFileLine(const std::string &line, HolidayInfoItem *holidayItem);
     std::string GetLanguageFromPath(const char* path);
     static std::string& Trim(std::string &str);

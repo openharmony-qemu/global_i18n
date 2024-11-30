@@ -501,8 +501,7 @@ HWTEST_F(IntlTest, IntlFuncTest0012, TestSize.Level1)
     EXPECT_EQ(out, expects);
     options = {
         { "dateStyle", "long" },
-        { "hourCycle", "h11" },
-        { "hour12", "fakeValue" }
+        { "hourCycle", "h11" }
     };
     DateTimeFormat *dateFormatH11 = new (std::nothrow) DateTimeFormat(locales, options);
     options.insert({ "hourCycle", "h12" });
@@ -1005,6 +1004,8 @@ HWTEST_F(IntlTest, IntlFuncTest0025, TestSize.Level1)
     string unit = "year";
     string res = formatter->Format(number, unit);
     EXPECT_EQ(res, "in 2,022 years");
+    string fakeUnit = "abc";
+    EXPECT_EQ(formatter->Format(number, fakeUnit), "");
     vector<vector<string>> timeVector;
     formatter->FormatToParts(number, unit, timeVector);
     EXPECT_EQ(timeVector.size(), 5);
@@ -1036,6 +1037,7 @@ HWTEST_F(IntlTest, IntlFuncTest0025, TestSize.Level1)
     EXPECT_EQ(res, "in 18 days");
     formatter->FormatToParts(number, unit, timeVector);
     EXPECT_EQ(timeVector.size(), 17);
+
     delete formatter;
 }
 
@@ -1072,6 +1074,10 @@ HWTEST_F(IntlTest, IntlFuncTest0026, TestSize.Level1)
     EXPECT_EQ(res, "in 1 second");
     formatter->FormatToParts(number, unit, timeVector);
     EXPECT_EQ(timeVector.size(), 9);
+    string fakeUnit = "abc";
+    vector<vector<string>> fakeVector;
+    formatter->FormatToParts(number, fakeUnit, fakeVector);
+    EXPECT_EQ(fakeVector.size(), 0);
 
     delete formatter;
 }

@@ -46,9 +46,6 @@ RegexRule::RegexRule(icu::UnicodeString& regex, std::string& isValidType, std::s
     if (regex.length() == 0) {
         return;
     }
-    if (U_FAILURE(this->status)) {
-        HILOG_ERROR_I18N("member pattern construct failed.");
-    }
 }
 
 RegexRule::~RegexRule()
@@ -145,11 +142,7 @@ PhoneNumberMatch* RegexRule::IsValidEnd(PhoneNumberMatch* possibleNumber, icu::U
             }
         }
     }
-    if (!isTwo) {
-        return possibleNumber;
-    } else {
-        return nullptr;
-    }
+    return isTwo ? nullptr : possibleNumber;
 }
 
 // check the prefix of possibleNumber
@@ -185,11 +178,7 @@ PhoneNumberMatch* RegexRule::IsValidStart(PhoneNumberMatch* possibleNumber, icu:
             break;
         }
     }
-    if (!isTwo) {
-        return possibleNumber;
-    } else {
-        return nullptr;
-    }
+    return isTwo ? nullptr : possibleNumber;
 }
 
 PhoneNumberMatch* RegexRule::IsValidDefault(PhoneNumberMatch* possibleNumber, icu::UnicodeString& message)

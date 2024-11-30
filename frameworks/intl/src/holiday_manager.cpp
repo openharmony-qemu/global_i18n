@@ -139,14 +139,11 @@ std::vector<HolidayInfoItem> HolidayManager::GetHolidayInfoItemArray(int32_t yea
     return vetor;
 }
 
-std::vector<HolidayInfoItem> HolidayManager::ReadHolidayFile(const char* path)
+std::vector<HolidayInfoItem> HolidayManager::ReadHolidayFile(const std::string &path)
 {
     std::vector<HolidayInfoItem> items;
-    if (path == nullptr) {
-        return items;
-    }
     std::ifstream fin;
-    fin.open(path, std::ios::in);
+    fin.open(path.c_str(), std::ios::in);
     std::string line;
     while (getline(fin, line)) {
         line = Trim(line);
