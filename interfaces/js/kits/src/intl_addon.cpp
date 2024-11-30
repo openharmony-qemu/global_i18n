@@ -124,7 +124,7 @@ int64_t GetIntegerOptionValue(napi_env env, napi_value options, const std::strin
     int64_t integerValue = -1;
     napi_valuetype type = napi_undefined;
     napi_status status = napi_typeof(env, options, &type);
-    if (status != napi_ok || type != napi_object) {
+    if (status != napi_ok && type != napi_object) {
         HILOG_ERROR_I18N("GetIntegerOptionValue: Set option failed, option is not an object");
         return integerValue;
     }
