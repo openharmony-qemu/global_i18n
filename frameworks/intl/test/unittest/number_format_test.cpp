@@ -1834,6 +1834,57 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0036, TestSize.Level1)
     ASSERT_TRUE(numFmtTW != nullptr);
     EXPECT_EQ(numFmtTW->Format(1234567.89), "1,234,567.89 次/分鐘");
 }
+
+/**
+ * @tc.name: NumberFormatFuncTest0037
+ * @tc.desc: Test Intl NumberFormat.formatRange
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0037, TestSize.Level1)
+{
+    string locale = "en-US";
+    vector<string> locales{locale};
+    string unit = "meter";
+    string style = "unit";
+    map<string, string> options = { { "style", style},
+                                    { "unit", unit } };
+    std::unique_ptr<NumberFormat> rangeFormatter = std::make_unique<NumberFormat>(locales, options);
+    ASSERT_TRUE(rangeFormatter != nullptr);
+    EXPECT_EQ(rangeFormatter->FormatRange(1, 5), "1–5 m");
+    EXPECT_EQ(rangeFormatter->FormatRange(4.9999999, 5.0000001), "~5 m");
+    EXPECT_EQ(rangeFormatter->FormatRange(5, 5), "~5 m");
+    EXPECT_EQ(rangeFormatter->FormatRange(0, 3), "0–3 m");
+    EXPECT_EQ(rangeFormatter->FormatRange(0, 0), "~0 m");
+    EXPECT_EQ(rangeFormatter->FormatRange(3, 3000), "3–3,000 m");
+    EXPECT_EQ(rangeFormatter->FormatRange(3000, 5000), "3,000–5,000 m");
+    EXPECT_EQ(rangeFormatter->FormatRange(4999, 5001), "4,999–5,001 m");
+    EXPECT_EQ(rangeFormatter->FormatRange(5000, 5000), "~5,000 m");
+    EXPECT_EQ(rangeFormatter->FormatRange(5e3, 5e6), "5,000–5,000,000 m");
+}
+
+/**
+ * @tc.name: NumberFormatFuncTest0038
+ * @tc.desc: Test Intl NumberFormat.formatRange
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0038, TestSize.Level1)
+{
+    string locale = "ja";
+    vector<string> locales{locale};
+    map<string, string> options = {};
+    std::unique_ptr<NumberFormat> rangeFormatter = std::make_unique<NumberFormat>(locales, options);
+    ASSERT_TRUE(rangeFormatter != nullptr);
+    EXPECT_EQ(rangeFormatter->FormatRange(1, 5), "1～5");
+    EXPECT_EQ(rangeFormatter->FormatRange(4.9999999, 5.0000001), "約5");
+    EXPECT_EQ(rangeFormatter->FormatRange(5, 5), "約5");
+    EXPECT_EQ(rangeFormatter->FormatRange(0, 3), "0～3");
+    EXPECT_EQ(rangeFormatter->FormatRange(0, 0), "約0");
+    EXPECT_EQ(rangeFormatter->FormatRange(3, 3000), "3～3,000");
+    EXPECT_EQ(rangeFormatter->FormatRange(3000, 5000), "3,000～5,000");
+    EXPECT_EQ(rangeFormatter->FormatRange(4999, 5001), "4,999～5,001");
+    EXPECT_EQ(rangeFormatter->FormatRange(5000, 5000), "約5,000");
+    EXPECT_EQ(rangeFormatter->FormatRange(5e3, 5e6), "5,000～5,000,000");
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

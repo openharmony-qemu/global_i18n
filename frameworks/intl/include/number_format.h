@@ -38,6 +38,7 @@
 #include "locale_info.h"
 #include "measure_data.h"
 #include "relative_time_format.h"
+#include "unicode/numberrangeformatter.h"
 
 namespace OHOS {
 namespace Global {
@@ -47,6 +48,7 @@ public:
     NumberFormat(const std::vector<std::string> &localeTag, std::map<std::string, std::string> &configs);
     virtual ~NumberFormat();
     std::string Format(double number);
+    std::string FormatRange(double start, double end);
     void GetResolvedOptions(std::map<std::string, std::string> &map);
     std::string GetCurrency() const;
     std::string GetCurrencySign() const;
@@ -88,6 +90,7 @@ private:
     std::unique_ptr<LocaleInfo> localeInfo = nullptr;
     std::unique_ptr<RelativeTimeFormat> relativeTimeFormat = nullptr;
     icu::number::LocalizedNumberFormatter numberFormat;
+    icu::number::LocalizedNumberRangeFormatter numberRangeFormat;
     icu::number::Notation notation = icu::number::Notation::simple();
     UNumberUnitWidth unitDisplay = UNumberUnitWidth::UNUM_UNIT_WIDTH_SHORT;
     UNumberUnitWidth currencyDisplay = UNumberUnitWidth::UNUM_UNIT_WIDTH_SHORT;
@@ -115,8 +118,10 @@ private:
     void ParseConfigs(std::map<std::string, std::string> &configs);
     void ParseDigitsConfigs(std::map<std::string, std::string> &configs);
     void GetDigitsResolvedOptions(std::map<std::string, std::string> &map);
-    void InitProperties();
-    void InitDigitsProperties();
+    void InitProperties(icu::number::UnlocalizedNumberFormatter &formatter);
+    void InitUnitProperties(icu::number::UnlocalizedNumberFormatter &formatter);
+    void InitDigitsProperties(icu::number::UnlocalizedNumberFormatter &formatter);
+    void InitNumberFormat(icu::number::UnlocalizedNumberFormatter &formatter);
     void SetUnit(std::string &preferredUnit);
     void SetDefaultStyle();
     void SetPrecisionWithByte(double number, const std::string& finalUnit);
