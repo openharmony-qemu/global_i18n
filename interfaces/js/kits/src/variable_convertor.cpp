@@ -21,6 +21,16 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
+const std::map<napi_valuetype, std::string> VariableConvertor::NAPI_TYPE_MAP {
+    {napi_valuetype::napi_boolean, "boolean"},
+    {napi_valuetype::napi_number, "number"},
+    {napi_valuetype::napi_string, "string"},
+    {napi_valuetype::napi_bigint, "bigint"},
+    {napi_valuetype::napi_symbol, "symbol"},
+    {napi_valuetype::napi_object, "object"},
+    {napi_valuetype::napi_null, "null"},
+    {napi_valuetype::napi_undefined, "undefined"},
+};
 bool VariableConvertor::CheckNapiIsNull(napi_env env, napi_value value)
 {
     if (value != nullptr) {
@@ -39,7 +49,7 @@ void VariableConvertor::GetOptionValue(napi_env env, napi_value options, const s
     napi_value optionValue = nullptr;
     napi_valuetype type = napi_undefined;
     napi_status status = napi_typeof(env, options, &type);
-    if (status != napi_ok && type != napi_object) {
+    if (status != napi_ok || type != napi_object) {
         HILOG_ERROR_I18N("GetOptionValue: Get option failed, option is not an object");
         return;
     }
@@ -66,7 +76,7 @@ bool VariableConvertor::GetBoolOptionValue(napi_env env, napi_value &options, co
 {
     napi_valuetype type = napi_undefined;
     napi_status status = napi_typeof(env, options, &type);
-    if (status != napi_ok && type != napi_object) {
+    if (status != napi_ok || type != napi_object) {
         HILOG_ERROR_I18N("option is not an object");
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, optionName, "a valid object", true);
         return false;
@@ -111,7 +121,7 @@ bool VariableConvertor::GetStringArrayFromJsParam(napi_env env, napi_value &jsAr
     std::vector<std::string> &strArray)
 {
     if (jsArray == nullptr) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, valueName, "", true);
+        ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, valueName, true);
         return false;
     }
     bool isArray = false;
@@ -160,14 +170,14 @@ napi_value VariableConvertor::CreateNumber(napi_env env, const int32_t &num)
     return result;
 }
 
-void VariableConvertor::VerifyType(napi_env env, const std::string& valueName, const std::string& type,
+void VariableConvertor::VerifyType(napi_env env, const std::string& valueName, napi_valuetype napiType,
     napi_value argv)
 {
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv, &valueType);
-    if (type == "string" && valueType != napi_valuetype::napi_string) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, valueName, type, true);
-    } else if (type == "number" && valueType != napi_valuetype::napi_number) {
+    if (valueType != napiType) {
+        auto iter = NAPI_TYPE_MAP.find(napiType);
+        std::string type = iter != NAPI_TYPE_MAP.end() ? iter->second : "";
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, valueName, type, true);
     }
 }

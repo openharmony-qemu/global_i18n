@@ -101,7 +101,7 @@ napi_value I18nNormalizerAddon::I18nNormalizerConstructor(napi_env env, napi_cal
         return nullptr;
     }
     if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "mode", "", true);
+        ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, "mode", true);
         return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
@@ -149,7 +149,7 @@ napi_value I18nNormalizerAddon::Normalize(napi_env env, napi_callback_info info)
         return nullptr;
     }
     if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "text", "", true);
+        ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, "text", true);
         return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
