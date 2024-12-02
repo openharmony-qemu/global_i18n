@@ -251,9 +251,6 @@ napi_value LocaleInfoAddon::GetLocaleInfoAttribute(napi_env env, napi_callback_i
         return nullptr;
     }
     std::string value = func(obj->locale_);
-    if (value.empty()) {
-        return nullptr;
-    }
     napi_value result = nullptr;
     status = napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &result);
     if (status != napi_ok) {
