@@ -309,7 +309,7 @@ napi_value LocaleInfoAddon::GetNumeric(napi_env env, napi_callback_info info)
     void *data = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
 
-    IntlAddon *obj = nullptr;
+    LocaleInfoAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->locale_) {
         HILOG_ERROR_I18N("GetNumeric: Get Locale object failed");
