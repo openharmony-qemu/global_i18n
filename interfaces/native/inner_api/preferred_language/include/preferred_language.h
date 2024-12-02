@@ -19,13 +19,11 @@
 #include <string>
 #include <vector>
 #include "i18n_types.h"
-#ifdef SUPPORT_APP_PREFERRED_LANGUAGE
-#include "preferences_helper.h"
-#endif
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
+class NativePreferences::Preferences;
 class PreferredLanguage {
 public:
     /**
