@@ -116,7 +116,7 @@ napi_value SystemLocaleManagerAddon::GetLanguageInfoArray(napi_env env, napi_cal
         return nullptr;
     }
     if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "languages", "", true);
+        ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, "languages", true);
         return nullptr;
     }
     std::vector<std::string> languageList;
@@ -155,7 +155,7 @@ napi_value SystemLocaleManagerAddon::GetCountryInfoArray(napi_env env, napi_call
         return nullptr;
     }
     if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "regions", "", true);
+        ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, "regions", true);
         return nullptr;
     }
     std::vector<std::string> countryList;

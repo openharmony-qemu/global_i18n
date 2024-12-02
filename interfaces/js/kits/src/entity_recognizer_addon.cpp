@@ -114,7 +114,7 @@ napi_value EntityRecognizerAddon::FindEntityInfo(napi_env env, napi_callback_inf
     if (status != napi_ok) {
         return nullptr;
     } else if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "text", "", true);
+        ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, "text", true);
         return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;

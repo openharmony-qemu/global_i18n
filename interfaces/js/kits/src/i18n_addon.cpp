@@ -25,6 +25,7 @@
 #include "i18n_timezone_addon.h"
 #include "i18n_unicode_addon.h"
 #include "js_utils.h"
+#include "locale_config.h"
 #include "locale_info.h"
 #include "locale_matcher.h"
 #include "node_api.h"
@@ -37,6 +38,7 @@
 #include "variable_convertor.h"
 #include "i18n_addon.h"
 #include "date_time_sequence.h"
+#include "locale_info_addon.h"
 
 namespace OHOS {
 namespace Global {
@@ -85,7 +87,8 @@ napi_value I18nAddon::InitI18nUtil(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getTimePeriodName", GetTimePeriodName),
         DECLARE_NAPI_STATIC_FUNCTION("getBestMatchLocale", GetBestMatchLocale),
         DECLARE_NAPI_STATIC_FUNCTION("getThreeLetterLanguage", GetThreeLetterLanguage),
-        DECLARE_NAPI_STATIC_FUNCTION("getThreeLetterRegion", GetThreeLetterRegion)
+        DECLARE_NAPI_STATIC_FUNCTION("getThreeLetterRegion", GetThreeLetterRegion),
+        DECLARE_NAPI_STATIC_FUNCTION("getUnicodeWrappedFilePath", GetLocalizedFilePath)
     };
     napi_value constructor = nullptr;
     napi_status status = napi_define_class(env, "I18NUtil", NAPI_AUTO_LENGTH, JSUtils::DefaultConstructor, nullptr,
@@ -281,7 +284,7 @@ int I18nAddon::GetParamOfGetTimePeriodName(napi_env env, napi_callback_info info
         HILOG_ERROR_I18N("GetTimePeriodName can't get parameters from getTimePerioudName.");
         return -1;
     } else if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "hour", "", true);
+        ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, "hour", true);
         return -1;
     }
 
@@ -377,7 +380,7 @@ napi_value I18nAddon::GetBestMatchLocale(napi_env env, napi_callback_info info)
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok || argc < 2) { // 2 is the request param num.
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale or localeList", "", true);
+        ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, "locale or localeList", true);
         return nullptr;
     }
     LocaleInfo *requestLocale = ProcessJsParamLocale(env, argv[0]);
@@ -421,7 +424,7 @@ napi_value I18nAddon::GetThreeLetterLanguage(napi_env env, napi_callback_info in
         HILOG_ERROR_I18N("GetThreeLetterLanguage napi get param error.");
         return nullptr;
     } else if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "", true);
+        ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, "locale", true);
         return nullptr;
     }
 
@@ -462,7 +465,7 @@ napi_value I18nAddon::GetThreeLetterRegion(napi_env env, napi_callback_info info
         HILOG_ERROR_I18N("GetThreeLetterRegion: Failed to obtain the parameter.");
         return nullptr;
     } else if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "", true);
+        ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, "locale", true);
         return nullptr;
     }
 
@@ -723,6 +726,69 @@ napi_value I18nAddon::IsRTL(napi_env env, napi_callback_info info)
         return nullptr;
     }
     return result;
+}
+
+napi_value I18nAddon::GetLocalizedFilePath(napi_env env, napi_callback_info info)
+{
+    size_t argc = 3;
+    napi_value argv[3] = { 0 };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
+    if (argc < 1) {
+        ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, "path", true);
+        return nullptr;
+    }
+    VariableConvertor::VerifyType(env, "path", napi_valuetype::napi_string, argv[0]);
+    int32_t code = 0;
+    std::string path = VariableConvertor::GetString(env, argv[0], code);
+    if (code) {
+        return nullptr;
+    }
+    char delimiter = PATH_SEPARATOR;
+    if (argc >= 2) { // 2 is parameter count
+        VariableConvertor::VerifyType(env, "delimiter", napi_valuetype::napi_string, argv[1]);
+        delimiter = GetDelimiter(env, argv[1]);
+        if (delimiter == '\0') {
+            return nullptr;
+        }
+    }
+    LocaleInfoAddon *obj = nullptr;
+    if (argc == 3) { // 3 is parameter count
+        napi_status status = napi_unwrap(env,
+            argv[2], reinterpret_cast<void **>(&obj)); // 2 is the last parameter index
+        if (status != napi_ok || !obj || !obj->GetLocaleInfo()) {
+            HILOG_ERROR_I18N("GetLanguage: Get Locale object failed");
+            return nullptr;
+        }
+    }
+    std::string errorCode;
+    std::shared_ptr<LocaleInfo> localeInfoPtr = obj == nullptr ? nullptr : obj->GetLocaleInfo();
+    std::string result = LocaleConfig::GetLocalizedFilePath(path, delimiter,
+        localeInfoPtr, errorCode);
+    if (!errorCode.empty()) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, errorCode, "valid", true);
+        return nullptr;
+    }
+    return VariableConvertor::CreateString(env, result);
+}
+
+char I18nAddon::GetDelimiter(napi_env env, napi_value argVal)
+{
+    int32_t code = 0;
+    std::string result = VariableConvertor::GetString(env, argVal, code);
+    if (code) {
+        HILOG_ERROR_I18N("GetDelimiter: Get string failed");
+        return '\0';
+    }
+    if (result.length() != 1) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "delimiter", "a valid delimiter", true);
+        return '\0';
+    }
+    return result.at(0);
 }
 
 napi_value I18nAddon::InitPhoneNumberFormat(napi_env env, napi_value exports)
