@@ -21,13 +21,14 @@
 #include "i18n_types.h"
 
 namespace OHOS {
-namespace Global {
-namespace I18n {
 
 namespace NativePreferences {
 class Preferences;
+struct Options;
 }
 
+namespace Global {
+namespace I18n {
 class PreferredLanguage {
 public:
     /**
