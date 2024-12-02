@@ -2133,14 +2133,17 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0045, TestSize.Level1)
     options = {
         {"style", "currency"},
         {"currency", "USD"},
-        {"roundingIncrement", "2"},
+        {"roundingIncrement", "5"},
         {"maximumFractionDigits", "2"},
+        {"roundingMode": "halfCeil"}
     };
     std::unique_ptr<NumberFormat> numberFmt = std::make_unique<NumberFormat>(locales, options);
     ASSERT_TRUE(numberFmt != nullptr);
-    EXPECT_EQ(numberFmt->Format(11.29), "$11.30");
-    EXPECT_EQ(numberFmt->Format(11.25), "$11.26");
-    EXPECT_EQ(numberFmt->Format(11.22), "$11.22");
+    EXPECT_EQ(numberFmt->Format(11.21), "$11.20");
+    EXPECT_EQ(numberFmt->Format(11.22), "$11.20");
+    EXPECT_EQ(numberFmt->Format(11.224), "$11.20");
+    EXPECT_EQ(numberFmt->Format(11.225), "$11.25");
+    EXPECT_EQ(numberFmt->Format(11.23), "$11.25");
 }
 } // namespace I18n
 } // namespace Global

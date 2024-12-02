@@ -102,8 +102,10 @@ private:
     UNumberSignDisplay signDisplay = UNumberSignDisplay::UNUM_SIGN_AUTO;
     static const int MAX_UNIT_NUM = 500;
     static const int DEFAULT_FRACTION_DIGITS = 3;
+    static const int DEFAULT_MAX_SIGNIFICANT_DIGITS = 21;
     static const char *DEVICE_TYPE_NAME;
     static const int BUFFER_LEN = 10;
+    static const int POW_BASE_NUMBER = 10;
     static const int CURRENCY_LEN = 3;
     static std::unordered_map<std::string, std::string> numToCurrency;
     icu::MeasureUnit unitArray[MAX_UNIT_NUM];
@@ -137,6 +139,9 @@ private:
     void HandleRoundingPriority(icu::number::UnlocalizedNumberFormatter &formatter);
     void SetRoundingIncrement(icu::number::UnlocalizedNumberFormatter &formatter);
     int32_t GetMinimumSignificantDigitsIntValue();
+    int32_t GetMaximumSignificantDigitsIntValue();
+    int32_t GetMaximumFractionDigitsValue();
+    int32_t GetMinimumFractionDigitsValue();
 };
 } // namespace I18n
 } // namespace Global

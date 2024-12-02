@@ -274,35 +274,35 @@ void NumberFormat::InitDigitsProperties(icu::number::UnlocalizedNumberFormatter 
 
 void NumberFormat::SetRoundingIncrement(icu::number::UnlocalizedNumberFormatter &formatter)
 {
-    if (!maximumFractionDigits.empty() && roundingIncrement != 1) {
-        int32_t status = 0;
-        int32_t maxFractionDigits = ConvertString2Int(maximumFractionDigits, status);
-        if (status != 0) {
-            return;
-        }
-        double increment = pow(10, -1.0 * maxFractionDigits) * roundingIncrement; // 10 is base number
+    if (roundingIncrement != 1) {
+        int32_t maxFractionDigits = GetMaximumFractionDigitsValue();
+        double increment = pow(POW_BASE_NUMBER, -1.0 * maxFractionDigits) * roundingIncrement;
         formatter = formatter.precision(icu::number::Precision::increment(increment));
     }
 }
 
 void NumberFormat::HandleRoundingPriority(icu::number::UnlocalizedNumberFormatter &formatter)
 {
-    if (!maximumFractionDigits.empty() && !maximumSignificantDigits.empty()) {
-        if (roundingPriorityStr.compare("auto") == 0) {
-            return;
-        }
-        int32_t status = 0;
-        int32_t maxFractionDigits = ConvertString2Int(maximumFractionDigits, status);
-        if (status != 0) {
-            return;
-        }
-        int32_t maxSignifDigits = ConvertString2Int(maximumSignificantDigits, status);
-        if (status != 0) {
-            return;
-        }
-        int32_t minSigDigits = GetMinimumSignificantDigitsIntValue();
+    if (roundingPriorityStr.compare("auto") == 0) {
+        return;
+    }
+    int32_t maxSigDigits = GetMaximumSignificantDigitsIntValue();
+    int32_t minSigDigits = GetMinimumSignificantDigitsIntValue();
+    if (!minimumFractionDigits.empty() && maximumFractionDigits.empty()) {
+        int32_t minFractionDigits = GetMinimumFractionDigitsValue();
+        auto precision = icu::number::Precision::minFraction(minFractionDigits)
+            .withSignificantDigits(minSigDigits, maxSigDigits, roundingPriority);
+        formatter = formatter.precision(precision);
+    } else if (minimumFractionDigits.empty() && !maximumFractionDigits.empty()) {
+        int32_t maxFractionDigits = GetMaximumFractionDigitsValue();
         auto precision = icu::number::Precision::maxFraction(maxFractionDigits)
-            .withSignificantDigits(minSigDigits, maxSignifDigits, roundingPriority);
+            .withSignificantDigits(minSigDigits, maxSigDigits, roundingPriority);
+        formatter = formatter.precision(precision);
+    } else if (!minimumFractionDigits.empty() && !maximumFractionDigits.empty()) {
+        int32_t minFractionDigits = GetMinimumFractionDigitsValue();
+        int32_t maxFractionDigits = GetMaximumFractionDigitsValue();
+        auto precision = icu::number::Precision::minMaxFraction(minFractionDigits, maxFractionDigits)
+            .withSignificantDigits(minSigDigits, maxSigDigits, roundingPriority);
         formatter = formatter.precision(precision);
     }
 }
@@ -316,6 +316,39 @@ int32_t NumberFormat::GetMinimumSignificantDigitsIntValue()
         minSignifDigits = (status == 0) ? minSignDigits : minSignifDigits;
     }
     return minSignifDigits;
+}
+
+int32_t NumberFormat::GetMaximumSignificantDigitsIntValue()
+{
+    int32_t maxSign = DEFAULT_MAX_SIGNIFICANT_DIGITS;
+    if (!maximumSignificantDigits.empty()) {
+        int32_t status = 0;
+        int32_t maxSignDigits = ConvertString2Int(maximumSignificantDigits, status);
+        maxSign = (status == 0) ? maxSignDigits : maxSign;
+    }
+    return maxSign;
+}
+
+int32_t NumberFormat::GetMaximumFractionDigitsValue()
+{
+    int32_t maxFraction = DEFAULT_FRACTION_DIGITS;
+    if (!maximumFractionDigits.empty()) {
+        int32_t status = 0;
+        int32_t maxFractionDigits = ConvertString2Int(maximumFractionDigits, status);
+        maxFraction = (status == 0) ? maxFractionDigits : maxFraction;
+    }
+    return maxFraction;
+}
+
+int32_t NumberFormat::GetMinimumFractionDigitsValue()
+{
+    int32_t minFraction = 0;
+    if (!minimumFractionDigits.empty()) {
+        int32_t status = 0;
+        int32_t minFractionDigits = ConvertString2Int(minimumFractionDigits, status);
+        minFraction = (status == 0) ? minFractionDigits : minFraction;
+    }
+    return minFraction; 
 }
 
 void NumberFormat::ParseConfigs(std::map<std::string, std::string> &configs)
