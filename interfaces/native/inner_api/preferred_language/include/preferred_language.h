@@ -23,7 +23,11 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-class NativePreferences::Preferences;
+
+namespace NativePreferences {
+class Preferences;
+}
+
 class PreferredLanguage {
 public:
     /**
