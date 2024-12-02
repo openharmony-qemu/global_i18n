@@ -38,6 +38,7 @@
 #include "locale_info.h"
 #include "measure_data.h"
 #include "relative_time_format.h"
+#include "unicode/numberrangeformatter.h"
 
 namespace OHOS {
 namespace Global {
@@ -47,6 +48,7 @@ public:
     NumberFormat(const std::vector<std::string> &localeTag, std::map<std::string, std::string> &configs);
     virtual ~NumberFormat();
     std::string Format(double number);
+    std::string FormatRange(double start, double end);
     void GetResolvedOptions(std::map<std::string, std::string> &map);
     std::string GetCurrency() const;
     std::string GetCurrencySign() const;
@@ -83,12 +85,18 @@ private:
     std::string unitUsage;
     std::string unitType;
     std::string unitMeasSys;
+    std::string roundingPriorityStr = "auto";
+    std::string roundingModeStr;
+    size_t roundingIncrement = 1;
     bool createSuccess = false;
     bool isSetFraction = false;
     std::unique_ptr<LocaleInfo> localeInfo = nullptr;
     std::unique_ptr<RelativeTimeFormat> relativeTimeFormat = nullptr;
     icu::number::LocalizedNumberFormatter numberFormat;
+    icu::number::LocalizedNumberRangeFormatter numberRangeFormat;
     icu::number::Notation notation = icu::number::Notation::simple();
+    UNumberRoundingPriority roundingPriority = UNumberRoundingPriority::UNUM_ROUNDING_PRIORITY_STRICT;
+    UNumberFormatRoundingMode roundingMode = UNumberFormatRoundingMode::UNUM_ROUND_HALFUP;
     UNumberUnitWidth unitDisplay = UNumberUnitWidth::UNUM_UNIT_WIDTH_SHORT;
     UNumberUnitWidth currencyDisplay = UNumberUnitWidth::UNUM_UNIT_WIDTH_SHORT;
     UNumberSignDisplay signDisplay = UNumberSignDisplay::UNUM_SIGN_AUTO;
@@ -108,18 +116,26 @@ private:
     static std::unordered_map<UMeasurementSystem, std::string> measurementSystem;
     static std::unordered_map<std::string, UNumberUnitWidth> defaultUnitStyle;
     static std::unordered_map<std::string, UNumberUnitWidth> defaultCurrencyStyle;
+    static std::unordered_map<std::string, UNumberRoundingPriority> roundingPriorityStyle;
+    static std::unordered_map<std::string, UNumberFormatRoundingMode> roundingModeStyle;
+    static std::vector<size_t> roundingIncrementList;
     static std::map<std::string, std::string> RelativeTimeFormatConfigs;
     static bool ReadISO4217Ddatas();
     std::string GetCurrencyFromConfig(const std::string& currency);
     void CreateRelativeTimeFormat(const std::string& locale);
     void ParseConfigs(std::map<std::string, std::string> &configs);
     void ParseDigitsConfigs(std::map<std::string, std::string> &configs);
+    void ParseRoundingConfigs(std::map<std::string, std::string> &configs);
     void GetDigitsResolvedOptions(std::map<std::string, std::string> &map);
-    void InitProperties();
-    void InitDigitsProperties();
+    void InitProperties(icu::number::UnlocalizedNumberFormatter &formatter);
+    void InitUnitProperties(icu::number::UnlocalizedNumberFormatter &formatter);
+    void InitDigitsProperties(icu::number::UnlocalizedNumberFormatter &formatter);
+    void InitNumberFormat(icu::number::UnlocalizedNumberFormatter &formatter);
     void SetUnit(std::string &preferredUnit);
     void SetDefaultStyle();
     void SetPrecisionWithByte(double number, const std::string& finalUnit);
+    void HandleRoundingPriority(icu::number::UnlocalizedNumberFormatter &formatter);
+    int32_t GetMinimumSignificantDigitsIntValue();
 };
 } // namespace I18n
 } // namespace Global

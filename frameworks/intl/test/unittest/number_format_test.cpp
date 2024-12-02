@@ -1834,6 +1834,315 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0036, TestSize.Level1)
     ASSERT_TRUE(numFmtTW != nullptr);
     EXPECT_EQ(numFmtTW->Format(1234567.89), "1,234,567.89 次/分鐘");
 }
+
+/**
+ * @tc.name: NumberFormatFuncTest0037
+ * @tc.desc: Test Intl NumberFormat.formatRange
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0037, TestSize.Level1)
+{
+    string locale = "en-US";
+    vector<string> locales{locale};
+    string unit = "meter";
+    string style = "unit";
+    map<string, string> options = { { "style", style},
+                                    { "unit", unit } };
+    std::unique_ptr<NumberFormat> rangeFormatter = std::make_unique<NumberFormat>(locales, options);
+    ASSERT_TRUE(rangeFormatter != nullptr);
+    EXPECT_EQ(rangeFormatter->FormatRange(1, 5), "1–5 m");
+    EXPECT_EQ(rangeFormatter->FormatRange(4.9999999, 5.0000001), "~5 m");
+    EXPECT_EQ(rangeFormatter->FormatRange(5, 5), "~5 m");
+    EXPECT_EQ(rangeFormatter->FormatRange(0, 3), "0–3 m");
+    EXPECT_EQ(rangeFormatter->FormatRange(0, 0), "~0 m");
+    EXPECT_EQ(rangeFormatter->FormatRange(3, 3000), "3–3,000 m");
+    EXPECT_EQ(rangeFormatter->FormatRange(3000, 5000), "3,000–5,000 m");
+    EXPECT_EQ(rangeFormatter->FormatRange(4999, 5001), "4,999–5,001 m");
+    EXPECT_EQ(rangeFormatter->FormatRange(5000, 5000), "~5,000 m");
+    EXPECT_EQ(rangeFormatter->FormatRange(5e3, 5e6), "5,000–5,000,000 m");
+}
+
+/**
+ * @tc.name: NumberFormatFuncTest0038
+ * @tc.desc: Test Intl NumberFormat.formatRange
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0038, TestSize.Level1)
+{
+    string locale = "ja";
+    vector<string> locales{locale};
+    map<string, string> options = {};
+    std::unique_ptr<NumberFormat> rangeFormatter = std::make_unique<NumberFormat>(locales, options);
+    ASSERT_TRUE(rangeFormatter != nullptr);
+    EXPECT_EQ(rangeFormatter->FormatRange(1, 5), "1～5");
+    EXPECT_EQ(rangeFormatter->FormatRange(4.9999999, 5.0000001), "約5");
+    EXPECT_EQ(rangeFormatter->FormatRange(5, 5), "約5");
+    EXPECT_EQ(rangeFormatter->FormatRange(0, 3), "0～3");
+    EXPECT_EQ(rangeFormatter->FormatRange(0, 0), "約0");
+    EXPECT_EQ(rangeFormatter->FormatRange(3, 3000), "3～3,000");
+    EXPECT_EQ(rangeFormatter->FormatRange(3000, 5000), "3,000～5,000");
+    EXPECT_EQ(rangeFormatter->FormatRange(4999, 5001), "4,999～5,001");
+    EXPECT_EQ(rangeFormatter->FormatRange(5000, 5000), "約5,000");
+    EXPECT_EQ(rangeFormatter->FormatRange(5e3, 5e6), "5,000～5,000,000");
+}
+
+/**
+ * @tc.name: NumberFormatFuncTest0039
+ * @tc.desc: Test Intl NumberFormat.format
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0039, TestSize.Level1)
+{
+    string locale = "en";
+    vector<string> locales{locale};
+    map<string, string> options = {
+        {"maximumFractionDigits", "3"},
+    };
+    std::unique_ptr<NumberFormat> formatter = std::make_unique<NumberFormat>(locales, options);
+    ASSERT_TRUE(formatter != nullptr);
+    EXPECT_EQ(formatter->Format(1.23456), "1.235");
+    options = {
+        {"maximumSignificantDigits", "3"},
+    };
+    std::unique_ptr<NumberFormat> formatter2 = std::make_unique<NumberFormat>(locales, options);
+    EXPECT_EQ(formatter2->Format(1.23456), "1.23");
+    options = {
+        {"maximumFractionDigits", "3"},
+        {"maximumSignificantDigits", "3"},
+    };
+    std::unique_ptr<NumberFormat> formatter3 = std::make_unique<NumberFormat>(locales, options);
+    EXPECT_EQ(formatter3->Format(1.23456), "1.23");
+    options = {
+        {"roundingPriority", "lessPrecision"},
+        {"maximumFractionDigits", "3"},
+        {"maximumSignificantDigits", "3"},
+    };
+    std::unique_ptr<NumberFormat> formatter4 = std::make_unique<NumberFormat>(locales, options);
+    EXPECT_EQ(formatter4->Format(1.23456), "1.23");
+    options = {
+        {"roundingPriority", "morePrecision"},
+        {"maximumFractionDigits", "3"},
+        {"maximumSignificantDigits", "3"},
+    };
+    std::unique_ptr<NumberFormat> formatter5 = std::make_unique<NumberFormat>(locales, options);
+    EXPECT_EQ(formatter5->Format(1.23456), "1.23");
+    options = {
+        {"roundingPriority", "lessPrecision"},
+        {"minimumFractionDigits", "2"},
+        {"minimumSignificantDigits", "2"},
+    };
+    std::unique_ptr<NumberFormat> formatter6 = std::make_unique<NumberFormat>(locales, options);
+    EXPECT_EQ(formatter6->Format(1), "1.00");
+    options = {
+        {"roundingPriority", "morePrecision"},
+        {"minimumFractionDigits", "2"},
+        {"minimumSignificantDigits", "2"},
+    };
+    std::unique_ptr<NumberFormat> formatter7 = std::make_unique<NumberFormat>(locales, options);
+    EXPECT_EQ(formatter7->Format(1), "1.0");
+}
+
+/**
+ * @tc.name: NumberFormatFuncTest0040
+ * @tc.desc: Test Intl NumberFormat.format
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0040, TestSize.Level1)
+{
+    string locale = "en";
+    vector<string> locales{locale};
+    map<string, string> options = {
+        {"roundingMode", "ceil"},
+        {"maximumSignificantDigits", "2"},
+    };
+    std::unique_ptr<NumberFormat> formatter = std::make_unique<NumberFormat>(locales, options);
+    ASSERT_TRUE(formatter != nullptr);
+    EXPECT_EQ(formatter->Format(2.23), "2.3");
+    EXPECT_EQ(formatter->Format(2.25), "2.3");
+    EXPECT_EQ(formatter->Format(2.28), "2.3");
+    EXPECT_EQ(formatter->Format(-2.23), "-2.2");
+    EXPECT_EQ(formatter->Format(-2.25), "-2.2");
+    EXPECT_EQ(formatter->Format(-2.28), "-2.2");
+
+    options = {
+        {"roundingMode", "halfCeil"},
+        {"maximumSignificantDigits", "2"},
+    };
+    std::unique_ptr<NumberFormat> numFmt = std::make_unique<NumberFormat>(locales, options);
+    ASSERT_TRUE(numFmt != nullptr);
+    EXPECT_EQ(numFmt->Format(2.23), "2.2");
+    EXPECT_EQ(numFmt->Format(2.25), "2.3");
+    EXPECT_EQ(numFmt->Format(2.28), "2.3");
+    EXPECT_EQ(numFmt->Format(-2.23), "-2.2");
+    EXPECT_EQ(numFmt->Format(-2.25), "-2.2");
+    EXPECT_EQ(numFmt->Format(-2.28), "-2.3");
+}
+
+/**
+ * @tc.name: NumberFormatFuncTest0041
+ * @tc.desc: Test Intl NumberFormat.format
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0041, TestSize.Level1)
+{
+    string locale = "en";
+    vector<string> locales{locale};
+    map<string, string> options = {
+        {"roundingMode", "floor"},
+        {"maximumSignificantDigits", "2"},
+    };
+    std::unique_ptr<NumberFormat> formatter = std::make_unique<NumberFormat>(locales, options);
+    ASSERT_TRUE(formatter != nullptr);
+    EXPECT_EQ(formatter->Format(2.23), "2.2");
+    EXPECT_EQ(formatter->Format(2.25), "2.2");
+    EXPECT_EQ(formatter->Format(2.28), "2.2");
+    EXPECT_EQ(formatter->Format(-2.23), "-2.3");
+    EXPECT_EQ(formatter->Format(-2.25), "-2.3");
+    EXPECT_EQ(formatter->Format(-2.28), "-2.3");
+
+    options = {
+        {"roundingMode", "halfFloor"},
+        {"maximumSignificantDigits", "2"},
+    };
+    std::unique_ptr<NumberFormat> formatter2 = std::make_unique<NumberFormat>(locales, options);
+    ASSERT_TRUE(formatter2 != nullptr);
+    EXPECT_EQ(formatter2->Format(2.23), "2.2");
+    EXPECT_EQ(formatter2->Format(2.25), "2.2");
+    EXPECT_EQ(formatter2->Format(2.28), "2.3");
+    EXPECT_EQ(formatter2->Format(-2.23), "-2.2");
+    EXPECT_EQ(formatter2->Format(-2.25), "-2.3");
+    EXPECT_EQ(formatter2->Format(-2.28), "-2.3");
+}
+
+/**
+ * @tc.name: NumberFormatFuncTest0042
+ * @tc.desc: Test Intl NumberFormat.format
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0042, TestSize.Level1)
+{
+    string locale = "en";
+    vector<string> locales{locale};
+    map<string, string> options = {
+        {"roundingMode", "expand"},
+        {"maximumSignificantDigits", "2"},
+    };
+    std::unique_ptr<NumberFormat> formatter = std::make_unique<NumberFormat>(locales, options);
+    ASSERT_TRUE(formatter != nullptr);
+    EXPECT_EQ(formatter->Format(2.23), "2.3");
+    EXPECT_EQ(formatter->Format(2.25), "2.3");
+    EXPECT_EQ(formatter->Format(2.28), "2.3");
+    EXPECT_EQ(formatter->Format(-2.23), "-2.3");
+    EXPECT_EQ(formatter->Format(-2.25), "-2.3");
+    EXPECT_EQ(formatter->Format(-2.28), "-2.3");
+
+    options = {
+        {"roundingMode", "halfExpand"},
+        {"maximumSignificantDigits", "2"},
+    };
+    std::unique_ptr<NumberFormat> numberFormat = std::make_unique<NumberFormat>(locales, options);
+    ASSERT_TRUE(numberFormat != nullptr);
+    EXPECT_EQ(numberFormat->Format(2.23), "2.2");
+    EXPECT_EQ(numberFormat->Format(2.25), "2.3");
+    EXPECT_EQ(numberFormat->Format(2.28), "2.3");
+    EXPECT_EQ(numberFormat->Format(-2.23), "-2.2");
+    EXPECT_EQ(numberFormat->Format(-2.25), "-2.3");
+    EXPECT_EQ(numberFormat->Format(-2.28), "-2.3");
+}
+
+/**
+ * @tc.name: NumberFormatFuncTest0043
+ * @tc.desc: Test Intl NumberFormat.format
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0043, TestSize.Level1)
+{
+    string locale = "en";
+    vector<string> locales{locale};
+    map<string, string> options = {
+        {"roundingMode", "trunc"},
+        {"maximumSignificantDigits", "2"},
+    };
+    std::unique_ptr<NumberFormat> formatter = std::make_unique<NumberFormat>(locales, options);
+    ASSERT_TRUE(formatter != nullptr);
+    EXPECT_EQ(formatter->Format(2.23), "2.2");
+    EXPECT_EQ(formatter->Format(2.25), "2.2");
+    EXPECT_EQ(formatter->Format(2.28), "2.2");
+    EXPECT_EQ(formatter->Format(-2.23), "-2.2");
+    EXPECT_EQ(formatter->Format(-2.25), "-2.2");
+    EXPECT_EQ(formatter->Format(-2.28), "-2.2");
+
+    options = {
+        {"roundingMode", "halfTrunc"},
+        {"maximumSignificantDigits", "2"},
+    };
+    std::unique_ptr<NumberFormat> numberFormat = std::make_unique<NumberFormat>(locales, options);
+    ASSERT_TRUE(numberFormat != nullptr);
+    EXPECT_EQ(numberFormat->Format(2.23), "2.2");
+    EXPECT_EQ(numberFormat->Format(2.25), "2.2");
+    EXPECT_EQ(numberFormat->Format(2.28), "2.3");
+    EXPECT_EQ(numberFormat->Format(-2.23), "-2.2");
+    EXPECT_EQ(numberFormat->Format(-2.25), "-2.2");
+    EXPECT_EQ(numberFormat->Format(-2.28), "-2.3");
+}
+
+/**
+ * @tc.name: NumberFormatFuncTest0044
+ * @tc.desc: Test Intl NumberFormat.format
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0044, TestSize.Level1)
+{
+    string locale = "en";
+    vector<string> locales{locale};
+    map<string, string> options = {
+        {"roundingMode", "halfEven"},
+        {"maximumSignificantDigits", "2"},
+    };
+    std::unique_ptr<NumberFormat> formatter = std::make_unique<NumberFormat>(locales, options);
+    ASSERT_TRUE(formatter != nullptr);
+    EXPECT_EQ(formatter->Format(2.23), "2.2");
+    EXPECT_EQ(formatter->Format(2.25), "2.2");
+    EXPECT_EQ(formatter->Format(2.28), "2.3");
+    EXPECT_EQ(formatter->Format(-2.23), "-2.2");
+    EXPECT_EQ(formatter->Format(-2.25), "-2.2");
+    EXPECT_EQ(formatter->Format(-2.28), "-2.3");
+}
+
+/**
+ * @tc.name: NumberFormatFuncTest0045
+ * @tc.desc: Test Intl NumberFormat.format
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0045, TestSize.Level1)
+{
+    string locale = "en-US";
+    vector<string> locales{locale};
+    map<string, string> options = {
+        {"style", "currency"},
+        {"currency", "USD"},
+        {"roundingIncrement", "5"},
+        {"maximumFractionDigits", "2"},
+    };
+    std::unique_ptr<NumberFormat> formatter = std::make_unique<NumberFormat>(locales, options);
+    ASSERT_TRUE(formatter != nullptr);
+    EXPECT_EQ(formatter->Format(11.29), "$11.30");
+    EXPECT_EQ(formatter->Format(11.25), "$11.25");
+    EXPECT_EQ(formatter->Format(11.22), "$11.20");
+
+    options = {
+        {"style", "currency"},
+        {"currency", "USD"},
+        {"roundingIncrement", "2"},
+        {"maximumFractionDigits", "2"},
+    };
+    std::unique_ptr<NumberFormat> numberFmt = std::make_unique<NumberFormat>(locales, options);
+    ASSERT_TRUE(numberFmt != nullptr);
+    EXPECT_EQ(numberFmt->Format(11.29), "$11.30");
+    EXPECT_EQ(numberFmt->Format(11.25), "$11.26");
+    EXPECT_EQ(numberFmt->Format(11.22), "$11.22");
+
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

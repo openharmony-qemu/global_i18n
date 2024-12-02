@@ -151,6 +151,7 @@ napi_value IntlAddon::InitNumberFormat(napi_env env, napi_value exports)
     napi_status status = napi_ok;
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("format", FormatNumber),
+        DECLARE_NAPI_FUNCTION("formatRange", FormatRangeNumber),
         DECLARE_NAPI_FUNCTION("resolvedOptions", GetNumberResolvedOptions)
     };
 
@@ -573,6 +574,8 @@ void GetNumberOptionValues(napi_env env, napi_value options, std::map<std::strin
     GetOptionValue(env, options, "numberingSystem", map);
     GetOptionValue(env, options, "notation", map);
     GetOptionValue(env, options, "unitUsage", map);
+    GetOptionValue(env, options, "roundingPriority", map);
+    GetOptionValue(env, options, "roundingMode", map);
     GetBoolOptionValue(env, options, "useGrouping", map);
     GetIntegerOptionValue(env, options, "minimumIntegerDigits", map);
     int64_t minFd = GetIntegerOptionValue(env, options, "minimumFractionDigits", map);
@@ -583,6 +586,7 @@ void GetNumberOptionValues(napi_env env, napi_value options, std::map<std::strin
     }
     GetIntegerOptionValue(env, options, "minimumSignificantDigits", map);
     GetIntegerOptionValue(env, options, "maximumSignificantDigits", map);
+    GetIntegerOptionValue(env, options, "roundingIncrement", map);
 }
 
 napi_value IntlAddon::NumberFormatConstructor(napi_env env, napi_callback_info info)
@@ -1164,6 +1168,49 @@ napi_value IntlAddon::FormatNumber(napi_env env, napi_callback_info info)
     status = napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &result);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("FormatNumber: Create format string failed");
+        return nullptr;
+    }
+    return result;
+}
+
+napi_value IntlAddon::FormatRangeNumber(napi_env env, napi_callback_info info)
+{
+    size_t argc = 2;
+    napi_value argv[2] = { 0 };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("FormatRangeNumber: Get parameter info failed");
+        return nullptr;
+    }
+    if (argc != 2) { // 2 is parameter count
+        HILOG_ERROR_I18N("FormatRangeNumber: Insufficient parameters");
+        return nullptr;
+    }
+    double start = 0;
+    double end = 0;
+    status = napi_get_value_double(env, argv[0], &start);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("FormatRangeNumber: Get first param value failed");
+        return nullptr;
+    }
+    status = napi_get_value_double(env, argv[1], &end);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("FormatRangeNumber: Get second param value failed");
+        return nullptr;
+    }
+    IntlAddon *obj = nullptr;
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    if (status != napi_ok || !obj || !obj->numberfmt_) {
+        HILOG_ERROR_I18N("FormatRangeNumber: Get NumberFormat object failed");
+        return nullptr;
+    }
+    std::string value = obj->numberfmt_->FormatRange(start, end);
+    napi_value result;
+    status = napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &result);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("create string js variable failed.");
         return nullptr;
     }
     return result;
