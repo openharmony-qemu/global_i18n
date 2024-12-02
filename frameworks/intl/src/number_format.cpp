@@ -15,6 +15,7 @@
 #include "locale_config.h"
 
 #include <cctype>
+#include <cmath>
 #include <sstream>
 #include "i18n_hilog.h"
 #include "ohos/init_data.h"
@@ -267,10 +268,21 @@ void NumberFormat::InitDigitsProperties(icu::number::UnlocalizedNumberFormatter 
                 formatter.precision(icu::number::Precision::minMaxFraction(minFractionDigits, maxFractionDigits));
         }
     }
-    if (roundingIncrement != 1) {
-        formatter = formatter.precision(icu::number::Precision::increment(roundingIncrement));
-    }
+    SetRoundingIncrement(formatter);
     HandleRoundingPriority(formatter);
+}
+
+void NumberFormat::SetRoundingIncrement(icu::number::UnlocalizedNumberFormatter &formatter)
+{
+    if (!maximumFractionDigits.empty() && roundingIncrement != 1) {
+        int32_t status = 0;
+        int32_t maxFractionDigits = ConvertString2Int(maximumFractionDigits, status);
+        if (status != 0) {
+            return;
+        }
+        double increment = pow(10, -1.0 * maxFractionDigits) * roundingIncrement; // 10 is base number
+        formatter = formatter.precision(icu::number::Precision::increment(increment));
+    }
 }
 
 void NumberFormat::HandleRoundingPriority(icu::number::UnlocalizedNumberFormatter &formatter)

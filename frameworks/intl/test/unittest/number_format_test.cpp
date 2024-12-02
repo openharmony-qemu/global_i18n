@@ -1925,7 +1925,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0039, TestSize.Level1)
         {"maximumSignificantDigits", "3"},
     };
     std::unique_ptr<NumberFormat> formatter5 = std::make_unique<NumberFormat>(locales, options);
-    EXPECT_EQ(formatter5->Format(1.23456), "1.23");
+    EXPECT_EQ(formatter5->Format(1.23456), "1.235");
     options = {
         {"roundingPriority", "lessPrecision"},
         {"minimumFractionDigits", "2"},
@@ -2141,7 +2141,6 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0045, TestSize.Level1)
     EXPECT_EQ(numberFmt->Format(11.29), "$11.30");
     EXPECT_EQ(numberFmt->Format(11.25), "$11.26");
     EXPECT_EQ(numberFmt->Format(11.22), "$11.22");
-
 }
 } // namespace I18n
 } // namespace Global

@@ -135,6 +135,7 @@ private:
     void SetDefaultStyle();
     void SetPrecisionWithByte(double number, const std::string& finalUnit);
     void HandleRoundingPriority(icu::number::UnlocalizedNumberFormatter &formatter);
+    void SetRoundingIncrement(icu::number::UnlocalizedNumberFormatter &formatter);
     int32_t GetMinimumSignificantDigitsIntValue();
 };
 } // namespace I18n
