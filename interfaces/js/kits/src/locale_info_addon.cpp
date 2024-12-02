@@ -205,14 +205,6 @@ std::string LocaleInfoAddon::GetNumberingSystemInner(std::shared_ptr<LocaleInfo>
     return "";
 }
 
-std::string LocaleInfoAddon::GetNumericInner(std::shared_ptr<LocaleInfo> localeInfo)
-{
-    if (localeInfo != nullptr) {
-        return localeInfo->GetNumeric();
-    }
-    return "";
-}
-
 std::string LocaleInfoAddon::GetCaseFirstInner(std::shared_ptr<LocaleInfo> localeInfo)
 {
     if (localeInfo != nullptr) {
@@ -313,7 +305,25 @@ napi_value LocaleInfoAddon::GetNumberingSystem(napi_env env, napi_callback_info 
 
 napi_value LocaleInfoAddon::GetNumeric(napi_env env, napi_callback_info info)
 {
-    return GetLocaleInfoAttribute(env, info, GetNumericInner);
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
+
+    IntlAddon *obj = nullptr;
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    if (status != napi_ok || !obj || !obj->locale_) {
+        HILOG_ERROR_I18N("GetNumeric: Get Locale object failed");
+        return nullptr;
+    }
+    std::string value = obj->locale_->GetNumeric();
+    bool optionBoolValue = (value == "true");
+    napi_value result = nullptr;
+    status = napi_get_boolean(env, optionBoolValue, &result);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("Create numeric boolean value failed");
+        return nullptr;
+    }
+    return result;
 }
 
 napi_value LocaleInfoAddon::GetCaseFirst(napi_env env, napi_callback_info info)

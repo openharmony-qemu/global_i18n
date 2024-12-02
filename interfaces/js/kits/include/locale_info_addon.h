@@ -58,7 +58,6 @@ private:
     static std::string GetCollationInner(std::shared_ptr<LocaleInfo> localeInfo);
     static std::string GetHourCycleInner(std::shared_ptr<LocaleInfo> localeInfo);
     static std::string GetNumberingSystemInner(std::shared_ptr<LocaleInfo> localeInfo);
-    static std::string GetNumericInner(std::shared_ptr<LocaleInfo> localeInfo);
     static std::string GetCaseFirstInner(std::shared_ptr<LocaleInfo> localeInfo);
     static std::string ToStringInner(std::shared_ptr<LocaleInfo> localeInfo);
     static std::string MaximizeInner(std::shared_ptr<LocaleInfo> localeInfo);
