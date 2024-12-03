@@ -15,6 +15,7 @@
 #ifndef OHOS_GLOBAL_I18N_VARIABLE_CONVERTOR_H
 #define OHOS_GLOBAL_I18N_VARIABLE_CONVERTOR_H
 
+#include <map>
 #include <string>
 #include <vector>
 #include "napi/native_api.h"
@@ -38,8 +39,11 @@ public:
     // Convert c++ variable to napi variable
     static napi_value CreateString(napi_env env, const std::string &str);
     static napi_value CreateNumber(napi_env env, const int32_t &num);
-    static void VerifyType(napi_env env, const std::string& valueName, const std::string& type, napi_value argv);
+    static void VerifyType(napi_env env, const std::string& valueName, napi_valuetype napiType, napi_value argv);
     static napi_status SetEnumValue(napi_env env, napi_value enumObj, const std::string& enumName, int32_t enumVal);
+
+private:
+    static const std::map<napi_valuetype, std::string> NAPI_TYPE_MAP;
 };
 } // namespace I18n
 } // namespace Global
