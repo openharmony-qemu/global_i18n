@@ -2135,7 +2135,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0045, TestSize.Level1)
         {"currency", "USD"},
         {"roundingIncrement", "5"},
         {"maximumFractionDigits", "2"},
-        {"roundingMode": "halfCeil"}
+        {"roundingMode", "halfCeil"},
     };
     std::unique_ptr<NumberFormat> numberFmt = std::make_unique<NumberFormat>(locales, options);
     ASSERT_TRUE(numberFmt != nullptr);
