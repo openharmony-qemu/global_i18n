@@ -84,6 +84,7 @@ std::unordered_map<std::string, UNumberUnitWidth> NumberFormat::defaultCurrencyS
 };
 
 std::unordered_map<std::string, UNumberRoundingPriority> NumberFormat::roundingPriorityStyle = {
+    { "auto", UNumberRoundingPriority::UNUM_ROUNDING_PRIORITY_STRICT },
     { "morePrecision", UNumberRoundingPriority::UNUM_ROUNDING_PRIORITY_RELAXED },
     { "lessPrecision", UNumberRoundingPriority::UNUM_ROUNDING_PRIORITY_STRICT }
 };
@@ -215,21 +216,22 @@ void NumberFormat::InitProperties(icu::number::UnlocalizedNumberFormatter &forma
 
 void NumberFormat::InitUnitProperties(icu::number::UnlocalizedNumberFormatter &formatter)
 {
-    if (!styleString.empty() && styleString == "unit") {
-        for (icu::MeasureUnit curUnit : unitArray) {
-            if (!strcmp(curUnit.getSubtype(), unit.c_str())) {
-                formatter = formatter.unit(curUnit);
-                unitType = curUnit.getType();
-            }
-        }
-        UErrorCode status = U_ZERO_ERROR;
-        UMeasurementSystem measSys = ulocdata_getMeasurementSystem(localeBaseName.c_str(), &status);
-        if (U_SUCCESS(status) && measSys >= 0) {
-            unitMeasSys = measurementSystem[measSys];
-        }
-        formatter = formatter.unitWidth(unitDisplay);
-        formatter = formatter.precision(icu::number::Precision::maxFraction(DEFAULT_FRACTION_DIGITS));
+    if (styleString.empty() || styleString.compare("unit") != 0) {
+        return;
     }
+    for (icu::MeasureUnit curUnit : unitArray) {
+        if (!strcmp(curUnit.getSubtype(), unit.c_str())) {
+            formatter = formatter.unit(curUnit);
+            unitType = curUnit.getType();
+        }
+    }
+    UErrorCode status = U_ZERO_ERROR;
+    UMeasurementSystem measSys = ulocdata_getMeasurementSystem(localeBaseName.c_str(), &status);
+    if (U_SUCCESS(status) && measSys >= 0) {
+        unitMeasSys = measurementSystem[measSys];
+    }
+    formatter = formatter.unitWidth(unitDisplay);
+    formatter = formatter.precision(icu::number::Precision::maxFraction(DEFAULT_FRACTION_DIGITS));
 }
 
 void NumberFormat::InitDigitsProperties(icu::number::UnlocalizedNumberFormatter &formatter)
@@ -283,28 +285,16 @@ void NumberFormat::SetRoundingIncrement(icu::number::UnlocalizedNumberFormatter 
 
 void NumberFormat::HandleRoundingPriority(icu::number::UnlocalizedNumberFormatter &formatter)
 {
-    if (roundingPriorityStr.compare("auto") == 0) {
+    if (roundingPriorityStr.empty()) {
         return;
     }
+    int32_t minFractionDigits = GetMinimumFractionDigitsValue();
+    int32_t maxFractionDigits = GetMaximumFractionDigitsValue();
     int32_t maxSigDigits = GetMaximumSignificantDigitsIntValue();
     int32_t minSigDigits = GetMinimumSignificantDigitsIntValue();
-    if (!minimumFractionDigits.empty() && maximumFractionDigits.empty()) {
-        int32_t minFractionDigits = GetMinimumFractionDigitsValue();
-        auto precision = icu::number::Precision::minFraction(minFractionDigits)
-            .withSignificantDigits(minSigDigits, maxSigDigits, roundingPriority);
-        formatter = formatter.precision(precision);
-    } else if (minimumFractionDigits.empty() && !maximumFractionDigits.empty()) {
-        int32_t maxFractionDigits = GetMaximumFractionDigitsValue();
-        auto precision = icu::number::Precision::maxFraction(maxFractionDigits)
-            .withSignificantDigits(minSigDigits, maxSigDigits, roundingPriority);
-        formatter = formatter.precision(precision);
-    } else if (!minimumFractionDigits.empty() && !maximumFractionDigits.empty()) {
-        int32_t minFractionDigits = GetMinimumFractionDigitsValue();
-        int32_t maxFractionDigits = GetMaximumFractionDigitsValue();
-        auto precision = icu::number::Precision::minMaxFraction(minFractionDigits, maxFractionDigits)
-            .withSignificantDigits(minSigDigits, maxSigDigits, roundingPriority);
-        formatter = formatter.precision(precision);
-    }
+    auto precision = icu::number::Precision::minMaxFraction(minFractionDigits, maxFractionDigits)
+        .withSignificantDigits(minSigDigits, maxSigDigits, roundingPriority);
+    formatter = formatter.precision(precision);
 }
 
 int32_t NumberFormat::GetMinimumSignificantDigitsIntValue()
@@ -629,7 +619,9 @@ void NumberFormat::GetDigitsResolvedOptions(std::map<std::string, std::string> &
     if (!roundingPriorityStr.empty()) {
         map.insert(std::make_pair("roundingPriority", roundingPriorityStr));
     }
-    map.insert(std::make_pair("roundingIncrement", std::to_string(roundingIncrement)));
+    if (roundingIncrement != 1) {
+        map.insert(std::make_pair("roundingIncrement", std::to_string(roundingIncrement)));
+    }
 }
 
 void NumberFormat::SetPrecisionWithByte(double number, const std::string& finalUnit)

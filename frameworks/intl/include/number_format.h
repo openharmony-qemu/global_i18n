@@ -85,7 +85,7 @@ private:
     std::string unitUsage;
     std::string unitType;
     std::string unitMeasSys;
-    std::string roundingPriorityStr = "auto";
+    std::string roundingPriorityStr;
     std::string roundingModeStr;
     size_t roundingIncrement = 1;
     bool createSuccess = false;
