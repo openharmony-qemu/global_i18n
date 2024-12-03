@@ -338,7 +338,7 @@ int32_t NumberFormat::GetMinimumFractionDigitsValue()
         int32_t minFractionDigits = ConvertString2Int(minimumFractionDigits, status);
         minFraction = (status == 0) ? minFractionDigits : minFraction;
     }
-    return minFraction; 
+    return minFraction;
 }
 
 void NumberFormat::ParseConfigs(std::map<std::string, std::string> &configs)
