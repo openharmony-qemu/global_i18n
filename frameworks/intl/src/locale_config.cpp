@@ -1157,6 +1157,7 @@ std::string LocaleConfig::GetValidLocale(const std::string &localeTag)
 bool LocaleConfig::IsEmpty24HourClock()
 {
     std::string is24Hour = ReadSystemParameter(HOUR_KEY, CONFIG_LEN);
+    HILOG_INFO_I18N("IsEmpty24HourClock: read from system param:%{public}s.", is24Hour.c_str());
     if (is24Hour.compare("default") == 0) {
         return true;
     }
@@ -1166,6 +1167,7 @@ bool LocaleConfig::IsEmpty24HourClock()
 bool LocaleConfig::Is24HourClock()
 {
     std::string is24Hour = ReadSystemParameter(HOUR_KEY, CONFIG_LEN);
+    HILOG_INFO_I18N("Is24HourClock: read from system param:%{public}s.", is24Hour.c_str());
     if (is24Hour.compare("default") == 0) {
         std::string systemLocale = GetSystemLocale();
         return Is24HourLocale(systemLocale);
