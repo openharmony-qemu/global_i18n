@@ -17,7 +17,6 @@
 #include "error_util.h"
 #include "i18n_hilog.h"
 #include "locale_config.h"
-#include "variable_convertor.h"
 #include "locale_info_addon.h"
 #include "js_utils.h"
 
