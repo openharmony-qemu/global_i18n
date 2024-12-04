@@ -81,7 +81,7 @@ std::string ReadSystemParameter(const char *paramKey, const int paramLength)
 {
     char param[paramLength];
     int status = GetParameter(paramKey, "", param, paramLength);
-    if (status == 0) {
+    if (status > 0) {
         return param;
     }
     HILOG_ERROR_I18N("GetParameter: error code: %{public}d.", status);
