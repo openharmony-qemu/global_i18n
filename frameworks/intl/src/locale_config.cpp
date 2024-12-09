@@ -1180,7 +1180,7 @@ bool LocaleConfig::Is24HourClock()
 std::string LocaleConfig::GetSystemHour()
 {
     std::string is24HourVal = ReadSystemParameter(HOUR_KEY, CONFIG_LEN);
-    HILOG_INFO_I18N("Is24HourClock: read from system param:%{public}s.", is24HourVal.c_str());
+    HILOG_INFO_I18N("GetSystemHour: read from system param:%{public}s.", is24HourVal.c_str());
     bool is24Hour = Is24HourClock();
     return is24Hour ? "true" : "false";
 }
