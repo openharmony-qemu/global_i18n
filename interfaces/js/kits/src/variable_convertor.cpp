@@ -15,7 +15,7 @@
 
 #include "error_util.h"
 #include "i18n_hilog.h"
-#include "js_utils.h"
+#include "locale_info_addon.h"
 #include "variable_convertor.h"
 
 namespace OHOS {
@@ -208,6 +208,33 @@ napi_status VariableConvertor::SetEnumValue(napi_env env, napi_value enumObj, co
         return status;
     }
     return napi_ok;
+}
+
+std::shared_ptr<LocaleInfo> VariableConvertor::ParseIntlLocale(napi_env env, napi_value intlLocale)
+{
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    napi_status status = napi_typeof(env, intlLocale, &valueType);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("ParseIntlLocale: Failed to get type of intlLocale.");
+        return nullptr;
+    } else if (valueType != napi_valuetype::napi_object) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "intl.Locale", true);
+        return nullptr;
+    }
+
+    LocaleInfoAddon *localeInfoAddon = nullptr;
+    status = napi_unwrap(env, intlLocale, reinterpret_cast<void **>(&localeInfoAddon));
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("ParseIntlLocale: Failed to unwrap intlLocale.");
+        return nullptr;
+    } else if (!localeInfoAddon) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "intl.Locale", true);
+        return nullptr;
+    } else if (!localeInfoAddon->GetLocaleInfo()) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "locale", "a valid intl.Locale", true);
+        return nullptr;
+    }
+    return localeInfoAddon->GetLocaleInfo();
 }
 } // namespace I18n
 } // namespace Global
