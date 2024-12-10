@@ -72,7 +72,7 @@ napi_value HolidayManagerAddon::HolidayManagerConstructor(napi_env env, napi_cal
     if (status != napi_ok) {
         return nullptr;
     } else if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "icsPath", "", true);
+        ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, "icsPath", true);
         return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;

@@ -15,6 +15,7 @@
 #ifndef JS_UTILS_H
 #define JS_UTILS_H
 
+#include <map>
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 
@@ -25,6 +26,11 @@ class JSUtils {
 public:
     static napi_value DefaultConstructor(napi_env env, napi_callback_info info);
     static napi_value CreateEmptyString(napi_env env);
+    static void GetOptionValue(napi_env env, napi_value options, const std::string &optionName,
+        std::map<std::string, std::string> &map);
+    static void GetBoolOptionValue(napi_env env, napi_value options, const std::string &optionName,
+        std::map<std::string, std::string> &map);
+    static std::string GetLocaleTag(napi_env env, napi_value argv);
 };
 } // namespace I18n
 } // namespace Global
