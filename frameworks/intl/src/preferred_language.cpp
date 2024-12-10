@@ -19,6 +19,7 @@
 #include "bundle_mgr_interface.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
+#include "preferences_helper.h"
 #endif
 #include "i18n_hilog.h"
 #include "locale_config.h"
