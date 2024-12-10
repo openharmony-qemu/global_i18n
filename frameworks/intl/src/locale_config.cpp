@@ -1271,8 +1271,7 @@ std::unordered_set<std::string> LocaleConfig::GetLanguageBlockedRegions()
     return emptyResult;
 }
 
-I18nErrorCode LocaleConfig::SetSystemLanguage(const std::string &languageTag, const int32_t userId,
-    const bool isSwitchUser)
+I18nErrorCode LocaleConfig::SetSystemLanguage(const std::string &languageTag, int32_t userId, bool isSwitchUser)
 {
     if (!IsValidTag(languageTag)) {
         HILOG_ERROR_I18N("LocaleConfig::SetSystemLanguage %{public}s is not valid language tag.",
@@ -1304,7 +1303,7 @@ I18nErrorCode LocaleConfig::SetSystemLanguage(const std::string &languageTag, co
     return I18nErrorCode::UPDATE_SYSTEM_LANGUAGE_FAILED;
 }
 
-I18nErrorCode LocaleConfig::SetSystemRegion(const std::string &regionTag, const int32_t userId)
+I18nErrorCode LocaleConfig::SetSystemRegion(const std::string &regionTag, int32_t userId)
 {
     QueryUpgradeLocale();
     if (!IsValidRegion(regionTag)) {
@@ -1324,8 +1323,7 @@ void LocaleConfig::QueryUpgradeLocale()
     }
 }
 
-I18nErrorCode LocaleConfig::SetSystemLocale(const std::string &localeTag, const int32_t userId,
-    const bool isSwitchUser)
+I18nErrorCode LocaleConfig::SetSystemLocale(const std::string &localeTag, int32_t userId, bool isSwitchUser)
 {
     if (!IsValidTag(localeTag)) {
         HILOG_ERROR_I18N("LocaleConfig::SetSystemLocale %{public}s is not a valid locale tag.", localeTag.c_str());
@@ -1345,7 +1343,7 @@ I18nErrorCode LocaleConfig::SetSystemLocale(const std::string &localeTag, const 
 #endif
 #ifdef SUPPORT_GRAPHICS
     UpdateConfiguration(AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE, localeTag, userId, isSwitchUser);
-    return PublishCommonEvent(EventFwk::CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED);
+    return PublishCommonEvent(EventFwk::CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED, userId);
 #else
     return I18nErrorCode::SUCCESS;
 #endif
@@ -1359,8 +1357,7 @@ bool LocaleConfig::IsValid24HourClockValue(const std::string &tag)
     return false;
 }
 
-I18nErrorCode LocaleConfig::Set24HourClock(const std::string &option, const int32_t userId,
-    const bool isSwitchUser)
+I18nErrorCode LocaleConfig::Set24HourClock(const std::string &option, int32_t userId, bool isSwitchUser)
 {
     if (!IsValid24HourClockValue(option)) {
         HILOG_ERROR_I18N("LocaleConfig::Set24HourClock invalid 24 Hour clock tag: %{public}s", option.c_str());
@@ -1381,13 +1378,13 @@ I18nErrorCode LocaleConfig::Set24HourClock(const std::string &option, const int3
 #endif
 #ifdef SUPPORT_GRAPHICS
     UpdateConfiguration(AAFwk::GlobalConfigurationKey::SYSTEM_HOUR, option, userId, isSwitchUser);
-    return PublishCommonEvent(EventFwk::CommonEventSupport::COMMON_EVENT_TIME_CHANGED);
+    return PublishCommonEvent(EventFwk::CommonEventSupport::COMMON_EVENT_TIME_CHANGED, userId);
 #else
     return I18nErrorCode::SUCCESS;
 #endif
 }
 
-I18nErrorCode LocaleConfig::SetUsingLocalDigit(bool flag, const int32_t userId)
+I18nErrorCode LocaleConfig::SetUsingLocalDigit(bool flag, int32_t userId)
 {
     // check whether current language support local digit.
     std::string localeTag = GetSystemLocale();
@@ -1402,7 +1399,7 @@ I18nErrorCode LocaleConfig::SetUsingLocalDigit(bool flag, const int32_t userId)
     return SetSystemLocale(ModifyExtParam(localeTag, NUMBER_SYSTEM_KEY, localDigit), userId);
 }
 
-I18nErrorCode LocaleConfig::SetTemperatureType(const TemperatureType& type, const int32_t userId)
+I18nErrorCode LocaleConfig::SetTemperatureType(const TemperatureType& type, int32_t userId)
 {
     if (temperatureTypeToName.find(type) == temperatureTypeToName.end()) {
         HILOG_ERROR_I18N("LocaleConfig::SetTemperatureType: temperature type failed.");
@@ -1526,7 +1523,7 @@ void LocaleConfig::UpdateConfiguration(const char *key, const std::string &value
     HILOG_INFO_I18N("LocaleConfig::UpdateLanguageConfiguration update configuration finished.");
 }
 
-I18nErrorCode LocaleConfig::PublishCommonEvent(const std::string &eventType)
+I18nErrorCode LocaleConfig::PublishCommonEvent(const std::string &eventType, int32_t userId)
 {
     OHOS::AAFwk::Want localeChangeWant;
     localeChangeWant.SetAction(eventType);
@@ -1534,12 +1531,22 @@ I18nErrorCode LocaleConfig::PublishCommonEvent(const std::string &eventType)
     if (EventFwk::CommonEventSupport::COMMON_EVENT_TIME_CHANGED.compare(eventType) == 0) {
         event.SetData(HOUR_EVENT_DATA);
     }
-    if (!OHOS::EventFwk::CommonEventManager::PublishCommonEvent(event)) {
-        HILOG_ERROR_I18N("LocaleConfig::PublishCommonEvent Failed to Publish event %{public}s",
-            localeChangeWant.GetAction().c_str());
+    if (userId == -1) {
+        if (!OHOS::EventFwk::CommonEventManager::PublishCommonEvent(event)) {
+            HILOG_ERROR_I18N("LocaleConfig::PublishCommonEvent Failed to Publish event %{public}s",
+                localeChangeWant.GetAction().c_str());
+            return I18nErrorCode::PUBLISH_COMMON_EVENT_FAILED;
+        }
+        HILOG_INFO_I18N("LocaleConfig::PublishCommonEvent publish event finished.");
+        return I18nErrorCode::SUCCESS;
+    }
+
+    if (!OHOS::EventFwk::CommonEventManager::PublishCommonEventAsUser(event, userId)) {
+        HILOG_ERROR_I18N("LocaleConfig::PublishCommonEvent Failed to Publish event %{public}s, userId %{public}d.",
+            localeChangeWant.GetAction().c_str(), userId);
         return I18nErrorCode::PUBLISH_COMMON_EVENT_FAILED;
     }
-    HILOG_INFO_I18N("LocaleConfig::PublishCommonEvent publish event finished.");
+    HILOG_INFO_I18N("LocaleConfig::PublishCommonEvent publish event finished,  userId %{public}d.", userId);
     return I18nErrorCode::SUCCESS;
 }
 #endif

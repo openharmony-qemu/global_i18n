@@ -48,32 +48,52 @@ I18nServiceAbility::~I18nServiceAbility()
 
 I18nErrorCode I18nServiceAbility::SetSystemLanguage(const std::string &language)
 {
+#ifdef SUPPORT_MULTI_USER
     int32_t userId = GetCallingUserId();
     return LocaleConfig::SetSystemLanguage(language, userId);
+#else
+    return LocaleConfig::SetSystemLanguage(language);
+#endif
 }
 
 I18nErrorCode I18nServiceAbility::SetSystemRegion(const std::string &region)
 {
+#ifdef SUPPORT_MULTI_USER
     int32_t userId = GetCallingUserId();
     return LocaleConfig::SetSystemRegion(region, userId);
+#else
+    return LocaleConfig::SetSystemRegion(region);
+#endif
 }
 
 I18nErrorCode I18nServiceAbility::SetSystemLocale(const std::string &locale)
 {
+#ifdef SUPPORT_MULTI_USER
     int32_t userId = GetCallingUserId();
     return LocaleConfig::SetSystemLocale(locale, userId);
+#else
+    return LocaleConfig::SetSystemLocale(locale);
+#endif
 }
 
 I18nErrorCode I18nServiceAbility::Set24HourClock(const std::string &flag)
 {
+#ifdef SUPPORT_MULTI_USER
     int32_t userId = GetCallingUserId();
     return LocaleConfig::Set24HourClock(flag, userId);
+#else
+    return LocaleConfig::Set24HourClock(flag);
+#endif
 }
 
 I18nErrorCode I18nServiceAbility::SetUsingLocalDigit(bool flag)
 {
+#ifdef SUPPORT_MULTI_USER
     int32_t userId = GetCallingUserId();
     return LocaleConfig::SetUsingLocalDigit(flag, userId);
+#else
+    return LocaleConfig::SetUsingLocalDigit(flag);
+#endif
 }
 
 I18nErrorCode I18nServiceAbility::AddPreferredLanguage(const std::string &language, int32_t index)
@@ -88,14 +108,22 @@ I18nErrorCode I18nServiceAbility::RemovePreferredLanguage(int32_t index)
 
 I18nErrorCode I18nServiceAbility::SetTemperatureType(TemperatureType type)
 {
+#ifdef SUPPORT_MULTI_USER
     int32_t userId = GetCallingUserId();
     return LocaleConfig::SetTemperatureType(type, userId);
+#else
+    return LocaleConfig::SetTemperatureType(type);
+#endif
 }
 
 I18nErrorCode I18nServiceAbility::SetFirstDayOfWeek(WeekDay type)
 {
+#ifdef SUPPORT_MULTI_USER
     int32_t userId = GetCallingUserId();
     return LocaleConfig::SetFirstDayOfWeek(type, userId);
+#else
+    return LocaleConfig::SetFirstDayOfWeek(type);
+#endif
 }
 
 void I18nServiceAbility::UnloadI18nServiceAbility()
