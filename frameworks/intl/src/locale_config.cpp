@@ -280,6 +280,7 @@ static unordered_map<string, string> g_languageMap = {
     { "az-Latn", "az-Latn" },
     { "bs-Latn", "bs-Latn" },
     { "en-Latn-US", "en" },
+    { "en-US", "en" },
     { "en-Qaag", "en-Qaag" },
     { "uz-Latn", "uz-Latn" },
     { "sr-Latn", "sr-Latn" },
@@ -1414,6 +1415,9 @@ std::string LocaleConfig::GetTemperatureName(const TemperatureType& type)
         HILOG_ERROR_I18N("LocaleConfig::GetTemperatureName: temperature type failed.");
         return "";
     }
+    if (type == TemperatureType::FAHRENHEIT) {
+        return "fahrenheit";
+    }
     return temperatureTypeToName[type];
 }
 
@@ -1733,6 +1737,40 @@ std::string LocaleConfig::GetSimplifiedSystemLanguage()
     }
     LocaleInfo simplifiedLocale(locale);
     return simplifiedLocale.Minimize();
+}
+
+std::string LocaleConfig::GetLocalizedFilePath(const std::string &path, const char delimiter,
+    std::shared_ptr<LocaleInfo> localeInfo, std::string &errorCode)
+{
+    if (delimiter == '\0') {
+        errorCode = "delimiter";
+        return path;
+    }
+    if (path.empty() || path.length() > PATH_MAX) {
+        errorCode = "path";
+        return path;
+    }
+    std::string locale;
+    if (localeInfo != nullptr) {
+        locale = localeInfo->GetBaseName();
+    }
+    if (!IsValidTag(locale)) {
+        locale = GetSystemLocale();
+    }
+    if (!IsRTL(locale)) {
+        return path;
+    }
+    std::string result;
+    if (path[0] != delimiter) {
+        result.append("\u200f");
+    }
+    for (char c : path) {
+        if (c == delimiter) {
+            result.append("\u200f");
+        }
+        result.push_back(c);
+    }
+    return result;
 }
 } // namespace I18n
 } // namespace Global

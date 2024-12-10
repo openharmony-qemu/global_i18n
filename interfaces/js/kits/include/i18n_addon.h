@@ -61,6 +61,7 @@ public:
     static napi_value GetAvailableIDs(napi_env env, napi_callback_info info);
     static napi_value InitUtil(napi_env env, napi_value exports);
     static napi_value System(napi_env env, napi_value exports);
+    static napi_value GetLocalizedFilePath(napi_env env, napi_callback_info info);
 
 private:
     static napi_value PhoneNumberFormatConstructor(napi_env env, napi_callback_info info);
@@ -95,6 +96,7 @@ private:
     static napi_value I18nTransliteratorConstructor(napi_env env, napi_callback_info info);
     static std::string ModifyOrder(std::string &pattern);
     static void ProcessNormal(char ch, int *order, size_t orderSize, int *lengths, size_t lengsSize);
+    static char GetDelimiter(napi_env env, napi_value argVal);
 
     static int GetParamOfGetTimePeriodName(napi_env env, napi_callback_info info, std::string &tag, int32_t &hour);
 
@@ -105,6 +107,7 @@ private:
     static std::unordered_map<std::string, int32_t> EnumWeekDay;
 
     napi_env env_;
+    static const char PATH_SEPARATOR = '/';
     std::unique_ptr<PhoneNumberFormat> phonenumberfmt_ = nullptr;
     std::unique_ptr<icu::Transliterator> transliterator_ = nullptr;
     std::unique_ptr<I18nBreakIterator> brkiter_ = nullptr;
