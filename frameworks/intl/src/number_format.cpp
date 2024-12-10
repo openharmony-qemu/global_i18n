@@ -131,8 +131,7 @@ NumberFormat::NumberFormat(const std::vector<std::string> &localeTags, std::map<
         }
     }
     if (createSuccess) {
-        icu::number::UnlocalizedNumberFormatter formatter = icu::number::NumberFormatter::with();
-        InitNumberFormat(formatter);
+        InitNumberFormat();
     }
 }
 
@@ -140,8 +139,9 @@ NumberFormat::~NumberFormat()
 {
 }
 
-void NumberFormat::InitNumberFormat(icu::number::UnlocalizedNumberFormatter &formatter)
+void NumberFormat::InitNumberFormat()
 {
+    icu::number::UnlocalizedNumberFormatter formatter = icu::number::NumberFormatter::with();
     InitProperties(formatter);
     numberFormat = formatter.locale(locale);
     numberRangeFormat = icu::number::NumberRangeFormatter::with()
@@ -215,21 +215,22 @@ void NumberFormat::InitSignProperties(icu::number::UnlocalizedNumberFormatter &f
 
 void NumberFormat::InitUnitProperties(icu::number::UnlocalizedNumberFormatter &formatter)
 {
-    if (!styleString.empty() && styleString == "unit") {
-        for (icu::MeasureUnit curUnit : unitArray) {
-            if (!strcmp(curUnit.getSubtype(), unit.c_str())) {
-                formatter = formatter.unit(curUnit);
-                unitType = curUnit.getType();
-            }
-        }
-        UErrorCode status = U_ZERO_ERROR;
-        UMeasurementSystem measSys = ulocdata_getMeasurementSystem(localeBaseName.c_str(), &status);
-        if (U_SUCCESS(status) && measSys >= 0) {
-            unitMeasSys = measurementSystem[measSys];
-        }
-        formatter = formatter.unitWidth(unitDisplay);
-        formatter = formatter.precision(icu::number::Precision::maxFraction(DEFAULT_FRACTION_DIGITS));
+    if (styleString.empty() || styleString.compare("unit") != 0) {
+        return;
     }
+    for (icu::MeasureUnit curUnit : unitArray) {
+        if (!strcmp(curUnit.getSubtype(), unit.c_str())) {
+            formatter = formatter.unit(curUnit);
+            unitType = curUnit.getType();
+        }
+    }
+    UErrorCode status = U_ZERO_ERROR;
+    UMeasurementSystem measSys = ulocdata_getMeasurementSystem(localeBaseName.c_str(), &status);
+    if (U_SUCCESS(status) && measSys >= 0) {
+        unitMeasSys = measurementSystem[measSys];
+    }
+    formatter = formatter.unitWidth(unitDisplay);
+    formatter = formatter.precision(icu::number::Precision::maxFraction(DEFAULT_FRACTION_DIGITS));
 }
 
 void NumberFormat::InitDigitsProperties(icu::number::UnlocalizedNumberFormatter &formatter)

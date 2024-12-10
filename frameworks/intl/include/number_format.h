@@ -126,7 +126,7 @@ private:
     void InitNotationProperties(icu::number::UnlocalizedNumberFormatter &formatter);
     void InitSignProperties(icu::number::UnlocalizedNumberFormatter &formatter);
     void InitDigitsProperties(icu::number::UnlocalizedNumberFormatter &formatter);
-    void InitNumberFormat(icu::number::UnlocalizedNumberFormatter &formatter);
+    void InitNumberFormat();
     void SetUnit(std::string &preferredUnit);
     void SetDefaultStyle();
     void SetPrecisionWithByte(double number, const std::string& finalUnit);
