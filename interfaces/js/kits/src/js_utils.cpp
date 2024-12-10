@@ -21,6 +21,17 @@ napi_value JSUtils::DefaultConstructor(napi_env env, napi_callback_info info)
 {
     return nullptr;
 }
+
+napi_value JSUtils::CreateEmptyString(napi_env env)
+{
+    napi_value result;
+    std::string emptyStr = "";
+    napi_status status = napi_create_string_utf8(env, emptyStr.c_str(), NAPI_AUTO_LENGTH, &result);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("JSUtils: create string js variable failed.");
+    }
+    return result;
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

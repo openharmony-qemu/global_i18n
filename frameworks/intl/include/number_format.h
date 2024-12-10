@@ -120,6 +120,11 @@ private:
     void GetDigitsResolvedOptions(std::map<std::string, std::string> &map);
     void InitProperties(icu::number::UnlocalizedNumberFormatter &formatter);
     void InitUnitProperties(icu::number::UnlocalizedNumberFormatter &formatter);
+    void InitCurrencyProperties(icu::number::UnlocalizedNumberFormatter &formatter);
+    void InitPercentStyleProperties(icu::number::UnlocalizedNumberFormatter &formatter);
+    void InitUseGroupingProperties(icu::number::UnlocalizedNumberFormatter &formatter);
+    void InitNotationProperties(icu::number::UnlocalizedNumberFormatter &formatter);
+    void InitSignProperties(icu::number::UnlocalizedNumberFormatter &formatter);
     void InitDigitsProperties(icu::number::UnlocalizedNumberFormatter &formatter);
     void InitNumberFormat(icu::number::UnlocalizedNumberFormatter &formatter);
     void SetUnit(std::string &preferredUnit);
