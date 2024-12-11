@@ -116,7 +116,6 @@ NumberFormat::NumberFormat(const std::vector<std::string> &localeTags, std::map<
     std::unique_ptr<icu::LocaleBuilder> builder = nullptr;
     builder = std::make_unique<icu::LocaleBuilder>();
     ParseConfigs(configs);
-    icu::number::UnlocalizedNumberFormatter formatter = icu::number::NumberFormatter::with();
     for (size_t i = 0; i < localeTags.size(); i++) {
         std::string curLocale = localeTags[i];
         locale = icu::Locale::forLanguageTag(icu::StringPiece(curLocale), status);
@@ -155,7 +154,7 @@ NumberFormat::NumberFormat(const std::vector<std::string> &localeTags, std::map<
         }
     }
     if (createSuccess) {
-        InitNumberFormat(formatter);
+        InitNumberFormat();
     }
 }
 
@@ -163,10 +162,10 @@ NumberFormat::~NumberFormat()
 {
 }
 
-void NumberFormat::InitNumberFormat(icu::number::UnlocalizedNumberFormatter &formatter)
+void NumberFormat::InitNumberFormat()
 {
+    icu::number::UnlocalizedNumberFormatter formatter = icu::number::NumberFormatter::with();
     InitProperties(formatter);
-    InitDigitsProperties(formatter);
     numberFormat = formatter.locale(locale);
     numberRangeFormat = icu::number::NumberRangeFormatter::with()
         .numberFormatterBoth(formatter)
@@ -184,6 +183,17 @@ void NumberFormat::CreateRelativeTimeFormat(const std::string& locale)
 
 void NumberFormat::InitProperties(icu::number::UnlocalizedNumberFormatter &formatter)
 {
+    InitCurrencyProperties(formatter);
+    InitPercentStyleProperties(formatter);
+    InitUnitProperties(formatter);
+    InitUseGroupingProperties(formatter);
+    InitSignProperties(formatter);
+    InitNotationProperties(formatter);
+    InitDigitsProperties(formatter);
+}
+
+void NumberFormat::InitCurrencyProperties(icu::number::UnlocalizedNumberFormatter &formatter)
+{
     if (!currency.empty()) {
         UErrorCode status = U_ZERO_ERROR;
         icu::CurrencyUnit currencyUnit(icu::UnicodeString(currency.c_str()).getBuffer(), status);
@@ -192,25 +202,37 @@ void NumberFormat::InitProperties(icu::number::UnlocalizedNumberFormatter &forma
             formatter = formatter.unitWidth(currencyDisplay);
         }
     }
+}
+
+void NumberFormat::InitPercentStyleProperties(icu::number::UnlocalizedNumberFormatter &formatter)
+{
     if (!styleString.empty() && styleString == "percent") {
         formatter = formatter.unit(icu::NoUnit::percent())
             .scale(icu::number::Scale::powerOfTen(2)) // 2 is the power of ten
             .precision(icu::number::Precision::fixedFraction(0));
     }
-    InitUnitProperties(formatter);
+}
+
+void NumberFormat::InitUseGroupingProperties(icu::number::UnlocalizedNumberFormatter &formatter)
+{
     if (!useGrouping.empty()) {
         UNumberGroupingStrategy groupingStrategy = (useGrouping == "true") ?
             UNumberGroupingStrategy::UNUM_GROUPING_AUTO : UNumberGroupingStrategy::UNUM_GROUPING_OFF;
         formatter = formatter.grouping(groupingStrategy);
     }
-    if (!currencySign.empty() || !signDisplayString.empty()) {
-        formatter = formatter.sign(signDisplay);
-    }
+}
+
+void NumberFormat::InitNotationProperties(icu::number::UnlocalizedNumberFormatter &formatter)
+{
     if (!notationString.empty()) {
         formatter = formatter.notation(notation);
     }
-    if (!roundingModeStr.empty()) {
-        formatter = formatter.roundingMode(roundingMode);
+}
+
+void NumberFormat::InitSignProperties(icu::number::UnlocalizedNumberFormatter &formatter)
+{
+    if (!currencySign.empty() || !signDisplayString.empty()) {
+        formatter = formatter.sign(signDisplay);
     }
 }
 
@@ -522,6 +544,7 @@ std::string NumberFormat::Format(double number)
 std::string NumberFormat::FormatRange(double start, double end)
 {
     if (!createSuccess) {
+        HILOG_ERROR_I18N("FormatRange: init numberRangeFormat failed.");
         return PseudoLocalizationProcessor("");
     }
     if (end < start) {
@@ -532,10 +555,12 @@ std::string NumberFormat::FormatRange(double start, double end)
     icu::number::FormattedNumberRange numberRange =
         numberRangeFormat.formatFormattableRange(start, end, status);
     if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("FormatRange: formatFormattableRange failed.");
         return PseudoLocalizationProcessor("");
     }
     icu::UnicodeString res = numberRange.toString(status);
     if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("FormatRange: icu::UnicodeString.toString() failed.");
         return PseudoLocalizationProcessor("");
     }
     std::string result;
