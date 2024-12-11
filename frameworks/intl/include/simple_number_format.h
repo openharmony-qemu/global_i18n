@@ -29,6 +29,8 @@ public:
     std::string Format(double number);
 
 private:
+    static bool Init();
+    static bool icuInitialized;
     icu::number::LocalizedNumberFormatter simpleNumberFormat;
     bool initSuccess = false;
 };
