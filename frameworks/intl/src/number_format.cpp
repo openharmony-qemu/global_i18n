@@ -292,16 +292,19 @@ void NumberFormat::InitDigitsProperties(icu::number::UnlocalizedNumberFormatter 
                 formatter.precision(icu::number::Precision::minMaxFraction(minFractionDigits, maxFractionDigits));
         }
     }
-    SetRoundingIncrement(formatter);
+    SetRoundingProperties(formatter);
     HandleRoundingPriority(formatter);
 }
 
-void NumberFormat::SetRoundingIncrement(icu::number::UnlocalizedNumberFormatter &formatter)
+void NumberFormat::SetRoundingProperties(icu::number::UnlocalizedNumberFormatter &formatter)
 {
     if (roundingIncrement != 1) {
         int32_t maxFractionDigits = GetMaximumFractionDigitsValue();
         double increment = pow(POW_BASE_NUMBER, -1.0 * maxFractionDigits) * roundingIncrement;
         formatter = formatter.precision(icu::number::Precision::increment(increment));
+    }
+    if (!roundingModeStr.empty()) {
+        formatter = formatter.roundingMode(roundingMode);
     }
 }
 

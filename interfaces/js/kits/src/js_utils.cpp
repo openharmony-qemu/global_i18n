@@ -47,7 +47,7 @@ void JSUtils::GetOptionValue(napi_env env, napi_value options, const std::string
     bool hasProperty = false;
     status = napi_has_named_property(env, options, optionName.c_str(), &hasProperty);
     if (status != napi_ok || !hasProperty) {
-        HILOG_ERROR_I18N("GetOptionValue: Has not named property");
+        HILOG_ERROR_I18N("GetOptionValue: Has not named property:%{public}s", optionName.c_str());
         return;
     }
     status = napi_get_named_property(env, options, optionName.c_str(), &optionValue);
@@ -61,6 +61,7 @@ void JSUtils::GetOptionValue(napi_env env, napi_value options, const std::string
         HILOG_ERROR_I18N("GetOptionValue: get string length failed");
         return;
     }
+
     std::vector<char> optionBuf(len + 1);
     status = napi_get_value_string_utf8(env, optionValue, optionBuf.data(), len + 1, &len);
     if (status != napi_ok) {

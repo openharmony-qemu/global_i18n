@@ -142,7 +142,7 @@ private:
     void SetDefaultStyle();
     void SetPrecisionWithByte(double number, const std::string& finalUnit);
     void HandleRoundingPriority(icu::number::UnlocalizedNumberFormatter &formatter);
-    void SetRoundingIncrement(icu::number::UnlocalizedNumberFormatter &formatter);
+    void SetRoundingProperties(icu::number::UnlocalizedNumberFormatter &formatter);
     int32_t GetMinimumSignificantDigitsIntValue();
     int32_t GetMaximumSignificantDigitsIntValue();
     int32_t GetMaximumFractionDigitsValue();
