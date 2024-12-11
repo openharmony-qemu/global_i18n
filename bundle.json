@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "Provides internationalization APIS for implementing functions such date and time formatting.",
     "homePage": "https://gitee.com/openharmony/",
-    "license": "Apache V2",
+    "license": "Apache License 2.0",
     "repository": "https://gitee.com/openharmony/global_i18n",
     "domain": "os",
     "language": "",
