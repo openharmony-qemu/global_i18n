@@ -29,6 +29,7 @@
 #include "locale_info.h"
 #include "locale_matcher.h"
 #include "node_api.h"
+#include "simple_number_format_addon.h"
 #include "system_locale_manager_addon.h"
 #include "unicode/datefmt.h"
 #include "unicode/locid.h"
@@ -123,6 +124,8 @@ napi_value I18nAddon::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("removePreferredLanguage", I18nSystemAddon::RemovePreferredLanguage),
         DECLARE_NAPI_FUNCTION("getPreferredLanguageList", I18nSystemAddon::GetPreferredLanguageList),
         DECLARE_NAPI_FUNCTION("getFirstPreferredLanguage", I18nSystemAddon::GetFirstPreferredLanguage),
+        DECLARE_NAPI_FUNCTION("getSimpleNumberFormatBySkeleton",
+            SimpleNumberFormatAddon::GetSimpleNumberFormatBySkeleton),
         DECLARE_NAPI_FUNCTION("is24HourClock", I18nSystemAddon::Is24HourClock),
         DECLARE_NAPI_FUNCTION("set24HourClock", I18nSystemAddon::Set24HourClock),
         DECLARE_NAPI_FUNCTION("getTimeZone", I18nTimeZoneAddon::GetI18nTimeZone),
@@ -1730,6 +1733,7 @@ napi_value Init(napi_env env, napi_value exports)
     val = I18nSystemAddon::InitI18nSystem(env, val);
     val = HolidayManagerAddon::InitHolidayManager(env, val);
     val = EntityRecognizerAddon::InitEntityRecognizer(env, val);
+    val = SimpleNumberFormatAddon::InitSimpleNumberFormat(env, val);
     return val;
 }
 
