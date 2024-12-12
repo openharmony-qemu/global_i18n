@@ -130,6 +130,7 @@ ohos_shared_library("intl_util") {
       "src/relative_time_format.cpp",
       "src/signature_verifier.cpp",
       "src/simple_number_format.cpp",
+      "src/styled_number_format.cpp",
       "src/system_locale_manager.cpp",
       "src/taboo.cpp",
       "src/taboo_utils.cpp",

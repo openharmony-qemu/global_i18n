@@ -14,6 +14,7 @@
  */
 #include "js_utils.h"
 #include "i18n_hilog.h"
+#include "utils.h"
 
 namespace OHOS {
 namespace Global {
@@ -21,17 +22,6 @@ namespace I18n {
 napi_value JSUtils::DefaultConstructor(napi_env env, napi_callback_info info)
 {
     return nullptr;
-}
-
-napi_value JSUtils::CreateEmptyString(napi_env env)
-{
-    napi_value result;
-    std::string emptyStr = "";
-    napi_status status = napi_create_string_utf8(env, emptyStr.c_str(), NAPI_AUTO_LENGTH, &result);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("JSUtils: create string js variable failed.");
-    }
-    return result;
 }
 
 void JSUtils::GetOptionValue(napi_env env, napi_value options, const std::string &optionName,
@@ -132,6 +122,124 @@ std::string JSUtils::GetLocaleTag(napi_env env, napi_value argv)
         return "";
     }
     return buf.data();
+}
+
+void JSUtils::GetLocaleTags(napi_env env, napi_value rawLocaleTag, std::vector<std::string> &localeTags)
+{
+    size_t len = 0;
+    napi_status status = napi_get_value_string_utf8(env, rawLocaleTag, nullptr, 0, &len);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("GetLocaleTag -> void: Get locale tag length failed");
+        return;
+    }
+    std::vector<char> buf(len + 1);
+    status = napi_get_value_string_utf8(env, rawLocaleTag, buf.data(), len + 1, &len);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("GetLocaleTags: Get locale tag failed");
+        return;
+    }
+    localeTags.push_back(buf.data());
+}
+
+void JSUtils::GetNumberOptionValues(napi_env env, napi_value options, std::map<std::string, std::string> &map)
+{
+    JSUtils::GetOptionValue(env, options, "currency", map);
+    JSUtils::GetOptionValue(env, options, "currencySign", map);
+    JSUtils::GetOptionValue(env, options, "currencyDisplay", map);
+    JSUtils::GetOptionValue(env, options, "unit", map);
+    JSUtils::GetOptionValue(env, options, "unitDisplay", map);
+    JSUtils::GetOptionValue(env, options, "compactDisplay", map);
+    JSUtils::GetOptionValue(env, options, "signDisplay", map);
+    JSUtils::GetOptionValue(env, options, "localeMatcher", map);
+    JSUtils::GetOptionValue(env, options, "style", map);
+    JSUtils::GetOptionValue(env, options, "numberingSystem", map);
+    JSUtils::GetOptionValue(env, options, "notation", map);
+    JSUtils::GetOptionValue(env, options, "unitUsage", map);
+    JSUtils::GetBoolOptionValue(env, options, "useGrouping", map);
+    GetIntegerOptionValue(env, options, "minimumIntegerDigits", map);
+    int64_t minFd = GetIntegerOptionValue(env, options, "minimumFractionDigits", map);
+    int64_t maxFd = GetIntegerOptionValue(env, options, "maximumFractionDigits", map);
+    if (minFd != -1 && maxFd != -1 && minFd > maxFd) {
+        HILOG_ERROR_I18N(
+            "GetNumberOptionValues: Invalid parameter value: minimumFractionDigits > maximumFractionDigits");
+    }
+    GetIntegerOptionValue(env, options, "minimumSignificantDigits", map);
+    GetIntegerOptionValue(env, options, "maximumSignificantDigits", map);
+}
+
+int64_t JSUtils::GetIntegerOptionValue(napi_env env, napi_value options, const std::string &optionName,
+    std::map<std::string, std::string> &map)
+{
+    napi_value optionValue = nullptr;
+    int64_t integerValue = -1;
+    napi_valuetype type = napi_undefined;
+    napi_status status = napi_typeof(env, options, &type);
+    if (status != napi_ok && type != napi_object) {
+        HILOG_ERROR_I18N("GetIntegerOptionValue: Set option failed, option is not an object");
+        return integerValue;
+    }
+    bool hasProperty = false;
+    napi_status propStatus = napi_has_named_property(env, options, optionName.c_str(), &hasProperty);
+    if (propStatus == napi_ok && hasProperty) {
+        status = napi_get_named_property(env, options, optionName.c_str(), &optionValue);
+        if (status == napi_ok) {
+            status = napi_get_value_int64(env, optionValue, &integerValue);
+            if (status == napi_ok) {
+                map.insert(make_pair(optionName, std::to_string(integerValue)));
+            }
+        }
+    }
+    return integerValue;
+}
+
+void JSUtils::SetOptionProperties(napi_env env, napi_value &result, std::map<std::string, std::string> &options,
+    const std::string &option)
+{
+    if (options.count(option) > 0) {
+        std::string optionValue = options[option];
+        napi_value optionJsValue = nullptr;
+        napi_create_string_utf8(env, optionValue.c_str(), NAPI_AUTO_LENGTH, &optionJsValue);
+        napi_set_named_property(env, result, option.c_str(), optionJsValue);
+    } else {
+        napi_value undefined = nullptr;
+        napi_get_undefined(env, &undefined);
+        napi_set_named_property(env, result, option.c_str(), undefined);
+    }
+}
+
+void JSUtils::SetBooleanOptionProperties(napi_env env, napi_value &result, std::map<std::string, std::string> &options,
+    const std::string &option)
+{
+    if (options.count(option) > 0) {
+        std::string optionValue = options[option];
+        bool optionBoolValue = (optionValue == "true");
+        napi_value optionJsValue = nullptr;
+        napi_get_boolean(env, optionBoolValue, &optionJsValue);
+        napi_set_named_property(env, result, option.c_str(), optionJsValue);
+    } else {
+        napi_value undefined = nullptr;
+        napi_get_undefined(env, &undefined);
+        napi_set_named_property(env, result, option.c_str(), undefined);
+    }
+}
+
+void JSUtils::SetIntegerOptionProperties(napi_env env, napi_value &result, std::map<std::string, std::string> &options,
+    const std::string &option)
+{
+    if (options.count(option) > 0) {
+        std::string optionValue = options[option];
+        napi_value optionJsValue = nullptr;
+        int32_t status = 0;
+        int64_t integerValue = ConvertString2Int(optionValue, status);
+        if (status != -1) {
+            napi_create_int64(env, integerValue, &optionJsValue);
+            napi_set_named_property(env, result, option.c_str(), optionJsValue);
+            return;
+        }
+    }
+    napi_value undefined = nullptr;
+    napi_get_undefined(env, &undefined);
+    napi_set_named_property(env, result, option.c_str(), undefined);
 }
 } // namespace I18n
 } // namespace Global

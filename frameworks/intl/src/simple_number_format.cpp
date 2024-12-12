@@ -88,6 +88,21 @@ std::string SimpleNumberFormat::Format(double number)
     formatResult.toUTF8String(result);
     return PseudoLocalizationProcessor(result);
 }
+
+icu::number::FormattedNumber SimpleNumberFormat::FormatToFormattedNumber(double number)
+{
+    if (!initSuccess) {
+        HILOG_ERROR_I18N("SimpleNumberFormat::FormatToFormattedNumber: Init failed.");
+        return {};
+    }
+    UErrorCode status = U_ZERO_ERROR;
+    icu::number::FormattedNumber formattedNumber = simpleNumberFormat.formatDouble(number, status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("SimpleNumberFormat::FormatToFormattedNumber: Format double failed.");
+        return {};
+    }
+    return formattedNumber;
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
