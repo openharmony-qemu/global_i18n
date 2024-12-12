@@ -207,6 +207,22 @@ void RelativeTimeFormat::FormatToParts(double number, const std::string &unit,
     }
 }
 
+icu::FormattedRelativeDateTime RelativeTimeFormat::FormatToFormattedValue(double number, const std::string &unit)
+{
+    if (!createSuccess || !relativeUnits.count(unit)) {
+        return {};
+    }
+    UErrorCode status = U_ZERO_ERROR;
+    icu::FormattedRelativeDateTime fmtRelativeTime;
+    if (!strcmp(numeric.c_str(), "always")) {
+        fmtRelativeTime = relativeTimeFormat->formatNumericToValue(number, relativeUnits[unit], status);
+    } else {
+        fmtRelativeTime = relativeTimeFormat->formatToValue(number, relativeUnits[unit], status);
+    }
+
+    return fmtRelativeTime;
+}
+
 void RelativeTimeFormat::GetResolvedOptions(std::map<std::string, std::string> &map)
 {
     map.insert(std::make_pair("locale", localeBaseName));

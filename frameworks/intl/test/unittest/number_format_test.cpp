@@ -17,6 +17,8 @@
 #include <gtest/gtest.h>
 #include "locale_config.h"
 #include "number_format.h"
+#include "simple_number_format.h"
+#include "styled_number_format.h"
 #include "unicode/locid.h"
 #include "parameter.h"
 
@@ -1884,6 +1886,107 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0038, TestSize.Level1)
     EXPECT_EQ(rangeFormatter->FormatRange(4999, 5001), "4,999～5,001");
     EXPECT_EQ(rangeFormatter->FormatRange(5000, 5000), "約5,000");
     EXPECT_EQ(rangeFormatter->FormatRange(5e3, 5e6), "5,000～5,000,000");
+}
+
+/**
+ * @tc.name: NumberFormatFuncTest0039
+ * @tc.desc: Test I18n StyledNumberFormat.format
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0039, TestSize.Level1)
+{
+    string locale = "en-IN";
+    string expects = "+1,23,456.79 euros";
+    vector<string> locales{locale};
+    string useGrouping = "true";
+    string minimumIntegerDigits = "7";
+    string maximumFractionDigits = "2";
+    string style = "currency";
+    string currency = "978";
+    map<string, string> options = { { "useGrouping", useGrouping },
+                                    { "style", style },
+                                    { "currency", currency },
+                                    { "currencyDisplay", "name" },
+                                    { "currencySign", "accounting" },
+                                    { "signDisplay", "always" } };
+    std::shared_ptr<NumberFormat> numFmt = std::make_shared<NumberFormat>(locales, options);
+    ASSERT_TRUE(numFmt != nullptr);
+    StyledNumberFormat styledNumFmt(true, numfmt, nullptr);
+    string out = styledNumFmt.Format(123456.789);
+    EXPECT_EQ(out, expects);
+}
+
+/**
+ * @tc.name: NumberFormatFuncTest0040
+ * @tc.desc: Test I18n StyledNumberFormat.ParseToParts
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0040, TestSize.Level1)
+{
+    string locale = "en-IN";
+    vector<string> locales{locale};
+    string useGrouping = "true";
+    string minimumIntegerDigits = "7";
+    string maximumFractionDigits = "2";
+    string style = "currency";
+    string currency = "978";
+    map<string, string> options = { { "useGrouping", useGrouping },
+                                    { "style", style },
+                                    { "currency", currency },
+                                    { "currencyDisplay", "name" },
+                                    { "currencySign", "accounting" },
+                                    { "signDisplay", "always" } };
+    std::shared_ptr<NumberFormat> numFmt = std::make_shared<NumberFormat>(locales, options);
+    ASSERT_TRUE(numFmt != nullptr);
+    StyledNumberFormat styledNumFmt(true, numfmt, nullptr);
+    std::vector<StyledNumberFormat::NumberPart> out = styledNumFmt.ParseToParts(123456.789);
+    EXPECT_EQ(out.size(), 5);
+    EXPECT_EQ(out[0].part_name, "integer")
+    EXPECT_EQ(out[1].part_name, "integer")
+    EXPECT_EQ(out[2].part_name, "decimal")
+    EXPECT_EQ(out[3].part_name, "fraction")
+    EXPECT_EQ(out[4].part_name, "unit")
+}
+
+/**
+ * @tc.name: NumberFormatFuncTest0041
+ * @tc.desc: Test I18n StyledNumberFormat.format
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0041, TestSize.Level1)
+{
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    std::string skeleton = "percent";
+    std::shared_ptr<LocaleInfo> localeInfo = std::make_shared<LocaleInfo>("zh-Hans-CN");
+    ASSERT_TRUE(localeInfo != nullptr);
+    std::shared_ptr<SimpleNumberFormat> formatter = std::make_shared<SimpleNumberFormat>(skeleton, localeInfo, err);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    ASSERT_TRUE(formatter != nullptr);
+    StyledNumberFormat styledNumFmt(false, nullptr, formatter);
+    std::string result = styledNumFmt->Format(10);
+    EXPECT_EQ(result, "10%");
+}
+
+/**
+ * @tc.name: NumberFormatFuncTest0042
+ * @tc.desc: Test I18n StyledNumberFormat.ParseToParts and StyledNumberFormat.Format
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0042, TestSize.Level1)
+{
+    string locale = "en";
+    vector<string> locales{locale};
+    map<string, string> options = { { "style", "unit" },
+                                    { "unit": "minute" },
+                                    { "unitUsage": "elapsed-time-second" } };
+    std::shared_ptr<NumberFormat> numFmt = std::make_shared<NumberFormat>(locales, options);
+    ASSERT_TRUE(numFmt != nullptr);
+    StyledNumberFormat styledNumFmt(true, numfmt, nullptr);
+    EXPECT_EQ(styledNumFmt.Format(1234.5678), "20 hours ago")
+    std::vector<StyledNumberFormat::NumberPart> out = styledNumFmt.ParseToParts(123456.789);
+    EXPECT_EQ(out.size(), 2);
+    EXPECT_EQ(out[0].part_name, "integer")
+    EXPECT_EQ(out[1].part_name, "unit")
 }
 } // namespace I18n
 } // namespace Global
