@@ -132,7 +132,8 @@ std::string JSUtils::GetLocaleTag(napi_env env, napi_value argv)
         HILOG_ERROR_I18N("GetLocaleTag: Get locale tag failed");
         return "";
     }
-    return buf.data();
+    std::string result(buf.data());
+    return result;
 }
 } // namespace I18n
 } // namespace Global

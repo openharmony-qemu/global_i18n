@@ -348,6 +348,10 @@ napi_value LocaleInfoAddon::GetMaximizeOrMinimize(napi_env env, napi_callback_in
     std::string localeTag = func(obj->locale_);
 
     napi_value constructor = nullptr;
+    if (g_constructor == nullptr) {
+        HILOG_ERROR_I18N("Maximize: g_constructor is nullptr.");
+        return nullptr;
+    }
     status = napi_get_reference_value(env, *g_constructor, &constructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Maximize: Get locale constructor reference failed");
