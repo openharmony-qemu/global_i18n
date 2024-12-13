@@ -1911,7 +1911,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0039, TestSize.Level1)
                                     { "signDisplay", "always" } };
     std::shared_ptr<NumberFormat> numFmt = std::make_shared<NumberFormat>(locales, options);
     ASSERT_TRUE(numFmt != nullptr);
-    StyledNumberFormat styledNumFmt(true, numfmt, nullptr);
+    StyledNumberFormat styledNumFmt(true, numFmt, nullptr);
     string out = styledNumFmt.Format(123456.789);
     EXPECT_EQ(out, expects);
 }
@@ -1938,14 +1938,14 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0040, TestSize.Level1)
                                     { "signDisplay", "always" } };
     std::shared_ptr<NumberFormat> numFmt = std::make_shared<NumberFormat>(locales, options);
     ASSERT_TRUE(numFmt != nullptr);
-    StyledNumberFormat styledNumFmt(true, numfmt, nullptr);
+    StyledNumberFormat styledNumFmt(true, numFmt, nullptr);
     std::vector<StyledNumberFormat::NumberPart> out = styledNumFmt.ParseToParts(123456.789);
     EXPECT_EQ(out.size(), 5);
-    EXPECT_EQ(out[0].part_name, "integer")
-    EXPECT_EQ(out[1].part_name, "integer")
-    EXPECT_EQ(out[2].part_name, "decimal")
-    EXPECT_EQ(out[3].part_name, "fraction")
-    EXPECT_EQ(out[4].part_name, "unit")
+    EXPECT_EQ(out[0].part_name, "integer");
+    EXPECT_EQ(out[1].part_name, "integer");
+    EXPECT_EQ(out[2].part_name, "decimal");
+    EXPECT_EQ(out[3].part_name, "fraction");
+    EXPECT_EQ(out[4].part_name, "unit");
 }
 
 /**
@@ -1981,12 +1981,12 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0042, TestSize.Level1)
                                     { "unitUsage": "elapsed-time-second" } };
     std::shared_ptr<NumberFormat> numFmt = std::make_shared<NumberFormat>(locales, options);
     ASSERT_TRUE(numFmt != nullptr);
-    StyledNumberFormat styledNumFmt(true, numfmt, nullptr);
+    StyledNumberFormat styledNumFmt(true, numFmt, nullptr);
     EXPECT_EQ(styledNumFmt.Format(1234.5678), "20 hours ago")
     std::vector<StyledNumberFormat::NumberPart> out = styledNumFmt.ParseToParts(123456.789);
     EXPECT_EQ(out.size(), 2);
-    EXPECT_EQ(out[0].part_name, "integer")
-    EXPECT_EQ(out[1].part_name, "unit")
+    EXPECT_EQ(out[0].part_name, "integer");
+    EXPECT_EQ(out[1].part_name, "unit");
 }
 } // namespace I18n
 } // namespace Global
