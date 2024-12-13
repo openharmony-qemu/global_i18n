@@ -1963,7 +1963,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0041, TestSize.Level1)
     EXPECT_EQ(err, I18nErrorCode::SUCCESS);
     ASSERT_TRUE(formatter != nullptr);
     StyledNumberFormat styledNumFmt(false, nullptr, formatter);
-    std::string result = styledNumFmt->Format(10);
+    std::string result = styledNumFmt.Format(10);
     EXPECT_EQ(result, "10%");
 }
 
@@ -1977,12 +1977,12 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0042, TestSize.Level1)
     string locale = "en";
     vector<string> locales{locale};
     map<string, string> options = { { "style", "unit" },
-                                    { "unit": "minute" },
-                                    { "unitUsage": "elapsed-time-second" } };
+                                    { "unit", "minute" },
+                                    { "unitUsage", "elapsed-time-second" } };
     std::shared_ptr<NumberFormat> numFmt = std::make_shared<NumberFormat>(locales, options);
     ASSERT_TRUE(numFmt != nullptr);
     StyledNumberFormat styledNumFmt(true, numFmt, nullptr);
-    EXPECT_EQ(styledNumFmt.Format(1234.5678), "20 hours ago")
+    EXPECT_EQ(styledNumFmt.Format(1234.5678), "20 hours ago");
     std::vector<StyledNumberFormat::NumberPart> out = styledNumFmt.ParseToParts(123456.789);
     EXPECT_EQ(out.size(), 2);
     EXPECT_EQ(out[0].part_name, "integer");

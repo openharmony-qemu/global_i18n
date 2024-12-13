@@ -121,7 +121,7 @@ napi_value SimpleNumberFormatAddon::Format(napi_env env, napi_callback_info info
         HILOG_ERROR_I18N("SimpleNumberFormatAddon::Format: Failed to get type of argv[0].");
         return VariableConvertor::CreateString(env, "");
     } else if (valueType != napi_valuetype::napi_number) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "value", "number", true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "value", "number", true);
         return VariableConvertor::CreateString(env, "");
     }
 
