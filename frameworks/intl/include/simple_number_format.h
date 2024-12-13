@@ -30,6 +30,8 @@ public:
     icu::number::FormattedNumber FormatToFormattedNumber(double number);
 
 private:
+    static bool Init();
+    static bool icuInitialized;
     icu::number::LocalizedNumberFormatter simpleNumberFormat;
     bool initSuccess = false;
 };
