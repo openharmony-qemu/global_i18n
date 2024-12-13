@@ -370,51 +370,18 @@ void NumberFormat::SetUnit(std::string &preferredUnit)
 
 std::string NumberFormat::Format(double number)
 {
-    if (!createSuccess) {
-        return PseudoLocalizationProcessor("");
-    }
-    double finalNumber = number;
-    std::string finalUnit = unit;
-    if ((unitUsage == "size-file-byte" || unitUsage == "size-shortfile-byte") && ConvertByte(finalNumber, finalUnit)) {
-        SetUnit(finalUnit);
-        SetPrecisionWithByte(finalNumber, finalUnit);
-    } else if (unitUsage == "elapsed-time-second" && ConvertDate(finalNumber, finalUnit) &&
-        relativeTimeFormat != nullptr) {
-        return relativeTimeFormat->Format(finalNumber, finalUnit);
-    } else if (!unitUsage.empty()) {
-        std::vector<std::string> preferredUnits;
-        if (unitUsage == "default") {
-            GetDefaultPreferredUnit(localeInfo->GetRegion(), unitType, preferredUnits);
-        } else {
-            GetPreferredUnit(localeInfo->GetRegion(), unitUsage, preferredUnits);
-        }
-        std::map<double, std::string> preferredValuesOverOne;
-        std::map<double, std::string> preferredValuesUnderOne;
-        double num = number;
-        for (size_t i = 0; i < preferredUnits.size(); i++) {
-            int status = Convert(num, unit, unitMeasSys, preferredUnits[i], unitMeasSys);
-            if (!status) {
-                continue;
-            }
-            if (num >= 1) {
-                preferredValuesOverOne.insert(std::make_pair(num, preferredUnits[i]));
-            } else {
-                preferredValuesUnderOne.insert(std::make_pair(num, preferredUnits[i]));
-            }
-        }
-        std::string preferredUnit;
-        if (preferredValuesOverOne.size() > 0) {
-            finalNumber = preferredValuesOverOne.begin()->first;
-            preferredUnit = preferredValuesOverOne.begin()->second;
-        } else if (preferredValuesUnderOne.size() > 0) {
-            finalNumber = preferredValuesUnderOne.rbegin()->first;
-            preferredUnit = preferredValuesUnderOne.rbegin()->second;
-        }
-        SetUnit(preferredUnit);
-    }
     std::string result;
     UErrorCode status = U_ZERO_ERROR;
-    numberFormat.formatDouble(finalNumber, status).toString(status).toUTF8String(result);
+    if (IsRelativeTimeFormat(number)) {
+        icu::FormattedRelativeDateTime formattedTime = FormatToFormattedRelativeDateTime(number);
+        formattedTime.toString(status).toUTF8String(result);
+    } else {
+        icu::number::FormattedNumber formattedNumber = FormatToFormattedNumber(number);
+        formattedNumber.toString(status).toUTF8String(result);
+    }
+    if (U_FAILURE(status)) {
+        result = "";
+    }
     return PseudoLocalizationProcessor(result);
 }
 
@@ -471,7 +438,11 @@ icu::number::FormattedNumber NumberFormat::FormatToFormattedNumber(double number
         SetUnit(preferredUnit);
     }
     UErrorCode status = U_ZERO_ERROR;
-    return numberFormat.formatDouble(finalNumber, status);
+    icu::number::FormattedNumber formattedNumber = numberFormat.formatDouble(finalNumber, status);
+    if (U_FAILURE(status)) {
+        return {};
+    }
+    return formattedNumber;
 }
 
 icu::FormattedRelativeDateTime NumberFormat::FormatToFormattedRelativeDateTime(double number)

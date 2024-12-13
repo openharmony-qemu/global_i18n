@@ -47,6 +47,7 @@ private:
         napi_ref textStyleRef);
     static void GetNumberFmtOrSimpleNumberFmt(napi_env env, napi_value arg,
         NumberFormatAddon **numberformataddon, SimpleNumberFormatAddon **simpleNumberFormatAddon);
+    static void SetNamedProperty(napi_env env, napi_value &option, const std::string& name, napi_value &property);
 
     bool InitStyledNumberFormatContent(napi_env env, NumberFormatAddon* numberFormatAddon,
         SimpleNumberFormatAddon* simpleNumberFormatAddon, napi_value options);

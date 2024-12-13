@@ -25,6 +25,7 @@ namespace I18n {
 class JSUtils {
 public:
     static napi_value DefaultConstructor(napi_env env, napi_callback_info info);
+    static napi_value CreateEmptyString(napi_env env);
     static void GetOptionValue(napi_env env, napi_value options, const std::string &optionName,
         std::map<std::string, std::string> &map);
     static void GetBoolOptionValue(napi_env env, napi_value options, const std::string &optionName,
