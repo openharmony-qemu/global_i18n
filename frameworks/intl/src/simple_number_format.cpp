@@ -15,6 +15,7 @@
 
 #include "i18n_hilog.h"
 #include "locale_config.h"
+#include "ohos/init_data.h"
 #include "unicode/locid.h"
 #include "utils.h"
 #include "simple_number_format.h"
@@ -22,6 +23,8 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
+bool SimpleNumberFormat::icuInitialized = SimpleNumberFormat::Init();
+
 SimpleNumberFormat::SimpleNumberFormat(const std::string& skeleton, std::shared_ptr<LocaleInfo> localeInfo,
     I18nErrorCode& errCode)
 {
@@ -87,6 +90,12 @@ std::string SimpleNumberFormat::Format(double number)
     std::string result;
     formatResult.toUTF8String(result);
     return PseudoLocalizationProcessor(result);
+}
+
+bool SimpleNumberFormat::Init()
+{
+    SetHwIcuDirectory();
+    return true;
 }
 } // namespace I18n
 } // namespace Global

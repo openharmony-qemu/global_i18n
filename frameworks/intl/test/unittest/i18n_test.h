@@ -86,6 +86,8 @@ int I18nFuncTest065(void);
 int I18nFuncTest066(void);
 int I18nFuncTest067(void);
 int I18nFuncTest068(void);
+int I18nFuncTest069(void);
+int I18nFuncTest070(void);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
