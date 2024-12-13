@@ -299,12 +299,23 @@ void StyledNumberFormatAddon::GetNumberFmtOrSimpleNumberFmt(napi_env env, napi_v
         return;
     }
 
-    *numberFormatAddon = nullptr;
-    *simpleNumberFormatAddon = nullptr;
-    bool isNumberFormat = true;
-    status = napi_has_named_property(env, arg, "resolvedOptions", &isNumberFormat);
+    napi_value numFmtConstructor = nullptr;
+    napi_value intlModule;
+    status = napi_load_module(env, "@ohos.intl", &intlModule);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("StyledNumberFormatAddon::constructor Failed to get property.");
+        HILOG_ERROR_I18N("StyledNumberFormatAddon::constructor Failed to get intl module.");
+        return;
+    }
+    status = napi_get_named_property(env, intlModule, "NumberFormat", &numFmtConstructor);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("StyledNumberFormatAddon::constructo: get NumberFormat  constructor failed");
+        return;
+    }
+
+    bool isNumberFormat = true;
+    status = napi_instanceof(env, arg, numFmtConstructor, &isNumberFormat);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("StyledNumberFormatAddon::constructor Failed to get instance of argv 0.");
         return;
     }
     if (isNumberFormat) {
