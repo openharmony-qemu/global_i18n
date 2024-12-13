@@ -371,51 +371,21 @@ void NumberFormat::SetUnit(std::string &preferredUnit)
 
 std::string NumberFormat::Format(double number)
 {
-    if (!createSuccess) {
-        return PseudoLocalizationProcessor("");
-    }
-    double finalNumber = number;
-    std::string finalUnit = unit;
-    if ((unitUsage == "size-file-byte" || unitUsage == "size-shortfile-byte") && ConvertByte(finalNumber, finalUnit)) {
-        SetUnit(finalUnit);
-        SetPrecisionWithByte(finalNumber, finalUnit);
-    } else if (unitUsage == "elapsed-time-second" && ConvertDate(finalNumber, finalUnit) &&
-        relativeTimeFormat != nullptr) {
-        return relativeTimeFormat->Format(finalNumber, finalUnit);
-    } else if (!unitUsage.empty()) {
-        std::vector<std::string> preferredUnits;
-        if (unitUsage == "default") {
-            GetDefaultPreferredUnit(localeInfo->GetRegion(), unitType, preferredUnits);
-        } else {
-            GetPreferredUnit(localeInfo->GetRegion(), unitUsage, preferredUnits);
-        }
-        std::map<double, std::string> preferredValuesOverOne;
-        std::map<double, std::string> preferredValuesUnderOne;
-        double num = number;
-        for (size_t i = 0; i < preferredUnits.size(); i++) {
-            int status = Convert(num, unit, unitMeasSys, preferredUnits[i], unitMeasSys);
-            if (!status) {
-                continue;
-            }
-            if (num >= 1) {
-                preferredValuesOverOne.insert(std::make_pair(num, preferredUnits[i]));
-            } else {
-                preferredValuesUnderOne.insert(std::make_pair(num, preferredUnits[i]));
-            }
-        }
-        std::string preferredUnit;
-        if (preferredValuesOverOne.size() > 0) {
-            finalNumber = preferredValuesOverOne.begin()->first;
-            preferredUnit = preferredValuesOverOne.begin()->second;
-        } else if (preferredValuesUnderOne.size() > 0) {
-            finalNumber = preferredValuesUnderOne.rbegin()->first;
-            preferredUnit = preferredValuesUnderOne.rbegin()->second;
-        }
-        SetUnit(preferredUnit);
-    }
     std::string result;
     UErrorCode status = U_ZERO_ERROR;
-    numberFormat.formatDouble(finalNumber, status).toString(status).toUTF8String(result);
+    icu::UnicodeString formatResult;
+    if (IsRelativeTimeFormat(number)) {
+        icu::FormattedRelativeDateTime formattedTime = FormatToFormattedRelativeDateTime(number);
+        formatResult = formattedTime.toString(status);
+    } else {
+        icu::number::FormattedNumber formattedNumber = FormatToFormattedNumber(number);
+        formatResult = formattedNumber.toString(status);
+    }
+    if (U_FAILURE(status)) {
+        result = "";
+    } else {
+        formatResult.toUTF8String(result);
+    }
     return PseudoLocalizationProcessor(result);
 }
 
@@ -423,7 +393,7 @@ bool NumberFormat::IsRelativeTimeFormat(double number)
 {
     double finalNumber = number;
     std::string finalUnit = unit;
-    if (unitUsage == "elapsed-time-second" && ConvertDate(finalNumber, finalUnit) &&
+    if (unitUsage.compare("elapsed-time-second") == 0 && ConvertDate(finalNumber, finalUnit) &&
         relativeTimeFormat != nullptr) {
         return true;
     }
@@ -437,12 +407,13 @@ icu::number::FormattedNumber NumberFormat::FormatToFormattedNumber(double number
     }
     double finalNumber = number;
     std::string finalUnit = unit;
-    if ((unitUsage == "size-file-byte" || unitUsage == "size-shortfile-byte") && ConvertByte(finalNumber, finalUnit)) {
+    if ((unitUsage.compare("size-file-byte") == 0 || unitUsage.compare("size-shortfile-byte") == 0) &&
+        ConvertByte(finalNumber, finalUnit)) {
         SetUnit(finalUnit);
         SetPrecisionWithByte(finalNumber, finalUnit);
     } else if (!unitUsage.empty()) {
         std::vector<std::string> preferredUnits;
-        if (unitUsage == "default") {
+        if (unitUsage.compare("default") == 0) {
             GetDefaultPreferredUnit(localeInfo->GetRegion(), unitType, preferredUnits);
         } else {
             GetPreferredUnit(localeInfo->GetRegion(), unitUsage, preferredUnits);
@@ -471,8 +442,12 @@ icu::number::FormattedNumber NumberFormat::FormatToFormattedNumber(double number
         }
         SetUnit(preferredUnit);
     }
-    UErrorCode status = U_ZERO_ERROR;
-    return numberFormat.formatDouble(finalNumber, status);
+    UErrorCode icuStatus = U_ZERO_ERROR;
+    icu::number::FormattedNumber formattedNumber = numberFormat.formatDouble(finalNumber, icuStatus);
+    if (U_FAILURE(icuStatus)) {
+        return {};
+    }
+    return formattedNumber;
 }
 
 icu::FormattedRelativeDateTime NumberFormat::FormatToFormattedRelativeDateTime(double number)
@@ -483,7 +458,7 @@ icu::FormattedRelativeDateTime NumberFormat::FormatToFormattedRelativeDateTime(d
 
     double finalNumber = number;
     std::string finalUnit = unit;
-    if (unitUsage == "elapsed-time-second" && ConvertDate(finalNumber, finalUnit) &&
+    if (unitUsage.compare("elapsed-time-second") == 0 && ConvertDate(finalNumber, finalUnit) &&
         relativeTimeFormat != nullptr) {
         return relativeTimeFormat->FormatToFormattedValue(finalNumber, finalUnit);
     }

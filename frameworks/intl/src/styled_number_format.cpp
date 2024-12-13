@@ -17,6 +17,7 @@
 
 #include <unordered_map>
 #include "unicode/formattedvalue.h"
+#include "i18n_hilog.h"
 
 namespace OHOS {
 namespace Global {
@@ -42,95 +43,110 @@ std::vector<StyledNumberFormat::NumberPart> StyledNumberFormat::ParseToParts(dou
 {
     if (isNumberFormat && numberFormat) {
         if (numberFormat->IsRelativeTimeFormat(number)) {
-            return ParseToParts(numberFormat->FormatToFormattedRelativeDateTime(number));
+            icu::FormattedRelativeDateTime formattedValue = numberFormat->FormatToFormattedRelativeDateTime(number);
+            return ParseToParts(formattedValue);
         } else {
-            return ParseToParts(numberFormat->FormatToFormattedNumber(number));
+            icu::number::FormattedNumber formattedValue = numberFormat->FormatToFormattedNumber(number);
+            return ParseToParts(formattedValue);
         }
     }
     if (!isNumberFormat && simpleNumberFormat) {
-        return ParseToParts(simpleNumberFormat->FormatToFormattedNumber(number));
+        icu::number::FormattedNumber formattedValue = simpleNumberFormat->FormatToFormattedNumber(number);
+        return ParseToParts(formattedValue);
     }
     return {};
 }
 
 std::vector<StyledNumberFormat::NumberPart> StyledNumberFormat::ParseToParts(
-    icu::number::FormattedNumber formattedValue)
+    icu::number::FormattedNumber &formattedValue)
 {
     std::vector<NumberPart> result;
     UErrorCode status = U_ZERO_ERROR;
     icu::ConstrainedFieldPosition constrainedPos;
     constrainedPos.constrainCategory(UFIELD_CATEGORY_NUMBER);
     while (formattedValue.nextPosition(constrainedPos, status)) {
+        if (U_FAILURE(status)) {
+            HILOG_ERROR_I18N("StyledNumberFormat::ParseToParts get nextPosition faild");
+            break;
+        }
         size_t startIndex = (size_t)constrainedPos.getStart();
-        if (constrainedPos.getCategory() == UFIELD_CATEGORY_NUMBER) {
-            switch (constrainedPos.getField()) {
-                case UNUM_PERCENT_FIELD:
-                case UNUM_PERMILL_FIELD:
-                case UNUM_MEASURE_UNIT_FIELD:
-                case UNUM_CURRENCY_FIELD: {
-                    result.push_back({"unit", startIndex,
-                        static_cast<size_t>(constrainedPos.getLimit() - startIndex)});
-                    break;
-                }
-                case UNUM_DECIMAL_SEPARATOR_FIELD: {
-                    result.push_back({"decimal", startIndex,
-                        static_cast<size_t>(constrainedPos.getLimit() - startIndex)});
-                    break;
-                }
-                case UNUM_EXPONENT_SYMBOL_FIELD:
-                case UNUM_EXPONENT_SIGN_FIELD:
-                case UNUM_EXPONENT_FIELD:
-                case UNUM_SIGN_FIELD:
-                case UNUM_COMPACT_FIELD:
-                case UNUM_INTEGER_FIELD: {
-                    result.push_back({"integer", startIndex,
-                        static_cast<size_t>(constrainedPos.getLimit() - startIndex)});
-                    break;
-                }
-                case UNUM_FRACTION_FIELD: {
-                    result.push_back({"fraction", startIndex,
-                        static_cast<size_t>(constrainedPos.getLimit() - startIndex)});
-                    break;
-                }
-                default:
-                    break;
+        if (constrainedPos.getCategory() != UFIELD_CATEGORY_NUMBER) {
+            continue;
+        }
+        switch (constrainedPos.getField()) {
+            case UNUM_PERCENT_FIELD:
+            case UNUM_PERMILL_FIELD:
+            case UNUM_MEASURE_UNIT_FIELD:
+            case UNUM_CURRENCY_FIELD: {
+                result.push_back({"unit", startIndex,
+                    static_cast<size_t>(constrainedPos.getLimit() - startIndex)});
+                break;
             }
+            case UNUM_DECIMAL_SEPARATOR_FIELD: {
+                result.push_back({"decimal", startIndex,
+                    static_cast<size_t>(constrainedPos.getLimit() - startIndex)});
+                break;
+            }
+            case UNUM_EXPONENT_SYMBOL_FIELD:
+            case UNUM_EXPONENT_SIGN_FIELD:
+            case UNUM_EXPONENT_FIELD:
+            case UNUM_SIGN_FIELD:
+            case UNUM_COMPACT_FIELD:
+            case UNUM_INTEGER_FIELD: {
+                result.push_back({"integer", startIndex,
+                    static_cast<size_t>(constrainedPos.getLimit() - startIndex)});
+                break;
+            }
+            case UNUM_FRACTION_FIELD: {
+                result.push_back({"fraction", startIndex,
+                    static_cast<size_t>(constrainedPos.getLimit() - startIndex)});
+                break;
+            }
+            default:
+                break;
         }
     }
     return result;
 }
 
 std::vector<StyledNumberFormat::NumberPart> StyledNumberFormat::ParseToParts(
-    icu::FormattedRelativeDateTime formattedValue)
+    icu::FormattedRelativeDateTime &formattedValue)
 {
     std::vector<NumberPart> result;
     UErrorCode status = U_ZERO_ERROR;
     std::string numberStr;
     formattedValue.toString(status).toUTF8String(numberStr);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("StyledNumberFormat::ParseToParts toString faild");
+        return result;
+    }
     icu::ConstrainedFieldPosition constrainedPos;
     constrainedPos.constrainCategory(UFIELD_CATEGORY_NUMBER);
     size_t prevIndex = 0;
     size_t length = numberStr.length();
     while (formattedValue.nextPosition(constrainedPos, status)) {
-        size_t startIndex = (size_t)constrainedPos.getStart();
-        if (constrainedPos.getCategory() == UFIELD_CATEGORY_NUMBER) {
-            if (constrainedPos.getField() == UNUM_GROUPING_SEPARATOR_FIELD) {
-                continue;
-            }
-            if (constrainedPos.getField() == UNUM_DECIMAL_SEPARATOR_FIELD) {
-                result.push_back({"decimal", startIndex, static_cast<size_t>(constrainedPos.getLimit() - startIndex)});
-            }
-            if (constrainedPos.getField() == UNUM_INTEGER_FIELD) {
-                result.push_back({"integer", startIndex, static_cast<size_t>(constrainedPos.getLimit() - startIndex)});
-            }
-            if (constrainedPos.getField() == UNUM_FRACTION_FIELD) {
-                result.push_back({"fraction", startIndex, static_cast<size_t>(constrainedPos.getLimit() - startIndex)});
-            }
-            if (startIndex > prevIndex) {
-                result.push_back({"unit", prevIndex, startIndex - startIndex});
-            }
-            prevIndex = (size_t)constrainedPos.getLimit();
+        if (U_FAILURE(status)) {
+            HILOG_ERROR_I18N("StyledNumberFormat::ParseToParts get nextPosition faild");
+            break;
         }
+        size_t startIndex = (size_t)constrainedPos.getStart();
+        if (constrainedPos.getCategory() != UFIELD_CATEGORY_NUMBER ||
+            constrainedPos.getField() == UNUM_GROUPING_SEPARATOR_FIELD) {
+            continue;
+        }
+        if (constrainedPos.getField() == UNUM_DECIMAL_SEPARATOR_FIELD) {
+            result.push_back({"decimal", startIndex, static_cast<size_t>(constrainedPos.getLimit() - startIndex)});
+        }
+        if (constrainedPos.getField() == UNUM_INTEGER_FIELD) {
+            result.push_back({"integer", startIndex, static_cast<size_t>(constrainedPos.getLimit() - startIndex)});
+        }
+        if (constrainedPos.getField() == UNUM_FRACTION_FIELD) {
+            result.push_back({"fraction", startIndex, static_cast<size_t>(constrainedPos.getLimit() - startIndex)});
+        }
+        if (startIndex > prevIndex) {
+            result.push_back({"unit", prevIndex, startIndex - prevIndex});
+        }
+        prevIndex = (size_t)constrainedPos.getLimit();
     }
     if (prevIndex < length) {
         result.push_back({"unit", prevIndex, length - prevIndex});

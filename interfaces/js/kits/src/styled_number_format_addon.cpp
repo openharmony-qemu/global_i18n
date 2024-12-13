@@ -75,7 +75,7 @@ napi_value StyledNumberFormatAddon::constructor(napi_env env, napi_callback_info
     }
 
     if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "numberFormat", "", true);
+        ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, "numberFormat", true);
         return nullptr;
     }
 
@@ -90,6 +90,10 @@ napi_value StyledNumberFormatAddon::constructor(napi_env env, napi_callback_info
     }
 
     std::unique_ptr<StyledNumberFormatAddon> obj = std::make_unique<StyledNumberFormatAddon>();
+    if (!obj) {
+        HILOG_ERROR_I18N("StyledNumberFormatAddon::constructor make unique ptr error");
+        return nullptr;
+    }
     status = napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), Destructor, nullptr, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("StyledNumberFormatAddon::constructor napi_wrap error");
@@ -113,7 +117,7 @@ napi_value StyledNumberFormatAddon::Format(napi_env env, napi_callback_info info
         HILOG_ERROR_I18N("StyledNumberFormatAddon::Format: Get cb info failed.");
         return VariableConvertor::CreateString(env, "");
     } else if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "value", "", true);
+        ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, "value", true);
         return VariableConvertor::CreateString(env, "");
     }
 
@@ -295,11 +299,20 @@ napi_value StyledNumberFormatAddon::CreateStyleOption(napi_env env,
         HILOG_ERROR_I18N("CreateStyleoption: create int32 failed");
         return nullptr;
     }
-    status = napi_set_named_property(env, option, "start", start);
-    status = napi_set_named_property(env, option, "length", length);
-    status = napi_set_named_property(env, option, "styledKey", styledKey);
-    status = napi_set_named_property(env, option, "styledValue", textStyle);
+    SetNamedProperty(env, option, "start", start);
+    SetNamedProperty(env, option, "length", length);
+    SetNamedProperty(env, option, "styledKey", styledKey);
+    SetNamedProperty(env, option, "styledValue", textStyle);
     return option;
+}
+
+void StyledNumberFormatAddon::SetNamedProperty(napi_env env, napi_value &option, const std::string& name,
+    napi_value &property)
+{
+    napi_status status = napi_set_named_property(env, option, name.c_str(), property);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("CreateStyleoption: set property %{public}s failed", name.c_str());
+    }
 }
 
 void StyledNumberFormatAddon::GetNumberFmtOrSimpleNumberFmt(napi_env env, napi_value arg,

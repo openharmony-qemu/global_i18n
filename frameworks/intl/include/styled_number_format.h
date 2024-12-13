@@ -39,8 +39,8 @@ public:
     std::vector<StyledNumberFormat::NumberPart> ParseToParts(double number);
 
 private:
-    std::vector<StyledNumberFormat::NumberPart> ParseToParts(icu::number::FormattedNumber formattedValue);
-    std::vector<StyledNumberFormat::NumberPart> ParseToParts(icu::FormattedRelativeDateTime formattedValue);
+    std::vector<StyledNumberFormat::NumberPart> ParseToParts(icu::number::FormattedNumber &formattedValue);
+    std::vector<StyledNumberFormat::NumberPart> ParseToParts(icu::FormattedRelativeDateTime &formattedValue);
     void HandlePart(const std::string& part, std::unordered_map<std::string, size_t> &index,
         std::vector<StyledNumberFormat::NumberPart> &result);
 

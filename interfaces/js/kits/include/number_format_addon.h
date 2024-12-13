@@ -38,6 +38,7 @@ private:
     static napi_value NumberFormatConstructor(napi_env env, napi_callback_info info);
     static napi_value FormatNumber(napi_env env, napi_callback_info info);
     static napi_value GetNumberResolvedOptions(napi_env env, napi_callback_info info);
+    static napi_value FormatRangeNumber(napi_env env, napi_callback_info info);
 
     bool InitNumberFormatContext(napi_env env, napi_callback_info info, std::vector<std::string> localeTags,
         std::map<std::string, std::string> &map);
