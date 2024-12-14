@@ -31,6 +31,7 @@ ohos_shared_library("intl") {
     "src/intl_addon.cpp",
     "src/js_utils.cpp",
     "src/locale_info_addon.cpp",
+    "src/number_format_addon.cpp",
   ]
 
   deps = [ "//base/global/i18n/frameworks/intl:intl_util" ]
@@ -67,8 +68,10 @@ ohos_shared_library("i18n") {
     "src/i18n_unicode_addon.cpp",
     "src/js_utils.cpp",
     "src/locale_info_addon.cpp",
+    "src/number_format_addon.cpp",
     "src/simple_date_time_format_addon.cpp",
     "src/simple_number_format_addon.cpp",
+    "src/styled_number_format_addon.cpp",
     "src/system_locale_manager_addon.cpp",
     "src/variable_convertor.cpp",
   ]

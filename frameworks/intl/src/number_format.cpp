@@ -370,17 +370,42 @@ void NumberFormat::SetUnit(std::string &preferredUnit)
 
 std::string NumberFormat::Format(double number)
 {
+    std::string result;
+    UErrorCode status = U_ZERO_ERROR;
+    if (IsRelativeTimeFormat(number)) {
+        icu::FormattedRelativeDateTime formattedTime = FormatToFormattedRelativeDateTime(number);
+        formattedTime.toString(status).toUTF8String(result);
+    } else {
+        icu::number::FormattedNumber formattedNumber = FormatToFormattedNumber(number);
+        formattedNumber.toString(status).toUTF8String(result);
+    }
+    if (U_FAILURE(status)) {
+        result = "";
+    }
+    return PseudoLocalizationProcessor(result);
+}
+
+bool NumberFormat::IsRelativeTimeFormat(double number)
+{
+    double finalNumber = number;
+    std::string finalUnit = unit;
+    if (unitUsage == "elapsed-time-second" && ConvertDate(finalNumber, finalUnit) &&
+        relativeTimeFormat != nullptr) {
+        return true;
+    }
+    return false;
+}
+
+icu::number::FormattedNumber NumberFormat::FormatToFormattedNumber(double number)
+{
     if (!createSuccess) {
-        return PseudoLocalizationProcessor("");
+        return {};
     }
     double finalNumber = number;
     std::string finalUnit = unit;
     if ((unitUsage == "size-file-byte" || unitUsage == "size-shortfile-byte") && ConvertByte(finalNumber, finalUnit)) {
         SetUnit(finalUnit);
         SetPrecisionWithByte(finalNumber, finalUnit);
-    } else if (unitUsage == "elapsed-time-second" && ConvertDate(finalNumber, finalUnit) &&
-        relativeTimeFormat != nullptr) {
-        return relativeTimeFormat->Format(finalNumber, finalUnit);
     } else if (!unitUsage.empty()) {
         std::vector<std::string> preferredUnits;
         if (unitUsage == "default") {
@@ -412,10 +437,27 @@ std::string NumberFormat::Format(double number)
         }
         SetUnit(preferredUnit);
     }
-    std::string result;
     UErrorCode status = U_ZERO_ERROR;
-    numberFormat.formatDouble(finalNumber, status).toString(status).toUTF8String(result);
-    return PseudoLocalizationProcessor(result);
+    icu::number::FormattedNumber formattedNumber = numberFormat.formatDouble(finalNumber, status);
+    if (U_FAILURE(status)) {
+        return {};
+    }
+    return formattedNumber;
+}
+
+icu::FormattedRelativeDateTime NumberFormat::FormatToFormattedRelativeDateTime(double number)
+{
+    if (!createSuccess) {
+        return {};
+    }
+
+    double finalNumber = number;
+    std::string finalUnit = unit;
+    if (unitUsage == "elapsed-time-second" && ConvertDate(finalNumber, finalUnit) &&
+        relativeTimeFormat != nullptr) {
+        return relativeTimeFormat->FormatToFormattedValue(finalNumber, finalUnit);
+    }
+    return {};
 }
 
 std::string NumberFormat::FormatRange(double start, double end)

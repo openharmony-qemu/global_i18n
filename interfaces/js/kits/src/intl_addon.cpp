@@ -23,6 +23,7 @@
 #include "node_api.h"
 #include "utils.h"
 #include "locale_info_addon.h"
+#include "number_format_addon.h"
 
 namespace OHOS {
 namespace Global {
@@ -93,56 +94,6 @@ napi_value IntlAddon::InitRelativeTimeFormat(napi_env env, napi_value exports)
     return exports;
 }
 
-napi_value IntlAddon::InitNumberFormat(napi_env env, napi_value exports)
-{
-    napi_status status = napi_ok;
-    napi_property_descriptor properties[] = {
-        DECLARE_NAPI_FUNCTION("format", FormatNumber),
-        DECLARE_NAPI_FUNCTION("formatRange", FormatRangeNumber),
-        DECLARE_NAPI_FUNCTION("resolvedOptions", GetNumberResolvedOptions)
-    };
-
-    napi_value constructor = nullptr;
-    status = napi_define_class(env, "NumberFormat", NAPI_AUTO_LENGTH, NumberFormatConstructor, nullptr,
-        sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("Define class failed when InitNumberFormat");
-        return nullptr;
-    }
-
-    status = napi_set_named_property(env, exports, "NumberFormat", constructor);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("Set property failed when InitNumberFormat");
-        return nullptr;
-    }
-    return exports;
-}
-
-int64_t GetIntegerOptionValue(napi_env env, napi_value options, const std::string &optionName,
-    std::map<std::string, std::string> &map)
-{
-    napi_value optionValue = nullptr;
-    int64_t integerValue = -1;
-    napi_valuetype type = napi_undefined;
-    napi_status status = napi_typeof(env, options, &type);
-    if (status != napi_ok && type != napi_object) {
-        HILOG_ERROR_I18N("GetIntegerOptionValue: Set option failed, option is not an object");
-        return integerValue;
-    }
-    bool hasProperty = false;
-    napi_status propStatus = napi_has_named_property(env, options, optionName.c_str(), &hasProperty);
-    if (propStatus == napi_ok && hasProperty) {
-        status = napi_get_named_property(env, options, optionName.c_str(), &optionValue);
-        if (status == napi_ok) {
-            status = napi_get_value_int64(env, optionValue, &integerValue);
-            if (status == napi_ok) {
-                map.insert(make_pair(optionName, std::to_string(integerValue)));
-            }
-        }
-    }
-    return integerValue;
-}
-
 void GetDateOptionValues(napi_env env, napi_value options, std::map<std::string, std::string> &map)
 {
     JSUtils::GetOptionValue(env, options, "calendar", map);
@@ -203,23 +154,6 @@ std::string GetLocaleTag(napi_env env, napi_value argv)
     return localeTag;
 }
 
-void GetLocaleTags(napi_env env, napi_value rawLocaleTag, std::vector<std::string> &localeTags)
-{
-    size_t len = 0;
-    napi_status status = napi_get_value_string_utf8(env, rawLocaleTag, nullptr, 0, &len);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("GetLocaleTag -> void: Get locale tag length failed");
-        return;
-    }
-    std::vector<char> buf(len + 1);
-    status = napi_get_value_string_utf8(env, rawLocaleTag, buf.data(), len + 1, &len);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("GetLocaleTags: Get locale tag failed");
-        return;
-    }
-    localeTags.push_back(buf.data());
-}
-
 napi_value IntlAddon::DateTimeFormatConstructor(napi_env env, napi_callback_info info)
 {
     size_t argc = 2;
@@ -237,14 +171,14 @@ napi_value IntlAddon::DateTimeFormatConstructor(napi_env env, napi_callback_info
         bool isArray = false;
         napi_is_array(env, argv[0], &isArray);
         if (valueType == napi_valuetype::napi_string) {
-            GetLocaleTags(env, argv[0], localeTags);
+            JSUtils::GetLocaleTags(env, argv[0], localeTags);
         } else if (isArray) {
             uint32_t arrayLength = 0;
             napi_get_array_length(env, argv[0], &arrayLength);
             napi_value element = nullptr;
             for (uint32_t i = 0; i < arrayLength; i++) {
                 napi_get_element(env, argv[0], i, &element);
-                GetLocaleTags(env, element, localeTags);
+                JSUtils::GetLocaleTags(env, element, localeTags);
             }
         }
     }
@@ -300,14 +234,14 @@ napi_value IntlAddon::RelativeTimeFormatConstructor(napi_env env, napi_callback_
         bool isArray = false;
         napi_is_array(env, argv[0], &isArray);
         if (valueType == napi_valuetype::napi_string) {
-            GetLocaleTags(env, argv[0], localeTags);
+            JSUtils::GetLocaleTags(env, argv[0], localeTags);
         } else if (isArray) {
             uint32_t arrayLength = 0;
             napi_get_array_length(env, argv[0], &arrayLength);
             napi_value element = nullptr;
             for (uint32_t i = 0; i < arrayLength; i++) {
                 napi_get_element(env, argv[0], i, &element);
-                GetLocaleTags(env, element, localeTags);
+                JSUtils::GetLocaleTags(env, element, localeTags);
             }
         }
     }
@@ -400,96 +334,6 @@ napi_value IntlAddon::FormatDateTimeRange(napi_env env, napi_callback_info info)
     return result;
 }
 
-void GetNumberOptionValues(napi_env env, napi_value options, std::map<std::string, std::string> &map)
-{
-    JSUtils::GetOptionValue(env, options, "currency", map);
-    JSUtils::GetOptionValue(env, options, "currencySign", map);
-    JSUtils::GetOptionValue(env, options, "currencyDisplay", map);
-    JSUtils::GetOptionValue(env, options, "unit", map);
-    JSUtils::GetOptionValue(env, options, "unitDisplay", map);
-    JSUtils::GetOptionValue(env, options, "compactDisplay", map);
-    JSUtils::GetOptionValue(env, options, "signDisplay", map);
-    JSUtils::GetOptionValue(env, options, "localeMatcher", map);
-    JSUtils::GetOptionValue(env, options, "style", map);
-    JSUtils::GetOptionValue(env, options, "numberingSystem", map);
-    JSUtils::GetOptionValue(env, options, "notation", map);
-    JSUtils::GetOptionValue(env, options, "unitUsage", map);
-    JSUtils::GetBoolOptionValue(env, options, "useGrouping", map);
-    GetIntegerOptionValue(env, options, "minimumIntegerDigits", map);
-    int64_t minFd = GetIntegerOptionValue(env, options, "minimumFractionDigits", map);
-    int64_t maxFd = GetIntegerOptionValue(env, options, "maximumFractionDigits", map);
-    if (minFd != -1 && maxFd != -1 && minFd > maxFd) {
-        HILOG_ERROR_I18N(
-            "GetNumberOptionValues: Invalid parameter value: minimumFractionDigits > maximumFractionDigits");
-    }
-    GetIntegerOptionValue(env, options, "minimumSignificantDigits", map);
-    GetIntegerOptionValue(env, options, "maximumSignificantDigits", map);
-}
-
-napi_value IntlAddon::NumberFormatConstructor(napi_env env, napi_callback_info info)
-{
-    size_t argc = 2;
-    napi_value argv[2] = { nullptr };
-    napi_value thisVar = nullptr;
-    void *data = nullptr;
-    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
-    if (status != napi_ok) {
-        return nullptr;
-    }
-    std::vector<std::string> localeTags;
-    if (argc > 0) {
-        napi_valuetype valueType = napi_valuetype::napi_undefined;
-        napi_typeof(env, argv[0], &valueType);
-        bool isArray = false;
-        napi_is_array(env, argv[0], &isArray);
-
-        if (valueType == napi_valuetype::napi_string) {
-            GetLocaleTags(env, argv[0], localeTags);
-        } else if (isArray) {
-            uint32_t arrayLength = 0;
-            napi_get_array_length(env, argv[0], &arrayLength);
-            napi_value element = nullptr;
-            for (uint32_t i = 0; i < arrayLength; i++) {
-                napi_get_element(env, argv[0], i, &element);
-                GetLocaleTags(env, element, localeTags);
-            }
-        }
-    }
-    std::map<std::string, std::string> map = {};
-    if (argc > 1) {
-        GetNumberOptionValues(env, argv[1], map);
-    }
-    std::unique_ptr<IntlAddon> obj = nullptr;
-    obj = std::make_unique<IntlAddon>();
-    status =
-        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), IntlAddon::Destructor, nullptr, nullptr);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("NumberFormatConstructor: Wrap IntlAddon failed");
-        return nullptr;
-    }
-    if (!obj->InitNumberFormatContext(env, info, localeTags, map)) {
-        HILOG_ERROR_I18N("Init NumberFormat failed");
-        return nullptr;
-    }
-    obj.release();
-    return thisVar;
-}
-
-bool IntlAddon::InitNumberFormatContext(napi_env env, napi_callback_info info, std::vector<std::string> localeTags,
-    std::map<std::string, std::string> &map)
-{
-    napi_value global = nullptr;
-    napi_status status = napi_get_global(env, &global);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("InitNumberFormatContext: Get global failed");
-        return false;
-    }
-    env_ = env;
-    numberfmt_ = std::make_unique<NumberFormat>(localeTags, map);
-
-    return numberfmt_ != nullptr;
-}
-
 int64_t IntlAddon::GetMilliseconds(napi_env env, napi_value *argv, int index)
 {
     napi_value funcGetDateInfo = nullptr;
@@ -513,56 +357,6 @@ int64_t IntlAddon::GetMilliseconds(napi_env env, napi_value *argv, int index)
     return milliseconds;
 }
 
-void SetOptionProperties(napi_env env, napi_value &result, std::map<std::string, std::string> &options,
-    const std::string &option)
-{
-    if (options.count(option) > 0) {
-        std::string optionValue = options[option];
-        napi_value optionJsValue = nullptr;
-        napi_create_string_utf8(env, optionValue.c_str(), NAPI_AUTO_LENGTH, &optionJsValue);
-        napi_set_named_property(env, result, option.c_str(), optionJsValue);
-    } else {
-        napi_value undefined = nullptr;
-        napi_get_undefined(env, &undefined);
-        napi_set_named_property(env, result, option.c_str(), undefined);
-    }
-}
-
-void SetIntegerOptionProperties(napi_env env, napi_value &result, std::map<std::string, std::string> &options,
-    const std::string &option)
-{
-    if (options.count(option) > 0) {
-        std::string optionValue = options[option];
-        napi_value optionJsValue = nullptr;
-        int32_t status = 0;
-        int64_t integerValue = ConvertString2Int(optionValue, status);
-        if (status != -1) {
-            napi_create_int64(env, integerValue, &optionJsValue);
-            napi_set_named_property(env, result, option.c_str(), optionJsValue);
-            return;
-        }
-    }
-    napi_value undefined = nullptr;
-    napi_get_undefined(env, &undefined);
-    napi_set_named_property(env, result, option.c_str(), undefined);
-}
-
-void SetBooleanOptionProperties(napi_env env, napi_value &result, std::map<std::string, std::string> &options,
-    const std::string &option)
-{
-    if (options.count(option) > 0) {
-        std::string optionValue = options[option];
-        bool optionBoolValue = (optionValue == "true");
-        napi_value optionJsValue = nullptr;
-        napi_get_boolean(env, optionBoolValue, &optionJsValue);
-        napi_set_named_property(env, result, option.c_str(), optionJsValue);
-    } else {
-        napi_value undefined = nullptr;
-        napi_get_undefined(env, &undefined);
-        napi_set_named_property(env, result, option.c_str(), undefined);
-    }
-}
-
 napi_value IntlAddon::GetRelativeTimeResolvedOptions(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
@@ -579,10 +373,10 @@ napi_value IntlAddon::GetRelativeTimeResolvedOptions(napi_env env, napi_callback
     napi_create_object(env, &result);
     std::map<std::string, std::string> options = {};
     obj->relativetimefmt_->GetResolvedOptions(options);
-    SetOptionProperties(env, result, options, "locale");
-    SetOptionProperties(env, result, options, "style");
-    SetOptionProperties(env, result, options, "numeric");
-    SetOptionProperties(env, result, options, "numberingSystem");
+    JSUtils::SetOptionProperties(env, result, options, "locale");
+    JSUtils::SetOptionProperties(env, result, options, "style");
+    JSUtils::SetOptionProperties(env, result, options, "numeric");
+    JSUtils::SetOptionProperties(env, result, options, "numberingSystem");
     return result;
 }
 
@@ -602,132 +396,26 @@ napi_value IntlAddon::GetDateTimeResolvedOptions(napi_env env, napi_callback_inf
     napi_create_object(env, &result);
     std::map<std::string, std::string> options = {};
     obj->datefmt_->GetResolvedOptions(options);
-    SetOptionProperties(env, result, options, "locale");
-    SetOptionProperties(env, result, options, "calendar");
-    SetOptionProperties(env, result, options, "dateStyle");
-    SetOptionProperties(env, result, options, "timeStyle");
-    SetOptionProperties(env, result, options, "hourCycle");
-    SetOptionProperties(env, result, options, "timeZone");
-    SetOptionProperties(env, result, options, "timeZoneName");
-    SetOptionProperties(env, result, options, "numberingSystem");
-    SetBooleanOptionProperties(env, result, options, "hour12");
-    SetOptionProperties(env, result, options, "weekday");
-    SetOptionProperties(env, result, options, "era");
-    SetOptionProperties(env, result, options, "year");
-    SetOptionProperties(env, result, options, "month");
-    SetOptionProperties(env, result, options, "day");
-    SetOptionProperties(env, result, options, "hour");
-    SetOptionProperties(env, result, options, "minute");
-    SetOptionProperties(env, result, options, "second");
-    SetOptionProperties(env, result, options, "dayPeriod");
-    SetOptionProperties(env, result, options, "localeMatcher");
-    SetOptionProperties(env, result, options, "formatMatcher");
-    return result;
-}
-
-napi_value IntlAddon::GetNumberResolvedOptions(napi_env env, napi_callback_info info)
-{
-    napi_value thisVar = nullptr;
-    void *data = nullptr;
-    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
-
-    IntlAddon *obj = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
-    if (status != napi_ok || !obj || !obj->numberfmt_) {
-        HILOG_ERROR_I18N("GetNumberResolvedOptions: Get NumberFormat object failed");
-        return nullptr;
-    }
-    napi_value result = nullptr;
-    napi_create_object(env, &result);
-    std::map<std::string, std::string> options = {};
-    obj->numberfmt_->GetResolvedOptions(options);
-    SetOptionProperties(env, result, options, "locale");
-    SetOptionProperties(env, result, options, "currency");
-    SetOptionProperties(env, result, options, "currencySign");
-    SetOptionProperties(env, result, options, "currencyDisplay");
-    SetOptionProperties(env, result, options, "unit");
-    SetOptionProperties(env, result, options, "unitDisplay");
-    SetOptionProperties(env, result, options, "signDisplay");
-    SetOptionProperties(env, result, options, "compactDisplay");
-    SetOptionProperties(env, result, options, "notation");
-    SetOptionProperties(env, result, options, "style");
-    SetOptionProperties(env, result, options, "numberingSystem");
-    SetOptionProperties(env, result, options, "unitUsage");
-    SetBooleanOptionProperties(env, result, options, "useGrouping");
-    SetIntegerOptionProperties(env, result, options, "minimumIntegerDigits");
-    SetIntegerOptionProperties(env, result, options, "minimumFractionDigits");
-    SetIntegerOptionProperties(env, result, options, "maximumFractionDigits");
-    SetIntegerOptionProperties(env, result, options, "minimumSignificantDigits");
-    SetIntegerOptionProperties(env, result, options, "maximumSignificantDigits");
-    SetOptionProperties(env, result, options, "localeMatcher");
-    return result;
-}
-
-napi_value IntlAddon::FormatNumber(napi_env env, napi_callback_info info)
-{
-    size_t argc = 1;
-    napi_value argv[1] = { 0 };
-    napi_value thisVar = nullptr;
-    void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
-    double number = 0;
-    napi_get_value_double(env, argv[0], &number);
-    IntlAddon *obj = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
-    if (status != napi_ok || !obj || !obj->numberfmt_) {
-        HILOG_ERROR_I18N("FormatNumber: Get NumberFormat object failed");
-        return nullptr;
-    }
-    std::string value = obj->numberfmt_->Format(number);
-    napi_value result = nullptr;
-    status = napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &result);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("FormatNumber: Create format string failed");
-        return nullptr;
-    }
-    return result;
-}
-
-napi_value IntlAddon::FormatRangeNumber(napi_env env, napi_callback_info info)
-{
-    size_t argc = 2;
-    napi_value argv[2] = { 0 };
-    napi_value thisVar = nullptr;
-    void *data = nullptr;
-    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("FormatRangeNumber: Get parameter info failed");
-        return JSUtils::CreateEmptyString(env);
-    }
-    if (argc != 2) { // 2 is parameter count
-        HILOG_ERROR_I18N("FormatRangeNumber: Insufficient parameters");
-        return JSUtils::CreateEmptyString(env);
-    }
-    double start = 0;
-    double end = 0;
-    status = napi_get_value_double(env, argv[0], &start);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("FormatRangeNumber: Get first param value failed");
-        return JSUtils::CreateEmptyString(env);
-    }
-    status = napi_get_value_double(env, argv[1], &end);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("FormatRangeNumber: Get second param value failed");
-        return JSUtils::CreateEmptyString(env);
-    }
-    IntlAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
-    if (status != napi_ok || !obj || !obj->numberfmt_) {
-        HILOG_ERROR_I18N("FormatRangeNumber: Get NumberFormat object failed");
-        return JSUtils::CreateEmptyString(env);
-    }
-    std::string value = obj->numberfmt_->FormatRange(start, end);
-    napi_value result;
-    status = napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &result);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("create string js variable failed.");
-        return JSUtils::CreateEmptyString(env);
-    }
+    JSUtils::SetOptionProperties(env, result, options, "locale");
+    JSUtils::SetOptionProperties(env, result, options, "calendar");
+    JSUtils::SetOptionProperties(env, result, options, "dateStyle");
+    JSUtils::SetOptionProperties(env, result, options, "timeStyle");
+    JSUtils::SetOptionProperties(env, result, options, "hourCycle");
+    JSUtils::SetOptionProperties(env, result, options, "timeZone");
+    JSUtils::SetOptionProperties(env, result, options, "timeZoneName");
+    JSUtils::SetOptionProperties(env, result, options, "numberingSystem");
+    JSUtils::SetBooleanOptionProperties(env, result, options, "hour12");
+    JSUtils::SetOptionProperties(env, result, options, "weekday");
+    JSUtils::SetOptionProperties(env, result, options, "era");
+    JSUtils::SetOptionProperties(env, result, options, "year");
+    JSUtils::SetOptionProperties(env, result, options, "month");
+    JSUtils::SetOptionProperties(env, result, options, "day");
+    JSUtils::SetOptionProperties(env, result, options, "hour");
+    JSUtils::SetOptionProperties(env, result, options, "minute");
+    JSUtils::SetOptionProperties(env, result, options, "second");
+    JSUtils::SetOptionProperties(env, result, options, "dayPeriod");
+    JSUtils::SetOptionProperties(env, result, options, "localeMatcher");
+    JSUtils::SetOptionProperties(env, result, options, "formatMatcher");
     return result;
 }
 
@@ -898,14 +586,14 @@ napi_value IntlAddon::CollatorConstructor(napi_env env, napi_callback_info info)
         bool isArray = false;
         napi_is_array(env, argv[0], &isArray);
         if (valueType == napi_valuetype::napi_string) {
-            GetLocaleTags(env, argv[0], localeTags);
+            JSUtils::GetLocaleTags(env, argv[0], localeTags);
         } else if (isArray) {
             uint32_t arrayLength = 0;
             napi_get_array_length(env, argv[0], &arrayLength);
             napi_value element = nullptr;
             for (uint32_t i = 0; i < arrayLength; i++) {
                 napi_get_element(env, argv[0], i, &element);
-                GetLocaleTags(env, element, localeTags);
+                JSUtils::GetLocaleTags(env, element, localeTags);
             }
         }
     }
@@ -1129,14 +817,14 @@ napi_value IntlAddon::GetCollatorResolvedOptions(napi_env env, napi_callback_inf
     napi_create_object(env, &result);
     std::map<std::string, std::string> options = {};
     obj->collator_->ResolvedOptions(options);
-    SetOptionProperties(env, result, options, "localeMatcher");
-    SetOptionProperties(env, result, options, "locale");
-    SetOptionProperties(env, result, options, "usage");
-    SetOptionProperties(env, result, options, "sensitivity");
-    SetBooleanOptionProperties(env, result, options, "ignorePunctuation");
-    SetBooleanOptionProperties(env, result, options, "numeric");
-    SetOptionProperties(env, result, options, "caseFirst");
-    SetOptionProperties(env, result, options, "collation");
+    JSUtils::SetOptionProperties(env, result, options, "localeMatcher");
+    JSUtils::SetOptionProperties(env, result, options, "locale");
+    JSUtils::SetOptionProperties(env, result, options, "usage");
+    JSUtils::SetOptionProperties(env, result, options, "sensitivity");
+    JSUtils::SetBooleanOptionProperties(env, result, options, "ignorePunctuation");
+    JSUtils::SetBooleanOptionProperties(env, result, options, "numeric");
+    JSUtils::SetOptionProperties(env, result, options, "caseFirst");
+    JSUtils::SetOptionProperties(env, result, options, "collation");
     return result;
 }
 
@@ -1157,7 +845,7 @@ void GetPluralRulesType(napi_env env, napi_value options, std::map<std::string, 
 
 void GetPluralRulesInteger(napi_env env, napi_value options, std::map<std::string, std::string> &map)
 {
-    GetIntegerOptionValue(env, options, "minimumIntegerDigits", map);
+    JSUtils::GetIntegerOptionValue(env, options, "minimumIntegerDigits", map);
     auto it = map.find("minimumIntegerDigits");
     if (it != map.end()) {
         std::string minimumIntegerDigits = it->second;
@@ -1174,7 +862,7 @@ void GetPluralRulesInteger(napi_env env, napi_value options, std::map<std::strin
 
 void GetPluralRulesFractions(napi_env env, napi_value options, std::map<std::string, std::string> &map)
 {
-    GetIntegerOptionValue(env, options, "minimumFractionDigits", map);
+    JSUtils::GetIntegerOptionValue(env, options, "minimumFractionDigits", map);
     auto it = map.find("minimumFractionDigits");
     if (it != map.end()) {
         std::string minimumFractionDigits = it->second;
@@ -1186,7 +874,7 @@ void GetPluralRulesFractions(napi_env env, napi_value options, std::map<std::str
         }
     }
 
-    GetIntegerOptionValue(env, options, "maximumFractionDigits", map);
+    JSUtils::GetIntegerOptionValue(env, options, "maximumFractionDigits", map);
     it = map.find("maximumFractionDigits");
     if (it != map.end()) {
         std::string maximumFractionDigits = it->second;
@@ -1202,7 +890,7 @@ void GetPluralRulesFractions(napi_env env, napi_value options, std::map<std::str
 void GetPluralRulesSignificant(napi_env env, napi_value options, std::map<std::string, std::string> &map)
 {
     int minSignificant = -1;
-    GetIntegerOptionValue(env, options, "minimumSignificantDigits", map);
+    JSUtils::GetIntegerOptionValue(env, options, "minimumSignificantDigits", map);
     auto it = map.find("minimumSignificantDigits");
     if (it != map.end()) {
         std::string minSignificantStr = it->second;
@@ -1218,7 +906,7 @@ void GetPluralRulesSignificant(napi_env env, napi_value options, std::map<std::s
         minSignificant = 1;
     }
 
-    GetIntegerOptionValue(env, options, "maximumSignificantDigits", map);
+    JSUtils::GetIntegerOptionValue(env, options, "maximumSignificantDigits", map);
     it = map.find("maximumSignificantDigits");
     if (it != map.end()) {
         std::string maxSignificantStr = it->second;
@@ -1281,14 +969,14 @@ napi_value IntlAddon::PluralRulesConstructor(napi_env env, napi_callback_info in
         bool isArray = false;
         napi_is_array(env, argv[0], &isArray);
         if (valueType == napi_valuetype::napi_string) {
-            GetLocaleTags(env, argv[0], localeTags);
+            JSUtils::GetLocaleTags(env, argv[0], localeTags);
         } else if (isArray) {
             uint32_t arrayLength = 0;
             napi_get_array_length(env, argv[0], &arrayLength);
             napi_value element = nullptr;
             for (uint32_t i = 0; i < arrayLength; i++) {
                 napi_get_element(env, argv[0], i, &element);
-                GetLocaleTags(env, element, localeTags);
+                JSUtils::GetLocaleTags(env, element, localeTags);
             }
         }
     }
@@ -1369,10 +1057,11 @@ napi_value Init(napi_env env, napi_value exports)
 {
     napi_value val = LocaleInfoAddon::InitLocale(env, exports);
     val = IntlAddon::InitDateTimeFormat(env, val);
-    val = IntlAddon::InitNumberFormat(env, val);
     val = IntlAddon::InitCollator(env, val);
     val = IntlAddon::InitRelativeTimeFormat(env, val);
-    return IntlAddon::InitPluralRules(env, val);
+    val = IntlAddon::InitPluralRules(env, val);
+    val = NumberFormatAddon::InitNumberFormat(env, val);
+    return val;
 }
 
 static napi_module g_intlModule = {
