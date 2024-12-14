@@ -174,8 +174,8 @@ void VariableConvertor::VerifyType(napi_env env, const std::string& valueName, n
     napi_value argv)
 {
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv, &valueType);
-    if (valueType != napiType) {
+    napi_status status = napi_typeof(env, argv, &valueType);
+    if (status != napi_ok || valueType != napiType) {
         auto iter = NAPI_TYPE_MAP.find(napiType);
         std::string type = iter != NAPI_TYPE_MAP.end() ? iter->second : "";
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, valueName, type, true);

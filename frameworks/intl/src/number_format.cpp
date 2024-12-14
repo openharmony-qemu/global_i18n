@@ -15,6 +15,7 @@
 #include "locale_config.h"
 
 #include <cctype>
+#include <cmath>
 #include <sstream>
 #include "i18n_hilog.h"
 #include "ohos/init_data.h"
@@ -80,6 +81,28 @@ std::unordered_map<std::string, UNumberUnitWidth> NumberFormat::defaultCurrencyS
     { "wearable", UNumberUnitWidth::UNUM_UNIT_WIDTH_NARROW },
     { "liteWearable", UNumberUnitWidth::UNUM_UNIT_WIDTH_NARROW },
     { "watch", UNumberUnitWidth::UNUM_UNIT_WIDTH_NARROW }
+};
+
+std::unordered_map<std::string, UNumberRoundingPriority> NumberFormat::roundingPriorityStyle = {
+    { "auto", UNumberRoundingPriority::UNUM_ROUNDING_PRIORITY_STRICT },
+    { "morePrecision", UNumberRoundingPriority::UNUM_ROUNDING_PRIORITY_RELAXED },
+    { "lessPrecision", UNumberRoundingPriority::UNUM_ROUNDING_PRIORITY_STRICT }
+};
+
+std::unordered_map<std::string, UNumberFormatRoundingMode> NumberFormat::roundingModeStyle = {
+    { "ceil", UNumberFormatRoundingMode::UNUM_ROUND_CEILING },
+    { "floor", UNumberFormatRoundingMode::UNUM_ROUND_FLOOR },
+    { "expand", UNumberFormatRoundingMode::UNUM_ROUND_UP },
+    { "trunc", UNumberFormatRoundingMode::UNUM_ROUND_DOWN },
+    { "halfCeil", UNumberFormatRoundingMode::UNUM_ROUND_HALF_CEILING },
+    { "halfFloor", UNumberFormatRoundingMode::UNUM_ROUND_HALF_FLOOR },
+    { "halfExpand", UNumberFormatRoundingMode::UNUM_ROUND_HALFUP },
+    { "halfTrunc", UNumberFormatRoundingMode::UNUM_ROUND_HALFDOWN },
+    { "halfEven", UNumberFormatRoundingMode::UNUM_ROUND_HALFEVEN },
+};
+
+std::vector<size_t> NumberFormat::roundingIncrementList = {
+    1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 2500, 5000
 };
 
 std::map<std::string, std::string> NumberFormat::RelativeTimeFormatConfigs = {
@@ -269,6 +292,78 @@ void NumberFormat::InitDigitsProperties(icu::number::UnlocalizedNumberFormatter 
                 formatter.precision(icu::number::Precision::minMaxFraction(minFractionDigits, maxFractionDigits));
         }
     }
+    SetRoundingProperties(formatter);
+    HandleRoundingPriority(formatter);
+}
+
+void NumberFormat::SetRoundingProperties(icu::number::UnlocalizedNumberFormatter &formatter)
+{
+    if (roundingIncrement != 1) {
+        int32_t maxFractionDigits = GetMaximumFractionDigitsValue();
+        double increment = pow(POW_BASE_NUMBER, -1.0 * maxFractionDigits) * roundingIncrement;
+        formatter = formatter.precision(icu::number::Precision::increment(increment));
+    }
+    if (!roundingModeStr.empty()) {
+        formatter = formatter.roundingMode(roundingMode);
+    }
+}
+
+void NumberFormat::HandleRoundingPriority(icu::number::UnlocalizedNumberFormatter &formatter)
+{
+    if (roundingPriorityStr.empty()) {
+        return;
+    }
+    int32_t minFractionDigits = GetMinimumFractionDigitsValue();
+    int32_t maxFractionDigits = GetMaximumFractionDigitsValue();
+    int32_t maxSigDigits = GetMaximumSignificantDigitsIntValue();
+    int32_t minSigDigits = GetMinimumSignificantDigitsIntValue();
+    auto precision = icu::number::Precision::minMaxFraction(minFractionDigits, maxFractionDigits)
+        .withSignificantDigits(minSigDigits, maxSigDigits, roundingPriority);
+    formatter = formatter.precision(precision);
+}
+
+int32_t NumberFormat::GetMinimumSignificantDigitsIntValue()
+{
+    int32_t minSignifDigits = 1;
+    if (!minimumSignificantDigits.empty()) {
+        int32_t status = 0;
+        int32_t minSignDigits = ConvertString2Int(minimumSignificantDigits, status);
+        minSignifDigits = (status == 0) ? minSignDigits : minSignifDigits;
+    }
+    return minSignifDigits;
+}
+
+int32_t NumberFormat::GetMaximumSignificantDigitsIntValue()
+{
+    int32_t maxSign = DEFAULT_MAX_SIGNIFICANT_DIGITS;
+    if (!maximumSignificantDigits.empty()) {
+        int32_t status = 0;
+        int32_t maxSignDigits = ConvertString2Int(maximumSignificantDigits, status);
+        maxSign = (status == 0) ? maxSignDigits : maxSign;
+    }
+    return maxSign;
+}
+
+int32_t NumberFormat::GetMaximumFractionDigitsValue()
+{
+    int32_t maxFraction = DEFAULT_FRACTION_DIGITS;
+    if (!maximumFractionDigits.empty()) {
+        int32_t status = 0;
+        int32_t maxFractionDigits = ConvertString2Int(maximumFractionDigits, status);
+        maxFraction = (status == 0) ? maxFractionDigits : maxFraction;
+    }
+    return maxFraction;
+}
+
+int32_t NumberFormat::GetMinimumFractionDigitsValue()
+{
+    int32_t minFraction = 0;
+    if (!minimumFractionDigits.empty()) {
+        int32_t status = 0;
+        int32_t minFractionDigits = ConvertString2Int(minimumFractionDigits, status);
+        minFraction = (status == 0) ? minFractionDigits : minFraction;
+    }
+    return minFraction;
 }
 
 void NumberFormat::ParseConfigs(std::map<std::string, std::string> &configs)
@@ -308,6 +403,7 @@ void NumberFormat::ParseConfigs(std::map<std::string, std::string> &configs)
         }
     }
     ParseDigitsConfigs(configs);
+    ParseRoundingConfigs(configs);
 }
 
 void NumberFormat::ParseDigitsConfigs(std::map<std::string, std::string> &configs)
@@ -353,6 +449,36 @@ void NumberFormat::ParseDigitsConfigs(std::map<std::string, std::string> &config
     }
     if (configs.count("localeMatcher") > 0) {
         localeMatcher = configs["localeMatcher"];
+    }
+}
+
+void NumberFormat::ParseRoundingConfigs(std::map<std::string, std::string> &configs)
+{
+    if (configs.count("roundingMode") > 0) {
+        std::string tempRoundingModeStr = configs["roundingMode"];
+        auto iter = roundingModeStyle.find(tempRoundingModeStr);
+        if (iter != roundingModeStyle.end()) {
+            roundingMode = iter->second;
+            roundingModeStr = tempRoundingModeStr;
+        }
+    }
+    if (configs.count("roundingPriority") > 0) {
+        std::string tempRoundingPriorityStr = configs["roundingPriority"];
+        auto iter = roundingPriorityStyle.find(tempRoundingPriorityStr);
+        if (iter != roundingPriorityStyle.end()) {
+            roundingPriorityStr = tempRoundingPriorityStr;
+            roundingPriority = iter->second;
+        }
+    }
+    if (configs.count("roundingIncrement") > 0) {
+        std::string increment = configs["roundingIncrement"];
+        int32_t status = 0;
+        int32_t incrementNum = ConvertString2Int(increment, status);
+        incrementNum = static_cast<size_t>(incrementNum);
+        auto iter = std::find(roundingIncrementList.begin(), roundingIncrementList.end(), incrementNum);
+        if (status == 0 && iter != roundingIncrementList.end()) {
+            roundingIncrement = *iter;
+        }
     }
 }
 
@@ -556,6 +682,15 @@ void NumberFormat::GetDigitsResolvedOptions(std::map<std::string, std::string> &
     }
     if (!notationString.empty()) {
         map.insert(std::make_pair("notation", notationString));
+    }
+    if (!roundingModeStr.empty()) {
+        map.insert(std::make_pair("roundingMode", roundingModeStr));
+    }
+    if (!roundingPriorityStr.empty()) {
+        map.insert(std::make_pair("roundingPriority", roundingPriorityStr));
+    }
+    if (roundingIncrement != 1) {
+        map.insert(std::make_pair("roundingIncrement", std::to_string(roundingIncrement)));
     }
 }
 

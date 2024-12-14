@@ -48,7 +48,7 @@ void JSUtils::GetOptionValue(napi_env env, napi_value options, const std::string
     bool hasProperty = false;
     status = napi_has_named_property(env, options, optionName.c_str(), &hasProperty);
     if (status != napi_ok || !hasProperty) {
-        HILOG_ERROR_I18N("GetOptionValue: Has not named property");
+        HILOG_ERROR_I18N("GetOptionValue: Has not named property:%{public}s", optionName.c_str());
         return;
     }
     status = napi_get_named_property(env, options, optionName.c_str(), &optionValue);
@@ -62,6 +62,7 @@ void JSUtils::GetOptionValue(napi_env env, napi_value options, const std::string
         HILOG_ERROR_I18N("GetOptionValue: get string length failed");
         return;
     }
+
     std::vector<char> optionBuf(len + 1);
     status = napi_get_value_string_utf8(env, optionValue, optionBuf.data(), len + 1, &len);
     if (status != napi_ok) {
@@ -132,7 +133,8 @@ std::string JSUtils::GetLocaleTag(napi_env env, napi_value argv)
         HILOG_ERROR_I18N("GetLocaleTag: Get locale tag failed");
         return "";
     }
-    return buf.data();
+    std::string result(buf.data());
+    return result;
 }
 
 void JSUtils::GetLocaleTags(napi_env env, napi_value rawLocaleTag, std::vector<std::string> &localeTags)
@@ -166,6 +168,8 @@ void JSUtils::GetNumberOptionValues(napi_env env, napi_value options, std::map<s
     JSUtils::GetOptionValue(env, options, "numberingSystem", map);
     JSUtils::GetOptionValue(env, options, "notation", map);
     JSUtils::GetOptionValue(env, options, "unitUsage", map);
+    JSUtils::GetOptionValue(env, options, "roundingPriority", map);
+    JSUtils::GetOptionValue(env, options, "roundingMode", map);
     JSUtils::GetBoolOptionValue(env, options, "useGrouping", map);
     GetIntegerOptionValue(env, options, "minimumIntegerDigits", map);
     int64_t minFd = GetIntegerOptionValue(env, options, "minimumFractionDigits", map);
@@ -176,6 +180,7 @@ void JSUtils::GetNumberOptionValues(napi_env env, napi_value options, std::map<s
     }
     GetIntegerOptionValue(env, options, "minimumSignificantDigits", map);
     GetIntegerOptionValue(env, options, "maximumSignificantDigits", map);
+    GetIntegerOptionValue(env, options, "roundingIncrement", map);
 }
 
 int64_t JSUtils::GetIntegerOptionValue(napi_env env, napi_value options, const std::string &optionName,
