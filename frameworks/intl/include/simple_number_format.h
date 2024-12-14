@@ -27,8 +27,11 @@ public:
     SimpleNumberFormat(const std::string& skeleton, std::shared_ptr<LocaleInfo> localeInfo, I18nErrorCode& errCode);
     ~SimpleNumberFormat();
     std::string Format(double number);
+    icu::number::FormattedNumber FormatToFormattedNumber(double number);
 
 private:
+    static bool Init();
+    static bool icuInitialized;
     icu::number::LocalizedNumberFormatter simpleNumberFormat;
     bool initSuccess = false;
 };

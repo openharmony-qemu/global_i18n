@@ -48,6 +48,9 @@ public:
     NumberFormat(const std::vector<std::string> &localeTag, std::map<std::string, std::string> &configs);
     virtual ~NumberFormat();
     std::string Format(double number);
+    bool IsRelativeTimeFormat(double number);
+    icu::number::FormattedNumber FormatToFormattedNumber(double number);
+    icu::FormattedRelativeDateTime FormatToFormattedRelativeDateTime(double number);
     std::string FormatRange(double start, double end);
     void GetResolvedOptions(std::map<std::string, std::string> &map);
     std::string GetCurrency() const;

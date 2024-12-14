@@ -50,6 +50,7 @@ public:
     RelativeTimeFormat(const std::vector<std::string> &localeTag, std::map<std::string, std::string> &configs);
     virtual ~RelativeTimeFormat();
     std::string Format(double number, const std::string &unit);
+    icu::FormattedRelativeDateTime FormatToFormattedValue(double number, const std::string &unit);
     void FormatToParts(double number, const std::string &unit, std::vector<std::vector<std::string>> &timeVector);
     void GetResolvedOptions(std::map<std::string, std::string> &map);
 
