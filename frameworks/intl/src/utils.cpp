@@ -67,6 +67,7 @@ std::string ReadSystemParameter(const char *paramKey, const int paramLength)
     if (status > 0) {
         return param;
     }
+    HILOG_ERROR_I18N("GetParameter: get param for %{public}s failed.", paramKey);
     return "";
 }
 
