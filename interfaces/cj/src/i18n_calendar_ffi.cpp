@@ -120,15 +120,27 @@ void FfiOHOSCalendarSetOfDay(int64_t id, int32_t hour, int32_t minute, int32_t s
     auto instance = FFIData::GetData<CCalendar>(id);
     std::time_t t = std::time(nullptr);
     std::tm* now = std::localtime(&t);
+
+    int32_t currentHour = 0;
+    int32_t currentMinute = 0;
+    int32_t currentSecond = 0;
+
+    if (now != nullptr) {
+        currentHour = now->tm_hour;
+        currentMinute = now->tm_min;
+        currentSecond = now->tm_sec;
+    }
+    
     if (hour == -1) {
-        hour = now->tm_hour;
+        hour = currentHour;
     }
     if (minute == -1) {
-        minute = now->tm_min;
+        minute = currentMinute;
     }
     if (second == -1) {
-        second = now->tm_sec;
+        second = currentSecond;
     }
+    
     instance->Set(UCalendarDateFields::UCAL_HOUR_OF_DAY, hour);
     instance->Set(UCalendarDateFields::UCAL_MINUTE, minute);
     instance->Set(UCalendarDateFields::UCAL_SECOND, second);
