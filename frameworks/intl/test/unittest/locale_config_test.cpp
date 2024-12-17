@@ -148,6 +148,15 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest006, TestSize.Level1)
     EXPECT_EQ(status, I18nErrorCode::SUCCESS);
     status = LocaleConfig::SetSystemRegion("@*%");
     EXPECT_EQ(status, I18nErrorCode::INVALID_REGION_TAG);
+    status = LocaleConfig::SetSystemLocale("zh-Hans-CN", 2, true);
+    EXPECT_EQ(status, I18nErrorCode::SUCCESS);
+    status = LocaleConfig::SetSystemLocale("zh-Hans-CN", 2, true);
+    EXPECT_EQ(status, I18nErrorCode::SUCCESS);
+    status = LocaleConfig::SetSystemLocale("ar-EG");
+    EXPECT_EQ(status, I18nErrorCode::SUCCESS);
+    EXPECT_TRUE(LocaleConfig::GetUsingLocalDigit());
+    status = LocaleConfig::SetSystemLocale("$$@");
+    EXPECT_NE(status, I18nErrorCode::SUCCESS);
 }
 
 /**
@@ -327,6 +336,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest014, TestSize.Level1)
     status = LocaleConfig::Set24HourClock("abc");
     EXPECT_EQ(status, I18nErrorCode::INVALID_24_HOUR_CLOCK_TAG);
     LocaleConfig::Set24HourClock("");
+    LocaleConfig::Set24HourClock("false");
 }
 
 /**

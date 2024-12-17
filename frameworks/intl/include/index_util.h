@@ -20,6 +20,7 @@
 
 #include "memory"
 #include "unicode/alphaindex.h"
+#include "unicode/utypes.h"
 
 namespace OHOS {
 namespace Global {
@@ -27,10 +28,14 @@ namespace I18n {
 class IndexUtil {
 public:
     explicit IndexUtil(const std::string &localeTag);
-    ~IndexUtil();
+    virtual ~IndexUtil();
     std::vector<std::string> GetIndexList();
     void AddLocale(const std::string &localeTag);
     std::string GetIndex(const std::string &String);
+
+protected:
+    virtual bool IsCreateSuccess();
+    virtual bool IsStatusSuccess(const UErrorCode &status);
 
 private:
     std::unique_ptr<icu::AlphabeticIndex> index;
