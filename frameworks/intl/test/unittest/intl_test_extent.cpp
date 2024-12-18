@@ -65,6 +65,7 @@
 
 using namespace OHOS::Global::I18n;
 using testing::ext::TestSize;
+using testing::_;
 using namespace std;
 using namespace testing;
 
@@ -235,23 +236,28 @@ HWTEST_F(IntlTest, IntlFuncTest0052, TestSize.Level1)
     indexUtil3->AddLocale("en-US");
     indexStr = indexUtil3->GetIndex("A");
     EXPECT_EQ(indexStr, "A");
-
+    printf("----------1111111111------------");
     std::unique_ptr<IndexUtilMock> indexUtilMock = std::make_unique<IndexUtilMock>("zh-CN");
     EXPECT_CALL(*indexUtilMock, IsCreateSuccess())
     .WillRepeatedly(Return(false));
+    printf("----------2222------------");
     indexUtilMock->GetIndexList();
+    printf("----------333333------------");
     EXPECT_EQ(indexUtilMock->GetIndex("A"), "");
+    printf("----------444444------------");
 
     std::unique_ptr<IndexUtilMock> indexUtilMock2 = std::make_unique<IndexUtilMock>("zh-CN");
-    EXPECT_CALL(*indexUtilMock2, IsStatusSuccess)
+    EXPECT_CALL(*indexUtilMock2, IsStatusSuccess(_))
     .WillOnce(Return(false));
     EXPECT_EQ(indexUtilMock2->GetIndex("A"), "");
+    printf("----------55555555555------------");
 
     std::unique_ptr<IndexUtilMock> indexUtilMock3 = std::make_unique<IndexUtilMock>("zh-CN");   
-    EXPECT_CALL(*indexUtilMock3, IsStatusSuccess)
+    EXPECT_CALL(*indexUtilMock3, IsStatusSuccess(_))
     .WillOnce(Return(true))
     .WillRepeatedly(Return(false));
     EXPECT_EQ(indexUtilMock3->GetIndex("A"), "");
+    printf("----------6666------------");
 }
 
 /**
@@ -478,7 +484,6 @@ HWTEST_F(IntlTest, IntlFuncTest0059, TestSize.Level1)
     std::unique_ptr<LocaleInfo> current = std::make_unique<LocaleInfo>("en");
     std::unique_ptr<LocaleInfo> other = std::make_unique<LocaleInfo>("en-US");
     LocaleMatcher::IsMoreSuitable(current.get(), other.get(), requestZh.get());
-    std::unique_ptr<LocaleInfo> requestZh = std::make_unique<LocaleInfo>("zh-Hant");
     LocaleMatcher::IsMoreSuitable(currentEn.get(), current.get(), requestZh.get());
     std::unique_ptr<LocaleInfo> requestQaag = std::make_unique<LocaleInfo>("en-Qaag");
     int8_t suitable = LocaleMatcher::IsMoreSuitable(currentEn.get(), otherEn.get(), requestQaag.get());
@@ -1036,13 +1041,13 @@ HWTEST_F(IntlTest, IntlFuncTest0075, TestSize.Level1)
     std::string locale = "en";
     DateTimeRule* dtRule = new DateTimeRule(locale);
     RulesEngineMock ruleEngineMock(dtRule, rulesSet);
-    EXPECT_CALL(ruleEngineMock, IsRegexPatternInvalid)
+    EXPECT_CALL(ruleEngineMock, IsRegexPatternInvalid(_))
     .WillRepeatedly(Return(true));
     std::vector<MatchedDateTimeInfo> matches = ruleEngineMock.Match(message);
     EXPECT_EQ(matches.size(), 0);
 
     RulesEngineMock ruleEngineMock2(dtRule, rulesSet);
-    EXPECT_CALL(ruleEngineMock2, IsRegexMatcherInvalid)
+    EXPECT_CALL(ruleEngineMock2, IsRegexMatcherInvalid(_))
     .WillRepeatedly(Return(true));
     matches = ruleEngineMock2.Match(message);
     EXPECT_EQ(matches.size(), 0);
