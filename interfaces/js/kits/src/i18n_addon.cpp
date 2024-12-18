@@ -37,6 +37,7 @@
 #include "variable_convertor.h"
 #include "i18n_addon.h"
 #include "date_time_sequence.h"
+#include "locale_info_addon.h"
 
 namespace OHOS {
 namespace Global {
@@ -281,7 +282,7 @@ int I18nAddon::GetParamOfGetTimePeriodName(napi_env env, napi_callback_info info
         HILOG_ERROR_I18N("GetTimePeriodName can't get parameters from getTimePerioudName.");
         return -1;
     } else if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "hour", "", true);
+        ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, "hour", true);
         return -1;
     }
 
@@ -377,7 +378,7 @@ napi_value I18nAddon::GetBestMatchLocale(napi_env env, napi_callback_info info)
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok || argc < 2) { // 2 is the request param num.
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale or localeList", "", true);
+        ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, "locale or localeList", true);
         return nullptr;
     }
     LocaleInfo *requestLocale = ProcessJsParamLocale(env, argv[0]);
@@ -421,7 +422,7 @@ napi_value I18nAddon::GetThreeLetterLanguage(napi_env env, napi_callback_info in
         HILOG_ERROR_I18N("GetThreeLetterLanguage napi get param error.");
         return nullptr;
     } else if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "", true);
+        ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, "locale", true);
         return nullptr;
     }
 
@@ -462,7 +463,7 @@ napi_value I18nAddon::GetThreeLetterRegion(napi_env env, napi_callback_info info
         HILOG_ERROR_I18N("GetThreeLetterRegion: Failed to obtain the parameter.");
         return nullptr;
     } else if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "", true);
+        ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, "locale", true);
         return nullptr;
     }
 

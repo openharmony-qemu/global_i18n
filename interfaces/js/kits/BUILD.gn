@@ -27,10 +27,16 @@ ohos_shared_library("intl") {
     "//base/global/i18n/interfaces/js/kits/include",
   ]
 
-  sources = [ "src/intl_addon.cpp" ]
+  sources = [
+    "src/intl_addon.cpp",
+    "src/js_utils.cpp",
+    "src/locale_info_addon.cpp",
+    "src/number_format_addon.cpp",
+  ]
 
   deps = [ "//base/global/i18n/frameworks/intl:intl_util" ]
   external_deps = [
+    "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
     "icu:shared_icuuc",
     "libphonenumber:phonenumber_standard",
@@ -62,6 +68,7 @@ ohos_shared_library("i18n") {
     "src/i18n_timezone_addon.cpp",
     "src/i18n_unicode_addon.cpp",
     "src/js_utils.cpp",
+    "src/locale_info_addon.cpp",
     "src/system_locale_manager_addon.cpp",
     "src/variable_convertor.cpp",
   ]
