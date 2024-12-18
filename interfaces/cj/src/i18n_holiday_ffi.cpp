@@ -95,7 +95,7 @@ static int32_t HolidayInfo2Cj(const std::vector<HolidayInfoItem>& items, Holiday
 
             if (HolidayLocalNames2Cj(each.localNames, info.localNames) != HOLIDAY_OPT_SUCCESS) {
                 for (uint32_t index = 0; index < idx; index++) {
-                    free(arr.head[idx].baseName);
+                    free(arr.head[index].baseName);
                 }
                 free(info.baseName);
                 free(arr.head);
