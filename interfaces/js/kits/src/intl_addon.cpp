@@ -513,6 +513,56 @@ int64_t IntlAddon::GetMilliseconds(napi_env env, napi_value *argv, int index)
     return milliseconds;
 }
 
+void SetOptionProperties(napi_env env, napi_value &result, std::map<std::string, std::string> &options,
+    const std::string &option)
+{
+    if (options.count(option) > 0) {
+        std::string optionValue = options[option];
+        napi_value optionJsValue = nullptr;
+        napi_create_string_utf8(env, optionValue.c_str(), NAPI_AUTO_LENGTH, &optionJsValue);
+        napi_set_named_property(env, result, option.c_str(), optionJsValue);
+    } else {
+        napi_value undefined = nullptr;
+        napi_get_undefined(env, &undefined);
+        napi_set_named_property(env, result, option.c_str(), undefined);
+    }
+}
+
+void SetIntegerOptionProperties(napi_env env, napi_value &result, std::map<std::string, std::string> &options,
+    const std::string &option)
+{
+    if (options.count(option) > 0) {
+        std::string optionValue = options[option];
+        napi_value optionJsValue = nullptr;
+        int32_t status = 0;
+        int64_t integerValue = ConvertString2Int(optionValue, status);
+        if (status != -1) {
+            napi_create_int64(env, integerValue, &optionJsValue);
+            napi_set_named_property(env, result, option.c_str(), optionJsValue);
+            return;
+        }
+    }
+    napi_value undefined = nullptr;
+    napi_get_undefined(env, &undefined);
+    napi_set_named_property(env, result, option.c_str(), undefined);
+}
+
+void SetBooleanOptionProperties(napi_env env, napi_value &result, std::map<std::string, std::string> &options,
+    const std::string &option)
+{
+    if (options.count(option) > 0) {
+        std::string optionValue = options[option];
+        bool optionBoolValue = (optionValue == "true");
+        napi_value optionJsValue = nullptr;
+        napi_get_boolean(env, optionBoolValue, &optionJsValue);
+        napi_set_named_property(env, result, option.c_str(), optionJsValue);
+    } else {
+        napi_value undefined = nullptr;
+        napi_get_undefined(env, &undefined);
+        napi_set_named_property(env, result, option.c_str(), undefined);
+    }
+}
+
 napi_value IntlAddon::GetRelativeTimeResolvedOptions(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
