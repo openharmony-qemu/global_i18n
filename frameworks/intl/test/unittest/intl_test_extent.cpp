@@ -65,7 +65,6 @@
 
 using namespace OHOS::Global::I18n;
 using testing::ext::TestSize;
-using testing::_;
 using namespace std;
 using namespace testing;
 
@@ -236,28 +235,28 @@ HWTEST_F(IntlTest, IntlFuncTest0052, TestSize.Level1)
     indexUtil3->AddLocale("en-US");
     indexStr = indexUtil3->GetIndex("A");
     EXPECT_EQ(indexStr, "A");
-    printf("----------1111111111------------");
-    std::unique_ptr<IndexUtilMock> indexUtilMock = std::make_unique<IndexUtilMock>("zh-CN");
+    printf("----------1111111111------------\n");
+    std::unique_ptr<MockIndexUtil> indexUtilMock = std::make_unique<MockIndexUtil>("zh-CN");
     EXPECT_CALL(*indexUtilMock, IsCreateSuccess())
     .WillRepeatedly(Return(false));
-    printf("----------2222------------");
+    printf("----------2222------------\n");
     indexUtilMock->GetIndexList();
-    printf("----------333333------------");
+    printf("----------333333------------\n");
     EXPECT_EQ(indexUtilMock->GetIndex("A"), "");
-    printf("----------444444------------");
-
-    std::unique_ptr<IndexUtilMock> indexUtilMock2 = std::make_unique<IndexUtilMock>("zh-CN");
-    EXPECT_CALL(*indexUtilMock2, IsStatusSuccess(_))
+    printf("----------444444------------\n");
+    UErrorCode status = U_ZERO_ERROR;
+    std::unique_ptr<MockIndexUtil> indexUtilMock2 = std::make_unique<MockIndexUtil>("zh-CN");
+    EXPECT_CALL(*indexUtilMock2, IsStatusSuccess(status))
     .WillOnce(Return(false));
     EXPECT_EQ(indexUtilMock2->GetIndex("A"), "");
-    printf("----------55555555555------------");
+    printf("----------55555555555------------\n");
 
-    std::unique_ptr<IndexUtilMock> indexUtilMock3 = std::make_unique<IndexUtilMock>("zh-CN");
-    EXPECT_CALL(*indexUtilMock3, IsStatusSuccess(_))
+    std::unique_ptr<MockIndexUtil> indexUtilMock3 = std::make_unique<MockIndexUtil>("zh-CN");
+    EXPECT_CALL(*indexUtilMock3, IsStatusSuccess(status))
     .WillOnce(Return(true))
     .WillRepeatedly(Return(false));
     EXPECT_EQ(indexUtilMock3->GetIndex("A"), "");
-    printf("----------6666------------");
+    printf("----------6666------------\n");
 }
 
 /**
@@ -1026,6 +1025,7 @@ HWTEST_F(IntlTest, IntlFuncTest0074, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest0075, TestSize.Level1)
 {
+    using testing::_;
     DateTimeRule* dateTimeRule = nullptr;
     std::unordered_map<std::string, std::string> rulesMap = {};
     std::unordered_map<std::string, std::string> subRules = {};
@@ -1038,13 +1038,13 @@ HWTEST_F(IntlTest, IntlFuncTest0075, TestSize.Level1)
     icu::UnicodeString message(str.c_str());
     std::string locale = "en";
     DateTimeRule* dtRule = new DateTimeRule(locale);
-    RulesEngineMock ruleEngineMock(dtRule, rulesSet);
+    MockRulesEngine ruleEngineMock(dtRule, rulesSet);
     EXPECT_CALL(ruleEngineMock, IsRegexPatternInvalid(_))
     .WillRepeatedly(Return(true));
     std::vector<MatchedDateTimeInfo> matches = ruleEngineMock.Match(message);
     EXPECT_EQ(matches.size(), 0);
 
-    RulesEngineMock ruleEngineMock2(dtRule, rulesSet);
+    MockRulesEngine ruleEngineMock2(dtRule, rulesSet);
     EXPECT_CALL(ruleEngineMock2, IsRegexMatcherInvalid(_))
     .WillRepeatedly(Return(true));
     matches = ruleEngineMock2.Match(message);

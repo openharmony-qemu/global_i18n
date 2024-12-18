@@ -21,13 +21,13 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-class IndexUtilMock : public IndexUtil {
+class MockIndexUtil : public IndexUtil {
 public:
-    IndexUtilMock(const std::string &localeTag) : IndexUtil(localeTag) {
+    MockIndexUtil(const std::string &localeTag) : IndexUtil(localeTag) {
     };
-    ~IndexUtilMock() override = default;
-    MOCK_METHOD0(IsCreateSuccess, bool());
-    MOCK_METHOD1(IsStatusSuccess, bool(const UErrorCode &status));
+    ~MockIndexUtil() override = default;
+    MOCK_METHOD(bool, IsCreateSuccess, (), (override));
+    MOCK_METHOD(bool, IsStatusSuccess, (const UErrorCode &status), (override));
 };
 } // namespace I18n
 } // namespace Global

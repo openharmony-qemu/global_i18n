@@ -21,13 +21,13 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-class RulesEngineMock : public RulesEngine {
+class MockRulesEngine : public RulesEngine {
 public:
-    RulesEngineMock(DateTimeRule* dateTimeRule, RulesSet& rulesSet)
+    MockRulesEngine(DateTimeRule* dateTimeRule, RulesSet& rulesSet)
         : RulesEngine(dateTimeRule, rulesSet) {};
-    ~RulesEngineMock() override = default;
-    MOCK_METHOD1(IsRegexPatternInvalid, bool(icu::RegexPattern* pattern));
-    MOCK_METHOD1(IsRegexMatcherInvalid, bool(icu::RegexMatcher* matcher));
+    ~MockRulesEngine() override = default;
+    MOCK_METHOD(bool, IsRegexPatternInvalid, (icu::RegexPattern* pattern), (override));
+    MOCK_METHOD(bool, IsRegexMatcherInvalid, (icu::RegexMatcher* matcher), (override));
 };
 } // namespace I18n
 } // namespace Global
