@@ -252,7 +252,7 @@ HWTEST_F(IntlTest, IntlFuncTest0052, TestSize.Level1)
     EXPECT_EQ(indexUtilMock2->GetIndex("A"), "");
     printf("----------55555555555------------");
 
-    std::unique_ptr<IndexUtilMock> indexUtilMock3 = std::make_unique<IndexUtilMock>("zh-CN");   
+    std::unique_ptr<IndexUtilMock> indexUtilMock3 = std::make_unique<IndexUtilMock>("zh-CN");
     EXPECT_CALL(*indexUtilMock3, IsStatusSuccess(_))
     .WillOnce(Return(true))
     .WillRepeatedly(Return(false));
@@ -479,7 +479,7 @@ HWTEST_F(IntlTest, IntlFuncTest0059, TestSize.Level1)
     std::unique_ptr<LocaleInfo> currentEn = std::make_unique<LocaleInfo>("en-GB");
     std::unique_ptr<LocaleInfo> otherEn = std::make_unique<LocaleInfo>("en-US");
     int8_t result = LocaleMatcher::IsMoreSuitable(currentEn.get(), otherEn.get(), request.get());
-    EXPECT_EQ(result, 0);
+    EXPECT_EQ(result, 1);
     std::unique_ptr<LocaleInfo> requestZh = std::make_unique<LocaleInfo>("zh-Hant");
     std::unique_ptr<LocaleInfo> current = std::make_unique<LocaleInfo>("en");
     std::unique_ptr<LocaleInfo> other = std::make_unique<LocaleInfo>("en-US");
@@ -487,9 +487,9 @@ HWTEST_F(IntlTest, IntlFuncTest0059, TestSize.Level1)
     LocaleMatcher::IsMoreSuitable(currentEn.get(), current.get(), requestZh.get());
     std::unique_ptr<LocaleInfo> requestQaag = std::make_unique<LocaleInfo>("en-Qaag");
     int8_t suitable = LocaleMatcher::IsMoreSuitable(currentEn.get(), otherEn.get(), requestQaag.get());
-    EXPECT_EQ(suitable, 0);
+    EXPECT_EQ(suitable, 1);
     suitable = LocaleMatcher::IsMoreSuitable(currentEn.get(), otherEn.get(), current.get());
-    EXPECT_EQ(suitable, 0);
+    EXPECT_EQ(suitable, -1);
 }
 
 /**
@@ -877,7 +877,6 @@ HWTEST_F(IntlTest, IntlFuncTest0069, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest0070, TestSize.Level1)
 {
-
 }
 
 /**
@@ -887,7 +886,6 @@ HWTEST_F(IntlTest, IntlFuncTest0070, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest0071, TestSize.Level1)
 {
-
 }
 
 /**

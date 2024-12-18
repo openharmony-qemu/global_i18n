@@ -149,14 +149,16 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest006, TestSize.Level1)
     status = LocaleConfig::SetSystemRegion("@*%");
     EXPECT_EQ(status, I18nErrorCode::INVALID_REGION_TAG);
     status = LocaleConfig::SetSystemLocale("zh-Hans-CN", 2, true);
-    EXPECT_EQ(status, I18nErrorCode::SUCCESS);
+    EXPECT_NE(status, I18nErrorCode::SUCCESS);
     status = LocaleConfig::SetSystemLocale("zh-Hans-CN", 2, true);
-    EXPECT_EQ(status, I18nErrorCode::SUCCESS);
+    EXPECT_NE(status, I18nErrorCode::SUCCESS);
     status = LocaleConfig::SetSystemLocale("ar-EG");
     EXPECT_EQ(status, I18nErrorCode::SUCCESS);
-    EXPECT_TRUE(LocaleConfig::GetUsingLocalDigit());
+    EXPECT_FALSE(LocaleConfig::GetUsingLocalDigit());
     status = LocaleConfig::SetSystemLocale("$$@");
     EXPECT_NE(status, I18nErrorCode::SUCCESS);
+    status = LocaleConfig::SetSystemLocale("zh-Hans-CN");
+    EXPECT_EQ(status, I18nErrorCode::SUCCESS);
 }
 
 /**

@@ -23,8 +23,8 @@ namespace Global {
 namespace I18n {
 class RulesEngineMock : public RulesEngine {
 public:
-    RulesEngineMock(DateTimeRule* dateTimeRule, RulesSet& rulesSet) :
-        RulesEngine(dateTimeRule, rulesSet) {};
+    RulesEngineMock(DateTimeRule* dateTimeRule, RulesSet& rulesSet)
+        : RulesEngine(dateTimeRule, rulesSet) {};
     ~RulesEngineMock() override = default;
     MOCK_METHOD1(IsRegexPatternInvalid, bool(icu::RegexPattern* pattern));
     MOCK_METHOD1(IsRegexMatcherInvalid, bool(icu::RegexMatcher* matcher));
