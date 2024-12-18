@@ -31,7 +31,6 @@ ohos_shared_library("intl") {
     "src/intl_addon.cpp",
     "src/js_utils.cpp",
     "src/locale_info_addon.cpp",
-    "src/number_format_addon.cpp",
   ]
 
   deps = [ "//base/global/i18n/frameworks/intl:intl_util" ]
