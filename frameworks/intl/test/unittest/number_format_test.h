@@ -55,6 +55,8 @@ int NumberFormatFuncTest0033(void);
 int NumberFormatFuncTest0034(void);
 int NumberFormatFuncTest0035(void);
 int NumberFormatFuncTest0036(void);
+int NumberFormatFuncTest0037(void);
+int NumberFormatFuncTest0038(void);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

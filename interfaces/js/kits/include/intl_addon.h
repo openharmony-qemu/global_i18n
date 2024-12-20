@@ -74,6 +74,7 @@ private:
 
     static napi_value GetNumberResolvedOptions(napi_env env, napi_callback_info info);
     static napi_value FormatNumber(napi_env env, napi_callback_info info);
+    static napi_value FormatRangeNumber(napi_env env, napi_callback_info info);
 
     static napi_value CollatorConstructor(napi_env env, napi_callback_info info);
     static napi_value CompareString(napi_env env, napi_callback_info info);

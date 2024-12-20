@@ -98,6 +98,7 @@ napi_value IntlAddon::InitNumberFormat(napi_env env, napi_value exports)
     napi_status status = napi_ok;
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("format", FormatNumber),
+        DECLARE_NAPI_FUNCTION("formatRange", FormatRangeNumber),
         DECLARE_NAPI_FUNCTION("resolvedOptions", GetNumberResolvedOptions)
     };
 
@@ -116,7 +117,6 @@ napi_value IntlAddon::InitNumberFormat(napi_env env, napi_value exports)
     }
     return exports;
 }
-
 
 int64_t GetIntegerOptionValue(napi_env env, napi_value options, const std::string &optionName,
     std::map<std::string, std::string> &map)
@@ -684,6 +684,49 @@ napi_value IntlAddon::FormatNumber(napi_env env, napi_callback_info info)
     if (status != napi_ok) {
         HILOG_ERROR_I18N("FormatNumber: Create format string failed");
         return nullptr;
+    }
+    return result;
+}
+
+napi_value IntlAddon::FormatRangeNumber(napi_env env, napi_callback_info info)
+{
+    size_t argc = 2;
+    napi_value argv[2] = { 0 };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("FormatRangeNumber: Get parameter info failed");
+        return JSUtils::CreateEmptyString(env);
+    }
+    if (argc != 2) { // 2 is parameter count
+        HILOG_ERROR_I18N("FormatRangeNumber: Insufficient parameters");
+        return JSUtils::CreateEmptyString(env);
+    }
+    double start = 0;
+    double end = 0;
+    status = napi_get_value_double(env, argv[0], &start);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("FormatRangeNumber: Get first param value failed");
+        return JSUtils::CreateEmptyString(env);
+    }
+    status = napi_get_value_double(env, argv[1], &end);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("FormatRangeNumber: Get second param value failed");
+        return JSUtils::CreateEmptyString(env);
+    }
+    IntlAddon *obj = nullptr;
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    if (status != napi_ok || !obj || !obj->numberfmt_) {
+        HILOG_ERROR_I18N("FormatRangeNumber: Get NumberFormat object failed");
+        return JSUtils::CreateEmptyString(env);
+    }
+    std::string value = obj->numberfmt_->FormatRange(start, end);
+    napi_value result;
+    status = napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &result);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("create string js variable failed.");
+        return JSUtils::CreateEmptyString(env);
     }
     return result;
 }
