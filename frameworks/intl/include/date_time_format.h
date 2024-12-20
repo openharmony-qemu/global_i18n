@@ -113,9 +113,6 @@ private:
     static const int HALF_HOUR = 30;
     static const int HOURS_OF_A_DAY = 24;
     static bool icuInitialized;
-    static const char *TIMEZONE_KEY;
-    static const char *DEFAULT_TIMEZONE;
-    static constexpr int SYS_PARAM_LEN = 128;
     static const int BUFFER_LEN = 10;
     static const char* DEVICE_TYPE_NAME;
     static bool Init();
@@ -154,7 +151,6 @@ private:
     void RemoveAmPmChar();
     bool CheckInitSuccess();
     void FreeDateTimeFormat();
-    std::string GetSystemTimezone();
 };
 } // namespace I18n
 } // namespace Global
