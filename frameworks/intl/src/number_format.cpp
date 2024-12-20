@@ -226,7 +226,8 @@ void NumberFormat::InitUnitProperties(icu::number::UnlocalizedNumberFormatter &f
     }
     UErrorCode status = U_ZERO_ERROR;
     UMeasurementSystem measSys = ulocdata_getMeasurementSystem(localeBaseName.c_str(), &status);
-    if (U_SUCCESS(status) && measSys >= 0) {
+    bool isValidMeaSys = measurementSystem.find(measSys) != measurementSystem.end();
+    if (U_SUCCESS(status) && measSys >= 0 && isValidMeaSys) {
         unitMeasSys = measurementSystem[measSys];
     }
     formatter = formatter.unitWidth(unitDisplay);
