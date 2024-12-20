@@ -1761,12 +1761,18 @@ std::string LocaleConfig::GetSimplifiedSystemLanguage()
 {
     std::string locale = GetSystemLanguage();
     LocaleInfo localeInfo(locale);
+    LocaleInfo localeInfoMax(localeInfo.Maximize());
     std::string language = localeInfo.GetLanguage();
     if (language.compare("zh") == 0) {
-        language = language + '-' + localeInfo.GetScript();
+        language = language + '-' + localeInfoMax.GetScript();
     }
     if (dialectLanguages.find(language) != dialectLanguages.end()) {
-        locale = GetSystemLocale();
+        std::string systemRegion = localeInfo.GetRegion();
+        if (!systemRegion.empty() && language.compare("en") != 0) {
+            locale = language + '-' + systemRegion;
+        } else {
+            locale = GetSystemLocale();
+        }
         LocaleInfo* requestLocale = new LocaleInfo(locale);
         if (requestLocale == nullptr) {
             HILOG_ERROR_I18N("GetSimplifiedLanguage: %{public}s failed to construct LocaleInfo.", locale.c_str());
