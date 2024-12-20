@@ -27,6 +27,7 @@
 #include "measure_data.h"
 #include "phone_number_format_mock.h"
 #include "preferred_language.h"
+#include "simple_number_format.h"
 #include "utils.h"
 
 using namespace OHOS::Global::I18n;
@@ -1692,6 +1693,41 @@ HWTEST_F(I18nTest, I18nFuncTest067, TestSize.Level1)
     EXPECT_EQ(code, 0);
     EXPECT_EQ(LocaleConfig::GetSimplifiedLanguage("cr-Cans-CA", code), "cr");
     EXPECT_EQ(code, 0);
+}
+
+/**
+ * @tc.name: I18nFuncTest068
+ * @tc.desc: Test I18n simple number format
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest068, TestSize.Level1)
+{
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    std::string skeleton = "percent";
+    std::shared_ptr<LocaleInfo> localeInfo = std::make_shared<LocaleInfo>("zh-Hans-CN");
+    ASSERT_TRUE(localeInfo != nullptr);
+    std::unique_ptr<SimpleNumberFormat> formatter = std::make_unique<SimpleNumberFormat>(skeleton, localeInfo, err);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    ASSERT_TRUE(formatter != nullptr);
+    std::string result = formatter->Format(10);
+    EXPECT_EQ(result, "10%");
+
+    skeleton = "%";
+    std::unique_ptr<SimpleNumberFormat> formatterWithoutLocale =
+        std::make_unique<SimpleNumberFormat>(skeleton, nullptr, err);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    ASSERT_TRUE(formatterWithoutLocale != nullptr);
+    result = formatterWithoutLocale->Format(10);
+    EXPECT_EQ(result, "10%");
+
+    skeleton = "5%";
+    std::unique_ptr<SimpleNumberFormat> formatterWithError =
+        std::make_unique<SimpleNumberFormat>(skeleton, nullptr, err);
+    EXPECT_EQ(err, I18nErrorCode::INVALID_NUMBER_FORMAT_SKELETON);
+
+    std::unique_ptr<SimpleNumberFormat> formatterWithEmpty =
+        std::make_unique<SimpleNumberFormat>("", nullptr, err);
+    EXPECT_EQ(err, I18nErrorCode::INVALID_NUMBER_FORMAT_SKELETON);
 }
 } // namespace I18n
 } // namespace Global
