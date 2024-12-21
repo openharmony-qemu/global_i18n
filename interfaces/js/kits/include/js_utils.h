@@ -31,6 +31,18 @@ public:
     static void GetBoolOptionValue(napi_env env, napi_value options, const std::string &optionName,
         std::map<std::string, std::string> &map);
     static std::string GetLocaleTag(napi_env env, napi_value argv);
+    static void GetLocaleTags(napi_env env, napi_value rawLocaleTag, std::vector<std::string> &localeTags);
+
+    static void GetNumberOptionValues(napi_env env, napi_value options, std::map<std::string, std::string> &map);
+    static int64_t GetIntegerOptionValue(napi_env env, napi_value options, const std::string &optionName,
+        std::map<std::string, std::string> &map);
+
+    static void SetOptionProperties(napi_env env, napi_value &result,
+        std::map<std::string, std::string> &options, const std::string &option);
+    static void SetBooleanOptionProperties(napi_env env, napi_value &result,
+        std::map<std::string, std::string> &options, const std::string &option);
+    static void SetIntegerOptionProperties(napi_env env, napi_value &result,
+        std::map<std::string, std::string> &options, const std::string &option);
 };
 } // namespace I18n
 } // namespace Global
