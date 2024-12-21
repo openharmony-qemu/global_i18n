@@ -35,7 +35,7 @@ public:
 private:
     static napi_value Format(napi_env env, napi_callback_info info);
     static std::vector<napi_value> GenerateParameter(napi_env env, napi_callback_info info, bool isBestPattern,
-        size_t& number);
+        size_t& num);
     static bool GetDateTime(napi_env env, napi_value date, int64_t& milliseconds);
     static napi_value SimpleDateTimeFormatConstructor(napi_env env, napi_callback_info info);
     std::unique_ptr<SimpleDateTimeFormat> simpleDateTimeFormat_ = nullptr;
