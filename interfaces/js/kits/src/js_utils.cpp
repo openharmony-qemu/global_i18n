@@ -168,6 +168,8 @@ void JSUtils::GetNumberOptionValues(napi_env env, napi_value options, std::map<s
     JSUtils::GetOptionValue(env, options, "numberingSystem", map);
     JSUtils::GetOptionValue(env, options, "notation", map);
     JSUtils::GetOptionValue(env, options, "unitUsage", map);
+    JSUtils::GetOptionValue(env, options, "roundingPriority", map);
+    JSUtils::GetOptionValue(env, options, "roundingMode", map);
     JSUtils::GetBoolOptionValue(env, options, "useGrouping", map);
     GetIntegerOptionValue(env, options, "minimumIntegerDigits", map);
     int64_t minFd = GetIntegerOptionValue(env, options, "minimumFractionDigits", map);
@@ -178,6 +180,7 @@ void JSUtils::GetNumberOptionValues(napi_env env, napi_value options, std::map<s
     }
     GetIntegerOptionValue(env, options, "minimumSignificantDigits", map);
     GetIntegerOptionValue(env, options, "maximumSignificantDigits", map);
+    GetIntegerOptionValue(env, options, "roundingIncrement", map);
 }
 
 int64_t JSUtils::GetIntegerOptionValue(napi_env env, napi_value options, const std::string &optionName,
