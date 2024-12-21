@@ -164,7 +164,7 @@ napi_value SimpleDateTimeFormatAddon::Format(napi_env env, napi_callback_info in
 }
 
 std::vector<napi_value> SimpleDateTimeFormatAddon::GenerateParameter(napi_env env, napi_callback_info info,
-    bool isBestPattern, size_t& number)
+    bool isBestPattern, size_t& num)
 {
     size_t argc = 2;
     napi_value argv[2] = { nullptr };
@@ -202,7 +202,7 @@ std::vector<napi_value> SimpleDateTimeFormatAddon::GenerateParameter(napi_env en
     for (size_t i = 0; i < argc; i++) {
         result.emplace_back(argv[i]);
     }
-    number = argc + 1;
+    num = argc + 1;
     return result;
 }
 
