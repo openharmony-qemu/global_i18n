@@ -58,10 +58,12 @@ SimpleDateTimeFormat::SimpleDateTimeFormat(const std::string& skeletonOrPattern,
 
     errCode = isBestPattern ? ParsePattern(skeletonOrPattern) : ParseSkeleton(skeletonOrPattern, icuLocale);
     if (errCode != I18nErrorCode::SUCCESS) {
+        HILOG_ERROR_I18N("SimpleDateTimeFormat: Parse pattern or skeleton failed.");
         return;
     }
     errCode = InitFormatters(icuLocale, isBestPattern);
     if (errCode != I18nErrorCode::SUCCESS) {
+        HILOG_ERROR_I18N("SimpleDateTimeFormat: Init formatters failed.");
         return;
     }
     initSuccess = true;
