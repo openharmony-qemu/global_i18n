@@ -87,6 +87,8 @@ const std::string LocaleConfig::NUMBER_SYSTEM_KEY = "nu";
 const std::string LocaleConfig::TEMPERATURE_UNIT_KEY = "mu";
 const std::string LocaleConfig::WEEK_DAY_KEY = "fw";
 const std::string LocaleConfig::HOUR_EVENT_DATA = "24HourChange";
+const std::string LocaleConfig::TIMEZONE_KEY = "persist.time.timezone";
+const std::string LocaleConfig::DEFAULT_TIMEZONE = "GMT";
 unordered_set<string> LocaleConfig::supportedLocales;
 unordered_set<string> LocaleConfig::supportLocales;
 unordered_set<string> LocaleConfig::supportedRegions;
@@ -397,6 +399,12 @@ string LocaleConfig::GetSystemLocale()
         systemLocale = ReadSystemParameter(DEFAULT_LOCALE_KEY, CONFIG_LEN);
     }
     return systemLocale;
+}
+
+std::string LocaleConfig::GetSystemTimezone()
+{
+    std::string systemTimezone = ReadSystemParameter(TIMEZONE_KEY.c_str(), CONFIG_LEN);
+    return systemTimezone.empty() ? DEFAULT_TIMEZONE : systemTimezone;
 }
 
 bool LocaleConfig::IsValidLanguage(const string &language)

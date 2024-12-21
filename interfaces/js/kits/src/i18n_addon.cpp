@@ -28,6 +28,7 @@
 #include "locale_info.h"
 #include "locale_matcher.h"
 #include "node_api.h"
+#include "simple_date_time_format_addon.h"
 #include "simple_number_format_addon.h"
 #include "styled_number_format_addon.h"
 #include "system_locale_manager_addon.h"
@@ -125,6 +126,10 @@ napi_value I18nAddon::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getFirstPreferredLanguage", I18nSystemAddon::GetFirstPreferredLanguage),
         DECLARE_NAPI_FUNCTION("getSimpleNumberFormatBySkeleton",
             SimpleNumberFormatAddon::GetSimpleNumberFormatBySkeleton),
+        DECLARE_NAPI_FUNCTION("getSimpleDateTimeFormatByPattern",
+            SimpleDateTimeFormatAddon::GetSimpleDateTimeFormatByPattern),
+        DECLARE_NAPI_FUNCTION("getSimpleDateTimeFormatBySkeleton",
+            SimpleDateTimeFormatAddon::GetSimpleDateTimeFormatBySkeleton),
         DECLARE_NAPI_FUNCTION("is24HourClock", I18nSystemAddon::Is24HourClock),
         DECLARE_NAPI_FUNCTION("set24HourClock", I18nSystemAddon::Set24HourClock),
         DECLARE_NAPI_FUNCTION("getTimeZone", I18nTimeZoneAddon::GetI18nTimeZone),
@@ -1671,6 +1676,7 @@ napi_value Init(napi_env env, napi_value exports)
     val = EntityRecognizerAddon::InitEntityRecognizer(env, val);
     val = SimpleNumberFormatAddon::InitSimpleNumberFormat(env, val);
     val = StyledNumberFormatAddon::InitStyledNumberFormat(env, val);
+    val = SimpleDateTimeFormatAddon::InitSimpleDateTimeFormat(env, val);
     return val;
 }
 

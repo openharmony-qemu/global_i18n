@@ -70,6 +70,7 @@ ohos_shared_library("i18n") {
     "src/js_utils.cpp",
     "src/locale_info_addon.cpp",
     "src/number_format_addon.cpp",
+    "src/simple_date_time_format_addon.cpp",
     "src/simple_number_format_addon.cpp",
     "src/styled_number_format_addon.cpp",
     "src/system_locale_manager_addon.cpp",
