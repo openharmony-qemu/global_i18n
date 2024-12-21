@@ -72,16 +72,8 @@ SimpleNumberFormat::~SimpleNumberFormat() {}
 
 std::string SimpleNumberFormat::Format(double number)
 {
-    if (!initSuccess) {
-        HILOG_ERROR_I18N("SimpleNumberFormat::Format: Init failed.");
-        return PseudoLocalizationProcessor("");
-    }
+    icu::number::FormattedNumber formattedNumber = FormatToFormattedNumber(number);
     UErrorCode status = U_ZERO_ERROR;
-    icu::number::FormattedNumber formattedNumber = simpleNumberFormat.formatDouble(number, status);
-    if (U_FAILURE(status)) {
-        HILOG_ERROR_I18N("SimpleNumberFormat::Format: Format double failed.");
-        return PseudoLocalizationProcessor("");
-    }
     icu::UnicodeString formatResult = formattedNumber.toString(status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("SimpleNumberFormat::Format: FormattedNumber convert to string failed.");
@@ -96,6 +88,21 @@ bool SimpleNumberFormat::Init()
 {
     SetHwIcuDirectory();
     return true;
+}
+
+icu::number::FormattedNumber SimpleNumberFormat::FormatToFormattedNumber(double number)
+{
+    if (!initSuccess) {
+        HILOG_ERROR_I18N("SimpleNumberFormat::FormatToFormattedNumber: Init failed.");
+        return {};
+    }
+    UErrorCode status = U_ZERO_ERROR;
+    icu::number::FormattedNumber formattedNumber = simpleNumberFormat.formatDouble(number, status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("SimpleNumberFormat::FormatToFormattedNumber: Format double failed.");
+        return {};
+    }
+    return formattedNumber;
 }
 } // namespace I18n
 } // namespace Global

@@ -76,7 +76,7 @@ RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTag
             localeBaseName = localeInfo->GetBaseName();
             relativeTimeFormat = std::make_unique<icu::RelativeDateTimeFormatter>(locale, nullptr, style,
                 UDISPCTX_CAPITALIZATION_NONE, status);
-            if (!U_SUCCESS(status)) {
+            if (!U_SUCCESS(status) || !relativeTimeFormat) {
                 status = U_ZERO_ERROR;
                 continue;
             }
@@ -91,7 +91,7 @@ RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTag
             localeBaseName = localeInfo->GetBaseName();
             relativeTimeFormat = std::make_unique<icu::RelativeDateTimeFormatter>(locale, nullptr, style,
                 UDISPCTX_CAPITALIZATION_NONE, status);
-            if (U_SUCCESS(status)) {
+            if (U_SUCCESS(status) && relativeTimeFormat) {
                 createSuccess = true;
             }
         }
@@ -121,18 +121,15 @@ void RelativeTimeFormat::ParseConfigs(std::map<std::string, std::string> &config
 
 std::string RelativeTimeFormat::Format(double number, const std::string &unit)
 {
-    if (!createSuccess || !relativeUnits.count(unit)) {
-        return PseudoLocalizationProcessor("");
-    }
+    icu::FormattedRelativeDateTime formattedTime = FormatToFormattedValue(number, unit);
     UErrorCode status = U_ZERO_ERROR;
-    icu::UnicodeString formattedTime;
     std::string result;
-    if (!strcmp(numeric.c_str(), "always")) {
-        formattedTime = relativeTimeFormat->formatNumericToValue(number, relativeUnits[unit], status).toString(status);
+    icu::UnicodeString formatResult = formattedTime.toString(status);
+    if (U_FAILURE(status)) {
+        result = "";
     } else {
-        formattedTime = relativeTimeFormat->formatToValue(number, relativeUnits[unit], status).toString(status);
+        formatResult.toUTF8String(result);
     }
-    formattedTime.toUTF8String(result);
     return PseudoLocalizationProcessor(result);
 }
 
@@ -167,17 +164,9 @@ void RelativeTimeFormat::ProcessIntegerField(const std::map<size_t, size_t> &ind
 void RelativeTimeFormat::FormatToParts(double number, const std::string &unit,
     std::vector<std::vector<std::string>> &timeVector)
 {
-    if (!createSuccess || !relativeUnits.count(unit)) {
-        return;
-    }
+    icu::FormattedRelativeDateTime fmtRelativeTime = FormatToFormattedValue(number, unit);
     UErrorCode status = U_ZERO_ERROR;
     std::string result;
-    icu::FormattedRelativeDateTime fmtRelativeTime;
-    if (numeric.empty() || !strcmp(numeric.c_str(), "always")) {
-        fmtRelativeTime = relativeTimeFormat->formatNumericToValue(number, relativeUnits[unit], status);
-    } else {
-        fmtRelativeTime = relativeTimeFormat->formatToValue(number, relativeUnits[unit], status);
-    }
     fmtRelativeTime.toString(status).toUTF8String(result);
     icu::ConstrainedFieldPosition constrainedPos;
     constrainedPos.constrainCategory(UFIELD_CATEGORY_NUMBER);
@@ -205,6 +194,26 @@ void RelativeTimeFormat::FormatToParts(double number, const std::string &unit,
     if (prevIndex < length) {
         InsertInfo(timeVector, unit, false, result.substr(prevIndex, length - prevIndex));
     }
+}
+
+icu::FormattedRelativeDateTime RelativeTimeFormat::FormatToFormattedValue(double number, const std::string &unit)
+{
+    if (!createSuccess || !relativeUnits.count(unit)) {
+        return {};
+    }
+    UErrorCode status = U_ZERO_ERROR;
+    icu::FormattedRelativeDateTime fmtRelativeTime;
+    if (numeric.compare("always") == 0) {
+        fmtRelativeTime = relativeTimeFormat->formatNumericToValue(number, relativeUnits[unit], status);
+    } else {
+        fmtRelativeTime = relativeTimeFormat->formatToValue(number, relativeUnits[unit], status);
+    }
+
+    if (U_FAILURE(status)) {
+        return {};
+    }
+
+    return fmtRelativeTime;
 }
 
 void RelativeTimeFormat::GetResolvedOptions(std::map<std::string, std::string> &map)

@@ -185,7 +185,7 @@ napi_value SimpleNumberFormatAddon::SimpleNumberFormatConstructor(napi_env env, 
     }
 
     I18nErrorCode errCode = I18nErrorCode::SUCCESS;
-    obj->simpleNumberFormat_ = std::make_unique<SimpleNumberFormat>(skeleton, localeInfo, errCode);
+    obj->simpleNumberFormat_ = std::make_shared<SimpleNumberFormat>(skeleton, localeInfo, errCode);
     if (errCode == I18nErrorCode::INVALID_NUMBER_FORMAT_SKELETON) {
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "skeleton", "a valid number format skeleton", true);
         return nullptr;
@@ -195,6 +195,11 @@ napi_value SimpleNumberFormatAddon::SimpleNumberFormatConstructor(napi_env env, 
     }
     obj.release();
     return thisVar;
+}
+
+std::shared_ptr<SimpleNumberFormat> SimpleNumberFormatAddon::CopySimpleNumberFormat()
+{
+    return simpleNumberFormat_;
 }
 } // namespace I18n
 } // namespace Global

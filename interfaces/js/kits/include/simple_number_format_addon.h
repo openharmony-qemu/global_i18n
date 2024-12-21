@@ -31,10 +31,12 @@ public:
     static napi_value InitSimpleNumberFormat(napi_env env, napi_value exports);
     static napi_value GetSimpleNumberFormatBySkeleton(napi_env env, napi_callback_info info);
 
+    std::shared_ptr<SimpleNumberFormat> CopySimpleNumberFormat();
+
 private:
     static napi_value Format(napi_env env, napi_callback_info info);
     static napi_value SimpleNumberFormatConstructor(napi_env env, napi_callback_info info);
-    std::unique_ptr<SimpleNumberFormat> simpleNumberFormat_ = nullptr;
+    std::shared_ptr<SimpleNumberFormat> simpleNumberFormat_ = nullptr;
 };
 } // namespace I18n
 } // namespace Global

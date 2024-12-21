@@ -30,6 +30,7 @@
 #include "node_api.h"
 #include "simple_date_time_format_addon.h"
 #include "simple_number_format_addon.h"
+#include "styled_number_format_addon.h"
 #include "system_locale_manager_addon.h"
 #include "unicode/datefmt.h"
 #include "unicode/locid.h"
@@ -1674,6 +1675,7 @@ napi_value Init(napi_env env, napi_value exports)
     val = HolidayManagerAddon::InitHolidayManager(env, val);
     val = EntityRecognizerAddon::InitEntityRecognizer(env, val);
     val = SimpleNumberFormatAddon::InitSimpleNumberFormat(env, val);
+    val = StyledNumberFormatAddon::InitStyledNumberFormat(env, val);
     val = SimpleDateTimeFormatAddon::InitSimpleDateTimeFormat(env, val);
     return val;
 }
