@@ -227,7 +227,7 @@ napi_value SimpleDateTimeFormatAddon::SimpleDateTimeFormatConstructor(napi_env e
     int32_t code = 0;
     std::string skeleton = VariableConvertor::GetString(env, argv[1], code);
     if (code != 0) {
-        HILOG_ERROR_I18N("SimpleDateTimeFormatConstructor: get argv[1] failed.");
+        HILOG_ERROR_I18N("SimpleDateTimeFormatConstructor: Get argv[1] failed.");
         return nullptr;
     }
 
@@ -235,6 +235,10 @@ napi_value SimpleDateTimeFormatAddon::SimpleDateTimeFormatConstructor(napi_env e
         VariableConvertor::ParseIntlLocale(env, argv[SIZE_WITH_LOCALE - 1]) : nullptr;
 
     std::unique_ptr<SimpleDateTimeFormatAddon> obj = std::make_unique<SimpleDateTimeFormatAddon>();
+    if (obj == nullptr) {
+        HILOG_ERROR_I18N("SimpleDateTimeFormatConstructor: Cerate SimpleDateTimeFormatAddon failed.");
+        return nullptr;
+    }
     status = napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()),
         SimpleDateTimeFormatAddon::Destructor, nullptr, nullptr);
     if (status != napi_ok) {
