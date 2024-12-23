@@ -28,6 +28,7 @@
 #endif
 #include "i18n_types.h"
 #include "unicode/calendar.h"
+#include "locale_info.h"
 #include "unicode/locid.h"
 
 namespace OHOS {
@@ -134,6 +135,8 @@ public:
     static std::string GetHourKey();
     static std::string GetSimplifiedLanguage(const std::string& language, int32_t &code);
     static std::string GetSimplifiedSystemLanguage();
+    static std::string GetLocalizedFilePath(const std::string &path, const char delimiter,
+        std::shared_ptr<LocaleInfo> localeInfo, std::string &errorCode);
 
 private:
     static void Split(const std::string &src, const std::string &sep, std::vector<std::string> &dest);
