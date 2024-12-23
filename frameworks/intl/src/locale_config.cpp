@@ -1830,7 +1830,8 @@ std::string LocaleConfig::GetLocalizedFilePath(const std::string &path, const ch
         return path;
     }
     std::string result;
-    if (path[0] != delimiter) {
+	auto iter = path.find(std::to_string(delimiter));
+    if (path[0] != delimiter && iter != std::string::npos) {
         result.append("\u200f");
     }
     for (char c : path) {
