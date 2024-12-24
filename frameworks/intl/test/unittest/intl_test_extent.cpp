@@ -650,7 +650,6 @@ HWTEST_F(IntlTest, IntlFuncTest0063, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest0064, TestSize.Level1)
 {
-
 }
 
 /**
