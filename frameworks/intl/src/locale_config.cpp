@@ -1451,6 +1451,9 @@ std::string LocaleConfig::GetTemperatureName(const TemperatureType& type)
         HILOG_ERROR_I18N("LocaleConfig::GetTemperatureName: temperature type failed.");
         return "";
     }
+    if (type == TemperatureType::FAHRENHEIT) {
+        return "fahrenheit";
+    }
     return temperatureTypeToName[type];
 }
 
