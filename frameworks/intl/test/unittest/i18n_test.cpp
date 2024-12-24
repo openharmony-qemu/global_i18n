@@ -27,6 +27,8 @@
 #include "measure_data.h"
 #include "phone_number_format_mock.h"
 #include "preferred_language.h"
+#include "simple_date_time_format.h"
+#include "simple_number_format.h"
 #include "utils.h"
 
 using namespace OHOS::Global::I18n;
@@ -1692,6 +1694,115 @@ HWTEST_F(I18nTest, I18nFuncTest067, TestSize.Level1)
     EXPECT_EQ(code, 0);
     EXPECT_EQ(LocaleConfig::GetSimplifiedLanguage("cr-Cans-CA", code), "cr");
     EXPECT_EQ(code, 0);
+}
+
+/**
+ * @tc.name: I18nFuncTest068
+ * @tc.desc: Test I18n simple number format
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest068, TestSize.Level1)
+{
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    std::string skeleton = "percent";
+    std::shared_ptr<LocaleInfo> localeInfo = std::make_shared<LocaleInfo>("zh-Hans-CN");
+    ASSERT_TRUE(localeInfo != nullptr);
+    std::unique_ptr<SimpleNumberFormat> formatter = std::make_unique<SimpleNumberFormat>(skeleton, localeInfo, err);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    ASSERT_TRUE(formatter != nullptr);
+    std::string result = formatter->Format(10);
+    EXPECT_EQ(result, "10%");
+
+    skeleton = "%";
+    std::unique_ptr<SimpleNumberFormat> formatterWithoutLocale =
+        std::make_unique<SimpleNumberFormat>(skeleton, nullptr, err);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    ASSERT_TRUE(formatterWithoutLocale != nullptr);
+    result = formatterWithoutLocale->Format(10);
+    EXPECT_EQ(result, "10%");
+
+    skeleton = "5%";
+    std::unique_ptr<SimpleNumberFormat> formatterWithError =
+        std::make_unique<SimpleNumberFormat>(skeleton, nullptr, err);
+    EXPECT_EQ(err, I18nErrorCode::INVALID_NUMBER_FORMAT_SKELETON);
+
+    std::unique_ptr<SimpleNumberFormat> formatterWithEmpty =
+        std::make_unique<SimpleNumberFormat>("", nullptr, err);
+    EXPECT_EQ(err, I18nErrorCode::INVALID_NUMBER_FORMAT_SKELETON);
+}
+
+/**
+ * @tc.name: I18nFuncTest069
+ * @tc.desc: Test I18n simple date time format
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest069, TestSize.Level1)
+{
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    std::shared_ptr<LocaleInfo> localeInfo = std::make_shared<LocaleInfo>("zh-Hans-CN");
+    ASSERT_TRUE(localeInfo != nullptr);
+
+    std::string skeleton = "yMd";
+    std::unique_ptr<SimpleDateTimeFormat> skeletonFormatter =
+        std::make_unique<SimpleDateTimeFormat>(skeleton, localeInfo, false, err);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    ASSERT_TRUE(skeletonFormatter != nullptr);
+
+    int64_t milliseconds = 98765432100;
+    std::string result = skeletonFormatter->Format(milliseconds);
+    EXPECT_EQ(result, "1973/2/17");
+
+    std::unique_ptr<SimpleDateTimeFormat> formatterWithoutLocale =
+        std::make_unique<SimpleDateTimeFormat>(skeleton, nullptr, false, err);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+
+    skeleton = "y/M/d";
+    std::unique_ptr<SimpleDateTimeFormat> formatterInvalidSkeleton =
+        std::make_unique<SimpleDateTimeFormat>(skeleton, localeInfo, false, err);
+    EXPECT_EQ(err, I18nErrorCode::INVALID_DATE_TIME_FORMAT_SKELETON);
+
+    std::unique_ptr<SimpleDateTimeFormat> formatterWithEmptySkeleton =
+        std::make_unique<SimpleDateTimeFormat>("", localeInfo, false, err);
+    EXPECT_EQ(err, I18nErrorCode::INVALID_DATE_TIME_FORMAT_SKELETON);
+}
+
+/**
+ * @tc.name: I18nFuncTest070
+ * @tc.desc: Test I18n simple date time format
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest070, TestSize.Level1)
+{
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    std::shared_ptr<LocaleInfo> localeInfo = std::make_shared<LocaleInfo>("zh-Hans-CN");
+    ASSERT_TRUE(localeInfo != nullptr);
+    
+    std::string pattern = "yMd";
+    std::unique_ptr<SimpleDateTimeFormat> patternFormatter =
+        std::make_unique<SimpleDateTimeFormat>(pattern, localeInfo, true, err);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    ASSERT_TRUE(patternFormatter != nullptr);
+
+    int64_t milliseconds = 98765432100;
+    std::string result = patternFormatter->Format(milliseconds);
+    EXPECT_EQ(result, "1973217");
+
+    pattern = "'year('y')month('M')day('d')'";
+    std::unique_ptr<SimpleDateTimeFormat> formatterWithContent =
+        std::make_unique<SimpleDateTimeFormat>(pattern, localeInfo, true, err);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    ASSERT_TRUE(formatterWithContent != nullptr);
+    result = formatterWithContent->Format(milliseconds);
+    EXPECT_EQ(result, "year(1973)month(2)day(17)");
+
+    pattern = "y''Md";
+    std::unique_ptr<SimpleDateTimeFormat> formatterInvalidPattern =
+        std::make_unique<SimpleDateTimeFormat>(pattern, localeInfo, true, err);
+    EXPECT_EQ(err, I18nErrorCode::INVALID_DATE_TIME_FORMAT_PATTERN);
+
+    std::unique_ptr<SimpleDateTimeFormat> formatterWithEmptyPattern =
+        std::make_unique<SimpleDateTimeFormat>("", localeInfo, true, err);
+    EXPECT_EQ(err, I18nErrorCode::INVALID_DATE_TIME_FORMAT_PATTERN);
 }
 } // namespace I18n
 } // namespace Global

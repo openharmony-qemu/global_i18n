@@ -71,6 +71,12 @@ void ErrorUtil::NapiThrow(napi_env env, int32_t errCode, const std::string& valu
     }
     napi_throw(env, error);
 }
+
+void ErrorUtil::NapiNotFoundError(napi_env env, int32_t errCode, const std::string& valueName,
+    bool throwError)
+{
+    NapiThrow(env, errCode, valueName, "", throwError);
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

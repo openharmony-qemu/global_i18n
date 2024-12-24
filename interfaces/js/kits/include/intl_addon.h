@@ -30,30 +30,14 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-void GetLocaleTags(napi_env env, napi_value rawLocaleTag, std::vector<std::string> &localeTags);
-void GetOptionValue(napi_env env, napi_value options, const std::string &optionName,
-    std::map<std::string, std::string> &map);
-void GetBoolOptionValue(napi_env env, napi_value options, const std::string &optionName,
-    std::map<std::string, std::string> &map);
-int64_t GetIntegerOptionValue(napi_env env, napi_value options, const std::string &optionName,
-    std::map<std::string, std::string> &map);
 void GetDateOptionValues(napi_env env, napi_value options, std::map<std::string, std::string> &map);
-void GetNumberOptionValues(napi_env env, napi_value options, std::map<std::string, std::string> &map);
 void GetCollatorOptionValue(napi_env env, napi_value options, std::map<std::string, std::string> &map);
 void GetPluralRulesOptionValues(napi_env env, napi_value options, std::map<std::string, std::string> &map);
-void SetOptionProperties(napi_env env, napi_value &result, std::map<std::string, std::string> &options,
-    const std::string &option);
-void SetIntegerOptionProperties(napi_env env, napi_value &result,
-    std::map<std::string, std::string> &options, const std::string &option);
-void SetBooleanOptionProperties(napi_env env, napi_value &result,
-    std::map<std::string, std::string> &options, const std::string &option);
 void GetRelativeTimeOptionValues(napi_env env, napi_value options, std::map<std::string, std::string> &map);
 
 class IntlAddon {
 public:
-    static napi_value InitLocale(napi_env env, napi_value exports);
     static napi_value InitDateTimeFormat(napi_env env, napi_value exports);
-    static napi_value InitNumberFormat(napi_env env, napi_value exports);
     static napi_value InitCollator(napi_env env, napi_value exports);
     static napi_value InitRelativeTimeFormat(napi_env env, napi_value exports);
     static napi_value InitPluralRules(napi_env env, napi_value exports);
@@ -64,22 +48,7 @@ public:
 
 private:
     static napi_value DateTimeFormatConstructor(napi_env env, napi_callback_info info);
-    static napi_value NumberFormatConstructor(napi_env env, napi_callback_info info);
-    static napi_value LocaleConstructor(napi_env env, napi_callback_info info);
     static napi_value RelativeTimeFormatConstructor(napi_env env, napi_callback_info info);
-    static napi_value GetLanguage(napi_env env, napi_callback_info info);
-    static napi_value GetScript(napi_env env, napi_callback_info info);
-    static napi_value GetRegion(napi_env env, napi_callback_info info);
-    static napi_value GetBaseName(napi_env env, napi_callback_info info);
-    static napi_value GetCalendar(napi_env env, napi_callback_info info);
-    static napi_value GetCollation(napi_env env, napi_callback_info info);
-    static napi_value GetHourCycle(napi_env env, napi_callback_info info);
-    static napi_value GetNumberingSystem(napi_env env, napi_callback_info info);
-    static napi_value GetNumeric(napi_env env, napi_callback_info info);
-    static napi_value GetCaseFirst(napi_env env, napi_callback_info info);
-    static napi_value ToString(napi_env env, napi_callback_info info);
-    static napi_value Maximize(napi_env env, napi_callback_info info);
-    static napi_value Minimize(napi_env env, napi_callback_info info);
 
     static napi_value FormatDateTime(napi_env env, napi_callback_info info);
     static napi_value FormatDateTimeRange(napi_env env, napi_callback_info info);
@@ -91,9 +60,6 @@ private:
         const std::vector<std::vector<std::string>> &timeVector);
     static napi_value GetRelativeTimeResolvedOptions(napi_env env, napi_callback_info info);
 
-    static napi_value GetNumberResolvedOptions(napi_env env, napi_callback_info info);
-    static napi_value FormatNumber(napi_env env, napi_callback_info info);
-
     static napi_value CollatorConstructor(napi_env env, napi_callback_info info);
     static napi_value CompareString(napi_env env, napi_callback_info info);
     static napi_value GetCollatorResolvedOptions(napi_env env, napi_callback_info info);
@@ -102,11 +68,7 @@ private:
     static napi_value Select(napi_env env, napi_callback_info info);
 
     static int64_t GetMilliseconds(napi_env env, napi_value *argv, int index);
-    bool InitLocaleContext(napi_env env, napi_callback_info info, const std::string localeTag,
-        std::map<std::string, std::string> &map);
     bool InitDateTimeFormatContext(napi_env env, napi_callback_info info, std::vector<std::string> localeTags,
-        std::map<std::string, std::string> &map);
-    bool InitNumberFormatContext(napi_env env, napi_callback_info info, std::vector<std::string> localeTags,
         std::map<std::string, std::string> &map);
     bool InitCollatorContext(napi_env env, napi_callback_info info, std::vector<std::string> localeTags,
         std::map<std::string, std::string> &map);
@@ -115,12 +77,8 @@ private:
     bool InitPluralRulesContext(napi_env env, napi_callback_info info, std::vector<std::string> localeTags,
         std::map<std::string, std::string> &map);
 
-    static napi_value SetProperty(napi_env env, napi_callback_info info);
-
     napi_env env_;
-    std::unique_ptr<LocaleInfo> locale_ = nullptr;
     std::unique_ptr<DateTimeFormat> datefmt_ = nullptr;
-    std::unique_ptr<NumberFormat> numberfmt_ = nullptr;
     std::unique_ptr<RelativeTimeFormat> relativetimefmt_ = nullptr;
     std::unique_ptr<Collator> collator_ = nullptr;
     std::unique_ptr<PluralRules> pluralrules_ = nullptr;

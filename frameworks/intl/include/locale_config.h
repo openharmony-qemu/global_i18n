@@ -105,6 +105,7 @@ public:
     static std::string GetSystemLanguage();
     static std::string GetSystemRegion();
     static std::string GetSystemLocale();
+    static std::string GetSystemTimezone();
     static void GetSystemLanguages(std::vector<std::string> &ret);
     static void GetSystemCountries(std::vector<std::string> &ret);
     static bool IsSuggested(const std::string &language);
@@ -179,6 +180,8 @@ private:
     static const char *DIALECT_LANGS_NAME;
     static const char *REGION_PATH;
     static const std::string HOUR_EVENT_DATA;
+    static const std::string TIMEZONE_KEY;
+    static const std::string DEFAULT_TIMEZONE;
     static std::mutex dialectLocaleMutex;
     static std::mutex region2DisplayNameMutex;
     static std::mutex locale2DisplayNameMutex;

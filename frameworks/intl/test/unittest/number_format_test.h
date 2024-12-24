@@ -60,6 +60,19 @@ int NumberFormatFuncTest0038(void);
 int NumberFormatFuncTest0039(void);
 int NumberFormatFuncTest0040(void);
 int NumberFormatFuncTest0041(void);
+int NumberFormatFuncTest0042(void);
+int NumberFormatFuncTest0043(void);
+int NumberFormatFuncTest0044(void);
+int NumberFormatFuncTest0045(void);
+int NumberFormatFuncTest0046(void);
+int NumberFormatFuncTest0047(void);
+int NumberFormatFuncTest0048(void);
+int NumberFormatFuncTest0049(void);
+int NumberFormatFuncTest0050(void);
+int NumberFormatFuncTest0051(void);
+int NumberFormatFuncTest0052(void);
+int NumberFormatFuncTest0053(void);
+int NumberFormatFuncTest0054(void);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

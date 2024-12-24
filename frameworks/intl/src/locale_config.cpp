@@ -87,6 +87,8 @@ const std::string LocaleConfig::NUMBER_SYSTEM_KEY = "nu";
 const std::string LocaleConfig::TEMPERATURE_UNIT_KEY = "mu";
 const std::string LocaleConfig::WEEK_DAY_KEY = "fw";
 const std::string LocaleConfig::HOUR_EVENT_DATA = "24HourChange";
+const std::string LocaleConfig::TIMEZONE_KEY = "persist.time.timezone";
+const std::string LocaleConfig::DEFAULT_TIMEZONE = "GMT";
 unordered_set<string> LocaleConfig::supportedLocales;
 unordered_set<string> LocaleConfig::supportLocales;
 unordered_set<string> LocaleConfig::supportedRegions;
@@ -394,6 +396,12 @@ string LocaleConfig::GetSystemLocale()
         systemLocale = ReadSystemParameter(DEFAULT_LOCALE_KEY, CONFIG_LEN);
     }
     return systemLocale;
+}
+
+std::string LocaleConfig::GetSystemTimezone()
+{
+    std::string systemTimezone = ReadSystemParameter(TIMEZONE_KEY.c_str(), CONFIG_LEN);
+    return systemTimezone.empty() ? DEFAULT_TIMEZONE : systemTimezone;
 }
 
 bool LocaleConfig::IsValidLanguage(const string &language)
@@ -1746,12 +1754,18 @@ std::string LocaleConfig::GetSimplifiedSystemLanguage()
 {
     std::string locale = GetSystemLanguage();
     LocaleInfo localeInfo(locale);
+    LocaleInfo localeInfoMax(localeInfo.Maximize());
     std::string language = localeInfo.GetLanguage();
     if (language.compare("zh") == 0) {
-        language = language + '-' + localeInfo.GetScript();
+        language = language + '-' + localeInfoMax.GetScript();
     }
     if (dialectLanguages.find(language) != dialectLanguages.end()) {
-        locale = GetSystemLocale();
+        std::string systemRegion = localeInfo.GetRegion();
+        if (!systemRegion.empty() && language.compare("en") != 0) {
+            locale = language + '-' + systemRegion;
+        } else {
+            locale = GetSystemLocale();
+        }
         LocaleInfo* requestLocale = new LocaleInfo(locale);
         if (requestLocale == nullptr) {
             HILOG_ERROR_I18N("GetSimplifiedLanguage: %{public}s failed to construct LocaleInfo.", locale.c_str());

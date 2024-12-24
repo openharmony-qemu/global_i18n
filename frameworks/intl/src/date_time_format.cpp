@@ -22,8 +22,6 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 const char* DateTimeFormat::DEVICE_TYPE_NAME = "const.product.devicetype";
-const char *DateTimeFormat::TIMEZONE_KEY = "persist.time.timezone";
-const char *DateTimeFormat::DEFAULT_TIMEZONE = "GMT";
 
 using namespace icu;
 bool DateTimeFormat::icuInitialized = DateTimeFormat::Init();
@@ -547,12 +545,6 @@ void DateTimeFormat::ComputeEraOfPattern(std::string option, char16_t character,
     }
 }
 
-std::string DateTimeFormat::GetSystemTimezone()
-{
-    std::string systemTimezone = ReadSystemParameter(TIMEZONE_KEY, SYS_PARAM_LEN);
-    return systemTimezone.empty() ? DEFAULT_TIMEZONE : systemTimezone;
-}
-
 std::string DateTimeFormat::Format(int64_t milliseconds)
 {
     if (!createSuccess) {
@@ -562,7 +554,7 @@ std::string DateTimeFormat::Format(int64_t milliseconds)
     std::string result;
     UnicodeString dateString;
     calendar->clear();
-    std::string timezoneStr = timeZone.empty() ? GetSystemTimezone() : timeZone;
+    std::string timezoneStr = timeZone.empty() ? LocaleConfig::GetSystemTimezone() : timeZone;
     auto zone = std::unique_ptr<TimeZone>(TimeZone::createTimeZone(timezoneStr.c_str()));
     if (zone != nullptr) {
         calendar->setTimeZone(*zone);
@@ -583,7 +575,7 @@ std::string DateTimeFormat::FormatRange(int64_t fromMilliseconds, int64_t toMill
     std::string result;
     UnicodeString dateString;
     calendar->clear();
-    std::string timezoneStr = timeZone.empty() ? GetSystemTimezone() : timeZone;
+    std::string timezoneStr = timeZone.empty() ? LocaleConfig::GetSystemTimezone() : timeZone;
     auto zone = std::unique_ptr<TimeZone>(TimeZone::createTimeZone(timezoneStr.c_str()));
     if (zone != nullptr) {
         calendar->setTimeZone(*zone);

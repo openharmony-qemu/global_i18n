@@ -15,12 +15,22 @@
 
 #include "error_util.h"
 #include "i18n_hilog.h"
-#include "js_utils.h"
+#include "locale_info_addon.h"
 #include "variable_convertor.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
+const std::map<napi_valuetype, std::string> VariableConvertor::NAPI_TYPE_MAP {
+    {napi_valuetype::napi_boolean, "boolean"},
+    {napi_valuetype::napi_number, "number"},
+    {napi_valuetype::napi_string, "string"},
+    {napi_valuetype::napi_bigint, "bigint"},
+    {napi_valuetype::napi_symbol, "symbol"},
+    {napi_valuetype::napi_object, "object"},
+    {napi_valuetype::napi_null, "null"},
+    {napi_valuetype::napi_undefined, "undefined"},
+};
 bool VariableConvertor::CheckNapiIsNull(napi_env env, napi_value value)
 {
     if (value != nullptr) {
@@ -111,7 +121,7 @@ bool VariableConvertor::GetStringArrayFromJsParam(napi_env env, napi_value &jsAr
     std::vector<std::string> &strArray)
 {
     if (jsArray == nullptr) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, valueName, "", true);
+        ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, valueName, true);
         return false;
     }
     bool isArray = false;
@@ -160,14 +170,14 @@ napi_value VariableConvertor::CreateNumber(napi_env env, const int32_t &num)
     return result;
 }
 
-void VariableConvertor::VerifyType(napi_env env, const std::string& valueName, const std::string& type,
+void VariableConvertor::VerifyType(napi_env env, const std::string& valueName, napi_valuetype napiType,
     napi_value argv)
 {
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv, &valueType);
-    if (type == "string" && valueType != napi_valuetype::napi_string) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, valueName, type, true);
-    } else if (type == "number" && valueType != napi_valuetype::napi_number) {
+    napi_status status = napi_typeof(env, argv, &valueType);
+    if (status != napi_ok || valueType != napiType) {
+        auto iter = NAPI_TYPE_MAP.find(napiType);
+        std::string type = iter != NAPI_TYPE_MAP.end() ? iter->second : "";
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, valueName, type, true);
     }
 }
@@ -198,6 +208,33 @@ napi_status VariableConvertor::SetEnumValue(napi_env env, napi_value enumObj, co
         return status;
     }
     return napi_ok;
+}
+
+std::shared_ptr<LocaleInfo> VariableConvertor::ParseIntlLocale(napi_env env, napi_value intlLocale)
+{
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    napi_status status = napi_typeof(env, intlLocale, &valueType);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("ParseIntlLocale: Failed to get type of intlLocale.");
+        return nullptr;
+    } else if (valueType != napi_valuetype::napi_object) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "intl.Locale", true);
+        return nullptr;
+    }
+
+    LocaleInfoAddon *localeInfoAddon = nullptr;
+    status = napi_unwrap(env, intlLocale, reinterpret_cast<void **>(&localeInfoAddon));
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("ParseIntlLocale: Failed to unwrap intlLocale.");
+        return nullptr;
+    } else if (!localeInfoAddon) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "intl.Locale", true);
+        return nullptr;
+    } else if (!localeInfoAddon->GetLocaleInfo()) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "locale", "a valid intl.Locale", true);
+        return nullptr;
+    }
+    return localeInfoAddon->GetLocaleInfo();
 }
 } // namespace I18n
 } // namespace Global

@@ -28,6 +28,9 @@
 #include "locale_info.h"
 #include "locale_matcher.h"
 #include "node_api.h"
+#include "simple_date_time_format_addon.h"
+#include "simple_number_format_addon.h"
+#include "styled_number_format_addon.h"
 #include "system_locale_manager_addon.h"
 #include "unicode/datefmt.h"
 #include "unicode/locid.h"
@@ -37,6 +40,7 @@
 #include "variable_convertor.h"
 #include "i18n_addon.h"
 #include "date_time_sequence.h"
+#include "locale_info_addon.h"
 
 namespace OHOS {
 namespace Global {
@@ -120,6 +124,12 @@ napi_value I18nAddon::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("removePreferredLanguage", I18nSystemAddon::RemovePreferredLanguage),
         DECLARE_NAPI_FUNCTION("getPreferredLanguageList", I18nSystemAddon::GetPreferredLanguageList),
         DECLARE_NAPI_FUNCTION("getFirstPreferredLanguage", I18nSystemAddon::GetFirstPreferredLanguage),
+        DECLARE_NAPI_FUNCTION("getSimpleNumberFormatBySkeleton",
+            SimpleNumberFormatAddon::GetSimpleNumberFormatBySkeleton),
+        DECLARE_NAPI_FUNCTION("getSimpleDateTimeFormatByPattern",
+            SimpleDateTimeFormatAddon::GetSimpleDateTimeFormatByPattern),
+        DECLARE_NAPI_FUNCTION("getSimpleDateTimeFormatBySkeleton",
+            SimpleDateTimeFormatAddon::GetSimpleDateTimeFormatBySkeleton),
         DECLARE_NAPI_FUNCTION("is24HourClock", I18nSystemAddon::Is24HourClock),
         DECLARE_NAPI_FUNCTION("set24HourClock", I18nSystemAddon::Set24HourClock),
         DECLARE_NAPI_FUNCTION("getTimeZone", I18nTimeZoneAddon::GetI18nTimeZone),
@@ -281,7 +291,7 @@ int I18nAddon::GetParamOfGetTimePeriodName(napi_env env, napi_callback_info info
         HILOG_ERROR_I18N("GetTimePeriodName can't get parameters from getTimePerioudName.");
         return -1;
     } else if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "hour", "", true);
+        ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, "hour", true);
         return -1;
     }
 
@@ -377,7 +387,7 @@ napi_value I18nAddon::GetBestMatchLocale(napi_env env, napi_callback_info info)
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok || argc < 2) { // 2 is the request param num.
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale or localeList", "", true);
+        ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, "locale or localeList", true);
         return nullptr;
     }
     LocaleInfo *requestLocale = ProcessJsParamLocale(env, argv[0]);
@@ -421,7 +431,7 @@ napi_value I18nAddon::GetThreeLetterLanguage(napi_env env, napi_callback_info in
         HILOG_ERROR_I18N("GetThreeLetterLanguage napi get param error.");
         return nullptr;
     } else if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "", true);
+        ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, "locale", true);
         return nullptr;
     }
 
@@ -462,7 +472,7 @@ napi_value I18nAddon::GetThreeLetterRegion(napi_env env, napi_callback_info info
         HILOG_ERROR_I18N("GetThreeLetterRegion: Failed to obtain the parameter.");
         return nullptr;
     } else if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "", true);
+        ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, "locale", true);
         return nullptr;
     }
 
@@ -1664,6 +1674,9 @@ napi_value Init(napi_env env, napi_value exports)
     val = I18nSystemAddon::InitI18nSystem(env, val);
     val = HolidayManagerAddon::InitHolidayManager(env, val);
     val = EntityRecognizerAddon::InitEntityRecognizer(env, val);
+    val = SimpleNumberFormatAddon::InitSimpleNumberFormat(env, val);
+    val = StyledNumberFormatAddon::InitStyledNumberFormat(env, val);
+    val = SimpleDateTimeFormatAddon::InitSimpleDateTimeFormat(env, val);
     return val;
 }
 

@@ -38,6 +38,7 @@
 #include "locale_info.h"
 #include "measure_data.h"
 #include "relative_time_format.h"
+#include "unicode/numberrangeformatter.h"
 
 namespace OHOS {
 namespace Global {
@@ -47,6 +48,10 @@ public:
     NumberFormat(const std::vector<std::string> &localeTag, std::map<std::string, std::string> &configs);
     virtual ~NumberFormat();
     std::string Format(double number);
+    bool IsRelativeTimeFormat(double number);
+    icu::number::FormattedNumber FormatToFormattedNumber(double number);
+    icu::FormattedRelativeDateTime FormatToFormattedRelativeDateTime(double number);
+    std::string FormatRange(double start, double end);
     void GetResolvedOptions(std::map<std::string, std::string> &map);
     std::string GetCurrency() const;
     std::string GetCurrencySign() const;
@@ -83,19 +88,27 @@ private:
     std::string unitUsage;
     std::string unitType;
     std::string unitMeasSys;
+    std::string roundingPriorityStr;
+    std::string roundingModeStr;
+    size_t roundingIncrement = 1;
     bool createSuccess = false;
     bool isSetFraction = false;
     std::unique_ptr<LocaleInfo> localeInfo = nullptr;
     std::unique_ptr<RelativeTimeFormat> relativeTimeFormat = nullptr;
     icu::number::LocalizedNumberFormatter numberFormat;
+    icu::number::LocalizedNumberRangeFormatter numberRangeFormat;
     icu::number::Notation notation = icu::number::Notation::simple();
+    UNumberRoundingPriority roundingPriority = UNumberRoundingPriority::UNUM_ROUNDING_PRIORITY_STRICT;
+    UNumberFormatRoundingMode roundingMode = UNumberFormatRoundingMode::UNUM_ROUND_HALFUP;
     UNumberUnitWidth unitDisplay = UNumberUnitWidth::UNUM_UNIT_WIDTH_SHORT;
     UNumberUnitWidth currencyDisplay = UNumberUnitWidth::UNUM_UNIT_WIDTH_SHORT;
     UNumberSignDisplay signDisplay = UNumberSignDisplay::UNUM_SIGN_AUTO;
     static const int MAX_UNIT_NUM = 500;
     static const int DEFAULT_FRACTION_DIGITS = 3;
+    static const int DEFAULT_MAX_SIGNIFICANT_DIGITS = 21;
     static const char *DEVICE_TYPE_NAME;
     static const int BUFFER_LEN = 10;
+    static const int POW_BASE_NUMBER = 10;
     static const int CURRENCY_LEN = 3;
     static std::unordered_map<std::string, std::string> numToCurrency;
     icu::MeasureUnit unitArray[MAX_UNIT_NUM];
@@ -108,18 +121,35 @@ private:
     static std::unordered_map<UMeasurementSystem, std::string> measurementSystem;
     static std::unordered_map<std::string, UNumberUnitWidth> defaultUnitStyle;
     static std::unordered_map<std::string, UNumberUnitWidth> defaultCurrencyStyle;
+    static std::unordered_map<std::string, UNumberRoundingPriority> roundingPriorityStyle;
+    static std::unordered_map<std::string, UNumberFormatRoundingMode> roundingModeStyle;
+    static std::vector<size_t> roundingIncrementList;
     static std::map<std::string, std::string> RelativeTimeFormatConfigs;
     static bool ReadISO4217Ddatas();
     std::string GetCurrencyFromConfig(const std::string& currency);
     void CreateRelativeTimeFormat(const std::string& locale);
     void ParseConfigs(std::map<std::string, std::string> &configs);
     void ParseDigitsConfigs(std::map<std::string, std::string> &configs);
+    void ParseRoundingConfigs(std::map<std::string, std::string> &configs);
     void GetDigitsResolvedOptions(std::map<std::string, std::string> &map);
-    void InitProperties();
-    void InitDigitsProperties();
+    void InitProperties(icu::number::UnlocalizedNumberFormatter &formatter);
+    void InitUnitProperties(icu::number::UnlocalizedNumberFormatter &formatter);
+    void InitCurrencyProperties(icu::number::UnlocalizedNumberFormatter &formatter);
+    void InitPercentStyleProperties(icu::number::UnlocalizedNumberFormatter &formatter);
+    void InitUseGroupingProperties(icu::number::UnlocalizedNumberFormatter &formatter);
+    void InitNotationProperties(icu::number::UnlocalizedNumberFormatter &formatter);
+    void InitSignProperties(icu::number::UnlocalizedNumberFormatter &formatter);
+    void InitDigitsProperties(icu::number::UnlocalizedNumberFormatter &formatter);
+    void InitNumberFormat();
     void SetUnit(std::string &preferredUnit);
     void SetDefaultStyle();
     void SetPrecisionWithByte(double number, const std::string& finalUnit);
+    void HandleRoundingPriority(icu::number::UnlocalizedNumberFormatter &formatter);
+    void SetRoundingProperties(icu::number::UnlocalizedNumberFormatter &formatter);
+    int32_t GetMinimumSignificantDigitsIntValue();
+    int32_t GetMaximumSignificantDigitsIntValue();
+    int32_t GetMaximumFractionDigitsValue();
+    int32_t GetMinimumFractionDigitsValue();
 };
 } // namespace I18n
 } // namespace Global

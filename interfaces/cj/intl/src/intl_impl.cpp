@@ -269,6 +269,9 @@ CArrArrString RelativeTimeFormatImpl::FormatToParts(double number, char *unit)
         char **time = static_cast<char **>(malloc(sizeof(char *) * timeVector.size()));
         if (time == nullptr) {
             HILOG_ERROR_I18N("The char** is nullptr");
+            for (size_t k = 0; k < i; k++) {
+                free(res[k].head);
+            }
             return ret;
         }
         for (size_t j = 0; j < timeVector.size(); j++) {
@@ -276,7 +279,7 @@ CArrArrString RelativeTimeFormatImpl::FormatToParts(double number, char *unit)
             time[j] = IMallocCString(value);
         }
         retime.head = time;
-        retime.size = timeVector.size();
+        retime.size = static_cast<int64_t>(timeVector.size());
         res[i] = retime;
     }
     ret.head = res;
