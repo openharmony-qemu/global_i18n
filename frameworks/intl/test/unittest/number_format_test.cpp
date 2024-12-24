@@ -1890,7 +1890,6 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0038, TestSize.Level1)
 
 /**
  * @tc.name: NumberFormatFuncTest0039
- * @tc.desc: Test Intl NumberFormat.format
  * @tc.desc: Test I18n StyledNumberFormat.format
  * @tc.type: FUNC
  */
@@ -1919,7 +1918,6 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0039, TestSize.Level1)
 
 /**
  * @tc.name: NumberFormatFuncTest0040
- * @tc.desc: Test Intl NumberFormat.format
  * @tc.desc: Test I18n StyledNumberFormat.ParseToParts
  * @tc.type: FUNC
  */
