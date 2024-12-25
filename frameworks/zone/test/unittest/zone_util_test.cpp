@@ -14,6 +14,8 @@
  */
 
 #include <gtest/gtest.h>
+#include "locale_config.h"
+#include "utils.h"
 #include "zone_util.h"
 
 using namespace OHOS::Global::I18n;
@@ -321,7 +323,8 @@ HWTEST_F(ZoneUtilTest, ZoneUtilFuncTest0012, TestSize.Level1)
         }
         EXPECT_TRUE(timeZoneList.find(timeZoneId) != timeZoneList.end());
         if (timeZoneList.find(timeZoneId) == timeZoneList.end()) {
-            printf("-----%s, %s\r\n", vec[i].c_str(), timeZoneId.c_str());
+            EXPECT_EQ(vec[i], "");
+            EXPECT_EQ(timeZoneId, "");
         }
     }
 }
