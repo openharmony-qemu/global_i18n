@@ -1007,7 +1007,6 @@ HWTEST_F(IntlTest, IntlFuncTest0073, TestSize.Level1)
         formated = phoneNumFmt->format(formated);
     }
     EXPECT_EQ(formated, "712 345");
-    PhoneNumberFormat::CloseDynamicHandler();
 }
 
 /**
