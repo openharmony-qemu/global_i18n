@@ -16,9 +16,23 @@
 #ifndef OHOS_GLOBAL_I18N_NUMBER_FORMAT_TEST
 #define OHOS_GLOBAL_I18N_NUMBER_FORMAT_TEST
 
+#include <gtest/gtest.h>
+#include <string>
+
 namespace OHOS {
 namespace Global {
 namespace I18n {
+class NumberFormatTest : public testing::Test {
+public:
+    static std::string originalLanguage;
+    static std::string originalRegion;
+    static std::string originalLocale;
+    static void SetUpTestCase(void);
+    static void TearDownTestCase(void);
+    void SetUp();
+    void TearDown();
+};
+
 int NumberFormatFuncTest001(void);
 int NumberFormatFuncTest002(void);
 int NumberFormatFuncTest003(void);
