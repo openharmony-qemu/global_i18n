@@ -45,6 +45,7 @@ unordered_map<string, string> ZoneUtil::defaultMap = {
     {"AR", "America/Argentina/Buenos_Aires"},
     {"AU", "Australia/Sydney"},
     {"BR", "America/Noronha"},
+    {"BT", "Asia/Thimbu"}, // alias Asia/Thimphu
     {"CA", "America/St_Johns"},
     {"CD", "Africa/Kinshasa"},
     {"CL", "America/Santiago"},
@@ -52,16 +53,20 @@ unordered_map<string, string> ZoneUtil::defaultMap = {
     {"CY", "Asia/Nicosia"},
     {"DE", "Europe/Berlin"},
     {"EC", "America/Guayaquil"},
+    {"ER", "Africa/Asmara"}, // alias Africa/Asmera
     {"ES", "Europe/Madrid"},
     {"FM", "Pacific/Pohnpei"},
+    {"FO", "Atlantic/Faroe"}, // alias Atlantic/Faeroe
     {"GL", "America/Godthab"},
     {"ID", "Asia/Jakarta"},
+    {"IN", "Asia/Kolkata"}, // alias Asia/Calcutta
     {"KI", "Pacific/Tarawa"},
     {"KZ", "Asia/Almaty"},
     {"MH", "Pacific/Majuro"},
     {"MN", "Asia/Ulaanbaatar"},
     {"MX", "America/Mexico_City"},
     {"MY", "Asia/Kuala_Lumpur"},
+    {"NP", "Asia/Kathmandu"}, // alias Asia/Katmandu
     {"NZ", "Pacific/Auckland"},
     {"PF", "Pacific/Tahiti"},
     {"PG", "Pacific/Port_Moresby"},
@@ -72,6 +77,7 @@ unordered_map<string, string> ZoneUtil::defaultMap = {
     {"UM", "Pacific/Wake"},
     {"US", "America/New_York"},
     {"UZ", "Asia/Tashkent"},
+    {"VN", "Asia/Ho_Chi_Minh"}, // alias Asia/Saigon
 };
 
 bool ZoneUtil::icuInitialized = ZoneUtil::Init();

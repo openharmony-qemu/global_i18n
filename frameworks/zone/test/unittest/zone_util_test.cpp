@@ -301,6 +301,30 @@ HWTEST_F(ZoneUtilTest, ZoneUtilFuncTest011, TestSize.Level1)
     EXPECT_EQ(result5.timezoneId, "Asia/Nicosia");
     EXPECT_EQ(result5.quality, 2);
 }
+
+/**
+ * @tc.name: ZoneUtilFuncTest0012
+ * @tc.desc: Test ZoneUtil LookupTimezoneByCountry
+ * @tc.type: FUNC
+ */
+HWTEST_F(ZoneUtilTest, ZoneUtilFuncTest0012, TestSize.Level1)
+{
+    ZoneUtil util;
+    I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
+    std::set<std::string> timeZoneList = GetTimeZoneAvailableIDs(errorCode);
+    std::vector<std::string> vec;
+    LocaleConfig::GetSystemCountries(vec);
+    for (size_t i = 0; i < vec.size(); ++i) {
+        std::string timeZoneId = util.GetDefaultZone(vec[i]);
+        if (timeZoneId.empty()) {
+            continue;
+        }
+        EXPECT_TRUE(timeZoneList.find(timeZoneId) != timeZoneList.end());
+        if (timeZoneList.find(timeZoneId) == timeZoneList.end()) {
+            printf("-----%s, %s\r\n", vec[i].c_str(), timeZoneId.c_str());
+        }
+    }
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
