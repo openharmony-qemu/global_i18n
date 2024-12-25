@@ -306,7 +306,7 @@ HWTEST_F(ZoneUtilTest, ZoneUtilFuncTest011, TestSize.Level1)
 
 /**
  * @tc.name: ZoneUtilFuncTest0012
- * @tc.desc: Test ZoneUtil LookupTimezoneByCountry
+ * @tc.desc: Test ZoneUtil GetDefaultZone
  * @tc.type: FUNC
  */
 HWTEST_F(ZoneUtilTest, ZoneUtilFuncTest0012, TestSize.Level1)
