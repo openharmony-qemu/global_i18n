@@ -141,15 +141,6 @@ PhoneNumberFormat::~PhoneNumberFormat()
 {
 }
 
-void PhoneNumberFormat::CloseDynamicHandler()
-{
-    std::lock_guard<std::mutex> phoneLock(phoneMutex);
-    if (dynamicHandler != nullptr) {
-        dlclose(dynamicHandler);
-    }
-    dynamicHandler = nullptr;
-}
-
 std::unique_ptr<PhoneNumberFormat> PhoneNumberFormat::CreateInstance(const std::string &countryTag,
     const std::map<std::string, std::string> &options)
 {

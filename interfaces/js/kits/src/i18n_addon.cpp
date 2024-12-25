@@ -69,7 +69,6 @@ I18nAddon::I18nAddon() : env_(nullptr) {}
 
 I18nAddon::~I18nAddon()
 {
-    PhoneNumberFormat::CloseDynamicHandler();
 }
 
 void I18nAddon::Destructor(napi_env env, void *nativeObject, void *hint)
