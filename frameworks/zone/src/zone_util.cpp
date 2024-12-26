@@ -52,12 +52,15 @@ unordered_map<string, string> ZoneUtil::defaultMap = {
     {"CN", "Asia/Shanghai"},
     {"CY", "Asia/Nicosia"},
     {"DE", "Europe/Berlin"},
+    {"DG", "Indian/Chagos"},
+    {"EA", "Africa/Ceuta"},
     {"EC", "America/Guayaquil"},
     {"ER", "Africa/Asmara"}, // alias Africa/Asmera
     {"ES", "Europe/Madrid"},
     {"FM", "Pacific/Pohnpei"},
     {"FO", "Atlantic/Faroe"}, // alias Atlantic/Faeroe
     {"GL", "America/Godthab"},
+    {"IC", "Atlantic/Canary"},
     {"ID", "Asia/Jakarta"},
     {"IN", "Asia/Kolkata"}, // alias Asia/Calcutta
     {"KI", "Pacific/Tarawa"},
