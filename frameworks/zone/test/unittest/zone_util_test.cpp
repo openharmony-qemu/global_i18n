@@ -318,9 +318,6 @@ HWTEST_F(ZoneUtilTest, ZoneUtilFuncTest0012, TestSize.Level1)
     LocaleConfig::GetSystemCountries(vec);
     for (size_t i = 0; i < vec.size(); ++i) {
         std::string timeZoneId = util.GetDefaultZone(vec[i]);
-        if (timeZoneId.empty()) {
-            continue;
-        }
         EXPECT_TRUE(timeZoneList.find(timeZoneId) != timeZoneList.end());
         if (timeZoneList.find(timeZoneId) == timeZoneList.end()) {
             EXPECT_EQ(vec[i], "");
