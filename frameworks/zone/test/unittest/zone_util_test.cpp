@@ -14,6 +14,8 @@
  */
 
 #include <gtest/gtest.h>
+#include "locale_config.h"
+#include "utils.h"
 #include "zone_util.h"
 
 using namespace OHOS::Global::I18n;
@@ -300,6 +302,28 @@ HWTEST_F(ZoneUtilTest, ZoneUtilFuncTest011, TestSize.Level1)
     CountryResult result5 = util.LookupTimezoneByCountry(region, currentMillis);
     EXPECT_EQ(result5.timezoneId, "Asia/Nicosia");
     EXPECT_EQ(result5.quality, 2);
+}
+
+/**
+ * @tc.name: ZoneUtilFuncTest0012
+ * @tc.desc: Test ZoneUtil GetDefaultZone
+ * @tc.type: FUNC
+ */
+HWTEST_F(ZoneUtilTest, ZoneUtilFuncTest0012, TestSize.Level1)
+{
+    ZoneUtil util;
+    I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
+    std::set<std::string> timeZoneList = GetTimeZoneAvailableIDs(errorCode);
+    std::vector<std::string> vec;
+    LocaleConfig::GetSystemCountries(vec);
+    for (size_t i = 0; i < vec.size(); ++i) {
+        std::string timeZoneId = util.GetDefaultZone(vec[i]);
+        EXPECT_TRUE(timeZoneList.find(timeZoneId) != timeZoneList.end());
+        if (timeZoneList.find(timeZoneId) == timeZoneList.end()) {
+            EXPECT_EQ(vec[i], "");
+            EXPECT_EQ(timeZoneId, "");
+        }
+    }
 }
 } // namespace I18n
 } // namespace Global
