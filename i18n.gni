@@ -14,10 +14,4 @@
 declare_args() {
   i18n_support_ui = true
   i18n_support_app_preferred_language = true
-  tel_core_service_enable = true
-
-  if (defined(global_parts_info) &&
-      !defined(global_parts_info.telephony_core_service)) {
-    tel_core_service_enable = false
-  }
 }

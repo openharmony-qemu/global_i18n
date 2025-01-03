@@ -23,9 +23,6 @@
 #include "i18n_timezone.h"
 #include "unicode/localebuilder.h"
 #include "unicode/locid.h"
-#ifdef TEL_CORE_SERVICE_ENABLE
-#include "core_service_client.h"
-#endif
 
 namespace OHOS {
 namespace Global {
@@ -411,21 +408,6 @@ std::set<std::string> SystemLocaleManager::GetCountryCodeFromSimCard()
 
 void SystemLocaleManager::GetCountryCodeFromSimCardInner(std::set<std::string> &resultSet, size_t soltId)
 {
-#if defined(TEL_CORE_SERVICE_ENABLE)
-    std::u16string countryCode;
-    int32_t errorCode = DelayedRefSingleton<Telephony::CoreServiceClient>::GetInstance().GetISOCountryCodeForSim(
-        soltId, countryCode);
-    HILOG_INFO_I18N("SystemLocaleManager: getCountryCodeForSim id:%{public}zu, errorCode:%{public}d.",
-        soltId, errorCode);
-    std::string result = Str16ToStr8(countryCode);
-    if (result.empty()) {
-        return;
-    }
-    for (size_t i = 0; i < result.length(); ++i) {
-        result[i] = toupper(result[i]);
-    }
-    resultSet.insert(result);
-#endif
 }
 } // I18n
 } // Global
