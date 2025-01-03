@@ -1830,16 +1830,18 @@ std::string LocaleConfig::GetLocalizedFilePath(const std::string &path, const ch
         return path;
     }
     std::string result;
-    auto iter = path.find(std::to_string(delimiter));
-    if (path[0] != delimiter && iter != std::string::npos) {
-        result.append("\u200f");
+    std::vector<string> dest;
+    std::string sep(1, delimiter); // 1 is char count
+    Split(path, sep, dest);
+    if (dest.size() == 1) { // 1 is array's size
+        return path;
     }
-    for (char c : path) {
-        if (c == delimiter) {
-            result.append("\u200f");
-        }
-        result.push_back(c);
+    for (size_t i =0 ; i < dest.size(); i++) {
+        dest[i] = "\u200e" + dest[i] + "\u200e";
     }
+    std::string newSep = "\u200f" + sep;
+    Merge(dest, newSep, result);
+    result = "\u202b" + result + "\u202c";
     return result;
 }
 } // namespace I18n

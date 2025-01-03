@@ -135,15 +135,15 @@ HWTEST_F(IntlTest, IntlFuncTest0049, TestSize.Level1)
     std::shared_ptr<LocaleInfo> localeInfo = std::make_shared<LocaleInfo>(localeStr);
     std::string errorCode;
     std::string res = LocaleConfig::GetLocalizedFilePath(path, delimiter, localeInfo, errorCode);
-    EXPECT_EQ(res, "\u200f/data\u200f/log\u200f/faultlog");
+    EXPECT_EQ(res, "\u202b\u200f/\u200edata\u200e\u200f/\u200elog\u200e\u200f/\u200efaultlog\u200e\u202c");
     path = "\\data\\log\\faultlog";
     delimiter = '\\';
     res = LocaleConfig::GetLocalizedFilePath(path, delimiter, localeInfo, errorCode);
-    EXPECT_EQ(res, "\u200f\\data\u200f\\log\u200f\\faultlog");
+    EXPECT_EQ(res, "\u202b\u200f\\\u200edata\u200e\u200f\\\u200elog\u200e\u200f\\\u200efaultlog\u200e\u202c");
     path = "data>log>faultlog";
     delimiter = '>';
     res = LocaleConfig::GetLocalizedFilePath(path, delimiter, localeInfo, errorCode);
-    EXPECT_EQ(res, "\u200fdata\u200f>log\u200f>faultlog");
+    EXPECT_EQ(res, "\u202b\u200f\u200edat\u200ea\u200f>\u200elog\u200e\u200f>\u200efaultlog\u200e\u202c");
 }
 
 /**
