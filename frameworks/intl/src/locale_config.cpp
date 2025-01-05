@@ -549,16 +549,19 @@ void LocaleConfig::ExtendWhiteLanguages()
             extendWhiteLanguageList.insert(baseNameStr);
         }
         const char* language = locale.getLanguage();
-        ExtendLanguageWithScript(language);
+        if (language != nullptr) {
+            std::string languageStr(language);
+            ExtendLanguageWithScript(languageStr);
+        }
     }
 }
 
-void LocaleConfig::ExtendLanguageWithScript(const char* language)
+void LocaleConfig::ExtendLanguageWithScript(const std::string &languageStr)
 {
-    if (language == nullptr) {
+    if (languageStr.empty()) {
+        HILOG_INFO_I18N("ExtendLanguageWithScript languageStr is empty.");
         return;
     }
-    std::string languageStr(language);
     string mainLanguage = GetMainLanguage(languageStr);
     if (!mainLanguage.empty()) {
         extendWhiteLanguageList.insert(mainLanguage);
@@ -1166,7 +1169,6 @@ std::string LocaleConfig::GetValidLocale(const std::string &localeTag)
 bool LocaleConfig::IsEmpty24HourClock()
 {
     std::string is24Hour = ReadSystemParameter(HOUR_KEY, CONFIG_LEN);
-    HILOG_INFO_I18N("IsEmpty24HourClock: read from system param:%{public}s.", is24Hour.c_str());
     if (is24Hour.compare("default") == 0) {
         return true;
     }
