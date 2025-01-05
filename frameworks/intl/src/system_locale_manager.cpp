@@ -27,7 +27,6 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-const char* SystemLocaleManager::SIM_COUNTRY_CODE_KEY = "telephony.sim.countryCode0";
 const std::unordered_set<std::string> SystemLocaleManager::supportLocales {
     "ar-Arab-EG",
     "az-Cyrl-AZ",

@@ -128,7 +128,6 @@ private:
         const std::string &localeTag);
     static const std::unordered_set<std::string> supportLocales;
     std::unique_ptr<TabooUtils> tabooUtils;
-    static const char* SIM_COUNTRY_CODE_KEY;
     static constexpr int CONFIG_LEN = 128;
 };
 } // namespace I18n
