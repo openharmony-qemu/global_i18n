@@ -1837,6 +1837,9 @@ std::string LocaleConfig::GetLocalizedFilePath(const std::string &path, const ch
         return path;
     }
     for (size_t i = 0 ; i < dest.size(); i++) {
+        if (dest[i].empty()) {
+            continue;
+        }
         dest[i] = "\u200e" + dest[i] + "\u200e";
     }
     std::string newSep = "\u200f" + sep;
