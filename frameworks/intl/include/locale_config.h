@@ -274,7 +274,6 @@ private:
     static std::string GenerateExtParam(const std::unordered_map<std::string, std::string>& paramMap);
     static void ExtendWhiteLanguages();
     static void ExtendLanguageWithScript(const std::string &languageStr);
-    static bool IsErrorCodeFailed(const UErrorCode &status);
     static std::unordered_set<std::string> supportedLocales;
     static std::unordered_set<std::string> supportedRegions;
     static std::unordered_set<std::string> supportLocales;

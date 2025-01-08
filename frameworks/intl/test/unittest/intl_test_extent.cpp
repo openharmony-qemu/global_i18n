@@ -219,47 +219,43 @@ HWTEST_F(IntlTest, IntlFuncTest0051, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest0052, TestSize.Level1)
 {
-    /**IndexUtil *indexUtil = new IndexUtil("zh-CN");
+    std::unique_ptr<IndexUtil> indexUtil = std::make_unique<IndexUtil>("zh-CN");
     std::vector<std::string> indexList = indexUtil->GetIndexList();
     EXPECT_EQ(indexList.size(), 28);
     indexUtil->AddLocale("en-US");
     std::string indexStr = indexUtil->GetIndex("A");
     EXPECT_EQ(indexStr, "A");
-    IndexUtil *idxUtil = new IndexUtil("@@#");
+    std::unique_ptr<IndexUtil> idxUtil = std::make_unique<IndexUtil>("@@#");
     idxUtil->GetIndexList();
     idxUtil->GetIndex("**");
-    delete indexUtil;
-    delete idxUtil;
 
     std::unique_ptr<IndexUtil> indexUtil3 = std::make_unique<IndexUtil>("");
     indexUtil3->AddLocale("en-US");
     indexStr = indexUtil3->GetIndex("A");
-    EXPECT_EQ(indexStr, "A");*/
-    printf("----------1111111111------------\n");
+    EXPECT_EQ(indexStr, "A");
     std::unique_ptr<MockIndexUtil> indexUtilMock = std::make_unique<MockIndexUtil>("zh-CN");
     ASSERT_TRUE(indexUtilMock != nullptr);
     EXPECT_CALL(*indexUtilMock, IsCreateSuccess())
     .WillRepeatedly(Return(false));
-    printf("----------2222------------\n");
     indexUtilMock->GetIndexList();
-    printf("----------333333------------\n");
-    EXPECT_EQ(indexUtilMock->GetIndex("A"), "");
-    printf("----------444444------------\n");
+    std::string res = indexUtilMock->GetIndex("A");
+    EXPECT_EQ(res, "");
     UErrorCode status = U_ZERO_ERROR;
-    std::unique_ptr<MockIndexUtil> indexUtilMock2 = std::make_unique<MockIndexUtil>("zh-CN");
-    ASSERT_TRUE(indexUtilMock2 != nullptr);
-    EXPECT_CALL(*indexUtilMock2, IsStatusSuccess(status))
-    .WillOnce(Return(false));
-    EXPECT_EQ(indexUtilMock2->GetIndex("A"), "");
-    printf("----------55555555555------------\n");
+    std::unique_ptr<MockIndexUtil> mockIndexUtil = std::make_unique<MockIndexUtil>("zh-CN");
+    ASSERT_TRUE(mockIndexUtil != nullptr);
+    EXPECT_CALL(*mockIndexUtil, IsCreateSuccess()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*mockIndexUtil, IsStatusSuccess(status)).WillOnce(Return(false));
+    std::string result = mockIndexUtil->GetIndex("A");
+    EXPECT_EQ(result, "");
 
     std::unique_ptr<MockIndexUtil> indexUtilMock3 = std::make_unique<MockIndexUtil>("zh-CN");
     ASSERT_TRUE(indexUtilMock3 != nullptr);
+    EXPECT_CALL(*indexUtilMock3, IsCreateSuccess()).WillRepeatedly(Return(true));
     EXPECT_CALL(*indexUtilMock3, IsStatusSuccess(status))
     .WillOnce(Return(true))
     .WillRepeatedly(Return(false));
-    EXPECT_EQ(indexUtilMock3->GetIndex("A"), "");
-    printf("----------6666------------\n");
+    std::string resultIndex = indexUtilMock3->GetIndex("B");
+    EXPECT_EQ(resultIndex, "");
 }
 
 /**
@@ -537,7 +533,6 @@ HWTEST_F(IntlTest, IntlFuncTest0060, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest0061, TestSize.Level1)
 {
-
 }
 
 /**

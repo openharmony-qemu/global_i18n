@@ -26,8 +26,8 @@ public:
     MockRulesEngine(DateTimeRule* dateTimeRule, RulesSet& rulesSet)
         : RulesEngine(dateTimeRule, rulesSet) {};
     ~MockRulesEngine() override = default;
-    MOCK_METHOD(bool, IsRegexPatternInvalid, (icu::RegexPattern* pattern), (override));
-    MOCK_METHOD(bool, IsRegexMatcherInvalid, (icu::RegexMatcher* matcher), (override));
+    MOCK_METHOD1(IsRegexPatternInvalid, bool(icu::RegexPattern* pattern));
+    MOCK_METHOD1(IsRegexMatcherInvalid, bool(icu::RegexMatcher* matcher));
 };
 } // namespace I18n
 } // namespace Global

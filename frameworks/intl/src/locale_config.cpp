@@ -535,7 +535,7 @@ void LocaleConfig::ExtendWhiteLanguages()
         extendWhiteLanguageList.insert(*iter);
         icu::Locale locale = icu::Locale::forLanguageTag((*iter).c_str(), status);
         locale.addLikelySubtags(status);
-        if (IsErrorCodeFailed(status)) {
+        if (U_FAILURE(status)) {
             HILOG_INFO_I18N("create Locale object for %{public}s failed.", (*iter).c_str());
             continue;
         }
@@ -725,21 +725,21 @@ string LocaleConfig::GetMainLanguage(const string &language)
 {
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale origin = icu::Locale::forLanguageTag(language, status);
-    if (IsErrorCodeFailed(status)) {
+    if (U_FAILURE(status)) {
         return "";
     }
     origin.addLikelySubtags(status);
-    if (IsErrorCodeFailed(status)) {
+    if (U_FAILURE(status)) {
         return "";
     }
     icu::LocaleBuilder builder = icu::LocaleBuilder().setLanguage(origin.getLanguage()).
         setScript(origin.getScript()).setRegion(origin.getCountry());
     icu::Locale temp = builder.setExtension('u', "").build(status);
-    if (IsErrorCodeFailed(status)) {
+    if (U_FAILURE(status)) {
         return "";
     }
     string fullLanguage = temp.toLanguageTag<string>(status);
-    if (IsErrorCodeFailed(status)) {
+    if (U_FAILURE(status)) {
         return "";
     }
     if (dialectMap.find(fullLanguage) != dialectMap.end()) {
@@ -747,11 +747,11 @@ string LocaleConfig::GetMainLanguage(const string &language)
     }
     builder.setRegion("");
     temp = builder.build(status);
-    if (IsErrorCodeFailed(status)) {
+    if (U_FAILURE(status)) {
         return "";
     }
     fullLanguage = temp.toLanguageTag<string>(status);
-    if (IsErrorCodeFailed(status)) {
+    if (U_FAILURE(status)) {
         return "";
     }
     return fullLanguage;
@@ -764,11 +764,11 @@ string LocaleConfig::GetDisplayLanguage(const string &language, const string &di
     if (adjust == language) {
         UErrorCode status = U_ZERO_ERROR;
         icu::Locale displayLoc = icu::Locale::forLanguageTag(displayLocale, status);
-        if (IsErrorCodeFailed(status)) {
+        if (U_FAILURE(status)) {
             return PseudoLocalizationProcessor("");
         }
         icu::Locale locale = icu::Locale::forLanguageTag(language, status);
-        if (IsErrorCodeFailed(status)) {
+        if (U_FAILURE(status)) {
             return PseudoLocalizationProcessor("");
         }
         icu::UnicodeString unistr;
@@ -995,7 +995,7 @@ string LocaleConfig::GetDisplayOverrideRegion(const std::string &region, const s
         return region2DisplayName.at(region);
     } else {
         icu::Locale locale = icu::Locale::forLanguageTag(displayLocale, status);
-        if (IsErrorCodeFailed(status)) {
+        if (U_FAILURE(status)) {
             return "";
         }
         if (IsValidRegion(region)) {
@@ -1025,11 +1025,11 @@ string LocaleConfig::GetDisplayRegion(const string &region, const string &displa
     if (country.length() == 0) {
         return PseudoLocalizationProcessor("");
     }
-    if (IsErrorCodeFailed(status)) {
+    if (U_FAILURE(status)) {
         return PseudoLocalizationProcessor("");
     }
     icu::Locale locale = icu::Locale::forLanguageTag(displayLocale, status);
-    if (IsErrorCodeFailed(status)) {
+    if (U_FAILURE(status)) {
         return PseudoLocalizationProcessor("");
     }
     icu::UnicodeString unistr;
@@ -1201,7 +1201,7 @@ bool LocaleConfig::Is24HourLocale(const std::string& systemLocale)
     }
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(icu::StringPiece(systemLocale), status);
-    if (IsErrorCodeFailed(status)) {
+    if (U_FAILURE(status)) {
         HILOG_INFO_I18N("Is24HourLocale: %{public}s create locale failed", systemLocale.c_str());
         return false;
     }
@@ -1478,12 +1478,12 @@ WeekDay LocaleConfig::GetFirstDayOfWeek()
     }
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale tempLocale = icu::Locale::forLanguageTag(localeTag, status);
-    if (IsErrorCodeFailed(status)) {
+    if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("LocaleConfig::GetFirstDayOfWeek: create icu::Locale failed.");
         return WeekDay::MON;
     }
     icu::Calendar* calendar = icu::Calendar::createInstance(tempLocale, status);
-    if (IsErrorCodeFailed(status)) {
+    if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("LocaleConfig::GetFirstDayOfWeek: create icu::Calendar failed.");
         return WeekDay::MON;
     }
@@ -1552,7 +1552,7 @@ std::string LocaleConfig::UpdateLanguageOfLocale(const std::string &languageTag)
     // Compute language and script part from languageTag.
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale languageLocale = icu::Locale::forLanguageTag(languageTag.c_str(), status);
-    if (IsErrorCodeFailed(status)) {
+    if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("LocaleConfig::UpdateLanguageOfLocale init icu Locale for language %{public}s failed.",
             languageTag.c_str());
         return "";
@@ -1562,7 +1562,7 @@ std::string LocaleConfig::UpdateLanguageOfLocale(const std::string &languageTag)
     // Compute region and extend param part from current system locale.
     std::string systemLocaleTag = GetSystemLocale();
     icu::Locale systemLocale = icu::Locale::forLanguageTag(systemLocaleTag.c_str(), status);
-    if (IsErrorCodeFailed(status)) {
+    if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("LocaleConfig::UpdateSystemLocale init icu Locale for locale %{public}s failed.",
             systemLocaleTag.c_str());
         return systemLocaleTag;
@@ -1610,19 +1610,19 @@ std::string LocaleConfig::UpdateRegionOfLocale(const std::string &regionTag)
     // combine locale with origin locale's language and script with regionTag.
     UErrorCode status = U_ZERO_ERROR;
     const icu::Locale origin = icu::Locale::forLanguageTag(localeTag, status);
-    if (IsErrorCodeFailed(status)) {
+    if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("LocaleConfig::UpdateRegionOfLocale init origin locale failed.");
         return localeTag;
     }
     icu::LocaleBuilder builder = icu::LocaleBuilder().setLanguage(origin.getLanguage()).
         setScript(origin.getScript()).setRegion(regionTag);
     icu::Locale temp = builder.build(status);
-    if (IsErrorCodeFailed(status)) {
+    if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("LocaleConfig::UpdateRegionOfLocale: build locale failed.");
         return localeTag;
     }
     string ret = temp.toLanguageTag<string>(status);
-    if (IsErrorCodeFailed(status)) {
+    if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("LocaleConfig::UpdateRegionOfLocale obtain new locale's tag failed.");
         return localeTag;
     }
@@ -1637,12 +1637,12 @@ std::string LocaleConfig::CreateLocaleFromRegion(const std::string &regionTag)
     icu::Locale locale("", regionTag.c_str());
     UErrorCode status = U_ZERO_ERROR;
     locale.addLikelySubtags(status);
-    if (IsErrorCodeFailed(status)) {
+    if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("LocaleConfig::CreateLocaleFromRegion init new locale failed.");
         return "";
     }
     std::string localeTag = locale.toLanguageTag<string>(status);
-    if (IsErrorCodeFailed(status)) {
+    if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("LocaleConfig::CreateLocaleFromRegion obtain new locale's tag failed.");
         return "";
     }
@@ -1738,11 +1738,6 @@ std::string LocaleConfig::GetLocaleKey()
 std::string LocaleConfig::GetHourKey()
 {
     return HOUR_KEY;
-}
-
-bool LocaleConfig::IsErrorCodeFailed(const UErrorCode &status)
-{
-    return U_FAILURE(status);
 }
 
 std::string LocaleConfig::GetSimplifiedLanguage(const std::string& languageTag, int32_t &code)
