@@ -23,14 +23,10 @@
 #include "i18n_timezone.h"
 #include "unicode/localebuilder.h"
 #include "unicode/locid.h"
-#ifdef TEL_CORE_SERVICE_ENABLE
-#include "core_service_client.h"
-#endif
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-const char* SystemLocaleManager::SIM_COUNTRY_CODE_KEY = "telephony.sim.countryCode0";
 const std::unordered_set<std::string> SystemLocaleManager::supportLocales {
     "ar-Arab-EG",
     "az-Cyrl-AZ",
@@ -158,7 +154,7 @@ std::vector<LocaleItem> SystemLocaleManager::GetLanguageInfoArray(const std::vec
         return localeItemList;
     }
     std::unordered_set<std::string> blockedLanguages = LocaleConfig::GetBlockedLanguages();
-    std::set<std::string> simRegions = GetCountryCodeFromSimCard();
+    std::unordered_set<std::string> simRegions = GetCountryCodeFromSimCard();
     for (auto it = languages.begin(); it != languages.end(); ++it) {
         if (blockedLanguages.find(*it) != blockedLanguages.end()) {
             continue;
@@ -203,7 +199,7 @@ std::vector<LocaleItem> SystemLocaleManager::GetCountryInfoArray(const std::vect
     std::string systemLanguage = LocaleConfig::GetSystemLanguage();
     std::unordered_set<std::string> blockedRegions = LocaleConfig::GetBlockedRegions();
     std::unordered_set<std::string> blockedLanguageRegions = LocaleConfig::GetLanguageBlockedRegions();
-    std::set<std::string> simRegions = GetCountryCodeFromSimCard();
+    std::unordered_set<std::string> simRegions = GetCountryCodeFromSimCard();
     for (auto it = countries.begin(); it != countries.end(); ++it) {
         if (blockedRegions.find(*it) != blockedRegions.end() || blockedLanguageRegions.find(*it) !=
             blockedLanguageRegions.end()) {
@@ -275,7 +271,7 @@ void SystemLocaleManager::SortLocaleItemList(std::vector<LocaleItem> &localeItem
     delete collator;
 }
 
-bool SystemLocaleManager::IsLanguageSimRegionSuggest(const std::set<std::string> &simRegions,
+bool SystemLocaleManager::IsLanguageSimRegionSuggest(const std::unordered_set<std::string> &simRegions,
     const std::string &language)
 {
     for (auto iter = simRegions.begin(); iter != simRegions.end(); ++iter) {
@@ -399,9 +395,9 @@ void SystemLocaleManager::SortTimezoneCityItemList(const std::string &locale,
     delete collator;
 }
 
-std::set<std::string> SystemLocaleManager::GetCountryCodeFromSimCard()
+std::unordered_set<std::string> SystemLocaleManager::GetCountryCodeFromSimCard()
 {
-    std::set<std::string> resultSet;
+    std::unordered_set<std::string> resultSet;
     std::vector<size_t> soltIds = {0, 1};
     for (size_t i = 0; i < soltIds.size(); i++) {
         GetCountryCodeFromSimCardInner(resultSet, soltIds[i]);
@@ -409,23 +405,9 @@ std::set<std::string> SystemLocaleManager::GetCountryCodeFromSimCard()
     return resultSet;
 }
 
-void SystemLocaleManager::GetCountryCodeFromSimCardInner(std::set<std::string> &resultSet, size_t soltId)
+void SystemLocaleManager::GetCountryCodeFromSimCardInner(std::unordered_set<std::string> &resultSet,
+    size_t soltId)
 {
-#if defined(TEL_CORE_SERVICE_ENABLE)
-    std::u16string countryCode;
-    int32_t errorCode = DelayedRefSingleton<Telephony::CoreServiceClient>::GetInstance().GetISOCountryCodeForSim(
-        soltId, countryCode);
-    HILOG_INFO_I18N("SystemLocaleManager: getCountryCodeForSim id:%{public}zu, errorCode:%{public}d.",
-        soltId, errorCode);
-    std::string result = Str16ToStr8(countryCode);
-    if (result.empty()) {
-        return;
-    }
-    for (size_t i = 0; i < result.length(); ++i) {
-        result[i] = toupper(result[i]);
-    }
-    resultSet.insert(result);
-#endif
 }
 } // I18n
 } // Global

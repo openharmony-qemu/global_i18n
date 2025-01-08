@@ -246,9 +246,13 @@ napi_value StyledNumberFormatAddon::CreateStyleOptions(napi_env env,
         return nullptr;
     }
 
-    size_t index = 0;
+    unsigned int index = 0;
     for (size_t i = 0; i < numberParts.size(); ++i) {
-        napi_ref textStyleRef = styledNumberFormatOptions.at(numberParts[i].part_name);
+        auto iter = styledNumberFormatOptions.find(numberParts[i].part_name);
+        if (iter == styledNumberFormatOptions.end()) {
+            continue;
+        }
+        napi_ref textStyleRef = iter->second;
         napi_value option = CreateStyleOption(env, numberParts[i], textStyleRef);
         status = napi_set_element(env, result, index, option);
         if (status != napi_ok) {

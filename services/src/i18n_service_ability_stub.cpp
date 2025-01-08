@@ -40,6 +40,8 @@ int32_t I18nServiceAbilityStub::OnRemoteRequest(uint32_t code, MessageParcel &da
     MessageOption &option)
 {
     HILOG_INFO_I18N("I18nServiceAbilityStub::OnRemoteRequest process request for code=%{public}u", code);
+    // trigger release i18n service after one request finished.
+    UnloadI18nServiceAbility();
     // check whether request's descriptor is consistent with sa's descriptor
     std::u16string descriptor = GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
@@ -55,8 +57,6 @@ int32_t I18nServiceAbilityStub::OnRemoteRequest(uint32_t code, MessageParcel &da
         HILOG_INFO_I18N("I18nServiceAbilityStub::OnRemoteRequest invalid request code=%{public}u", code);
         ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
-    // trigger release i18n service after one request finished.
-    UnloadI18nServiceAbility();
     return ret;
 }
 

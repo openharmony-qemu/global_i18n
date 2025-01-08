@@ -282,6 +282,7 @@ static unordered_map<string, string> g_languageMap = {
     { "az-Latn", "az-Latn" },
     { "bs-Latn", "bs-Latn" },
     { "en-Latn-US", "en" },
+    { "en-US", "en" },
     { "en-Qaag", "en-Qaag" },
     { "uz-Latn", "uz-Latn" },
     { "sr-Latn", "sr-Latn" },
@@ -545,16 +546,19 @@ void LocaleConfig::ExtendWhiteLanguages()
             extendWhiteLanguageList.insert(baseNameStr);
         }
         const char* language = locale.getLanguage();
-        ExtendLanguageWithScript(language);
+        if (language != nullptr) {
+            std::string languageStr(language);
+            ExtendLanguageWithScript(languageStr);
+        }
     }
 }
 
-void LocaleConfig::ExtendLanguageWithScript(const char* language)
+void LocaleConfig::ExtendLanguageWithScript(const std::string &languageStr)
 {
-    if (language == nullptr) {
+    if (languageStr.empty()) {
+        HILOG_INFO_I18N("ExtendLanguageWithScript languageStr is empty.");
         return;
     }
-    std::string languageStr(language);
     string mainLanguage = GetMainLanguage(languageStr);
     if (!mainLanguage.empty()) {
         extendWhiteLanguageList.insert(mainLanguage);
@@ -1434,6 +1438,9 @@ std::string LocaleConfig::GetTemperatureName(const TemperatureType& type)
     if (temperatureTypeToName.find(type) == temperatureTypeToName.end()) {
         HILOG_ERROR_I18N("LocaleConfig::GetTemperatureName: temperature type failed.");
         return "";
+    }
+    if (type == TemperatureType::FAHRENHEIT) {
+        return "fahrenheit";
     }
     return temperatureTypeToName[type];
 }
