@@ -82,11 +82,6 @@ int NumberFormatFuncTest0046(void);
 int NumberFormatFuncTest0047(void);
 int NumberFormatFuncTest0048(void);
 int NumberFormatFuncTest0049(void);
-int NumberFormatFuncTest0050(void);
-int NumberFormatFuncTest0051(void);
-int NumberFormatFuncTest0052(void);
-int NumberFormatFuncTest0053(void);
-int NumberFormatFuncTest0054(void);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

@@ -26,8 +26,8 @@ public:
     MockIndexUtil(const std::string &localeTag) : IndexUtil(localeTag) {
     };
     ~MockIndexUtil() override = default;
-    MOCK_METHOD(bool, IsCreateSuccess, (), (override));
-    MOCK_METHOD(bool, IsStatusSuccess, (const UErrorCode &status), (override));
+    MOCK_METHOD0(IsCreateSuccess, bool());
+    MOCK_METHOD1(IsStatusSuccess, bool(const UErrorCode &status));
 };
 } // namespace I18n
 } // namespace Global
