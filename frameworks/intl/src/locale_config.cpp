@@ -1513,8 +1513,12 @@ void LocaleConfig::UpdateConfiguration(const char *key, const std::string &value
             HILOG_INFO_I18N("LocaleConfig::UpdateLanguageConfiguration: update userId 0.");
         }
     } else {
-        appMgrClient->UpdateConfiguration(configuration, userId);
-        HILOG_INFO_I18N("LocaleConfig::UpdateLanguageConfiguration: update userId %{public}d.", userId);
+        if (userId == -1) {
+            appMgrClient->UpdateConfiguration(configuration);
+        } else {
+            appMgrClient->UpdateConfiguration(configuration, userId);
+            HILOG_INFO_I18N("LocaleConfig::UpdateLanguageConfiguration: update userId %{public}d.", userId);
+        }
     }
     HILOG_INFO_I18N("LocaleConfig::UpdateLanguageConfiguration update configuration finished.");
 }
