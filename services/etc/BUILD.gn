@@ -19,24 +19,3 @@ ohos_prebuilt_etc("i18n_sa_etc") {
   subsystem_name = "global"
   part_name = "i18n"
 }
-
-ohos_prebuilt_etc("version_txt") {
-  source = "./timezone/version.txt"
-  module_install_dir = "etc/TIMEZONE/generic/current/"
-  subsystem_name = "global"
-  part_name = "i18n"
-}
-
-ohos_prebuilt_etc("prefabrication_timezone") {
-  source = "./timezone/prefabrication"
-  module_install_dir = "etc/tzdata_distro/"
-  subsystem_name = "global"
-  part_name = "i18n"
-}
-
-ohos_prebuilt_etc("prefabrication_libphonenumber") {
-  source = "./libphonenumber/prefabrication"
-  module_install_dir = "etc/LIBPHONENUMBER/mount_dir/"
-  subsystem_name = "global"
-  part_name = "i18n"
-}

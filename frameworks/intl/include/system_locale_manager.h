@@ -127,7 +127,6 @@ private:
     LocaleItem GetLocaleItem(const std::string &region, SuggestionType &suggestionType,
         const std::string &localeTag);
     static const std::unordered_set<std::string> supportLocales;
-    std::unique_ptr<TabooUtils> tabooUtils;
     static constexpr int CONFIG_LEN = 128;
 };
 } // namespace I18n

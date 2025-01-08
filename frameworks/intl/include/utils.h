@@ -15,6 +15,7 @@
 #ifndef OHOS_GLOBAL_I18N_UTILS_H
 #define OHOS_GLOBAL_I18N_UTILS_H
 
+#include <filesystem>
 #include <regex>
 #include <string>
 #include <vector>
@@ -45,6 +46,7 @@ bool FileCopy(const std::string& srcPath, const std::string& dstPath);
 bool IsLegalPath(const std::string& path);
 void Split(const std::string &src, const std::string &sep, std::vector<std::string> &dest);
 bool IsDirExist(const char *path);
+void ClearDir(const std::filesystem::path& dirPath);
 bool GetPseudoLocalizationEnforce();
 std::string PseudoLocalizationProcessor(const std::string &input);
 std::string PseudoLocalizationProcessor(const std::string &input, bool ifEnforce);
