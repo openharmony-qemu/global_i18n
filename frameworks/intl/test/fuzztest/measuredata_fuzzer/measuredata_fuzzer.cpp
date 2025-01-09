@@ -45,7 +45,7 @@ namespace OHOS {
             ComputeValue(input, input, factors);
             ConvertByte(number, input);
             ConvertDate(number, input);
-            Convert(number, input, input, input, input);           
+            Convert(number, input, input, input, input);
         }
         return false;
     }
