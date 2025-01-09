@@ -23,6 +23,9 @@ namespace OHOS {
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
         using namespace Global::I18n;
+        if (size < 1) {
+            return false;
+        }
         std::string input(reinterpret_cast<const char*>(data), size);
         std::vector<std::string> units;
         units.push_back(input);
