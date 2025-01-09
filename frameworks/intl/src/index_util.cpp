@@ -105,7 +105,7 @@ bool IndexUtil::IsCreateSuccess()
     return createSuccess;
 }
 
-bool IndexUtil::IsStatusSuccess(const UErrorCode &status)
+bool IndexUtil::IsStatusSuccess(UErrorCode status)
 {
     return U_SUCCESS(status);
 }

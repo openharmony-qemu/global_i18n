@@ -35,7 +35,7 @@ public:
 
 protected:
     virtual bool IsCreateSuccess();
-    virtual bool IsStatusSuccess(const UErrorCode &status);
+    virtual bool IsStatusSuccess(UErrorCode status);
 
 private:
     std::unique_ptr<icu::AlphabeticIndex> index;

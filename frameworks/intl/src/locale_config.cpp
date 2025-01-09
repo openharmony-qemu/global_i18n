@@ -366,7 +366,11 @@ string LocaleConfig::GetSystemRegion()
     if (systemRegion.empty()) {
         systemRegion = GetCountry(DEFAULT_LOCALE_KEY);
     }
-    return systemRegion.empty() ? "CN" : systemRegion;
+    if (systemRegion.empty()) {
+        HILOG_INFO_I18N("GetSystemRegion: system region is empty.");
+        return "CN";
+    }
+    return systemRegion;
 }
 
 string LocaleConfig::GetCountry(const string& parameter)

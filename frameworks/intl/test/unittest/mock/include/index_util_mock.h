@@ -27,7 +27,7 @@ public:
     };
     ~MockIndexUtil() override = default;
     MOCK_METHOD0(IsCreateSuccess, bool());
-    MOCK_METHOD1(IsStatusSuccess, bool(const UErrorCode &status));
+    MOCK_METHOD1(IsStatusSuccess, bool(UErrorCode status));
 };
 } // namespace I18n
 } // namespace Global

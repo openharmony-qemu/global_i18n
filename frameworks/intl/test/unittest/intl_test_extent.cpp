@@ -481,8 +481,10 @@ HWTEST_F(IntlTest, IntlFuncTest0059, TestSize.Level1)
     std::unique_ptr<LocaleInfo> requestZh = std::make_unique<LocaleInfo>("zh-Hant");
     std::unique_ptr<LocaleInfo> current = std::make_unique<LocaleInfo>("en");
     std::unique_ptr<LocaleInfo> other = std::make_unique<LocaleInfo>("en-US");
-    LocaleMatcher::IsMoreSuitable(current.get(), other.get(), requestZh.get());
-    LocaleMatcher::IsMoreSuitable(currentEn.get(), current.get(), requestZh.get());
+    result = LocaleMatcher::IsMoreSuitable(current.get(), other.get(), requestZh.get());
+    EXPECT_EQ(result, 1);
+    result = LocaleMatcher::IsMoreSuitable(currentEn.get(), current.get(), requestZh.get());
+    EXPECT_EQ(result, -1);
     std::unique_ptr<LocaleInfo> requestQaag = std::make_unique<LocaleInfo>("en-Qaag");
     int8_t suitable = LocaleMatcher::IsMoreSuitable(currentEn.get(), otherEn.get(), requestQaag.get());
     EXPECT_EQ(suitable, 1);
@@ -1034,19 +1036,19 @@ HWTEST_F(IntlTest, IntlFuncTest0075, TestSize.Level1)
     std::string str = "abc123";
     icu::UnicodeString message(str.c_str());
     std::string locale = "en";
-    DateTimeRule* dtRule = new DateTimeRule(locale);
-    MockRulesEngine ruleEngineMock(dtRule, rulesSet);
+    std::unique_ptr<DateTimeRule> dtRule = std::make_unique<DateTimeRule>(locale);
+    ASSERT_TRUE(dtRule != nullptr);
+    MockRulesEngine ruleEngineMock(dtRule.get(), rulesSet);
     EXPECT_CALL(ruleEngineMock, IsRegexPatternInvalid(_))
     .WillRepeatedly(Return(true));
     std::vector<MatchedDateTimeInfo> matches = ruleEngineMock.Match(message);
     EXPECT_EQ(matches.size(), 0);
 
-    MockRulesEngine ruleEngineMock2(dtRule, rulesSet);
+    MockRulesEngine ruleEngineMock2(dtRule.get(), rulesSet);
     EXPECT_CALL(ruleEngineMock2, IsRegexMatcherInvalid(_))
     .WillRepeatedly(Return(true));
     matches = ruleEngineMock2.Match(message);
     EXPECT_EQ(matches.size(), 0);
-    delete dtRule;
 }
 
 /**
