@@ -23,7 +23,7 @@ public:
     IcsFileWriter();
     ~IcsFileWriter();
     std::string GenerateFile();
-    std::string WriteVersionFile(const std::string& verison, std::string fileName);
+    bool WriteFile(const std::string& content, const std::string& filePath) const;
     std::string WriteManifest(const std::vector<std::string>& list, std::string& fileName);
     std::string WriteBinaryFile(std::string& fileName);
 };

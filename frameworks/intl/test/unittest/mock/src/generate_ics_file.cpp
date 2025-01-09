@@ -70,18 +70,16 @@ std::string IcsFileWriter::GenerateFile()
     return filePath;
 }
 
-std::string IcsFileWriter::WriteVersionFile(const std::string& verison, std::string fileName)
+bool IcsFileWriter::WriteFile(const std::string& content, const std::string& filePath) const
 {
-    std::string filePath = "/data/log/" + fileName + ".txt";
     std::ofstream fstream(filePath);
     if (!fstream.is_open()) {
         printf("file can't access.\r\n");
-        return filePath;
+        return false;
     }
-    std::string content = "version=" + verison;
     fstream << content << std::endl;
     fstream.close();
-    return filePath;
+    return true;
 }
 
 std::string IcsFileWriter::WriteManifest(const std::vector<std::string>& list, std::string& fileName)
