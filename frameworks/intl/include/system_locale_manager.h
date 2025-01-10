@@ -17,6 +17,7 @@
 #define OHOS_GLOBAL_SYSTEM_LOCALE_MANAGER_H
 
 #include <string>
+#include <unordered_set>
 #include <vector>
 #include "collator.h"
 #include "i18n_types.h"
@@ -118,15 +119,14 @@ private:
     static void SortTimezoneCityItemList(const std::string &locale,
                                          std::vector<TimeZoneCityItem> &timezoneCityItemList);
     static std::vector<TimeZoneCityItem> GetTimezoneCityInfoArray();
-    std::set<std::string> GetCountryCodeFromSimCard();
-    bool IsLanguageSimRegionSuggest(const std::set<std::string> &simRegions, const std::string &language);
-    void GetCountryCodeFromSimCardInner(std::set<std::string> &resultSet, size_t soltId);
+    std::unordered_set<std::string> GetCountryCodeFromSimCard();
+    bool IsLanguageSimRegionSuggest(const std::unordered_set<std::string> &simRegions,
+        const std::string &language);
+    void GetCountryCodeFromSimCardInner(std::unordered_set<std::string> &resultSet, size_t soltId);
     bool IsSuggestRegion(const std::string &language, const std::string &region);
     LocaleItem GetLocaleItem(const std::string &region, SuggestionType &suggestionType,
         const std::string &localeTag);
     static const std::unordered_set<std::string> supportLocales;
-    std::unique_ptr<TabooUtils> tabooUtils;
-    static const char* SIM_COUNTRY_CODE_KEY;
     static constexpr int CONFIG_LEN = 128;
 };
 } // namespace I18n

@@ -27,6 +27,7 @@
 #include <common_event_data.h>
 #endif
 #include "i18n_types.h"
+#include "taboo_utils.h"
 #include "unicode/calendar.h"
 #include "locale_info.h"
 #include "unicode/locid.h"
@@ -187,6 +188,7 @@ private:
     static std::mutex dialectLocaleMutex;
     static std::mutex region2DisplayNameMutex;
     static std::mutex locale2DisplayNameMutex;
+    static std::mutex tabooUtilsMutex;
     static const std::string EXT_PARAM_KEY;
     static const std::string NUMBER_SYSTEM_KEY;
     static const std::string TEMPERATURE_UNIT_KEY;
@@ -275,7 +277,7 @@ private:
     static std::unordered_map<std::string, std::string> ParseExtParam(const std::string& param);
     static std::string GenerateExtParam(const std::unordered_map<std::string, std::string>& paramMap);
     static void ExtendWhiteLanguages();
-    static void ExtendLanguageWithScript(const char* language);
+    static void ExtendLanguageWithScript(const std::string &languageStr);
     static std::unordered_set<std::string> supportedLocales;
     static std::unordered_set<std::string> supportedRegions;
     static std::unordered_set<std::string> supportLocales;
@@ -307,7 +309,10 @@ private:
     static std::set<std::string> validKfTag;
     static std::set<std::string> validNuTag;
     static std::set<std::string> validHcTag;
+    static std::unique_ptr<TabooUtils> tabooUtils;
+    static bool initTabooUtils;
     static bool listsInitialized;
+    static void InitTabooUtils();
     static bool InitializeLists();
 };
 } // namespace I18n

@@ -17,9 +17,16 @@ import("//build/ohos.gni")
 
 group("build_module") {
   deps = [
+    ":hmos_cust_libphonenumber_mount",
+    ":hmos_cust_taboo_mount",
+    ":hmos_cust_timezone_mount",
     ":intl_util",
     ":preferred_language",
-    ":system_locale",
+    "./parameter_upgrade:libphonenumber_version_txt",
+    "./parameter_upgrade:prefabrication_libphonenumber",
+    "./parameter_upgrade:prefabrication_timezone",
+    "./parameter_upgrade:taboo_version_txt",
+    "./parameter_upgrade:timezone_version_txt",
   ]
 }
 
@@ -71,6 +78,7 @@ config("intl_util_config") {
     "//base/global/i18n/frameworks/intl/entity_recognition/include",
     "//base/global/i18n/frameworks/intl/entity_recognition/phone_number_recognition/include",
     "//base/global/i18n/frameworks/intl/include",
+    "//base/global/i18n/frameworks/intl/parameter_upgrade/include",
     "//base/global/i18n/interfaces/native/inner_api/i18n/include",
   ]
 }
@@ -108,6 +116,8 @@ ohos_shared_library("intl_util") {
       "entity_recognition/phone_number_recognition/src/positive_rule.cpp",
       "entity_recognition/phone_number_recognition/src/regex_rule.cpp",
       "entity_recognition/src/entity_recognizer.cpp",
+      "parameter_upgrade/src/signature_verifier.cpp",
+      "parameter_upgrade/src/upgrade_utils.cpp",
       "src/character.cpp",
       "src/collator.cpp",
       "src/date_time_format.cpp",
@@ -129,10 +139,10 @@ ohos_shared_library("intl_util") {
       "src/phone_number_format.cpp",
       "src/plural_rules.cpp",
       "src/relative_time_format.cpp",
-      "src/signature_verifier.cpp",
       "src/simple_date_time_format.cpp",
       "src/simple_number_format.cpp",
       "src/styled_number_format.cpp",
+      "src/system_locale_manager.cpp",
       "src/taboo.cpp",
       "src/taboo_utils.cpp",
       "src/utils.cpp",
@@ -199,42 +209,6 @@ ohos_shared_library("intl_util") {
     if (target_platform == "pc") {
       defines += [ "SUPPORT_MULTI_USER" ]
     }
-  }
-  install_images = [ system_base_dir ]
-  relative_install_dir = "platformsdk"
-  subsystem_name = "global"
-  innerapi_tags = [ "platformsdk" ]
-  part_name = "i18n"
-}
-
-ohos_shared_library("system_locale") {
-  branch_protector_ret = "pac_ret"
-  include_dirs = [ "//base/global/i18n/frameworks/intl/system_locale/include" ]
-  sources = [ "system_locale/src/system_locale_manager.cpp" ]
-  external_deps = [
-    "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
-    "hilog:libhilog",
-    "icu:shared_icui18n",
-    "icu:shared_icuuc",
-    "libpng:libpng",
-  ]
-  cflags_cc = [
-    "-Wall",
-    "-fPIC",
-    "-frtti",
-  ]
-  remove_configs = [ "//build/config/compiler:no_rtti" ]
-  use_exceptions = true
-  deps = [ ":intl_util" ]
-  public_external_deps = []
-  defines = []
-  if (is_asan) {
-    defines += [ "SUPPORT_ASAN" ]
-  }
-  if (tel_core_service_enable) {
-    public_external_deps += [ "core_service:tel_core_service_api" ]
-    defines += [ "TEL_CORE_SERVICE_ENABLE" ]
   }
   install_images = [ system_base_dir ]
   relative_install_dir = "platformsdk"
@@ -393,6 +367,49 @@ ohos_prebuilt_etc("region_supported_locales_xml") {
 ohos_prebuilt_etc("dialect_languages_xml") {
   source = "//base/global/i18n/frameworks/intl/etc/dialect_languages.xml"
   module_install_dir = "usr/ohos_locale_config/"
+  part_name = "i18n"
+  subsystem_name = "global"
+}
+
+ohos_executable("hmos_cust_libphonenumber_mount") {
+  sources = [ "./parameter_upgrade/mount/hmos_libphonenumber_mount.cpp" ]
+  include_dirs = [ "./include" ]
+  deps = [ ":intl_util" ]
+  external_deps = [
+    "hilog:libhilog",
+    "openssl:libcrypto_shared",
+    "openssl:libssl_shared",
+  ]
+  install_images = [ "system" ]
+  part_name = "i18n"
+  subsystem_name = "global"
+}
+
+ohos_executable("hmos_cust_taboo_mount") {
+  sources = [ "./parameter_upgrade/mount/hmos_taboo_mount.cpp" ]
+  include_dirs = [ "./include" ]
+  deps = [ ":intl_util" ]
+  external_deps = [
+    "hilog:libhilog",
+    "openssl:libcrypto_shared",
+    "openssl:libssl_shared",
+  ]
+  install_images = [ "system" ]
+  part_name = "i18n"
+  subsystem_name = "global"
+}
+
+ohos_executable("hmos_cust_timezone_mount") {
+  sources = [ "./parameter_upgrade/mount/hmos_timezone_mount.cpp" ]
+  include_dirs = [ "./include" ]
+  deps = [ ":intl_util" ]
+  external_deps = [
+    "hilog:libhilog",
+    "init:libbegetutil",
+    "openssl:libcrypto_shared",
+    "openssl:libssl_shared",
+  ]
+  install_images = [ "system" ]
   part_name = "i18n"
   subsystem_name = "global"
 }

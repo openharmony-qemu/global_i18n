@@ -54,10 +54,10 @@
 #include "taboo_utils.h"
 #include "taboo.h"
 #include "token_setproc.h"
+#include "upgrade_utils.h"
 #include "utils.h"
 #include "intl_test.h"
 #include "generate_ics_file.h"
-#include "signature_verifier.h"
 #include <unistd.h>
 #include "unicode/utypes.h"
 
@@ -1095,22 +1095,11 @@ HWTEST_F(IntlTest, IntlFuncTest0075, TestSize.Level1)
     RulesEngine rulesEngine(dateTimeRule, rulesSet);
     std::string locale = "&&%";
     DateTimeSequence::GetDateOrder(locale);
-    const std::string oldWriteVersion = "1.10.23.100";
-    const std::string newWriteVersion = "1.10.24.100";
-    IcsFileWriter icsFileWriter;
-    std::string oldFilePath = icsFileWriter.WriteVersionFile(oldWriteVersion, "old");
-    std::string newFilePath = icsFileWriter.WriteVersionFile(newWriteVersion, "new");
-    std::string oldVersion = SignatureVerifier::LoadFileVersion(oldFilePath);
-    std::string newVersion = SignatureVerifier::LoadFileVersion(newFilePath);
-    int res = SignatureVerifier::CompareVersion(oldVersion, newVersion);
-    EXPECT_EQ(res, 1);
-    res = SignatureVerifier::CompareVersion(newVersion, oldVersion);
-    EXPECT_EQ(res, -1);
-    std::string fakeVersion = "1.10.4";
-    res = SignatureVerifier::CompareVersion(fakeVersion, oldVersion);
-    EXPECT_EQ(res, -1);
-    res = SignatureVerifier::CompareVersion(oldVersion, oldVersion);
-    EXPECT_EQ(res, 0);
+    const std::string oldWriteVersion = "version=1.10.23.100";
+    IcsFileWriter icsFileriter;
+    std::string oldFilePath = "/data/log/old.txt";
+    bool status = icsFileriter.WriteFile(oldWriteVersion, oldFilePath);
+    ASSERT_TRUE(status);
     FileExist(oldFilePath);
     trim(locale);
     const std::string destPath = "/data/log/copy.txt";
@@ -1521,48 +1510,17 @@ HWTEST_F(IntlTest, IntlFuncTest0087, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest0088, TestSize.Level1)
 {
-    std::vector<std::string> list;
-    list.push_back("Name: version.txt");
-    list.push_back("SHA-256-Digest: ZI5bXA19r7Zc9THhWCuoSaSvg+mvdX9ztQNocDvlej4=");
-    list.push_back("");
+    std::string localVersionPath = "/data/log/local_version.txt";
+    std::string updateVersionPath = "/data/log/update_version.txt";
+    std::string localVersionContent = "version=1.0.24.100";
+    std::string updateVersionContent = "version=1.0.24.101";
     IcsFileWriter icsFileWriter;
-    std::string manifestName = "MANIFEST.MF";
-    std::string manifestPath = icsFileWriter.WriteManifest(list, manifestName);
-    const std::string filePath = "/data/log/";
-    std::string fileName = "version.txt";
-    std::vector<std::string> versonList;
-    versonList.push_back("version=1.10.25.100");
-    versonList.push_back("type=TIMEZONE");
-    versonList.push_back("subtype=generic");
-    versonList.push_back("compatibleVersion=1");
-    versonList.push_back("classify=2");
-    versonList.push_back("displayVersion=TB.GENC.1.10.25.100");
-    icsFileWriter.WriteManifest(versonList, fileName);
-    bool flag = SignatureVerifier::VerifyParamFile(fileName, filePath, manifestPath);
-    EXPECT_FALSE(flag);
-    std::string fakeManifestPath = "/data/54321.MF";
-    flag = SignatureVerifier::VerifyParamFile(fileName, filePath, fakeManifestPath);
-    std::string fakeFileName = "version0.txt";
-    flag = SignatureVerifier::VerifyParamFile(fakeFileName, filePath, manifestPath);
-    std::string fakePath = "/data/log/123.txt";
-    std::string resultVersion = SignatureVerifier::LoadFileVersion(fakePath);
-    EXPECT_EQ(resultVersion, "");
-    resultVersion = SignatureVerifier::LoadFileVersion(manifestPath);
-    EXPECT_EQ(resultVersion, "");
-
-    std::vector<std::string> verifyList;
-    list.push_back("SHA-256-Digest-Manifest: digRIFiRRqEetuyxz6QSRpPePWxaCvAqWgBSnB42Cwc=");
-    list.push_back("Name: version.txt");
-    list.push_back("SHA-256-Digest: UkBz6aVlhyCe1tHdxZOvwg8y2pODSmbJSgMTurmeNN0");
-    list.push_back("");
-    std::string verifyName = "CERT.SF";
-    std::string verifyPath = icsFileWriter.WriteManifest(verifyList, verifyName);
-    std::string certName = "CERT.ENC";
-    std::string certPath = icsFileWriter.WriteBinaryFile(certName);
-    std::string publicName = "123.pem";
-    std::string pubkeyPath = icsFileWriter.WriteBinaryFile(publicName);
-    bool verifyFlag = SignatureVerifier::VerifyCertFile(certPath, verifyPath, pubkeyPath, manifestPath);
-    EXPECT_FALSE(verifyFlag);
+    bool status = icsFileWriter.WriteFile(localVersionContent, localVersionPath);
+    ASSERT_TRUE(status);
+    status = icsFileWriter.WriteFile(updateVersionContent, updateVersionPath);
+    ASSERT_TRUE(status);
+    bool isNecessary = UpgradeUtils::CheckIfUpdateNecessary(updateVersionPath, localVersionPath);
+    ASSERT_TRUE(isNecessary);
 }
 
 /**

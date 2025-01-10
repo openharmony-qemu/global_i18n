@@ -19,9 +19,34 @@
 #include "measuredata_fuzzer.h"
 
 namespace OHOS {
+    const size_t FIRST_PARAM_OFFSET_SIZE = 8;
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
         using namespace Global::I18n;
+        if (size < 1) {
+            return false;
+        }
+        std::string input(reinterpret_cast<const char*>(data), size);
+        std::vector<std::string> units;
+        units.push_back(input);
+        GetMask(input);
+        GetDefaultPreferredUnit(input, input, units);
+        GetFallbackPreferredUnit(input, input, units);
+        GetRestPreferredUnit(input, input, units);
+        GetPreferredUnit(input, input, units);
+        ComputeSIPrefixValue(input);
+        if (size >= FIRST_PARAM_OFFSET_SIZE) {
+            uint32_t offset = 0;
+            double number = *(reinterpret_cast<const double*>(data + offset));
+            std::vector<double> factors;
+            factors.push_back(number);
+            ComputeFactorValue(input, input, factors);
+            ComputePowerValue(input, input, factors);
+            ComputeValue(input, input, factors);
+            ConvertByte(number, input);
+            ConvertDate(number, input);
+            Convert(number, input, input, input, input);
+        }
         return false;
     }
 }

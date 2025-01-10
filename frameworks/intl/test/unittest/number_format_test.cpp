@@ -14,7 +14,7 @@
  */
 
 #include "number_format_test.h"
-#include <gtest/gtest.h>
+
 #include "locale_config.h"
 #include "number_format.h"
 #include "simple_number_format.h"
@@ -29,17 +29,6 @@ using namespace std;
 namespace OHOS {
 namespace Global {
 namespace I18n {
-class NumberFormatTest : public testing::Test {
-public:
-    static string originalLanguage;
-    static string originalRegion;
-    static string originalLocale;
-    static void SetUpTestCase(void);
-    static void TearDownTestCase(void);
-    void SetUp();
-    void TearDown();
-};
-
 string NumberFormatTest::originalLanguage;
 string NumberFormatTest::originalRegion;
 string NumberFormatTest::originalLocale;
