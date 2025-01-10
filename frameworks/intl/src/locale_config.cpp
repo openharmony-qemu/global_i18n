@@ -89,6 +89,8 @@ const std::string LocaleConfig::WEEK_DAY_KEY = "fw";
 const std::string LocaleConfig::HOUR_EVENT_DATA = "24HourChange";
 const std::string LocaleConfig::TIMEZONE_KEY = "persist.time.timezone";
 const std::string LocaleConfig::DEFAULT_TIMEZONE = "GMT";
+std::unique_ptr<TabooUtils> LocaleConfig::tabooUtils = nullptr;
+bool LocaleConfig::initTabooUtils = false;
 unordered_set<string> LocaleConfig::supportedLocales;
 unordered_set<string> LocaleConfig::supportLocales;
 unordered_set<string> LocaleConfig::supportedRegions;
@@ -100,6 +102,7 @@ unordered_map<string, unordered_set<string>> LocaleConfig::blockedLanguageRegion
 unordered_set<string> LocaleConfig::whiteLanguages;
 std::set<std::string> LocaleConfig::extendWhiteLanguageList;
 std::set<int32_t> LocaleConfig::userIds;
+std::mutex LocaleConfig::tabooUtilsMutex;
 unordered_map<string, string> LocaleConfig::dialectMap {
     { "es-Latn-419", "es-Latn-419" },
     { "es-Latn-BO", "es-Latn-419" },
@@ -784,6 +787,12 @@ string LocaleConfig::GetDisplayLanguage(const string &language, const string &di
     if (result.empty()) {
         result = GetDisplayLanguageInner(adjust, displayLocale, sentenceCase);
     }
+    InitTabooUtils();
+    if (tabooUtils != nullptr) {
+        result = tabooUtils->ReplaceLanguageName(adjust, displayLocale, result);
+    } else {
+        HILOG_ERROR_I18N("LocaleConfig::GetDisplayLanguage: tabooUtils is nullptr.");
+    }
     if (sentenceCase && !result.empty()) {
         char ch = static_cast<char>(toupper(result[0]));
         return PseudoLocalizationProcessor(result.replace(0, 1, 1, ch));
@@ -1044,6 +1053,12 @@ string LocaleConfig::GetDisplayRegion(const string &region, const string &displa
     } else {
         originLocale.getDisplayCountry(locale, displayRegion);
         displayRegion.toUTF8String(result);
+    }
+    InitTabooUtils();
+    if (tabooUtils != nullptr) {
+        result = tabooUtils->ReplaceCountryName(region, displayLocale, result);
+    } else {
+        HILOG_ERROR_I18N("LocaleConfig::GetDisplayRegion: tabooUtils is nullptr.");
     }
     if (sentenceCase) {
         char ch = static_cast<char>(toupper(result[0]));
@@ -1802,6 +1817,18 @@ std::string LocaleConfig::GetSimplifiedSystemLanguage()
     }
     LocaleInfo simplifiedLocale(locale);
     return simplifiedLocale.Minimize();
+}
+
+void LocaleConfig::InitTabooUtils()
+{
+    if (initTabooUtils) {
+        return;
+    }
+    std::lock_guard<std::mutex> tabooUtilsLock(tabooUtilsMutex);
+    if (!initTabooUtils) {
+        tabooUtils = std::make_unique<TabooUtils>();
+        initTabooUtils = (tabooUtils != nullptr);
+    }
 }
 } // namespace I18n
 } // namespace Global

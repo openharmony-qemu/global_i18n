@@ -27,6 +27,7 @@
 #include <common_event_data.h>
 #endif
 #include "i18n_types.h"
+#include "taboo_utils.h"
 #include "unicode/calendar.h"
 #include "unicode/locid.h"
 #include "unicode/utypes.h"
@@ -185,6 +186,7 @@ private:
     static std::mutex dialectLocaleMutex;
     static std::mutex region2DisplayNameMutex;
     static std::mutex locale2DisplayNameMutex;
+    static std::mutex tabooUtilsMutex;
     static const std::string EXT_PARAM_KEY;
     static const std::string NUMBER_SYSTEM_KEY;
     static const std::string TEMPERATURE_UNIT_KEY;
@@ -305,7 +307,10 @@ private:
     static std::set<std::string> validKfTag;
     static std::set<std::string> validNuTag;
     static std::set<std::string> validHcTag;
+    static std::unique_ptr<TabooUtils> tabooUtils;
+    static bool initTabooUtils;
     static bool listsInitialized;
+    static void InitTabooUtils();
     static bool InitializeLists();
 };
 } // namespace I18n

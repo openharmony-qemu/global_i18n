@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_GLOBAL_I18N_VERIFY_SIGN_TOOL_H
-#define OHOS_GLOBAL_I18N_VERIFY_SIGN_TOOL_H
+#ifndef OHOS_GLOBAL_I18N_SIGNATURE_VERIFIER_H
+#define OHOS_GLOBAL_I18N_SIGNATURE_VERIFIER_H
 
 #include <openssl/rsa.h>
 #include <string>
@@ -22,34 +22,27 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-enum VerifyStatus {
-    VERIFY_FAILED = 0,
-    VERIFY_START = 1,
-    VERIFY_SUCCESS = 2
-};
-
 class SignatureVerifier {
 public:
-    static bool VerifyCertFile(const std::string& certPath,
-        const std::string& verifyPath, const std::string& pubkeyPath, const std::string& manifestPath);
-    static bool VerifyParamFile(const std::string& filePath,
-        const std::string& manifestPath, const std::string& absFilePath);
-    static std::string LoadFileVersion(const std::string& versionPath);
-    static int CompareVersion(std::string& preVersion, std::string& curVersion);
+    static bool VerifyCertFile(const std::string& certPath, const std::string& verifyPath,
+        const std::string& pubkeyPath, const std::string& manifestPath);
+    static bool VerifyUpdateFile(const std::string& filePath, const std::string& manifestPath,
+        std::vector<std::string>& filesList);
+    static const size_t MIN_SIZE;
 
 private:
     static bool VerifyRsa(RSA* pubkey, const std::string& digest, const std::string& sign);
     static std::string CalcFileSha256Digest(const std::string& path);
     static void CalcBase64(uint8_t* input, uint32_t inputLen, std::string& encodedStr);
-    static int CalcFileShaOriginal(const std::string& filePath, unsigned char* hash);
+    static bool CalcFileShaOriginal(const std::string& filePath, unsigned char* hash);
     static bool VerifyFileSign(const std::string& pubkeyPath, const std::string& signPath,
         const std::string& digestPath);
     static std::string GetFileStream(const std::string& filePath);
-    static const int HASH_BUFFER_SIZE;
-    static const int MIN_SIZE;
-    static const int VERSION_SIZE;
+    static const int32_t BASE64_ENCODE_PACKET_LEN;
+    static const int32_t BASE64_ENCODE_LEN_OF_EACH_GROUP_DATA;
+    static const size_t HASH_BUFFER_SIZE;
+    static const std::string PREFIX_NAME;
 };
-
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

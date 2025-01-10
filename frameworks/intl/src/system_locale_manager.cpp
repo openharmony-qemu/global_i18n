@@ -129,7 +129,6 @@ const std::unordered_set<std::string> SystemLocaleManager::supportLocales {
 
 SystemLocaleManager::SystemLocaleManager()
 {
-    tabooUtils = std::make_unique<TabooUtils>();
 }
 
 SystemLocaleManager::~SystemLocaleManager()
@@ -160,11 +159,9 @@ std::vector<LocaleItem> SystemLocaleManager::GetLanguageInfoArray(const std::vec
             continue;
         }
         std::string languageDisplayName = LocaleConfig::GetDisplayLanguage(*it, options.localeTag, true);
-        languageDisplayName = tabooUtils->ReplaceLanguageName(*it, options.localeTag, languageDisplayName);
         std::string languageNativeName;
         if (options.isUseLocalName) {
             languageNativeName = LocaleConfig::GetDisplayLanguage(*it, *it, true);
-            languageNativeName = tabooUtils->ReplaceLanguageName(*it, *it, languageNativeName);
         }
         bool isSuggestedWithSystemRegion = LocaleConfig::IsSuggested(*it, LocaleConfig::GetSystemRegion());
         SuggestionType suggestionType = SuggestionType::SUGGESTION_TYPE_NONE;
@@ -224,9 +221,6 @@ LocaleItem SystemLocaleManager::GetLocaleItem(const std::string &region,
 {
     std::string pseudoProcessedRegion = PseudoLocalizationProcessor("");
     std::string regionName = LocaleConfig::GetDisplayRegion(region, localeTag, true);
-    if (this->tabooUtils != nullptr) {
-        regionName = this->tabooUtils->ReplaceCountryName(region, localeTag, regionName);
-    }
     LocaleItem item { region, suggestionType, regionName, pseudoProcessedRegion };
     return item;
 }
