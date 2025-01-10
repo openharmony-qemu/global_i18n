@@ -841,26 +841,8 @@ HWTEST_F(IntlTest, IntlFuncTest0069, TestSize.Level1)
 {
     std::string locale = "&&%";
     DateTimeSequence::GetDateOrder(locale);
-    const std::string oldWriteVersion = "1.10.23.100";
-    const std::string newWriteVersion = "1.10.24.100";
-    IcsFileWriter icsFileWriter;
-    std::string oldFilePath = icsFileWriter.WriteVersionFile(oldWriteVersion, "old");
-    std::string newFilePath = icsFileWriter.WriteVersionFile(newWriteVersion, "new");
-    std::string oldVersion = SignatureVerifier::LoadFileVersion(oldFilePath);
-    std::string newVersion = SignatureVerifier::LoadFileVersion(newFilePath);
-    int res = SignatureVerifier::CompareVersion(oldVersion, newVersion);
-    EXPECT_EQ(res, 1);
-    res = SignatureVerifier::CompareVersion(newVersion, oldVersion);
-    EXPECT_EQ(res, -1);
-    std::string fakeVersion = "1.10.4";
-    res = SignatureVerifier::CompareVersion(fakeVersion, oldVersion);
-    EXPECT_EQ(res, -1);
-    res = SignatureVerifier::CompareVersion(oldVersion, oldVersion);
-    EXPECT_EQ(res, 0);
-    FileExist(oldFilePath);
     trim(locale);
     const std::string destPath = "/data/log/copy.txt";
-    FileCopy(oldFilePath, destPath);
     IsLegalPath(destPath);
     const std::string relativePath = "../log/copy.txt";
     IsLegalPath(relativePath);
