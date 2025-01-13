@@ -635,9 +635,9 @@ void LocaleConfig::ExtendLanguageWithScript(const std::string &languageStr)
         HILOG_INFO_I18N("ExtendLanguageWithScript languageStr is empty.");
         return;
     }
-    string mainLanguage = GetMainLanguage(languageStr);
+    string mainLanguage = GetMainLanguage(languageStr, dialectMap);
     if (!mainLanguage.empty()) {
-        extendWhiteLanguageList.insert(mainLanguage, dialectMap);
+        extendWhiteLanguageList.insert(mainLanguage);
     }
 }
 

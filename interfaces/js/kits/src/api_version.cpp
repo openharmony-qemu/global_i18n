@@ -39,11 +39,11 @@ bool ApiVersion::CheckApiTargetVersion(const std::string &apiName)
         return false;
     }
     version = iter->second;
-    InitSystemVersion();
+    InitSystemApiVersion();
     return SYS_API_VERSION >= version;
 }
 
-void ApiVersion::InitSystemVersion()
+void ApiVersion::InitSystemApiVersion()
 {
     if (SYS_API_VERSION > 0) {
         return;
@@ -53,8 +53,10 @@ void ApiVersion::InitSystemVersion()
         return;
     }
     int32_t version = GetApiTargetVersion();
-    HILOG_INFO_I18N("InitSystemVersion: Current api version is %{public}d.", version);
-    return SYS_API_VERSION >= version;
+    HILOG_INFO_I18N("InitSystemApiVersion: Current api version is %{public}d.", version);
+    if (version > 0) {
+        SYS_API_VERSION = version;
+    }
 }
 
 int32_t ApiVersion::GetApiTargetVersion()
@@ -70,7 +72,7 @@ int32_t ApiVersion::GetApiTargetVersion()
     }
     OHOS::AppExecFwk::BundleInfo bundleInfo;
     auto ret =
-        bundleMgrProxy->GetBundleInfoForSelf(OHOS::AppExecFwk::BUndleFlag::GET_BUNDLE_WITH_ABILITIES, bundleInfo);
+        bundleMgrProxy->GetBundleInfoForSelf(OHOS::AppExecFwk::BundleFlag::GET_BUNDLE_WITH_ABILITIES, bundleInfo);
     if (ret != 0) {
         HILOG_ERROR_I18N("GetApiTargetVersion: GetBundleInfoForSelf failed");
         return 0;

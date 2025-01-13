@@ -71,9 +71,9 @@ private:
     static napi_value GetDisplayLanguageImpl(napi_env env, napi_callback_info info, bool throwError);
     static napi_value GetSystemCountriesImpl(napi_env env, napi_callback_info info, bool throwError);
     static napi_value IsSuggestedImpl(napi_env env, napi_callback_info info, bool throwError);
-    static bool IsSuggestedByApiVersion(const std::string &language, bool newapi);
+    static bool IsSuggestedByApiVersion(const std::string &language, bool newApi);
     static bool IsSuggestedByApiVersion(const std::string &language,
-        const std::string &region, bool newapi);
+        const std::string &region, bool newApi);
     static napi_value SetSystemLanguageImpl(napi_env env, napi_callback_info info, bool throwError);
     static napi_value SetSystemRegionImpl(napi_env env, napi_callback_info info, bool throwError);
     static napi_value SetSystemLocaleImpl(napi_env env, napi_callback_info info, bool throwError);

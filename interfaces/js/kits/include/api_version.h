@@ -34,7 +34,7 @@ private:
     static std::mutex initMutex;
 
     static int32_t GetApiTargetVersion();
-    static void InitSystemVersion();
+    static void InitSystemApiVersion();
 };
 } // namespace I18n
 } // namespace Global
