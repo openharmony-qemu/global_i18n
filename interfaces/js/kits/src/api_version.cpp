@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 const int32_t ApiVersion::API_VERSION_MOD = 1000;
-// The initial version of the system api is -1.
+// The initial version of the system API is -1.
 int32_t ApiVersion::SYS_API_VERSION = -1;
 std::mutex ApiVersion::initMutex;
 std::unordered_map<std::string, int32_t> ApiVersion::versionMap {
