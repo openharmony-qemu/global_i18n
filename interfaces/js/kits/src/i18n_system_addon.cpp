@@ -571,7 +571,7 @@ napi_value I18nSystemAddon::IsSuggestedImpl(napi_env env, napi_callback_info inf
         return nullptr;
     }
     VariableConvertor::VerifyType(env, "language", napi_valuetype::napi_string, argv[0]);
-    int32_t code =0;
+    int32_t code = 0;
     std::string language = VariableConvertor::GetString(env, argv[0], code);
     if (code != 0) {
         HILOG_ERROR_I18N("IsSuggestedImpl: Failed to get string argv[0].");
