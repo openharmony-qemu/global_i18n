@@ -110,6 +110,8 @@ public:
     static void GetSystemCountries(std::vector<std::string> &ret);
     static bool IsSuggested(const std::string &language);
     static bool IsSuggested(const std::string &language, const std::string &region);
+    static bool IsSuggestedV15(const std::string &language);
+    static bool IsSuggestedV15(const std::string &language, const std::string &region);
     static std::string GetDisplayLanguage(const std::string &language, const std::string &displayLocale,
         bool sentenceCase);
     static std::string GetDisplayRegion(const std::string &region, const std::string &displayLocale,
@@ -152,6 +154,7 @@ private:
     static const char *DEFAULT_REGION_KEY;
     static const char *SIM_COUNTRY_CODE_KEY;
     static const char *SUPPORTED_LOCALES_PATH;
+    static const char *SUPPORTED_LOCALES_OLD_PATH;
     static constexpr int CONFIG_LEN = 128;
     static const char *SUPPORTED_LOCALES_NAME;
     static const char *SUPPORTED_REGIONS_NAME;
@@ -192,15 +195,19 @@ private:
     static const std::string WEEK_DAY_KEY;
 
     static const std::unordered_set<std::string>& GetSupportedLocales();
+    static const std::unordered_set<std::string>& GetSupportedLocalesV15();
     static const std::unordered_set<std::string>& GetForbiddenRegions();
     static const std::unordered_set<std::string>& GetSupportedRegions();
     static void GetCountriesFromSim(std::vector<std::string> &simCountries);
     static void GetRelatedLocales(std::unordered_set<std::string> &relatedLocales,
         const std::vector<std::string> countries);
+    static void GetRelatedLocalesV15(std::unordered_set<std::string> &relatedLocales,
+        const std::vector<std::string> countries);
     static void GetListFromFile(const char *path, const char *resourceName, std::unordered_set<std::string> &ret);
     static void LoadRegionsLanguages(std::unordered_set<std::string>& forbiddenRegions);
     static void Expunge(std::unordered_set<std::string> &src, const std::unordered_set<std::string> &another);
-    static std::string GetMainLanguage(const std::string &language);
+    static std::string GetMainLanguage(const std::string &language,
+        std::unordered_map<std::string, std::string> selfDialectMap);
     static std::string GetCountry(const std::string& parameter);
     static std::string GetDisplayLanguageWithDialect(const std::string &language, const std::string &displayLocale);
     static std::string GetDisplayOverrideRegion(const std::string &region, const std::string &displayLocale);
@@ -276,6 +283,7 @@ private:
     static void ExtendWhiteLanguages();
     static void ExtendLanguageWithScript(const std::string &languageStr);
     static std::unordered_set<std::string> supportedLocales;
+    static std::unordered_set<std::string> supportedLocalesV15;
     static std::unordered_set<std::string> supportedRegions;
     static std::unordered_set<std::string> supportLocales;
     static std::unordered_set<std::string> dialectLang;
@@ -285,8 +293,10 @@ private:
     static std::unordered_map<std::string, std::unordered_set<std::string>> blockedLanguageRegions;
     static std::unordered_set<std::string> whiteLanguages;
     static std::set<std::string> extendWhiteLanguageList;
+    static std::set<std::string> extendWhiteLanguageListV15;
     static std::map<std::string, std::string> supportedDialectLocales;
     static std::unordered_map<std::string, std::string> dialectMap;
+    static std::unordered_map<std::string, std::string> dialectMapV15;
     static std::unordered_map<std::string, std::string> localDigitMap;
     static std::unordered_map<TemperatureType, std::string> temperatureTypeToName;
     static std::unordered_map<std::string, TemperatureType> nameToTemperatureType;

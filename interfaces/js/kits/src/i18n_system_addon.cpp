@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "api_version.h"
 #include "error_util.h"
 #include "i18n_hilog.h"
 #include "i18n_service_ability_client.h"
@@ -570,34 +571,23 @@ napi_value I18nSystemAddon::IsSuggestedImpl(napi_env env, napi_callback_info inf
         return nullptr;
     }
     VariableConvertor::VerifyType(env, "language", napi_valuetype::napi_string, argv[0]);
-    size_t len = 0;
-    status = napi_get_value_string_utf8(env, argv[0], nullptr, 0, &len);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("IsSuggestedImpl: Failed to get string len argv[0].");
-        return nullptr;
-    }
-    std::vector<char> languageBuf(len + 1);
-    status = napi_get_value_string_utf8(env, argv[0], languageBuf.data(), len + 1, &len);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("isSuggested: Failed to get string item argv[0]");
+    int32_t code =0;
+    std::string language = VariableConvertor::GetString(env, argv[0], code);
+    if (code != 0) {
+        HILOG_ERROR_I18N("IsSuggestedImpl: Failed to get string argv[0].");
         return nullptr;
     }
     bool isSuggested = false;
+    bool api16 = ApiVersion::CheckApiTargetVersion("isSuggested");
     if (VariableConvertor::CheckNapiIsNull(env, argv[1])) {
-        status = napi_get_value_string_utf8(env, argv[1], nullptr, 0, &len);
-        if (status != napi_ok) {
-            HILOG_ERROR_I18N("IsSuggestedImpl: Failed to get string len argv[1].");
-            return nullptr;
-        }
-        std::vector<char> regionBuf(len + 1);
-        status = napi_get_value_string_utf8(env, argv[1], regionBuf.data(), len + 1, &len);
-        if (status != napi_ok) {
-            HILOG_ERROR_I18N("isSuggested: Failed to get string item argv[1]");
+        std::string region = VariableConvertor::GetString(env, argv[1], code);
+        if (code != 0) {
+            HILOG_ERROR_I18N("IsSuggestedImpl: Failed to get string argv[1].");
             return nullptr;
         }
         isSuggested = LocaleConfig::IsSuggested(languageBuf.data(), regionBuf.data());
     } else {
-        isSuggested = LocaleConfig::IsSuggested(languageBuf.data());
+        isSuggested = 
     }
     napi_value result = nullptr;
     status = napi_get_boolean(env, isSuggested, &result);
@@ -606,6 +596,25 @@ napi_value I18nSystemAddon::IsSuggestedImpl(napi_env env, napi_callback_info inf
         return nullptr;
     }
     return result;
+}
+
+bool I18nSystemAddon::IsSuggestedByApiVersion(const std::string &language, bool newapi)
+{
+    if (newapi) {
+        return LocaleConfig::IsSuggested(language);
+    } else {
+        return LocaleConfig::IsSuggestedV15(language);
+    }
+}
+
+bool I18nSystemAddon::IsSuggestedByApiVersion(const std::string &language,
+    const std::string &region, bool newapi)
+{
+    if (newapi) {
+        return LocaleConfig::IsSuggested(language, region);
+    } else {
+        return LocaleConfig::IsSuggestedV15(language, region);
+    }
 }
 
 napi_value I18nSystemAddon::SetSystemLanguageImpl(napi_env env, napi_callback_info info, bool throwError)
