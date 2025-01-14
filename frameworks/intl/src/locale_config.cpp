@@ -645,7 +645,8 @@ void LocaleConfig::GetRelatedLocales(unordered_set<string> &relatedLocales, vect
 {
     // remove unsupported countries
     const unordered_set<string> &regions = GetSupportedRegions();
-    for (auto iter = countries.begin(); iter != countries.end();) {
+    auto iter = countries.begin();
+    while (iter != countries.end()) {
         if (regions.find(*iter) == regions.end()) {
             iter = countries.erase(iter);
         } else {
@@ -653,9 +654,9 @@ void LocaleConfig::GetRelatedLocales(unordered_set<string> &relatedLocales, vect
         }
     }
     const unordered_set<string> &locales = GetSupportedLocales();
-    for (string locale : locales) {
+    for (const string &locale : locales) {
         bool find = false;
-        for (string country : countries) {
+        for (string &country : countries) {
             if (locale.find(country) != string::npos) {
                 find = true;
                 break;
@@ -665,7 +666,7 @@ void LocaleConfig::GetRelatedLocales(unordered_set<string> &relatedLocales, vect
             continue;
         }
         string mainLanguage = GetMainLanguage(locale, dialectMap);
-        if (mainLanguage != "") {
+        if (!mainLanguage.empty()) {
             relatedLocales.insert(mainLanguage);
         }
     }
@@ -675,7 +676,8 @@ void LocaleConfig::GetRelatedLocalesV15(unordered_set<string> &relatedLocales, v
 {
     // remove unsupported countries
     const unordered_set<string> &regions = GetSupportedRegions();
-    for (auto iter = countries.begin(); iter != countries.end();) {
+    auto iter = countries.begin();
+    while (iter != countries.end()) {
         if (regions.find(*iter) == regions.end()) {
             iter = countries.erase(iter);
         } else {
@@ -683,9 +685,9 @@ void LocaleConfig::GetRelatedLocalesV15(unordered_set<string> &relatedLocales, v
         }
     }
     const unordered_set<string> &locales = GetSupportedLocalesV15();
-    for (string locale : locales) {
+    for (const string &locale : locales) {
         bool find = false;
-        for (string country : countries) {
+        for (const string &country : countries) {
             if (locale.find(country) != string::npos) {
                 find = true;
                 break;
@@ -695,7 +697,7 @@ void LocaleConfig::GetRelatedLocalesV15(unordered_set<string> &relatedLocales, v
             continue;
         }
         string mainLanguage = GetMainLanguage(locale, dialectMapV15);
-        if (mainLanguage != "") {
+        if (!mainLanguage.empty()) {
             relatedLocales.insert(mainLanguage);
         }
     }

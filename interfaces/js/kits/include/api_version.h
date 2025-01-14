@@ -30,11 +30,10 @@ public:
 private:
     static std::unordered_map<std::string, int32_t> versionMap;
     static const int32_t API_VERSION_MOD;
-    static int32_t SYS_API_VERSION;
     static std::mutex initMutex;
 
     static int32_t GetApiTargetVersion();
-    static void InitSystemApiVersion();
+    static int32_t InitSystemApiVersion();
 };
 } // namespace I18n
 } // namespace Global

@@ -24,9 +24,8 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 const int32_t ApiVersion::API_VERSION_MOD = 1000;
-// The initial version of the system API is -1.
-int32_t ApiVersion::SYS_API_VERSION = -1;
 std::mutex ApiVersion::initMutex;
+thread_local int32_t sysApiVersion = 0;
 std::unordered_map<std::string, int32_t> ApiVersion::versionMap {
     {"isSuggested", 16},
 };
@@ -34,29 +33,29 @@ std::unordered_map<std::string, int32_t> ApiVersion::versionMap {
 bool ApiVersion::CheckApiTargetVersion(const std::string &apiName)
 {
     auto iter = versionMap.find(apiName);
-    int32_t version = -1;
     if (iter == versionMap.end()) {
         return false;
     }
-    version = iter->second;
-    InitSystemApiVersion();
-    return SYS_API_VERSION >= version;
+    int32_t version = iter->second;
+    int32_t currentVersion = InitSystemApiVersion();
+    return currentVersion >= version;
 }
 
-void ApiVersion::InitSystemApiVersion()
+int32_t ApiVersion::InitSystemApiVersion()
 {
-    if (SYS_API_VERSION > 0) {
-        return;
+    if (sysApiVersion > 0) {
+        return sysApiVersion;
     }
     std::lock_guard<std::mutex> systemApiLock(initMutex);
-    if (SYS_API_VERSION > 0) {
-        return;
+    if (sysApiVersion > 0) {
+        return sysApiVersion;
     }
     int32_t version = GetApiTargetVersion();
     HILOG_INFO_I18N("InitSystemApiVersion: Current api version is %{public}d.", version);
     if (version > 0) {
-        SYS_API_VERSION = version;
+        sysApiVersion = version;
     }
+    return sysApiVersion;
 }
 
 int32_t ApiVersion::GetApiTargetVersion()
