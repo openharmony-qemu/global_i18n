@@ -55,7 +55,7 @@ int32_t ApiVersion::InitSystemApiVersion()
     if (version > 0) {
         sysApiVersion = version;
     }
-    return sysApiVersion;
+    return version;
 }
 
 int32_t ApiVersion::GetApiTargetVersion()
