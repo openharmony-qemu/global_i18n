@@ -36,9 +36,9 @@ namespace OHOS {
         GetPreferredUnit(input, input, units);
         ComputeSIPrefixValue(input);
         if (size >= FIRST_PARAM_OFFSET_SIZE) {
-            uint32_t offset = 0;
-            double number = *(reinterpret_cast<const double*>(data + offset));
+            double number = *(reinterpret_cast<const double*>(data));
             std::vector<double> factors;
+            factors.push_back(number);
             factors.push_back(number);
             ComputeFactorValue(input, input, factors);
             ComputePowerValue(input, input, factors);
