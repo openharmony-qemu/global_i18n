@@ -390,7 +390,7 @@ void MultiUsers::UpdateConfiguration(const std::string& locale, const std::strin
 
     if (!isUpdated && WriteMultiUsersParameter(UPDATED_USERS_KEY, TRUE_VALUE, userIdStr, false) !=
         I18nErrorCode::SUCCESS) {
-        HILOG_INFO_I18N("MultiUsers::UpdateConfiguration: Write UPDATED_USERS_KEY failed.");
+        HILOG_ERROR_I18N("MultiUsers::UpdateConfiguration: Write UPDATED_USERS_KEY failed.");
     }
 }
 
