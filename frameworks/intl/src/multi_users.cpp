@@ -13,6 +13,13 @@
  * limitations under the License.
  */
 
+#ifdef SUPPORT_GRAPHICS
+#include "app_mgr_client.h"
+#include "ability_manager_client.h"
+#include <common_event_manager.h>
+#include <common_event_publish_info.h>
+#include <common_event_support.h>
+#endif
 #include "i18n_hilog.h"
 #include "locale_config.h"
 #include "os_account_manager.h"
@@ -28,6 +35,9 @@ const std::string MultiUsers::MULTI_USERS_LANGUAGE_KEY = "languageData";
 const std::string MultiUsers::MULTI_USERS_LOCALE_KEY = "localeData";
 const std::string MultiUsers::MULTI_USERS_HOUR_KEY = "is24HourData";
 const std::string MultiUsers::INIT_KEY = "init";
+const std::string MultiUsers::UPDATED_USERS_KEY = "updateUsers";
+const std::string MultiUsers::DEFAULT_UPDATED_USERS = "100:true";
+const std::string MultiUsers::TRUE_VALUE = "true";
 const std::string MultiUsers::PREFERENCE_PATH = "/data/service/el1/public/i18n/global/GlobalParamData";
 const int32_t MultiUsers::DEFAULT_LOCAL_ID = 100;
 const int MultiUsers::CONFIG_LEN = 128;
@@ -50,6 +60,7 @@ void MultiUsers::InitMultiUser()
     if (!init) {
         AddUser(localId);
         preferences->PutBool(INIT_KEY, true);
+        preferences->PutString(UPDATED_USERS_KEY, DEFAULT_UPDATED_USERS);
         preferences->Flush();
         HILOG_INFO_I18N("InitMultiUser: init multi user data success");
     }
@@ -167,9 +178,9 @@ I18nErrorCode MultiUsers::SaveIs24Hour(const std::string& localId, const std::st
 
 I18nErrorCode MultiUsers::SaveGlobalParam(const std::string& localId)
 {
-    std::string language = ReadSystemParameter(LocaleConfig::GetLanguageKey().data(), CONFIG_LEN);
-    std::string locale = ReadSystemParameter(LocaleConfig::GetLocaleKey().data(), CONFIG_LEN);
-    std::string is24Hour = ReadSystemParameter(LocaleConfig::GetHourKey().data(), CONFIG_LEN);
+    std::string language = ReadSystemParameter(LocaleConfig::LANGUAGE_KEY.c_str(), CONFIG_LEN);
+    std::string locale = ReadSystemParameter(LocaleConfig::LOCALE_KEY.c_str(), CONFIG_LEN);
+    std::string is24Hour = ReadSystemParameter(LocaleConfig::HOUR_KEY.c_str(), CONFIG_LEN);
     I18nErrorCode errCode = SaveLanguage(localId, language);
     if (errCode != I18nErrorCode::SUCCESS) {
         HILOG_ERROR_I18N("SaveGlobalParam: save language failed");
@@ -191,28 +202,32 @@ I18nErrorCode MultiUsers::SaveGlobalParam(const std::string& localId)
 I18nErrorCode MultiUsers::LoadGlobalParam(const std::string& localId)
 {
     std::string newLocale = ReadMultiUsersParameter(MULTI_USERS_LOCALE_KEY, localId);
-    if (!newLocale.empty() && SetParameter(LocaleConfig::GetLocaleKey().data(), newLocale.data()) != 0) {
+    if (!newLocale.empty() && SetParameter(LocaleConfig::LOCALE_KEY.c_str(), newLocale.c_str()) != 0) {
         HILOG_ERROR_I18N("LoadGlobalParam: set locale failed");
         return I18nErrorCode::FAILED;
     }
 
     std::string newLanguage = ReadMultiUsersParameter(MULTI_USERS_LANGUAGE_KEY, localId);
+    if (!newLanguage.empty() && SetParameter(LocaleConfig::LANGUAGE_KEY.c_str(), newLanguage.c_str()) != 0) {
+        HILOG_ERROR_I18N("LoadGlobalParam: set language failed");
+        return I18nErrorCode::FAILED;
+    }
+
+    std::string newIs24Hour = ReadMultiUsersParameter(MULTI_USERS_HOUR_KEY, localId);
+    if (!newIs24Hour.empty() && SetParameter(LocaleConfig::HOUR_KEY.c_str(), newIs24Hour.c_str()) != 0) {
+        HILOG_ERROR_I18N("LoadGlobalParam: set is24Hour failed");
+        return I18nErrorCode::FAILED;
+    }
+#ifdef SUPPORT_GRAPHICS
     int32_t status = 0;
     int32_t userId = ConvertString2Int(localId, status);
     if (status == -1) {
         HILOG_ERROR_I18N("LoadGlobalParam: convert userId failed");
         return I18nErrorCode::FAILED;
     }
-    if (!newLanguage.empty() && LocaleConfig::SetSystemLanguage(newLanguage, userId, true) != 0) {
-        HILOG_ERROR_I18N("LoadGlobalParam: set language failed");
-        return I18nErrorCode::FAILED;
-    }
-
-    std::string newIs24Hour = ReadMultiUsersParameter(MULTI_USERS_HOUR_KEY, localId);
-    if (!newIs24Hour.empty() && LocaleConfig::Set24HourClock(newIs24Hour, userId, true) != 0) {
-        HILOG_ERROR_I18N("LoadGlobalParam: set is24Hour failed");
-        return I18nErrorCode::FAILED;
-    }
+    UpdateConfiguration(newLocale, newIs24Hour, userId);
+    return PublishCommonEvent(userId);
+#endif
     return I18nErrorCode::SUCCESS;
 }
 
@@ -233,6 +248,12 @@ I18nErrorCode MultiUsers::RemoveGlobalParam(const std::string& localId)
     errCode = WriteMultiUsersParameter(MULTI_USERS_HOUR_KEY, "", localId, true);
     if (errCode != I18nErrorCode::SUCCESS) {
         HILOG_ERROR_I18N("RemoveGlobalParam: remove is24Hour failed");
+        return I18nErrorCode::FAILED;
+    }
+
+    errCode = WriteMultiUsersParameter(UPDATED_USERS_KEY, "", localId, true);
+    if (errCode != I18nErrorCode::SUCCESS) {
+        HILOG_ERROR_I18N("RemoveGlobalParam: Remove %{public}s failed.", localId.c_str());
         return I18nErrorCode::FAILED;
     }
     return I18nErrorCode::SUCCESS;
@@ -346,6 +367,58 @@ I18nErrorCode MultiUsers::SetParamFromPreferences(const std::string& paramKey, c
     preferences->Flush();
     return I18nErrorCode::SUCCESS;
 }
+
+#ifdef SUPPORT_GRAPHICS
+void MultiUsers::UpdateConfiguration(const std::string& locale, const std::string& is24Hour,
+    int32_t userId)
+{
+    AppExecFwk::Configuration configuration;
+    configuration.AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE, locale);
+    configuration.AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_HOUR, is24Hour);
+    auto appMgrClient = std::make_unique<AppExecFwk::AppMgrClient>();
+
+    std::string userIdStr = std::to_string(userId);
+    bool isUpdated = TRUE_VALUE.compare(ReadMultiUsersParameter(UPDATED_USERS_KEY, userIdStr)) == 0;
+    userId = isUpdated ? 0 : userId;
+
+    AppExecFwk::AppMgrResultCode status = appMgrClient->UpdateConfiguration(configuration, userId);
+    if (status != AppExecFwk::AppMgrResultCode::RESULT_OK) {
+        HILOG_ERROR_I18N("MultiUsers::UpdateConfiguration: Update configuration userId %{public}d failed.", userId);
+        return;
+    }
+    HILOG_INFO_I18N("MultiUsers::UpdateConfiguration: Update configuration userId %{public}d success.", userId);
+
+    if (!isUpdated && WriteMultiUsersParameter(UPDATED_USERS_KEY, TRUE_VALUE, userIdStr, false) !=
+        I18nErrorCode::SUCCESS) {
+        HILOG_ERROR_I18N("MultiUsers::UpdateConfiguration: Write UPDATED_USERS_KEY failed.");
+    }
+}
+
+I18nErrorCode MultiUsers::PublishCommonEvent(int32_t userId)
+{
+    OHOS::AAFwk::Want localeChangeWant;
+    localeChangeWant.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED);
+    OHOS::EventFwk::CommonEventData localeChangeEvent(localeChangeWant);
+    if (!OHOS::EventFwk::CommonEventManager::PublishCommonEventAsUser(localeChangeEvent, userId)) {
+        HILOG_ERROR_I18N("MultiUsers::PublishCommonEvent: Failed to publish locale change event, userId %{public}d.",
+            userId);
+        return I18nErrorCode::PUBLISH_COMMON_EVENT_FAILED;
+    }
+
+    OHOS::AAFwk::Want is24HourChangeWant;
+    is24HourChangeWant.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED);
+    OHOS::EventFwk::CommonEventData is24HourChangeEvent(is24HourChangeWant);
+    is24HourChangeEvent.SetData(LocaleConfig::HOUR_EVENT_DATA);
+    if (!OHOS::EventFwk::CommonEventManager::PublishCommonEventAsUser(is24HourChangeEvent, userId)) {
+        HILOG_ERROR_I18N("MultiUsers::PublishCommonEvent: Failed to publish is24Hour change event, userId %{public}d.",
+            userId);
+        return I18nErrorCode::PUBLISH_COMMON_EVENT_FAILED;
+    }
+
+    HILOG_INFO_I18N("MultiUsers::PublishCommonEvent: Publish event finished,  userId %{public}d.", userId);
+    return I18nErrorCode::SUCCESS;
+}
+#endif
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

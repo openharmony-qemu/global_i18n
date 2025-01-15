@@ -46,10 +46,18 @@ private:
     static std::string GetParamFromPreferences(const std::string& paramKey);
     static I18nErrorCode SetParamFromPreferences(const std::string& paramKey, const std::string& paramValue);
 
+#ifdef SUPPORT_GRAPHICS
+    static void UpdateConfiguration(const std::string& locale, const std::string& is24Hour, int32_t userId);
+    static I18nErrorCode PublishCommonEvent(int32_t userId);
+#endif
+
     static const std::string MULTI_USERS_LANGUAGE_KEY;
     static const std::string MULTI_USERS_LOCALE_KEY;
     static const std::string MULTI_USERS_HOUR_KEY;
     static const std::string INIT_KEY;
+    static const std::string UPDATED_USERS_KEY;
+    static const std::string DEFAULT_UPDATED_USERS;
+    static const std::string TRUE_VALUE;
     static const std::string PREFERENCE_PATH;
     static const int32_t DEFAULT_LOCAL_ID;
     static const int CONFIG_LEN;
