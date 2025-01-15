@@ -128,6 +128,22 @@ HWTEST_F(IntlTest, IntlFuncTest0049, TestSize.Level1)
     EXPECT_EQ(status, I18nErrorCode::UPDATE_LOCAL_DIGIT_FAILED);
     bool usingLocalDigit = LocaleConfig::GetUsingLocalDigit();
     EXPECT_FALSE(usingLocalDigit);
+
+    std::string path = "/data/log/faultlog";
+    char delimiter = '/';
+    const std::string localeStr = "ar";
+    std::shared_ptr<LocaleInfo> localeInfo = std::make_shared<LocaleInfo>(localeStr);
+    std::string errorCode;
+    std::string res = LocaleConfig::GetUnicodeWrappedFilePath(path, delimiter, localeInfo, errorCode);
+    EXPECT_EQ(res, "\u200f/\u200edata\u200e\u200f/\u200elog\u200e\u200f/\u200efaultlog\u200e");
+    path = "\\data\\log\\faultlog";
+    delimiter = '\\';
+    res = LocaleConfig::GetUnicodeWrappedFilePath(path, delimiter, localeInfo, errorCode);
+    EXPECT_EQ(res, "\u200f\\\u200edata\u200e\u200f\\\u200elog\u200e\u200f\\\u200efaultlog\u200e");
+    path = "data>log>faultlog";
+    delimiter = '>';
+    res = LocaleConfig::GetUnicodeWrappedFilePath(path, delimiter, localeInfo, errorCode);
+    EXPECT_EQ(res, "\u200f\u200edata\u200e\u200f>\u200elog\u200e\u200f>\u200efaultlog\u200e");
 }
 
 /**

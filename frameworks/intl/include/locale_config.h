@@ -29,6 +29,7 @@
 #include "i18n_types.h"
 #include "taboo_utils.h"
 #include "unicode/calendar.h"
+#include "locale_info.h"
 #include "unicode/locid.h"
 
 namespace OHOS {
@@ -131,6 +132,8 @@ public:
     static bool IsValid24HourClockValue(const std::string &tag);
     static std::string GetSimplifiedLanguage(const std::string& language, int32_t &code);
     static std::string GetSimplifiedSystemLanguage();
+    static std::string GetUnicodeWrappedFilePath(const std::string &path, const char delimiter,
+        std::shared_ptr<LocaleInfo> localeInfo, std::string &invalidField);
     static const std::string HOUR_EVENT_DATA;
     static const std::string LANGUAGE_KEY;
     static const std::string LOCALE_KEY;

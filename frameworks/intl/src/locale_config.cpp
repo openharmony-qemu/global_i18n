@@ -1798,6 +1798,49 @@ std::string LocaleConfig::GetSimplifiedSystemLanguage()
     return simplifiedLocale.Minimize();
 }
 
+std::string LocaleConfig::GetUnicodeWrappedFilePath(const std::string &path, const char delimiter,
+    std::shared_ptr<LocaleInfo> localeInfo, std::string &invalidField)
+{
+    if (delimiter == '\0') {
+        invalidField = "delimiter";
+        return path;
+    }
+    if (path.empty() || path.length() > PATH_MAX) {
+        invalidField = "path";
+        return path;
+    }
+    std::string locale;
+    if (localeInfo != nullptr) {
+        locale = localeInfo->GetBaseName();
+    }
+    if (!IsValidTag(locale)) {
+        locale = GetSystemLocale();
+    }
+    if (!IsRTL(locale)) {
+        return path;
+    }
+    std::string result;
+    std::vector<string> dest;
+    std::string sep(1, delimiter); // 1 is char count
+    Split(path, sep, dest);
+    if (dest.size() == 1) { // 1 is array's size
+        return path;
+    }
+    for (size_t i = 0 ; i < dest.size(); i++) {
+        if (dest[i].empty()) {
+            continue;
+        }
+        if (i == 0 && dest[i].compare(sep) != 0) {
+            dest[i] = "\u200f\u200e" + dest[i] + "\u200e";
+            continue;
+        }
+        dest[i] = "\u200e" + dest[i] + "\u200e";
+    }
+    std::string newSep = "\u200f" + sep;
+    Merge(dest, newSep, result);
+    return result;
+}
+
 void LocaleConfig::InitTabooUtils()
 {
     if (initTabooUtils) {
