@@ -46,8 +46,7 @@ public:
      * @param languageTag language tag to set.
      * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
      */
-    static I18nErrorCode SetSystemLanguage(const std::string &languageTag, int32_t userId = -1,
-        bool isSwitchUser = false);
+    static I18nErrorCode SetSystemLanguage(const std::string &languageTag, int32_t userId = -1);
 
     /**
      * @brief Set the System Region to region tag.
@@ -63,7 +62,7 @@ public:
      * @param localeTag locale tag to set.
      * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
      */
-    static I18nErrorCode SetSystemLocale(const std::string &localeTag, int32_t userId = -1, bool isSwitchUser = false);
+    static I18nErrorCode SetSystemLocale(const std::string &localeTag, int32_t userId = -1);
 
     /**
      * @brief Set system hour to 12 or 24-hour clock.
@@ -73,7 +72,7 @@ public:
      * system locale default behavior.
      * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
      */
-    static I18nErrorCode Set24HourClock(const std::string &option, int32_t userId = -1, bool isSwitchUser = false);
+    static I18nErrorCode Set24HourClock(const std::string &option, int32_t userId = -1);
 
     /**
      * @brief Set system digit to local digit or Arbic digit.
@@ -131,13 +130,14 @@ public:
     static bool IsValidRegion(const std::string &region);
     static bool IsValidTag(const std::string &tag);
     static bool IsValid24HourClockValue(const std::string &tag);
-    static std::string GetLanguageKey();
-    static std::string GetLocaleKey();
-    static std::string GetHourKey();
     static std::string GetSimplifiedLanguage(const std::string& language, int32_t &code);
     static std::string GetSimplifiedSystemLanguage();
     static std::string GetUnicodeWrappedFilePath(const std::string &path, const char delimiter,
         std::shared_ptr<LocaleInfo> localeInfo, std::string &invalidField);
+    static const std::string HOUR_EVENT_DATA;
+    static const std::string LANGUAGE_KEY;
+    static const std::string LOCALE_KEY;
+    static const std::string HOUR_KEY;
 
 private:
     static void Split(const std::string &src, const std::string &sep, std::vector<std::string> &dest);
@@ -146,9 +146,6 @@ private:
     static constexpr uint32_t LANGUAGE_LEN = 2;
     static constexpr uint32_t LOCALE_ITEM_COUNT = 3;
     static constexpr uint32_t SCRIPT_OFFSET = 2;
-    static const char *LANGUAGE_KEY;
-    static const char *LOCALE_KEY;
-    static const char *HOUR_KEY;
     static const char *UPGRADE_LOCALE_KEY;
     static const char *DEFAULT_LOCALE_KEY;
     static const char *DEFAULT_LANGUAGE_KEY;
@@ -182,7 +179,6 @@ private:
     static const char *DIALECT_LANGS_PATH;
     static const char *DIALECT_LANGS_NAME;
     static const char *REGION_PATH;
-    static const std::string HOUR_EVENT_DATA;
     static const std::string TIMEZONE_KEY;
     static const std::string DEFAULT_TIMEZONE;
     static std::mutex dialectLocaleMutex;
@@ -227,7 +223,7 @@ private:
      * @param userId Indicats update user id.
      * @param isSwitchUser Indicates whether user switch.
      */
-    static void UpdateConfiguration(const char *key, const std::string &value, int32_t userId, bool isSwitchUser);
+    static void UpdateConfiguration(const char *key, const std::string &value, int32_t userId);
 
     /**
      * @brief Provided for public i18n event include locale-change event and time-change event.
@@ -302,7 +298,6 @@ private:
     static std::unordered_map<std::string, std::vector<std::string>> dialectLanguages;
     static std::string currentDialectLocale;
     static std::string currentOverrideRegion;
-    static std::set<int32_t> userIds;
     static std::set<std::string> validCaTag;
     static std::set<std::string> validCoTag;
     static std::set<std::string> validKnTag;
