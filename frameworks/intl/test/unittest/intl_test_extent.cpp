@@ -135,15 +135,15 @@ HWTEST_F(IntlTest, IntlFuncTest0049, TestSize.Level1)
     std::shared_ptr<LocaleInfo> localeInfo = std::make_shared<LocaleInfo>(localeStr);
     std::string errorCode;
     std::string res = LocaleConfig::GetUnicodeWrappedFilePath(path, delimiter, localeInfo, errorCode);
-    EXPECT_EQ(res, "\u202b\u200f/\u200edata\u200e\u200f/\u200elog\u200e\u200f/\u200efaultlog\u200e\u202c");
+    EXPECT_EQ(res, "\u200f/\u200edata\u200e\u200f/\u200elog\u200e\u200f/\u200efaultlog\u200e");
     path = "\\data\\log\\faultlog";
     delimiter = '\\';
     res = LocaleConfig::GetUnicodeWrappedFilePath(path, delimiter, localeInfo, errorCode);
-    EXPECT_EQ(res, "\u202b\u200f\\\u200edata\u200e\u200f\\\u200elog\u200e\u200f\\\u200efaultlog\u200e\u202c");
+    EXPECT_EQ(res, "\u200f\\\u200edata\u200e\u200f\\\u200elog\u200e\u200f\\\u200efaultlog\u200e");
     path = "data>log>faultlog";
     delimiter = '>';
     res = LocaleConfig::GetUnicodeWrappedFilePath(path, delimiter, localeInfo, errorCode);
-    EXPECT_EQ(res, "\u202b\u200edata\u200e\u200f>\u200elog\u200e\u200f>\u200efaultlog\u200e\u202c");
+    EXPECT_EQ(res, "\u200edata\u200e\u200f>\u200elog\u200e\u200f>\u200efaultlog\u200e");
 }
 
 /**
