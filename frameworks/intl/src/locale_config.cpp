@@ -1830,15 +1830,15 @@ std::string LocaleConfig::GetSimplifiedSystemLanguage()
     return simplifiedLocale.Minimize();
 }
 
-std::string LocaleConfig::GetLocalizedFilePath(const std::string &path, const char delimiter,
-    std::shared_ptr<LocaleInfo> localeInfo, std::string &errorCode)
+std::string LocaleConfig::GetUnicodeWrappedFilePath(const std::string &path, const char delimiter,
+    std::shared_ptr<LocaleInfo> localeInfo, std::string &invalidField)
 {
     if (delimiter == '\0') {
-        errorCode = "delimiter";
+        invalidField = "delimiter";
         return path;
     }
     if (path.empty() || path.length() > PATH_MAX) {
-        errorCode = "path";
+        invalidField = "path";
         return path;
     }
     std::string locale;

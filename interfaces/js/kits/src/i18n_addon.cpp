@@ -91,7 +91,7 @@ napi_value I18nAddon::InitI18nUtil(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getBestMatchLocale", GetBestMatchLocale),
         DECLARE_NAPI_STATIC_FUNCTION("getThreeLetterLanguage", GetThreeLetterLanguage),
         DECLARE_NAPI_STATIC_FUNCTION("getThreeLetterRegion", GetThreeLetterRegion),
-        DECLARE_NAPI_STATIC_FUNCTION("getUnicodeWrappedFilePath", GetLocalizedFilePath)
+        DECLARE_NAPI_STATIC_FUNCTION("getUnicodeWrappedFilePath", GetUnicodeWrappedFilePath)
     };
     napi_value constructor = nullptr;
     napi_status status = napi_define_class(env, "I18NUtil", NAPI_AUTO_LENGTH, JSUtils::DefaultConstructor, nullptr,
@@ -737,7 +737,7 @@ napi_value I18nAddon::IsRTL(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value I18nAddon::GetLocalizedFilePath(napi_env env, napi_callback_info info)
+napi_value I18nAddon::GetUnicodeWrappedFilePath(napi_env env, napi_callback_info info)
 {
     size_t argc = 3;
     napi_value argv[3] = { 0 };
@@ -776,7 +776,7 @@ napi_value I18nAddon::GetLocalizedFilePath(napi_env env, napi_callback_info info
     }
     std::string errorCode;
     std::shared_ptr<LocaleInfo> localeInfoPtr = obj == nullptr ? nullptr : obj->GetLocaleInfo();
-    std::string result = LocaleConfig::GetLocalizedFilePath(path, delimiter,
+    std::string result = LocaleConfig::GetUnicodeWrappedFilePath(path, delimiter,
         localeInfoPtr, errorCode);
     if (!errorCode.empty()) {
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, errorCode, "valid", true);

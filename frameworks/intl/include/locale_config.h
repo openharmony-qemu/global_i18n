@@ -136,8 +136,8 @@ public:
     static std::string GetHourKey();
     static std::string GetSimplifiedLanguage(const std::string& language, int32_t &code);
     static std::string GetSimplifiedSystemLanguage();
-    static std::string GetLocalizedFilePath(const std::string &path, const char delimiter,
-        std::shared_ptr<LocaleInfo> localeInfo, std::string &errorCode);
+    static std::string GetUnicodeWrappedFilePath(const std::string &path, const char delimiter,
+        std::shared_ptr<LocaleInfo> localeInfo, std::string &invalidField);
 
 private:
     static void Split(const std::string &src, const std::string &sep, std::vector<std::string> &dest);

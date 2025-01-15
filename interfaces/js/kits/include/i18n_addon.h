@@ -61,7 +61,7 @@ public:
     static napi_value GetAvailableIDs(napi_env env, napi_callback_info info);
     static napi_value InitUtil(napi_env env, napi_value exports);
     static napi_value System(napi_env env, napi_value exports);
-    static napi_value GetLocalizedFilePath(napi_env env, napi_callback_info info);
+    static napi_value GetUnicodeWrappedFilePath(napi_env env, napi_callback_info info);
 
 private:
     static napi_value PhoneNumberFormatConstructor(napi_env env, napi_callback_info info);
