@@ -1830,11 +1830,11 @@ std::string LocaleConfig::GetUnicodeWrappedFilePath(const std::string &path, con
         if (dest[i].empty()) {
             continue;
         }
-        dest[i] = "\u200e" + dest[i] + "\u200e";
+        dest[i] = "\u200e" + dest[i];
     }
     std::string newSep = "\u200f" + sep;
     Merge(dest, newSep, result);
-    result = "\u202b" + result + "\u202c";
+    //result = "\u202b" + result + "\u202c";
     return result;
 }
 
