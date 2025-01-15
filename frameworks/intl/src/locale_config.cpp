@@ -1830,6 +1830,10 @@ std::string LocaleConfig::GetUnicodeWrappedFilePath(const std::string &path, con
         if (dest[i].empty()) {
             continue;
         }
+        if (i == 0 && dest[i].compare(sep) != 0) {
+            dest[i] = "\u200f\u200e" + dest[i] + "\u200e";
+            continue;
+        }
         dest[i] = "\u200e" + dest[i] + "\u200e";
     }
     std::string newSep = "\u200f" + sep;
