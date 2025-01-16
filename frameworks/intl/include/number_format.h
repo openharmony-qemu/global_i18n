@@ -16,6 +16,7 @@
 #define OHOS_GLOBAL_I18N_NUMBER_FORMAT_H
 
 #include <map>
+#include <mutex>
 #include <set>
 #include <unordered_map>
 #include <vector>
@@ -110,6 +111,8 @@ private:
     static const int BUFFER_LEN = 10;
     static const int POW_BASE_NUMBER = 10;
     static const int CURRENCY_LEN = 3;
+    static const size_t ISO4217_LEN = 252;
+    static std::mutex numToCurrencyMutex;
     static std::unordered_map<std::string, std::string> numToCurrency;
     icu::MeasureUnit unitArray[MAX_UNIT_NUM];
     static bool icuInitialized;
@@ -125,7 +128,7 @@ private:
     static std::unordered_map<std::string, UNumberFormatRoundingMode> roundingModeStyle;
     static std::vector<size_t> roundingIncrementList;
     static std::map<std::string, std::string> RelativeTimeFormatConfigs;
-    static bool ReadISO4217Ddatas();
+    static bool ReadISO4217Datas();
     std::string GetCurrencyFromConfig(const std::string& currency);
     void CreateRelativeTimeFormat(const std::string& locale);
     void ParseConfigs(std::map<std::string, std::string> &configs);
