@@ -42,9 +42,17 @@ I18nErrorCode I18nServiceAbilityClient::SetSystemLanguage(const std::string &lan
     I18nErrorCode err = I18nErrorCode::SUCCESS;
     sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
     if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetSystemLanguage: Get proxy failed.");
         return err;
     }
-    return i18nServiceAbilityObj->SetSystemLanguage(language);
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->SetSystemLanguage(language, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetSystemLanguage: Set language failed, errCode is %{public}d.",
+            static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::SetSystemRegion(const std::string &region)
@@ -52,9 +60,17 @@ I18nErrorCode I18nServiceAbilityClient::SetSystemRegion(const std::string &regio
     I18nErrorCode err = I18nErrorCode::SUCCESS;
     sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
     if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetSystemRegion: Get proxy failed.");
         return err;
     }
-    return i18nServiceAbilityObj->SetSystemRegion(region);
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->SetSystemRegion(region, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetSystemRegion: Set region failed, errCode is %{public}d.",
+            static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::SetSystemLocale(const std::string &locale)
@@ -62,9 +78,17 @@ I18nErrorCode I18nServiceAbilityClient::SetSystemLocale(const std::string &local
     I18nErrorCode err = I18nErrorCode::SUCCESS;
     sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
     if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetSystemLocale: Get proxy failed.");
         return err;
     }
-    return i18nServiceAbilityObj->SetSystemLocale(locale);
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->SetSystemLocale(locale, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetSystemLocale: Set locale failed, errCode is %{public}d.",
+            static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::Set24HourClock(const std::string &flag)
@@ -72,9 +96,17 @@ I18nErrorCode I18nServiceAbilityClient::Set24HourClock(const std::string &flag)
     I18nErrorCode err = I18nErrorCode::SUCCESS;
     sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
     if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::Set24HourClock: Get proxy failed.");
         return err;
     }
-    return i18nServiceAbilityObj->Set24HourClock(flag);
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->Set24HourClock(flag, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::Set24HourClock: Set 24HourClock failed, errCode is %{public}d.",
+            static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::SetUsingLocalDigit(bool flag)
@@ -82,9 +114,17 @@ I18nErrorCode I18nServiceAbilityClient::SetUsingLocalDigit(bool flag)
     I18nErrorCode err = I18nErrorCode::SUCCESS;
     sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
     if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetUsingLocalDigit: Get proxy failed.");
         return err;
     }
-    return i18nServiceAbilityObj->SetUsingLocalDigit(flag);
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->SetUsingLocalDigit(flag, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetUsingLocalDigit: Set local digit failed, "
+            "errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::AddPreferredLanguage(const std::string &language, int32_t index)
@@ -92,9 +132,17 @@ I18nErrorCode I18nServiceAbilityClient::AddPreferredLanguage(const std::string &
     I18nErrorCode err = I18nErrorCode::SUCCESS;
     sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
     if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::AddPreferredLanguage: Get proxy failed.");
         return err;
     }
-    return i18nServiceAbilityObj->AddPreferredLanguage(language, index);
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->AddPreferredLanguage(language, index, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::AddPreferredLanguage: Add preferred language failed, "
+            "errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::RemovePreferredLanguage(int32_t index)
@@ -102,9 +150,17 @@ I18nErrorCode I18nServiceAbilityClient::RemovePreferredLanguage(int32_t index)
     I18nErrorCode err = I18nErrorCode::SUCCESS;
     sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
     if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::RemovePreferredLanguage: Get proxy failed.");
         return err;
     }
-    return i18nServiceAbilityObj->RemovePreferredLanguage(index);
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->RemovePreferredLanguage(index, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::RemovePreferredLanguage: Remove preferred language failed, "
+            "errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::SetTemperatureType(TemperatureType type)
@@ -112,9 +168,17 @@ I18nErrorCode I18nServiceAbilityClient::SetTemperatureType(TemperatureType type)
     I18nErrorCode err = I18nErrorCode::SUCCESS;
     sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
     if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetTemperatureType: Get proxy failed.");
         return err;
     }
-    return i18nServiceAbilityObj->SetTemperatureType(type);
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->SetTemperatureType(static_cast<int32_t>(type), code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetTemperatureType: Set temperature type failed, "
+            "errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::SetFirstDayOfWeek(WeekDay type)
@@ -122,9 +186,17 @@ I18nErrorCode I18nServiceAbilityClient::SetFirstDayOfWeek(WeekDay type)
     I18nErrorCode err = I18nErrorCode::SUCCESS;
     sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
     if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetFirstDayOfWeek: Get proxy failed.");
         return err;
     }
-    return i18nServiceAbilityObj->SetFirstDayOfWeek(type);
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->SetFirstDayOfWeek(static_cast<int32_t>(type), code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetFirstDayOfWeek: Set first day of week failed, "
+            "errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 } // namespace I18n
 } // namespace Global

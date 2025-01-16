@@ -11,13 +11,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/config/components/idl_tool/idl.gni")
 import("//build/ohos.gni")
+
+idl_gen_interface("i18n_service_interface") {
+  src_idl = rebase_path("II18nServiceAbility.idl")
+  log_domainid = "0xD001E00"
+  log_tag = "GLOBAL_I18N"
+}
 
 group("i18n_service_ability") {
   deps = [
     ":i18n_sa",
     ":i18n_sa_client",
     "./etc:i18n_sa_etc",
+  ]
+}
+
+config("I18n_service_public_config") {
+  include_dirs = [
+    "${target_gen_dir}",
+    "./include",
+    "../frameworks/intl/include",
   ]
 }
 
@@ -33,13 +48,11 @@ ohos_shared_library("i18n_sa_client") {
     "./src/i18n_service_ability_client.cpp",
     "./src/i18n_service_ability_load_callback.cpp",
     "./src/i18n_service_ability_load_manager.cpp",
-    "./src/i18n_service_ability_proxy.cpp",
   ]
-  include_dirs = [
-    "./include",
-    "../frameworks/intl/include",
-  ]
-  deps = []
+  output_values = get_target_outputs(":i18n_service_interface")
+  sources += filter_include(output_values, [ "*_proxy.cpp" ])
+  public_configs = [ ":I18n_service_public_config" ]
+  deps = [ ":i18n_service_interface" ]
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
@@ -61,16 +74,19 @@ ohos_shared_library("i18n_sa") {
 
   sources = [
     "./src/i18n_service_ability.cpp",
-    "./src/i18n_service_ability_stub.cpp",
     "./src/i18n_service_event.cpp",
   ]
+  output_values = get_target_outputs(":i18n_service_interface")
+  sources += filter_include(output_values, [ "*_stub.cpp" ])
   include_dirs = [
+    "${target_gen_dir}",
     "./include",
     "../frameworks/intl/include",
     "../interfaces/native/inner_api/preferred_language/include",
   ]
   deps = [
     ":i18n_sa_client",
+    ":i18n_service_interface",
     "../frameworks/intl:intl_util",
     "../frameworks/intl:preferred_language",
   ]

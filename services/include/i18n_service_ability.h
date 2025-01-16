@@ -32,20 +32,15 @@ public:
     ~I18nServiceAbility();
 
     // The following are the i18n service implement functions.
-    I18nErrorCode SetSystemLanguage(const std::string &language) override;
-    I18nErrorCode SetSystemRegion(const std::string &region) override;
-    I18nErrorCode SetSystemLocale(const std::string &locale) override;
-    I18nErrorCode Set24HourClock(const std::string &flag) override;
-    I18nErrorCode SetUsingLocalDigit(bool flag) override;
-    I18nErrorCode AddPreferredLanguage(const std::string &language, int32_t index) override;
-    I18nErrorCode RemovePreferredLanguage(int32_t index) override;
-    I18nErrorCode SetTemperatureType(TemperatureType type) override;
-    I18nErrorCode SetFirstDayOfWeek(WeekDay type) override;
-    /**
-     * @brief Trigger unload i18n service after one request finished, but service will not unload
-     * until there no request in 10s.
-     */
-    void UnloadI18nServiceAbility() override;
+    ErrCode SetSystemLanguage(const std::string& language, int32_t& code) override;
+    ErrCode SetSystemRegion(const std::string& region, int32_t& code) override;
+    ErrCode SetSystemLocale(const std::string& locale, int32_t& code) override;
+    ErrCode Set24HourClock(const std::string& flag, int32_t& code) override;
+    ErrCode SetUsingLocalDigit(bool flag, int32_t& code) override;
+    ErrCode AddPreferredLanguage(const std::string& language, int32_t index, int32_t& code) override;
+    ErrCode RemovePreferredLanguage(int32_t index, int32_t& code) override;
+    ErrCode SetTemperatureType(int32_t type, int32_t& code) override;
+    ErrCode SetFirstDayOfWeek(int32_t type, int32_t& code) override;
 
 protected:
     /**
@@ -58,11 +53,32 @@ protected:
      */
     void OnStop() override;
 
+    /**
+     * @brief Called when i18n service unload.
+     */
+    int32_t OnIdle(const SystemAbilityOnDemandReason& idleReason) override;
+
 private:
+    enum class ModifyTaskNumber {
+        DECREASE = -1,
+        QUERY = 0,
+        INCREASE = 1
+    };
+    /**
+     * @brief Trigger unload i18n service after one request finished, but service will not unload
+     * until there no request in 10s.
+     */
+    void DelayUnloadI18nServiceAbility();
+    int32_t GetTaskNumber(ModifyTaskNumber action);
+    void StartTask(int32_t pid);
+    void FinishTask(int32_t pid);
     int32_t GetCallingUserId();
+    I18nErrorCode CheckPermission();
     // i18n service unload event handler.
-    std::shared_ptr<AppExecFwk::EventHandler> handler;
-    I18nServiceEvent* i18nServiceEvent = nullptr;
+    std::shared_ptr<AppExecFwk::EventHandler> handler = nullptr;
+    std::unique_ptr<I18nServiceEvent> i18nServiceEvent = nullptr;
+    std::mutex taskNumberMutex;
+    int32_t taskNumber;
 };
 } // namespace I18n
 } // namespace Global
