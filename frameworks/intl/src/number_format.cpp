@@ -31,6 +31,7 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 const char* NumberFormat::DEVICE_TYPE_NAME = "const.product.devicetype";
+std::mutex NumberFormat::numToCurrencyMutex;
 std::unordered_map<std::string, std::string> NumberFormat::numToCurrency = {};
 bool NumberFormat::icuInitialized = NumberFormat::Init();
 
@@ -475,8 +476,8 @@ void NumberFormat::ParseRoundingConfigs(std::map<std::string, std::string> &conf
         std::string increment = configs["roundingIncrement"];
         int32_t status = 0;
         int32_t incrementNum = ConvertString2Int(increment, status);
-        incrementNum = static_cast<size_t>(incrementNum);
-        auto iter = std::find(roundingIncrementList.begin(), roundingIncrementList.end(), incrementNum);
+        auto iter = std::find(roundingIncrementList.begin(), roundingIncrementList.end(),
+            static_cast<size_t>(incrementNum));
         if (status == 0 && iter != roundingIncrementList.end()) {
             roundingIncrement = *iter;
         }
@@ -808,9 +809,13 @@ void NumberFormat::SetDefaultStyle()
     }
 }
 
-bool NumberFormat::ReadISO4217Ddatas()
+bool NumberFormat::ReadISO4217Datas()
 {
-    if (numToCurrency.size()) {
+    if (numToCurrency.size() == ISO4217_LEN) {
+        return true;
+    }
+    std::lock_guard<std::mutex> readDataLock(numToCurrencyMutex);
+    if (numToCurrency.size() == ISO4217_LEN) {
         return true;
     }
     UErrorCode status = U_ZERO_ERROR;
@@ -853,7 +858,7 @@ std::string NumberFormat::GetCurrencyFromConfig(const std::string& currency)
     if (isAlpha) {
         return currency;
     }
-    if (ReadISO4217Ddatas() && numToCurrency.find(currency) != numToCurrency.end()) {
+    if (ReadISO4217Datas() && numToCurrency.find(currency) != numToCurrency.end()) {
         return numToCurrency[currency];
     }
     HILOG_ERROR_I18N("Invalid currency code : %{public}s", currency.c_str());

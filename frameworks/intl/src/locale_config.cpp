@@ -1770,14 +1770,14 @@ std::string LocaleConfig::GetSimplifiedSystemLanguage()
         } else {
             locale = GetSystemLocale();
         }
-        LocaleInfo* requestLocale = new LocaleInfo(locale);
+        LocaleInfo* requestLocale = new(std::nothrow) LocaleInfo(locale);
         if (requestLocale == nullptr) {
             HILOG_ERROR_I18N("GetSimplifiedLanguage: %{public}s failed to construct LocaleInfo.", locale.c_str());
             return "";
         }
         std::vector<LocaleInfo*> candidateLocales;
         for (auto& candidate : dialectLanguages[language]) {
-            LocaleInfo* candidateInfo = new LocaleInfo(candidate);
+            LocaleInfo* candidateInfo = new(std::nothrow) LocaleInfo(candidate);
             if (candidateInfo == nullptr) {
                 HILOG_ERROR_I18N("GetSimplifiedLanguage: %{public}s failed to construct LocaleInfo.",
                     candidate.c_str());

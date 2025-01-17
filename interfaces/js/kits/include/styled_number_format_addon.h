@@ -53,8 +53,8 @@ private:
         SimpleNumberFormatAddon* simpleNumberFormatAddon, napi_value options);
     void SetTextStyle(napi_env env, napi_value options, const std::string &optionName);
 
-    napi_env env_;
-    std::unordered_map<std::string, napi_ref> styledNumberFormatOptions_;
+    napi_env env_ = nullptr;
+    std::unordered_map<std::string, napi_ref> styledNumberFormatOptions_ {};
     std::unique_ptr<StyledNumberFormat> styledNumberFormat_ = nullptr;
 };
 } // namespace I18n
