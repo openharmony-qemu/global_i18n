@@ -570,7 +570,7 @@ napi_value I18nSystemAddon::IsSuggestedImpl(napi_env env, napi_callback_info inf
     }
     bool isSuggested = false;
     bool api16 = GetApiCheckResult();
-    if (VariableConvertor::CheckNapiIsNull(env, argv[1])) {
+    if (VariableConvertor::CheckNapiValueType(env, argv[1])) {
         std::string region = VariableConvertor::GetString(env, argv[1], code);
         if (code != 0) {
             HILOG_ERROR_I18N("IsSuggestedImpl: Failed to get string argv[1].");

@@ -227,7 +227,7 @@ LocaleItem SystemLocaleManager::GetLocaleItem(const std::string &region,
     std::string regionName = LocaleConfig::GetDisplayRegion(region, localeTag, true);
     if (this->tabooUtils != nullptr) {
         regionName = this->tabooUtils->ReplaceCountryName(region, localeTag, regionName);
-	}
+    }
     LocaleItem item { region, suggestionType, regionName, pseudoProcessedRegion };
     return item;
 }
