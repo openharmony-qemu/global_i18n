@@ -139,6 +139,7 @@ ohos_shared_library("intl_util") {
       ":common_datetime_xml",
       ":common_phonenumber_xml",
       ":config_locales_xml",
+      ":config_locales_old_xml",
       ":dialect_languages_xml",
       ":en_Latn_lang_xml",
       ":en_datetime_xml",
@@ -211,6 +212,13 @@ ohos_prebuilt_para("i18n.para.dac") {
 
 ohos_prebuilt_etc("config_locales_xml") {
   source = "//base/global/i18n/frameworks/intl/etc/supported_locales.xml"
+  module_install_dir = "usr/ohos_locale_config/"
+  part_name = "i18n"
+  subsystem_name = "global"
+}
+
+ohos_prebuilt_etc("config_locales_old_xml") {
+  source = "//base/global/i18n/frameworks/intl/etc/supported_locales_old.xml"
   module_install_dir = "usr/ohos_locale_config/"
   part_name = "i18n"
   subsystem_name = "global"

@@ -51,6 +51,7 @@ ohos_shared_library("i18n") {
   cflags_cc = [ "-frtti" ]
   remove_configs = [ "//build/config/compiler:no_rtti" ]
   sources = [
+    "src/api_version.cpp",
     "src/entity_recognizer_addon.cpp",
     "src/error_util.cpp",
     "src/holiday_manager_addon.cpp",
@@ -70,6 +71,8 @@ ohos_shared_library("i18n") {
     "//base/global/i18n/services:i18n_sa_client",
   ]
   external_deps = [
+    "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",

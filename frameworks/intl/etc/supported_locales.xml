@@ -13,10 +13,7 @@
      limitations under the License.
 -->
 <supported_locales>
-    <item>af-Latn-NA</item>
-    <item>af-Latn-ZA</item>
     <item>agq-Latn-CM</item>
-    <item>ak-Latn-GH</item>
     <item>am-Ethi-ET</item>
     <item>ar-Arab-001</item>
     <item>ar-Arab-AE</item>
@@ -57,12 +54,9 @@
     <item>bem-Latn-ZM</item>
     <item>bez-Latn-TZ</item>
     <item>bg-Cyrl-BG</item>
-    <item>bm-Latn-ML</item>
     <item>bn-Beng-BD</item>
     <item>bn-Beng-IN</item>
     <item>bo-Tibt-CN</item>
-    <item>bo-Tibt-IN</item>
-    <item>br-Latn-FR</item>
     <item>brx-Deva-IN</item>
     <item>bs-Cyrl-BA</item>
     <item>bs-Latn-BA</item>
@@ -72,14 +66,11 @@
     <item>ca-Latn-IT</item>
     <item>ccp-Cakm-BD</item>
     <item>ccp-Cakm-IN</item>
-    <item>ce-Cyrl-RU</item>
     <item>ceb-Latn-PH</item>
     <item>cgg-Latn-UG</item>
-    <item>chr-Cher-US</item>
     <item>ckb-Arab-IQ</item>
     <item>ckb-Arab-IR</item>
     <item>cs-Latn-CZ</item>
-    <item>cy-Latn-GB</item>
     <item>da-Latn-DK</item>
     <item>da-Latn-GL</item>
     <item>dav-Latn-KE</item>
@@ -96,13 +87,12 @@
     <item>dyo-Latn-SN</item>
     <item>dz-Tibt-BT</item>
     <item>ebu-Latn-KE</item>
-    <item>ee-Latn-GH</item>
-    <item>ee-Latn-TG</item>
     <item>el-Grek-CY</item>
     <item>el-Grek-GR</item>
     <item>en-Latn-001</item>
     <item>en-Latn-150</item>
     <item>en-Latn-AE</item>
+    <item>en-Latn-AF</item>
     <item>en-Latn-AG</item>
     <item>en-Latn-AI</item>
     <item>en-Latn-AS</item>
@@ -156,12 +146,12 @@
     <item>en-Latn-LS</item>
     <item>en-Latn-MG</item>
     <item>en-Latn-MH</item>
-    <item>en-Latn-MM</item>
     <item>en-Latn-MO</item>
     <item>en-Latn-MP</item>
     <item>en-Latn-MS</item>
     <item>en-Latn-MT</item>
     <item>en-Latn-MU</item>
+    <item>en-Latn-MV</item>
     <item>en-Latn-MW</item>
     <item>en-Latn-MY</item>
     <item>en-Latn-NA</item>
@@ -190,6 +180,7 @@
     <item>en-Latn-SX</item>
     <item>en-Latn-SZ</item>
     <item>en-Latn-TC</item>
+    <item>en-Latn-TJ</item>
     <item>en-Latn-TK</item>
     <item>en-Latn-TO</item>
     <item>en-Latn-TT</item>
@@ -207,7 +198,6 @@
     <item>en-Latn-ZA</item>
     <item>en-Latn-ZM</item>
     <item>en-Latn-ZW</item>
-    <item>en-Qaag-MM</item>
     <item>en-Qaag-US</item>
     <item>eo-Latn-001</item>
     <item>es-Latn-419</item>
@@ -243,33 +233,13 @@
     <item>ewo-Latn-CM</item>
     <item>fa-Arab-AF</item>
     <item>fa-Arab-IR</item>
-    <item>ff-Adlm-BF</item>
-    <item>ff-Adlm-CM</item>
-    <item>ff-Adlm-GH</item>
-    <item>ff-Adlm-GM</item>
-    <item>ff-Adlm-GN</item>
+    <item>en-Latn-IR</item>
     <item>ff-Adlm-GW</item>
-    <item>ff-Adlm-LR</item>
-    <item>ff-Adlm-MR</item>
-    <item>ff-Adlm-NE</item>
-    <item>ff-Adlm-NG</item>
     <item>ff-Adlm-SL</item>
-    <item>ff-Adlm-SN</item>
-    <item>ff-Latn-BF</item>
-    <item>ff-Latn-CM</item>
-    <item>ff-Latn-GH</item>
-    <item>ff-Latn-GM</item>
-    <item>ff-Latn-GN</item>
     <item>ff-Latn-GW</item>
-    <item>ff-Latn-LR</item>
-    <item>ff-Latn-MR</item>
-    <item>ff-Latn-NE</item>
-    <item>ff-Latn-NG</item>
     <item>ff-Latn-SL</item>
-    <item>ff-Latn-SN</item>
     <item>fi-Latn-FI</item>
     <item>fil-Latn-PH</item>
-    <item>fo-Latn-DK</item>
     <item>fo-Latn-FO</item>
     <item>fr-Latn-BE</item>
     <item>fr-Latn-BF</item>
@@ -318,21 +288,12 @@
     <item>fr-Latn-WF</item>
     <item>fr-Latn-YT</item>
     <item>fur-Latn-IT</item>
-    <item>fy-Latn-NL</item>
-    <item>ga-Latn-GB</item>
-    <item>ga-Latn-IE</item>
-    <item>gd-Latn-GB</item>
     <item>gl-Latn-ES</item>
     <item>gsw-Latn-CH</item>
     <item>gsw-Latn-FR</item>
     <item>gsw-Latn-LI</item>
     <item>gu-Gujr-IN</item>
     <item>guz-Latn-KE</item>
-    <item>gv-Latn-IM</item>
-    <item>ha-Latn-GH</item>
-    <item>ha-Latn-NE</item>
-    <item>ha-Latn-NG</item>
-    <item>haw-Latn-US</item>
     <item>he-Hebr-IL</item>
     <item>hi-Deva-IN</item>
     <item>hr-Latn-BA</item>
@@ -342,7 +303,6 @@
     <item>hy-Armn-AM</item>
     <item>ia-Latn-001</item>
     <item>id-Latn-ID</item>
-    <item>ig-Latn-NG</item>
     <item>ii-Yiii-CN</item>
     <item>is-Latn-IS</item>
     <item>it-Latn-CH</item>
@@ -358,37 +318,23 @@
     <item>kam-Latn-KE</item>
     <item>kde-Latn-TZ</item>
     <item>kea-Latn-CV</item>
-    <item>khq-Latn-ML</item>
-    <item>ki-Latn-KE</item>
     <item>kk-Cyrl-KZ</item>
     <item>kkj-Latn-CM</item>
-    <item>kl-Latn-GL</item>
     <item>kln-Latn-KE</item>
     <item>km-Khmr-KH</item>
     <item>kn-Knda-IN</item>
     <item>ko-Kore-KP</item>
     <item>ko-Kore-KR</item>
     <item>kok-Deva-IN</item>
-    <item>ks-Arab-IN</item>
     <item>ksb-Latn-TZ</item>
     <item>ksf-Latn-CM</item>
     <item>ksh-Latn-DE</item>
-    <item>ku-Latn-TR</item>
-    <item>kw-Latn-GB</item>
-    <item>ky-Cyrl-KG</item>
     <item>lag-Latn-TZ</item>
     <item>lb-Latn-LU</item>
-    <item>lg-Latn-UG</item>
-    <item>lkt-Latn-US</item>
-    <item>ln-Latn-AO</item>
-    <item>ln-Latn-CD</item>
-    <item>ln-Latn-CF</item>
-    <item>ln-Latn-CG</item>
     <item>lo-Laoo-LA</item>
     <item>lrc-Arab-IQ</item>
     <item>lrc-Arab-IR</item>
     <item>lt-Latn-LT</item>
-    <item>lu-Latn-CD</item>
     <item>luo-Latn-KE</item>
     <item>luy-Latn-KE</item>
     <item>lv-Latn-LV</item>
@@ -396,11 +342,8 @@
     <item>mas-Latn-KE</item>
     <item>mas-Latn-TZ</item>
     <item>mer-Latn-KE</item>
-    <item>mfe-Latn-MU</item>
-    <item>mg-Latn-MG</item>
     <item>mgh-Latn-MZ</item>
     <item>mgo-Latn-CM</item>
-    <item>mi-Latn-NZ</item>
     <item>mk-Cyrl-MK</item>
     <item>ml-Mlym-IN</item>
     <item>mn-Cyrl-MN</item>
@@ -410,7 +353,6 @@
     <item>ms-Latn-BN</item>
     <item>ms-Latn-MY</item>
     <item>ms-Latn-SG</item>
-    <item>mt-Latn-MT</item>
     <item>mua-Latn-CM</item>
     <item>my-Mymr-MM</item>
     <item>my-Mymr-ZG</item>
@@ -419,7 +361,6 @@
     <item>naq-Latn-NA</item>
     <item>nb-Latn-NO</item>
     <item>nb-Latn-SJ</item>
-    <item>nd-Latn-ZW</item>
     <item>nds-Latn-DE</item>
     <item>nds-Latn-NL</item>
     <item>ne-Deva-IN</item>
@@ -432,21 +373,13 @@
     <item>nl-Latn-SR</item>
     <item>nl-Latn-SX</item>
     <item>nmg-Latn-CM</item>
-    <item>nn-Latn-NO</item>
     <item>nnh-Latn-CM</item>
     <item>nus-Latn-SS</item>
     <item>nyn-Latn-UG</item>
     <item>om-Latn-ET</item>
-    <item>om-Latn-KE</item>
-    <item>or-Orya-IN</item>
-    <item>os-Cyrl-GE</item>
-    <item>os-Cyrl-RU</item>
-    <item>pa-Arab-PK</item>
     <item>pa-Guru-IN</item>
-    <item>pcm-Latn-NG</item>
     <item>pl-Latn-PL</item>
     <item>ps-Arab-AF</item>
-    <item>ps-Arab-PK</item>
     <item>pt-Latn-AO</item>
     <item>pt-Latn-BR</item>
     <item>pt-Latn-CH</item>
@@ -459,11 +392,6 @@
     <item>pt-Latn-PT</item>
     <item>pt-Latn-ST</item>
     <item>pt-Latn-TL</item>
-    <item>qu-Latn-BO</item>
-    <item>qu-Latn-EC</item>
-    <item>qu-Latn-PE</item>
-    <item>rm-Latn-CH</item>
-    <item>rn-Latn-BI</item>
     <item>ro-Latn-MD</item>
     <item>ro-Latn-RO</item>
     <item>rof-Latn-TZ</item>
@@ -480,27 +408,16 @@
     <item>sat-Latn-IN</item>
     <item>sat-Olck-IN</item>
     <item>sbp-Latn-TZ</item>
-    <item>sd-Arab-PK</item>
-    <item>sd-Deva-IN</item>
     <item>se-Latn-FI</item>
-    <item>se-Latn-NO</item>
-    <item>se-Latn-SE</item>
     <item>seh-Latn-MZ</item>
-    <item>ses-Latn-ML</item>
-    <item>sg-Latn-CF</item>
-    <item>shi-Latn-MA</item>
-    <item>shi-Tfng-MA</item>
     <item>si-Sinh-LK</item>
     <item>sk-Latn-SK</item>
     <item>sl-Latn-SI</item>
     <item>smn-Latn-FI</item>
-    <item>sn-Latn-ZW</item>
-    <item>so-Latn-DJ</item>
     <item>so-Latn-ET</item>
-    <item>so-Latn-KE</item>
     <item>so-Latn-SO</item>
     <item>sq-Latn-AL</item>
-    <item>sq-Latn-MK</item>
+    <item>en-Latn-AL</item>
     <item>sq-Latn-XK</item>
     <item>sr-Cyrl-BA</item>
     <item>sr-Cyrl-ME</item>
@@ -510,37 +427,29 @@
     <item>sr-Latn-ME</item>
     <item>sr-Latn-RS</item>
     <item>sr-Latn-XK</item>
-    <item>su-Latn-ID</item>
     <item>sv-Latn-AX</item>
     <item>sv-Latn-FI</item>
     <item>sv-Latn-SE</item>
-    <item>sw-Latn-CD</item>
-    <item>sw-Latn-KE</item>
     <item>sw-Latn-TZ</item>
-    <item>sw-Latn-UG</item>
     <item>ta-Taml-IN</item>
     <item>ta-Taml-LK</item>
     <item>ta-Taml-MY</item>
-    <item>ta-Taml-SG</item>
     <item>te-Telu-IN</item>
     <item>teo-Latn-KE</item>
     <item>teo-Latn-UG</item>
     <item>tg-Cyrl-TJ</item>
     <item>th-Thai-TH</item>
-    <item>ti-Ethi-ER</item>
     <item>ti-Ethi-ET</item>
+    <item>en-Latn-TM</item>
     <item>tk-Latn-TM</item>
     <item>to-Latn-TO</item>
     <item>tr-Latn-CY</item>
     <item>tr-Latn-TR</item>
-    <item>tt-Cyrl-RU</item>
     <item>twq-Latn-NE</item>
-    <item>tzm-Latn-MA</item>
     <item>ug-Arab-CN</item>
     <item>uk-Cyrl-UA</item>
     <item>ur-Arab-IN</item>
     <item>ur-Arab-PK</item>
-    <item>uz-Arab-AF</item>
     <item>uz-Cyrl-UZ</item>
     <item>uz-Latn-UZ</item>
     <item>vai-Latn-LR</item>
@@ -548,23 +457,14 @@
     <item>vi-Latn-VN</item>
     <item>vun-Latn-TZ</item>
     <item>wae-Latn-CH</item>
-    <item>wo-Latn-SN</item>
-    <item>xh-Latn-ZA</item>
     <item>xog-Latn-UG</item>
     <item>yav-Latn-CM</item>
     <item>yi-Hebr-001</item>
-    <item>yo-Latn-BJ</item>
-    <item>yo-Latn-NG</item>
     <item>yue-Hans-CN</item>
     <item>yue-Hant-HK</item>
-    <item>zgh-Tfng-MA</item>
     <item>zh-Hans-CN</item>
-    <item>zh-Hans-HK</item>
-    <item>zh-Hans-MO</item>
-    <item>zh-Hans-SG</item>
     <item>zh-Hant-HK</item>
     <item>zh-Hant-MO</item>
     <item>zh-Hant-TW</item>
-    <item>zu-Latn-ZA</item>
     <item>zz-Latn-ZX</item>
 </supported_locales>
