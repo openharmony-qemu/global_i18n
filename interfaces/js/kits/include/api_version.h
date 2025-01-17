@@ -22,10 +22,16 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
+enum ApiCompareResult {
+    INVALID_PARAM = -2,
+    SYS_ERROR = -1,
+    LESS_THAN = 0,
+    GREATER_THAN = 1
+};
 
 class ApiVersion {
 public:
-    static bool CheckApiTargetVersion(const std::string &apiName);
+    static ApiCompareResult CheckApiTargetVersion(const std::string &apiName);
 
 private:
     static std::unordered_map<std::string, int32_t> versionMap;

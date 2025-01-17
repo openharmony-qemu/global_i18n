@@ -556,6 +556,12 @@ napi_value I18nSystemAddon::GetSystemCountriesImpl(napi_env env, napi_callback_i
     return result;
 }
 
+bool I18nSystemAddon::GetApiCheckResult()
+{
+    ApiCompareResult result = ApiVersion::CheckApiTargetVersion("isSuggested");
+    return result == ApiCompareResult::GREATER_THAN;
+}
+
 napi_value I18nSystemAddon::IsSuggestedImpl(napi_env env, napi_callback_info info, bool throwError)
 {
     // Need to get two parameters to check is suggested or not.
@@ -578,7 +584,7 @@ napi_value I18nSystemAddon::IsSuggestedImpl(napi_env env, napi_callback_info inf
         return nullptr;
     }
     bool isSuggested = false;
-    bool api16 = ApiVersion::CheckApiTargetVersion("isSuggested");
+    bool api16 = GetApiCheckResult();
     if (VariableConvertor::CheckNapiIsNull(env, argv[1])) {
         std::string region = VariableConvertor::GetString(env, argv[1], code);
         if (code != 0) {
@@ -602,9 +608,8 @@ bool I18nSystemAddon::IsSuggestedByApiVersion(const std::string &language, bool 
 {
     if (newApi) {
         return LocaleConfig::IsSuggested(language);
-    } else {
-        return LocaleConfig::IsSuggestedV15(language);
     }
+    return LocaleConfig::IsSuggestedV15(language);
 }
 
 bool I18nSystemAddon::IsSuggestedByApiVersion(const std::string &language,
@@ -612,9 +617,8 @@ bool I18nSystemAddon::IsSuggestedByApiVersion(const std::string &language,
 {
     if (newApi) {
         return LocaleConfig::IsSuggested(language, region);
-    } else {
-        return LocaleConfig::IsSuggestedV15(language, region);
     }
+    return LocaleConfig::IsSuggestedV15(language, region);
 }
 
 napi_value I18nSystemAddon::SetSystemLanguageImpl(napi_env env, napi_callback_info info, bool throwError)
