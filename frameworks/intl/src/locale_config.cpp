@@ -575,7 +575,8 @@ bool LocaleConfig::IsSuggestedV15(const string &language)
     vector<string> simCountries;
     GetCountriesFromSim(simCountries);
     GetRelatedLocalesV15(relatedLocales, simCountries);
-    for (auto iter = relatedLocales.begin(); iter != relatedLocales.end();) {
+    auto iter = relatedLocales.begin();
+    while (iter != relatedLocales.end()) {
         if (extendWhiteLanguageListV15.find(*iter) == extendWhiteLanguageListV15.end()) {
             iter = relatedLocales.erase(iter);
         } else {
@@ -591,7 +592,8 @@ bool LocaleConfig::IsSuggestedV15(const std::string &language, const std::string
     unordered_set<string> relatedLocales;
     vector<string> countries { region };
     GetRelatedLocalesV15(relatedLocales, countries);
-    for (auto iter = relatedLocales.begin(); iter != relatedLocales.end();) {
+    auto iter = relatedLocales.begin();
+    while (iter != relatedLocales.end()) {
         if (extendWhiteLanguageListV15.find(*iter) == extendWhiteLanguageListV15.end()) {
             iter = relatedLocales.erase(iter);
         } else {

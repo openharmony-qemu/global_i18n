@@ -34,13 +34,13 @@ ApiCompareResult ApiVersion::CheckApiTargetVersion(const std::string &apiName)
 {
     auto iter = versionMap.find(apiName);
     if (iter == versionMap.end()) {
-        HILOG_INFO_I18N("CheckApiTargetVersion: invalid api name: %{public}s", apiName.c_str());
+        HILOG_ERROR_I18N("CheckApiTargetVersion: invalid api name: %{public}s", apiName.c_str());
         return ApiCompareResult::INVALID_PARAM;
     }
     int32_t version = iter->second;
     int32_t currentVersion = InitSystemApiVersion();
     if (currentVersion == 0) {
-        HILOG_INFO_I18N("CheckApiTargetVersion: get api target version is 0.");
+        HILOG_ERROR_I18N("CheckApiTargetVersion: get api target version is 0.");
         return ApiCompareResult::SYS_ERROR;
     }
     return currentVersion >= version ? ApiCompareResult::GREATER_THAN : ApiCompareResult::LESS_THAN;
@@ -66,6 +66,10 @@ int32_t ApiVersion::InitSystemApiVersion()
 int32_t ApiVersion::GetApiTargetVersion()
 {
     auto saManager = OHOS::SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (saManager == nullptr) {
+        HILOG_ERROR_I18N("GetApiTargetVersion: saManager is nullptr");
+        return 0;
+    }
     OHOS::sptr<OHOS::IRemoteObject> remoteObject =
         saManager->GetSystemAbility(OHOS::BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
     OHOS::sptr<OHOS::AppExecFwk::IBundleMgr> bundleMgrProxy =
