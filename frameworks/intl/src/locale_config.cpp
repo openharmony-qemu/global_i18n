@@ -104,7 +104,6 @@ unordered_map<string, unordered_set<string>> LocaleConfig::blockedLanguageRegion
 unordered_set<string> LocaleConfig::whiteLanguages;
 std::set<std::string> LocaleConfig::extendWhiteLanguageList;
 std::set<std::string> LocaleConfig::extendWhiteLanguageListV15;
-std::set<int32_t> LocaleConfig::userIds;
 std::mutex LocaleConfig::tabooUtilsMutex;
 unordered_map<string, string> LocaleConfig::dialectMap {
     { "es-Latn-419", "es-Latn-419" },
