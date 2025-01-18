@@ -399,6 +399,7 @@ string LocaleConfig::GetSystemRegion()
         systemRegion = GetCountry(DEFAULT_LOCALE_KEY);
     }
     if (systemRegion.empty()) {
+        HILOG_INFO_I18N("GetSystemRegion: system region is empty.");
         return "CN";
     }
     return systemRegion;
@@ -1377,10 +1378,7 @@ bool LocaleConfig::GetUsingLocalDigit()
         return false;
     }
     std::string localNumberSystem = localDigitMap.at(language);
-    if (localNumberSystem.compare(localeInfo.GetNumberingSystem()) != 0) {
-        return false;
-    }
-    return true;
+    return localNumberSystem.compare(localeInfo.GetNumberingSystem()) == 0;
 }
 
 std::unordered_set<std::string> LocaleConfig::GetBlockedLanguages()
@@ -1421,10 +1419,7 @@ I18nErrorCode LocaleConfig::SetSystemLanguage(const std::string &languageTag, in
     std::string newLocaleTag = UpdateLanguageOfLocale(languageTag);
     if (SetSystemLocale(newLocaleTag, userId) == I18nErrorCode::SUCCESS) {
 #ifdef SUPPORT_MULTI_USER
-        std::string localId;
-        if (userId != -1) {
-            localId = std::to_string(userId);
-        }
+        std::string localId = (userId != -1) ? std::to_string(userId) : "";
         MultiUsers::SaveLanguage(localId, languageTag);
 #endif
         return I18nErrorCode::SUCCESS;
@@ -1467,10 +1462,7 @@ I18nErrorCode LocaleConfig::SetSystemLocale(const std::string &localeTag, int32_
         return I18nErrorCode::UPDATE_SYSTEM_LOCALE_FAILED;
     }
 #ifdef SUPPORT_MULTI_USER
-    std::string localId;
-    if (userId != -1) {
-        localId = std::to_string(userId);
-    }
+    std::string localId = (userId != -1) ? std::to_string(userId) : "";
     MultiUsers::SaveLocale(localId, localeTag);
 #endif
 #ifdef SUPPORT_GRAPHICS
@@ -1483,10 +1475,7 @@ I18nErrorCode LocaleConfig::SetSystemLocale(const std::string &localeTag, int32_
 
 bool LocaleConfig::IsValid24HourClockValue(const std::string &tag)
 {
-    if (tag.compare("true") == 0 || tag.compare("false") == 0 || tag.compare("default") == 0) {
-        return true;
-    }
-    return false;
+    return (tag.compare("true") == 0 || tag.compare("false") == 0 || tag.compare("default") == 0);
 }
 
 I18nErrorCode LocaleConfig::Set24HourClock(const std::string &option, int32_t userId)
@@ -1613,12 +1602,12 @@ WeekDay LocaleConfig::GetFirstDayOfWeek()
     }
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale tempLocale = icu::Locale::forLanguageTag(localeTag, status);
-    if ((U_FAILURE(status))) {
+    if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("LocaleConfig::GetFirstDayOfWeek: create icu::Locale failed.");
         return WeekDay::MON;
     }
     icu::Calendar* calendar = icu::Calendar::createInstance(tempLocale, status);
-    if ((U_FAILURE(status))) {
+    if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("LocaleConfig::GetFirstDayOfWeek: create icu::Calendar failed.");
         return WeekDay::MON;
     }

@@ -613,11 +613,14 @@ HWTEST_F(IntlTest, IntlFuncTest0016, TestSize.Level1)
     vector<string> locales;
     locales.push_back("en-US");
     map<string, string> inputOptions;
-    Collator *collator = new Collator(locales, inputOptions);
+    std::unique_ptr<Collator> collator = std::make_unique<Collator>(locales, inputOptions);
     const string param1 = "abc";
     const string param2 = "cba";
     CompareResult result = collator->Compare(param1, param2);
     EXPECT_EQ(result, CompareResult::SMALLER);
+    vector<string> localeVec;
+    localeVec.push_back("en-US-u-co-$$@");
+    std::unique_ptr<Collator> collatorPtr = std::make_unique<Collator>(localeVec, inputOptions);
     
     map<string, string> options;
     collator->ResolvedOptions(options);
@@ -654,7 +657,6 @@ HWTEST_F(IntlTest, IntlFuncTest0016, TestSize.Level1)
     if (it != options.end()) {
         EXPECT_EQ(it->second, "default");
     }
-    delete collator;
 }
 
 /**
@@ -713,7 +715,7 @@ HWTEST_F(IntlTest, IntlFuncTest0018, TestSize.Level1)
 {
     // normal test case
     vector<string> locales;
-    locales.push_back("zh-Hans");
+    locales.push_back("zh-Hans-u-co-pinyin");
     locales.push_back("en-US");
     map<string, string> inputOptions = {
         { "ignorePunctuation", "true" },

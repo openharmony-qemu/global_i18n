@@ -19,7 +19,6 @@
 #include "unicode/locid.h"
 #include "string"
 #include "unicode/unistr.h"
-#include "unicode/utypes.h"
 #include "vector"
 
 namespace OHOS {
@@ -53,7 +52,7 @@ std::vector<std::string> IndexUtil::GetIndexList()
 {
     UErrorCode status = U_ZERO_ERROR;
     std::vector<std::string> indexList;
-    if (!createSuccess) {
+    if (!IsCreateSuccess()) {
         return indexList;
     }
     index->resetBucketIterator(status);
@@ -79,19 +78,19 @@ void IndexUtil::AddLocale(const std::string &localeTag)
 
 std::string IndexUtil::GetIndex(const std::string &String)
 {
-    if (!createSuccess) {
+    if (!IsCreateSuccess()) {
         return "";
     }
     UErrorCode status = U_ZERO_ERROR;
     icu::UnicodeString unicodeString(String.c_str());
     int32_t bucketNumber = index->getBucketIndex(unicodeString, status);
-    if (!U_SUCCESS(status)) {
+    if (!IsStatusSuccess(status)) {
         return "";
     }
     index->resetBucketIterator(status);
     for (int32_t i = 0; i <= bucketNumber; i++) {
         index->nextBucket(status);
-        if (!U_SUCCESS(status)) {
+        if (!IsStatusSuccess(status)) {
             return "";
         }
     }
@@ -99,6 +98,16 @@ std::string IndexUtil::GetIndex(const std::string &String)
     std::string result;
     label.toUTF8String(result);
     return result;
+}
+
+bool IndexUtil::IsCreateSuccess()
+{
+    return createSuccess;
+}
+
+bool IndexUtil::IsStatusSuccess(UErrorCode status)
+{
+    return U_SUCCESS(status);
 }
 } // namespace I18n
 } // namespace Global

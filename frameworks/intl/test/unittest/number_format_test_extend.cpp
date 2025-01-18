@@ -397,6 +397,149 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0059, TestSize.Level1)
     ASSERT_TRUE(numFmtMY != nullptr);
     EXPECT_EQ(numFmtMY->Format(123), "တစ်မိနစ်လျှင် 123 ချက်");
 }
+
+/**
+ * @tc.name: NumberFormatFuncTest0060
+ * @tc.desc: Test Intl NumberFormat.format
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0060, TestSize.Level1)
+{
+    std::vector<std::string> localeTags = { "$$@@#" };
+    std::map<std::string, std::string> configs = {
+        {"style", "unit"}, {"unit", "fake unit"}
+    };
+    NumberFormat formatter(localeTags, configs);
+    std::string res = formatter.Format(12);
+    EXPECT_EQ(res, "12");
+    localeTags = { "zh-Hans-u-nu-latn" };
+    NumberFormat* format = new (std::nothrow) NumberFormat(localeTags, configs);
+    EXPECT_EQ(res, format->Format(12));
+    delete format;
+
+    string locale = "en-CN";
+    string expects = "123K";
+    vector<string> locales;
+    locales.push_back(locale);
+    string style = "decimal";
+    map<string, string> options = { { "style", style },
+                                    { "notation", "compact" } };
+    NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
+    if (!numFmt) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    string out = numFmt->Format(123456.789);
+    EXPECT_EQ(out, expects);
+    EXPECT_EQ(numFmt->GetStyle(), style);
+    delete numFmt;
+
+    locale = "en-GB";
+    locales.clear();
+    locales.push_back(locale);
+    options = { { "style", "unit" },
+                { "unit", "day" },
+                { "unitUsage", "elapsed-time-second"} };
+    NumberFormat *numFormat = new (std::nothrow) NumberFormat(locales, options);
+    ASSERT_TRUE(numFormat != nullptr);
+    std::string nowRes = numFormat->Format(0.00001);
+    std::string secondRes = numFormat->Format(0.00004);
+    std::string dayRes = numFormat->Format(1.5);
+    std::string monthRes = numFormat->Format(-62.5);
+
+    EXPECT_EQ(nowRes, "now");
+    EXPECT_EQ(secondRes, "3 seconds ago");
+    EXPECT_EQ(dayRes, "yesterday");
+    EXPECT_EQ(monthRes, "2 months ago");
+    delete numFormat;
+}
+
+/**
+ * @tc.name: NumberFormatFuncTest0061
+ * @tc.desc: Test Intl NumberFormat.format
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0061, TestSize.Level1)
+{
+    int bufferLen = 10;
+    char value[bufferLen];
+    vector<string> locales;
+    locales.push_back("en-GB");
+    int code = GetParameter("const.product.devicetype", "", value, bufferLen);
+    std::string deviceType;
+    if (code > 0) {
+        deviceType = value;
+    }
+    map<string, string> unitOptions = {
+        { "style", "unit" },
+        { "unit", "hectare" }
+    };
+    NumberFormat *unitFormatter = new NumberFormat(locales, unitOptions);
+    string unitRes = unitFormatter->Format(123);
+    map<string, string> currencyOptions = {
+        { "style", "currency" },
+        { "currency", "USD" }
+    };
+    NumberFormat *currencyFormatter = new NumberFormat(locales, currencyOptions);
+    string currencyRes = currencyFormatter->Format(123);
+    if (deviceType == "wearable" || deviceType == "liteWearable" || deviceType == "watch") {
+        EXPECT_EQ(currencyRes, "$123.00");
+        EXPECT_EQ(unitRes, "123ha");
+    } else if (deviceType == "tablet" || deviceType == "2in1" || deviceType == "tv" || deviceType == "pc") {
+        EXPECT_EQ(currencyRes, "US$123.00");
+        EXPECT_EQ(unitRes, "123 hectares");
+    } else {
+        EXPECT_EQ(currencyRes, "US$123.00");
+        EXPECT_EQ(unitRes, "123 ha");
+    }
+    delete unitFormatter;
+    delete currencyFormatter;
+}
+
+/**
+ * @tc.name: NumberFormatFuncTest0062
+ * @tc.desc: Test Intl NumberFormat.format
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0062, TestSize.Level1)
+{
+    std::string locale = "en-GB";
+    std::vector<std::string> locales;
+    locales.push_back(locale);
+    map<string, string> options = { { "style", "unit" },
+                                    { "unit", "megabyte" },
+                                    { "unitUsage", "size-file-byte"} };
+    NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
+    ASSERT_TRUE(numFmt != nullptr);
+    std::string byteRes = numFmt->Format(0.00000812);
+    std::string kbRes = numFmt->Format(0.125);
+    std::string mbRes = numFmt->Format(3.5);
+    std::string gbRes = numFmt->Format(23122);
+
+    EXPECT_EQ(byteRes, "8 byte");
+    EXPECT_EQ(kbRes, "125 kB");
+    EXPECT_EQ(mbRes, "3.50 MB");
+    EXPECT_EQ(gbRes, "23.12 GB");
+    delete numFmt;
+
+    locales.clear();
+    locales.push_back(locale);
+    options = { { "style", "unit" },
+                { "unit", "megabyte" },
+                { "unitUsage", "size-shortfile-byte"} };
+    NumberFormat *numFormat = new (std::nothrow) NumberFormat(locales, options);
+    ASSERT_TRUE(numFormat != nullptr);
+    byteRes = numFormat->Format(0.00000812);
+    kbRes = numFormat->Format(0.125);
+    mbRes = numFormat->Format(3.5);
+    gbRes = numFormat->Format(23122);
+
+    EXPECT_EQ(byteRes, "8 byte");
+    EXPECT_EQ(kbRes, "125 kB");
+    EXPECT_EQ(mbRes, "3.5 MB");
+    EXPECT_EQ(gbRes, "23 GB");
+    delete numFormat;
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

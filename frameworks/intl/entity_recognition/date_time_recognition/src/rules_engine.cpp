@@ -53,12 +53,12 @@ std::vector<MatchedDateTimeInfo> RulesEngine::Match(icu::UnicodeString& message)
         icu::UnicodeString regex = this->patterns[key];
         icu::RegexPattern* pattern = icu::RegexPattern::compile(regex,
             URegexpFlag::UREGEX_CASE_INSENSITIVE, status);
-        if (pattern == nullptr || U_FAILURE(status)) {
+        if (IsRegexPatternInvalid(pattern) || U_FAILURE(status)) {
             HILOG_ERROR_I18N("Match failed because pattern is nullptr.");
             return matches;
         }
         icu::RegexMatcher* matcher = pattern->matcher(message, status);
-        if (matcher == nullptr) {
+        if (IsRegexMatcherInvalid(matcher)) {
             HILOG_ERROR_I18N("Match failed because pattern matcher failed.");
             delete pattern;
             return matches;
@@ -99,15 +99,15 @@ bool RulesEngine::InitRules(std::string& rulesValue)
         return false;
     }
     icu::RegexPattern* pattern = dateTimeRule->GetPatternByKey("rules");
-    if (pattern == nullptr) {
+    if (IsRegexPatternInvalid(pattern)) {
         HILOG_ERROR_I18N("InitRules failed because pattern is nullptr.");
-        return isVaild;
+        return false;
     }
     UErrorCode status = U_ZERO_ERROR;
     if (param.size() != 0 || paramBackup.size() != 0) {
         icu::UnicodeString rules = rulesValue.c_str();
         icu::RegexMatcher* matcher = pattern->matcher(rules, status);
-        if (matcher == nullptr) {
+        if (IsRegexMatcherInvalid(matcher)) {
             HILOG_ERROR_I18N("InitRules failed because pattern matcher failed.");
             return false;
         }
@@ -145,13 +145,13 @@ std::string RulesEngine::InitOptRules(std::string& rule)
         return rulesValue;
     }
     icu::RegexPattern* pattern = dateTimeRule->GetPatternByKey("optrules");
-    if (pattern == nullptr) {
+    if (IsRegexPatternInvalid(pattern)) {
         HILOG_ERROR_I18N("InitOptRules failed because pattern is nullptr.");
         return rulesValue;
     }
     if (param.size() != 0 || paramBackup.size() != 0) {
         icu::RegexMatcher* matcher = pattern->matcher(matchedStr, status);
-        if (matcher == nullptr) {
+        if (IsRegexMatcherInvalid(matcher)) {
             HILOG_ERROR_I18N("InitOptRules failed because pattern matcher failed.");
             return rulesValue;
         }
@@ -192,13 +192,13 @@ std::string RulesEngine::InitSubRules(std::string& rule)
     icu::UnicodeString matchedStr = rule.c_str();
     UErrorCode status = U_ZERO_ERROR;
     icu::RegexPattern* pattern = dateTimeRule->GetPatternByKey("subrules");
-    if (pattern == nullptr) {
+    if (IsRegexPatternInvalid(pattern)) {
         HILOG_ERROR_I18N("InitSubRules failed because pattern is nullptr.");
         return rulesValue;
     }
     if (subRules.size() != 0) {
         icu::RegexMatcher* matcher = pattern->matcher(matchedStr, status);
-        if (matcher == nullptr) {
+        if (IsRegexMatcherInvalid(matcher)) {
             HILOG_ERROR_I18N("InitSubRules failed because pattern matcher failed.");
             return rulesValue;
         }
@@ -215,6 +215,16 @@ std::string RulesEngine::InitSubRules(std::string& rule)
         delete matcher;
     }
     return rulesValue;
+}
+
+bool RulesEngine::IsRegexPatternInvalid(icu::RegexPattern* pattern)
+{
+    return pattern == nullptr;
+}
+
+bool RulesEngine::IsRegexMatcherInvalid(icu::RegexMatcher* matcher)
+{
+    return matcher == nullptr;
 }
 } // namespace I18n
 } // namespace Global

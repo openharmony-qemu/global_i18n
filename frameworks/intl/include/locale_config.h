@@ -31,6 +31,7 @@
 #include "unicode/calendar.h"
 #include "locale_info.h"
 #include "unicode/locid.h"
+#include "unicode/utypes.h"
 
 namespace OHOS {
 namespace Global {

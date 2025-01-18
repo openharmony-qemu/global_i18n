@@ -272,11 +272,8 @@ void CodeRule::StartWithBrackets(icu::UnicodeString& number)
         icu::UnicodeString extraStr = number.tempSubString(neind);
         int extra = CountDigits(extraStr);
         // 4 is the number of numbers in parentheses, 1 and 2 are the number of numbers outside parentheses.
-        if ((phoneLength > 4) && (extra == 1 || extra == 2)) {
-            number = number.tempSubString(1, neind - 1);
-        } else {
-            number = number.tempSubString(1);
-        }
+        bool flag = (phoneLength > 4) && (extra == 1 || extra == 2);
+        number = flag ? number.tempSubString(1, neind - 1) : number.tempSubString(1);
     } else {
         number = number.tempSubString(1);
     }

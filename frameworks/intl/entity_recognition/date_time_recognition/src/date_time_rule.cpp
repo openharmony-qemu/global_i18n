@@ -396,11 +396,6 @@ std::unordered_map<std::string, std::string> DateTimeRule::GetParamBackup()
     return paramBackup;
 }
 
-std::unordered_map<std::string, icu::RegexPattern*> DateTimeRule::GetPatternsMap()
-{
-    return patternsMap;
-}
-
 icu::RegexPattern* DateTimeRule::GetPatternByKey(const std::string& key)
 {
     if (patternsMap.find(key) != patternsMap.end()) {

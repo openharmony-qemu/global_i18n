@@ -47,8 +47,12 @@ class RulesEngine {
 public:
     RulesEngine();
     RulesEngine(DateTimeRule* dateTimeRule, RulesSet& rulesSet);
-    ~RulesEngine();
+    virtual ~RulesEngine();
     std::vector<MatchedDateTimeInfo> Match(icu::UnicodeString& message);
+
+protected:
+    virtual bool IsRegexPatternInvalid(icu::RegexPattern* pattern);
+    virtual bool IsRegexMatcherInvalid(icu::RegexMatcher* matcher);
     
 private:
     void Init();

@@ -26,9 +26,6 @@ FindRule::FindRule(icu::UnicodeString& regex, std::string& insensitive)
     if (regex.length() == 0) {
         return;
     }
-    if (U_FAILURE(this->status)) {
-        HILOG_ERROR_I18N("member pattern construct failed.");
-    }
 }
 
 icu::RegexPattern* FindRule::GetPattern()

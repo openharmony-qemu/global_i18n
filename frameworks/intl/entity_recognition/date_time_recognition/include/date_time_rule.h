@@ -42,7 +42,6 @@ public:
     std::unordered_map<std::string, std::string> GetPastRules();
     std::unordered_map<std::string, std::string> GetParam();
     std::unordered_map<std::string, std::string> GetParamBackup();
-    std::unordered_map<std::string, icu::RegexPattern*> GetPatternsMap();
     int CompareLevel(std::string& key1, std::string& key2);
     std::string Get(std::unordered_map<std::string, std::string>& param, std::string& ruleName);
     std::string GetLocale();

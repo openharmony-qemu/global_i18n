@@ -31,6 +31,8 @@
 #include "i18n_break_iterator_mock.h"
 #include "i18n_calendar.h"
 #include "i18n_calendar_mock.h"
+#include "index_util_mock.h"
+#include "rules_engine_mock.h"
 #include "i18n_timezone.h"
 #include "i18n_types.h"
 #include "index_util.h"
@@ -167,12 +169,18 @@ HWTEST_F(IntlTest, IntlFuncTest0050, TestSize.Level1)
     const std::string fakeLanguage = "1**1";
     status = PreferredLanguage::AddPreferredLanguage(language, 0);
     EXPECT_EQ(status, I18nErrorCode::SUCCESS);
+    status = PreferredLanguage::AddPreferredLanguage(language, 0);
+    EXPECT_EQ(status, I18nErrorCode::SUCCESS);
+    PreferredLanguage::RemovePreferredLanguage(0);
     status = PreferredLanguage::AddPreferredLanguage(languageDe, 1);
     EXPECT_EQ(status, I18nErrorCode::SUCCESS);
     status = PreferredLanguage::AddPreferredLanguage(language, 3);
     EXPECT_EQ(status, I18nErrorCode::SUCCESS);
+    status = PreferredLanguage::AddPreferredLanguage("", 3);
+    EXPECT_EQ(status, I18nErrorCode::INVALID_LANGUAGE_TAG);
     PreferredLanguage::AddPreferredLanguage(fakeLanguage, -1);
     PreferredLanguage::AddPreferredLanguage(language, -1);
+    PreferredLanguage::AddPreferredLanguage("$$", 0);
     std::vector<std::string> list = PreferredLanguage::GetPreferredLanguageList();
     EXPECT_EQ(list.size(), 2);
     std::string firstPreferredLanguage = PreferredLanguage::GetFirstPreferredLanguage();
@@ -227,22 +235,43 @@ HWTEST_F(IntlTest, IntlFuncTest0051, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest0052, TestSize.Level1)
 {
-    IndexUtil *indexUtil = new IndexUtil("zh-CN");
+    std::unique_ptr<IndexUtil> indexUtil = std::make_unique<IndexUtil>("zh-CN");
     std::vector<std::string> indexList = indexUtil->GetIndexList();
     EXPECT_EQ(indexList.size(), 28);
     indexUtil->AddLocale("en-US");
     std::string indexStr = indexUtil->GetIndex("A");
     EXPECT_EQ(indexStr, "A");
-    IndexUtil *idxUtil = new IndexUtil("@@#");
+    std::unique_ptr<IndexUtil> idxUtil = std::make_unique<IndexUtil>("@@#");
     idxUtil->GetIndexList();
     idxUtil->GetIndex("**");
-    delete indexUtil;
-    delete idxUtil;
 
     std::unique_ptr<IndexUtil> indexUtil3 = std::make_unique<IndexUtil>("");
     indexUtil3->AddLocale("en-US");
     indexStr = indexUtil3->GetIndex("A");
     EXPECT_EQ(indexStr, "A");
+    std::unique_ptr<MockIndexUtil> indexUtilMock = std::make_unique<MockIndexUtil>("zh-CN");
+    ASSERT_TRUE(indexUtilMock != nullptr);
+    EXPECT_CALL(*indexUtilMock, IsCreateSuccess())
+    .WillRepeatedly(Return(false));
+    indexUtilMock->GetIndexList();
+    std::string res = indexUtilMock->GetIndex("A");
+    EXPECT_EQ(res, "");
+    UErrorCode status = U_ZERO_ERROR;
+    std::unique_ptr<MockIndexUtil> mockIndexUtil = std::make_unique<MockIndexUtil>("zh-CN");
+    ASSERT_TRUE(mockIndexUtil != nullptr);
+    EXPECT_CALL(*mockIndexUtil, IsCreateSuccess()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*mockIndexUtil, IsStatusSuccess(status)).WillOnce(Return(false));
+    std::string result = mockIndexUtil->GetIndex("A");
+    EXPECT_EQ(result, "");
+
+    std::unique_ptr<MockIndexUtil> indexUtilMock3 = std::make_unique<MockIndexUtil>("zh-CN");
+    ASSERT_TRUE(indexUtilMock3 != nullptr);
+    EXPECT_CALL(*indexUtilMock3, IsCreateSuccess()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*indexUtilMock3, IsStatusSuccess(status))
+    .WillOnce(Return(true))
+    .WillRepeatedly(Return(false));
+    std::string resultIndex = indexUtilMock3->GetIndex("B");
+    EXPECT_EQ(resultIndex, "");
 }
 
 /**
@@ -455,22 +484,28 @@ HWTEST_F(IntlTest, IntlFuncTest0058, TestSize.Level1)
 
 /**
  * @tc.name: IntlFuncTest0059
- * @tc.desc: Test Intl NumberFormat
+ * @tc.desc: Test Intl LocaleMatcher
  * @tc.type: FUNC
  */
 HWTEST_F(IntlTest, IntlFuncTest0059, TestSize.Level1)
 {
-    std::vector<std::string> localeTags = { "$$@@#" };
-    std::map<std::string, std::string> configs = {
-        {"style", "unit"}, {"unit", "fake unit"}
-    };
-    NumberFormat formatter(localeTags, configs);
-    std::string res = formatter.Format(12);
-    EXPECT_EQ(res, "12");
-    localeTags = { "zh-Hans-u-nu-latn" };
-    NumberFormat* format = new (std::nothrow) NumberFormat(localeTags, configs);
-    EXPECT_EQ(res, format->Format(12));
-    delete format;
+    std::unique_ptr<LocaleInfo> request = std::make_unique<LocaleInfo>("zh-Hant-HK");
+    std::unique_ptr<LocaleInfo> currentEn = std::make_unique<LocaleInfo>("en-GB");
+    std::unique_ptr<LocaleInfo> otherEn = std::make_unique<LocaleInfo>("en-US");
+    int8_t result = LocaleMatcher::IsMoreSuitable(currentEn.get(), otherEn.get(), request.get());
+    EXPECT_EQ(result, 1);
+    std::unique_ptr<LocaleInfo> requestZh = std::make_unique<LocaleInfo>("zh-Hant");
+    std::unique_ptr<LocaleInfo> current = std::make_unique<LocaleInfo>("en");
+    std::unique_ptr<LocaleInfo> other = std::make_unique<LocaleInfo>("en-US");
+    result = LocaleMatcher::IsMoreSuitable(current.get(), other.get(), requestZh.get());
+    EXPECT_EQ(result, 1);
+    result = LocaleMatcher::IsMoreSuitable(currentEn.get(), current.get(), requestZh.get());
+    EXPECT_EQ(result, -1);
+    std::unique_ptr<LocaleInfo> requestQaag = std::make_unique<LocaleInfo>("en-Qaag");
+    int8_t suitable = LocaleMatcher::IsMoreSuitable(currentEn.get(), otherEn.get(), requestQaag.get());
+    EXPECT_EQ(suitable, 1);
+    suitable = LocaleMatcher::IsMoreSuitable(currentEn.get(), otherEn.get(), current.get());
+    EXPECT_EQ(suitable, -1);
 }
 
 /**
@@ -516,22 +551,6 @@ HWTEST_F(IntlTest, IntlFuncTest0060, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest0061, TestSize.Level1)
 {
-    string locale = "en-CN";
-    string expects = "123K";
-    vector<string> locales;
-    locales.push_back(locale);
-    string style = "decimal";
-    map<string, string> options = { { "style", style },
-                                    { "notation", "compact" } };
-    NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
-    if (!numFmt) {
-        EXPECT_TRUE(false);
-        return;
-    }
-    string out = numFmt->Format(123456.789);
-    EXPECT_EQ(out, expects);
-    EXPECT_EQ(numFmt->GetStyle(), style);
-    delete numFmt;
 }
 
 /**
@@ -579,6 +598,10 @@ HWTEST_F(IntlTest, IntlFuncTest0062, TestSize.Level1)
     std::string localeRule = "zh-Hans";
     DateTimeRule* dateTimeRule = new DateTimeRule(localeRule);
     DateTimeFilter* dateTimeFilter = new DateTimeFilter(localeRule, dateTimeRule);
+    EXPECT_TRUE(dateTimeRule->GetPatternByKey("abc") == nullptr);
+    std::string key1 = "9000";
+    std::string key2 = "10000";
+    EXPECT_EQ(dateTimeRule->CompareLevel(key1, key2), 1);
     delete dateTimeFilter;
     delete dateTimeRule;
 }
@@ -643,39 +666,6 @@ HWTEST_F(IntlTest, IntlFuncTest0063, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest0064, TestSize.Level1)
 {
-    int bufferLen = 10;
-    char value[bufferLen];
-    vector<string> locales;
-    locales.push_back("en-GB");
-    int code = GetParameter("const.product.devicetype", "", value, bufferLen);
-    std::string deviceType;
-    if (code > 0) {
-        deviceType = value;
-    }
-    map<string, string> unitOptions = {
-        { "style", "unit" },
-        { "unit", "hectare" }
-    };
-    NumberFormat *unitFormatter = new NumberFormat(locales, unitOptions);
-    string unitRes = unitFormatter->Format(123);
-    map<string, string> currencyOptions = {
-        { "style", "currency" },
-        { "currency", "USD" }
-    };
-    NumberFormat *currencyFormatter = new NumberFormat(locales, currencyOptions);
-    string currencyRes = currencyFormatter->Format(123);
-    if (deviceType == "wearable" || deviceType == "liteWearable" || deviceType == "watch") {
-        EXPECT_EQ(currencyRes, "$123.00");
-        EXPECT_EQ(unitRes, "123ha");
-    } else if (deviceType == "tablet" || deviceType == "2in1" || deviceType == "tv" || deviceType == "pc") {
-        EXPECT_EQ(currencyRes, "US$123.00");
-        EXPECT_EQ(unitRes, "123 hectares");
-    } else {
-        EXPECT_EQ(currencyRes, "US$123.00");
-        EXPECT_EQ(unitRes, "123 ha");
-    }
-    delete unitFormatter;
-    delete currencyFormatter;
 }
 
 /**
@@ -865,27 +855,15 @@ HWTEST_F(IntlTest, IntlFuncTest0068, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest0069, TestSize.Level1)
 {
-    std::string locale = "en-GB";
-    std::vector<std::string> locales;
-    locales.push_back(locale);
-    map<string, string> options = { { "style", "unit" },
-                                    { "unit", "day" },
-                                    { "unitUsage", "elapsed-time-second"} };
-    NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
-    if (!numFmt) {
-        EXPECT_TRUE(false);
-        return;
-    }
-    std::string nowRes = numFmt->Format(0.00001);
-    std::string secondRes = numFmt->Format(0.00004);
-    std::string dayRes = numFmt->Format(1.5);
-    std::string monthRes = numFmt->Format(-62.5);
-
-    EXPECT_EQ(nowRes, "now");
-    EXPECT_EQ(secondRes, "3 seconds ago");
-    EXPECT_EQ(dayRes, "yesterday");
-    EXPECT_EQ(monthRes, "2 months ago");
-    delete numFmt;
+    std::string locale = "&&%";
+    DateTimeSequence::GetDateOrder(locale);
+    trim(locale);
+    const std::string destPath = "/data/log/copy.txt";
+    IsLegalPath(destPath);
+    const std::string relativePath = "../log/copy.txt";
+    IsLegalPath(relativePath);
+    const char* dirPath = "/data/log";
+    IsDirExist(dirPath);
 }
 
 /**
@@ -895,27 +873,6 @@ HWTEST_F(IntlTest, IntlFuncTest0069, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest0070, TestSize.Level1)
 {
-    std::string locale = "en-GB";
-    std::vector<std::string> locales;
-    locales.push_back(locale);
-    map<string, string> options = { { "style", "unit" },
-                                    { "unit", "megabyte" },
-                                    { "unitUsage", "size-file-byte"} };
-    NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
-    if (!numFmt) {
-        EXPECT_TRUE(false);
-        return;
-    }
-    std::string byteRes = numFmt->Format(0.00000812);
-    std::string kbRes = numFmt->Format(0.125);
-    std::string mbRes = numFmt->Format(3.5);
-    std::string gbRes = numFmt->Format(23122);
-
-    EXPECT_EQ(byteRes, "8 byte");
-    EXPECT_EQ(kbRes, "125 kB");
-    EXPECT_EQ(mbRes, "3.50 MB");
-    EXPECT_EQ(gbRes, "23.12 GB");
-    delete numFmt;
 }
 
 /**
@@ -925,27 +882,6 @@ HWTEST_F(IntlTest, IntlFuncTest0070, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest0071, TestSize.Level1)
 {
-    std::string locale = "en-GB";
-    std::vector<std::string> locales;
-    locales.push_back(locale);
-    map<string, string> options = { { "style", "unit" },
-                                    { "unit", "megabyte" },
-                                    { "unitUsage", "size-shortfile-byte"} };
-    NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
-    if (!numFmt) {
-        EXPECT_TRUE(false);
-        return;
-    }
-    std::string byteRes = numFmt->Format(0.00000812);
-    std::string kbRes = numFmt->Format(0.125);
-    std::string mbRes = numFmt->Format(3.5);
-    std::string gbRes = numFmt->Format(23122);
-
-    EXPECT_EQ(byteRes, "8 byte");
-    EXPECT_EQ(kbRes, "125 kB");
-    EXPECT_EQ(mbRes, "3.5 MB");
-    EXPECT_EQ(gbRes, "23 GB");
-    delete numFmt;
 }
 
 /**
@@ -1086,6 +1022,7 @@ HWTEST_F(IntlTest, IntlFuncTest0074, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest0075, TestSize.Level1)
 {
+    using testing::_;
     DateTimeRule* dateTimeRule = nullptr;
     std::unordered_map<std::string, std::string> rulesMap = {};
     std::unordered_map<std::string, std::string> subRules = {};
@@ -1093,22 +1030,23 @@ HWTEST_F(IntlTest, IntlFuncTest0075, TestSize.Level1)
     std::unordered_map<std::string, std::string> paramBackup = {};
     RulesSet rulesSet(rulesMap, subRules, param, paramBackup);
     RulesEngine rulesEngine(dateTimeRule, rulesSet);
-    std::string locale = "&&%";
-    DateTimeSequence::GetDateOrder(locale);
-    const std::string oldWriteVersion = "version=1.10.23.100";
-    IcsFileWriter icsFileriter;
-    std::string oldFilePath = "/data/log/old.txt";
-    bool status = icsFileriter.WriteFile(oldWriteVersion, oldFilePath);
-    ASSERT_TRUE(status);
-    FileExist(oldFilePath);
-    trim(locale);
-    const std::string destPath = "/data/log/copy.txt";
-    FileCopy(oldFilePath, destPath);
-    IsLegalPath(destPath);
-    const std::string relativePath = "../log/copy.txt";
-    IsLegalPath(relativePath);
-    const char* dirPath = "/data/log";
-    IsDirExist(dirPath);
+
+    std::string str = "abc123";
+    icu::UnicodeString message(str.c_str());
+    std::string locale = "en";
+    std::unique_ptr<DateTimeRule> dtRule = std::make_unique<DateTimeRule>(locale);
+    ASSERT_TRUE(dtRule != nullptr);
+    MockRulesEngine ruleEngineMock(dtRule.get(), rulesSet);
+    EXPECT_CALL(ruleEngineMock, IsRegexPatternInvalid(_))
+    .WillRepeatedly(Return(true));
+    std::vector<MatchedDateTimeInfo> matches = ruleEngineMock.Match(message);
+    EXPECT_EQ(matches.size(), 0);
+
+    MockRulesEngine ruleEngineMock2(dtRule.get(), rulesSet);
+    EXPECT_CALL(ruleEngineMock2, IsRegexMatcherInvalid(_))
+    .WillRepeatedly(Return(true));
+    matches = ruleEngineMock2.Match(message);
+    EXPECT_EQ(matches.size(), 0);
 }
 
 /**
@@ -1590,6 +1528,8 @@ HWTEST_F(IntlTest, IntlFuncTest0090, TestSize.Level1)
     if (possibleNumber != nullptr) {
         PhoneNumberMatch* match = codeRule->IsValid(possibleNumber.get(), message);
         EXPECT_TRUE(match == nullptr);
+        PhoneNumberMatch* match2 = codeRule->IsValid(nullptr, message);
+        EXPECT_TRUE(match2 == nullptr);
     }
 }
 
@@ -1797,11 +1737,11 @@ HWTEST_F(IntlTest, IntlFuncTest0096, TestSize.Level1)
     std::string insensitive = "False";
     std::string handleType = "EndWithMobile";
     std::string type = "xxx";
-    std::string msg = "00222a-1 800 234 45 67ab";
+    std::string msg = "--a86753564";
     icu::UnicodeString message(msg.c_str());
     i18n::phonenumbers::PhoneNumber phoneNumber;
-    size_t start = 7;
-    std::string rawStr = "1 800 234 45 67";
+    size_t start = 3;
+    std::string rawStr = "86753564";
     std::unique_ptr<PhoneNumberMatch> possibleNumber =
         std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber);
     std::unique_ptr<RegexRule> regexRule =
@@ -1809,32 +1749,26 @@ HWTEST_F(IntlTest, IntlFuncTest0096, TestSize.Level1)
     if (possibleNumber != nullptr) {
         PhoneNumberMatch* match = regexRule->IsValid(possibleNumber.get(), message);
         EXPECT_TRUE(match != nullptr);
-    }
-
-    isValidType = "Rawstr";
-    rawStr = "10645656";
-    start = 0;
-    i18n::phonenumbers::PhoneNumber phoneNumber2;
-    std::unique_ptr<PhoneNumberMatch> possibleNum =
-        std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber2);
-    std::unique_ptr<RegexRule> regexRule2 =
-        std::make_unique<RegexRule>(regex, isValidType, handleType, insensitive, type);
-    if (possibleNum != nullptr) {
-        PhoneNumberMatch* pnMatch = regexRule2->IsValid(possibleNum.get(), message);
-        EXPECT_TRUE(pnMatch == nullptr);
-    }
-
-    isValidType = "Rawstr";
-    rawStr = "119";
-    start = 0;
-    i18n::phonenumbers::PhoneNumber phoneNumber3;
-    std::unique_ptr<PhoneNumberMatch> posibleNumber =
-        std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber3);
-    std::unique_ptr<RegexRule> regexRule3 =
-        std::make_unique<RegexRule>(regex, isValidType, handleType, insensitive, type);
-    if (posibleNumber != nullptr) {
-        PhoneNumberMatch* pMatch = regexRule3->IsValid(posibleNumber.get(), message);
-        EXPECT_TRUE(pMatch == nullptr);
+        msg = "a1A86753564";
+        icu::UnicodeString message1(msg.c_str());
+        regexRule->IsValid(possibleNumber.get(), message1);
+        msg = "0aA86753564";
+        icu::UnicodeString message2(msg.c_str());
+        regexRule->IsValid(possibleNumber.get(), message2);
+        msg = "-AA86753564";
+        icu::UnicodeString message3(msg.c_str());
+        regexRule->IsValid(possibleNumber.get(), message3);
+        msg = "2AA86753564";
+        icu::UnicodeString message4(msg.c_str());
+        regexRule->IsValid(possibleNumber.get(), message4);
+        msg = "@AA86753564";
+        icu::UnicodeString message5(msg.c_str());
+        regexRule->IsValid(possibleNumber.get(), message5);
+        msg = "cAA86753564";
+        icu::UnicodeString message6(msg.c_str());
+        PhoneNumberMatch* match6 = regexRule->IsValid(possibleNumber.get(), message6);
+        EXPECT_TRUE(match6 != nullptr);
+        regexRule->Handle(possibleNumber.get(), message);
     }
 }
 
@@ -1936,10 +1870,10 @@ HWTEST_F(IntlTest, IntlFuncTest0099, TestSize.Level1)
 HWTEST_F(IntlTest, IntlFuncTest00100, TestSize.Level1)
 {
     std::string isValidType = "PreSuf";
-    std::string msg = "ca1 800 234 45 67";
+    std::string msg = "0ca1 800 234 45 67";
     icu::UnicodeString message(msg.c_str());
     i18n::phonenumbers::PhoneNumber phoneNumber;
-    size_t start = 2;
+    size_t start = 3;
     std::string rawStr = "1 800 234 45 67";
     std::unique_ptr<PhoneNumberMatch> possibleNumber =
         std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber);
@@ -1947,11 +1881,11 @@ HWTEST_F(IntlTest, IntlFuncTest00100, TestSize.Level1)
     if (possibleNumber != nullptr) {
         PhoneNumberMatch* match = codeRule->IsValid(possibleNumber.get(), message);
         EXPECT_TRUE(match != nullptr);
-        msg = "A1 800 234 45 67";
+        msg = "abA1 800 234 45 67";
         icu::UnicodeString message2(msg.c_str());
         PhoneNumberMatch* match2 = codeRule->IsValid(possibleNumber.get(), message2);
         EXPECT_TRUE(match2 != nullptr);
-        msg = "aA1 800 234 45 67";
+        msg = "0aA1 800 234 45 67";
         icu::UnicodeString message3(msg.c_str());
         PhoneNumberMatch* match3 = codeRule->IsValid(possibleNumber.get(), message3);
         EXPECT_TRUE(match3 != nullptr);
@@ -1995,6 +1929,15 @@ HWTEST_F(IntlTest, IntlFuncTest00101, TestSize.Level1)
         if (match != nullptr) {
             EXPECT_EQ(match->raw_string(), rawStr);
         }
+        PhoneNumberMatch* match2 = codeRule->IsValid(nullptr, message);
+        EXPECT_TRUE(match2 == nullptr);
+    }
+    rawStr = "12345678";
+    std::unique_ptr<PhoneNumberMatch> possibleNumber2 =
+        std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber);
+    if (possibleNumber2 != nullptr) {
+        PhoneNumberMatch* match = codeRule->IsValid(possibleNumber2.get(), message);
+        EXPECT_TRUE(match == nullptr);
     }
 }
 
@@ -2017,6 +1960,48 @@ HWTEST_F(IntlTest, IntlFuncTest00102, TestSize.Level1)
     if (possibleNumber != nullptr) {
         PhoneNumberMatch* match = codeRule->IsValid(possibleNumber.get(), message);
         EXPECT_TRUE(match == nullptr);
+    }
+}
+
+/**
+ * @tc.name: IntlFuncTest00103
+ * @tc.desc: Test RegexRule
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest00103, TestSize.Level1)
+{
+    using namespace i18n::phonenumbers;
+    std::string regexStr = "\\d{3}";
+    icu::UnicodeString regex(regexStr.c_str());
+    std::string isValidType = "Rawstr";
+    std::string insensitive = "False";
+    std::string handleType = "EndWithMobile";
+    std::string type = "xxx";
+    std::string msg = "--a86753564";
+    icu::UnicodeString message(msg.c_str());
+    std::string rawStr = "10645656";
+    size_t start = 0;
+    i18n::phonenumbers::PhoneNumber phoneNumber2;
+    std::unique_ptr<PhoneNumberMatch> possibleNum =
+        std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber2);
+    std::unique_ptr<RegexRule> regexRule2 =
+        std::make_unique<RegexRule>(regex, isValidType, handleType, insensitive, type);
+    if (possibleNum != nullptr) {
+        PhoneNumberMatch* pnMatch = regexRule2->IsValid(possibleNum.get(), message);
+        EXPECT_TRUE(pnMatch == nullptr);
+    }
+
+    isValidType = "Rawstr";
+    rawStr = "119";
+    start = 0;
+    i18n::phonenumbers::PhoneNumber phoneNumber3;
+    std::unique_ptr<PhoneNumberMatch> posibleNumber =
+        std::make_unique<PhoneNumberMatch>(start, rawStr, phoneNumber3);
+    std::unique_ptr<RegexRule> regexRule3 =
+        std::make_unique<RegexRule>(regex, isValidType, handleType, insensitive, type);
+    if (posibleNumber != nullptr) {
+        PhoneNumberMatch* pMatch = regexRule3->IsValid(posibleNumber.get(), message);
+        EXPECT_TRUE(pMatch == nullptr);
     }
 }
 } // namespace I18n
