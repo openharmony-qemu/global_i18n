@@ -138,6 +138,9 @@ std::string PreferredLanguage::GetMatchedLanguage(const std::string& language)
 std::string PreferredLanguage::GetFirstPreferredLanguage()
 {
     std::vector<std::string> preferredLanguageList = GetPreferredLanguageList();
+    if (preferredLanguageList.empty()) {
+        return "";
+    }
     return preferredLanguageList[0];
 }
 
