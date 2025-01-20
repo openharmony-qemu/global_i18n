@@ -65,6 +65,7 @@ const char *LocaleConfig::WHITE_LANGUAGES_NAME = "white_languages";
 const char *LocaleConfig::FORBIDDEN_LANGUAGES_NAME = "forbidden_languages";
 const char *LocaleConfig::FORBIDDEN_REGIONS_NAME = "forbidden_regions";
 const char *LocaleConfig::SUPPORTED_LOCALES_PATH = "/system/usr/ohos_locale_config/supported_locales.xml";
+const char *LocaleConfig::SUPPORTED_LOCALES_OLD_PATH = "/system/usr/ohos_locale_config/supported_locales_old.xml";
 const char *LocaleConfig::SUPPORT_LOCALES_PATH = "/etc/ohos_lang_config/supported_locales.xml";
 const char *LocaleConfig::SUPPORT_LOCALES_NAME = "supported_locales";
 const char *LocaleConfig::DIALECT_LANGS_PATH = "/system/usr/ohos_locale_config/dialect_languages.xml";
@@ -83,6 +84,7 @@ const char *LocaleConfig::secondRootRegion = "region";
 const char *LocaleConfig::NUMBER_SYSTEM_KEY = "-nu-";
 const std::string LocaleConfig::HOUR_EVENT_DATA = "24HourChange";
 unordered_set<string> LocaleConfig::supportedLocales;
+unordered_set<string> LocaleConfig::supportedLocalesV15;
 unordered_set<string> LocaleConfig::supportLocales;
 unordered_set<string> LocaleConfig::supportedRegions;
 unordered_set<string> LocaleConfig::overrideSupportedRegions;
@@ -92,7 +94,34 @@ unordered_set<string> LocaleConfig::blockedRegions;
 unordered_map<string, unordered_set<string>> LocaleConfig::blockedLanguageRegions;
 unordered_set<string> LocaleConfig::whiteLanguages;
 std::set<std::string> LocaleConfig::extendWhiteLanguageList;
+std::set<std::string> LocaleConfig::extendWhiteLanguageListV15;
 unordered_map<string, string> LocaleConfig::dialectMap {
+    { "es-Latn-419", "es-Latn-419" },
+    { "es-Latn-BO", "es-Latn-419" },
+    { "es-Latn-BR", "es-Latn-419" },
+    { "es-Latn-BZ", "es-Latn-419" },
+    { "es-Latn-CL", "es-Latn-419" },
+    { "es-Latn-CO", "es-Latn-419" },
+    { "es-Latn-CR", "es-Latn-419" },
+    { "es-Latn-CU", "es-Latn-419" },
+    { "es-Latn-DO", "es-Latn-419" },
+    { "es-Latn-EC", "es-Latn-419" },
+    { "es-Latn-GT", "es-Latn-419" },
+    { "es-Latn-HN", "es-Latn-419" },
+    { "es-Latn-MX", "es-Latn-419" },
+    { "es-Latn-NI", "es-Latn-419" },
+    { "es-Latn-PA", "es-Latn-419" },
+    { "es-Latn-PE", "es-Latn-419" },
+    { "es-Latn-PR", "es-Latn-419" },
+    { "es-Latn-PY", "es-Latn-419" },
+    { "es-Latn-SV", "es-Latn-419" },
+    { "es-Latn-US", "es-Latn-419" },
+    { "es-Latn-UY", "es-Latn-419" },
+    { "es-Latn-VE", "es-Latn-419" },
+    { "pt-Latn-PT", "pt-Latn-PT" }
+};
+
+unordered_map<string, string> LocaleConfig::dialectMapV15 {
     { "es-Latn-419", "es-Latn-419" },
     { "es-Latn-BO", "es-Latn-419" },
     { "es-Latn-BR", "es-Latn-419" },
@@ -415,6 +444,11 @@ const unordered_set<string>& LocaleConfig::GetSupportedLocales()
     return supportedLocales;
 }
 
+const unordered_set<string>& LocaleConfig::GetSupportedLocalesV15()
+{
+    return supportedLocalesV15;
+}
+
 const unordered_set<string>& LocaleConfig::GetSupportedRegions()
 {
     return supportedRegions;
@@ -438,7 +472,7 @@ bool LocaleConfig::IsSuggested(const string &language)
             ++iter;
         }
     }
-    string mainLanguage = GetMainLanguage(language);
+    string mainLanguage = GetMainLanguage(language, dialectMap);
     return relatedLocales.find(mainLanguage) != relatedLocales.end();
 }
 
@@ -454,7 +488,42 @@ bool LocaleConfig::IsSuggested(const std::string &language, const std::string &r
             ++iter;
         }
     }
-    string mainLanguage = GetMainLanguage(language);
+    string mainLanguage = GetMainLanguage(language, dialectMap);
+    return relatedLocales.find(mainLanguage) != relatedLocales.end();
+}
+
+bool LocaleConfig::IsSuggestedV15(const string &language)
+{
+    unordered_set<string> relatedLocales;
+    vector<string> simCountries;
+    GetCountriesFromSim(simCountries);
+    GetRelatedLocalesV15(relatedLocales, simCountries);
+    auto iter = relatedLocales.begin();
+    while (iter != relatedLocales.end()) {
+        if (extendWhiteLanguageListV15.find(*iter) == extendWhiteLanguageListV15.end()) {
+            iter = relatedLocales.erase(iter);
+        } else {
+            ++iter;
+        }
+    }
+    string mainLanguage = GetMainLanguage(language, dialectMapV15);
+    return relatedLocales.find(mainLanguage) != relatedLocales.end();
+}
+
+bool LocaleConfig::IsSuggestedV15(const std::string &language, const std::string &region)
+{
+    unordered_set<string> relatedLocales;
+    vector<string> countries { region };
+    GetRelatedLocalesV15(relatedLocales, countries);
+    auto iter = relatedLocales.begin();
+    while (iter != relatedLocales.end()) {
+        if (extendWhiteLanguageListV15.find(*iter) == extendWhiteLanguageListV15.end()) {
+            iter = relatedLocales.erase(iter);
+        } else {
+            ++iter;
+        }
+    }
+    string mainLanguage = GetMainLanguage(language, dialectMapV15);
     return relatedLocales.find(mainLanguage) != relatedLocales.end();
 }
 
@@ -463,6 +532,7 @@ void LocaleConfig::ExtendWhiteLanguages()
     UErrorCode status = U_ZERO_ERROR;
     for (auto iter = whiteLanguages.begin(); iter != whiteLanguages.end(); ++iter) {
         extendWhiteLanguageList.insert(*iter);
+        extendWhiteLanguageListV15.insert(*iter);
         icu::Locale locale = icu::Locale::forLanguageTag((*iter).c_str(), status);
         locale.addLikelySubtags(status);
         if (U_FAILURE(status)) {
@@ -474,7 +544,25 @@ void LocaleConfig::ExtendWhiteLanguages()
             std::string baseNameStr(baseName);
             std::replace(baseNameStr.begin(), baseNameStr.end(), '_', '-');
             extendWhiteLanguageList.insert(baseNameStr);
+            extendWhiteLanguageListV15.insert(baseNameStr);
         }
+        const char* language = locale.getLanguage();
+        if (language != nullptr) {
+            std::string languageStr(language);
+            ExtendLanguageWithScript(languageStr);
+        }
+    }
+}
+
+void LocaleConfig::ExtendLanguageWithScript(const std::string &languageStr)
+{
+    if (languageStr.empty()) {
+        HILOG_INFO_I18N("ExtendLanguageWithScript languageStr is empty.");
+        return;
+    }
+    string mainLanguage = GetMainLanguage(languageStr, dialectMap);
+    if (!mainLanguage.empty()) {
+        extendWhiteLanguageList.insert(mainLanguage);
     }
 }
 
@@ -482,7 +570,8 @@ void LocaleConfig::GetRelatedLocales(unordered_set<string> &relatedLocales, vect
 {
     // remove unsupported countries
     const unordered_set<string> &regions = GetSupportedRegions();
-    for (auto iter = countries.begin(); iter != countries.end();) {
+    auto iter = countries.begin();
+    while (iter != countries.end()) {
         if (regions.find(*iter) == regions.end()) {
             iter = countries.erase(iter);
         } else {
@@ -490,9 +579,9 @@ void LocaleConfig::GetRelatedLocales(unordered_set<string> &relatedLocales, vect
         }
     }
     const unordered_set<string> &locales = GetSupportedLocales();
-    for (string locale : locales) {
+    for (const string &locale : locales) {
         bool find = false;
-        for (string country : countries) {
+        for (string &country : countries) {
             if (locale.find(country) != string::npos) {
                 find = true;
                 break;
@@ -501,8 +590,39 @@ void LocaleConfig::GetRelatedLocales(unordered_set<string> &relatedLocales, vect
         if (!find) {
             continue;
         }
-        string mainLanguage = GetMainLanguage(locale);
-        if (mainLanguage != "") {
+        string mainLanguage = GetMainLanguage(locale, dialectMap);
+        if (!mainLanguage.empty()) {
+            relatedLocales.insert(mainLanguage);
+        }
+    }
+}
+
+void LocaleConfig::GetRelatedLocalesV15(unordered_set<string> &relatedLocales, vector<string> countries)
+{
+    // remove unsupported countries
+    const unordered_set<string> &regions = GetSupportedRegions();
+    auto iter = countries.begin();
+    while (iter != countries.end()) {
+        if (regions.find(*iter) == regions.end()) {
+            iter = countries.erase(iter);
+        } else {
+            ++iter;
+        }
+    }
+    const unordered_set<string> &locales = GetSupportedLocalesV15();
+    for (const string &locale : locales) {
+        bool find = false;
+        for (const string &country : countries) {
+            if (locale.find(country) != string::npos) {
+                find = true;
+                break;
+            }
+        }
+        if (!find) {
+            continue;
+        }
+        string mainLanguage = GetMainLanguage(locale, dialectMapV15);
+        if (!mainLanguage.empty()) {
             relatedLocales.insert(mainLanguage);
         }
     }
@@ -586,6 +706,7 @@ bool LocaleConfig::InitializeLists()
     Expunge(supportedRegions, blockedRegions);
     Expunge(whiteLanguages, blockedLanguages);
     GetListFromFile(SUPPORTED_LOCALES_PATH, SUPPORTED_LOCALES_NAME, supportedLocales);
+    GetListFromFile(SUPPORTED_LOCALES_OLD_PATH, SUPPORTED_LOCALES_NAME, supportedLocalesV15);
     GetListFromFile(SUPPORT_LOCALES_PATH, SUPPORT_LOCALES_NAME, supportLocales);
     GetListFromFile(OVERRIDE_SUPPORTED_REGIONS_PATH, OVERRIDE_SUPPORTED_REGIONS_NAME, overrideSupportedRegions);
     GetListFromFile(DIALECT_LANGS_PATH, DIALECT_LANGS_NAME, dialectLang);
@@ -634,7 +755,8 @@ void LocaleConfig::LoadRegionsLanguages(unordered_set<std::string>& forbiddenReg
     xmlFreeDoc(doc);
 }
 
-string LocaleConfig::GetMainLanguage(const string &language)
+string LocaleConfig::GetMainLanguage(const string &language,
+    std::unordered_map<std::string, std::string> selfDialectMap)
 {
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale origin = icu::Locale::forLanguageTag(language, status);
@@ -655,8 +777,8 @@ string LocaleConfig::GetMainLanguage(const string &language)
     if (status != U_ZERO_ERROR) {
         return "";
     }
-    if (dialectMap.find(fullLanguage) != dialectMap.end()) {
-        return dialectMap[fullLanguage];
+    if (selfDialectMap.find(fullLanguage) != selfDialectMap.end()) {
+        return selfDialectMap[fullLanguage];
     }
     builder.setRegion("");
     temp = builder.build(status);
