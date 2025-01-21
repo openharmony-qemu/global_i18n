@@ -111,8 +111,8 @@ private:
     static const int BUFFER_LEN = 10;
     static const int POW_BASE_NUMBER = 10;
     static const int CURRENCY_LEN = 3;
-    static const size_t ISO4217_LEN = 252;
     static std::mutex numToCurrencyMutex;
+    static bool initISO4217;
     static std::unordered_map<std::string, std::string> numToCurrency;
     icu::MeasureUnit unitArray[MAX_UNIT_NUM];
     static bool icuInitialized;

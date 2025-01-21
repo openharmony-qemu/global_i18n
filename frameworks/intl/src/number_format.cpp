@@ -32,6 +32,7 @@ namespace Global {
 namespace I18n {
 const char* NumberFormat::DEVICE_TYPE_NAME = "const.product.devicetype";
 std::mutex NumberFormat::numToCurrencyMutex;
+bool NumberFormat::initISO4217 = false;
 std::unordered_map<std::string, std::string> NumberFormat::numToCurrency = {};
 bool NumberFormat::icuInitialized = NumberFormat::Init();
 
@@ -811,11 +812,11 @@ void NumberFormat::SetDefaultStyle()
 
 bool NumberFormat::ReadISO4217Datas()
 {
-    if (numToCurrency.size() == ISO4217_LEN) {
+    if (initISO4217) {
         return true;
     }
     std::lock_guard<std::mutex> readDataLock(numToCurrencyMutex);
-    if (numToCurrency.size() == ISO4217_LEN) {
+    if (initISO4217) {
         return true;
     }
     UErrorCode status = U_ZERO_ERROR;
@@ -839,6 +840,7 @@ bool NumberFormat::ReadISO4217Datas()
         numToCurrency.insert(std::make_pair<std::string, std::string>(ss.str(), currentCurrency));
     }
     uenum_close(currencies);
+    initISO4217 = true;
     return !numToCurrency.empty();
 }
 
