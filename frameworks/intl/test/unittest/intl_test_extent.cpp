@@ -907,7 +907,7 @@ HWTEST_F(IntlTest, IntlFuncTest0071, TestSize.Level1)
     EXPECT_EQ(res, path);
     delimiter = '/';
     res = LocaleConfig::GetUnicodeWrappedFilePath("", delimiter, localeInfo, errorCode);
-    EXPECT_EQ(res, path);
+    EXPECT_EQ(res, "");
     std::shared_ptr<LocaleInfo> invalidLocale = std::make_shared<LocaleInfo>("@@@");
     res = LocaleConfig::GetUnicodeWrappedFilePath(path, delimiter, invalidLocale, errorCode);
     EXPECT_EQ(res, path);
