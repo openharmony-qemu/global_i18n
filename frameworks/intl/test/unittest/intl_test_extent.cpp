@@ -553,7 +553,7 @@ HWTEST_F(IntlTest, IntlFuncTest0061, TestSize.Level1)
 {
     bool flag = LocaleConfig::IsSuggestedV15("zh-Hans");
     EXPECT_TRUE(flag);
-    EXPECT_TRUE(IsSuggestedV15("zh-Hans", "SG"));
+    EXPECT_TRUE(LocaleConfig::IsSuggestedV15("zh-Hans", "SG"));
 }
 
 /**
