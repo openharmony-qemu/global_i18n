@@ -414,6 +414,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0060, TestSize.Level1)
     EXPECT_EQ(res, "12");
     localeTags = { "zh-Hans-u-nu-latn" };
     NumberFormat* format = new (std::nothrow) NumberFormat(localeTags, configs);
+    ASSERT_TRUE(format != nullptr);
     EXPECT_EQ(res, format->Format(12));
     delete format;
 
@@ -425,10 +426,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0060, TestSize.Level1)
     map<string, string> options = { { "style", style },
                                     { "notation", "compact" } };
     NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
-    if (!numFmt) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(numFmt != nullptr);
     string out = numFmt->Format(123456.789);
     EXPECT_EQ(out, expects);
     EXPECT_EQ(numFmt->GetStyle(), style);
@@ -475,12 +473,14 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0061, TestSize.Level1)
         { "unit", "hectare" }
     };
     NumberFormat *unitFormatter = new NumberFormat(locales, unitOptions);
+    ASSERT_TRUE(unitFormatter != nullptr);
     string unitRes = unitFormatter->Format(123);
     map<string, string> currencyOptions = {
         { "style", "currency" },
         { "currency", "USD" }
     };
     NumberFormat *currencyFormatter = new NumberFormat(locales, currencyOptions);
+    ASSERT_TRUE(currencyFormatter != nullptr);
     string currencyRes = currencyFormatter->Format(123);
     if (deviceType == "wearable" || deviceType == "liteWearable" || deviceType == "watch") {
         EXPECT_EQ(currencyRes, "$123.00");

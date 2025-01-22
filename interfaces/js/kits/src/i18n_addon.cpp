@@ -745,6 +745,7 @@ napi_value I18nAddon::GetUnicodeWrappedFilePath(napi_env env, napi_callback_info
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
+        HILOG_ERROR_I18N("GetUnicodeWrappedFilePath: Get param info failed");
         return nullptr;
     }
     if (argc < 1) {
@@ -755,6 +756,7 @@ napi_value I18nAddon::GetUnicodeWrappedFilePath(napi_env env, napi_callback_info
     int32_t code = 0;
     std::string path = VariableConvertor::GetString(env, argv[0], code);
     if (code) {
+        HILOG_ERROR_I18N("GetUnicodeWrappedFilePath: Get param string argv[0] failed");
         return nullptr;
     }
     char delimiter = PATH_SEPARATOR;
@@ -762,6 +764,7 @@ napi_value I18nAddon::GetUnicodeWrappedFilePath(napi_env env, napi_callback_info
         VariableConvertor::VerifyType(env, "delimiter", napi_valuetype::napi_string, argv[1]);
         delimiter = GetDelimiter(env, argv[1]);
         if (delimiter == '\0') {
+            HILOG_ERROR_I18N("GetUnicodeWrappedFilePath: Second param is empty");
             return nullptr;
         }
     }
@@ -770,7 +773,7 @@ napi_value I18nAddon::GetUnicodeWrappedFilePath(napi_env env, napi_callback_info
         napi_status status = napi_unwrap(env,
             argv[2], reinterpret_cast<void **>(&obj)); // 2 is the last parameter index
         if (status != napi_ok || !obj || !obj->GetLocaleInfo()) {
-            HILOG_ERROR_I18N("GetLanguage: Get Locale object failed");
+            HILOG_ERROR_I18N("GetUnicodeWrappedFilePath: Get Locale object failed");
             return nullptr;
         }
     }
