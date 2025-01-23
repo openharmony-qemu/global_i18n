@@ -291,7 +291,7 @@ std::map<int, std::string> I18nTimeZone::categoryNum2TimezoneEN {
     { 44, "Asia/Bishkek" },
     { 45, "Asia/Brunei" },
     { 46, "Asia/Chita" },
-    { 47, "Asia/Choibalsan" },
+    { 47, "Asia/Ulaanbaatar" },
     { 48, "Asia/Colombo" },
     { 49, "Asia/Damascus" },
     { 50, "Asia/Dhaka" },
