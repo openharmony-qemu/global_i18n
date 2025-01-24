@@ -272,6 +272,7 @@ CArrArrString RelativeTimeFormatImpl::FormatToParts(double number, char *unit)
             for (size_t k = 0; k < i; k++) {
                 free(res[k].head);
             }
+            free(res);
             return ret;
         }
         for (size_t j = 0; j < timeVector.size(); j++) {
