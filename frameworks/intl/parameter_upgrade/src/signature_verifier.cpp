@@ -118,11 +118,14 @@ bool SignatureVerifier::VerifyFileSign(const std::string& pubkeyPath, const std:
 bool SignatureVerifier::VerifyUpdateFile(const std::string& filePath, const std::string& manifestPath,
     std::vector<std::string>& filesList)
 {
-    if (!CheckFilePath(manifestPath)) {
-        HILOG_ERROR_I18N("SignatureVerifier::VerifyUpdateFile: Check manifest file failed.");
+    char* result = realpath(filePath.c_str(), nullptr);
+    if (result == nullptr) {
+        HILOG_ERROR_I18N("SignatureVerifier::VerifyUpdateFile: realpath error: %{public}s.", strerror(errno));
         return false;
     }
-    std::ifstream file(manifestPath);
+    std::ifstream file(result);
+    free(result);
+    result = nullptr;
     if (!file.is_open()) {
         HILOG_ERROR_I18N("SignatureVerifier::VerifyUpdateFile: Open manifest failed.");
         return false;
@@ -137,14 +140,12 @@ bool SignatureVerifier::VerifyUpdateFile(const std::string& filePath, const std:
         std::vector<std::string> strs;
         Split(nextLine, ":", strs);
         if (strs.size() < MIN_SIZE) {
-            file.close();
             HILOG_ERROR_I18N("SignatureVerifier::VerifyUpdateFile: Parse digest failed.");
             return false;
         }
         std::string sha256Digest = strs[1];
         sha256Digest = trim(sha256Digest);
         if (sha256Digest.empty()) {
-            file.close();
             HILOG_ERROR_I18N("SignatureVerifier::VerifyUpdateFile: Digest is empty.");
             return false;
         }
@@ -152,18 +153,15 @@ bool SignatureVerifier::VerifyUpdateFile(const std::string& filePath, const std:
         filesList.push_back(fileName);
         std::string absFilePath = filePath + trim(fileName);
         if (!CheckFilePath(absFilePath)) {
-            file.close();
             HILOG_ERROR_I18N("VerifyUpdateFile: File %{public}s is not exist.", fileName.c_str());
             return false;
         }
         std::string fileDigest = CalcFileSha256Digest(absFilePath);
         if (fileDigest.compare(sha256Digest) != 0) {
-            file.close();
             HILOG_ERROR_I18N("VerifyUpdateFile: verify %{public}s failed.", fileDigest.c_str());
             return false;
         }
     }
-    file.close();
     return true;
 }
 
@@ -265,26 +263,22 @@ std::string SignatureVerifier::GetFileStream(const std::string& filePath)
         HILOG_ERROR_I18N("SignatureVerifier::GetFileStream: File path length is too large.");
         return "";
     }
-    std::unique_ptr<char[]> resolvedPath = std::make_unique<char[]>(PATH_MAX + 1);
-    if (resolvedPath == nullptr) {
-        HILOG_ERROR_I18N("SignatureVerifier::GetFileStream: Create resolvedPath failed.");
-        return "";
-    }
-    char* result = realpath(filePath.c_str(), resolvedPath.get());
-    if (result == nullptr || strlen(result) >= PATH_MAX) {
+    char* result = realpath(filePath.c_str(), nullptr);
+    if (result == nullptr) {
         HILOG_ERROR_I18N("SignatureVerifier::GetFileStream: Get real path failed.");
         return "";
     }
-    std::ifstream file(resolvedPath.get(), std::ios::in | std::ios::binary);
+    std::ifstream file(result, std::ios::in | std::ios::binary);
+    free(result);
+    result = nullptr;
     if (!file.is_open()) {
         HILOG_ERROR_I18N("SignatureVerifier::GetFileStream: Open file failed.");
         return "";
     }
     std::stringstream inFile;
     inFile << file.rdbuf();
-    file.close();
     return inFile.str();
 }
-}
-}
-}
+} // namespace I18n
+} // namespace Global
+} // namespace OHOS

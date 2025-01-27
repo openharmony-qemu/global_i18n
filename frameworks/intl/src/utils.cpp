@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include "utils.h"
 #include <algorithm>
 #include <cerrno>
 #include <climits>
@@ -32,7 +32,6 @@
 #include "parameter.h"
 #include "tokenid_kit.h"
 #include "unicode/localebuilder.h"
-#include "utils.h"
 
 namespace OHOS {
 namespace Global {
@@ -148,17 +147,18 @@ void GetAllValidLocalesTag(std::unordered_set<std::string>& allValidLocalesLangu
 
 bool CheckFilePath(const std::string &filePath)
 {
-    std::unique_ptr<char[]> resolvedPath = std::make_unique<char[]>(PATH_MAX + 1);
-    char* result = realpath(filePath.c_str(), resolvedPath.get());
-    if (result == nullptr || strlen(result) >= PATH_MAX) {
+    char* result = realpath(filePath.c_str(), nullptr);
+    if (result == nullptr) {
+        HILOG_ERROR_I18N("utils: CheckFilePath realpath error, error message: %{public}s.", strerror(errno));
         return false;
     }
-    std::ifstream file(resolvedPath.get());
+    std::ifstream file(result);
+    free(result);
+    result = nullptr;
     if (!file.good()) {
-        file.close();
+        HILOG_ERROR_I18N("utils: file open is not good.");
         return false;
     }
-    file.close();
     return true;
 }
 
@@ -250,7 +250,7 @@ bool IsLegalPath(const std::string& path)
     }
     return true;
 }
- 
+
 bool IsDirExist(const char *path)
 {
     if (!(path && *path)) {
