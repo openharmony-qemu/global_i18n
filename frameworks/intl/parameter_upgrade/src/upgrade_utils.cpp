@@ -113,11 +113,14 @@ bool UpgradeUtils::FileDirMount(const std::string& srcDirPath, const std::string
 std::string UpgradeUtils::LoadFileVersion(const std::string& versionPath)
 {
     std::string version;
-    if (!CheckFilePath(versionPath)) {
-        HILOG_ERROR_I18N("UpgradeUtils::LoadFileVersion: Check version file failed.");
+    char* result = realpath(versionPath.c_str(), nullptr);
+    if (result == nullptr) {
+        HILOG_ERROR_I18N("UpgradeUtils::LoadFileVersion: realpath error: %{public}s.", strerror(errno));
         return version;
     }
-    std::ifstream file(versionPath);
+    std::ifstream file(result);
+    free(result);
+    result = nullptr;
     if (!file.is_open()) {
         HILOG_ERROR_I18N("UpgradeUtils::LoadFileVersion: open version file failed.");
         return version;
@@ -134,7 +137,6 @@ std::string UpgradeUtils::LoadFileVersion(const std::string& versionPath)
             break;
         }
     }
-    file.close();
     return version;
 }
 
