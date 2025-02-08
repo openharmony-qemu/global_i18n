@@ -83,11 +83,7 @@ int I18nFuncTest062(void);
 int I18nFuncTest063(void);
 int I18nFuncTest064(void);
 int I18nFuncTest065(void);
-<<<<<<< HEAD
-=======
 int I18nFuncTest066(void);
-int I18nFuncTest067(void);
->>>>>>> a2529d6 (方言语言最简表示)
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

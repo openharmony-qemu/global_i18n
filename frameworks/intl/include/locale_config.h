@@ -287,6 +287,7 @@ private:
     static std::map<std::string, std::string> locale2DisplayName;
     static std::map<std::string, std::string> region2DisplayName;
     static std::unordered_map<std::string, std::vector<std::string>> dialectLanguages;
+    static std::unordered_map<std::string, std::string> resourceIdMap;
     static std::string currentDialectLocale;
     static std::string currentOverrideRegion;
     static std::set<std::string> validCaTag;

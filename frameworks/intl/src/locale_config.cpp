@@ -27,11 +27,7 @@
 #include "ipc_skeleton.h"
 #include "libxml/parser.h"
 #include "locale_info.h"
-<<<<<<< HEAD
-=======
 #include "locale_matcher.h"
-#include "multi_users.h"
->>>>>>> a2529d6 (方言语言最简表示)
 #include "unicode/localebuilder.h"
 #include "unicode/locdspnm.h"
 #include "unicode/locid.h"
@@ -165,10 +161,20 @@ unordered_map<string, string> LocaleConfig::localDigitMap {
 };
 
 std::unordered_map<std::string, std::vector<std::string>> LocaleConfig::dialectLanguages {
-    { "en", { "en-US", "en-GB" } },
-    { "es", { "es-ES", "es-US" } },
-    { "pt", { "pt-PT", "pt-BR" } },
+    { "en-Latn", { "en-Latn-US", "en-Latn-GB" } },
+    { "pt-Latn", { "pt-Latn-PT", "pt-Latn-BR" } },
     { "zh-Hant", { "zh-Hant-HK", "zh-Hant-TW" } },
+};
+
+std::unordered_map<std::string, std::string> LocaleConfig::resourceIdMap {
+    { "zh", "zh-Hans" },
+    { "zh-HK", "zh-Hant-HK" },
+    { "zh-TW", "zh-Hant" },
+    { "az", "az-Latn" },
+    { "bs", "bs-Latn" },
+    { "jv", "jv-Latn" },
+    { "uz", "uz-Latn" },
+    { "mn", "mn-Cyrl" },
 };
 
 std::map<std::string, std::string> LocaleConfig::supportedDialectLocales;
@@ -1605,13 +1611,17 @@ std::string LocaleConfig::GetSimplifiedSystemLanguage()
 {
     std::string locale = GetSystemLanguage();
     LocaleInfo localeInfo(locale);
-    std::string language = localeInfo.GetLanguage();
-    if (language.compare("zh") == 0) {
-        language = language + '-' + localeInfo.GetScript();
-    }
+    LocaleInfo localeInfoMax(localeInfo.Maximize());
+    std::string language = localeInfoMax.GetLanguage();
+    language = language + '-' + localeInfoMax.GetScript();
     if (dialectLanguages.find(language) != dialectLanguages.end()) {
-        locale = GetSystemLocale();
-        LocaleInfo* requestLocale = new LocaleInfo(locale);
+        std::string systemRegion = localeInfo.GetRegion();
+        if (!systemRegion.empty() && language.compare("en-Latn") != 0) {
+            locale = language + '-' + systemRegion;
+        } else {
+            locale = GetSystemLocale();
+        }
+        LocaleInfo* requestLocale = new(std::nothrow) LocaleInfo(locale);
         if (requestLocale == nullptr) {
             HILOG_ERROR_I18N("GetSimplifiedLanguage: %{public}s failed to construct LocaleInfo.", locale.c_str());
             return "";
@@ -1636,7 +1646,12 @@ std::string LocaleConfig::GetSimplifiedSystemLanguage()
         requestLocale = nullptr;
     }
     LocaleInfo simplifiedLocale(locale);
-    return simplifiedLocale.Minimize();
+    std::string ret = simplifiedLocale.Minimize();
+    auto iter = resourceIdMap.find(ret);
+    if (iter != resourceIdMap.end()) {
+        ret = iter->second;
+    }
+    return ret;
 }
 } // namespace I18n
 } // namespace Global

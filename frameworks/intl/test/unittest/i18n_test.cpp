@@ -1640,14 +1640,14 @@ HWTEST_F(I18nTest, I18nFuncTest066, TestSize.Level1)
     EXPECT_EQ(LocaleConfig::GetSimplifiedSystemLanguage(), "en-GB");
     LocaleConfig::SetSystemLanguage("zh-Hant");
     LocaleConfig::SetSystemRegion("CN");
-    EXPECT_EQ(LocaleConfig::GetSimplifiedSystemLanguage(), "zh-TW");
+    EXPECT_EQ(LocaleConfig::GetSimplifiedSystemLanguage(), "zh-Hant");
     LocaleConfig::SetSystemRegion("HK");
-    EXPECT_EQ(LocaleConfig::GetSimplifiedSystemLanguage(), "zh-HK");
+    EXPECT_EQ(LocaleConfig::GetSimplifiedSystemLanguage(), "zh-Hant-HK");
     LocaleConfig::SetSystemLanguage("es");
     LocaleConfig::SetSystemRegion("ES");
     EXPECT_EQ(LocaleConfig::GetSimplifiedSystemLanguage(), "es");
     LocaleConfig::SetSystemRegion("US");
-    EXPECT_EQ(LocaleConfig::GetSimplifiedSystemLanguage(), "es-US");
+    EXPECT_EQ(LocaleConfig::GetSimplifiedSystemLanguage(), "es");
     LocaleConfig::SetSystemLanguage("pt");
     LocaleConfig::SetSystemRegion("PT");
     EXPECT_EQ(LocaleConfig::GetSimplifiedSystemLanguage(), "pt-PT");
