@@ -118,7 +118,7 @@ bool SignatureVerifier::VerifyFileSign(const std::string& pubkeyPath, const std:
 bool SignatureVerifier::VerifyUpdateFile(const std::string& filePath, const std::string& manifestPath,
     std::vector<std::string>& filesList)
 {
-    char* result = realpath(filePath.c_str(), nullptr);
+    char* result = realpath(manifestPath.c_str(), nullptr);
     if (result == nullptr) {
         HILOG_ERROR_I18N("SignatureVerifier::VerifyUpdateFile: realpath error: %{public}s.", strerror(errno));
         return false;
