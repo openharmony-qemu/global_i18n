@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <cctype>
 #include "i18n_hilog.h"
 #include "locale_config.h"
 #include "system_locale_manager.h"
@@ -20,11 +21,112 @@
 #include "unicode/timezone.h"
 #include "utils.h"
 #include "i18n_timezone.h"
+#include "unicode/localebuilder.h"
+#include "unicode/locid.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
 const char* SystemLocaleManager::SIM_COUNTRY_CODE_KEY = "telephony.sim.countryCode0";
+const std::unordered_set<std::string> SystemLocaleManager::supportLocales {
+    "ar-Arab-EG",
+    "az-Cyrl-AZ",
+    "bo-Tibt-CN",
+    "jv-Latn-ID",
+    "sr-Latn-RS",
+    "be-Cyrl-BY",
+    "bg-Cyrl-BG",
+    "bn-Beng-BD",
+    "bs-Cyrl-BA",
+    "ca-Latn-ES",
+    "cs-Latn-CZ",
+    "da-Latn-DK",
+    "de-Latn-DE",
+    "de-Latn-LI",
+    "de-Latn-CH",
+    "de-Latn-AT",
+    "el-Grek-GR",
+    "en-Latn-AU",
+    "en-Latn-CA",
+    "en-Latn-GB",
+    "en-Latn-IN",
+    "en-Latn-NZ",
+    "en-Latn-SG",
+    "en-Latn-US",
+    "en-Qaag-US",
+    "es-Latn-ES",
+    "es-Latn-US",
+    "et-Latn-EE",
+    "eu-Latn-ES",
+    "fa-Arab-IR",
+    "fa-Arab-AF",
+    "fi-Latn-FI",
+    "fr-Latn-FR",
+    "fr-Latn-CA",
+    "fr-Latn-BE",
+    "fr-Latn-CH",
+    "gl-Latn-ES",
+    "gu-Gujr-IN",
+    "hi-Deva-IN",
+    "hr-Latn-HR",
+    "hu-Latn-HU",
+    "in-Latn-ID",
+    "id-Latn-ID",
+    "it-Latn-IT",
+    "it-Latn-CH",
+    "fil-Latn-PH",
+    "iw-Hebr-IL",
+    "he-Hebr-IL",
+    "ja-Jpan-JP",
+    "ka-Geor-GE",
+    "kk-Cyrl-KZ",
+    "km-Khmr-KH",
+    "kn-Knda-IN",
+    "ko-Kore-KR",
+    "lo-Laoo-LA",
+    "lt-Latn-LT",
+    "lv-Latn-LV",
+    "mai-Deva-IN",
+    "mk-Cyrl-MK",
+    "mi-Latn-NZ",
+    "ml-Mlym-IN",
+    "mn-Cyrl-MN",
+    "mr-Deva-IN",
+    "ms-Latn-MY",
+    "my-Mymr-MM",
+    "my-Qaag-MM",
+    "nb-Latn-NO",
+    "ne-Deva-NP",
+    "nl-Latn-NL",
+    "nl-Latn-BE",
+    "or-Orya-IN",
+    "pa-Arab-PK",
+    "pa-Guru-IN",
+    "pl-Latn-PL",
+    "pt-Latn-BR",
+    "pt-Latn-PT",
+    "ro-Latn-RO",
+    "ru-Cyrl-RU",
+    "si-Sinh-LK",
+    "sk-Latn-SK",
+    "sl-Latn-SI",
+    "sv-Latn-SE",
+    "sw-Latn-KE",
+    "sw-Latn-TZ",
+    "ta-Taml-IN",
+    "te-Telu-IN",
+    "th-Thai-TH",
+    "tr-Latn-TR",
+    "ug-Arab-CN",
+    "uk-Cyrl-UA",
+    "ur-Arab-PK",
+    "uz-Cyrl-UZ",
+    "uz-Latn-UZ",
+    "vi-Latn-VN",
+    "zh-Hans-CN",
+    "zh-Hant-HK",
+    "zh-Hant-TW",
+};
 
 SystemLocaleManager::SystemLocaleManager()
 {
@@ -53,6 +155,7 @@ std::vector<LocaleItem> SystemLocaleManager::GetLanguageInfoArray(const std::vec
         return localeItemList;
     }
     std::unordered_set<std::string> blockedLanguages = LocaleConfig::GetBlockedLanguages();
+    std::unordered_set<std::string> simRegions = GetCountryCodeFromSimCard();
     for (auto it = languages.begin(); it != languages.end(); ++it) {
         if (blockedLanguages.find(*it) != blockedLanguages.end()) {
             continue;
@@ -65,16 +168,11 @@ std::vector<LocaleItem> SystemLocaleManager::GetLanguageInfoArray(const std::vec
             languageNativeName = tabooUtils->ReplaceLanguageName(*it, *it, languageNativeName);
         }
         bool isSuggestedWithSystemRegion = LocaleConfig::IsSuggested(*it, LocaleConfig::GetSystemRegion());
-        std::string simRegion = ReadSystemParameter(SIM_COUNTRY_CODE_KEY, CONFIG_LEN);
-        bool isSuggestedWithSimRegion = false;
-        if (simRegion.length() > 0) {
-            isSuggestedWithSimRegion = LocaleConfig::IsSuggested(*it, simRegion);
-        }
         SuggestionType suggestionType = SuggestionType::SUGGESTION_TYPE_NONE;
-        if (isSuggestedWithSimRegion) {
-            suggestionType = SuggestionType::SUGGESTION_TYPE_SIM;
-        } else if (isSuggestedWithSystemRegion) {
+        if (isSuggestedWithSystemRegion) {
             suggestionType = SuggestionType::SUGGESTION_TYPE_RELATED;
+        } else if (IsLanguageSimRegionSuggest(simRegions, *it)) {
+            suggestionType = SuggestionType::SUGGESTION_TYPE_SIM;
         }
         LocaleItem item { *it, suggestionType, languageDisplayName, languageNativeName };
         localeItemList.push_back(item);
@@ -99,26 +197,39 @@ std::vector<LocaleItem> SystemLocaleManager::GetCountryInfoArray(const std::vect
         status = I18nErrorCode::NOT_SYSTEM_APP;
         return localeItemList;
     }
+    std::string systemLanguage = LocaleConfig::GetSystemLanguage();
     std::unordered_set<std::string> blockedRegions = LocaleConfig::GetBlockedRegions();
     std::unordered_set<std::string> blockedLanguageRegions = LocaleConfig::GetLanguageBlockedRegions();
-    std::string pseudoProcessedRegion = PseudoLocalizationProcessor("");
+    std::unordered_set<std::string> simRegions = GetCountryCodeFromSimCard();
     for (auto it = countries.begin(); it != countries.end(); ++it) {
         if (blockedRegions.find(*it) != blockedRegions.end() || blockedLanguageRegions.find(*it) !=
             blockedLanguageRegions.end()) {
             continue;
         }
-        std::string regionDisplayName = LocaleConfig::GetDisplayRegion(*it, options.localeTag, true);
-        regionDisplayName = tabooUtils->ReplaceCountryName(*it, options.localeTag, regionDisplayName);
-        bool isSuggestedRegion = LocaleConfig::IsSuggested(LocaleConfig::GetSystemLanguage(), *it);
+        bool isSuggestedRegion = IsSuggestRegion(systemLanguage, *it);
         SuggestionType suggestionType = SuggestionType::SUGGESTION_TYPE_NONE;
         if (isSuggestedRegion) {
             suggestionType = SuggestionType::SUGGESTION_TYPE_RELATED;
+        } else if (simRegions.find(*it) != simRegions.end()) {
+            suggestionType = SuggestionType::SUGGESTION_TYPE_SIM;
         }
-        LocaleItem item { *it, suggestionType, regionDisplayName, pseudoProcessedRegion };
+        LocaleItem item = GetLocaleItem(*it, suggestionType, options.localeTag);
         localeItemList.push_back(item);
     }
     SortLocaleItemList(localeItemList, options);
     return localeItemList;
+}
+
+LocaleItem SystemLocaleManager::GetLocaleItem(const std::string &region,
+    SuggestionType &suggestionType, const std::string &localeTag)
+{
+    std::string pseudoProcessedRegion = PseudoLocalizationProcessor("");
+    std::string regionName = LocaleConfig::GetDisplayRegion(region, localeTag, true);
+    if (this->tabooUtils != nullptr) {
+        regionName = this->tabooUtils->ReplaceCountryName(region, localeTag, regionName);
+    }
+    LocaleItem item { region, suggestionType, regionName, pseudoProcessedRegion };
+    return item;
 }
 
 void SystemLocaleManager::SortLocaleItemList(std::vector<LocaleItem> &localeItemList, const SortOptions &options)
@@ -159,6 +270,46 @@ void SystemLocaleManager::SortLocaleItemList(std::vector<LocaleItem> &localeItem
     };
     std::sort(localeItemList.begin(), localeItemList.end(), compareFunc);
     delete collator;
+}
+
+bool SystemLocaleManager::IsLanguageSimRegionSuggest(const std::unordered_set<std::string> &simRegions,
+    const std::string &language)
+{
+    for (auto iter = simRegions.begin(); iter != simRegions.end(); ++iter) {
+        if (LocaleConfig::IsSuggested(language, *iter)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool SystemLocaleManager::IsSuggestRegion(const std::string &language, const std::string &region)
+{
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale origin = icu::Locale::forLanguageTag(language, status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("SystemLocaleManager: create locale for %{public}s failed.", language.c_str());
+        return false;
+    }
+    origin.addLikelySubtags(status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("SystemLocaleManager: addLikelySubtags for %{public}s failed.", language.c_str());
+        return false;
+    }
+    icu::LocaleBuilder builder = icu::LocaleBuilder().setLanguage(origin.getLanguage()).
+        setScript(origin.getScript()).setRegion(region);
+    icu::Locale temp = builder.setExtension('u', "").build(status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("SystemLocaleManager: LocaleBuilder for %{public}s, %{public}s failed.",
+            language.c_str(), region.c_str());
+        return false;
+    }
+    std::string fullLanguage = temp.toLanguageTag<std::string>(status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("SystemLocaleManager: toLanguageTag for %{public}s failed.", language.c_str());
+        return false;
+    }
+    return supportLocales.find(fullLanguage) != supportLocales.end();
 }
 
 std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray(I18nErrorCode& status)
@@ -243,6 +394,21 @@ void SystemLocaleManager::SortTimezoneCityItemList(const std::string &locale,
     };
     std::sort(timezoneCityItemList.begin(), timezoneCityItemList.end(), sortFunc);
     delete collator;
+}
+
+std::unordered_set<std::string> SystemLocaleManager::GetCountryCodeFromSimCard()
+{
+    std::unordered_set<std::string> resultSet;
+    std::vector<size_t> soltIds = {0, 1};
+    for (size_t i = 0; i < soltIds.size(); i++) {
+        GetCountryCodeFromSimCardInner(resultSet, soltIds[i]);
+    }
+    return resultSet;
+}
+
+void SystemLocaleManager::GetCountryCodeFromSimCardInner(std::unordered_set<std::string> &resultSet,
+    size_t soltId)
+{
 }
 } // I18n
 } // Global
