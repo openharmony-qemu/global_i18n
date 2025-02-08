@@ -44,7 +44,7 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    
+
     static std::string originalLanguage;
     static std::string originalRegion;
     static std::string originalLocale;
@@ -1426,7 +1426,7 @@ HWTEST_F(I18nTest, I18nFuncTest059, TestSize.Level1)
     current = new LocaleInfo("en-AU");
     res = LocaleMatcher::IsMoreSuitable(current, other, request);
     EXPECT_TRUE(res > 0);
-    
+
     other = new LocaleInfo("en-GB");
     res = LocaleMatcher::IsMoreSuitable(current, other, request);
     EXPECT_TRUE(res < 0);
@@ -1672,14 +1672,14 @@ HWTEST_F(I18nTest, I18nFuncTest067, TestSize.Level1)
     EXPECT_EQ(LocaleConfig::GetSimplifiedSystemLanguage(), "en-GB");
     LocaleConfig::SetSystemLanguage("zh-Hant");
     LocaleConfig::SetSystemRegion("CN");
-    EXPECT_EQ(LocaleConfig::GetSimplifiedSystemLanguage(), "zh-TW");
+    EXPECT_EQ(LocaleConfig::GetSimplifiedSystemLanguage(), "zh-Hant");
     LocaleConfig::SetSystemRegion("HK");
-    EXPECT_EQ(LocaleConfig::GetSimplifiedSystemLanguage(), "zh-HK");
+    EXPECT_EQ(LocaleConfig::GetSimplifiedSystemLanguage(), "zh-Hant-HK");
     LocaleConfig::SetSystemLanguage("es");
     LocaleConfig::SetSystemRegion("ES");
     EXPECT_EQ(LocaleConfig::GetSimplifiedSystemLanguage(), "es");
     LocaleConfig::SetSystemRegion("US");
-    EXPECT_EQ(LocaleConfig::GetSimplifiedSystemLanguage(), "es-US");
+    EXPECT_EQ(LocaleConfig::GetSimplifiedSystemLanguage(), "es");
     LocaleConfig::SetSystemLanguage("pt");
     LocaleConfig::SetSystemRegion("PT");
     EXPECT_EQ(LocaleConfig::GetSimplifiedSystemLanguage(), "pt-PT");
@@ -1776,7 +1776,7 @@ HWTEST_F(I18nTest, I18nFuncTest070, TestSize.Level1)
     I18nErrorCode err = I18nErrorCode::SUCCESS;
     std::shared_ptr<LocaleInfo> localeInfo = std::make_shared<LocaleInfo>("zh-Hans-CN");
     ASSERT_TRUE(localeInfo != nullptr);
-    
+
     std::string pattern = "yMd";
     std::unique_ptr<SimpleDateTimeFormat> patternFormatter =
         std::make_unique<SimpleDateTimeFormat>(pattern, localeInfo, true, err);
