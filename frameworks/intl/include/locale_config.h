@@ -103,6 +103,7 @@ public:
     static TemperatureType GetTemperatureType();
     static std::string GetTemperatureName(const TemperatureType& type);
     static WeekDay GetFirstDayOfWeek();
+    static std::string GetEffectiveLanguage();
     static std::string GetSystemLanguage();
     static std::string GetSystemRegion();
     static std::string GetSystemLocale();
@@ -146,6 +147,7 @@ private:
     static void Split(const std::string &src, const std::string &sep, std::vector<std::string> &dest);
     static void Split(const std::string &src, const std::string &sep, std::unordered_set<std::string> &dest);
     static I18nErrorCode UpdateSystemLocale(const std::string &language);
+    static std::string ComputeEffectiveLanguage(const std::string& locale, const std::string& language);
     static constexpr uint32_t LANGUAGE_LEN = 2;
     static constexpr uint32_t LOCALE_ITEM_COUNT = 3;
     static constexpr uint32_t SCRIPT_OFFSET = 2;

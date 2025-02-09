@@ -310,17 +310,14 @@ static unordered_map<string, string> g_languageMap = {
     { "my-Qaag", "my-Qaag" },
     { "es-Latn-419", "es-419" },
     { "es-Latn-US", "es-419" },
-    { "es-US", "es-419" },
     { "az-Latn", "az-Latn" },
     { "bs-Latn", "bs-Latn" },
     { "en-Latn-US", "en" },
-    { "en-US", "en" },
     { "en-Qaag", "en-Qaag" },
     { "uz-Latn", "uz-Latn" },
     { "sr-Latn", "sr-Latn" },
     { "jv-Latn", "jv-Latn" },
     { "pt-Latn-BR", "pt-BR" },
-    { "pt-PT", "pt" },
     { "pa-Guru", "pa-Guru" },
     { "mai-Deva", "mai-Deva" }
 };
@@ -382,6 +379,13 @@ string GetDisplayLanguageInner(const string &language, const string &displayLoca
 }
 
 bool LocaleConfig::listsInitialized = LocaleConfig::InitializeLists();
+
+std::string LocaleConfig::GetEffectiveLanguage()
+{
+    std::string systemLocale = GetSystemLocale();
+    std::string systemLanguage = GetSystemLanguage();
+    return ComputeEffectiveLanguage(systemLocale, systemLanguage);
+}
 
 string LocaleConfig::GetSystemLanguage()
 {
@@ -1450,6 +1454,42 @@ void LocaleConfig::QueryUpgradeLocale()
     }
 }
 
+std::string LocaleConfig::ComputeEffectiveLanguage(const std::string& locale, const std::string& language)
+{
+    if (locale.empty()) {
+        HILOG_ERROR_I18N("LocaleConfig::ComputeEffectiveLanguage: locale is empty.");
+        return locale;
+    }
+    size_t prefixLength = 2;
+    if (locale.compare(0, prefixLength, "es") != 0 && locale.compare(0, prefixLength, "pt") != 0) {
+        return locale;
+    }
+    std::shared_ptr<LocaleInfo> esESLocale = std::make_shared<LocaleInfo>("es-ES");
+    std::shared_ptr<LocaleInfo> esUSLocale = std::make_shared<LocaleInfo>("es-US");
+    std::shared_ptr<LocaleInfo> ptPTLocale = std::make_shared<LocaleInfo>("pt-PT");
+    std::shared_ptr<LocaleInfo> ptBRLocale = std::make_shared<LocaleInfo>("pt-BR");
+    std::vector<LocaleInfo*> candidateLocales {
+        esESLocale.get(),
+        esUSLocale.get(),
+        ptPTLocale.get(),
+        ptBRLocale.get()
+    };
+    std::shared_ptr<LocaleInfo> requestLocale = std::make_shared<LocaleInfo>(locale);
+    std::string bestMatchedLocale = LocaleMatcher::GetBestMatchedLocale(requestLocale.get(), candidateLocales);
+    if (bestMatchedLocale.empty()) {
+        HILOG_ERROR_I18N("LocaleConfig::ComputeEffectiveLanguage: Get best matched locale failed.");
+        return locale;
+    }
+    if (language.empty()) {
+        HILOG_ERROR_I18N("LocaleConfig::ComputeEffectiveLanguage: language is empty.");
+        return locale;
+    }
+    if (bestMatchedLocale.compare(language) == 0) {
+        return locale;
+    }
+    return language;
+}
+
 I18nErrorCode LocaleConfig::SetSystemLocale(const std::string &localeTag, int32_t userId)
 {
     if (!IsValidTag(localeTag)) {
@@ -1461,12 +1501,14 @@ I18nErrorCode LocaleConfig::SetSystemLocale(const std::string &localeTag, int32_
     if (SetParameter(LOCALE_KEY.c_str(), localeTag.data()) != 0) {
         return I18nErrorCode::UPDATE_SYSTEM_LOCALE_FAILED;
     }
+    std::string systemLanguage = GetSystemLanguage();
+    std::string effectiveLanguage = ComputeEffectiveLanguage(localeTag, systemLanguage);
 #ifdef SUPPORT_MULTI_USER
     std::string localId = (userId != -1) ? std::to_string(userId) : "";
     MultiUsers::SaveLocale(localId, localeTag);
 #endif
 #ifdef SUPPORT_GRAPHICS
-    UpdateConfiguration(AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE, localeTag, userId);
+    UpdateConfiguration(AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE, effectiveLanguage, userId);
     return PublishCommonEvent(EventFwk::CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED, userId);
 #else
     return I18nErrorCode::SUCCESS;
