@@ -35,11 +35,29 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
+
+    static std::vector<std::pair<std::string, std::string>> languageAndRegion;
+    static std::vector<std::string> simplifiedLanguage;
 };
 
 string LocaleConfigTest::originalLanguage;
 string LocaleConfigTest::originalRegion;
 string LocaleConfigTest::originalLocale;
+
+std::vector<std::pair<std::string, std::string>> LocaleConfigTest::languageAndRegion {
+    { "zh-Hans", "CN" }, { "zh-Hant", "HK" }, { "zh-Hant", "TW" }, { "en-Latn-US", "US" }, { "en-Latn-US", "GB" },
+    { "bo", "CN" }, { "ug", "CN" }, { "am", "CN" }, { "ar", "CN" }, { "as", "CN" }, { "az-Latn", "IR" },
+    { "be", "CN" }, { "bg", "CN" }, { "bn", "CN" }, { "bs-Latn", "CN" }, { "ca", "CN" }, { "cs", "CN" },
+    { "da", "CN" }, { "de", "CN" }, { "el", "CN" }, { "es-ES", "US" }, { "es-US", "ES" }, { "et", "CN" },
+    { "eu", "CN" }, { "fa", "IR" }, { "fi", "CN" }, { "tl", "CN" }, { "fr", "CN" },  { "jv-Latn", "CN" },
+    { "mai", "CN" }, { "mn-Cyrl", "CN" }, { "uz-Latn", "CN" }
+};
+
+std::vector<std::string> LocaleConfigTest::simplifiedLanguage {
+    "zh-Hans", "zh-Hant-HK", "zh-Hant", "en", "en-GB", "bo", "ug", "am", "ar", "as", "az-Latn", "be", "bg", "bn",
+    "bs-Latn", "ca", "cs", "da", "de", "el", "es", "es-US", "et", "eu", "fa", "fi", "tl", "fr", "jv-Latn", "mai",
+    "mn-Cyrl", "uz-Latn"
+};
 
 void LocaleConfigTest::SetUpTestCase(void)
 {
@@ -200,7 +218,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest008, TestSize.Level1)
     localeTag = "en-US";
     displayName = LocaleConfig::GetDisplayLanguage(languageTag, localeTag, false);
     EXPECT_EQ(displayName, "Simplified Chinese");
-    
+
     displayName = LocaleConfig::GetDisplayLanguage(languageTag, localeTag, true);
     EXPECT_EQ(displayName, "Simplified Chinese");
 
@@ -457,6 +475,21 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest021, TestSize.Level1)
     flag = LocaleConfig::IsValidTag(fakeTag);
     EXPECT_TRUE(!flag);
     EXPECT_FALSE(LocaleConfig::IsValidTag(""));
+}
+
+/**
+ * @tc.name: LocaleConfigFuncTest022
+ * @tc.desc: Test LocaleConfig GetSimplifiedSystemLanguage
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest022, TestSize.Level1)
+{
+    for (auto index = 0; index < LocaleConfigTest::languageAndRegion.size(); ++index) {
+        LocaleConfig::SetSystemLanguage(languageAndRegion[index].first);
+        LocaleConfig::SetSystemRegion(languageAndRegion[index].second);
+        std::string ret = LocaleConfig::GetSimplifiedSystemLanguage();
+        EXPECT_EQ(ret, LocaleConfigTest::simplifiedLanguage[index]);
+    }
 }
 } // namespace I18n
 } // namespace Global

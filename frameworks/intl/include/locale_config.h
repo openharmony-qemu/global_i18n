@@ -40,7 +40,7 @@ class LocaleConfig {
 public:
     LocaleConfig() = default;
     virtual ~LocaleConfig() = default;
-    
+
     /**
      * @brief Set the System Language to language Tag.
      *
@@ -261,7 +261,7 @@ private:
      */
     static std::string CreateLocale(const std::string &languageTag, const std::string &scriptTag,
         const std::string &regionTag, const std::string &extendParamTag);
-    
+
     /**
      * @brief Create a locale tag from region tag. Use icu to fill in missing parts.
      *
@@ -307,6 +307,7 @@ private:
     static std::map<std::string, std::string> locale2DisplayName;
     static std::map<std::string, std::string> region2DisplayName;
     static std::unordered_map<std::string, std::vector<std::string>> dialectLanguages;
+    static std::unordered_map<std::string, std::string> resourceIdMap;
     static std::string currentDialectLocale;
     static std::string currentOverrideRegion;
     static std::set<std::string> validCaTag;

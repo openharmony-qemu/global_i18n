@@ -170,10 +170,20 @@ unordered_map<string, string> LocaleConfig::localDigitMap {
 };
 
 std::unordered_map<std::string, std::vector<std::string>> LocaleConfig::dialectLanguages {
-    { "en", { "en-US", "en-GB" } },
-    { "es", { "es-ES", "es-US" } },
-    { "pt", { "pt-PT", "pt-BR" } },
+    { "en-Latn", { "en-Latn-US", "en-Latn-GB" } },
+    { "pt-Latn", { "pt-Latn-PT", "pt-Latn-BR" } },
     { "zh-Hant", { "zh-Hant-HK", "zh-Hant-TW" } },
+};
+
+std::unordered_map<std::string, std::string> LocaleConfig::resourceIdMap {
+    { "zh", "zh-Hans" },
+    { "zh-HK", "zh-Hant-HK" },
+    { "zh-TW", "zh-Hant" },
+    { "az", "az-Latn" },
+    { "bs", "bs-Latn" },
+    { "jv", "jv-Latn" },
+    { "uz", "uz-Latn" },
+    { "mn", "mn-Cyrl" },
 };
 
 std::unordered_map<TemperatureType, std::string> LocaleConfig::temperatureTypeToName {
@@ -1854,13 +1864,11 @@ std::string LocaleConfig::GetSimplifiedSystemLanguage()
     std::string locale = GetSystemLanguage();
     LocaleInfo localeInfo(locale);
     LocaleInfo localeInfoMax(localeInfo.Maximize());
-    std::string language = localeInfo.GetLanguage();
-    if (language.compare("zh") == 0) {
-        language = language + '-' + localeInfoMax.GetScript();
-    }
+    std::string language = localeInfoMax.GetLanguage();
+    language = language + '-' + localeInfoMax.GetScript();
     if (dialectLanguages.find(language) != dialectLanguages.end()) {
         std::string systemRegion = localeInfo.GetRegion();
-        if (!systemRegion.empty() && language.compare("en") != 0) {
+        if (!systemRegion.empty() && language.compare("en-Latn") != 0) {
             locale = language + '-' + systemRegion;
         } else {
             locale = GetSystemLocale();
@@ -1890,7 +1898,12 @@ std::string LocaleConfig::GetSimplifiedSystemLanguage()
         requestLocale = nullptr;
     }
     LocaleInfo simplifiedLocale(locale);
-    return simplifiedLocale.Minimize();
+    std::string ret = simplifiedLocale.Minimize();
+    auto iter = resourceIdMap.find(ret);
+    if (iter != resourceIdMap.end()) {
+        ret = iter->second;
+    }
+    return ret;
 }
 
 std::string LocaleConfig::GetUnicodeWrappedFilePath(const std::string &path, const char delimiter,
