@@ -1484,6 +1484,9 @@ std::string LocaleConfig::ComputeEffectiveLanguage(const std::string& locale, co
         HILOG_ERROR_I18N("LocaleConfig::ComputeEffectiveLanguage: language is empty.");
         return locale;
     }
+    if (language.compare("es") == 0) {
+        language = "es-ES";
+    }
     if (bestMatchedLocale.compare(language) == 0) {
         return locale;
     }
