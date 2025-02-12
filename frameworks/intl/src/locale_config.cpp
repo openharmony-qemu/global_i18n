@@ -1484,13 +1484,14 @@ std::string LocaleConfig::ComputeEffectiveLanguage(const std::string& locale, co
         HILOG_ERROR_I18N("LocaleConfig::ComputeEffectiveLanguage: language is empty.");
         return locale;
     }
+    std::string systemLanguage = language;
     if (language.compare("es") == 0) {
-        language = "es-ES";
+        systemLanguage = "es-ES";
     }
-    if (bestMatchedLocale.compare(language) == 0) {
+    if (bestMatchedLocale.compare(systemLanguage) == 0) {
         return locale;
     }
-    return language;
+    return systemLanguage;
 }
 
 I18nErrorCode LocaleConfig::SetSystemLocale(const std::string &localeTag, int32_t userId)
