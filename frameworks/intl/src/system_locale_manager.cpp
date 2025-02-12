@@ -128,9 +128,8 @@ const std::unordered_set<std::string> SystemLocaleManager::supportLocales {
 };
 
 std::unordered_map<std::string, std::string> SystemLocaleManager::custLanguageMap {
-    { "pt-PT", "pt" },
-    { "es-ES", "es" },
-    { "es-US", "es-419" }
+    { "es-US", "es-419" },
+    { "pt-PT", "pt" }
 };
 
 SystemLocaleManager::SystemLocaleManager()
