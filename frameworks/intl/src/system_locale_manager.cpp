@@ -127,6 +127,11 @@ const std::unordered_set<std::string> SystemLocaleManager::supportLocales {
     "zh-Hant-TW",
 };
 
+std::unordered_map<std::string, std::string> SystemLocaleManager::custLanguageMap {
+    { "es-US", "es-419" },
+    { "pt-PT", "pt" }
+};
+
 SystemLocaleManager::SystemLocaleManager()
 {
 }
@@ -155,13 +160,17 @@ std::vector<LocaleItem> SystemLocaleManager::GetLanguageInfoArray(const std::vec
     std::unordered_set<std::string> blockedLanguages = LocaleConfig::GetBlockedLanguages();
     std::unordered_set<std::string> simRegions = GetCountryCodeFromSimCard();
     for (auto it = languages.begin(); it != languages.end(); ++it) {
-        if (blockedLanguages.find(*it) != blockedLanguages.end()) {
+        std::string language = *it;
+        if (blockedLanguages.find(language) != blockedLanguages.end()) {
             continue;
         }
-        std::string languageDisplayName = LocaleConfig::GetDisplayLanguage(*it, options.localeTag, true);
+        if (custLanguageMap.find(language) != custLanguageMap.end()) {
+            language = custLanguageMap[language];
+        }
+        std::string languageDisplayName = LocaleConfig::GetDisplayLanguage(language, options.localeTag, true);
         std::string languageNativeName;
         if (options.isUseLocalName) {
-            languageNativeName = LocaleConfig::GetDisplayLanguage(*it, *it, true);
+            languageNativeName = LocaleConfig::GetDisplayLanguage(language, language, true);
         }
         bool isSuggestedWithSystemRegion = LocaleConfig::IsSuggested(*it, LocaleConfig::GetSystemRegion());
         SuggestionType suggestionType = SuggestionType::SUGGESTION_TYPE_NONE;

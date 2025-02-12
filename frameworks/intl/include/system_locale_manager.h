@@ -127,6 +127,7 @@ private:
     LocaleItem GetLocaleItem(const std::string &region, SuggestionType &suggestionType,
         const std::string &localeTag);
     static const std::unordered_set<std::string> supportLocales;
+    static std::unordered_map<std::string, std::string> custLanguageMap;
     static constexpr int CONFIG_LEN = 128;
 };
 } // namespace I18n
