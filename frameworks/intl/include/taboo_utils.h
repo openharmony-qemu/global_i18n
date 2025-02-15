@@ -23,17 +23,28 @@ namespace Global {
 namespace I18n {
 class TabooUtils {
 public:
-    TabooUtils();
-    ~TabooUtils();
+    static TabooUtils* GetInstance();
     std::string ReplaceCountryName(const std::string& region, const std::string& displayLanguage,
         const std::string& name);
     std::string ReplaceLanguageName(const std::string& language, const std::string& displayLanguage,
         const std::string& name);
+    std::string ReplaceTimeZoneName(const std::string& tzId, const std::string& displayLanguage,
+        const std::string& name);
+    std::string ReplaceCityName(const std::string& cityId, const std::string& displayLanguage,
+        const std::string& name);
+    std::string ReplacePhoneLocationName(const std::string& phoneNumber, const std::string& displayLanguage,
+        const std::string& name);
+    std::unordered_set<std::string> GetBlockedLanguages() const;
+    std::unordered_set<std::string> GetBlockedRegions(const std::string& language) const;
+    std::unordered_set<std::string> GetBlockedCities() const;
+    std::unordered_set<std::string> GetBlockedPhoneNumbers() const;
 
 private:
-    std::shared_ptr<Taboo> GetLatestTaboo();
+    TabooUtils();
+    TabooUtils(const TabooUtils&) = delete;
+    TabooUtils& operator=(const TabooUtils&) = delete;
     std::shared_ptr<Taboo> systemTaboo;
-    std::string systemTabooDataPath = "/system/etc/taboo_res/";
+    static std::string SYSTEM_TABOO_DATA_PATH;
 };
 } // namespace I18n
 } // namespace Global

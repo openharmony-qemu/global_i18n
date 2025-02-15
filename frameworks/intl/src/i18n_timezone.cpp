@@ -67,13 +67,12 @@ const char *I18nTimeZone::CITY_DISPLAYNAME_ROOT_TAG = "display_names";
 const char *I18nTimeZone::CITY_DISPLAYNAME_SECOND_ROOT_TAG = "display_name";
 
 std::set<std::string> I18nTimeZone::supportedLocales {};
-std::set<std::string> I18nTimeZone::availableZoneCityIDs {};
-std::map<std::string, std::string> I18nTimeZone::city2TimeZoneID {};
+std::unordered_set<std::string> I18nTimeZone::availableZoneCityIDs {};
+std::unordered_map<std::string, std::string> I18nTimeZone::city2TimeZoneID {};
 std::map<std::string, std::string> I18nTimeZone::BEST_MATCH_LOCALE {};
-std::mutex I18nTimeZone::cityTimeZoneMutex;
 std::mutex I18nTimeZone::matchLocaleMutex;
-
-const int RECV_CHAR_LEN = 128;
+std::mutex I18nTimeZone::initZoneInfoMutex;
+bool I18nTimeZone::initAvailableZoneInfo = false;
 
 std::map<int, std::string> I18nTimeZone::categoryNum2TimezoneWN {
     { 0, "Africa/Abidjan" },
@@ -611,9 +610,7 @@ I18nTimeZone::I18nTimeZone(std::string &id, bool isZoneID)
             timezone = icu::TimeZone::createTimeZone(unicodeZoneID);
         }
     } else {
-        if (city2TimeZoneID.size() == 0) {
-            GetAvailableZoneCityIDs();
-        }
+        GetAvailableZoneCityIDs();
         if (city2TimeZoneID.find(id) == city2TimeZoneID.end()) {
             timezone = icu::TimeZone::createDefault();
         } else {
@@ -724,27 +721,14 @@ std::string I18nTimeZone::GetDisplayName(
 }
 
 std::string I18nTimeZone::GetDisplayNameByTaboo(
-    const std::string& localeStr, std::string result)
+    const std::string& localeStr, const std::string& result)
 {
-    void *i18nUtilHandle = dlopen("libi18n_util.z.so", RTLD_NOW);
-    if (i18nUtilHandle == nullptr) {
+    TabooUtils* tabooUtils = TabooUtils::GetInstance();
+    if (tabooUtils == nullptr) {
+        HILOG_ERROR_I18N("I18nTimeZone::GetDisplayNameByTaboo: tabooUtils is nullptr.");
         return result;
     }
-    GetReplacedTimezoneDisplayName getReplacedTimezoneDisplayName =
-        (GetReplacedTimezoneDisplayName)dlsym(i18nUtilHandle, "GetReplacedTimezoneDisplayName");
-
-    char recvArr[RECV_CHAR_LEN];
-    int err = strcpy_s(recvArr, RECV_CHAR_LEN, result.c_str());
-    if (err != 0) {
-        dlclose(i18nUtilHandle);
-        return result;
-    }
-    if (getReplacedTimezoneDisplayName) {
-        getReplacedTimezoneDisplayName(localeStr.c_str(), GetID().c_str(), recvArr);
-    }
-    result = recvArr;
-    dlclose(i18nUtilHandle);
-    return result;
+    return tabooUtils->ReplaceTimeZoneName(GetID(), localeStr, result);
 }
 
 bool I18nTimeZone::ReadTimeZoneData(const char *xmlPath)
@@ -779,7 +763,7 @@ bool I18nTimeZone::ReadTimeZoneData(const char *xmlPath)
             availableZoneCityIDs.insert(reinterpret_cast<const char *>(contents[0]));
             const char* pairKey = reinterpret_cast<const char *>(contents[0]);
             const char* pairVal = reinterpret_cast<const char *>(contents[1]);
-            SetCity2TimeZoneID(pairKey, pairVal);
+            city2TimeZoneID.insert(std::make_pair<std::string, std::string>(pairKey, pairVal));
         }
         for (size_t i = 0; i < ELEMENT_NUM; i++) {
             if (contents[i] != nullptr) {
@@ -790,13 +774,6 @@ bool I18nTimeZone::ReadTimeZoneData(const char *xmlPath)
     }
     xmlFreeDoc(doc);
     return true;
-}
-
-void I18nTimeZone::SetCity2TimeZoneID(const char* key, const char* value)
-{
-    std::lock_guard<std::mutex> cityTzLock(cityTimeZoneMutex);
-    city2TimeZoneID.insert(
-        std::make_pair<std::string, std::string>(key, value));
 }
 
 void I18nTimeZone::GetTimezoneIDFromZoneInfo(std::set<std::string> &availableIDs, std::string &parentPath,
@@ -826,9 +803,13 @@ std::set<std::string> I18nTimeZone::GetAvailableIDs(I18nErrorCode &errorCode)
     return GetTimeZoneAvailableIDs(errorCode);
 }
 
-std::set<std::string> I18nTimeZone::GetAvailableZoneCityIDs()
+std::unordered_set<std::string> I18nTimeZone::GetAvailableZoneCityIDs()
 {
-    if (availableZoneCityIDs.size() != 0) {
+    if (initAvailableZoneInfo) {
+        return availableZoneCityIDs;
+    }
+    std::lock_guard<std::mutex> lock(initZoneInfoMutex);
+    if (initAvailableZoneInfo) {
         return availableZoneCityIDs;
     }
     struct stat s;
@@ -839,6 +820,19 @@ std::set<std::string> I18nTimeZone::GetAvailableZoneCityIDs()
     } else {
         ReadTimeZoneData(CITY_TIMEZONE_DATA_PATH);
     }
+    TabooUtils* tabooUtils = TabooUtils::GetInstance();
+    if (tabooUtils == nullptr) {
+        HILOG_ERROR_I18N("I18nTimeZone::GetAvailableZoneCityIDs: tabooUtils is nullptr.");
+        return availableZoneCityIDs;
+    }
+    std::unordered_set<std::string> blockedCities = tabooUtils->GetBlockedCities();
+    for (const auto& city : blockedCities) {
+        if (availableZoneCityIDs.find(city) != availableZoneCityIDs.end()) {
+            availableZoneCityIDs.erase(city);
+            city2TimeZoneID.erase(city);
+        }
+    }
+    initAvailableZoneInfo = true;
     return availableZoneCityIDs;
 }
 
@@ -1014,21 +1008,25 @@ void I18nTimeZone::SetBestMatchLocale(const std::string& key, const std::string&
 
 std::string I18nTimeZone::GetCityDisplayName(std::string &cityID, std::string &localeStr)
 {
-    if (availableZoneCityIDs.size() == 0) {
-        GetAvailableZoneCityIDs();
-    }
+    GetAvailableZoneCityIDs();
     if (availableZoneCityIDs.find(cityID) == availableZoneCityIDs.end()) {
-        HILOG_ERROR_I18N("%{public}s is not supported cityID.", cityID.c_str());
+        HILOG_ERROR_I18N("I18nTimeZone::GetCityDisplayName: %{public}s is not supported cityID.", cityID.c_str());
         return PseudoLocalizationProcessor("");
     }
     std::string requestLocaleStr = GetLocaleBaseName(localeStr);
-    if (requestLocaleStr.length() != 0) {
-        std::string displayName = FindCityDisplayNameFromXml(cityID, requestLocaleStr);
-        if (displayName.length() != 0) {
-            return PseudoLocalizationProcessor(displayName);
-        }
+    if (requestLocaleStr.empty()) {
+        HILOG_ERROR_I18N("I18nTimeZone::GetCityDisplayName: requestLocaleStr is empty.");
+        return PseudoLocalizationProcessor("");
     }
-    return PseudoLocalizationProcessor("");
+    std::string displayName = FindCityDisplayNameFromXml(cityID, requestLocaleStr);
+    TabooUtils* tabooUtils = TabooUtils::GetInstance();
+    if (tabooUtils == nullptr) {
+        HILOG_ERROR_I18N("I18nTimeZone::GetCityDisplayName: tabooUtils is nullptr.");
+        return PseudoLocalizationProcessor(displayName);
+    }
+    requestLocaleStr = StrReplaceAll(requestLocaleStr, "_", "-");
+    displayName = tabooUtils->ReplaceCityName(cityID, requestLocaleStr, displayName);
+    return PseudoLocalizationProcessor(displayName);
 }
 
 std::string I18nTimeZone::GetLocaleBaseName(std::string &localeStr)
@@ -1053,9 +1051,7 @@ std::string I18nTimeZone::GetLocaleBaseName(std::string &localeStr)
 
 std::string I18nTimeZone::GetTimezoneIdByCityId(const std::string &cityId)
 {
-    if (city2TimeZoneID.size() == 0) {
-        GetAvailableZoneCityIDs();
-    }
+    GetAvailableZoneCityIDs();
     if (city2TimeZoneID.find(cityId) == city2TimeZoneID.end()) {
         return "";
     } else {

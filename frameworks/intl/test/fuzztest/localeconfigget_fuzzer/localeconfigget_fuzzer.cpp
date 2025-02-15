@@ -27,9 +27,8 @@ namespace OHOS {
         LocaleConfig::GetSystemLanguage();
         LocaleConfig::GetSystemRegion();
         LocaleConfig::GetSystemLocale();
-        std::vector<std::string> ret;
-        LocaleConfig::GetSystemLanguages(ret);
-        LocaleConfig::GetSystemCountries(ret);
+        LocaleConfig::GetSystemLanguages();
+        LocaleConfig::GetSystemCountries();
 
         std::string input(reinterpret_cast<const char*>(data), size);
         LocaleConfig::IsSuggested(input);

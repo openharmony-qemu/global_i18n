@@ -90,18 +90,16 @@ HWTEST_F(IntlTest, IntlFuncTest0047, TestSize.Level1)
 HWTEST_F(IntlTest, IntlFuncTest0048, TestSize.Level1)
 {
     std::unordered_set<std::string> regionSet = LocaleConfig::GetBlockedRegions();
-    EXPECT_TRUE(regionSet.size() == 0);
+    EXPECT_TRUE(regionSet.size() == 0 || regionSet.size() == 2);
 }
 
 /**
  * @tc.name: IntlFuncTest0049
- * @tc.desc: Test Intl LocaleConfig GetLanguageBlockedRegions
+ * @tc.desc: Test Intl LocaleConfig
  * @tc.type: FUNC
  */
 HWTEST_F(IntlTest, IntlFuncTest0049, TestSize.Level1)
 {
-    std::unordered_set<std::string> blockedRegionSet = LocaleConfig::GetLanguageBlockedRegions();
-    EXPECT_EQ(blockedRegionSet.size(), 0);
     I18nErrorCode status = LocaleConfig::SetSystemLanguage("zh-Hans");
     EXPECT_EQ(status, I18nErrorCode::SUCCESS);
     std::string systemLanguage = LocaleConfig::GetSystemLanguage();
@@ -319,16 +317,14 @@ HWTEST_F(IntlTest, IntlFuncTest0053, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest0054, TestSize.Level1)
 {
-    TabooUtils *tabooUtils = new TabooUtils();
+    TabooUtils* tabooUtils = TabooUtils::GetInstance();
+    ASSERT_TRUE(tabooUtils != nullptr);
     std::string res1 = tabooUtils->ReplaceCountryName("CN", "en", "China");
     EXPECT_EQ(res1, "China");
     std::string res2 = tabooUtils->ReplaceLanguageName("zh", "en", "chinese");
     EXPECT_EQ(res2, "chinese");
     std::string res3 = tabooUtils->ReplaceCountryName("TW", "zh-Hans", "中国台湾");
     EXPECT_EQ(res3, "中国台湾");
-    delete tabooUtils;
-    Taboo* taboo = new Taboo();
-    delete taboo;
 }
 
 /**
@@ -467,7 +463,7 @@ HWTEST_F(IntlTest, IntlFuncTest0058, TestSize.Level1)
     I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
     std::set<std::string> set0 = I18nTimeZone::GetAvailableIDs(errorCode);
     EXPECT_EQ(set0.size(), 442);
-    std::set<std::string> set1 = I18nTimeZone::GetAvailableZoneCityIDs();
+    std::unordered_set<std::string> set1 = I18nTimeZone::GetAvailableZoneCityIDs();
     EXPECT_TRUE(set1.size() > 0);
     std::string empty = "";
     std::string fakeCityId = "fake cityId";

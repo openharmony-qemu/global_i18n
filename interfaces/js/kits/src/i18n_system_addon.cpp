@@ -116,26 +116,27 @@ napi_value I18nSystemAddon::GetDisplayLanguageWithError(napi_env env, napi_callb
 
 napi_value I18nSystemAddon::GetSystemLanguages(napi_env env, napi_callback_info info)
 {
-    std::vector<std::string> systemLanguages;
-    LocaleConfig::GetSystemLanguages(systemLanguages);
+    std::unordered_set<std::string> systemLanguages = LocaleConfig::GetSystemLanguages();
     napi_value result = nullptr;
     napi_status status = napi_create_array_with_length(env, systemLanguages.size(), &result);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("GetSystemLanguages: Failed to create array");
         return nullptr;
     }
-    for (size_t i = 0; i < systemLanguages.size(); i++) {
+    size_t pos = 0;
+    for (const auto& language : systemLanguages) {
         napi_value value = nullptr;
-        status = napi_create_string_utf8(env, systemLanguages[i].c_str(), NAPI_AUTO_LENGTH, &value);
+        status = napi_create_string_utf8(env, language.c_str(), NAPI_AUTO_LENGTH, &value);
         if (status != napi_ok) {
             HILOG_ERROR_I18N("GetSystemLanguages: Failed to create string item");
             return nullptr;
         }
-        status = napi_set_element(env, result, i, value);
+        status = napi_set_element(env, result, pos, value);
         if (status != napi_ok) {
             HILOG_ERROR_I18N("GetSystemLanguages: Failed to set array item");
             return nullptr;
         }
+        pos++;
     }
     return result;
 }
@@ -520,38 +521,33 @@ napi_value I18nSystemAddon::GetSystemCountriesImpl(napi_env env, napi_callback_i
         return nullptr;
     }
     VariableConvertor::VerifyType(env, "language", napi_valuetype::napi_string, argv[0]);
-    size_t len = 0;
-    status = napi_get_value_string_utf8(env, argv[0], nullptr, 0, &len);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("GetSystemCountriesImpl: Failed to get string len argv[0].");
+    int32_t code = 0;
+    std::string language = VariableConvertor::GetString(env, argv[0], code);
+    if (code != 0) {
+        HILOG_ERROR_I18N("GetSystemCountriesImpl: Get argv[0] failed.");
         return nullptr;
     }
-    std::vector<char> localeBuf(len + 1);
-    status = napi_get_value_string_utf8(env, argv[0], localeBuf.data(), len + 1, &len);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("GetSystemCountriesImpl: Failed to get string item argv[0].");
-        return nullptr;
-    }
-    std::vector<std::string> systemCountries;
-    LocaleConfig::GetSystemCountries(systemCountries);
+    std::unordered_set<std::string> systemCountries = LocaleConfig::GetSystemCountries(language);
     napi_value result = nullptr;
     status = napi_create_array_with_length(env, systemCountries.size(), &result);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("GetSystemCountriesImpl: Failed to create array");
         return nullptr;
     }
-    for (size_t i = 0; i < systemCountries.size(); i++) {
+    size_t pos = 0;
+    for (const auto& country : systemCountries) {
         napi_value value = nullptr;
-        status = napi_create_string_utf8(env, systemCountries[i].c_str(), NAPI_AUTO_LENGTH, &value);
+        status = napi_create_string_utf8(env, country.c_str(), NAPI_AUTO_LENGTH, &value);
         if (status != napi_ok) {
             HILOG_ERROR_I18N("GetSystemCountries: Failed to create string item");
             return nullptr;
         }
-        status = napi_set_element(env, result, i, value);
+        status = napi_set_element(env, result, pos, value);
         if (status != napi_ok) {
             HILOG_ERROR_I18N("GetSystemCountries: Failed to set array item");
             return nullptr;
         }
+        pos++;
     }
     return result;
 }

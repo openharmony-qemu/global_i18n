@@ -63,6 +63,24 @@ void Split(const string &src, const string &sep, vector<string> &dest)
     }
 }
 
+void Split(const std::string& src, const std::string& sep, std::unordered_set<std::string>& dest)
+{
+    dest.clear();
+    if (src.empty()) {
+        return;
+    }
+    std::string::size_type begin = 0;
+    std::string::size_type end = src.find(sep);
+    while (end != string::npos) {
+        dest.insert(src.substr(begin, end - begin));
+        begin = end + sep.size();
+        end = src.find(sep, begin);
+    }
+    if (begin != src.size()) {
+        dest.insert(src.substr(begin));
+    }
+}
+
 void Merge(const std::vector<std::string>& src, const std::string& sep, std::string& dest)
 {
     if (src.size() == 0) {

@@ -24,6 +24,7 @@
 #include "i18n_types.h"
 #include "memory"
 #include "unicode/timezone.h"
+#include <unordered_set>
 #include <vector>
 #include <tuple>
 
@@ -43,10 +44,10 @@ public:
     std::string GetDisplayName(bool isDST);
     std::string GetDisplayName(std::string localeStr);
     std::string GetDisplayName(std::string localeStr, bool isDST);
-    virtual std::string GetDisplayNameByTaboo(const std::string& localeStr, std::string result);
+    virtual std::string GetDisplayNameByTaboo(const std::string& localeStr, const std::string& result);
     static std::unique_ptr<I18nTimeZone> CreateInstance(std::string &id, bool isZoneID);
     static std::set<std::string> GetAvailableIDs(I18nErrorCode &errorCode);
-    static std::set<std::string> GetAvailableZoneCityIDs();
+    static std::unordered_set<std::string> GetAvailableZoneCityIDs();
     static std::string GetCityDisplayName(std::string &cityID, std::string &locale);
     static std::vector<std::string> GetTimezoneIdByLocation(const double x, const double y);
     static std::map<std::string, std::string> FindCityDisplayNameMap(std::string &locale);
@@ -77,8 +78,8 @@ private:
     static const uint32_t TZ_MAX_PIXEL_VALUE = 255;
     static constexpr double NUM_PRECISION = 0.1;
     static std::set<std::string> supportedLocales;
-    static std::set<std::string> availableZoneCityIDs;
-    static std::map<std::string, std::string> city2TimeZoneID;
+    static std::unordered_set<std::string> availableZoneCityIDs;
+    static std::unordered_map<std::string, std::string> city2TimeZoneID;
     static std::map<int, std::string> categoryNum2TimezoneWN;
     static std::map<int, std::string> categoryNum2TimezoneEN;
     static std::map<int, std::string> categoryNum2TimezoneWS;
@@ -86,8 +87,9 @@ private:
     static std::map<std::string, std::string> BEST_MATCH_LOCALE;
     static constexpr int SYS_PARAM_LEN = 128;
     icu::TimeZone *timezone = nullptr;
-    static std::mutex cityTimeZoneMutex;
     static std::mutex matchLocaleMutex;
+    static std::mutex initZoneInfoMutex;
+    static bool initAvailableZoneInfo;
 
     static bool ReadTimeZoneData(const char *xmlPath);
     static std::string ComputeLocale(std::string &locale);
@@ -111,7 +113,6 @@ private:
     static bool ValidateDataIntegrity(const std::vector<std::string> &pathList);
     static bool CheckLatitudeAndLongitude(const double x, const double y);
     static std::map<int, std::string> GetTimeZoneCategoryMap(const double x, const double y);
-    static void SetCity2TimeZoneID(const char* key, const char* value);
     static void SetBestMatchLocale(const std::string& key, const std::string& value);
     static const char *GetDeviceCityDisplayNamePath();
 };

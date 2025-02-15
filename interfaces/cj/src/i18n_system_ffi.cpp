@@ -65,9 +65,10 @@ extern "C"
 
     CArrStr FfiI18nSystemGetSystemCountries(char* language)
     {
-        std::vector<std::string> systemCountries;
-        LocaleConfig::GetSystemCountries(systemCountries);
-        return VectorStringToCArr(systemCountries);
+        std::unordered_set<std::string> systemCountries = LocaleConfig::GetSystemCountries(language);
+        std::vector<std::string> result;
+        result.assign(systemCountries.begin(), systemCountries.end());
+        return VectorStringToCArr(result);
     }
 
     char* FfiI18nSystemGetDisplayCountry(char* country, char* locale, bool sentenceCase, int32_t* errcode)
@@ -130,9 +131,10 @@ extern "C"
 
     CArrStr FfiI18nSystemGetSystemLanguages()
     {
-        std::vector<std::string> systemLanguages;
-        LocaleConfig::GetSystemLanguages(systemLanguages);
-        return VectorStringToCArr(systemLanguages);
+        std::unordered_set<std::string> systemLanguages = LocaleConfig::GetSystemLanguages();
+        std::vector<std::string> result;
+        result.assign(systemLanguages.begin(), systemLanguages.end());
+        return VectorStringToCArr(result);
     }
 
     char* FfiI18nSystemGetDisplayLanguage(char* language, char* locale, bool sentenceCase, int32_t* errCode)

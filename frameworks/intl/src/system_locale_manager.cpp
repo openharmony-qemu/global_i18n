@@ -157,13 +157,10 @@ std::vector<LocaleItem> SystemLocaleManager::GetLanguageInfoArray(const std::vec
         status = I18nErrorCode::NOT_SYSTEM_APP;
         return localeItemList;
     }
-    std::unordered_set<std::string> blockedLanguages = LocaleConfig::GetBlockedLanguages();
+    
     std::unordered_set<std::string> simRegions = GetCountryCodeFromSimCard();
     for (auto it = languages.begin(); it != languages.end(); ++it) {
         std::string language = *it;
-        if (blockedLanguages.find(language) != blockedLanguages.end()) {
-            continue;
-        }
         if (custLanguageMap.find(language) != custLanguageMap.end()) {
             language = custLanguageMap[language];
         }
@@ -203,14 +200,8 @@ std::vector<LocaleItem> SystemLocaleManager::GetCountryInfoArray(const std::vect
         return localeItemList;
     }
     std::string systemLanguage = LocaleConfig::GetSystemLanguage();
-    std::unordered_set<std::string> blockedRegions = LocaleConfig::GetBlockedRegions();
-    std::unordered_set<std::string> blockedLanguageRegions = LocaleConfig::GetLanguageBlockedRegions();
     std::unordered_set<std::string> simRegions = GetCountryCodeFromSimCard();
     for (auto it = countries.begin(); it != countries.end(); ++it) {
-        if (blockedRegions.find(*it) != blockedRegions.end() || blockedLanguageRegions.find(*it) !=
-            blockedLanguageRegions.end()) {
-            continue;
-        }
         bool isSuggestedRegion = IsSuggestRegion(systemLanguage, *it);
         SuggestionType suggestionType = SuggestionType::SUGGESTION_TYPE_NONE;
         if (isSuggestedRegion) {
@@ -330,17 +321,13 @@ std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray(I18n
 std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray()
 {
     std::vector<TimeZoneCityItem> result;
-    std::set<std::string> zoneCityIds = I18nTimeZone::GetAvailableZoneCityIDs();
+    std::unordered_set<std::string> zoneCityIds = I18nTimeZone::GetAvailableZoneCityIDs();
     std::string locale = LocaleConfig::GetSystemLocale();
-    std::string localeBaseName = I18nTimeZone::GetLocaleBaseName(locale);
-    std::map<std::string, std::string> displayNameMap = I18nTimeZone::FindCityDisplayNameMap(localeBaseName);
     std::map<std::string, icu::TimeZone*> tzMap;
     bool ifEnforce = GetPseudoLocalizationEnforce();
     for (auto it = zoneCityIds.begin(); it != zoneCityIds.end(); ++it) {
-        std::string cityId = *it, cityDisplayName = "";
-        if (displayNameMap.find(cityId) != displayNameMap.end()) {
-            cityDisplayName = displayNameMap.find(cityId)->second;
-        }
+        std::string cityId = *it;
+        std::string cityDisplayName = I18nTimeZone::GetCityDisplayName(cityId, locale);
         int32_t rawOffset = 0, dstOffset = 0;
         bool local = false;
         UErrorCode status = U_ZERO_ERROR;

@@ -108,8 +108,8 @@ public:
     static std::string GetSystemRegion();
     static std::string GetSystemLocale();
     static std::string GetSystemTimezone();
-    static void GetSystemLanguages(std::vector<std::string> &ret);
-    static void GetSystemCountries(std::vector<std::string> &ret);
+    static std::unordered_set<std::string> GetSystemLanguages();
+    static std::unordered_set<std::string> GetSystemCountries(const std::string& language = "");
     static bool IsSuggested(const std::string &language);
     static bool IsSuggested(const std::string &language, const std::string &region);
     static bool IsSuggestedV15(const std::string &language);
@@ -128,8 +128,7 @@ public:
     static std::string GetSystemHour();
     static bool GetUsingLocalDigit();
     static std::unordered_set<std::string> GetBlockedLanguages();
-    static std::unordered_set<std::string> GetBlockedRegions();
-    static std::unordered_set<std::string> GetLanguageBlockedRegions();
+    static std::unordered_set<std::string> GetBlockedRegions(const std::string& language = "");
     static bool IsValidLanguage(const std::string &language);
     static bool IsValidRegion(const std::string &region);
     static bool IsValidTag(const std::string &tag);
@@ -142,6 +141,8 @@ public:
     static const std::string LANGUAGE_KEY;
     static const std::string LOCALE_KEY;
     static const std::string HOUR_KEY;
+    static const char *DEFAULT_REGION_KEY;
+    static constexpr int CONFIG_LEN = 128;
 
 private:
     static void Split(const std::string &src, const std::string &sep, std::vector<std::string> &dest);
@@ -154,16 +155,12 @@ private:
     static const char *UPGRADE_LOCALE_KEY;
     static const char *DEFAULT_LOCALE_KEY;
     static const char *DEFAULT_LANGUAGE_KEY;
-    static const char *DEFAULT_REGION_KEY;
     static const char *SIM_COUNTRY_CODE_KEY;
     static const char *SUPPORTED_LOCALES_PATH;
     static const char *SUPPORTED_LOCALES_OLD_PATH;
-    static constexpr int CONFIG_LEN = 128;
     static const char *SUPPORTED_LOCALES_NAME;
     static const char *SUPPORTED_REGIONS_NAME;
     static const char *WHITE_LANGUAGES_NAME;
-    static const char *FORBIDDEN_REGIONS_NAME;
-    static const char *FORBIDDEN_LANGUAGES_NAME;
     static const char *REGIONS_LANGUAGES_PATH;
     static const char *REGIONS_LANGUAGES_NAME;
     static const char *SUPPORT_LOCALES_PATH;
@@ -190,7 +187,6 @@ private:
     static std::mutex dialectLocaleMutex;
     static std::mutex region2DisplayNameMutex;
     static std::mutex locale2DisplayNameMutex;
-    static std::mutex tabooUtilsMutex;
     static const std::string EXT_PARAM_KEY;
     static const std::string NUMBER_SYSTEM_KEY;
     static const std::string TEMPERATURE_UNIT_KEY;
@@ -198,7 +194,6 @@ private:
 
     static const std::unordered_set<std::string>& GetSupportedLocales();
     static const std::unordered_set<std::string>& GetSupportedLocalesV15();
-    static const std::unordered_set<std::string>& GetForbiddenRegions();
     static const std::unordered_set<std::string>& GetSupportedRegions();
     static void GetCountriesFromSim(std::vector<std::string> &simCountries);
     static void GetRelatedLocales(std::unordered_set<std::string> &relatedLocales,
@@ -206,7 +201,7 @@ private:
     static void GetRelatedLocalesV15(std::unordered_set<std::string> &relatedLocales,
         const std::vector<std::string> countries);
     static void GetListFromFile(const char *path, const char *resourceName, std::unordered_set<std::string> &ret);
-    static void LoadRegionsLanguages(std::unordered_set<std::string>& forbiddenRegions);
+    static void LoadRegionsLanguages();
     static void Expunge(std::unordered_set<std::string> &src, const std::unordered_set<std::string> &another);
     static std::string GetMainLanguage(const std::string &language,
         std::unordered_map<std::string, std::string> selfDialectMap);
@@ -216,7 +211,6 @@ private:
     static std::string ComputeLocale(const std::string &displayLocale);
     static void ReadLangData(const char *langDataPath);
     static void ReadRegionData(const char *regionDataPath);
-    static void ProcessForbiddenRegions(const std::unordered_set<std::string> &forbiddenRegions);
     static void SetSupportedDialectLocales(const char* key, const char* value);
     static void SetRegion2DisplayName(const char* key, const char* value);
     static void SetLocale2DisplayName(const char* key, const char* value);
@@ -290,9 +284,6 @@ private:
     static std::unordered_set<std::string> supportLocales;
     static std::unordered_set<std::string> dialectLang;
     static std::unordered_set<std::string> overrideSupportedRegions;
-    static std::unordered_set<std::string> blockedLanguages;
-    static std::unordered_set<std::string> blockedRegions;
-    static std::unordered_map<std::string, std::unordered_set<std::string>> blockedLanguageRegions;
     static std::unordered_set<std::string> whiteLanguages;
     static std::set<std::string> extendWhiteLanguageList;
     static std::set<std::string> extendWhiteLanguageListV15;
@@ -318,10 +309,7 @@ private:
     static std::set<std::string> validKfTag;
     static std::set<std::string> validNuTag;
     static std::set<std::string> validHcTag;
-    static std::unique_ptr<TabooUtils> tabooUtils;
-    static bool initTabooUtils;
     static bool listsInitialized;
-    static void InitTabooUtils();
     static bool InitializeLists();
 };
 } // namespace I18n

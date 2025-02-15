@@ -189,7 +189,7 @@ napi_value I18nTimeZoneAddon::GetAvailableTimezoneIDs(napi_env env, napi_callbac
 
 napi_value I18nTimeZoneAddon::GetAvailableZoneCityIDs(napi_env env, napi_callback_info info)
 {
-    std::set<std::string> cityIDs = I18nTimeZone::GetAvailableZoneCityIDs();
+    std::unordered_set<std::string> cityIDs = I18nTimeZone::GetAvailableZoneCityIDs();
     napi_value result = nullptr;
     napi_status status = napi_create_array_with_length(env, cityIDs.size(), &result);
     if (status != napi_ok) {
