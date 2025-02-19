@@ -41,16 +41,36 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
+
+    static std::string originalLanguage;
+    static std::string originalRegion;
+    static std::string originalLocale;
 };
 
+std::string I18nTest::originalLanguage;
+std::string I18nTest::originalRegion;
+std::string I18nTest::originalLocale;
+
 void I18nTest::SetUpTestCase(void)
-{}
+{
+    LocaleConfig::SetSystemLanguage("zh-Hans");
+    LocaleConfig::SetSystemRegion("CN");
+    LocaleConfig::SetSystemLocale("zh-Hans-CN");
+}
 
 void I18nTest::TearDownTestCase(void)
-{}
+{
+    LocaleConfig::SetSystemLanguage(originalLanguage);
+    LocaleConfig::SetSystemRegion(originalRegion);
+    LocaleConfig::SetSystemLocale(originalLocale);
+}
 
 void I18nTest::SetUp(void)
-{}
+{
+    originalLanguage = LocaleConfig::GetSystemLanguage();
+    originalRegion = LocaleConfig::GetSystemRegion();
+    originalLocale = LocaleConfig::GetSystemLocale();
+}
 
 void I18nTest::TearDown(void)
 {}
@@ -1403,7 +1423,7 @@ HWTEST_F(I18nTest, I18nFuncTest059, TestSize.Level1)
     current = new LocaleInfo("en-AU");
     res = LocaleMatcher::IsMoreSuitable(current, other, request);
     EXPECT_TRUE(res > 0);
-    
+
     other = new LocaleInfo("en-GB");
     res = LocaleMatcher::IsMoreSuitable(current, other, request);
     EXPECT_TRUE(res < 0);
@@ -1604,6 +1624,44 @@ HWTEST_F(I18nTest, I18nFuncTest065, TestSize.Level1)
     EXPECT_EQ(month, 12);
     EXPECT_EQ(day, 13);
     EXPECT_EQ(isLeap, false);
+}
+
+/**
+ * @tc.name: I18nFuncTest066
+ * @tc.desc: Test I18n simplified language
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest066, TestSize.Level1)
+{
+    LocaleConfig::SetSystemLanguage("en-Latn");
+    LocaleConfig::SetSystemRegion("US");
+    EXPECT_EQ(LocaleConfig::GetSimplifiedSystemLanguage(), "en");
+    LocaleConfig::SetSystemRegion("GB");
+    EXPECT_EQ(LocaleConfig::GetSimplifiedSystemLanguage(), "en-GB");
+    LocaleConfig::SetSystemLanguage("zh-Hant");
+    LocaleConfig::SetSystemRegion("CN");
+    EXPECT_EQ(LocaleConfig::GetSimplifiedSystemLanguage(), "zh-Hant");
+    LocaleConfig::SetSystemRegion("HK");
+    EXPECT_EQ(LocaleConfig::GetSimplifiedSystemLanguage(), "zh-Hant-HK");
+    LocaleConfig::SetSystemLanguage("es");
+    LocaleConfig::SetSystemRegion("ES");
+    EXPECT_EQ(LocaleConfig::GetSimplifiedSystemLanguage(), "es");
+    LocaleConfig::SetSystemRegion("US");
+    EXPECT_EQ(LocaleConfig::GetSimplifiedSystemLanguage(), "es");
+    LocaleConfig::SetSystemLanguage("pt");
+    LocaleConfig::SetSystemRegion("PT");
+    EXPECT_EQ(LocaleConfig::GetSimplifiedSystemLanguage(), "pt-PT");
+    LocaleConfig::SetSystemRegion("BR");
+    EXPECT_EQ(LocaleConfig::GetSimplifiedSystemLanguage(), "pt");
+    LocaleConfig::SetSystemLanguage("ug-Arab");
+    LocaleConfig::SetSystemRegion("CN");
+    EXPECT_EQ(LocaleConfig::GetSimplifiedSystemLanguage(), "ug");
+
+    int32_t code = 0;
+    EXPECT_EQ(LocaleConfig::GetSimplifiedLanguage("zh-Hant-CN", code), "zh-Hant-CN");
+    EXPECT_EQ(code, 0);
+    EXPECT_EQ(LocaleConfig::GetSimplifiedLanguage("cr-Cans-CA", code), "cr");
+    EXPECT_EQ(code, 0);
 }
 } // namespace I18n
 } // namespace Global

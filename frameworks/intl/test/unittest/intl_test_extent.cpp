@@ -860,7 +860,8 @@ HWTEST_F(IntlTest, IntlFuncTest0070, TestSize.Level1)
     locales.push_back(locale);
     map<string, string> options = { { "style", "unit" },
                                     { "unit", "megabyte" },
-                                    { "unitUsage", "size-file-byte"} };
+                                    { "unitUsage", "size-file-byte"},
+                                    { "unitDisplay", "short" } };
     NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
     if (!numFmt) {
         EXPECT_TRUE(false);
@@ -890,7 +891,8 @@ HWTEST_F(IntlTest, IntlFuncTest0071, TestSize.Level1)
     locales.push_back(locale);
     map<string, string> options = { { "style", "unit" },
                                     { "unit", "megabyte" },
-                                    { "unitUsage", "size-shortfile-byte"} };
+                                    { "unitUsage", "size-shortfile-byte"},
+                                    { "unitDisplay", "short" } };
     NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
     if (!numFmt) {
         EXPECT_TRUE(false);
