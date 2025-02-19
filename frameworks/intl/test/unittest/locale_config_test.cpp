@@ -186,8 +186,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest006, TestSize.Level1)
  */
 HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest007, TestSize.Level1)
 {
-    vector<string> countries;
-    LocaleConfig::GetSystemCountries(countries);
+    std::unordered_set<std::string> countries = LocaleConfig::GetSystemCountries("zh");
     EXPECT_TRUE(countries.size() > 200);
 }
 
@@ -447,8 +446,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest019, TestSize.Level1)
  */
 HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest020, TestSize.Level1)
 {
-    vector<string> languages;
-    LocaleConfig::GetSystemLanguages(languages);
+    std::unordered_set<std::string> languages = LocaleConfig::GetSystemLanguages();
     EXPECT_TRUE(languages.size() > 2);
     LocaleConfig::SetSystemLocale("ur-Latn-PK");
     LocaleConfig::SetUsingLocalDigit(true);

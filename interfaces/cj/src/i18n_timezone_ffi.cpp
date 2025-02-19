@@ -62,7 +62,7 @@ extern "C"
 
     CArrStr FfiI18nTimezoneGetAvailableZoneCityIDs()
     {
-        std::set<std::string> cityIDSet = I18nTimeZone::GetAvailableZoneCityIDs();
+        std::unordered_set<std::string> cityIDSet = I18nTimeZone::GetAvailableZoneCityIDs();
         std::vector<std::string> cityIDVec(cityIDSet.begin(), cityIDSet.end());
         return VectorStringToCArr(cityIDVec);
     }

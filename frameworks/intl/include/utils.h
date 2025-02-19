@@ -30,6 +30,7 @@ namespace I18n {
 static std::set<std::string> availableIDs;
 
 void Split(const std::string &src, const std::string &sep, std::vector<std::string> &dest);
+void Split(const std::string& src, const std::string& sep, std::unordered_set<std::string>& dest);
 void Merge(const std::vector<std::string>& src, const std::string& sep, std::string& dest);
 std::string ReadSystemParameter(const char *paramKey, const int paramLength);
 int32_t ConvertString2Int(const std::string &numberStr, int32_t& status);
@@ -44,7 +45,6 @@ std::string trim(std::string &s);
 bool FileExist(const std::string& path);
 bool FileCopy(const std::string& srcPath, const std::string& dstPath);
 bool IsLegalPath(const std::string& path);
-void Split(const std::string &src, const std::string &sep, std::vector<std::string> &dest);
 bool IsDirExist(const char *path);
 void ClearDir(const std::filesystem::path& dirPath);
 bool GetPseudoLocalizationEnforce();

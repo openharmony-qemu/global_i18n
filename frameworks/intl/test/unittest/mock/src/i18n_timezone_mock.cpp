@@ -22,7 +22,7 @@ I18nTimeZoneMock::I18nTimeZoneMock(std::string &id, bool isZoneID)
 {
 }
 
-std::string I18nTimeZoneMock::GetDisplayNameByTaboo(const std::string& localeStr, std::string result)
+std::string I18nTimeZoneMock::GetDisplayNameByTaboo(const std::string& localeStr, const std::string& result)
 {
     std::string zhLocaleStr = "zh";
     size_t len = zhLocaleStr.size();

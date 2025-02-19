@@ -314,13 +314,12 @@ HWTEST_F(ZoneUtilTest, ZoneUtilFuncTest0012, TestSize.Level1)
     ZoneUtil util;
     I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
     std::set<std::string> timeZoneList = GetTimeZoneAvailableIDs(errorCode);
-    std::vector<std::string> vec;
-    LocaleConfig::GetSystemCountries(vec);
-    for (size_t i = 0; i < vec.size(); ++i) {
-        std::string timeZoneId = util.GetDefaultZone(vec[i]);
+    std::unordered_set<std::string> systemCountries = LocaleConfig::GetSystemCountries();
+    for (const auto& systemCountry : systemCountries) {
+        std::string timeZoneId = util.GetDefaultZone(systemCountry);
         EXPECT_TRUE(timeZoneList.find(timeZoneId) != timeZoneList.end());
         if (timeZoneList.find(timeZoneId) == timeZoneList.end()) {
-            EXPECT_EQ(vec[i], "");
+            EXPECT_EQ(systemCountry, "");
             EXPECT_EQ(timeZoneId, "");
         }
     }

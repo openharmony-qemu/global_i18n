@@ -271,9 +271,12 @@ std::string PhoneNumberFormat::getLocationName(
         if (getBlockedRegionName(regionCode, displayLocale.getLanguage())) {
             return "";
         }
-
-        TabooUtils taboo;
-        return taboo.ReplaceCountryName(regionCode, locale, displayCountryName);
+        TabooUtils* tabooUtils = TabooUtils::GetInstance();
+        if (tabooUtils == nullptr) {
+            HILOG_ERROR_I18N("PhoneNumberFormat::getLocationName: tabooUtils is nullptr.");
+            return displayCountryName;
+        }
+        return tabooUtils->ReplaceCountryName(regionCode, locale, displayCountryName);
     }
 
     // Process the city name
@@ -326,53 +329,30 @@ void PhoneNumberFormat::OpenHandler()
 bool PhoneNumberFormat::getBlockedRegionName(
     const std::string& regionCode, const std::string& language)
 {
-    void *i18nUtilHandle = dlopen("libi18n_util.z.so", RTLD_NOW);
-    if (i18nUtilHandle == nullptr) {
+    TabooUtils* tabooUtils = TabooUtils::GetInstance();
+    if (tabooUtils == nullptr) {
+        HILOG_ERROR_I18N("PhoneNumberFormat::getBlockedRegionName: tabooUtils is nullptr.");
         return false;
     }
-    GetBlockedRegionName getBlockedRegionName = (GetBlockedRegionName)dlsym(i18nUtilHandle, "GetBlockedRegionName");
-    bool ret = false;
-    if (getBlockedRegionName) {
-        ret = getBlockedRegionName(language.c_str(), regionCode.c_str());
-    }
-    dlclose(i18nUtilHandle);
-    i18nUtilHandle = nullptr;
-    return ret;
+    std::unordered_set<std::string> blockedRegions = tabooUtils->GetBlockedRegions(language);
+    return blockedRegions.find(regionCode) != blockedRegions.end();
 }
 
-std::string PhoneNumberFormat::getCityName(
-    const std::string& language, const std::string& phonenumber,
+std::string PhoneNumberFormat::getCityName(const std::string& language, const std::string& phonenumber,
     const std::string& locationName)
 {
-    char recvArr[RECV_CHAR_LEN];
-    int err = strcpy_s(recvArr, RECV_CHAR_LEN, locationName.c_str());
-    if (err != 0) {
+    TabooUtils* tabooUtils = TabooUtils::GetInstance();
+    if (tabooUtils == nullptr) {
+        HILOG_ERROR_I18N("PhoneNumberFormat::getCityName: tabooUtils is nullptr.");
         return locationName;
     }
-    void *i18nUtilHandle = dlopen("libi18n_util.z.so", RTLD_NOW);
-    if (i18nUtilHandle == nullptr) {
-        return locationName;
+    std::unordered_set<std::string> blockedPhoneNumbers = tabooUtils->GetBlockedPhoneNumbers();
+    for (const auto& blockedPhoneNumber : blockedPhoneNumbers) {
+        if (phonenumber.compare(0, blockedPhoneNumber.length(), blockedPhoneNumber) == 0) {
+            return "";
+        }
     }
-    GetBlockedPhoneLocationName getBlockedPhoneLocationName =
-        (GetBlockedPhoneLocationName)dlsym(i18nUtilHandle, "GetBlockedPhoneLocationName");
-    if (getBlockedPhoneLocationName) {
-        getBlockedPhoneLocationName(language.c_str(), phonenumber.c_str(), recvArr);
-    }
-    if (locationName.compare(recvArr) != 0) {
-        dlclose(i18nUtilHandle);
-        i18nUtilHandle = nullptr;
-        return "";
-    }
-
-    GetReplacedPhoneLocationName getReplacedPhoneLocationName =
-        (GetReplacedPhoneLocationName)dlsym(i18nUtilHandle, "GetReplacedPhoneLocationName");
-    if (getReplacedPhoneLocationName) {
-        getReplacedPhoneLocationName(language.c_str(), phonenumber.c_str(), recvArr);
-    }
-    dlclose(i18nUtilHandle);
-    i18nUtilHandle = nullptr;
-    std::string ret(recvArr);
-    return ret;
+    return tabooUtils->ReplacePhoneLocationName(phonenumber, language, locationName);
 }
 } // namespace I18n
 } // namespace Global

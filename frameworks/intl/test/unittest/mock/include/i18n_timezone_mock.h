@@ -23,7 +23,7 @@ namespace I18n {
 class I18nTimeZoneMock : public I18nTimeZone {
 public:
     I18nTimeZoneMock(std::string &id, bool isZoneID);
-    virtual std::string GetDisplayNameByTaboo(const std::string& localeStr, std::string result) override;
+    virtual std::string GetDisplayNameByTaboo(const std::string& localeStr, const std::string& result) override;
 };
 } // namespace I18n
 } // namespace Global

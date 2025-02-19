@@ -65,8 +65,6 @@ const char *LocaleConfig::REGIONS_LANGUAGES_PATH = "etc/xml/i18n_param_config.xm
 const char *LocaleConfig::REGIONS_LANGUAGES_NAME = "i18n_param_config";
 const char *LocaleConfig::SUPPORTED_REGIONS_NAME = "supported_regions";
 const char *LocaleConfig::WHITE_LANGUAGES_NAME = "white_languages";
-const char *LocaleConfig::FORBIDDEN_LANGUAGES_NAME = "forbidden_languages";
-const char *LocaleConfig::FORBIDDEN_REGIONS_NAME = "forbidden_regions";
 const char *LocaleConfig::SUPPORTED_LOCALES_PATH = "/system/usr/ohos_locale_config/supported_locales.xml";
 const char *LocaleConfig::SUPPORTED_LOCALES_OLD_PATH = "/system/usr/ohos_locale_config/supported_locales_old.xml";
 const char *LocaleConfig::SUPPORT_LOCALES_PATH = "/etc/ohos_lang_config/supported_locales.xml";
@@ -90,21 +88,15 @@ const std::string LocaleConfig::TEMPERATURE_UNIT_KEY = "mu";
 const std::string LocaleConfig::WEEK_DAY_KEY = "fw";
 const std::string LocaleConfig::TIMEZONE_KEY = "persist.time.timezone";
 const std::string LocaleConfig::DEFAULT_TIMEZONE = "GMT";
-std::unique_ptr<TabooUtils> LocaleConfig::tabooUtils = nullptr;
-bool LocaleConfig::initTabooUtils = false;
 unordered_set<string> LocaleConfig::supportedLocales;
 unordered_set<string> LocaleConfig::supportedLocalesV15;
 unordered_set<string> LocaleConfig::supportLocales;
 unordered_set<string> LocaleConfig::supportedRegions;
 unordered_set<string> LocaleConfig::overrideSupportedRegions;
 unordered_set<string> LocaleConfig::dialectLang;
-unordered_set<string> LocaleConfig::blockedLanguages;
-unordered_set<string> LocaleConfig::blockedRegions;
-unordered_map<string, unordered_set<string>> LocaleConfig::blockedLanguageRegions;
 unordered_set<string> LocaleConfig::whiteLanguages;
 std::set<std::string> LocaleConfig::extendWhiteLanguageList;
 std::set<std::string> LocaleConfig::extendWhiteLanguageListV15;
-std::mutex LocaleConfig::tabooUtilsMutex;
 unordered_map<string, string> LocaleConfig::dialectMap {
     { "es-Latn-419", "es-Latn-419" },
     { "es-Latn-BO", "es-Latn-419" },
@@ -525,9 +517,12 @@ void LocaleConfig::Split(const string &src, const string &sep, std::unordered_se
 }
 
 // language in white languages should have script.
-void LocaleConfig::GetSystemLanguages(vector<string> &ret)
+std::unordered_set<std::string> LocaleConfig::GetSystemLanguages()
 {
-    std::copy(whiteLanguages.begin(), whiteLanguages.end(), std::back_inserter(ret));
+    std::unordered_set<std::string> result(whiteLanguages);
+    std::unordered_set<string> blockedLanguages = GetBlockedLanguages();
+    Expunge(result, blockedLanguages);
+    return result;
 }
 
 const unordered_set<string>& LocaleConfig::GetSupportedLocales()
@@ -545,9 +540,12 @@ const unordered_set<string>& LocaleConfig::GetSupportedRegions()
     return supportedRegions;
 }
 
-void LocaleConfig::GetSystemCountries(vector<string> &ret)
+std::unordered_set<std::string> LocaleConfig::GetSystemCountries(const std::string& language)
 {
-    std::copy(supportedRegions.begin(), supportedRegions.end(), std::back_inserter(ret));
+    std::unordered_set<std::string> result(supportedRegions);
+    std::unordered_set<std::string> blockedRegion = LocaleConfig::GetBlockedRegions(language);
+    Expunge(result, blockedRegion);
+    return result;
 }
 
 bool LocaleConfig::IsSuggested(const string &language)
@@ -759,24 +757,6 @@ void LocaleConfig::GetListFromFile(const char *path, const char *resourceName, u
     xmlFreeDoc(doc);
 }
 
-void LocaleConfig::ProcessForbiddenRegions(const unordered_set<string> &forbiddenRegions)
-{
-    for (auto it = forbiddenRegions.begin(); it != forbiddenRegions.end(); ++it) {
-        size_t pos = it->rfind("-");
-        std::string language = it->substr(0, pos);
-        std::string region = it->substr(pos + 1);
-        if (language.compare("*") == 0) {
-            blockedRegions.insert(region);
-        } else {
-            if (blockedLanguageRegions.find(language) == blockedLanguageRegions.end()) {
-                blockedLanguageRegions[language] = { region };
-            } else {
-                blockedLanguageRegions[language].insert(region);
-            }
-        }
-    }
-}
-
 void LocaleConfig::Expunge(unordered_set<string> &src, const unordered_set<string> &another)
 {
     for (auto iter = src.begin(); iter != src.end();) {
@@ -791,11 +771,7 @@ void LocaleConfig::Expunge(unordered_set<string> &src, const unordered_set<strin
 bool LocaleConfig::InitializeLists()
 {
     SetHwIcuDirectory();
-    unordered_set<string> forbiddenRegions;
-    LoadRegionsLanguages(forbiddenRegions);
-    ProcessForbiddenRegions(forbiddenRegions);
-    Expunge(supportedRegions, blockedRegions);
-    Expunge(whiteLanguages, blockedLanguages);
+    LoadRegionsLanguages();
     GetListFromFile(SUPPORTED_LOCALES_PATH, SUPPORTED_LOCALES_NAME, supportedLocales);
     GetListFromFile(SUPPORTED_LOCALES_OLD_PATH, SUPPORTED_LOCALES_NAME, supportedLocalesV15);
     GetListFromFile(SUPPORT_LOCALES_PATH, SUPPORT_LOCALES_NAME, supportLocales);
@@ -805,7 +781,7 @@ bool LocaleConfig::InitializeLists()
     return true;
 }
 
-void LocaleConfig::LoadRegionsLanguages(unordered_set<std::string>& forbiddenRegions)
+void LocaleConfig::LoadRegionsLanguages()
 {
     char buf[MAX_PATH_LEN] = {0};
     char* path = GetOneCfgFile(REGIONS_LANGUAGES_PATH, buf, MAX_PATH_LEN);
@@ -831,12 +807,6 @@ void LocaleConfig::LoadRegionsLanguages(unordered_set<std::string>& forbiddenReg
         } else if (content != nullptr && !xmlStrcmp(cur->name,
             reinterpret_cast<const xmlChar *>(WHITE_LANGUAGES_NAME))) {
             Split(reinterpret_cast<const char*>(content), ",", whiteLanguages);
-        } else if (content != nullptr && !xmlStrcmp(cur->name,
-            reinterpret_cast<const xmlChar *>(FORBIDDEN_REGIONS_NAME))) {
-            Split(reinterpret_cast<const char*>(content), ",", forbiddenRegions);
-        } else if (content != nullptr && !xmlStrcmp(cur->name,
-            reinterpret_cast<const xmlChar *>(FORBIDDEN_LANGUAGES_NAME))) {
-            Split(reinterpret_cast<const char*>(content), ",", blockedLanguages);
         }
         if (content != nullptr) {
             xmlFree(content);
@@ -906,7 +876,7 @@ string LocaleConfig::GetDisplayLanguage(const string &language, const string &di
     if (result.empty()) {
         result = GetDisplayLanguageInner(adjust, displayLocale, sentenceCase);
     }
-    InitTabooUtils();
+    TabooUtils* tabooUtils = TabooUtils::GetInstance();
     if (tabooUtils != nullptr) {
         result = tabooUtils->ReplaceLanguageName(adjust, displayLocale, result);
     } else {
@@ -1173,7 +1143,7 @@ string LocaleConfig::GetDisplayRegion(const string &region, const string &displa
         originLocale.getDisplayCountry(locale, displayRegion);
         displayRegion.toUTF8String(result);
     }
-    InitTabooUtils();
+    TabooUtils* tabooUtils = TabooUtils::GetInstance();
     if (tabooUtils != nullptr) {
         result = tabooUtils->ReplaceCountryName(region, displayLocale, result);
     } else {
@@ -1397,22 +1367,22 @@ bool LocaleConfig::GetUsingLocalDigit()
 
 std::unordered_set<std::string> LocaleConfig::GetBlockedLanguages()
 {
-    return blockedLanguages;
-}
-
-std::unordered_set<std::string> LocaleConfig::GetBlockedRegions()
-{
-    return blockedRegions;
-}
-
-std::unordered_set<std::string> LocaleConfig::GetLanguageBlockedRegions()
-{
-    std::string systemLanguage = LocaleConfig::GetSystemLanguage();
-    if (blockedLanguageRegions.find(systemLanguage) != blockedLanguageRegions.end()) {
-        return blockedLanguageRegions[systemLanguage];
+    TabooUtils* tabooUtils = TabooUtils::GetInstance();
+    if (tabooUtils == nullptr) {
+        HILOG_ERROR_I18N("LocaleConfig::GetBlockedLanguages: tabooUtils is nullptr.");
+        return {};
     }
-    std::unordered_set<std::string> emptyResult;
-    return emptyResult;
+    return tabooUtils->GetBlockedLanguages();
+}
+
+std::unordered_set<std::string> LocaleConfig::GetBlockedRegions(const std::string& language)
+{
+    TabooUtils* tabooUtils = TabooUtils::GetInstance();
+    if (tabooUtils == nullptr) {
+        HILOG_ERROR_I18N("LocaleConfig::GetBlockedRegions: tabooUtils is nullptr.");
+        return {};
+    }
+    return tabooUtils->GetBlockedRegions(language);
 }
 
 I18nErrorCode LocaleConfig::SetSystemLanguage(const std::string &languageTag, int32_t userId)
@@ -1993,18 +1963,6 @@ std::string LocaleConfig::GetUnicodeWrappedFilePath(const std::string &path, con
     std::string newSep = "\u200f" + sep;
     Merge(dest, newSep, result);
     return result;
-}
-
-void LocaleConfig::InitTabooUtils()
-{
-    if (initTabooUtils) {
-        return;
-    }
-    std::lock_guard<std::mutex> tabooUtilsLock(tabooUtilsMutex);
-    if (!initTabooUtils) {
-        tabooUtils = std::make_unique<TabooUtils>();
-        initTabooUtils = (tabooUtils != nullptr);
-    }
 }
 } // namespace I18n
 } // namespace Global

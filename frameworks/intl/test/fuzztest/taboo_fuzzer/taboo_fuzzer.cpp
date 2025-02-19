@@ -26,11 +26,12 @@ namespace OHOS {
         using namespace Global::I18n;
 
         std::string input(reinterpret_cast<const char*>(data), size);
-        TabooUtils tabooUtils;
-        tabooUtils.ReplaceCountryName(input, input, input);
-        tabooUtils.ReplaceLanguageName(input, input, input);
-        Taboo* taboo = new Taboo();
-        delete taboo;
+        TabooUtils* tabooUtils = TabooUtils::GetInstance();
+        if (tabooUtils == nullptr) {
+            return;
+        }
+        tabooUtils->ReplaceCountryName(input, input, input);
+        tabooUtils->ReplaceLanguageName(input, input, input);
     }
 }
 
