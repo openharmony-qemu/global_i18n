@@ -287,7 +287,7 @@ void I18nServiceAbility::OnStop()
 
 int32_t I18nServiceAbility::OnIdle(const SystemAbilityOnDemandReason& idleReason)
 {
-    if (GetTaskNumber(ModifyTaskNumber::QUERY) == 0) {
+    if (UpdateTaskNumber(ModifyTaskNumber::QUERY) == 0) {
         HILOG_INFO_I18N("I18nServiceAbility::OnIdle: Immediately unload.");
         return 0;
     }
@@ -295,7 +295,7 @@ int32_t I18nServiceAbility::OnIdle(const SystemAbilityOnDemandReason& idleReason
     return DELAY_MILLISECONDS_FOR_UNLOAD_SA;
 }
 
-int32_t I18nServiceAbility::GetTaskNumber(ModifyTaskNumber action)
+int32_t I18nServiceAbility::UpdateTaskNumber(ModifyTaskNumber action)
 {
     std::lock_guard<std::mutex> taskLock(taskNumberMutex);
     taskNumber += static_cast<int32_t>(action);
@@ -307,7 +307,7 @@ void I18nServiceAbility::StartTask(int32_t pid)
     if (Memory::MemMgrClient::GetInstance().SetCritical(pid, true, I18N_SA_ID) != 0) {
         HILOG_ERROR_I18N("I18nServiceAbility::StartTask: Set critical true failed.");
     }
-    GetTaskNumber(ModifyTaskNumber::INCREASE);
+    UpdateTaskNumber(ModifyTaskNumber::INCREASE);
     DelayUnloadI18nServiceAbility();
 }
 
@@ -316,7 +316,7 @@ void I18nServiceAbility::FinishTask(int32_t pid)
     if (Memory::MemMgrClient::GetInstance().SetCritical(pid, false, I18N_SA_ID) != 0) {
         HILOG_ERROR_I18N("I18nServiceAbility::StartTask: Set critical true failed.");
     }
-    GetTaskNumber(ModifyTaskNumber::DECREASE);
+    UpdateTaskNumber(ModifyTaskNumber::DECREASE);
 }
 
 int32_t I18nServiceAbility::GetCallingUserId()

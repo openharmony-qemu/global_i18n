@@ -69,7 +69,7 @@ private:
      * until there no request in 10s.
      */
     void DelayUnloadI18nServiceAbility();
-    int32_t GetTaskNumber(ModifyTaskNumber action);
+    int32_t UpdateTaskNumber(ModifyTaskNumber action);
     void StartTask(int32_t pid);
     void FinishTask(int32_t pid);
     int32_t GetCallingUserId();
