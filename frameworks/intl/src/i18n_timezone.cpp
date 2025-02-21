@@ -72,7 +72,9 @@ std::unordered_map<std::string, std::string> I18nTimeZone::city2TimeZoneID {};
 std::map<std::string, std::string> I18nTimeZone::BEST_MATCH_LOCALE {};
 std::mutex I18nTimeZone::matchLocaleMutex;
 std::mutex I18nTimeZone::initZoneInfoMutex;
+std::mutex I18nTimeZone::initSupportedLocalesMutex;
 bool I18nTimeZone::initAvailableZoneInfo = false;
+bool I18nTimeZone::initSupportedLocales = false;
 
 std::map<int, std::string> I18nTimeZone::categoryNum2TimezoneWN {
     { 0, "Africa/Abidjan" },
@@ -942,8 +944,15 @@ std::map<std::string, std::string> I18nTimeZone::FindCityDisplayNameMap(std::str
 
 bool I18nTimeZone::GetSupportedLocales()
 {
-    using std::filesystem::directory_iterator;
+    if (initSupportedLocales) {
+        return true;
+    }
+    std::lock_guard<std::mutex> lock(initSupportedLocalesMutex);
+    if (initSupportedLocales) {
+        return true;
+    }
 
+    using std::filesystem::directory_iterator;
     struct stat s;
     std::string displayNamePath = GetDeviceCityDisplayNamePath();
     if (displayNamePath.length() == 0) {
@@ -960,6 +969,7 @@ bool I18nTimeZone::GetSupportedLocales()
         std::string localeStr = xmlPath.substr(displayNamePath.length(), localeStrLen);
         supportedLocales.insert(localeStr);
     }
+    initSupportedLocales = true;
     return true;
 }
 
@@ -1031,12 +1041,10 @@ std::string I18nTimeZone::GetCityDisplayName(std::string &cityID, std::string &l
 
 std::string I18nTimeZone::GetLocaleBaseName(std::string &localeStr)
 {
-    if (supportedLocales.size() == 0) {
-        bool status = GetSupportedLocales();
-        if (!status) {
-            HILOG_ERROR_I18N("get supported Locales failed");
-            return "";
-        }
+    bool status = GetSupportedLocales();
+    if (!status) {
+        HILOG_ERROR_I18N("get supported Locales failed");
+        return "";
     }
     UErrorCode errorCode = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, errorCode);

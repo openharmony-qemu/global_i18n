@@ -89,8 +89,9 @@ private:
     icu::TimeZone *timezone = nullptr;
     static std::mutex matchLocaleMutex;
     static std::mutex initZoneInfoMutex;
+    static std::mutex initSupportedLocalesMutex;
     static bool initAvailableZoneInfo;
-
+    static bool initSupportedLocales;
     static bool ReadTimeZoneData(const char *xmlPath);
     static std::string ComputeLocale(std::string &locale);
     icu::TimeZone* GetTimeZone();
