@@ -781,6 +781,13 @@ bool LocaleConfig::InitializeLists()
     return true;
 }
 
+__attribute__((destructor)) void LocaleConfig::CleanupXmlResources()
+{
+    if (listsInitialized) {
+        xmlCleanupParser();
+    }
+}
+
 void LocaleConfig::LoadRegionsLanguages()
 {
     char buf[MAX_PATH_LEN] = {0};
