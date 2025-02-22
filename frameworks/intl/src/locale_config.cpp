@@ -392,8 +392,13 @@ std::string LocaleConfig::GetEffectiveLanguage()
 string LocaleConfig::GetSystemLanguage()
 {
     std::string systemLanguage = ReadSystemParameter(LANGUAGE_KEY.c_str(), CONFIG_LEN);
+    if (!systemLanguage.empty()) {
+        return systemLanguage;
+    }
+    systemLanguage = ReadSystemParameter(DEFAULT_LANGUAGE_KEY, CONFIG_LEN);
     if (systemLanguage.empty()) {
-        systemLanguage = ReadSystemParameter(DEFAULT_LANGUAGE_KEY, CONFIG_LEN);
+        HILOG_ERROR_I18N("LocaleConfig::GetSystemLanguage: Read default system language failed.");
+        return "zh-Hans";
     }
     return systemLanguage;
 }
@@ -405,7 +410,7 @@ string LocaleConfig::GetSystemRegion()
         systemRegion = GetCountry(DEFAULT_LOCALE_KEY);
     }
     if (systemRegion.empty()) {
-        HILOG_ERROR_I18N("GetSystemRegion: system region is empty.");
+        HILOG_ERROR_I18N("LocaleConfig::GetSystemRegion: system region is empty.");
         return "CN";
     }
     return systemRegion;
@@ -415,28 +420,34 @@ string LocaleConfig::GetCountry(const string& parameter)
 {
     std::string systemRegion = ReadSystemParameter(parameter.c_str(), CONFIG_LEN);
     if (systemRegion.empty()) {
-        HILOG_ERROR_I18N("GetCountry: ReadSystemParameter %{public}s failed", parameter.c_str());
+        HILOG_ERROR_I18N("LocaleConfig::GetCountry: ReadSystemParameter %{public}s failed.", parameter.c_str());
         return systemRegion;
     }
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale origin = icu::Locale::forLanguageTag(systemRegion, status);
-    if (U_SUCCESS(status)) {
-        const char* country = origin.getCountry();
-        if (country != nullptr) {
-            return country;
-        }
-        HILOG_INFO_I18N("GetCountry: %{public}s get failed, country is nullptr", parameter.c_str());
-    } else {
-        HILOG_ERROR_I18N("GetCountry: %{public}s get failed, U_SUCCESS is false", parameter.c_str());
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("LocaleConfig::GetCountry: Create icu::Locale failed.");
+        return "";
     }
-    return "";
+    const char* country = origin.getCountry();
+    if (country == nullptr) {
+        HILOG_ERROR_I18N("LocaleConfig::GetCountry: Get country from icu::Locale failed.");
+        return "";
+    }
+    return country;
 }
 
 string LocaleConfig::GetSystemLocale()
 {
     std::string systemLocale = ReadSystemParameter(LOCALE_KEY.c_str(), CONFIG_LEN);
+    if (!systemLocale.empty()) {
+        return systemLocale;
+    }
+    HILOG_ERROR_I18N("LocaleConfig::GetSystemLocale: Read system locale failed.");
+    systemLocale = ReadSystemParameter(DEFAULT_LANGUAGE_KEY, CONFIG_LEN);
     if (systemLocale.empty()) {
-        systemLocale = ReadSystemParameter(DEFAULT_LOCALE_KEY, CONFIG_LEN);
+        HILOG_ERROR_I18N("LocaleConfig::GetSystemLocale: Read default system locale failed.");
+        return "zh-Hans-CN";
     }
     return systemLocale;
 }
@@ -444,7 +455,11 @@ string LocaleConfig::GetSystemLocale()
 std::string LocaleConfig::GetSystemTimezone()
 {
     std::string systemTimezone = ReadSystemParameter(TIMEZONE_KEY.c_str(), CONFIG_LEN);
-    return systemTimezone.empty() ? DEFAULT_TIMEZONE : systemTimezone;
+    if (systemTimezone.empty()) {
+        HILOG_ERROR_I18N("LocaleConfig::GetSystemTimezone: Read system time zone failed.");
+        return DEFAULT_TIMEZONE;
+    }
+    return systemTimezone;
 }
 
 bool LocaleConfig::IsValidLanguage(const string &language)
@@ -1281,6 +1296,10 @@ std::string LocaleConfig::GetValidLocale(const std::string &localeTag)
 bool LocaleConfig::IsEmpty24HourClock()
 {
     std::string is24Hour = ReadSystemParameter(HOUR_KEY.c_str(), CONFIG_LEN);
+    if (is24Hour.empty()) {
+        HILOG_ERROR_I18N("LocaleConfig::IsEmpty24HourClock: Read system is24Hour failed.");
+        return false;
+    }
     if (is24Hour.compare("default") == 0) {
         return true;
     }
@@ -1290,6 +1309,10 @@ bool LocaleConfig::IsEmpty24HourClock()
 bool LocaleConfig::Is24HourClock()
 {
     std::string is24Hour = ReadSystemParameter(HOUR_KEY.c_str(), CONFIG_LEN);
+    if (is24Hour.empty()) {
+        HILOG_ERROR_I18N("LocaleConfig::Is24HourClock: Read system is24Hour failed.");
+        return false;
+    }
     if (is24Hour.compare("default") == 0) {
         std::string systemLocale = GetSystemLocale();
         return Is24HourLocale(systemLocale);
@@ -1437,7 +1460,7 @@ void LocaleConfig::QueryUpgradeLocale()
 {
     std::string upgradeLocale = ReadSystemParameter(UPGRADE_LOCALE_KEY, CONFIG_LEN);
     if (!upgradeLocale.empty()) {
-        HILOG_ERROR_I18N("LocaleConfig::QueryUpgradeLocale: upgrade locale is %{public}s.", upgradeLocale.c_str());
+        HILOG_INFO_I18N("LocaleConfig::QueryUpgradeLocale: upgrade locale is %{public}s.", upgradeLocale.c_str());
     }
 }
 

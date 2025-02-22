@@ -90,8 +90,11 @@ void JSUtils::GetBoolOptionValue(napi_env env, napi_value options, const std::st
     }
     bool hasProperty = false;
     status = napi_has_named_property(env, options, optionName.c_str(), &hasProperty);
-    if (status != napi_ok || !hasProperty) {
+    if (status != napi_ok) {
         HILOG_ERROR_I18N("GetBoolOptionValue: Has not named property.");
+        return;
+    }
+    if (!hasProperty) {
         return;
     }
     status = napi_get_named_property(env, options, optionName.c_str(), &optionValue);

@@ -177,6 +177,10 @@ I18nErrorCode MultiUsers::SaveGlobalParam(const std::string& localId)
     std::string language = LocaleConfig::GetSystemLanguage();
     std::string locale = LocaleConfig::GetSystemLocale();
     std::string is24Hour = ReadSystemParameter(LocaleConfig::HOUR_KEY.c_str(), CONFIG_LEN);
+    if (is24Hour.empty()) {
+        HILOG_ERROR_I18N("SaveIs24Hour: Get is24Hour failed");
+        return I18nErrorCode::FAILED;
+    }
     I18nErrorCode errCode = SaveLanguage(localId, language);
     if (errCode != I18nErrorCode::SUCCESS) {
         HILOG_ERROR_I18N("SaveGlobalParam: save language failed");
