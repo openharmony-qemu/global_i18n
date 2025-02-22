@@ -523,12 +523,18 @@ void Taboo::InitLocaleTabooData(const std::string& fallbackLanguage, const std::
 void Taboo::InitFallBackSuffixes()
 {
     std::string mccmncFirst = ReadSystemParameter(MCC_MNC_FIRST_KEY.c_str(), LocaleConfig::CONFIG_LEN);
+    if (mccmncFirst.empty()) {
+        HILOG_ERROR_I18N("Taboo::InitFallBackSuffixes: Get first mccmnc failed.");
+    }
     std::string mccFirst;
     if (mccmncFirst.length() == MCC_MNC_LENGTH) {
         fallBackSuffixes.emplace_back(MCC_MNC_TAG + mccmncFirst);
         mccFirst = mccmncFirst.substr(0, MCC_LENGTH);
     }
     std::string mccmncSecond = ReadSystemParameter(MCC_MNC_SECOND_KEY.c_str(), LocaleConfig::CONFIG_LEN);
+    if (mccmncSecond.empty()) {
+        HILOG_ERROR_I18N("Taboo::InitFallBackSuffixes: Get second mccmnc failed.");
+    }
     std::string mccSecond;
     if (mccmncSecond.length() == MCC_MNC_LENGTH) {
         fallBackSuffixes.emplace_back(MCC_MNC_TAG + mccmncSecond);
@@ -543,10 +549,14 @@ void Taboo::InitFallBackSuffixes()
     std::string custRegion = ReadSystemParameter(CUST_REGION_KEY.c_str(), LocaleConfig::CONFIG_LEN);
     if (!custRegion.empty()) {
         fallBackSuffixes.emplace_back(CUST_REGION_TAG + custRegion);
+    } else {
+        HILOG_ERROR_I18N("Taboo::InitFallBackSuffixes: Get cust region failed.");
     }
     std::string defaultRegion = ReadSystemParameter(LocaleConfig::DEFAULT_REGION_KEY, LocaleConfig::CONFIG_LEN);
     if (!defaultRegion.empty()) {
         fallBackSuffixes.emplace_back(DEFAULT_REGION_TAG + defaultRegion);
+    } else {
+        HILOG_ERROR_I18N("Taboo::InitFallBackSuffixes: Get default region failed.");
     }
     fallBackSuffixes.emplace_back(COMMON_SUFFIX);
 }

@@ -602,7 +602,8 @@ I18nTimeZone::I18nTimeZone(std::string &id, bool isZoneID)
     if (isZoneID) {
         if (id.empty()) {
             std::string systemTimezone = ReadSystemParameter(TIMEZONE_KEY, SYS_PARAM_LEN);
-            if (systemTimezone.length() == 0) {
+            if (systemTimezone.empty()) {
+                HILOG_ERROR_I18N("I18nTimeZone::I18nTimeZone: Read system time zone failed.");
                 systemTimezone = DEFAULT_TIMEZONE;
             }
             icu::UnicodeString unicodeZoneID(systemTimezone.data(), systemTimezone.length());
