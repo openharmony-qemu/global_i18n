@@ -47,8 +47,11 @@ void JSUtils::GetOptionValue(napi_env env, napi_value options, const std::string
     }
     bool hasProperty = false;
     status = napi_has_named_property(env, options, optionName.c_str(), &hasProperty);
-    if (status != napi_ok || !hasProperty) {
+    if (status != napi_ok) {
         HILOG_ERROR_I18N("GetOptionValue: Has not named property:%{public}s", optionName.c_str());
+        return;
+    }
+    if (!hasProperty) {
         return;
     }
     status = napi_get_named_property(env, options, optionName.c_str(), &optionValue);

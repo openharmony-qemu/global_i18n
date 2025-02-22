@@ -100,6 +100,7 @@ bool SignatureVerifier::VerifyFileSign(const std::string& pubkeyPath, const std:
     }
     BIO* bio = BIO_new_file(pubkeyPath.c_str(), "r");
     if (bio == nullptr) {
+        RSA_free(pubkey);
         HILOG_ERROR_I18N("SignatureVerifier::VerifyFileSign: Create BIO failed.");
         return false;
     }

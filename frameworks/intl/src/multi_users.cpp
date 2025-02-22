@@ -35,9 +35,6 @@ const std::string MultiUsers::MULTI_USERS_LANGUAGE_KEY = "languageData";
 const std::string MultiUsers::MULTI_USERS_LOCALE_KEY = "localeData";
 const std::string MultiUsers::MULTI_USERS_HOUR_KEY = "is24HourData";
 const std::string MultiUsers::INIT_KEY = "init";
-const std::string MultiUsers::UPDATED_USERS_KEY = "updateUsers";
-const std::string MultiUsers::DEFAULT_UPDATED_USERS = "100:true";
-const std::string MultiUsers::TRUE_VALUE = "true";
 const std::string MultiUsers::PREFERENCE_PATH = "/data/service/el1/public/i18n/global/GlobalParamData";
 const int32_t MultiUsers::DEFAULT_LOCAL_ID = 100;
 const int MultiUsers::CONFIG_LEN = 128;
@@ -60,7 +57,6 @@ void MultiUsers::InitMultiUser()
     if (!init) {
         AddUser(localId);
         preferences->PutBool(INIT_KEY, true);
-        preferences->PutString(UPDATED_USERS_KEY, DEFAULT_UPDATED_USERS);
         preferences->Flush();
         HILOG_INFO_I18N("InitMultiUser: init multi user data success");
     }
@@ -178,8 +174,8 @@ I18nErrorCode MultiUsers::SaveIs24Hour(const std::string& localId, const std::st
 
 I18nErrorCode MultiUsers::SaveGlobalParam(const std::string& localId)
 {
-    std::string language = ReadSystemParameter(LocaleConfig::LANGUAGE_KEY.c_str(), CONFIG_LEN);
-    std::string locale = ReadSystemParameter(LocaleConfig::LOCALE_KEY.c_str(), CONFIG_LEN);
+    std::string language = LocaleConfig::GetSystemLanguage();
+    std::string locale = LocaleConfig::GetSystemLocale();
     std::string is24Hour = ReadSystemParameter(LocaleConfig::HOUR_KEY.c_str(), CONFIG_LEN);
     I18nErrorCode errCode = SaveLanguage(localId, language);
     if (errCode != I18nErrorCode::SUCCESS) {
@@ -251,11 +247,6 @@ I18nErrorCode MultiUsers::RemoveGlobalParam(const std::string& localId)
         return I18nErrorCode::FAILED;
     }
 
-    errCode = WriteMultiUsersParameter(UPDATED_USERS_KEY, "", localId, true);
-    if (errCode != I18nErrorCode::SUCCESS) {
-        HILOG_ERROR_I18N("RemoveGlobalParam: Remove %{public}s failed.", localId.c_str());
-        return I18nErrorCode::FAILED;
-    }
     return I18nErrorCode::SUCCESS;
 }
 
@@ -377,21 +368,12 @@ void MultiUsers::UpdateConfiguration(const std::string& locale, const std::strin
     configuration.AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_HOUR, is24Hour);
     auto appMgrClient = std::make_unique<AppExecFwk::AppMgrClient>();
 
-    std::string userIdStr = std::to_string(userId);
-    bool isUpdated = TRUE_VALUE.compare(ReadMultiUsersParameter(UPDATED_USERS_KEY, userIdStr)) == 0;
-    userId = isUpdated ? 0 : userId;
-
     AppExecFwk::AppMgrResultCode status = appMgrClient->UpdateConfiguration(configuration, userId);
     if (status != AppExecFwk::AppMgrResultCode::RESULT_OK) {
         HILOG_ERROR_I18N("MultiUsers::UpdateConfiguration: Update configuration userId %{public}d failed.", userId);
         return;
     }
     HILOG_INFO_I18N("MultiUsers::UpdateConfiguration: Update configuration userId %{public}d success.", userId);
-
-    if (!isUpdated && WriteMultiUsersParameter(UPDATED_USERS_KEY, TRUE_VALUE, userIdStr, false) !=
-        I18nErrorCode::SUCCESS) {
-        HILOG_ERROR_I18N("MultiUsers::UpdateConfiguration: Write UPDATED_USERS_KEY failed.");
-    }
 }
 
 I18nErrorCode MultiUsers::PublishCommonEvent(int32_t userId)

@@ -405,7 +405,7 @@ string LocaleConfig::GetSystemRegion()
         systemRegion = GetCountry(DEFAULT_LOCALE_KEY);
     }
     if (systemRegion.empty()) {
-        HILOG_INFO_I18N("GetSystemRegion: system region is empty.");
+        HILOG_ERROR_I18N("GetSystemRegion: system region is empty.");
         return "CN";
     }
     return systemRegion;
@@ -415,7 +415,7 @@ string LocaleConfig::GetCountry(const string& parameter)
 {
     std::string systemRegion = ReadSystemParameter(parameter.c_str(), CONFIG_LEN);
     if (systemRegion.empty()) {
-        HILOG_INFO_I18N("GetCountry: ReadSystemParameter %{public}s failed", parameter.c_str());
+        HILOG_ERROR_I18N("GetCountry: ReadSystemParameter %{public}s failed", parameter.c_str());
         return systemRegion;
     }
     UErrorCode status = U_ZERO_ERROR;
@@ -427,7 +427,7 @@ string LocaleConfig::GetCountry(const string& parameter)
         }
         HILOG_INFO_I18N("GetCountry: %{public}s get failed, country is nullptr", parameter.c_str());
     } else {
-        HILOG_INFO_I18N("GetCountry: %{public}s get failed, U_SUCCESS is false", parameter.c_str());
+        HILOG_ERROR_I18N("GetCountry: %{public}s get failed, U_SUCCESS is false", parameter.c_str());
     }
     return "";
 }
@@ -1488,7 +1488,7 @@ I18nErrorCode LocaleConfig::SetSystemLocale(const std::string &localeTag, int32_
         return I18nErrorCode::INVALID_LOCALE_TAG;
     }
     std::string localeCode = LocaleEncode(localeTag);
-    HILOG_INFO_I18N("LocaleConfig::SetSystemRegion: set locale %{public}s.", localeCode.c_str());
+    HILOG_INFO_I18N("LocaleConfig::SetSystemLocale: set locale %{public}s.", localeCode.c_str());
     if (SetParameter(LOCALE_KEY.c_str(), localeTag.data()) != 0) {
         return I18nErrorCode::UPDATE_SYSTEM_LOCALE_FAILED;
     }
@@ -1602,7 +1602,7 @@ std::string LocaleConfig::GetTemperatureName(const TemperatureType& type)
     return temperatureTypeToName[type];
 }
 
-I18nErrorCode LocaleConfig::SetFirstDayOfWeek(const WeekDay& type, const int32_t userId)
+I18nErrorCode LocaleConfig::SetFirstDayOfWeek(const WeekDay& type, int32_t userId)
 {
     if (weekDayToName.find(type) == weekDayToName.end()) {
         HILOG_ERROR_I18N("LocaleConfig::SetFirstDayOfWeek: week day failed.");

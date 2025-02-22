@@ -1501,6 +1501,7 @@ HWTEST_F(I18nTest, I18nFuncTest062, TestSize.Level1)
 HWTEST_F(I18nTest, I18nFuncTest063, TestSize.Level1)
 {
     std::unique_ptr<LunarCalendar> ptr = std::make_unique<LunarCalendar>();
+    ASSERT_TRUE(ptr != nullptr);
 
     ptr->SetGregorianDate(1900, 1, 31);
     int32_t year = ptr->GetLunarYear();
@@ -1551,6 +1552,8 @@ HWTEST_F(I18nTest, I18nFuncTest063, TestSize.Level1)
 HWTEST_F(I18nTest, I18nFuncTest064, TestSize.Level1)
 {
     std::unique_ptr<LunarCalendar> ptr = std::make_unique<LunarCalendar>();
+    ASSERT_TRUE(ptr != nullptr);
+
     ptr->SetGregorianDate(2087, 1, 11);
     int32_t year = ptr->GetLunarYear();
     int32_t month = ptr->GetLunarMonth();
@@ -1600,6 +1603,8 @@ HWTEST_F(I18nTest, I18nFuncTest064, TestSize.Level1)
 HWTEST_F(I18nTest, I18nFuncTest065, TestSize.Level1)
 {
     std::unique_ptr<LunarCalendar> ptr = std::make_unique<LunarCalendar>();
+    ASSERT_TRUE(ptr != nullptr);
+
     ptr->SetGregorianDate(2024, 8, 51);
     int32_t year = ptr->GetLunarYear();
     int32_t month = ptr->GetLunarMonth();

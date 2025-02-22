@@ -1743,8 +1743,8 @@ napi_value Init(napi_env env, napi_value exports)
     val = HolidayManagerAddon::InitHolidayManager(env, val);
     val = EntityRecognizerAddon::InitEntityRecognizer(env, val);
     val = SimpleNumberFormatAddon::InitSimpleNumberFormat(env, val);
-    val = StyledNumberFormatAddon::InitStyledNumberFormat(env, val);
     val = SimpleDateTimeFormatAddon::InitSimpleDateTimeFormat(env, val);
+    val = StyledNumberFormatAddon::InitStyledNumberFormat(env, val);
     return val;
 }
 

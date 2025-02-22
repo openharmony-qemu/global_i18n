@@ -830,8 +830,7 @@ bool NumberFormat::ReadISO4217Datas()
     int32_t length = 0;
     while ((currentCurrency = uenum_next(currencies, &length, &status)) != NULL) {
         u_charsToUChars(currentCurrency, code, length + 1);  // +1 includes the NUL
-        const UChar* currencyCode = code;
-        int32_t numCode = ucurr_getNumericCode(currencyCode);
+        int32_t numCode = ucurr_getNumericCode(code);
         if (numCode == 0) {
             continue;
         }
