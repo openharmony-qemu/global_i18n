@@ -1081,7 +1081,7 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
         return tzIdList;
     }
     std::string preferredPath = GetPreferredPath(x, filePaths);
-    if (preferredPath == "") {
+    if (preferredPath.empty()) {
         return tzIdList;
     }
     uint32_t width = 0;

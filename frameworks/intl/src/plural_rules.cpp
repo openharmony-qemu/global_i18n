@@ -63,9 +63,9 @@ int PluralRules::GetValidInteger(std::string &integerStr, int minValue, int maxV
 void PluralRules::ParseAllOptions(std::map<std::string, std::string> &options)
 {
     localeMatcher = ParseOption(options, "localeMatcher");
-    localeMatcher = (localeMatcher == "") ? "best fit" : localeMatcher;
+    localeMatcher = localeMatcher.empty() ? "best fit" : localeMatcher;
     type = ParseOption(options, "type");
-    type = (type == "") ? "cardinal" : type;
+    type = type.empty() ? "cardinal" : type;
     std::string minIntegerStr = ParseOption(options, "minimumIntegerDigits");
     // 1 is minValue and defaultValue, 21 is maxValue
     minInteger = GetValidInteger(minIntegerStr, 1, 21, 1);

@@ -59,11 +59,11 @@ void LocaleInfo::InitLocaleInfo(const std::string &localeTag, std::map<std::stri
 {
     UErrorCode status = U_ZERO_ERROR;
     configs = configMap;
-    if (localeTag != "") {
+    if (!localeTag.empty()) {
         ComputeFinalLocaleTag(localeTag);
         locale = icu::Locale::forLanguageTag(icu::StringPiece(finalLocaleTag), status);
     }
-    if (localeTag == "" || U_FAILURE(status)) {
+    if (localeTag.empty() || U_FAILURE(status)) {
         std::string defaultLocaleTag = LocaleConfig::GetSystemLocale();
         ResetFinalLocaleStatus();
         ComputeFinalLocaleTag(defaultLocaleTag);

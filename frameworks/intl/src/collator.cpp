@@ -46,22 +46,22 @@ std::string Collator::ParseOption(std::map<std::string, std::string> &options, c
 void Collator::ParseAllOptions(std::map<std::string, std::string> &options)
 {
     localeMatcher = ParseOption(options, "localeMatcher");
-    if (localeMatcher == "") {
+    if (localeMatcher.empty()) {
         localeMatcher = "best fit";
     }
 
     usage = ParseOption(options, "usage");
-    if (usage == "") {
+    if (usage.empty()) {
         usage = "sort";
     }
 
     sensitivity = ParseOption(options, "sensitivity");
-    if (sensitivity == "") {
+    if (sensitivity.empty()) {
         sensitivity = "variant";
     }
 
     ignorePunctuation = ParseOption(options, "ignorePunctuation");
-    if (ignorePunctuation == "") {
+    if (ignorePunctuation.empty()) {
         ignorePunctuation = "false";
     }
 
@@ -165,7 +165,7 @@ void Collator::SetNumeric()
     if (!collatorPtr) {
         return;
     }
-    if (numeric == "") {
+    if (numeric.empty()) {
         numeric = localeInfo->GetNumeric();
         if (numeric != "true" && numeric != "false") {
             numeric = "false";
@@ -186,7 +186,7 @@ void Collator::SetCaseFirst()
     if (!collatorPtr) {
         return;
     }
-    if (caseFirst == "") {
+    if (caseFirst.empty()) {
         caseFirst = localeInfo->GetCaseFirst();
         if (caseFirst != "upper" && caseFirst != "lower" && caseFirst != "false") {
             caseFirst = "false";
