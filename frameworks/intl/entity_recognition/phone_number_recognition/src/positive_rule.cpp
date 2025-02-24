@@ -30,13 +30,13 @@ PositiveRule::PositiveRule(icu::UnicodeString& regex, std::string& handleType, s
     this->status = U_ZERO_ERROR;
     this->handleType = handleType;
     this->insensitive = insensitive;
+    if (regex.length() == 0) {
+        return;
+    }
 }
 
 icu::RegexPattern* PositiveRule::GetPattern()
 {
-    if (this->regex.length() == 0) {
-        return nullptr;
-    }
     // Sets whether regular expression matching is case sensitive
     if (insensitive == "True") {
         return icu::RegexPattern::compile(this->regex, URegexpFlag::UREGEX_CASE_INSENSITIVE, this->status);

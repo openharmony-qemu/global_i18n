@@ -43,6 +43,9 @@ RegexRule::RegexRule(icu::UnicodeString& regex, std::string& isValidType, std::s
     this->isValidType = isValidType;
     this->handleType = handleType;
     this->insensitive = insensitive;
+    if (regex.length() == 0) {
+        return;
+    }
 }
 
 RegexRule::~RegexRule()
@@ -68,9 +71,6 @@ int RegexRule::GetType()
 
 icu::RegexPattern* RegexRule::GetPattern()
 {
-    if (this->regex.length() == 0) {
-        return nullptr;
-    }
     // Sets whether regular expression matching is case sensitive
     if (insensitive == "True") {
         return icu::RegexPattern::compile(this->regex, URegexpFlag::UREGEX_CASE_INSENSITIVE, this->status);

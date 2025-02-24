@@ -22,13 +22,13 @@ NegativeRule::NegativeRule(icu::UnicodeString& regex, std::string& insensitive)
     this->regex = regex;
     this->status = U_ZERO_ERROR;
     this->insensitive = insensitive;
+    if (regex.length() == 0) {
+        return;
+    }
 }
 
 icu::RegexPattern* NegativeRule::GetPattern()
 {
-    if (this->regex.length() == 0) {
-        return nullptr;
-    }
     // Sets whether regular expression matching is case sensitive
     if (this->insensitive == "True") {
         return icu::RegexPattern::compile(this->regex, URegexpFlag::UREGEX_CASE_INSENSITIVE, this->status);
