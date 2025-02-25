@@ -323,11 +323,20 @@ std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray()
     std::vector<TimeZoneCityItem> result;
     std::unordered_set<std::string> zoneCityIds = I18nTimeZone::GetAvailableZoneCityIDs();
     std::string locale = LocaleConfig::GetSystemLocale();
+    std::string localeBaseName = I18nTimeZone::GetLocaleBaseName(locale);
+    std::map<std::string, std::string> displayNameMap = I18nTimeZone::FindCityDisplayNameMap(localeBaseName);
     std::map<std::string, icu::TimeZone*> tzMap;
+    TabooUtils* tabooUtils = TabooUtils::GetInstance();
+    std::string requestLocale = StrReplaceAll(localeBaseName, "_", "-");
     bool ifEnforce = GetPseudoLocalizationEnforce();
-    for (auto it = zoneCityIds.begin(); it != zoneCityIds.end(); ++it) {
-        std::string cityId = *it;
-        std::string cityDisplayName = I18nTimeZone::GetCityDisplayName(cityId, locale);
+    for (const auto& cityId : zoneCityIds) {
+        if (displayNameMap.find(cityId) == displayNameMap.end()) {
+            continue;
+        }
+        std::string cityDisplayName = displayNameMap.find(cityId)->second;
+        if (tabooUtils != nullptr) {
+            cityDisplayName = tabooUtils->ReplaceCityName(cityId, requestLocale, cityDisplayName);
+        }
         int32_t rawOffset = 0, dstOffset = 0;
         bool local = false;
         UErrorCode status = U_ZERO_ERROR;
