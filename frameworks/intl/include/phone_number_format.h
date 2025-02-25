@@ -40,7 +40,7 @@ public:
                                                              const std::map<std::string, std::string> &options);
     std::string getLocationName(const std::string &number, const std::string &locale);
     std::string getPhoneLocationName(const std::string& number, const std::string& phoneLocale,
-        const std::string& displayLocale, const std::string& regionCode);
+        const std::string& displayLocale);
     virtual bool getBlockedRegionName(const std::string& regionCode, const std::string& language);
     virtual std::string getCityName(const std::string& language, const std::string& phonenumber,
         const std::string& locationName);
