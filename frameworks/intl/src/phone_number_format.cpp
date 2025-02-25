@@ -257,10 +257,10 @@ std::string PhoneNumberFormat::getLocationName(
     std::string regionCode;
     util->GetRegionCodeForNumber(phoneNumber, &regionCode);
 
-    std::string locName = getPhoneLocationName(number, phoneLocale.getName(), locale, regionCode);
+    std::string locName = getPhoneLocationName(number, phoneLocale.getName(), locale);
 
     icu::LocaleBuilder regionbuilder = icu::LocaleBuilder().setRegion(regionCode);
-    icu::Locale regionLocale = builder.build(status);
+    icu::Locale regionLocale = regionbuilder.build(status);
     icu::UnicodeString displayRegion;
     regionLocale.getDisplayCountry(displayLocale, displayRegion);
     std::string displayCountryName;
@@ -287,7 +287,7 @@ std::string PhoneNumberFormat::getLocationName(
 
 std::string PhoneNumberFormat::getPhoneLocationName(
     const std::string& number, const std::string& phoneLocale,
-    const std::string& displayLocale, const std::string& regionCode)
+    const std::string& displayLocale)
 {
     OpenHandler();
     std::lock_guard<std::mutex> phoneLock(phoneMutex);
