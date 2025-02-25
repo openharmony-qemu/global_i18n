@@ -444,7 +444,7 @@ string LocaleConfig::GetSystemLocale()
         return systemLocale;
     }
     HILOG_ERROR_I18N("LocaleConfig::GetSystemLocale: Read system locale failed.");
-    systemLocale = ReadSystemParameter(DEFAULT_LANGUAGE_KEY, CONFIG_LEN);
+    systemLocale = ReadSystemParameter(DEFAULT_LOCALE_KEY, CONFIG_LEN);
     if (systemLocale.empty()) {
         HILOG_ERROR_I18N("LocaleConfig::GetSystemLocale: Read default system locale failed.");
         return "zh-Hans-CN";
