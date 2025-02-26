@@ -56,7 +56,7 @@ std::vector<std::string> PreferredLanguage::GetPreferredLanguageList()
         }
         return list;
     }
-    if (list[0] == systemLanguage || systemLanguage == "") {
+    if (list[0] == systemLanguage || systemLanguage.empty()) {
         return list;
     }
     int systemLanguageIdx = -1;

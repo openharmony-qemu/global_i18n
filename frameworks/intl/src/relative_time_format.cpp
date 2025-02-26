@@ -97,7 +97,7 @@ RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTag
         }
     }
     numberingSystem = localeInfo->GetNumberingSystem();
-    if (numberingSystem == "") {
+    if (numberingSystem.empty()) {
         numberingSystem = "latn";
     }
 }

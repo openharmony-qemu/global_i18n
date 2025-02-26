@@ -76,7 +76,7 @@ extern "C"
         std::string countryStr(country);
         std::string localeStr(locale);
         LocaleInfo localeInfo(countryStr);
-        if (!LocaleConfig::IsValidRegion(countryStr) && localeInfo.GetRegion() == "") {
+        if (!LocaleConfig::IsValidRegion(countryStr) && localeInfo.GetRegion().empty()) {
             HILOG_ERROR_I18N("GetDisplayCountry: Failed to get display country, because param country is invalid!");
             *errcode = I18N_NOT_VALID;
             return MallocCString("");

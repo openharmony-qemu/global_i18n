@@ -39,7 +39,7 @@ public:
         if (isTimePeriod) {
             return isTimePeriod;
         }
-        if (regex == "") {
+        if (regex.empty()) {
             return false;
         }
         int32_t status = 0;

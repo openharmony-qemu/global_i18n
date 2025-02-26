@@ -411,7 +411,7 @@ napi_value I18nSystemAddon::GetDisplayCountryImpl(napi_env env, napi_callback_in
         return VariableConvertor::CreateString(env, "");
     }
     LocaleInfo localeInfo(localeBuf.data());
-    if (!LocaleConfig::IsValidRegion(localeBuf.data()) && localeInfo.GetRegion() == "") {
+    if (!LocaleConfig::IsValidRegion(localeBuf.data()) && localeInfo.GetRegion().empty()) {
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "country", "a valid region", throwError);
         return VariableConvertor::CreateString(env, "");
     } else if (!LocaleConfig::IsValidTag(displayLocaleBuf.data())) {

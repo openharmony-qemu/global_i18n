@@ -53,6 +53,9 @@ icu::UnicodeString NegativeRule::Handle(icu::UnicodeString& src)
 {
     icu::UnicodeString ret = src;
     icu::RegexPattern* pattern = GetPattern();
+    if (pattern == nullptr) {
+        return ret;
+    }
     UErrorCode status = U_ZERO_ERROR;
     icu::RegexMatcher* matcher = pattern->matcher(ret, status);
     while (matcher != nullptr && matcher->find(status)) {

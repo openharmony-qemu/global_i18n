@@ -370,11 +370,14 @@ std::vector<MatchedNumberInfo> RegexRule::HandleSlant(PhoneNumberMatch* possible
 {
     MatchedNumberInfo matchedNumberInfo;
     MatchedNumberInfo numberInfo;
+    std::vector<MatchedNumberInfo> matchedNumberInfoList;
     icu::UnicodeString number = possibleNumber->raw_string().c_str();
     icu::RegexPattern* pattern = GetPattern();
+    if (pattern == nullptr) {
+        return matchedNumberInfoList;
+    }
     UErrorCode status;
     icu::RegexMatcher* matcher = pattern->matcher(number, status);
-    std::vector<MatchedNumberInfo> matchedNumberInfoList;
     if (matcher != nullptr && matcher->find()) {
         int start = matcher->start(status);
         std::vector<MatchedNumberInfo> tempList = GetNumbersWithSlant(number);
@@ -493,6 +496,10 @@ std::vector<MatchedNumberInfo> RegexRule::HandlePossibleNumberWithPattern(PhoneN
     std::vector<MatchedNumberInfo> matchedList;
     icu::UnicodeString possible = possibleNumber->raw_string().c_str();
     icu::RegexPattern* pattern = GetPattern();
+    if (pattern == nullptr) {
+        HILOG_ERROR_I18N("RegexPattern is nullptr.");
+        return matchedList;
+    }
     icu::RegexMatcher* mat = pattern->matcher(message, status);
     while (mat != nullptr && mat->find(status)) {
         int start = mat->start(status);

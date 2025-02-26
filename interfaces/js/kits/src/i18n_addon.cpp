@@ -455,7 +455,7 @@ napi_value I18nAddon::GetThreeLetterLanguage(napi_env env, napi_callback_info in
 
     napi_value result;
     status = napi_create_string_utf8(env, language.c_str(), NAPI_AUTO_LENGTH, &result);
-    if (status != napi_ok || language == "") {
+    if (status != napi_ok || language.empty()) {
         HILOG_ERROR_I18N("GetThreeLetterLanguage create string fail or empty");
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "locale", "a valid locale", true);
         return nullptr;
@@ -496,7 +496,7 @@ napi_value I18nAddon::GetThreeLetterRegion(napi_env env, napi_callback_info info
 
     napi_value result;
     status = napi_create_string_utf8(env, country.c_str(), NAPI_AUTO_LENGTH, &result);
-    if (status != napi_ok || country == "") {
+    if (status != napi_ok || country.empty()) {
         HILOG_ERROR_I18N("GetThreeLetterRegion create string fail or empty");
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "locale", "a valid locale", true);
         return nullptr;

@@ -290,6 +290,10 @@ std::vector<MatchedNumberInfo> PositiveRule::HandlePossibleNumberWithPattern(Pho
     std::vector<MatchedNumberInfo> matchedList;
     icu::UnicodeString possible = possibleNumber->raw_string().c_str();
     icu::RegexPattern* pattern = GetPattern();
+    if (pattern == nullptr) {
+        HILOG_ERROR_I18N("RegexPattern is nullptr.");
+        return matchedList;
+    }
     icu::RegexMatcher* mat = pattern->matcher(message, status);
     while (mat != nullptr && mat->find(status)) {
         int start = mat->start(status);

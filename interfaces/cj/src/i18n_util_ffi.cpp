@@ -188,7 +188,7 @@ char* FfiI18nUtilGetTimePeriodName(int32_t hour, char* locale, int32_t* errcode)
 char* FfiI18nUtilGetThreeLetterLanguage(char* locale, int32_t* errcode)
 {
     std::string language = GetISO3Language(std::string(locale));
-    if (language == "") {
+    if (language.empty()) {
         *errcode = I18N_NOT_VALID;
         HILOG_ERROR_I18N("GetThreeLetterLanguage create string fail or empty");
         return nullptr;
@@ -200,7 +200,7 @@ char* FfiI18nUtilGetThreeLetterLanguage(char* locale, int32_t* errcode)
 char* FfiI18nUtilGetThreeLetterRegion(char* locale, int32_t* errcode)
 {
     std::string country = GetISO3Country(std::string(locale));
-    if (country == "") {
+    if (country.empty()) {
         HILOG_ERROR_I18N("GetThreeLetterRegion create string fail or empty");
         *errcode = I18N_NOT_VALID;
         return nullptr;
