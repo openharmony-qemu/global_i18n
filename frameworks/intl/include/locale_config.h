@@ -32,6 +32,8 @@
 namespace OHOS {
 
 #ifdef SUPPORT_GRAPHICS
+template <typename T>
+class sptr;
 class IRemoteObject;
 #endif
 
