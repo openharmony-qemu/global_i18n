@@ -22,10 +22,6 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
-#ifdef SUPPORT_GRAPHICS
-#include "configuration.h"
-#include <common_event_data.h>
-#endif
 #include "i18n_types.h"
 #include "taboo_utils.h"
 #include "unicode/calendar.h"
@@ -34,6 +30,11 @@
 #include "unicode/utypes.h"
 
 namespace OHOS {
+
+#ifdef SUPPORT_GRAPHICS
+class IRemoteObject;
+#endif
+
 namespace Global {
 namespace I18n {
 class LocaleConfig {
