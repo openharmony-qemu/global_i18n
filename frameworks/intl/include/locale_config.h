@@ -15,7 +15,6 @@
 #ifndef OHOS_GLOBAL_I18N_LOCALE_CONFIG_H
 #define OHOS_GLOBAL_I18N_LOCALE_CONFIG_H
 
-#define F_OK 0
 #include <map>
 #include <mutex>
 #include <vector>
