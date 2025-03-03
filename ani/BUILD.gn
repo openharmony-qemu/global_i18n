@@ -1,0 +1,69 @@
+# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/config/components/ets_frontend/ets2abc_config.gni")
+import("//build/ohos.gni")
+
+ohos_shared_library("intl_ani") {
+  include_dirs = [
+    "./include",
+    "../frameworks/intl/include",
+  ]
+  sources = [ "./native/intl_ani.cpp" ]
+  deps = [ "../frameworks/intl:intl_util" ]
+  external_deps = [
+    "icu:shared_icuuc",
+    "runtime_core:ani",
+  ]
+  use_exceptions = true
+  subsystem_name = "global"
+  part_name = "i18n"
+}
+
+generate_static_abc("intl_abc") {
+  dst_file = "$target_out_dir/intl_ani.abc"
+  arktsconfig = "./arktsconfig_intl.json"
+  out_puts = [ "$target_out_dir/intl" ]
+}
+
+group("ani_package_intl") {
+  deps = [
+    ":intl_abc",
+    ":intl_ani",
+  ]
+}
+
+ohos_shared_library("i18n_ani") {
+  include_dirs = [
+    "./include",
+    "../frameworks/intl/include/",
+  ]
+  sources = [ "./native/i18n_ani.cpp" ]
+  deps = [ "../frameworks/intl:intl_util" ]
+  external_deps = [ "runtime_core:ani" ]
+  subsystem_name = "global"
+  part_name = "i18n"
+}
+
+generate_static_abc("i18n_abc") {
+  dst_file = "$target_out_dir/i18n_ani.abc"
+  arktsconfig = "./arktsconfig_i18n.json"
+  out_puts = [ "$target_out_dir/i18n" ]
+}
+
+group("ani_package_i18n") {
+  deps = [
+    ":i18n_abc",
+    ":i18n_ani",
+  ]
+}
