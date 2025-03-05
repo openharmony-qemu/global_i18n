@@ -17,6 +17,8 @@
 #ifdef SUPPORT_GRAPHICS
 #include "app_mgr_client.h"
 #include "ability_manager_client.h"
+#include "configuration.h"
+#include <common_event_data.h>
 #include <common_event_manager.h>
 #include <common_event_publish_info.h>
 #include <common_event_support.h>
