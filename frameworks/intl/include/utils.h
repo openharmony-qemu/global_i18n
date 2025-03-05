@@ -36,7 +36,7 @@ std::string ReadSystemParameter(const char *paramKey, const int paramLength);
 int32_t ConvertString2Int(const std::string &numberStr, int32_t& status);
 bool IsValidLocaleTag(icu::Locale &locale);
 void GetAllValidLocalesTag(std::unordered_set<std::string>& allValidLocalesLanguageTag);
-bool CheckFilePath(const std::string &filePath);
+std::string CheckFilePath(const std::string &filePath);
 std::string StrReplaceAll(const std::string& str,
     const std::string& target, const std::string& replace);
 std::string GetISO3Language(const std::string& language);

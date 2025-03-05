@@ -96,11 +96,13 @@ void PhoneNumberRule::Init()
 // Load the rules of the corresponding country
 void PhoneNumberRule::InitRule(std::string& xmlPath)
 {
-    if (!CheckFilePath(xmlPath)) {
+    std::string validXmlPath = CheckFilePath(xmlPath);
+    if (validXmlPath.empty()) {
+        HILOG_ERROR_I18N("InitRule: invalid xmlPath: %{public}s.", xmlPath.c_str());
         return;
     }
     xmlKeepBlanksDefault(0);
-    xmlDocPtr doc = xmlParseFile(xmlPath.c_str());
+    xmlDocPtr doc = xmlParseFile(validXmlPath.c_str());
     if (doc == nullptr) return;
     xmlNodePtr root = xmlDocGetRootElement(doc);
     xmlNodePtr cur = root->xmlChildrenNode;
