@@ -56,10 +56,8 @@ HWTEST_F(PhoneNumberFormatTest, PhoneNumberFormatTest0001, TestSize.Level1)
     EXPECT_EQ(phoneNumberFormat->getLocationName("+551738491234", "pt"), "São Paulo");
     EXPECT_EQ(phoneNumberFormat->getLocationName("+558435211234", "en"), "Macao - RN");
     EXPECT_EQ(phoneNumberFormat->getLocationName("+551738491234", "en"), "São Paulo");
-
     EXPECT_EQ(phoneNumberFormat->getLocationName("+903921234567", "tr"), "Türkiye");
     EXPECT_EQ(phoneNumberFormat->getLocationName("+903921234567", "en"), "Türkiye");
-
     EXPECT_EQ(phoneNumberFormat->getLocationName("+3596139312", "en"), "Bulgaria");
     EXPECT_EQ(phoneNumberFormat->getLocationName("+3599355123", "en"), "Bulgaria");
     EXPECT_EQ(phoneNumberFormat->getLocationName("+3598128123", "en"), "Bulgaria");
@@ -73,16 +71,15 @@ HWTEST_F(PhoneNumberFormatTest, PhoneNumberFormatTest0001, TestSize.Level1)
         EXPECT_EQ(phoneNumberFormat->getLocationName("+38338123456", "en"), "");
         EXPECT_EQ(phoneNumberFormat->getLocationName("+38338123456", "sr"), "");
     }
-
     EXPECT_EQ(phoneNumberFormat->getLocationName("+913602123456", "en"), "India");
     EXPECT_EQ(phoneNumberFormat->getLocationName("+913800123456", "en"), "India");
-
-    EXPECT_EQ(phoneNumberFormat->getLocationName("+38138212345", "sr"), "Суринам");
-
-    EXPECT_EQ(phoneNumberFormat->getLocationName("+38138212345", "en"), "Vatican City");
-    EXPECT_EQ(phoneNumberFormat->getLocationName("+38138212345", "en"), "Milan");
-    EXPECT_EQ(phoneNumberFormat->getLocationName("+38138212345", "en"), "Italy");        
-
+    EXPECT_EQ(phoneNumberFormat->getLocationName("+38138212345", "sr"), "Србија");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("+38138212345", "en"), "Serbia");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("+38138212345", "en"), "Serbia");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("+38138212345", "en"), "Serbia");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("+39066981", "en"), "Vatican City");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("+39021234", "en"), "Milan");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("+393123456789", "en"), "Italy");
 }
 } // namespace I18n
 } // namespace Global
