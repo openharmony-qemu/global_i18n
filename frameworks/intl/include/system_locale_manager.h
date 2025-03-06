@@ -126,6 +126,8 @@ private:
     bool IsSuggestRegion(const std::string &language, const std::string &region);
     LocaleItem GetLocaleItem(const std::string &region, SuggestionType &suggestionType,
         const std::string &localeTag);
+    static std::string GetCityDisplayNameWithTaboo(const std::string &cityId, const std::string &localeBaseName,
+        const std::string &cityDisplayName);
     static const std::unordered_set<std::string> supportLocales;
     static std::unordered_map<std::string, std::string> custLanguageMap;
     static constexpr int CONFIG_LEN = 128;
