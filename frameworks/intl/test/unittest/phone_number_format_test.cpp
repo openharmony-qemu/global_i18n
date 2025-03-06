@@ -14,8 +14,9 @@
  */
 
 #include <gtest/gtest.h>
-#include "phone_number_format_test.h"
 #include <sys/stat.h>
+#include "phone_number_format.h"
+#include "phone_number_format_test.h"
 #include "taboo_utils.h"
 
 using namespace OHOS::Global::I18n;
@@ -27,28 +28,28 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 
-void TranslitTest::SetUpTestCase(void)
-{
-    SetHwIcuDirectory();
-}
-
-void TranslitTest::TearDownTestCase(void)
+void PhoneNumberFormatTest::SetUpTestCase(void)
 {
 }
 
-void TranslitTest::SetUp(void)
+void PhoneNumberFormatTest::TearDownTestCase(void)
+{
+}
+
+void PhoneNumberFormatTest::SetUp(void)
 {}
 
-void TranslitTest::TearDown(void)
+void PhoneNumberFormatTest::TearDown(void)
 {}
 
 /**
  * @tc.name: PhoneNumberFormatTest0001
- * @tc.desc: Test icu::Transliterator
+ * @tc.desc: Test getLocationName
  * @tc.type: FUNC
  */
-HWTEST_F(TranslitTest, PhoneNumberFormatTest0001, TestSize.Level1)
+HWTEST_F(PhoneNumberFormatTest, PhoneNumberFormatTest0001, TestSize.Level1)
 {
+    const char* systemTabooDataPath = "/system/etc/taboo_res/";
     map<string, string> options;
     std::unique_ptr<PhoneNumberFormat> phoneNumberFormat =
         std::make_unique<PhoneNumberFormat>("CN", options);
@@ -66,7 +67,7 @@ HWTEST_F(TranslitTest, PhoneNumberFormatTest0001, TestSize.Level1)
     EXPECT_EQ(phoneNumberFormat->getLocationName("+3599355123", "bg"), "България");
     EXPECT_EQ(phoneNumberFormat->getLocationName("+3598128123", "bg"), "България");
     struct stat s;
-    if (stat(SYSTEM_TABOO_DATA_PATH.c_str(), &s) == 0) {
+    if (stat(systemTabooDataPath, &s) == 0) {
         EXPECT_EQ(phoneNumberFormat->getLocationName("+212528912345", "en"), "");
         EXPECT_EQ(phoneNumberFormat->getLocationName("+212528912345", "fr"), "");
         EXPECT_EQ(phoneNumberFormat->getLocationName("+38338123456", "en"), "");
