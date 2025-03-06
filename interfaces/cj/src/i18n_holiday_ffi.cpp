@@ -40,6 +40,10 @@ int64_t FfiOHOSHolidayManagerImplConstructor(char* icsPath)
 bool FfiOHOSHolidayManagerIsHoliday(int64_t id, CDate date)
 {
     auto instance = FFIData::GetData<CHolidayManager>(id);
+    if (!instance) {
+        HILOG_ERROR_I18N("The CHolidayManager instance is nullptr");
+        return false;
+    }
     if (date.isNull) {
         return instance->isHoliday();
     } else {
@@ -73,6 +77,14 @@ static int32_t HolidayLocalNames2Cj(const std::vector<HolidayLocalName>& localNa
     return HOLIDAY_OPT_SUCCESS;
 }
 
+static void FreeHolidayLocalNameArr(HolidayLocalNameArr &arr)
+{
+    for (int64_t index = 0; index < arr.size; index++) {
+        free(arr.head[index].language);
+        free(arr.head[index].name);
+    }
+}
+
 static int32_t HolidayInfo2Cj(const std::vector<HolidayInfoItem>& items, HolidayInfoItemArr &arr)
 {
     int64_t size = static_cast<int64_t>(items.size());
@@ -82,30 +94,32 @@ static int32_t HolidayInfo2Cj(const std::vector<HolidayInfoItem>& items, Holiday
         return HOLIDAY_OPT_SUCCESS;
     }
     arr.head = static_cast<CHolidayInfoItem*>(malloc(sizeof(CHolidayInfoItem) * size));
-        if (arr.head == nullptr) {
+    if (arr.head == nullptr) {
+        return HOLIDAY_OPT_FAILED;
+    }
+    uint32_t idx = 0;
+    for (const auto& each : items) {
+        CHolidayInfoItem info;
+        info.baseName = MallocCString(each.baseName);
+        info.day = each.day;
+        info.month = each.month;
+        info.year = each.year;
+
+        if (HolidayLocalNames2Cj(each.localNames, info.localNames) != HOLIDAY_OPT_SUCCESS) {
+            for (uint32_t index = 0; index < idx; index++) {
+                free(arr.head[index].baseName);
+                FreeHolidayLocalNameArr(arr.head[index].localNames);
+                free(arr.head[index].localNames.head);
+            }
+            free(info.baseName);
+            free(arr.head);
             return HOLIDAY_OPT_FAILED;
         }
-        uint32_t idx = 0;
-        for (const auto& each : items) {
-            CHolidayInfoItem info;
-            info.baseName = MallocCString(each.baseName);
-            info.day = each.day;
-            info.month = each.month;
-            info.year = each.year;
 
-            if (HolidayLocalNames2Cj(each.localNames, info.localNames) != HOLIDAY_OPT_SUCCESS) {
-                for (uint32_t index = 0; index < idx; index++) {
-                    free(arr.head[index].baseName);
-                }
-                free(info.baseName);
-                free(arr.head);
-                return HOLIDAY_OPT_FAILED;
-            }
-
-            arr.head[idx] = info;
-            idx++;
-        }
-        arr.size = idx;
+        arr.head[idx] = info;
+        idx++;
+    }
+    arr.size = idx;
     return HOLIDAY_OPT_SUCCESS;
 }
 

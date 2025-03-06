@@ -106,18 +106,30 @@ int64_t FfiOHOSGetCalendar(const char* locale, const char* type)
 void FfiOHOSCalendarSetTime(int64_t id, double time)
 {
     auto instance = FFIData::GetData<CCalendar>(id);
+    if (!instance) {
+        HILOG_ERROR_I18N("The CCalendar instance is nullptr");
+        return;
+    }
     instance->SetTime(time);
 }
 
 void FfiOHOSCalendarSetDate(int64_t id, int32_t year, int32_t month, int32_t day)
 {
     auto instance = FFIData::GetData<CCalendar>(id);
+    if (!instance) {
+        HILOG_ERROR_I18N("The CCalendar instance is nullptr");
+        return;
+    }
     instance->Set(year, month, day);
 }
 
 void FfiOHOSCalendarSetOfDay(int64_t id, int32_t hour, int32_t minute, int32_t second)
 {
     auto instance = FFIData::GetData<CCalendar>(id);
+    if (!instance) {
+        HILOG_ERROR_I18N("The CCalendar instance is nullptr");
+        return;
+    }
     std::time_t t = std::time(nullptr);
     std::tm* now = std::localtime(&t);
 
@@ -149,12 +161,20 @@ void FfiOHOSCalendarSetOfDay(int64_t id, int32_t hour, int32_t minute, int32_t s
 void FfiOHOSCalendarSetTimeZone(int64_t id, const char* timeZone)
 {
     auto instance = FFIData::GetData<CCalendar>(id);
+    if (!instance) {
+        HILOG_ERROR_I18N("The CCalendar instance is nullptr");
+        return;
+    }
     instance->SetTimeZone(std::string(timeZone));
 }
 
 char* FfiOHOSCalendarGetTimeZone(int64_t id)
 {
     auto instance = FFIData::GetData<CCalendar>(id);
+    if (!instance) {
+        HILOG_ERROR_I18N("The CCalendar instance is nullptr");
+        return nullptr;
+    }
     std::string res = instance->GetTimeZone();
     return MallocCString(res);
 }
@@ -162,30 +182,50 @@ char* FfiOHOSCalendarGetTimeZone(int64_t id)
 void FfiOHOSCalendarSetFirstDayOfWeek(int64_t id, int32_t firstDayOfWeek)
 {
     auto instance = FFIData::GetData<CCalendar>(id);
+    if (!instance) {
+        HILOG_ERROR_I18N("The CCalendar instance is nullptr");
+        return;
+    }
     instance->SetFirstDayOfWeek(firstDayOfWeek);
 }
 
 int32_t FfiOHOSCalendarGetFirstDayOfWeek(int64_t id)
 {
     auto instance = FFIData::GetData<CCalendar>(id);
+    if (!instance) {
+        HILOG_ERROR_I18N("The CCalendar instance is nullptr");
+        return UCAL_SUNDAY;
+    }
     return instance->GetFirstDayOfWeek();
 }
 
 void FfiOHOSCalendarSetMinimalDaysInFirstWeek(int64_t id, int32_t minimalDays)
 {
     auto instance = FFIData::GetData<CCalendar>(id);
+    if (!instance) {
+        HILOG_ERROR_I18N("The CCalendar instance is nullptr");
+        return;
+    }
     instance->SetMinimalDaysInFirstWeek(minimalDays);
 }
 
 int32_t FfiOHOSCalendarGetMinimalDaysInFirstWeek(int64_t id)
 {
     auto instance = FFIData::GetData<CCalendar>(id);
+    if (!instance) {
+        HILOG_ERROR_I18N("The CCalendar instance is nullptr");
+        return 1;
+    }
     return instance->GetMinimalDaysInFirstWeek();
 }
 
 int32_t FfiOHOSCalendarGet(int64_t id, char* field)
 {
     auto instance = FFIData::GetData<CCalendar>(id);
+    if (!instance) {
+        HILOG_ERROR_I18N("The CCalendar instance is nullptr");
+        return 0;
+    }
     std::string fieldName(field);
     return instance->Get(g_fieldsMap[fieldName]);
 }
@@ -194,6 +234,10 @@ char* FfiOHOSCalendarGetDisplayName(int64_t id, char* locale)
 {
     std::string localeStr(locale);
     auto instance = FFIData::GetData<CCalendar>(id);
+    if (!instance) {
+        HILOG_ERROR_I18N("The CCalendar instance is nullptr");
+        return nullptr;
+    }
     std::string res = instance->GetDisplayName(localeStr);
     return MallocCString(res);
 }
@@ -201,6 +245,10 @@ char* FfiOHOSCalendarGetDisplayName(int64_t id, char* locale)
 bool FfiOHOSCalendarIsWeekend(int64_t id, CDate date)
 {
     auto instance = FFIData::GetData<CCalendar>(id);
+    if (!instance) {
+        HILOG_ERROR_I18N("The CCalendar instance is nullptr");
+        return false;
+    }
     // -1 indicates that the date is not provided
     if (date.isNull) {
         return instance->IsWeekend();
@@ -213,22 +261,34 @@ bool FfiOHOSCalendarIsWeekend(int64_t id, CDate date)
 void FfiOHOSCalendarAdd(int64_t id, char* field, int32_t amount, int32_t* errcode)
 {
     auto instance = FFIData::GetData<CCalendar>(id);
+    if (!instance) {
+        HILOG_ERROR_I18N("The CCalendar instance is nullptr");
+        return;
+    }
     std::string fieldStr(field);
     if (g_fieldsInFunctionAdd.find(fieldStr) == g_fieldsInFunctionAdd.end()) {
         *errcode = I18N_NOT_VALID;
     }
-    instance -> Add(g_fieldsMap[fieldStr], amount);
+    instance->Add(g_fieldsMap[fieldStr], amount);
 }
 
 double FfiOHOSCalendarGetTimeInMillis(int64_t id)
 {
     auto instance = FFIData::GetData<CCalendar>(id);
+    if (!instance) {
+        HILOG_ERROR_I18N("The CCalendar instance is nullptr");
+        return 0;
+    }
     return instance->GetTimeInMillis();
 }
 
 int32_t FfiOHOSCalendarCompareDays(int64_t id, CDate date)
 {
     auto instance = FFIData::GetData<CCalendar>(id);
+    if (!instance) {
+        HILOG_ERROR_I18N("The CCalendar instance is nullptr");
+        return 0;
+    }
     return instance->CompareDays(date.icuUdate);
 }
 }

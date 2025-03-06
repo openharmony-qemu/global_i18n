@@ -171,11 +171,20 @@ char* FfiI18nUtilGetTimePeriodName(int32_t hour, char* locale, int32_t* errcode)
         return nullptr;
     }
     icu::DateFormat* dateFormatter = icu::DateFormat::createDateInstance(icu::DateFormat::EStyle::kDefault, locale);
+    if (dateFormatter == nullptr) {
+        *errcode = I18N_NOT_VALID;
+        return nullptr;
+    }
     icu::SimpleDateFormat* formatter = static_cast<icu::SimpleDateFormat*>(dateFormatter);
     formatter->applyPattern("B");
     std::string temp;
     icu::UnicodeString name;
     icu::Calendar *calendar = icu::Calendar::createInstance(locale, status);
+    if (calendar == nullptr) {
+        *errcode = I18N_NOT_VALID;
+        delete formatter;
+        return nullptr;
+    }
     calendar->set(UCalendarDateFields::UCAL_HOUR_OF_DAY, hour);
     formatter->format(calendar->getTime(status), name);
     name.toUTF8String(temp);

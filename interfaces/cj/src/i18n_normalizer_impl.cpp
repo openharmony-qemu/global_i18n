@@ -33,7 +33,7 @@ extern "C"
         std::string normalizedText = normalizer_->Normalize(text, std::strlen(text), errorCode);
         if (errorCode != I18nErrorCode::SUCCESS) {
             HILOG_ERROR_I18N("FfiI18nNormalizer normalize fail, error code: %d", errorCode);
-            return MallocCString("");
+            return nullptr;
         }
         return MallocCString(normalizedText);
     }
