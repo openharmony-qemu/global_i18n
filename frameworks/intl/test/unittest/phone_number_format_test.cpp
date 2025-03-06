@@ -14,10 +14,9 @@
  */
 
 #include <gtest/gtest.h>
-#include <map>
-#include <vector>
-#include "phone+number_format_test.h"
-#include <unistd.h>
+#include "phone_number_format_test.h"
+#include <sys/stat.h>
+#include "taboo_utils.h"
 
 using namespace OHOS::Global::I18n;
 using testing::ext::TestSize;
@@ -66,12 +65,13 @@ HWTEST_F(TranslitTest, PhoneNumberFormatTest0001, TestSize.Level1)
     EXPECT_EQ(phoneNumberFormat->getLocationName("+3596139312", "bg"), "България");
     EXPECT_EQ(phoneNumberFormat->getLocationName("+3599355123", "bg"), "България");
     EXPECT_EQ(phoneNumberFormat->getLocationName("+3598128123", "bg"), "България");
-
-    EXPECT_EQ(phoneNumberFormat->getLocationName("+212528912345", "en"), "");
-    EXPECT_EQ(phoneNumberFormat->getLocationName("+212528912345", "fr"), "");
-
-    EXPECT_EQ(phoneNumberFormat->getLocationName("+38338123456", "en"), "");
-    EXPECT_EQ(phoneNumberFormat->getLocationName("+38338123456", "sr"), "");
+    struct stat s;
+    if (stat(SYSTEM_TABOO_DATA_PATH.c_str(), &s) == 0) {
+        EXPECT_EQ(phoneNumberFormat->getLocationName("+212528912345", "en"), "");
+        EXPECT_EQ(phoneNumberFormat->getLocationName("+212528912345", "fr"), "");
+        EXPECT_EQ(phoneNumberFormat->getLocationName("+38338123456", "en"), "");
+        EXPECT_EQ(phoneNumberFormat->getLocationName("+38338123456", "sr"), "");
+    }
 
     EXPECT_EQ(phoneNumberFormat->getLocationName("+913602123456", "en"), "India");
     EXPECT_EQ(phoneNumberFormat->getLocationName("+913800123456", "en"), "India");
