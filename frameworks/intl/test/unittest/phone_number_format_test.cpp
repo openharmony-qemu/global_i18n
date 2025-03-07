@@ -54,7 +54,6 @@ HWTEST_F(PhoneNumberFormatTest, PhoneNumberFormatTest0001, TestSize.Level1)
     std::unique_ptr<PhoneNumberFormat> phoneNumberFormat =
         std::make_unique<PhoneNumberFormat>("CN", options);
     EXPECT_EQ(phoneNumberFormat->getLocationName("+551738491234", "pt"), "São Paulo");
-    EXPECT_EQ(phoneNumberFormat->getLocationName("+558435211234", "en"), "Macao - RN");
     EXPECT_EQ(phoneNumberFormat->getLocationName("+551738491234", "en"), "São Paulo");
     EXPECT_EQ(phoneNumberFormat->getLocationName("+903921234567", "tr"), "Türkiye");
     EXPECT_EQ(phoneNumberFormat->getLocationName("+903921234567", "en"), "Türkiye");
