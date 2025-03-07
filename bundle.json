@@ -73,7 +73,8 @@
                 "preferences",
                 "resource_management",
                 "safwk",
-                "samgr"
+                "samgr",
+                "runtime_core"
             ],
             "third_party": []
         },
@@ -86,7 +87,9 @@
                 "//base/global/i18n/frameworks/intl:geocoding_depends",
                 "//base/global/i18n/ta:binary_files",
                 "//base/global/i18n/sa_profile:i18n_service_ability_profile",
-                "//base/global/i18n/services:i18n_service_ability"
+                "//base/global/i18n/services:i18n_service_ability",
+                "//base/global/i18n/ani:ani_package_intl",
+                "//base/global/i18n/ani:ani_package_i18n"
             ],
             "inner_kits": [
                 {
