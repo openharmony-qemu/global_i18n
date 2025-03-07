@@ -32,6 +32,7 @@ ohos_unittest("intl_test") {
     "unittest/mock/src/phone_number_format_mock.cpp",
     "unittest/number_format_test.cpp",
     "unittest/number_format_test_extend.cpp",
+    "unittest/phone_number_format_test.cpp",
     "unittest/translit_test.cpp",
   ]
   include_dirs = [
