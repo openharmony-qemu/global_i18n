@@ -12,11 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "phone_number_format_test.h"
 
 #include <gtest/gtest.h>
 #include <sys/stat.h>
 #include "phone_number_format.h"
-#include "phone_number_format_test.h"
 #include "taboo_utils.h"
 
 using namespace OHOS::Global::I18n;
