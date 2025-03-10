@@ -580,16 +580,15 @@ napi_value I18nSystemAddon::IsSuggestedImpl(napi_env env, napi_callback_info inf
         return nullptr;
     }
     bool isSuggested = false;
-    bool apiHighVersion = GetApiCheckResult();
     if (VariableConvertor::CheckNapiIsNull(env, argv[1])) {
         std::string region = VariableConvertor::GetString(env, argv[1], code);
         if (code != 0) {
             HILOG_ERROR_I18N("IsSuggestedImpl: Failed to get string argv[1].");
             return nullptr;
         }
-        isSuggested = IsSuggestedByApiVersion(language, region, apiHighVersion);
+        isSuggested = LocaleConfig::IsSuggestedV15(language, region);
     } else {
-        isSuggested = IsSuggestedByApiVersion(language, apiHighVersion);
+        isSuggested = LocaleConfig::IsSuggestedV15(language);
     }
     napi_value result = nullptr;
     status = napi_get_boolean(env, isSuggested, &result);
@@ -602,12 +601,18 @@ napi_value I18nSystemAddon::IsSuggestedImpl(napi_env env, napi_callback_info inf
 
 bool I18nSystemAddon::IsSuggestedByApiVersion(const std::string &language, bool newApi)
 {
+    if (newApi) {
+        return LocaleConfig::IsSuggested(language);
+    }
     return LocaleConfig::IsSuggestedV15(language);
 }
 
 bool I18nSystemAddon::IsSuggestedByApiVersion(const std::string &language,
     const std::string &region, bool newApi)
 {
+    if (newApi) {
+        return LocaleConfig::IsSuggested(language, region);
+    }
     return LocaleConfig::IsSuggestedV15(language, region);
 }
 
