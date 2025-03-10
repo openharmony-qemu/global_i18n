@@ -214,6 +214,14 @@ namespace intl {
             }
         }
 
+        constructor() {
+            this.nativeLocale = Locale.create().nativeLocale;
+        }
+
+        constructor(locale: string, options?: LocaleOptions) {
+            this.nativeLocale = Locale.create(locale, options).nativeLocale;
+        }
+
         native static create(): Locale;
         native static create(locale: string, options?: LocaleOptions): Locale;
     }
@@ -227,6 +235,14 @@ namespace intl {
             if (this.nativeDateTimeFormat == 0) {
                 this.nativeDateTimeFormat = context;
             }
+        }
+
+        constructor() {
+            this.nativeDateTimeFormat = DateTimeFormat.create().nativeDateTimeFormat;
+        }
+
+        constructor(locale: string, options?: DateTimeOptions) {
+            this.nativeDateTimeFormat = DateTimeFormat.create(locale, options).nativeDateTimeFormat;
         }
 
         native static create(): DateTimeFormat;
@@ -244,6 +260,14 @@ namespace intl {
             if (this.nativeNumberFormat == 0) {
                 this.nativeNumberFormat = context;
             }
+        }
+
+        constructor() {
+            this.nativeNumberFormat = NumberFormat.create().nativeNumberFormat;
+        }
+
+        constructor(locale: string, options?: NumberOptions) {
+            this.nativeNumberFormat = NumberFormat.create(locale, options).nativeNumberFormat;
         }
 
         native static create(): NumberFormat;
