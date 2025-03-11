@@ -22,58 +22,95 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 using namespace OHOS::FFI;
+constexpr int32_t OFF_BOUND = -1;
 extern "C" {
 void FfiOHOSBreakIteratorSetLineBreakText(int64_t id, const char* text)
 {
     auto instance = FFIData::GetData<CBreakIterator>(id);
+    if (!instance) {
+        HILOG_ERROR_I18N("The CBreakIterator instance is nullptr");
+        return;
+    }
     instance->SetLineBreakText(text);
 }
 
 char* FfiOHOSBreakIteratorGetLineBreakText(int64_t id)
 {
     auto instance = FFIData::GetData<CBreakIterator>(id);
+    if (!instance) {
+        HILOG_ERROR_I18N("The CBreakIterator instance is nullptr");
+        return nullptr;
+    }
     return MallocCString(instance->GetLineBreakText());
 }
 
 int32_t FfiOHOSBreakIteratorCurrent(int64_t id)
 {
     auto instance = FFIData::GetData<CBreakIterator>(id);
+    if (!instance) {
+        HILOG_ERROR_I18N("The CBreakIterator instance is nullptr");
+        return OFF_BOUND;
+    }
     return instance->current();
 }
 
 int32_t FfiOHOSBreakIteratorFirst(int64_t id)
 {
     auto instance = FFIData::GetData<CBreakIterator>(id);
+    if (!instance) {
+        HILOG_ERROR_I18N("The CBreakIterator instance is nullptr");
+        return OFF_BOUND;
+    }
     return instance->first();
 }
 
 int32_t FfiOHOSBreakIteratorFollowing(int64_t id, int32_t offset)
 {
     auto instance = FFIData::GetData<CBreakIterator>(id);
+    if (!instance) {
+        HILOG_ERROR_I18N("The CBreakIterator instance is nullptr");
+        return OFF_BOUND;
+    }
     return instance->following(offset);
 }
 
 int32_t FfiOHOSBreakIteratorLast(int64_t id)
 {
     auto instance = FFIData::GetData<CBreakIterator>(id);
+    if (!instance) {
+        HILOG_ERROR_I18N("The CBreakIterator instance is nullptr");
+        return OFF_BOUND;
+    }
     return instance->last();
 }
 
 int32_t FfiOHOSBreakIteratorNext(int64_t id, int32_t number)
 {
     auto instance = FFIData::GetData<CBreakIterator>(id);
+    if (!instance) {
+        HILOG_ERROR_I18N("The CBreakIterator instance is nullptr");
+        return OFF_BOUND;
+    }
     return instance->next(number);
 }
 
 int32_t FfiOHOSBreakIteratorPrevious(int64_t id)
 {
     auto instance = FFIData::GetData<CBreakIterator>(id);
+    if (!instance) {
+        HILOG_ERROR_I18N("The CBreakIterator instance is nullptr");
+        return OFF_BOUND;
+    }
     return instance->previous();
 }
 
 bool FfiOHOSBreakIteratorIsBoundary(int64_t id, int32_t offset)
 {
     auto instance = FFIData::GetData<CBreakIterator>(id);
+    if (!instance) {
+        HILOG_ERROR_I18N("The CBreakIterator instance is nullptr");
+        return false;
+    }
     return instance->IsBoundary(offset);
 }
 

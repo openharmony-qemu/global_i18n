@@ -47,6 +47,10 @@ extern "C"
     char* FfiI18nNormalizerNormalize(int64_t remoteDataID, char* text)
     {
         auto normalizer = FFIData::GetData<FfiI18nNormalizer>(remoteDataID);
+        if (!normalizer) {
+            HILOG_ERROR_I18N("The FfiI18nNormalizer instance is nullptr");
+            return nullptr;
+        }
         return normalizer->normalize(text);
     }
 }

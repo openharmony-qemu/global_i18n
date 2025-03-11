@@ -81,6 +81,10 @@ extern "C"
     char* FfiI18nTimezoneGetDisplayName(int64_t remoteDataID, char* locale, bool isDST, int32_t parameterStatus)
     {
         auto timezone = FFIData::GetData<FfiI18nTimeZone>(remoteDataID);
+        if (!timezone) {
+            HILOG_ERROR_I18N("The FfiI18nTimeZone instance is nullptr");
+            return nullptr;
+        }
         char* result;
         if (parameterStatus == 0) {
             result = timezone->getDisplayName();
@@ -97,6 +101,10 @@ extern "C"
     int32_t FfiI18nTimezoneGetOffset(int64_t remoteDataID, double date, int32_t parameterStatus)
     {
         auto timezone = FFIData::GetData<FfiI18nTimeZone>(remoteDataID);
+        if (!timezone) {
+            HILOG_ERROR_I18N("The FfiI18nTimeZone instance is nullptr");
+            return 0;
+        }
         double cDate = 0;
         if (parameterStatus == 0) { // 0 reprensents date is null, use system time instead
             auto time = std::chrono::system_clock::now();
@@ -112,12 +120,20 @@ extern "C"
     int32_t FfiI18nTimezoneGetRawOffset(int64_t remoteDataID)
     {
         auto timezone = FFIData::GetData<FfiI18nTimeZone>(remoteDataID);
+        if (!timezone) {
+            HILOG_ERROR_I18N("The FfiI18nTimeZone instance is nullptr");
+            return 0;
+        }
         return timezone->getRawOffset();
     }
 
     char* FfiI18nTimezoneGetID(int64_t remoteDataID)
     {
         auto timezone = FFIData::GetData<FfiI18nTimeZone>(remoteDataID);
+        if (!timezone) {
+            HILOG_ERROR_I18N("The FfiI18nTimeZone instance is nullptr");
+            return nullptr;
+        }
         return timezone->getID();
     }
 }

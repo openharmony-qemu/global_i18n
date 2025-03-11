@@ -31,7 +31,7 @@ public:
     ~FfiI18nPhoneNumberFormat() = default;
     char* format(std::string number);
     bool isValidNumber(std::string number);
-    char* getLocationNmae(std::string number, std::string locale);
+    char* getLocationName(std::string number, std::string locale);
 private:
     std::unique_ptr<OHOS::Global::I18n::PhoneNumberFormat> phoneNumberFormat_ = nullptr;
     friend class OHOS::FFI::RuntimeType;
