@@ -69,6 +69,7 @@ const char *I18nTimeZone::CITY_DISPLAYNAME_SECOND_ROOT_TAG = "display_name";
 std::set<std::string> I18nTimeZone::supportedLocales {};
 std::unordered_set<std::string> I18nTimeZone::availableZoneCityIDs {};
 std::unordered_map<std::string, std::string> I18nTimeZone::city2TimeZoneID {};
+std::unordered_map<std::string, std::string> I18nTimeZone::cityDisplayNameCache {};
 std::map<std::string, std::string> I18nTimeZone::BEST_MATCH_LOCALE {};
 std::mutex I18nTimeZone::matchLocaleMutex;
 std::mutex I18nTimeZone::initZoneInfoMutex;
