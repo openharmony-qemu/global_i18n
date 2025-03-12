@@ -51,7 +51,7 @@ void DateTimeRule::Init(std::string& locale)
 {
     InitRules(xmlCommonPath);
     std::string xmlPath = "/system/usr/ohos_locale_config/datetime/" + locale + ".xml";
-    std::string validXmlPath = CheckFilePath(xmlPath);
+    std::string validXmlPath = GetAbsoluteFilePath(xmlPath);
     if (validXmlPath.empty()) {
         this->locale = this->localeMap["locale"];
     } else {
@@ -92,9 +92,9 @@ void DateTimeRule::RuleLevel()
 
 void DateTimeRule::InitRules(std::string& xmlPath)
 {
-    std::string validXmlPath = CheckFilePath(xmlPath);
+    std::string validXmlPath = GetAbsoluteFilePath(xmlPath);
     if (validXmlPath.empty()) {
-        HILOG_ERROR_I18N("InitRules: invalid xmlPath: %{public}s.", xmlPath.c_str());
+        HILOG_ERROR_I18N("DateTimeRule::InitRules: invalid xmlPath: %{public}s.", xmlPath.c_str());
         return;
     }
     xmlKeepBlanksDefault(0);
@@ -131,9 +131,9 @@ void DateTimeRule::InitRules(std::string& xmlPath)
 
 void DateTimeRule::InitRuleBackup(std::string& xmlPathBackup)
 {
-    std::string validXmlPath = CheckFilePath(xmlPathBackup);
+    std::string validXmlPath = GetAbsoluteFilePath(xmlPathBackup);
     if (validXmlPath.empty()) {
-        HILOG_ERROR_I18N("InitRuleBackup: invalid xmlPathBackup: %{public}s.", xmlPathBackup.c_str());
+        HILOG_ERROR_I18N("DateTimeRule::InitRuleBackup: invalid xmlPathBackup: %{public}s.", xmlPathBackup.c_str());
         return;
     }
     xmlKeepBlanksDefault(0);

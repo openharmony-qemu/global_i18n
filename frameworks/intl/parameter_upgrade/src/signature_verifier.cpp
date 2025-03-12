@@ -73,17 +73,17 @@ bool SignatureVerifier::VerifyCertFile(const std::string& certPath, const std::s
 bool SignatureVerifier::VerifyFileSign(const std::string& pubkeyPath, const std::string& signPath,
     const std::string& digestPath)
 {
-    std::string validPubkeyPath = CheckFilePath(pubkeyPath);
+    std::string validPubkeyPath = GetAbsoluteFilePath(pubkeyPath);
     if (validPubkeyPath.empty()) {
         HILOG_ERROR_I18N("SignatureVerifier::VerifyFileSign: Check pubkey file failed.");
         return false;
     }
-    std::string validSignPath = CheckFilePath(signPath);
+    std::string validSignPath = GetAbsoluteFilePath(signPath);
     if (validSignPath.empty()) {
         HILOG_ERROR_I18N("SignatureVerifier::VerifyFileSign: Check sign file failed.");
         return false;
     }
-    std::string validDigestPath = CheckFilePath(digestPath);
+    std::string validDigestPath = GetAbsoluteFilePath(digestPath);
     if (validDigestPath.empty()) {
         HILOG_ERROR_I18N("SignatureVerifier::VerifyFileSign: Check digest file failed.");
         return false;
@@ -156,7 +156,7 @@ bool SignatureVerifier::VerifyUpdateFile(const std::string& filePath, const std:
         std::string fileName = line.substr(PREFIX_NAME.size());
         filesList.push_back(fileName);
         std::string absFilePath = filePath + trim(fileName);
-        absFilePath = CheckFilePath(absFilePath);
+        absFilePath = GetAbsoluteFilePath(absFilePath);
         if (absFilePath.empty()) {
             HILOG_ERROR_I18N("VerifyUpdateFile: File %{public}s is not exist.", fileName.c_str());
             return false;

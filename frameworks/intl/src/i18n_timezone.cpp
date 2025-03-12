@@ -1187,9 +1187,9 @@ void I18nTimeZone::GetTzDataWidth(std::vector<std::string> filePaths, uint32_t *
         return;
     }
     std::string firstPath = filePaths.at(0);
-    firstPath = CheckFilePath(firstPath.c_str());
+    firstPath = GetAbsoluteFilePath(firstPath.c_str());
     if (firstPath.empty()) {
-        HILOG_ERROR_I18N("GetTzDataWidth: firstPath %{public}s is invalid.", firstPath.c_str());
+        HILOG_ERROR_I18N("I18nTimeZone::GetTzDataWidth: firstPath %{public}s is invalid.", firstPath.c_str());
         return;
     }
     FILE* fp;
@@ -1220,7 +1220,7 @@ void I18nTimeZone::GetTzDataWidth(std::vector<std::string> filePaths, uint32_t *
 int I18nTimeZone::InitPngptr(png_structp &png_ptr, png_infop &info_ptr, FILE **fp,
                              std::string preferredPath)
 {
-    std::string validFilePath = CheckFilePath(preferredPath);
+    std::string validFilePath = GetAbsoluteFilePath(preferredPath);
     if (validFilePath.empty()) {
         HILOG_ERROR_I18N("timezone data filepath invalid.");
         return 1;

@@ -41,7 +41,7 @@ HolidayManager::HolidayManager(const char* path)
         HILOG_ERROR_I18N("Failed: parameter path is NULL.");
         return;
     }
-    std::string absolutePath = CheckFilePath(path);
+    std::string absolutePath = GetAbsoluteFilePath(path);
     if (absolutePath.empty()) {
         HILOG_ERROR_I18N("Failed: holiday file path: %{public}s invalid.", path);
         return;
