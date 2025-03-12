@@ -841,6 +841,20 @@ std::unordered_set<std::string> I18nTimeZone::GetAvailableZoneCityIDs()
 
 std::string I18nTimeZone::FindCityDisplayNameFromXml(std::string &cityID, std::string &locale)
 {
+    std::string key = cityID + ":" + locale;
+    std::string tempDisplayName = GetCityDisplayNameFromCache(key);
+    if (!tempDisplayName.empty()) {
+        return tempDisplayName;
+    }
+    std::string displayName = FindCityDisplayNameFromXmlInner(cityID, locale);
+    if (!displayName.empty() && cityDisplayNameCache.size() < MAX_CACHE_SIZE) {
+        cityDisplayNameCache.insert(std::make_pair(key, displayName));
+    }
+    return displayName;
+}
+
+std::string I18nTimeZone::FindCityDisplayNameFromXmlInner(std::string &cityID, std::string &locale)
+{
     xmlKeepBlanksDefault(0);
     std::string xmlPath = GetCityDisplayNameXmlPath(locale);
     xmlDocPtr doc = xmlParseFile(xmlPath.c_str());
@@ -885,6 +899,14 @@ std::string I18nTimeZone::FindCityDisplayNameFromXml(std::string &cityID, std::s
     }
     xmlFreeDoc(doc);
     return displayName;
+}
+
+std::string I18nTimeZone::GetCityDisplayNameFromCache(std::string &key)
+{
+    if (cityDisplayNameCache.find(key) != cityDisplayNameCache.end()) {
+        return cityDisplayNameCache.at(key);
+    }
+    return "";
 }
 
 std::string I18nTimeZone::GetCityDisplayNameXmlPath(const std::string &locale)
