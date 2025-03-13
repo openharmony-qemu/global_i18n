@@ -85,7 +85,7 @@ unordered_map<string, string> ZoneUtil::defaultMap = {
 
 bool ZoneUtil::icuInitialized = ZoneUtil::Init();
 
-string ZoneUtil::GetDefaultZone(const string &country)
+std::string ZoneUtil::GetDefaultZone(const std::string& country)
 {
     string temp(country);
     for (size_t i = 0; i < temp.size(); i++) {
@@ -103,24 +103,20 @@ string ZoneUtil::GetDefaultZone(const string &country)
     return ret;
 }
 
-string ZoneUtil::GetDefaultZone(const int32_t number)
+std::string ZoneUtil::GetDefaultZone(int32_t number)
 {
     using i18n::phonenumbers::PhoneNumberUtil;
-    string *region_code = new(nothrow) string();
-    if (!region_code) {
-        return "";
-    }
     PhoneNumberUtil* phoneUtil = PhoneNumberUtil::GetInstance();
-    phoneUtil->GetRegionCodeForCountryCode(number, region_code);
-    if (!region_code) {
+    if (phoneUtil == nullptr) {
+        HILOG_ERROR_I18N("ZoneUtil::GetDefaultZone: Get phone number util failed.");
         return "";
     }
-    string ret = GetDefaultZone(*region_code);
-    delete region_code;
-    return ret;
+    std::string regionCode;
+    phoneUtil->GetRegionCodeForCountryCode(number, &regionCode);
+    return GetDefaultZone(regionCode);
 }
 
-string ZoneUtil::GetDefaultZone(const string country, const int32_t offset)
+std::string ZoneUtil::GetDefaultZone(const std::string& country, int32_t offset)
 {
     UErrorCode status = U_ZERO_ERROR;
     StringEnumeration *strEnum =
@@ -137,24 +133,20 @@ string ZoneUtil::GetDefaultZone(const string country, const int32_t offset)
     return ret;
 }
 
-string ZoneUtil::GetDefaultZone(const int32_t number, const int32_t offset)
+std::string ZoneUtil::GetDefaultZone(int32_t number, int32_t offset)
 {
     using i18n::phonenumbers::PhoneNumberUtil;
-    string *region_code = new(nothrow) string();
-    if (!region_code) {
-        return "";
-    }
     PhoneNumberUtil* phoneUtil = PhoneNumberUtil::GetInstance();
-    phoneUtil->GetRegionCodeForCountryCode(number, region_code);
-    if (!region_code) {
+    if (phoneUtil == nullptr) {
+        HILOG_ERROR_I18N("ZoneUtil::GetDefaultZone: Get phone number util failed.");
         return "";
     }
-    string ret = GetDefaultZone(*region_code, offset);
-    delete region_code;
-    return ret;
+    std::string regionCode;
+    phoneUtil->GetRegionCodeForCountryCode(number, &regionCode);
+    return GetDefaultZone(regionCode, offset);
 }
 
-void ZoneUtil::GetZoneList(const string country, vector<string> &retVec)
+void ZoneUtil::GetZoneList(const std::string& country, std::vector<std::string>& retVec)
 {
     StringEnumeration *strEnum = TimeZone::createEnumeration(country.c_str());
     GetList(strEnum, retVec);
@@ -164,7 +156,7 @@ void ZoneUtil::GetZoneList(const string country, vector<string> &retVec)
     }
 }
 
-void ZoneUtil::GetZoneList(const string country, const int32_t offset, vector<string> &retVec)
+void ZoneUtil::GetZoneList(const std::string& country, int32_t offset, std::vector<std::string>& retVec)
 {
     UErrorCode status = U_ZERO_ERROR;
     StringEnumeration *strEnum =
@@ -184,7 +176,6 @@ void ZoneUtil::GetZoneList(const string country, const int32_t offset, vector<st
 void ZoneUtil::GetString(StringEnumeration *strEnum, string& ret)
 {
     UErrorCode status = U_ZERO_ERROR;
-    UnicodeString uniString;
     if (!strEnum) {
         return;
     }
@@ -279,7 +270,7 @@ CountryResult ZoneUtil::LookupTimezoneByNITZ(NITZData &nitzData)
     }
 
     CountryResult result = Match(validZones, nitzData, systemTimezone);
-    if (result.timezoneId.length() == 0 && nitzData.isDST >= 0) {
+    if (result.timezoneId.empty() && nitzData.isDST >= 0) {
         NITZData newNITZData = { -1, nitzData.totalOffset, nitzData.currentMillis };  // -1 means not consider DST
         result = Match(validZones, newNITZData, systemTimezone);
     }
@@ -295,7 +286,7 @@ CountryResult ZoneUtil::LookupTimezoneByCountry(std::string &region, int64_t cur
     if (TZLOOKUP_FILE_PATH != nullptr) {
         HILOG_INFO_I18N("ZoneUtil::LookupTimezoneByCountry use tzlookup.xml");
         GetCountryZones(region, defaultTimezone, isBoosted, zones);
-        if (defaultTimezone.length() == 0) {
+        if (defaultTimezone.empty()) {
             HILOG_ERROR_I18N("ZoneUtil::LookupTimezoneByCountry can't find default timezone for region %{public}s",
                 region.c_str());
         }
@@ -471,6 +462,7 @@ void ZoneUtil::GetICUCountryZones(std::string &region, std::vector<std::string> 
             defaultTimezone = zones[0];
         }
     }
+    delete strEnum;
 }
 
 CountryResult ZoneUtil::Match(std::vector<std::string> &zones, NITZData &nitzData, std::string &systemTimezone)
@@ -483,13 +475,22 @@ CountryResult ZoneUtil::Match(std::vector<std::string> &zones, NITZData &nitzDat
         std::string zoneId = zones[i];
         UnicodeString unicodeZoneID(zoneId.data(), zoneId.length());
         TimeZone *timezone = TimeZone::createTimeZone(unicodeZoneID);
+        if (timezone == nullptr) {
+            HILOG_ERROR_I18N("ZoneUtil::Match: Create time zone failed.");
+            continue;
+        }
         int32_t rawOffset;
         int32_t dstOffset;
         UErrorCode status = UErrorCode::U_ZERO_ERROR;
         timezone->getOffset(nitzData.currentMillis, static_cast<UBool>(local), rawOffset, dstOffset, status);
+        if (U_FAILURE(status)) {
+            HILOG_ERROR_I18N("ZoneUtil::Match: Time zone get offset failed.");
+            delete timezone;
+            continue;
+        }
         if ((nitzData.totalOffset - rawOffset == dstOffset) &&
             (nitzData.isDST < 0 || nitzData.isDST == (dstOffset != 0))) {
-            if (matchedZoneId.length() == 0) {
+            if (matchedZoneId.empty()) {
                 matchedZoneId = zoneId;
             } else {
                 isOnlyMatch = false;
@@ -499,9 +500,11 @@ CountryResult ZoneUtil::Match(std::vector<std::string> &zones, NITZData &nitzDat
                 useSystemTimezone = true;
             }
             if (!isOnlyMatch && useSystemTimezone) {
+                delete timezone;
                 break;
             }
         }
+        delete timezone;
     }
     CountryResult result = {isOnlyMatch, MatchQuality::DEFAULT_BOOSTED, matchedZoneId};
     return result;
@@ -512,27 +515,40 @@ bool ZoneUtil::CheckSameDstOffset(std::vector<std::string> &zones, std::string &
 {
     UnicodeString defaultID(defaultTimezoneId.data(), defaultTimezoneId.length());
     TimeZone *defaultTimezone = TimeZone::createTimeZone(defaultID);
+    if (defaultTimezone == nullptr) {
+        HILOG_ERROR_I18N("ZoneUtil::CheckSameDstOffset: Create default time zone failed.");
+        return false;
+    }
     int32_t rawOffset = 0;
     int32_t dstOffset = 0;
     bool local = false;
     UErrorCode status = U_ZERO_ERROR;
     defaultTimezone->getOffset(currentMillis, (UBool)local, rawOffset, dstOffset, status);
     if (U_FAILURE(status)) {
+        delete defaultTimezone;
         HILOG_ERROR_I18N("ZoneUtil::CheckSameDstOffset can not get timezone defaultID offset");
         return false;
     }
+    delete defaultTimezone;
     int32_t totalOffset = rawOffset + dstOffset;
     for (size_t i = 0; i < zones.size(); i++) {
         UnicodeString unicodeZoneID(zones[i].data(), zones[i].length());
         TimeZone *timezone = TimeZone::createTimeZone(unicodeZoneID);
+        if (timezone == nullptr) {
+            HILOG_ERROR_I18N("ZoneUtil::CheckSameDstOffset: Create time zone failed.");
+            return false;
+        }
         timezone->getOffset(currentMillis, (UBool)local, rawOffset, dstOffset, status);
         if (U_FAILURE(status)) {
+            delete timezone;
             HILOG_ERROR_I18N("ZoneUtil::CheckSameDstOffset can not get timezone unicodeZoneID offset");
             return false;
         }
         if (totalOffset - rawOffset != dstOffset) {
+            delete timezone;
             return false;
         }
+        delete timezone;
     }
     return true;
 }

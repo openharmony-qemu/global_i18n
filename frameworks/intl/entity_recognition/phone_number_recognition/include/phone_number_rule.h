@@ -46,7 +46,7 @@ public:
     bool isFixed;
 
 private:
-    void InitRule(std::string& xmlPath);
+    void InitRule(const std::string& xmlPath);
     void SetRules(std::string& category, icu::UnicodeString& content, std::string& valid,
         std::string& handle, std::string& insensitive, std::string& type);
     void ParseXmlNode(xmlNodePtr cur, std::string& category);
@@ -62,7 +62,8 @@ private:
     std::string country;
     std::string xmlPath;
     bool commonExit;
-    static std::string xmlCommonPath;
+    static const std::string XML_COMMON_PATH;
+    static const std::string XML_COMMON_FILE;
 };
 } // namespace I18n
 } // namespace Global

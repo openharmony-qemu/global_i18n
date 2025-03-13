@@ -18,7 +18,7 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-std::string DateTimeRule::xmlCommonPath = "/system/usr/ohos_locale_config/datetime/common.xml";
+const std::string DateTimeRule::XML_COMMON_PATH = "/system/usr/ohos_locale_config/datetime/common.xml";
 
 DateTimeRule::DateTimeRule(std::string& locale)
 {
@@ -48,7 +48,7 @@ DateTimeRule::~DateTimeRule()
 
 void DateTimeRule::Init(std::string& locale)
 {
-    InitRules(xmlCommonPath);
+    InitRules(XML_COMMON_PATH);
     std::string xmlPath = "/system/usr/ohos_locale_config/datetime/" + locale + ".xml";
     if (!CheckFilePath(xmlPath)) {
         this->locale = this->localeMap["locale"];
@@ -88,16 +88,21 @@ void DateTimeRule::RuleLevel()
     }
 }
 
-void DateTimeRule::InitRules(std::string& xmlPath)
+void DateTimeRule::InitRules(const std::string& xmlPath)
 {
     if (!CheckFilePath(xmlPath)) {
         return;
     }
     xmlKeepBlanksDefault(0);
     xmlDocPtr doc = xmlParseFile(xmlPath.c_str());
-    if (doc == nullptr) return;
+    if (doc == nullptr) {
+        return;
+    }
     xmlNodePtr root = xmlDocGetRootElement(doc);
-    if (root == nullptr) return;
+    if (root == nullptr) {
+        xmlFreeDoc(doc);
+        return;
+    }
     xmlNodePtr cur = root->xmlChildrenNode;
     while (cur != nullptr) {
         std::string category = reinterpret_cast<const char*>(cur->name);
@@ -132,8 +137,15 @@ void DateTimeRule::InitRuleBackup(std::string& xmlPathBackup)
     }
     xmlKeepBlanksDefault(0);
     xmlDocPtr doc = xmlParseFile(xmlPathBackup.c_str());
-    if (doc == nullptr) return;
-    xmlNodePtr cur = xmlDocGetRootElement(doc)->xmlChildrenNode;
+    if (doc == nullptr) {
+        return;
+    }
+    xmlNodePtr root = xmlDocGetRootElement(doc);
+    if (root == nullptr) {
+        xmlFreeDoc(doc);
+        return;
+    }
+    xmlNodePtr cur = root->xmlChildrenNode;
     while (cur != nullptr) {
         std::string category = reinterpret_cast<const char*>(cur->name);
         xmlNodePtr valueNext = cur->xmlChildrenNode;

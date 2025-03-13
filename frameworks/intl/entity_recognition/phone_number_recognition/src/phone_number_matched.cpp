@@ -71,7 +71,9 @@ std::vector<int> PhoneNumberMatched::DealWithoutFixed(icu::UnicodeString& messag
     std::vector<PhoneNumberMatch*> matchList = FindNumbers(country, message);
     std::vector<MatchedNumberInfo> result;
     for (auto& match : matchList) {
-        if (match == nullptr) continue;
+        if (match == nullptr) {
+            continue;
+        }
         MatchedNumberInfo info;
         icu::UnicodeString content = match->raw_string().c_str();
         PhoneNumber phoneNumber = match->number();
@@ -112,12 +114,13 @@ icu::UnicodeString PhoneNumberMatched::HandleNegativeRule(icu::UnicodeString& sr
 // Replace the characters in the specified area with REPLACE_CHAR
 void PhoneNumberMatched::ReplaceSpecifiedPos(icu::UnicodeString& chs, int start, int end)
 {
-    if (start < end) {
-        int len = chs.length();
-        for (int i = 0; i < len; i++) {
-            if (i >= start && i < end) {
-                chs.replace(i, 1, PhoneNumberMatched::REPLACE_CHAR);
-            }
+    if (start >= end) {
+        return;
+    }
+    int len = chs.length();
+    for (int i = 0; i < len; i++) {
+        if (i >= start && i < end) {
+            chs.replace(i, 1, PhoneNumberMatched::REPLACE_CHAR);
         }
     }
 }
@@ -141,7 +144,7 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::FindShortNumbers(std::string&
         return matchedNumberInfoList;
     }
     icu::RegexMatcher* shortMatch = shortPattern->matcher(message, status);
-    if (shortMatch == nullptr) {
+    if (U_FAILURE(status) || shortMatch == nullptr) {
         delete shortPattern;
         HILOG_ERROR_I18N("shortPattern matcher failed.");
         return matchedNumberInfoList;
@@ -304,8 +307,11 @@ bool PhoneNumberMatched::HandleWithShortAndShort(std::vector<MatchedNumberInfo>&
     // 3 is the length of findRules.
     size_t length = 3;
     if (GetFindRulesInside().size() == length) {
-        UErrorCode status = U_ZERO_ERROR;
         FindRule* regexRule = GetFindRulesInside()[0];
+        if (regexRule == nullptr) {
+            HILOG_ERROR_I18N("PhoneNumberMatched::HandleWithShortAndShort: Get FindRule failed.");
+            return false;
+        }
         icu::RegexPattern* pattern = regexRule->GetPattern();
         if (pattern == nullptr) {
             HILOG_ERROR_I18N("regexRule getPattern failed.");
@@ -317,13 +323,14 @@ bool PhoneNumberMatched::HandleWithShortAndShort(std::vector<MatchedNumberInfo>&
         } else {
             str = info.GetContent();
         }
+        UErrorCode status = U_ZERO_ERROR;
         icu::RegexMatcher* matcher = pattern->matcher(str, status);
-        if (matcher == nullptr) {
+        if (U_FAILURE(status) || matcher == nullptr) {
             delete pattern;
             HILOG_ERROR_I18N("pattern matcher failed.");
             return flag;
         }
-        if (!matcher->find(status)) {
+        if (!matcher->find(status) && U_SUCCESS(status)) {
             result.push_back(info);
             ReplaceSpecifiedPos(filteredString, pos.first, pos.second);
             flag = true;
@@ -455,6 +462,9 @@ bool PhoneNumberMatched::HandleBorderRule(PhoneNumberMatch* match, icu::UnicodeS
         return true;
     }
     for (BorderRule* rule : rules) {
+        if (rule == nullptr) {
+            return false;
+        }
         if (!rule->Handle(match, message)) {
             return false;
         }
@@ -471,6 +481,9 @@ PhoneNumberMatch* PhoneNumberMatched::HandleCodesRule(PhoneNumberMatch* phoneNum
         return nullptr;
     }
     for (CodeRule* rule : rules) {
+        if (rule == nullptr) {
+            continue;
+        }
         match = rule->Handle(match, message);
     }
     return match;
@@ -483,6 +496,9 @@ std::vector<MatchedNumberInfo> PhoneNumberMatched::HandlePositiveRule(PhoneNumbe
     std::vector<MatchedNumberInfo> infoList;
     std::vector<PositiveRule*> rules = GetPositiveRulesInside();
     for (PositiveRule* rule : rules) {
+        if (rule == nullptr) {
+            continue;
+        }
         infoList = rule->Handle(match, message);
         if (infoList.size() != 0) {
             break;

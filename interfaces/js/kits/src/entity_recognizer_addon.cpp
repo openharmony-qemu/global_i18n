@@ -23,6 +23,8 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
+const size_t EntityRecognizerAddon::ENTITY_INFO_LEN = 2;
+
 EntityRecognizerAddon::EntityRecognizerAddon() {}
 
 EntityRecognizerAddon::~EntityRecognizerAddon()
@@ -73,7 +75,10 @@ napi_value EntityRecognizerAddon::constructor(napi_env env, napi_callback_info i
         localeStr = LocaleConfig::GetSystemLocale();
     } else {
         napi_valuetype valueType = napi_valuetype::napi_undefined;
-        napi_typeof(env, argv[0], &valueType);
+        status = napi_typeof(env, argv[0], &valueType);
+        if (status != napi_ok) {
+            return nullptr;
+        }
         if (valueType != napi_valuetype::napi_string) {
             ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "string", true);
             return nullptr;
@@ -86,7 +91,10 @@ napi_value EntityRecognizerAddon::constructor(napi_env env, napi_callback_info i
     }
     UErrorCode localeStatus = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeStr, localeStatus);
-    if (!IsValidLocaleTag(locale)) {
+    if (U_FAILURE(localeStatus)) {
+        HILOG_ERROR_I18N("EntityRecognizerAddon::constructor: Create icu::Locale failed.");
+        return nullptr;
+    } else if (!IsValidLocaleTag(locale)) {
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "locale", "a valid locale", true);
         return nullptr;
     }
@@ -118,7 +126,10 @@ napi_value EntityRecognizerAddon::FindEntityInfo(napi_env env, napi_callback_inf
         return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     if (valueType != napi_valuetype::napi_string) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "text", "string", true);
         return nullptr;
@@ -151,16 +162,20 @@ napi_value EntityRecognizerAddon::GetEntityInfoItem(napi_env env, std::vector<st
     int index = 0;
     for (std::string::size_type t = 0; t < types.size(); t++) {
         for (int i = 0; i < entityInfo[t][0]; i++) {
-            int begin = entityInfo[t][2 * i + 1];
-            int end = entityInfo[t][2 * i + 2];
+            size_t posBegin = ENTITY_INFO_LEN * i + 1;
+            int begin = entityInfo[t][posBegin];
+            int end = entityInfo[t][posBegin + 1];
             std::string type = types[t];
             napi_value item = CreateEntityInfoItem(env, begin, end, type);
+            if (item == nullptr) {
+                continue;
+            }
             status = napi_set_element(env, result, index, item);
-            index++;
             if (status != napi_ok) {
                 HILOG_ERROR_I18N("Failed to set item element.");
                 return nullptr;
             }
+            index++;
         }
     }
     return result;

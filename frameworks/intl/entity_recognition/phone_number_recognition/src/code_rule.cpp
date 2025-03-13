@@ -207,7 +207,6 @@ PhoneNumberMatch* CodeRule::IsValidCode(PhoneNumberMatch* possibleNumber, icu::U
     if (possibleNumber == nullptr) {
         return nullptr;
     }
-    bool isValid = true;
     icu::UnicodeString number = possibleNumber->raw_string().c_str();
     // Processes the ;ext= extention number format
     int32_t ind = number.trim().indexOf(";ext=");
@@ -217,12 +216,10 @@ PhoneNumberMatch* CodeRule::IsValidCode(PhoneNumberMatch* possibleNumber, icu::U
     if (number[0] == '(' || number[0] == '[') {
         StartWithBrackets(number);
     }
-    isValid = NumberValid(number);
-    if (isValid) {
-        return possibleNumber;
-    } else {
+    if (!NumberValid(number)) {
         return nullptr;
     }
+    return possibleNumber;
 }
 
 PhoneNumberMatch* CodeRule::IsValidRawstr(PhoneNumberMatch* possibleNumber, icu::UnicodeString& message)
@@ -230,7 +227,6 @@ PhoneNumberMatch* CodeRule::IsValidRawstr(PhoneNumberMatch* possibleNumber, icu:
     if (possibleNumber == nullptr) {
         return nullptr;
     }
-    bool isValid = true;
     icu::UnicodeString number = possibleNumber->raw_string().c_str();
     // Processes the ;ext= extention number format
     int32_t ind = number.trim().indexOf(";ext=");
@@ -240,19 +236,11 @@ PhoneNumberMatch* CodeRule::IsValidRawstr(PhoneNumberMatch* possibleNumber, icu:
     if (number[0] == '(' || number[0] == '[') {
         number = number.tempSubString(1);
     }
-    // 8 is the number of digits in the phone number.
-    if (number[0] != '0' && CountDigits(number) == 8) {
-        isValid = false;
-    }
-    // 4 is the number of digits in the phone number.
-    if (CountDigits(number) <= 4) {
-        isValid = false;
-    }
-    if (isValid) {
-        return possibleNumber;
-    } else {
+    // 8 and 4 is the number of digits in the phone number.
+    if ((number[0] != '0' && CountDigits(number) == 8) || CountDigits(number) <= 4) {
         return nullptr;
     }
+    return possibleNumber;
 }
 
 // Handle phone number starting with '(' or '['

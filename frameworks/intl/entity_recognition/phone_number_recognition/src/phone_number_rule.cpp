@@ -32,11 +32,12 @@ using i18n::phonenumbers::PhoneNumber;
 using i18n::phonenumbers::PhoneNumberUtil;
 using i18n::phonenumbers::ShortNumberInfo;
 
-std::string PhoneNumberRule::xmlCommonPath = "/system/usr/ohos_locale_config/phonenumber/common.xml";
+const std::string PhoneNumberRule::XML_COMMON_PATH = "/system/usr/ohos_locale_config/phonenumber/";
+const std::string PhoneNumberRule::XML_COMMON_FILE = "common.xml";
 
 PhoneNumberRule::PhoneNumberRule(std::string& country)
 {
-    xmlPath = "/system/usr/ohos_locale_config/phonenumber/" + country + ".xml";
+    xmlPath = XML_COMMON_PATH + country + ".xml";
     isFixed = true;
     try {
         isFixed = std::filesystem::exists(xmlPath);
@@ -90,19 +91,25 @@ void PhoneNumberRule::Init()
     if (isFixed) {
         InitRule(xmlPath);
     }
-    InitRule(xmlCommonPath);
+    InitRule(XML_COMMON_PATH + XML_COMMON_FILE);
 }
 
 // Load the rules of the corresponding country
-void PhoneNumberRule::InitRule(std::string& xmlPath)
+void PhoneNumberRule::InitRule(const std::string& xmlPath)
 {
     if (!CheckFilePath(xmlPath)) {
         return;
     }
     xmlKeepBlanksDefault(0);
     xmlDocPtr doc = xmlParseFile(xmlPath.c_str());
-    if (doc == nullptr) return;
+    if (doc == nullptr) {
+        return;
+    }
     xmlNodePtr root = xmlDocGetRootElement(doc);
+    if (root == nullptr) {
+        xmlFreeDoc(doc);
+        return;
+    }
     xmlNodePtr cur = root->xmlChildrenNode;
     while (cur != nullptr) {
         std::string category = reinterpret_cast<const char*>(cur->name);
@@ -118,14 +125,23 @@ void PhoneNumberRule::ParseXmlNode(xmlNodePtr cur, std::string& category)
     while (rule != nullptr && !xmlStrcmp(rule->name, reinterpret_cast<const xmlChar*>("rule"))) {
         xmlNodePtr value = rule->xmlChildrenNode;
         std::string insensitive = XmlNodePtrToString(value);
-        value = value->next;
         if (category == "common_exit") {
             commonExit = (insensitive == "True");
             break;
         }
+        if (value == nullptr) {
+            break;
+        }
+        value = value->next;
         std::string type = XmlNodePtrToString(value);
+        if (value == nullptr) {
+            break;
+        }
         value = value->next;
         std::string valid = XmlNodePtrToString(value);
+        if (value == nullptr) {
+            break;
+        }
         value = value->next;
         std::string handle = XmlNodePtrToString(value);
         if (IsXmlNodeValueEmpty(insensitive, type, valid, handle)) {
@@ -136,7 +152,9 @@ void PhoneNumberRule::ParseXmlNode(xmlNodePtr cur, std::string& category)
             reinterpret_cast<const xmlChar*>("content"))) {
             value = value->next;
             xmlChar* contentPtr = xmlNodeGetContent(value);
-            if (contentPtr == nullptr) continue;
+            if (contentPtr == nullptr) {
+                continue;
+            }
             icu::UnicodeString tempContent = reinterpret_cast<char*>(contentPtr);
             content += tempContent;
             xmlFree(contentPtr);

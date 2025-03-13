@@ -37,6 +37,7 @@ private:
     static napi_value CreateEntityInfoItem(napi_env env, const int begin, const int end, const std::string& type);
     static napi_value GetEntityInfoItem(napi_env env, std::vector<std::vector<int>>& entityInfo);
     std::unique_ptr<EntityRecognizer> entityRecognizer_ = nullptr;
+    static const size_t ENTITY_INFO_LEN;
 };
 } // namespace I18n
 } // namespace Global

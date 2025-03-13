@@ -50,7 +50,6 @@ napi_value LocaleInfoAddon::SetProperty(napi_env env, napi_callback_info info)
 
 napi_value LocaleInfoAddon::InitLocale(napi_env env, napi_value exports)
 {
-    napi_status status = napi_ok;
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_GETTER_SETTER("language", GetLanguage, SetProperty),
         DECLARE_NAPI_GETTER_SETTER("baseName", GetBaseName, SetProperty),
@@ -67,7 +66,7 @@ napi_value LocaleInfoAddon::InitLocale(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("maximize", Maximize),
     };
     napi_value constructor = nullptr;
-    status = napi_define_class(env, "Locale", NAPI_AUTO_LENGTH, LocaleConstructor, nullptr,
+    napi_status status = napi_define_class(env, "Locale", NAPI_AUTO_LENGTH, LocaleConstructor, nullptr,
         sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Define class failed when InitLocale");
@@ -101,7 +100,14 @@ napi_value LocaleInfoAddon::LocaleConstructor(napi_env env, napi_callback_info i
     if (status != napi_ok) {
         return nullptr;
     }
-    std::string localeTag = JSUtils::GetLocaleTag(env, argc > 0 ? argv[0] : nullptr);
+    std::string localeTag;
+    if (argc > 0) {
+        int32_t code = 0;
+        localeTag = JSUtils::GetString(env, argv[0], code);
+        if (code != 0) {
+            return nullptr;
+        }
+    }
     std::map<std::string, std::string> map = {};
     if (argc > 1) {
         JSUtils::GetOptionValue(env, argv[1], "calendar", map);
@@ -111,8 +117,10 @@ napi_value LocaleInfoAddon::LocaleConstructor(napi_env env, napi_callback_info i
         JSUtils::GetBoolOptionValue(env, argv[1], "numeric", map);
         JSUtils::GetOptionValue(env, argv[1], "caseFirst", map);
     }
-    std::unique_ptr<LocaleInfoAddon> obj = nullptr;
-    obj = std::make_unique<LocaleInfoAddon>();
+    std::unique_ptr<LocaleInfoAddon> obj = std::make_unique<LocaleInfoAddon>();
+    if (obj == nullptr) {
+        return nullptr;
+    }
     status =
         napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), LocaleInfoAddon::Destructor, nullptr, nullptr);
     if (status != napi_ok) {
@@ -241,10 +249,12 @@ napi_value LocaleInfoAddon::GetLocaleInfoAttribute(napi_env env, napi_callback_i
 {
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
-
+    napi_status status = napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     LocaleInfoAddon *obj = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->locale_) {
         HILOG_ERROR_I18N("GetLocaleInfoAttribute: Get Locale object failed");
         return nullptr;
@@ -303,10 +313,12 @@ napi_value LocaleInfoAddon::GetNumeric(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
-
+    napi_status status = napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     LocaleInfoAddon *obj = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->locale_) {
         HILOG_ERROR_I18N("GetNumeric: Get Locale object failed");
         return nullptr;
@@ -337,10 +349,12 @@ napi_value LocaleInfoAddon::GetMaximizeOrMinimize(napi_env env, napi_callback_in
 {
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
-
+    napi_status status = napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     LocaleInfoAddon *obj = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->locale_) {
         HILOG_ERROR_I18N("Maximize: Get Locale object failed");
         return nullptr;

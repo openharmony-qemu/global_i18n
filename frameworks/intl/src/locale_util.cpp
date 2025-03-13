@@ -55,8 +55,8 @@ uint16_t LocaleUtil::EncodeRegionByLocaleInfo(const LocaleInfo *locale)
 uint16_t LocaleUtil::EncodeLanguage(const char *language)
 {
     if (IsStrEmpty(language)) {
-            return NULL_LANGUAGE;
-        }
+        return NULL_LANGUAGE;
+    }
     return EncodeLanguageOrRegion(language, 'a');
 }
 

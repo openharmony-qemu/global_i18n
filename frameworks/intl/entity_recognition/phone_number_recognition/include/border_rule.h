@@ -33,7 +33,6 @@ public:
 private:
     int type;
     icu::UnicodeString regex;
-    UErrorCode status;
     std::string insensitive;
     static const std::string CONTAIN_STR;
     static const std::string CONTAIN_OR_INTERSECT_STR;

@@ -132,7 +132,7 @@ PhoneNumberFormat::PhoneNumberFormat(const std::string &countryTag,
     } else {
         phoneNumberFormat = PhoneNumberUtil::PhoneNumberFormat::NATIONAL;
     }
-    if (type.compare("TYPING") == 0) {
+    if (type.compare("TYPING") == 0 && util != nullptr) {
         formatter = std::unique_ptr<AsYouTypeFormatter>(util->GetAsYouTypeFormatter(country));
     }
 }
@@ -154,7 +154,7 @@ std::unique_ptr<PhoneNumberFormat> PhoneNumberFormat::CreateInstance(const std::
     const std::map<std::string, std::string> &options)
 {
     std::unique_ptr<PhoneNumberFormat> phoneNumberFormat = std::make_unique<PhoneNumberFormat>(countryTag, options);
-    if (phoneNumberFormat->GetPhoneNumberUtil() == nullptr) {
+    if (phoneNumberFormat == nullptr || phoneNumberFormat->GetPhoneNumberUtil() == nullptr) {
         return nullptr;
     }
     return phoneNumberFormat;
@@ -167,6 +167,9 @@ PhoneNumberUtil* PhoneNumberFormat::GetPhoneNumberUtil()
 
 bool PhoneNumberFormat::isValidPhoneNumber(const std::string &number) const
 {
+    if (util == nullptr) {
+        return false;
+    }
     i18n::phonenumbers::PhoneNumber phoneNumber;
     PhoneNumberUtil::ErrorType type = util->Parse(number, country, &phoneNumber);
     if (type != PhoneNumberUtil::ErrorType::NO_PARSING_ERROR) {
@@ -177,23 +180,27 @@ bool PhoneNumberFormat::isValidPhoneNumber(const std::string &number) const
 
 std::string PhoneNumberFormat::format(const std::string &number)
 {
-    std::string formatted_number;
+    std::string formattedNumber;
     if (formatter != nullptr) {
-        formatted_number = GetAsYouTypeFormatResult(number);
-        return PseudoLocalizationProcessor(formatted_number);
+        formattedNumber = GetAsYouTypeFormatResult(number);
+        return PseudoLocalizationProcessor(formattedNumber);
     }
     i18n::phonenumbers::PhoneNumber phoneNumber;
+    if (util == nullptr) {
+        HILOG_ERROR_I18N("PhoneNumberFormat::format: util is nullptr.");
+        return PseudoLocalizationProcessor("");
+    }
     PhoneNumberUtil::ErrorType type = util->ParseAndKeepRawInput(number, country, &phoneNumber);
     if (type != PhoneNumberUtil::ErrorType::NO_PARSING_ERROR) {
         return PseudoLocalizationProcessor("");
     }
     const std::string prefix = "106";
     if (number.compare(0, prefix.length(), prefix) == 0) {
-        util->FormatInOriginalFormat(phoneNumber, country, &formatted_number);
+        util->FormatInOriginalFormat(phoneNumber, country, &formattedNumber);
     } else {
-        util->Format(phoneNumber, phoneNumberFormat, &formatted_number);
+        util->Format(phoneNumber, phoneNumberFormat, &formattedNumber);
     }
-    return PseudoLocalizationProcessor(formatted_number);
+    return PseudoLocalizationProcessor(formattedNumber);
 }
 
 std::string PhoneNumberFormat::GetAsYouTypeFormatResult(const std::string &number)
@@ -220,6 +227,10 @@ std::string PhoneNumberFormat::GetAsYouTypeFormatResult(const std::string &numbe
 std::string PhoneNumberFormat::FormatAllInputNumber(const std::string &originalNumber,
                                                     std::string &replacedNumber)
 {
+    if (formatter == nullptr) {
+        HILOG_ERROR_I18N("PhoneNumberFormat::FormatAllInputNumber: formatter is nullptr.");
+        return "";
+    }
     formatter->Clear();
     this->lastFormatNumber = replacedNumber;
     std::string result;
@@ -240,15 +251,24 @@ std::string PhoneNumberFormat::FormatAllInputNumber(const std::string &originalN
 std::string PhoneNumberFormat::getLocationName(
     const std::string &number, const std::string &locale)
 {
+    if (util == nullptr) {
+        return "";
+    }
     // Combine country and locale parameters
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale displayLocale = icu::Locale::createFromName(locale.c_str());
     displayLocale.addLikelySubtags(status);
-    icu::LocaleBuilder builder = icu::LocaleBuilder().setRegion(country);
-    builder.setLanguage(displayLocale.getLanguage());
-    builder.setScript(displayLocale.getScript());
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("PhoneNumberFormat::getLocationName: Add likely subtag failed.");
+        return "";
+    }
+    icu::LocaleBuilder builder = icu::LocaleBuilder().setRegion(country).setLanguage(displayLocale.getLanguage()).
+        setScript(displayLocale.getScript());
     icu::Locale phoneLocale = builder.build(status);
-
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("PhoneNumberFormat::getLocationName: Build phone locale failed.");
+        return "";
+    }
     i18n::phonenumbers::PhoneNumber phoneNumber;
     PhoneNumberUtil::ErrorType type = util->Parse(number, phoneLocale.getCountry(), &phoneNumber);
     if (type != PhoneNumberUtil::ErrorType::NO_PARSING_ERROR) {
@@ -280,9 +300,9 @@ std::string PhoneNumberFormat::getLocationName(
     }
 
     // Process the city name
-    std::string formatted_number;
-    util->Format(phoneNumber, PhoneNumberUtil::PhoneNumberFormat::E164, &formatted_number);
-    return getCityName(locale, formatted_number.substr(1), locName);
+    std::string formattedNumber;
+    util->Format(phoneNumber, PhoneNumberUtil::PhoneNumberFormat::E164, &formattedNumber);
+    return getCityName(locale, formattedNumber.substr(1), locName);
 }
 
 std::string PhoneNumberFormat::getPhoneLocationName(

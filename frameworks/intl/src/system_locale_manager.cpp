@@ -157,7 +157,7 @@ std::vector<LocaleItem> SystemLocaleManager::GetLanguageInfoArray(const std::vec
         status = I18nErrorCode::NOT_SYSTEM_APP;
         return localeItemList;
     }
-    
+
     std::unordered_set<std::string> simRegions = GetCountryCodeFromSimCard();
     for (auto it = languages.begin(); it != languages.end(); ++it) {
         std::string language = *it;
@@ -353,6 +353,10 @@ std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray()
             icuTimeZone->getOffset(date, (UBool)local, rawOffset, dstOffset, status);
             tzMap.insert({timezoneId, icuTimeZone});
         }
+        if (U_FAILURE(status)) {
+            HILOG_ERROR_I18N("SystemLocaleManager::GetTimezoneCityInfoArray: Get time zone offset failed.");
+            continue;
+        }
         struct TimeZoneCityItem tzCityItem = {
             timezoneId, cityId, PseudoLocalizationProcessor(cityDisplayName), dstOffset + rawOffset,
             PseudoLocalizationProcessor(""), rawOffset
@@ -409,8 +413,8 @@ std::string SystemLocaleManager::GetCityDisplayNameWithTaboo(const std::string &
     const std::string &localeBaseName, const std::string &cityDisplayName)
 {
     TabooUtils* tabooUtils = TabooUtils::GetInstance();
-    std::string requestLocale = StrReplaceAll(localeBaseName, "_", "-");
     if (tabooUtils != nullptr) {
+        std::string requestLocale = StrReplaceAll(localeBaseName, "_", "-");
         return tabooUtils->ReplaceCityName(cityId, requestLocale, cityDisplayName);
     }
     return cityDisplayName;

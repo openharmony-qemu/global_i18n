@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "negative_rule.h"
+#include "i18n_hilog.h"
 
 namespace OHOS {
 namespace Global {
@@ -20,21 +21,24 @@ namespace I18n {
 NegativeRule::NegativeRule(icu::UnicodeString& regex, std::string& insensitive)
 {
     this->regex = regex;
-    this->status = U_ZERO_ERROR;
     this->insensitive = insensitive;
-    if (regex.length() == 0) {
-        return;
-    }
 }
 
 icu::RegexPattern* NegativeRule::GetPattern()
 {
+    UErrorCode status = U_ZERO_ERROR;
+    icu::RegexPattern* pattern;
     // Sets whether regular expression matching is case sensitive
     if (this->insensitive == "True") {
-        return icu::RegexPattern::compile(this->regex, URegexpFlag::UREGEX_CASE_INSENSITIVE, this->status);
+        pattern = icu::RegexPattern::compile(this->regex, URegexpFlag::UREGEX_CASE_INSENSITIVE, status);
     } else {
-        return icu::RegexPattern::compile(this->regex, 0, this->status);
+        pattern = icu::RegexPattern::compile(this->regex, 0, status);
     }
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("NegativeRule::GetPattern: Compile regex pattern failed.");
+        return nullptr;
+    }
+    return pattern;
 }
 
 void NegativeRule::ReplaceSpecifiedPos(icu::UnicodeString& chs, int start, int end)

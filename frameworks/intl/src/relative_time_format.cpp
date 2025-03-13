@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "i18n_hilog.h"
 #include "locale_config.h"
 #include "ohos/init_data.h"
 #include "utils.h"
@@ -69,7 +70,7 @@ RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTag
         }
         if (LocaleInfo::allValidLocales.count(locale.getLanguage()) > 0) {
             localeInfo = std::make_unique<LocaleInfo>(curLocale, configs);
-            if (!localeInfo->InitSuccess()) {
+            if (localeInfo == nullptr || !localeInfo->InitSuccess()) {
                 continue;
             }
             locale = localeInfo->GetLocale();
@@ -86,7 +87,7 @@ RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTag
     }
     if (!createSuccess) {
         localeInfo = std::make_unique<LocaleInfo>(LocaleConfig::GetSystemLocale(), configs);
-        if (localeInfo->InitSuccess()) {
+        if (localeInfo != nullptr && localeInfo->InitSuccess()) {
             locale = localeInfo->GetLocale();
             localeBaseName = localeInfo->GetBaseName();
             relativeTimeFormat = std::make_unique<icu::RelativeDateTimeFormatter>(locale, nullptr, style,
@@ -95,6 +96,9 @@ RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTag
                 createSuccess = true;
             }
         }
+    }
+    if (localeInfo == nullptr) {
+        return;
     }
     numberingSystem = localeInfo->GetNumberingSystem();
     if (numberingSystem.empty()) {
@@ -125,9 +129,7 @@ std::string RelativeTimeFormat::Format(double number, const std::string &unit)
     UErrorCode status = U_ZERO_ERROR;
     std::string result;
     icu::UnicodeString formatResult = formattedTime.toString(status);
-    if (U_FAILURE(status)) {
-        result = "";
-    } else {
+    if (U_SUCCESS(status)) {
         formatResult.toUTF8String(result);
     }
     return PseudoLocalizationProcessor(result);
@@ -167,13 +169,20 @@ void RelativeTimeFormat::FormatToParts(double number, const std::string &unit,
     icu::FormattedRelativeDateTime fmtRelativeTime = FormatToFormattedValue(number, unit);
     UErrorCode status = U_ZERO_ERROR;
     std::string result;
-    fmtRelativeTime.toString(status).toUTF8String(result);
+    icu::UnicodeString fmtRelativeTimeStr = fmtRelativeTime.toString(status);
+    if (U_SUCCESS(status)) {
+        fmtRelativeTimeStr.toUTF8String(result);
+    }
     icu::ConstrainedFieldPosition constrainedPos;
     constrainedPos.constrainCategory(UFIELD_CATEGORY_NUMBER);
     size_t prevIndex = 0;
     size_t length = result.length();
     std::map<size_t, size_t> indexMap;
     while (fmtRelativeTime.nextPosition(constrainedPos, status)) {
+        if (U_FAILURE(status)) {
+            HILOG_ERROR_I18N("RelativeTimeFormat::FormatToParts: Get next position failed.");
+            return;
+        }
         size_t startIndex = (size_t)constrainedPos.getStart();
         if (constrainedPos.getCategory() == UFIELD_CATEGORY_NUMBER) {
             if (constrainedPos.getField() == UNUM_GROUPING_SEPARATOR_FIELD) {
@@ -198,7 +207,7 @@ void RelativeTimeFormat::FormatToParts(double number, const std::string &unit,
 
 icu::FormattedRelativeDateTime RelativeTimeFormat::FormatToFormattedValue(double number, const std::string &unit)
 {
-    if (!createSuccess || !relativeUnits.count(unit)) {
+    if (!createSuccess || relativeTimeFormat == nullptr || !relativeUnits.count(unit)) {
         return {};
     }
     UErrorCode status = U_ZERO_ERROR;

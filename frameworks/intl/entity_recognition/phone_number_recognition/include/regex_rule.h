@@ -63,7 +63,6 @@ private:
     int type; // border rules
     icu::UnicodeString regex; // positive Rules, negative rules, border rules, find rules
 
-    UErrorCode status;
     // Decide which IsValid function to use
     std::string isValidType; // codes rules
     // Decide which Handle function to use
