@@ -65,7 +65,7 @@ int64_t FfiOHOSNumberFormatImplConstructorwithArrayLocale(
 CNumberOptions FfiOHOSNumberFormatImplGetNumberResolvedOptions(int64_t id)
 {
     auto instance = FFIData::GetData<NumberFormatImpl>(id);
-    struct CNumberOptions numberOptions;
+    struct CNumberOptions numberOptions = { nullptr };
     if (!instance) {
         HILOG_ERROR_I18N("The NumberFormatImpl instance is nullptr");
         return numberOptions;
@@ -116,7 +116,7 @@ CArrArrString FfiOHOSRelativeTimeFormatImplFormatToParts(int64_t id, double numb
 {
     auto instance = FFIData::GetData<RelativeTimeFormatImpl>(id);
     if (!instance) {
-        CArrArrString ret = {.head = nullptr, .size = 0};
+        CArrArrString ret = { nullptr };
         HILOG_ERROR_I18N("The RelativeTimeFormatImpl instance is nullptr");
         return ret;
     }
@@ -127,7 +127,7 @@ CRelativeTimeFormatResolveOptions FfiOHOSRelativeTimeFormatImplResolvedOptions(i
 {
     auto instance = FFIData::GetData<RelativeTimeFormatImpl>(id);
     if (!instance) {
-        struct CRelativeTimeFormatResolveOptions relativeTimeFormatResolveOptions;
+        struct CRelativeTimeFormatResolveOptions relativeTimeFormatResolveOptions = { nullptr };
         HILOG_ERROR_I18N("The RelativeTimeFormatImpl instance is nullptr");
         return relativeTimeFormatResolveOptions;
     }
@@ -205,7 +205,7 @@ CCollatorOptions FfiOHOSCollatorOptionsImplResolvedOptions(int64_t id)
 {
     auto instance = FFIData::GetData<CollatorImpl>(id);
     if (!instance) {
-        struct CCollatorOptions collatorResolveOptions;
+        struct CCollatorOptions collatorResolveOptions = { nullptr };
         HILOG_ERROR_I18N("The CollatorImpl instance is nullptr");
         return collatorResolveOptions;
     }
@@ -255,7 +255,7 @@ CDateTimeOptions FfiOHOSDateTimeFormatOptionsImplResolvedOptions(int64_t id)
 {
     auto instance = FFIData::GetData<DateTimeFormatImpl>(id);
     if (!instance) {
-        struct CDateTimeOptions dateTimeOptions;
+        struct CDateTimeOptions dateTimeOptions = { nullptr };
         HILOG_ERROR_I18N("The DateTimeFormatImpl instance is nullptr");
         return dateTimeOptions;
     }
