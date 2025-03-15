@@ -241,7 +241,7 @@ namespace intl {
             this.nativeDateTimeFormat = DateTimeFormat.create().nativeDateTimeFormat;
         }
 
-        constructor(locale: string, options?: DateTimeOptions) {
+        constructor(locale: string | Array<string>, options?: DateTimeOptions) {
             this.nativeDateTimeFormat = DateTimeFormat.create(locale, options).nativeDateTimeFormat;
         }
 
@@ -266,7 +266,7 @@ namespace intl {
             this.nativeNumberFormat = NumberFormat.create().nativeNumberFormat;
         }
 
-        constructor(locale: string, options?: NumberOptions) {
+        constructor(locale: string | Array<string>, options?: NumberOptions) {
             this.nativeNumberFormat = NumberFormat.create(locale, options).nativeNumberFormat;
         }
 
