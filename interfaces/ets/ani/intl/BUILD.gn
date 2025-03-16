@@ -18,7 +18,10 @@ ohos_shared_library("intl_ani") {
   include_dirs = [ "./include" ]
   sources = [ "./src/intl.cpp" ]
   deps = [ "../../../../frameworks/intl:intl_util" ]
-  external_deps = [ "runtime_core:ani" ]
+  external_deps = [
+    "icu:shared_icuuc",
+    "runtime_core:ani",
+  ]
   part_name = "i18n"
   subsystem_name = "global"
 }
