@@ -1206,7 +1206,8 @@ std::tuple<uint32_t, uint32_t> I18nTimeZone::GetTzDataWidth(std::vector<std::str
     rewind(fp);
     png_init_io(png_ptr, fp);
     png_read_info(png_ptr, info_ptr);
-    unsigned int w, h;
+    unsigned int w;
+    unsigned int h;
     png_get_IHDR(png_ptr, info_ptr, &w, &h, NULL, NULL, NULL, NULL, NULL);
     png_destroy_read_struct(&png_ptr, &info_ptr, 0);
     CloseFile(fp);
