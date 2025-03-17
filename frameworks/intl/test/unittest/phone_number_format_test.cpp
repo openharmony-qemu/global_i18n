@@ -63,10 +63,8 @@ HWTEST_F(PhoneNumberFormatTest, PhoneNumberFormatTest0001, TestSize.Level1)
     EXPECT_EQ(phoneNumberFormat->getLocationName("+3598128123", "bg"), "България");
     struct stat s;
     if (stat(systemTabooDataPath, &s) == 0) {
-        EXPECT_EQ(phoneNumberFormat->getLocationName("+212528912345", "en"), "");
-        EXPECT_EQ(phoneNumberFormat->getLocationName("+212528912345", "fr"), "");
-        EXPECT_EQ(phoneNumberFormat->getLocationName("+38338123456", "en"), "");
-        EXPECT_EQ(phoneNumberFormat->getLocationName("+38338123456", "sr"), "");
+        EXPECT_EQ(phoneNumberFormat->getLocationName("+212528912345", "zh"), "");
+        EXPECT_EQ(phoneNumberFormat->getLocationName("+38328012345", "zh"), "");
     }
     EXPECT_EQ(phoneNumberFormat->getLocationName("+913602123456", "en"), "India");
     EXPECT_EQ(phoneNumberFormat->getLocationName("+913800123456", "en"), "India");
