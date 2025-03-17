@@ -512,12 +512,12 @@ int DateTimeFilter::GetResult(icu::UnicodeString& content, MatchedDateTimeInfo& 
         bool isBrackets = false;
         if (ss.trim() == '(') {
             icu::UnicodeString endStr = content.tempSubString(current.GetEnd());
-            UErrorCode status = U_ZERO_ERROR;
             icu::RegexPattern* pattern = dateTimeRule->GetPatternByKey("brackets");
             if (pattern == nullptr) {
                 HILOG_ERROR_I18N("GetResult failed because pattern is nullptr.");
                 return result;
             }
+            UErrorCode status = U_ZERO_ERROR;
             icu::RegexMatcher* matcher = pattern->matcher(endStr, status);
             if (matcher == nullptr) {
                 HILOG_ERROR_I18N("GetResult failed because pattern matcher failed.");

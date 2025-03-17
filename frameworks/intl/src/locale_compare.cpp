@@ -156,8 +156,8 @@ int32_t LocaleCompare::Compare(const std::string& localeTag1, const std::string&
     std::string region1 = locale1.getCountry();
     std::string region2 = locale2.getCountry();
     locale1.addLikelySubtags(status);
-    locale2.addLikelySubtags(status);
-    if (U_FAILURE(status)) {
+    locale2.addLikelySubtags(status2);
+    if (U_FAILURE(status) || U_FAILURE(status2)) {
         HILOG_ERROR_I18N("LocaleCompare::Compare add likely subtags failed.");
         return -1;
     }

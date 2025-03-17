@@ -66,7 +66,6 @@ napi_value I18nUnicodeAddon::InitI18nUnicode(napi_env env, napi_value exports)
 
 napi_value I18nUnicodeAddon::InitCharacter(napi_env env, napi_value exports)
 {
-    napi_status status = napi_ok;
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("isDigit", IsDigitAddon),
         DECLARE_NAPI_FUNCTION("isSpaceChar", IsSpaceCharAddon),
@@ -80,7 +79,7 @@ napi_value I18nUnicodeAddon::InitCharacter(napi_env env, napi_value exports)
     };
 
     napi_value constructor = nullptr;
-    status = napi_define_class(env, "Character", NAPI_AUTO_LENGTH, ObjectConstructor, nullptr,
+    napi_status status = status = napi_define_class(env, "Character", NAPI_AUTO_LENGTH, ObjectConstructor, nullptr,
         sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Define class failed when InitCharacter");

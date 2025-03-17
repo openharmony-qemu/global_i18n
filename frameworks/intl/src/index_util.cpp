@@ -39,7 +39,7 @@ IndexUtil::IndexUtil(const std::string &localeTag)
         icu::Locale locale(localeTag.c_str());
         index = std::make_unique<icu::AlphabeticIndex>(locale, status);
     }
-    if (U_SUCCESS(status)) {
+    if (U_SUCCESS(status) && index != nullptr) {
         createSuccess = true;
     }
 }
@@ -52,7 +52,7 @@ std::vector<std::string> IndexUtil::GetIndexList()
 {
     UErrorCode status = U_ZERO_ERROR;
     std::vector<std::string> indexList;
-    if (!IsCreateSuccess()) {
+    if (!IsCreateSuccess() || index == nullptr) {
         return indexList;
     }
     index->resetBucketIterator(status);
@@ -71,14 +71,14 @@ void IndexUtil::AddLocale(const std::string &localeTag)
 {
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale(localeTag.c_str());
-    if (createSuccess) {
+    if (createSuccess && index != nullptr) {
         index->addLabels(locale, status);
     }
 }
 
 std::string IndexUtil::GetIndex(const std::string &String)
 {
-    if (!IsCreateSuccess()) {
+    if (!IsCreateSuccess() || index == nullptr) {
         return "";
     }
     UErrorCode status = U_ZERO_ERROR;

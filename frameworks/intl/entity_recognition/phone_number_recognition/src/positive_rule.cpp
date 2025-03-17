@@ -27,42 +27,46 @@ using i18n::phonenumbers::ShortNumberInfo;
 PositiveRule::PositiveRule(icu::UnicodeString& regex, std::string& handleType, std::string& insensitive)
 {
     this->regex = regex;
-    this->status = U_ZERO_ERROR;
     this->handleType = handleType;
     this->insensitive = insensitive;
-    if (regex.length() == 0) {
-        return;
-    }
 }
 
 icu::RegexPattern* PositiveRule::GetPattern()
 {
+    UErrorCode status = U_ZERO_ERROR;
+    icu::RegexPattern* pattern;
     // Sets whether regular expression matching is case sensitive
     if (insensitive == "True") {
-        return icu::RegexPattern::compile(this->regex, URegexpFlag::UREGEX_CASE_INSENSITIVE, this->status);
+        pattern = icu::RegexPattern::compile(this->regex, URegexpFlag::UREGEX_CASE_INSENSITIVE, status);
     } else {
-        return icu::RegexPattern::compile(this->regex, 0, this->status);
+        pattern = icu::RegexPattern::compile(this->regex, 0, status);
     }
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("PositiveRule::GetPattern: Compile regex pattern failed.");
+        return nullptr;
+    }
+    return pattern;
 }
 
 // check whether the bracket at the start position are redundant
 bool PositiveRule::IsNumberWithOneBracket(icu::UnicodeString& message)
 {
-    if (message != "") {
-        int numLeft = 0;
-        int numRight = 0;
-        int len = message.length();
-        for (int i = 0; i < len; i++) {
-            if (message[i] == '(' || message[i] == '[') {
-                numLeft++;
-            }
-            if (message[i] == ')' || message[i] == ']') {
-                numRight++;
-            }
+    if (message.isEmpty()) {
+        return false;
+    }
+    int numLeft = 0;
+    int numRight = 0;
+    int len = message.length();
+    for (int i = 0; i < len; i++) {
+        if (message[i] == '(' || message[i] == '[') {
+            numLeft++;
         }
-        if (numLeft > numRight && (message[0] == '(' || message[0] == '[')) {
-            return true;
+        if (message[i] == ')' || message[i] == ']') {
+            numRight++;
         }
+    }
+    if (numLeft > numRight && (message[0] == '(' || message[0] == '[')) {
+        return true;
     }
     return false;
 }
@@ -77,6 +81,9 @@ icu::UnicodeString PositiveRule::DealStringWithOneBracket(icu::UnicodeString& me
 
 std::vector<MatchedNumberInfo> PositiveRule::Handle(PhoneNumberMatch* match, icu::UnicodeString& message)
 {
+    if (match == nullptr) {
+        return {};
+    }
     icu::UnicodeString rawString = match->raw_string().c_str();
     icu::UnicodeString str = DealStringWithOneBracket(rawString);
     icu::RegexPattern* pattern = this->GetPattern();
@@ -136,6 +143,10 @@ std::vector<MatchedNumberInfo> PositiveRule::HandleDefault(PhoneNumberMatch* pos
 std::vector<MatchedNumberInfo> PositiveRule::HandleOperator(PhoneNumberMatch* possibleNumber,
     icu::UnicodeString& message)
 {
+    std::vector<MatchedNumberInfo> matchedNumberInfoList;
+    if (possibleNumber == nullptr) {
+        return matchedNumberInfoList;
+    }
     MatchedNumberInfo matcher;
     if (possibleNumber->raw_string()[0] == '(' || possibleNumber->raw_string()[0] == '[') {
         matcher.SetBegin(possibleNumber->start() + 1);
@@ -144,7 +155,6 @@ std::vector<MatchedNumberInfo> PositiveRule::HandleOperator(PhoneNumberMatch* po
     }
     matcher.SetEnd(possibleNumber->end());
     matcher.SetContent(message);
-    std::vector<MatchedNumberInfo> matchedNumberInfoList;
     matchedNumberInfoList.push_back(matcher);
     return matchedNumberInfoList;
 }
@@ -152,27 +162,37 @@ std::vector<MatchedNumberInfo> PositiveRule::HandleOperator(PhoneNumberMatch* po
 std::vector<MatchedNumberInfo> PositiveRule::HandleBlank(PhoneNumberMatch* possibleNumber, icu::UnicodeString& message)
 {
     std::vector<MatchedNumberInfo> matchedNumberInfoList;
-    // exclude phone number 5201314
-    icu::UnicodeString speString = "5201314";
-    MatchedNumberInfo matchedNumberInfo;
-    icu::UnicodeString number = possibleNumber->raw_string().c_str();
+    if (possibleNumber == nullptr) {
+        return matchedNumberInfoList;
+    }
     icu::RegexPattern* pattern = GetPattern();
     if (pattern == nullptr) {
         return matchedNumberInfoList;
     }
-    UErrorCode status;
+    UErrorCode status = U_ZERO_ERROR;
+    icu::UnicodeString number = possibleNumber->raw_string().c_str();
     icu::RegexMatcher* matcher = pattern->matcher(number, status);
-    UErrorCode negativeStatus = U_ZERO_ERROR;
+    if (U_FAILURE(status) || matcher == nullptr) {
+        HILOG_ERROR_I18N("PositiveRule::HandleBlank: Pattern match failed.");
+        return {};
+    }
     // exclude phone number 2333333
     icu::UnicodeString negativeRegex = "(?<![-\\d])(23{6,7})(?![-\\d])";
-    icu::RegexMatcher negativePattern(negativeRegex, 0, negativeStatus);
+    icu::RegexMatcher negativePattern(negativeRegex, 0, status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("PositiveRule::HandleBlank: Create negative pattern failed.");
+        return {};
+    }
+    // exclude phone number 5201314
+    icu::UnicodeString speString = "5201314";
     negativePattern.reset(number);
-    if (matcher != nullptr && matcher->find()) {
+    if (matcher->find()) {
         if (negativePattern.find() || number == speString) {
             delete matcher;
             delete pattern;
             return matchedNumberInfoList;
         }
+        MatchedNumberInfo matchedNumberInfo;
         if (possibleNumber->raw_string()[0] != '(' && possibleNumber->raw_string()[0] != '[') {
             matchedNumberInfo.SetBegin(matcher->start(status) + possibleNumber->start());
         } else {
@@ -190,16 +210,21 @@ std::vector<MatchedNumberInfo> PositiveRule::HandleBlank(PhoneNumberMatch* possi
 std::vector<MatchedNumberInfo> PositiveRule::HandleSlant(PhoneNumberMatch* possibleNumber, icu::UnicodeString& message)
 {
     std::vector<MatchedNumberInfo> matchedNumberInfoList;
-    MatchedNumberInfo matchedNumberInfo;
-    MatchedNumberInfo numberInfo;
-    icu::UnicodeString number = possibleNumber->raw_string().c_str();
+    if (possibleNumber == nullptr) {
+        return matchedNumberInfoList;
+    }
     icu::RegexPattern* pattern = GetPattern();
     if (pattern == nullptr) {
         return matchedNumberInfoList;
     }
-    UErrorCode status;
+    UErrorCode status = U_ZERO_ERROR;
+    icu::UnicodeString number = possibleNumber->raw_string().c_str();
     icu::RegexMatcher* matcher = pattern->matcher(number, status);
-    if (matcher != nullptr && matcher->find()) {
+    if (U_FAILURE(status) || matcher == nullptr) {
+        HILOG_ERROR_I18N("PositiveRule::HandleSlant: Pattern match failed.");
+        return matchedNumberInfoList;
+    }
+    if (matcher->find()) {
         int start = matcher->start(status);
         std::vector<MatchedNumberInfo> tempList = GetNumbersWithSlant(number);
         // 2 is the size of tempList.
@@ -207,6 +232,7 @@ std::vector<MatchedNumberInfo> PositiveRule::HandleSlant(PhoneNumberMatch* possi
             start = 0;
         }
         if (tempList.size() > 0) {
+            MatchedNumberInfo matchedNumberInfo;
             matchedNumberInfo.SetBegin(tempList[0].GetBegin() + start + possibleNumber->start());
             matchedNumberInfo.SetEnd(tempList[0].GetEnd() + possibleNumber->start());
             icu::UnicodeString contentFirst = tempList[0].GetContent();
@@ -214,6 +240,7 @@ std::vector<MatchedNumberInfo> PositiveRule::HandleSlant(PhoneNumberMatch* possi
             matchedNumberInfoList.push_back(matchedNumberInfo);
             // 2 is the size of tempList.
             if (tempList.size() == 2) {
+                MatchedNumberInfo numberInfo;
                 numberInfo.SetBegin(tempList[1].GetBegin() + start + possibleNumber->start());
                 numberInfo.SetEnd(tempList[1].GetEnd() + possibleNumber->start());
                 icu::UnicodeString contentSecond = tempList[1].GetContent();
@@ -243,7 +270,6 @@ std::vector<MatchedNumberInfo> PositiveRule::HandleEndWithMobile(PhoneNumberMatc
 std::vector<MatchedNumberInfo> PositiveRule::GetNumbersWithSlant(icu::UnicodeString& testStr)
 {
     std::vector<MatchedNumberInfo> shortList;
-    PhoneNumberUtil* pnu = PhoneNumberUtil::GetInstance();
     ShortNumberInfo* shortInfo = new (std::nothrow) ShortNumberInfo();
     if (shortInfo == nullptr) {
         HILOG_ERROR_I18N("ShortNumberInfo construct failed.");
@@ -261,6 +287,11 @@ std::vector<MatchedNumberInfo> PositiveRule::GetNumbersWithSlant(icu::UnicodeStr
     }
     PhoneNumber phoneNumberFirst;
     PhoneNumber phoneNumberEnd;
+    PhoneNumberUtil* pnu = PhoneNumberUtil::GetInstance();
+    if (pnu == nullptr) {
+        HILOG_ERROR_I18N("PositiveRule::GetNumbersWithSlant: Get phone number util failed.");
+        return shortList;
+    }
     pnu->Parse(numberFisrt, "CN", &phoneNumberFirst);
     pnu->Parse(numberEnd, "CN", &phoneNumberEnd);
     if (shortInfo->IsValidShortNumber(phoneNumberFirst)) {
@@ -286,16 +317,23 @@ std::vector<MatchedNumberInfo> PositiveRule::GetNumbersWithSlant(icu::UnicodeStr
 std::vector<MatchedNumberInfo> PositiveRule::HandlePossibleNumberWithPattern(PhoneNumberMatch* possibleNumber,
     icu::UnicodeString& message, bool isStartsWithNumber)
 {
-    UErrorCode status = U_ZERO_ERROR;
     std::vector<MatchedNumberInfo> matchedList;
-    icu::UnicodeString possible = possibleNumber->raw_string().c_str();
+    if (possibleNumber == nullptr) {
+        return matchedList;
+    }
     icu::RegexPattern* pattern = GetPattern();
     if (pattern == nullptr) {
         HILOG_ERROR_I18N("RegexPattern is nullptr.");
         return matchedList;
     }
+    UErrorCode status = U_ZERO_ERROR;
     icu::RegexMatcher* mat = pattern->matcher(message, status);
-    while (mat != nullptr && mat->find(status)) {
+    if (U_FAILURE(status) || mat == nullptr) {
+        HILOG_ERROR_I18N("PositiveRule::HandlePossibleNumberWithPattern: Pattern match failed.");
+        return matchedList;
+    }
+    icu::UnicodeString possible = possibleNumber->raw_string().c_str();
+    while (mat->find(status)) {
         int start = mat->start(status);
         int end = mat->end(status);
         icu::UnicodeString matched = message.tempSubString(start, end - start);

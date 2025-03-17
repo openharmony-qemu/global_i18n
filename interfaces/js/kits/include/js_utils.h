@@ -30,8 +30,6 @@ public:
         std::map<std::string, std::string> &map);
     static void GetBoolOptionValue(napi_env env, napi_value options, const std::string &optionName,
         std::map<std::string, std::string> &map);
-    static std::string GetLocaleTag(napi_env env, napi_value argv);
-    static void GetLocaleTags(napi_env env, napi_value rawLocaleTag, std::vector<std::string> &localeTags);
 
     static void GetNumberOptionValues(napi_env env, napi_value options, std::map<std::string, std::string> &map);
     static int64_t GetIntegerOptionValue(napi_env env, napi_value options, const std::string &optionName,
@@ -43,6 +41,11 @@ public:
         std::map<std::string, std::string> &options, const std::string &option);
     static void SetIntegerOptionProperties(napi_env env, napi_value &result,
         std::map<std::string, std::string> &options, const std::string &option);
+    static std::string GetString(napi_env env, napi_value value, int32_t& code);
+    static std::vector<std::string> GetStringArray(napi_env env, napi_value value, int32_t& code);
+    static std::vector<std::string> GetLocaleArray(napi_env env, napi_value value, int32_t& code);
+    static napi_value CreateObject(napi_env env, std::unordered_map<std::string, napi_value>& propertys,
+        int32_t& code);
 };
 } // namespace I18n
 } // namespace Global

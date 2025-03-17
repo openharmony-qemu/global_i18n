@@ -114,12 +114,12 @@ std::vector<StyledNumberFormat::NumberPart> StyledNumberFormat::ParseToParts(
 {
     std::vector<NumberPart> result;
     UErrorCode status = U_ZERO_ERROR;
-    std::string numberStr;
     icu::UnicodeString formatResult = formattedValue.toString(status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("StyledNumberFormat::ParseToParts toString faild");
         return result;
     }
+    std::string numberStr;
     formatResult.toUTF8String(numberStr);
     icu::ConstrainedFieldPosition constrainedPos;
     constrainedPos.constrainCategory(UFIELD_CATEGORY_NUMBER);

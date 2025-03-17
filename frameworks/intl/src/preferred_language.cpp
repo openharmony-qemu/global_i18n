@@ -195,7 +195,7 @@ std::string PreferredLanguage::GetAppPreferredLanguage()
 void PreferredLanguage::SetAppPreferredLanguage(const std::string &language, I18nErrorCode &errCode)
 {
     std::shared_ptr<AbilityRuntime::ApplicationContext> appContext = AbilityRuntime::ApplicationContext::GetInstance();
-    if (language.compare("default") != 0) {
+    if (appContext != nullptr && language.compare("default") != 0) {
         appContext->SetLanguage(language);
     }
     std::shared_ptr<NativePreferences::Preferences> preferences = GetI18nAppPreferences();

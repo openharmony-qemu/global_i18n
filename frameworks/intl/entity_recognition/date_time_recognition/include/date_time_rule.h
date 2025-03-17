@@ -53,7 +53,7 @@ public:
 private:
     void Init(std::string& locale);
     void RuleLevel();
-    void InitRules(std::string& xmlPath);
+    void InitRules(const std::string& xmlPath);
     void InitRuleBackup(std::string& xmlPathBackup);
     void LoadStrToStr(std::unordered_map<std::string, std::string>* map, xmlNodePtr cur);
     void LoadStrToPattern(std::unordered_map<std::string, icu::RegexPattern*>& map, xmlNodePtr cur);
@@ -75,7 +75,7 @@ private:
     std::unordered_map<std::string, std::unordered_map<std::string, std::string>*> loadMap;
     std::unordered_map<std::string, icu::RegexPattern*> patternsMap;
     std::string locale;
-    static std::string xmlCommonPath;
+    static const std::string XML_COMMON_PATH;
 };
 } // namespace I18n
 } // namespace Global

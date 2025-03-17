@@ -31,11 +31,15 @@ const std::map<napi_valuetype, std::string> VariableConvertor::NAPI_TYPE_MAP {
     {napi_valuetype::napi_null, "null"},
     {napi_valuetype::napi_undefined, "undefined"},
 };
+
 bool VariableConvertor::CheckNapiIsNull(napi_env env, napi_value value)
 {
     if (value != nullptr) {
         napi_valuetype valueType = napi_valuetype::napi_undefined;
-        napi_typeof(env, value, &valueType);
+        napi_status status = napi_typeof(env, value, &valueType);
+        if (status != napi_ok) {
+            return false;
+        }
         if (valueType != napi_valuetype::napi_undefined && valueType != napi_valuetype::napi_null) {
             return true;
         }
@@ -59,7 +63,10 @@ void VariableConvertor::GetOptionValue(napi_env env, napi_value options, const s
         status = napi_get_named_property(env, options, optionName.c_str(), &optionValue);
         if (status == napi_ok) {
             size_t len;
-            napi_get_value_string_utf8(env, optionValue, nullptr, 0, &len);
+            status = napi_get_value_string_utf8(env, optionValue, nullptr, 0, &len);
+            if (status != napi_ok) {
+                return;
+            }
             std::vector<char> optionBuf(len + 1);
             status = napi_get_value_string_utf8(env, optionValue, optionBuf.data(), len + 1, &len);
             if (status != napi_ok) {
@@ -93,7 +100,10 @@ bool VariableConvertor::GetBoolOptionValue(napi_env env, napi_value &options, co
         HILOG_INFO_I18N("get option %{public}s failed", optionName.c_str());
         return false;
     }
-    napi_get_value_bool(env, optionValue, &boolVal);
+    status = napi_get_value_bool(env, optionValue, &boolVal);
+    if (status != napi_ok) {
+        return false;
+    }
     return true;
 }
 
@@ -133,11 +143,17 @@ bool VariableConvertor::GetStringArrayFromJsParam(napi_env env, napi_value &jsAr
         return false;
     }
     uint32_t arrayLength = 0;
-    napi_get_array_length(env, jsArray, &arrayLength);
+    status = napi_get_array_length(env, jsArray, &arrayLength);
+    if (status != napi_ok) {
+        return false;
+    }
     napi_value element = nullptr;
     int32_t code = 0;
     for (uint32_t i = 0; i < arrayLength; ++i) {
-        napi_get_element(env, jsArray, i, &element);
+        status = napi_get_element(env, jsArray, i, &element);
+        if (status != napi_ok) {
+            return false;
+        }
         std::string str = GetString(env, element, code);
         if (code != 0) {
             HILOG_ERROR_I18N("GetStringArrayFromJsParam: Failed to obtain the parameter.");

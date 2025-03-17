@@ -21,7 +21,6 @@ namespace I18n {
 FindRule::FindRule(icu::UnicodeString& regex, std::string& insensitive)
 {
     this->regex = regex;
-    this->status = U_ZERO_ERROR;
     this->insensitive = insensitive;
     if (regex.length() == 0) {
         return;
@@ -30,12 +29,19 @@ FindRule::FindRule(icu::UnicodeString& regex, std::string& insensitive)
 
 icu::RegexPattern* FindRule::GetPattern()
 {
+    UErrorCode status = U_ZERO_ERROR;
+    icu::RegexPattern* pattern;
     // Sets whether regular expression matching is case sensitive
     if (insensitive == "True") {
-        return icu::RegexPattern::compile(this->regex, URegexpFlag::UREGEX_CASE_INSENSITIVE, this->status);
+        pattern = icu::RegexPattern::compile(this->regex, URegexpFlag::UREGEX_CASE_INSENSITIVE, status);
     } else {
-        return icu::RegexPattern::compile(this->regex, 0, this->status);
+        pattern = icu::RegexPattern::compile(this->regex, 0, status);
     }
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("FindRule::GetPattern: Compile regex pattern failed.");
+        return nullptr;
+    }
+    return pattern;
 }
 } // namespace I18n
 } // namespace Global

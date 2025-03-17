@@ -76,7 +76,7 @@ void PluralRules::ParseAllOptions(std::map<std::string, std::string> &options)
     std::string maxFractionStr = ParseOption(options, "maximumFractionDigits");
     std::string minSignificantStr = ParseOption(options, "minimumSignificantDigits");
     std::string maxSignificantStr = ParseOption(options, "maximumSignificantDigits");
-    if (minSignificantStr != "" || maxSignificantStr != "") {
+    if (!minSignificantStr.empty() || !maxSignificantStr.empty()) {
         // 1 is minValue and defaultValue, 21 is maxValue
         minSignificant = GetValidInteger(minSignificantStr, 1, 21, 1);
         // 1 is minValue, 21 is maxValue and defaultValue
@@ -85,7 +85,7 @@ void PluralRules::ParseAllOptions(std::map<std::string, std::string> &options)
         minSignificant = 0;
         maxSignificant = 0;
 
-        if (minFractionStr != "" || maxFractionStr != "") {
+        if (!minFractionStr.empty() || !maxFractionStr.empty()) {
             // 0 is minValue and defaultValue, 20 is maxValue
             minFraction = GetValidInteger(minFractionStr, 0, 20, 0);
             int maxFractionDefault = std::max(3, minFraction);  // 3 is the default value of minFraction
@@ -114,20 +114,20 @@ void PluralRules::InitPluralRules(std::vector<std::string> &localeTags,
         }
         if (LocaleInfo::allValidLocales.count(locale.getLanguage()) > 0) {
             localeInfo = std::make_unique<LocaleInfo>(curLocale, options);
-            if (!localeInfo->InitSuccess()) {
+            if (localeInfo == nullptr || !localeInfo->InitSuccess()) {
                 continue;
             }
             locale = localeInfo->GetLocale();
             localeStr = localeInfo->GetBaseName();
             pluralRules = icu::PluralRules::forLocale(locale, uPluralType, status);
-            if (status != UErrorCode::U_ZERO_ERROR || !pluralRules) {
+            if (U_FAILURE(status) || !pluralRules) {
                 continue;
             }
             createSuccess = true;
             break;
         }
     }
-    if (status != UErrorCode::U_ZERO_ERROR || !pluralRules) {
+    if (U_FAILURE(status) || !pluralRules) {
         HILOG_ERROR_I18N("PluralRules object created failed");
         return;
     }
@@ -174,11 +174,19 @@ std::string PluralRules::Select(double number)
     }
     UErrorCode status = UErrorCode::U_ZERO_ERROR;
     icu::number::FormattedNumber formattedNumber = numberFormatter.formatDouble(number, status);
-    if (status != UErrorCode::U_ZERO_ERROR) {
+    if (U_FAILURE(status)) {
         status = UErrorCode::U_ZERO_ERROR;
         formattedNumber = numberFormatter.formatDouble(number, status);
     }
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("PluralRules::Select: Format double failed.");
+        return "";
+    }
     icu::UnicodeString unicodeString = pluralRules->select(formattedNumber, status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("PluralRules::Select: PluralRules select failed.");
+        return "";
+    }
     std::string result;
     unicodeString.toUTF8String(result);
     return result;

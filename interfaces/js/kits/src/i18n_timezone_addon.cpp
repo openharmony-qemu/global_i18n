@@ -43,9 +43,12 @@ napi_value I18nTimeZoneAddon::GetI18nTimeZone(napi_env env, napi_callback_info i
     napi_value argv[1] = { nullptr };
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     if (!VariableConvertor::CheckNapiIsNull(env, argv[0])) {
-        napi_status status = napi_create_string_utf8(env, "", NAPI_AUTO_LENGTH, &argv[0]);
+        status = napi_create_string_utf8(env, "", NAPI_AUTO_LENGTH, &argv[0]);
         if (status != napi_ok) {
             HILOG_ERROR_I18N("I18nTimeZoneAddon::GetI18nTimeZone: create string failed.");
             return nullptr;
@@ -117,11 +120,11 @@ napi_value I18nTimeZoneAddon::I18nTimeZoneConstructor(napi_env env, napi_callbac
     if (status != napi_ok) {
         return nullptr;
     }
-    std::string zoneID = "";
+    std::string zoneID;
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     if (argc > 0) {
-        napi_typeof(env, argv[0], &valueType);
-        if (valueType != napi_valuetype::napi_string) {
+        status = napi_typeof(env, argv[0], &valueType);
+        if (status != napi_ok || valueType != napi_valuetype::napi_string) {
             return nullptr;
         }
         int32_t code = 0;
@@ -133,8 +136,8 @@ napi_value I18nTimeZoneAddon::I18nTimeZoneConstructor(napi_env env, napi_callbac
     if (argc < FUNC_ARGS_COUNT) {
         return nullptr;
     }
-    napi_typeof(env, argv[1], &valueType);
-    if (valueType != napi_valuetype::napi_boolean) {
+    status = napi_typeof(env, argv[1], &valueType);
+    if (status != napi_ok || valueType != napi_valuetype::napi_boolean) {
         return nullptr;
     }
     bool isZoneID = false;
@@ -143,6 +146,9 @@ napi_value I18nTimeZoneAddon::I18nTimeZoneConstructor(napi_env env, napi_callbac
         return nullptr;
     }
     std::unique_ptr<I18nTimeZoneAddon> obj = std::make_unique<I18nTimeZoneAddon>();
+    if (obj == nullptr) {
+        return nullptr;
+    }
     status =
         napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), I18nTimeZoneAddon::Destructor, nullptr, nullptr);
     if (status != napi_ok) {
@@ -228,7 +234,10 @@ napi_value I18nTimeZoneAddon::GetCityDisplayName(napi_env env, napi_callback_inf
         return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     if (valueType != napi_valuetype::napi_string) {
         HILOG_ERROR_I18N("GetCityDisplayName: Invalid parameter type");
         return nullptr;
@@ -257,7 +266,10 @@ napi_value I18nTimeZoneAddon::GetTimezoneFromCity(napi_env env, napi_callback_in
     napi_value argv[1] = { nullptr };
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     return StaticGetTimeZone(env, argv, false);
 }
 
@@ -286,7 +298,10 @@ napi_value I18nTimeZoneAddon::GetTimezonesByLocation(napi_env env, napi_callback
         return nullptr;
     }
     napi_value timezoneList = nullptr;
-    napi_create_array(env, &timezoneList);
+    status = napi_create_array(env, &timezoneList);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     std::vector<std::string> tempList = I18nTimeZone::GetTimezoneIdByLocation(x, y);
     for (size_t i = 0; i < tempList.size(); i++) {
         napi_value timezoneId = nullptr;
@@ -341,9 +356,12 @@ napi_value I18nTimeZoneAddon::GetID(napi_env env, napi_callback_info info)
     napi_value *argv = nullptr;
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     I18nTimeZoneAddon *obj = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->timezone_) {
         HILOG_ERROR_I18N("GetID: Get TimeZone object failed");
         return nullptr;
@@ -409,9 +427,12 @@ napi_value I18nTimeZoneAddon::GetRawOffset(napi_env env, napi_callback_info info
     napi_value *argv = nullptr;
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     I18nTimeZoneAddon *obj = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->timezone_) {
         HILOG_ERROR_I18N("GetRawOffset: Get TimeZone object failed");
         return nullptr;
@@ -440,7 +461,10 @@ napi_value I18nTimeZoneAddon::GetOffset(napi_env env, napi_callback_info info)
     double date = 0;
     if (VariableConvertor::CheckNapiIsNull(env, argv[0])) {
         napi_valuetype valueType = napi_valuetype::napi_undefined;
-        napi_typeof(env, argv[0], &valueType);
+        status = napi_typeof(env, argv[0], &valueType);
+        if (status != napi_ok) {
+            return nullptr;
+        }
         if (valueType != napi_valuetype::napi_number) {
             HILOG_ERROR_I18N("GetOffset: Invalid parameter type");
             return nullptr;
@@ -498,12 +522,17 @@ napi_value I18nTimeZoneAddon::StaticGetTimeZone(napi_env env, napi_value *argv, 
 
 int32_t I18nTimeZoneAddon::GetParameter(napi_env env, napi_value *argv, std::string &localeStr, bool &isDST)
 {
-    napi_status status = napi_ok;
     if (VariableConvertor::CheckNapiIsNull(env, argv[1])) {
         napi_valuetype valueType0 = napi_valuetype::napi_undefined;
         napi_valuetype valueType1 = napi_valuetype::napi_undefined;
-        napi_typeof(env, argv[0], &valueType0);  // 0 represents first parameter
-        napi_typeof(env, argv[1], &valueType1);  // 1 represents second parameter
+        napi_status status = napi_typeof(env, argv[0], &valueType0);  // 0 represents first parameter
+        if (status != napi_ok) {
+            return -1;
+        }
+        status = napi_typeof(env, argv[1], &valueType1);  // 1 represents second parameter
+        if (status != napi_ok) {
+            return -1;
+        }
         bool firstParamFlag = VariableConvertor::CheckNapiIsNull(env, argv[0]);
         if (valueType1 == napi_valuetype::napi_boolean) {
             status = napi_get_value_bool(env, argv[1], &isDST);
@@ -545,9 +574,11 @@ int32_t I18nTimeZoneAddon::GetFirstParameter(napi_env env, napi_value value, std
     if (!VariableConvertor::CheckNapiIsNull(env, value)) {
         return 0;  // 0 represents no parameter.
     } else {
-        napi_status status = napi_ok;
         napi_valuetype valueType = napi_valuetype::napi_undefined;
-        napi_typeof(env, value, &valueType);
+        napi_status status = napi_typeof(env, value, &valueType);
+        if (status != napi_ok) {
+            return -1;
+        }
         if (valueType == napi_valuetype::napi_string) {
             bool valid = GetStringFromJS(env, value, localeStr);
             // -1 represents Invalid parameter.

@@ -146,7 +146,7 @@ NumberFormat::NumberFormat(const std::vector<std::string> &localeTags, std::map<
         std::string systemLocale = LocaleConfig::GetSystemLocale();
         localeInfo = std::make_unique<LocaleInfo>(systemLocale, configs);
         CreateRelativeTimeFormat(systemLocale);
-        if (localeInfo->InitSuccess()) {
+        if (localeInfo != nullptr && localeInfo->InitSuccess()) {
             locale = localeInfo->GetLocale();
             localeBaseName = localeInfo->GetBaseName();
             icu::MeasureUnit::getAvailable(unitArray, MAX_UNIT_NUM, status);
@@ -199,6 +199,10 @@ void NumberFormat::InitCurrencyProperties(icu::number::UnlocalizedNumberFormatte
     if (!currency.empty()) {
         UErrorCode status = U_ZERO_ERROR;
         icu::CurrencyUnit currencyUnit(icu::UnicodeString(currency.c_str()).getBuffer(), status);
+        if (U_FAILURE(status)) {
+            HILOG_ERROR_I18N("NumberFormat::InitCurrencyProperties: Create currency unit failed.");
+            return;
+        }
         formatter = formatter.unit(currencyUnit);
         if (currencyDisplay != UNumberUnitWidth::UNUM_UNIT_WIDTH_SHORT) {
             formatter = formatter.unitWidth(currencyDisplay);
@@ -251,8 +255,12 @@ void NumberFormat::InitUnitProperties(icu::number::UnlocalizedNumberFormatter &f
     }
     UErrorCode status = U_ZERO_ERROR;
     UMeasurementSystem measSys = ulocdata_getMeasurementSystem(localeBaseName.c_str(), &status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("NumberFormat::InitUnitProperties: Get measurement system failed.");
+        return;
+    }
     bool isValidMeaSys = measurementSystem.find(measSys) != measurementSystem.end();
-    if (U_SUCCESS(status) && measSys >= 0 && isValidMeaSys) {
+    if (measSys >= 0 && isValidMeaSys) {
         unitMeasSys = measurementSystem[measSys];
     }
     formatter = formatter.unitWidth(unitDisplay);
@@ -477,9 +485,13 @@ void NumberFormat::ParseRoundingConfigs(std::map<std::string, std::string> &conf
         std::string increment = configs["roundingIncrement"];
         int32_t status = 0;
         int32_t incrementNum = ConvertString2Int(increment, status);
+        if (status != 0) {
+            HILOG_ERROR_I18N("NumberFormat::ParseRoundingConfigs: Convert string to int failed.");
+            return;
+        }
         auto iter = std::find(roundingIncrementList.begin(), roundingIncrementList.end(),
             static_cast<size_t>(incrementNum));
-        if (status == 0 && iter != roundingIncrementList.end()) {
+        if (iter != roundingIncrementList.end()) {
             roundingIncrement = *iter;
         }
     }

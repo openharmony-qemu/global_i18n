@@ -26,7 +26,6 @@ public:
     icu::RegexPattern* GetPattern();
 
 private:
-    UErrorCode status;
     icu::UnicodeString regex;
     std::string insensitive;
 };

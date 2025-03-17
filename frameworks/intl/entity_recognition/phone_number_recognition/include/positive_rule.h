@@ -45,7 +45,6 @@ private:
     icu::UnicodeString DealStringWithOneBracket(icu::UnicodeString& message);
     bool IsNumberWithOneBracket(icu::UnicodeString& message);
     icu::UnicodeString regex;
-    UErrorCode status;
     std::string handleType;
     std::string insensitive;
 };
