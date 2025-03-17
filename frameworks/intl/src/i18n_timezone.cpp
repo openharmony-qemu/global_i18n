@@ -1184,6 +1184,7 @@ std::vector<int> I18nTimeZone::GetColorData(const uint16_t x, const uint16_t y,
 void I18nTimeZone::GetTzDataWidth(std::vector<std::string> filePaths, uint32_t *width, uint32_t *height)
 {
     if (filePaths.size() == 0) {
+        HILOG_ERROR_I18N("I18nTimeZone::GetTzDataWidth: filePaths is empty.");
         return;
     }
     std::string firstPath = filePaths.at(0);
@@ -1195,26 +1196,22 @@ void I18nTimeZone::GetTzDataWidth(std::vector<std::string> filePaths, uint32_t *
     FILE* fp;
     png_structp png_ptr;
     png_infop info_ptr;
-    try {
-        fp = fopen(firstPath.c_str(), "rb");
-        if (fp == NULL) {
-            return;
-        }
-        png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-        info_ptr = png_create_info_struct(png_ptr);
-        rewind(fp);
-        png_init_io(png_ptr, fp);
-        png_read_info(png_ptr, info_ptr);
-        unsigned int w, h;
-        png_get_IHDR(png_ptr, info_ptr, &w, &h, NULL, NULL, NULL, NULL, NULL);
-        *width = w;
-        *height = h;
-        png_destroy_read_struct(&png_ptr, &info_ptr, 0);
-        CloseFile(fp);
-    } catch(...) {
-        png_destroy_read_struct(&png_ptr, &info_ptr, 0);
-        CloseFile(fp);
+    fp = fopen(firstPath.c_str(), "rb");
+    if (fp == NULL) {
+        HILOG_ERROR_I18N("I18nTimeZone::GetTzDataWidth: fopen(%{public}s) return NULL.", firstPath.c_str());
+        return;
     }
+    png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    info_ptr = png_create_info_struct(png_ptr);
+    rewind(fp);
+    png_init_io(png_ptr, fp);
+    png_read_info(png_ptr, info_ptr);
+    unsigned int w, h;
+    png_get_IHDR(png_ptr, info_ptr, &w, &h, NULL, NULL, NULL, NULL, NULL);
+    *width = w;
+    *height = h;
+    png_destroy_read_struct(&png_ptr, &info_ptr, 0);
+    CloseFile(fp);
 }
 
 int I18nTimeZone::InitPngptr(png_structp &png_ptr, png_infop &info_ptr, FILE **fp,
