@@ -65,12 +65,17 @@ extern "C"
             temp.toUTF8String(id);
             idList.push_back(id);
         }
+        delete idStrEnum;
         return VectorStringToCArr(idList);
     }
 
     char* FfiI18nTransliteratorTransform(int64_t remoteDataId, char* text)
     {
         auto transLiterator_ = FFIData::GetData<FfiI18nTransliterator>(remoteDataId);
+        if (!transLiterator_) {
+            HILOG_ERROR_I18N("The FfiI18nTransliterator instance is nullptr");
+            return nullptr;
+        }
         return transLiterator_->transform(text);
     }
 }

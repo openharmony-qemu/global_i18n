@@ -149,15 +149,21 @@ napi_value I18nCalendarAddon::GetCalendar(napi_env env, napi_callback_info info)
     argv[1] = nullptr;
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     napi_value constructor = nullptr;
-    napi_status status = napi_get_reference_value(env, *g_constructor, &constructor);
+    status = napi_get_reference_value(env, *g_constructor, &constructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Failed to create reference at GetCalendar");
         return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv[1], &valueType);
+    status = napi_typeof(env, argv[1], &valueType);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     if (valueType != napi_valuetype::napi_string) {
         status = napi_create_string_utf8(env, "", NAPI_AUTO_LENGTH, argv + 1);
         if (status != napi_ok) {
@@ -186,7 +192,10 @@ napi_value I18nCalendarAddon::I18nCalendarConstructor(napi_env env, napi_callbac
         return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     if (valueType != napi_valuetype::napi_string) {
         HILOG_ERROR_I18N("CalendarConstructor: Parameter type does not match");
         return nullptr;
@@ -199,6 +208,9 @@ napi_value I18nCalendarAddon::I18nCalendarConstructor(napi_env env, napi_callbac
     CalendarType type = GetCalendarType(env, argv[1]);
     std::unique_ptr<I18nCalendarAddon> obj = nullptr;
     obj = std::make_unique<I18nCalendarAddon>();
+    if (obj == nullptr) {
+        return nullptr;
+    }
     status =
         napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), I18nCalendarAddon::Destructor, nullptr, nullptr);
     if (status != napi_ok) {
@@ -219,12 +231,15 @@ napi_value I18nCalendarAddon::SetTime(napi_env env, napi_callback_info info)
     argv[0] = nullptr;
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     if (!argv[0]) {
         return nullptr;
     }
     I18nCalendarAddon *obj = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->calendar_) {
         HILOG_ERROR_I18N("SetTime: Get calendar object failed");
         return nullptr;
@@ -256,12 +271,17 @@ napi_value I18nCalendarAddon::Set(napi_env env, napi_callback_info info)
     }
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_status status = napi_ok;
     int32_t times[3] = { 0 }; // There are at least 3 arguments.
     for (int i = 0; i < 3; ++i) { // There are at least 3 arguments.
-        napi_typeof(env, argv[i], &valueType);
+        status = napi_typeof(env, argv[i], &valueType);
+        if (status != napi_ok) {
+            return nullptr;
+        }
         if (valueType != napi_valuetype::napi_number) {
             HILOG_ERROR_I18N("Set: Parameter type does not match");
             return nullptr;
@@ -291,9 +311,12 @@ napi_value I18nCalendarAddon::GetTimeZone(napi_env env, napi_callback_info info)
     napi_value *argv = nullptr;
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     I18nCalendarAddon *obj = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->calendar_) {
         HILOG_ERROR_I18N("GetTimeZone: Get calendar object failed");
         return nullptr;
@@ -315,15 +338,21 @@ napi_value I18nCalendarAddon::SetTimeZone(napi_env env, napi_callback_info info)
     argv[0] = nullptr;
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     if (valueType != napi_valuetype::napi_string) {
         HILOG_ERROR_I18N("SetTimeZone: Parameter type does not match");
         return nullptr;
     }
     size_t len = 0;
-    napi_status status = napi_get_value_string_utf8(env, argv[0], nullptr, 0, &len);
+    status = napi_get_value_string_utf8(env, argv[0], nullptr, 0, &len);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("SetTimeZone: Get timezone length failed");
         return nullptr;
@@ -351,9 +380,12 @@ napi_value I18nCalendarAddon::GetFirstDayOfWeek(napi_env env, napi_callback_info
     napi_value *argv = nullptr;
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     I18nCalendarAddon *obj = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->calendar_) {
         HILOG_ERROR_I18N("GetFirstDayOfWeek: Get calendar object failed");
         return nullptr;
@@ -375,15 +407,21 @@ napi_value I18nCalendarAddon::SetFirstDayOfWeek(napi_env env, napi_callback_info
     argv[0] = nullptr;
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     if (valueType != napi_valuetype::napi_number) {
         HILOG_ERROR_I18N("SetFirstDayOfWeek: Parameter type does not match");
         return nullptr;
     }
     int32_t value = 0;
-    napi_status status = napi_get_value_int32(env, argv[0], &value);
+    status = napi_get_value_int32(env, argv[0], &value);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("SetFirstDayOfWeek: Get int32 failed");
         return nullptr;
@@ -404,9 +442,12 @@ napi_value I18nCalendarAddon::GetMinimalDaysInFirstWeek(napi_env env, napi_callb
     napi_value *argv = nullptr;
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     I18nCalendarAddon *obj = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->calendar_) {
         HILOG_ERROR_I18N("GetMinimalDaysInFirstWeek: Get calendar object failed");
         return nullptr;
@@ -428,15 +469,21 @@ napi_value I18nCalendarAddon::SetMinimalDaysInFirstWeek(napi_env env, napi_callb
     argv[0] = nullptr;
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     if (valueType != napi_valuetype::napi_number) {
         HILOG_ERROR_I18N("SetMinimalDaysInFirstWeek: Parameter type does not match");
         return nullptr;
     }
     int32_t value = 0;
-    napi_status status = napi_get_value_int32(env, argv[0], &value);
+    status = napi_get_value_int32(env, argv[0], &value);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("SetMinimalDaysInFirstWeek: Get int32 failed");
         return nullptr;
@@ -458,23 +505,22 @@ napi_value I18nCalendarAddon::Get(napi_env env, napi_callback_info info)
     argv[0] = nullptr;
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     if (valueType != napi_valuetype::napi_string) {
         HILOG_ERROR_I18N("Get: Parameter type does not match");
         return nullptr;
     }
-    size_t len = 0;
-    napi_status status = napi_get_value_string_utf8(env, argv[0], nullptr, 0, &len);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("Get field length failed");
-        return nullptr;
-    }
-    std::vector<char> buf(len + 1);
-    status = napi_get_value_string_utf8(env, argv[0], buf.data(), len + 1, &len);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("Get field failed");
+    int32_t code = 0;
+    std::string buf = VariableConvertor::GetString(env, argv[0], code);
+    if (code) {
         return nullptr;
     }
     std::string field(buf.data());
@@ -510,7 +556,10 @@ napi_value I18nCalendarAddon::Add(napi_env env, napi_callback_info info)
         return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     if (valueType != napi_valuetype::napi_string) {
         HILOG_ERROR_I18N("Parameter type does not match argv[0]");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "field", "string", true);
@@ -521,7 +570,10 @@ napi_value I18nCalendarAddon::Add(napi_env env, napi_callback_info info)
     if (code) {
         return nullptr;
     }
-    napi_typeof(env, argv[1], &valueType);
+    status = napi_typeof(env, argv[1], &valueType);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     if (valueType != napi_valuetype::napi_number) {
         HILOG_ERROR_I18N("Parameter type does not match argv[1]");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "amount", "number", true);
@@ -547,12 +599,17 @@ napi_value I18nCalendarAddon::GetDisplayName(napi_env env, napi_callback_info in
 {
     size_t argc = 1;
     napi_value argv[1] = { 0 };
-    argv[0] = nullptr;
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     if (valueType != napi_valuetype::napi_string) {
         HILOG_ERROR_I18N("GetDisplayName: Parameter type does not match");
         return nullptr;
@@ -563,7 +620,7 @@ napi_value I18nCalendarAddon::GetDisplayName(napi_env env, napi_callback_info in
         return nullptr;
     }
     I18nCalendarAddon *obj = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->calendar_) {
         HILOG_ERROR_I18N("GetDisplayName: Get calendar object failed");
         return nullptr;
@@ -588,9 +645,12 @@ napi_value I18nCalendarAddon::GetTimeInMillis(napi_env env, napi_callback_info i
     napi_value *argv = nullptr;
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     I18nCalendarAddon *obj = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->calendar_) {
         HILOG_ERROR_I18N("GetTimeInMillis: Get calendar object failed");
         flag = false;
@@ -603,7 +663,10 @@ napi_value I18nCalendarAddon::GetTimeInMillis(napi_env env, napi_callback_info i
     status = napi_create_double(env, temp, &result);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Create UDate failed");
-        napi_create_double(env, 0, &result);
+        status = napi_create_double(env, 0, &result);
+        if (status != napi_ok) {
+            return nullptr;
+        }
     }
     return result;
 }
@@ -612,43 +675,45 @@ napi_value I18nCalendarAddon::IsWeekend(napi_env env, napi_callback_info info)
 {
     size_t argc = 1;
     napi_value argv[1] = { 0 };
-    argv[0] = nullptr;
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     I18nCalendarAddon *obj = nullptr;
     bool isWeekEnd = false;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
-    do {
-        if (status != napi_ok || !obj || !obj->calendar_) {
-            HILOG_ERROR_I18N("IsWeekend: Get calendar object failed");
-            break;
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    if (status != napi_ok || !obj || !obj->calendar_) {
+        HILOG_ERROR_I18N("IsWeekend: Get calendar object failed");
+        return nullptr;
+    } else if (!VariableConvertor::CheckNapiIsNull(env, argv[0])) {
+        isWeekEnd = obj->calendar_->IsWeekend();
+    } else {
+        napi_value funcGetDateInfo = nullptr;
+        status = napi_get_named_property(env, argv[0], "valueOf", &funcGetDateInfo);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("Get method now failed");
+            return nullptr;
         }
-        if (!VariableConvertor::CheckNapiIsNull(env, argv[0])) {
-            isWeekEnd = obj->calendar_->IsWeekend();
-        } else {
-            napi_value funcGetDateInfo = nullptr;
-            status = napi_get_named_property(env, argv[0], "valueOf", &funcGetDateInfo);
-            if (status != napi_ok) {
-                HILOG_ERROR_I18N("Get method now failed");
-                break;
-            }
-            napi_value value = nullptr;
-            status = napi_call_function(env, argv[0], funcGetDateInfo, 0, nullptr, &value);
-            if (status != napi_ok) {
-                HILOG_ERROR_I18N("IsWeekend: Get milliseconds failed");
-                break;
-            }
-            double milliseconds = 0;
-            status = napi_get_value_double(env, value, &milliseconds);
-            if (status != napi_ok) {
-                HILOG_ERROR_I18N("IsWeekend: Retrieve milliseconds failed");
-                break;
-            }
-            UErrorCode error = U_ZERO_ERROR;
-            isWeekEnd = obj->calendar_->IsWeekend(milliseconds, error);
+        napi_value value = nullptr;
+        status = napi_call_function(env, argv[0], funcGetDateInfo, 0, nullptr, &value);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("IsWeekend: Get milliseconds failed");
+            return nullptr;
         }
-    } while (false);
+        double milliseconds = 0;
+        status = napi_get_value_double(env, value, &milliseconds);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("IsWeekend: Retrieve milliseconds failed");
+            return nullptr;
+        }
+        UErrorCode error = U_ZERO_ERROR;
+        isWeekEnd = obj->calendar_->IsWeekend(milliseconds, error);
+        if (U_FAILURE(error)) {
+            return nullptr;
+        }
+    }
     napi_value result = nullptr;
     status = napi_get_boolean(env, isWeekEnd, &result);
     if (status != napi_ok) {
@@ -664,10 +729,13 @@ napi_value I18nCalendarAddon::CompareDays(napi_env env, napi_callback_info info)
     napi_value argv[1] = { 0 };
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     napi_value result = nullptr;
     UDate milliseconds = 0;
-    napi_status status = napi_get_date_value(env, argv[0], &milliseconds);
+    status = napi_get_date_value(env, argv[0], &milliseconds);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("compareDays: function param is not Date");
         return nullptr;
@@ -678,11 +746,17 @@ napi_value I18nCalendarAddon::CompareDays(napi_env env, napi_callback_info info)
     if (status != napi_ok || !obj || !obj->calendar_) {
         HILOG_ERROR_I18N("CompareDays: Get calendar object failed");
         status = napi_create_int32(env, 0, &result); // if error return 0
+        if (status != napi_ok) {
+            return nullptr;
+        }
         return result;
     }
     
     int32_t diff_date = obj->calendar_->CompareDays(milliseconds);
     status = napi_create_int32(env, diff_date, &result);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     return result;
 }
 
@@ -698,7 +772,10 @@ CalendarType I18nCalendarAddon::GetCalendarType(napi_env env, napi_value value)
     CalendarType type = CalendarType::UNDEFINED;
     if (value != nullptr) {
         napi_valuetype valueType = napi_valuetype::napi_undefined;
-        napi_typeof(env, value, &valueType);
+        napi_status status = napi_typeof(env, value, &valueType);
+        if (status != napi_ok) {
+            return type;
+        }
         if (valueType != napi_valuetype::napi_string) {
             HILOG_ERROR_I18N("GetCalendarType: Parameter type does not match");
             return type;
@@ -722,12 +799,15 @@ void I18nCalendarAddon::SetField(napi_env env, napi_value value, UCalendarDateFi
     }
     int32_t val = 0;
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, value, &valueType);
+    napi_status status = napi_typeof(env, value, &valueType);
+    if (status != napi_ok) {
+        return;
+    }
     if (valueType != napi_valuetype::napi_number) {
         HILOG_ERROR_I18N("SetField: Parameter type does not match");
         return;
     }
-    napi_status status = napi_get_value_int32(env, value, &val);
+    status = napi_get_value_int32(env, value, &val);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("SetField: Retrieve field failed");
         return;
@@ -780,12 +860,15 @@ void I18nCalendarAddon::SetMilliseconds(napi_env env, napi_value value)
     }
     double milliseconds = 0;
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, value, &valueType);
+    napi_status status = napi_typeof(env, value, &valueType);
+    if (status != napi_ok) {
+        return;
+    }
     if (valueType != napi_valuetype::napi_number) {
         HILOG_ERROR_I18N("SetMilliseconds: Parameter type does not match");
         return;
     }
-    napi_status status = napi_get_value_double(env, value, &milliseconds);
+    status = napi_get_value_double(env, value, &milliseconds);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("SetMilliseconds: Retrieve milliseconds failed");
         return;

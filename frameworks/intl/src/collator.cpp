@@ -16,6 +16,7 @@
 
 #include <unicode/stringpiece.h>
 
+#include "i18n_hilog.h"
 #include "locale_config.h"
 #include "map"
 #include "set"
@@ -38,9 +39,8 @@ std::string Collator::ParseOption(std::map<std::string, std::string> &options, c
     std::map<std::string, std::string>::iterator it = options.find(key);
     if (it != options.end()) {
         return it->second;
-    } else {
-        return "";
     }
+    return "";
 }
 
 void Collator::ParseAllOptions(std::map<std::string, std::string> &options)
@@ -73,13 +73,13 @@ void Collator::ParseAllOptions(std::map<std::string, std::string> &options)
 Collator::Collator(std::vector<std::string> &localeTags, std::map<std::string, std::string> &options)
 {
     ParseAllOptions(options);
-    UErrorCode status = U_ZERO_ERROR;
+    
     localeTags.push_back(LocaleConfig::GetSystemLocale());
     for (size_t i = 0; i < localeTags.size(); i++) {
         std::string curLocale = localeTags[i];
+        UErrorCode status = U_ZERO_ERROR;
         locale = icu::Locale::forLanguageTag(icu::StringPiece(curLocale), status);
         if (U_FAILURE(status)) {
-            status = U_ZERO_ERROR;
             continue;
         }
         if (LocaleInfo::allValidLocales.count(locale.getLanguage()) > 0) {
@@ -100,26 +100,27 @@ Collator::Collator(std::vector<std::string> &localeTags, std::map<std::string, s
 
 bool Collator::IsValidCollation(std::string &collation)
 {
-    UErrorCode status = U_ZERO_ERROR;
     const char *currentCollation = uloc_toLegacyType("collation", collation.c_str());
-    if (currentCollation != nullptr) {
-        std::unique_ptr<icu::StringEnumeration> enumeration(
-            icu::Collator::getKeywordValuesForLocale("collation", icu::Locale(locale.getBaseName()), false, status));
-        if (!U_SUCCESS(status)) {
-            return false;
+    if (currentCollation == nullptr) {
+        return false;
+    }
+    UErrorCode status = U_ZERO_ERROR;
+    std::unique_ptr<icu::StringEnumeration> enumeration(
+        icu::Collator::getKeywordValuesForLocale("collation", icu::Locale(locale.getBaseName()), false, status));
+    if (U_FAILURE(status)) {
+        return false;
+    }
+    int length;
+    const char *validCollations = nullptr;
+    if (enumeration != nullptr) {
+        validCollations = enumeration->next(&length, status);
+    }
+    while (validCollations != nullptr) {
+        if (!strcmp(validCollations, currentCollation)) {
+            return true;
         }
-        int length;
-        const char *validCollations = nullptr;
         if (enumeration != nullptr) {
             validCollations = enumeration->next(&length, status);
-        }
-        while (validCollations != nullptr) {
-            if (!strcmp(validCollations, currentCollation)) {
-                return true;
-            }
-            if (enumeration != nullptr) {
-                validCollations = enumeration->next(&length, status);
-            }
         }
     }
     return false;
@@ -128,7 +129,7 @@ bool Collator::IsValidCollation(std::string &collation)
 void Collator::SetCollation()
 {
     UErrorCode status = U_ZERO_ERROR;
-    if (collation != "") {
+    if (!collation.empty()) {
         if (IsValidCollation(collation)) {
             locale.setUnicodeKeywordValue("co", collation, status);
         } else {
@@ -137,7 +138,7 @@ void Collator::SetCollation()
         }
     } else {
         collation = localeInfo->GetCollation();
-        if (collation != "") {
+        if (!collation.empty()) {
             if (IsValidCollation(collation)) {
                 locale.setUnicodeKeywordValue("co", collation, status);
             } else {
@@ -149,6 +150,9 @@ void Collator::SetCollation()
             collation = "default";
         }
     }
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("Collator::SetCollation: Set unicode key word value failed.");
+    }
 }
 
 void Collator::SetUsage()
@@ -157,6 +161,9 @@ void Collator::SetUsage()
         collation = "default";
         UErrorCode status = U_ZERO_ERROR;
         locale.setUnicodeKeywordValue("co", nullptr, status);
+        if (U_FAILURE(status)) {
+            HILOG_ERROR_I18N("Collator::SetUsage: Set unicode key word value failed.");
+        }
     }
 }
 
@@ -178,6 +185,9 @@ void Collator::SetNumeric()
     } else {
         collatorPtr->setAttribute(UColAttribute::UCOL_NUMERIC_COLLATION,
             UColAttributeValue::UCOL_OFF, status);
+    }
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("Collator::SetNumeric: Set attribute failed.");
     }
 }
 
@@ -202,6 +212,9 @@ void Collator::SetCaseFirst()
     } else {
         collatorPtr->setAttribute(UColAttribute::UCOL_CASE_FIRST,
             UColAttributeValue::UCOL_OFF, status);
+    }
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("Collator::SetCaseFirst: Set attribute failed.");
     }
 }
 
@@ -233,6 +246,9 @@ void Collator::SetIgnorePunctuation()
         UErrorCode status = U_ZERO_ERROR;
         collatorPtr->setAttribute(UColAttribute::UCOL_ALTERNATE_HANDLING,
             UColAttributeValue::UCOL_SHIFTED, status);
+        if (U_FAILURE(status)) {
+            HILOG_ERROR_I18N("Collator::SetIgnorePunctuation: Set attribute failed.");
+        }
     }
 }
 

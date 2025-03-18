@@ -17,6 +17,8 @@
 #ifdef SUPPORT_GRAPHICS
 #include "app_mgr_client.h"
 #include "ability_manager_client.h"
+#include "configuration.h"
+#include <common_event_data.h>
 #include <common_event_manager.h>
 #include <common_event_publish_info.h>
 #include <common_event_support.h>
@@ -640,7 +642,7 @@ void LocaleConfig::ExtendWhiteLanguages()
         icu::Locale locale = icu::Locale::forLanguageTag((*iter).c_str(), status);
         locale.addLikelySubtags(status);
         if (U_FAILURE(status)) {
-            HILOG_INFO_I18N("create Locale object for %{public}s failed.", (*iter).c_str());
+            HILOG_ERROR_I18N("create Locale object for %{public}s failed.", (*iter).c_str());
             continue;
         }
         const char* baseName = locale.getBaseName();
@@ -661,7 +663,7 @@ void LocaleConfig::ExtendWhiteLanguages()
 void LocaleConfig::ExtendLanguageWithScript(const std::string &languageStr)
 {
     if (languageStr.empty()) {
-        HILOG_INFO_I18N("ExtendLanguageWithScript languageStr is empty.");
+        HILOG_ERROR_I18N("ExtendLanguageWithScript languageStr is empty.");
         return;
     }
     string mainLanguage = GetMainLanguage(languageStr, dialectMap);
@@ -922,14 +924,14 @@ std::string LocaleConfig::ComputeLocale(const std::string &displayLocale)
         xmlNodePtr cur = xmlDocGetRootElement(doc);
         if (!cur || xmlStrcmp(cur->name, reinterpret_cast<const xmlChar *>(supportLocalesTag))) {
             xmlFreeDoc(doc);
-            HILOG_INFO_I18N("can not parse language supported locale file");
+            HILOG_ERROR_I18N("can not parse language supported locale file");
             return "";
         }
         cur = cur->xmlChildrenNode;
         while (cur != nullptr) {
             xmlChar *content = xmlNodeGetContent(cur);
             if (content == nullptr) {
-                HILOG_INFO_I18N("get xml node content failed");
+                HILOG_ERROR_I18N("get xml node content failed");
                 break;
             }
             std::map<std::string, std::string> localeInfoConfigs = {};
@@ -967,13 +969,13 @@ void LocaleConfig::ReadLangData(const char *langDataPath)
     }
     xmlDocPtr doc = xmlParseFile(langDataPath);
     if (!doc) {
-        HILOG_INFO_I18N("can not open language data file");
+        HILOG_ERROR_I18N("can not open language data file");
         return;
     }
     xmlNodePtr cur = xmlDocGetRootElement(doc);
     if (!cur || xmlStrcmp(cur->name, reinterpret_cast<const xmlChar *>(rootTag))) {
         xmlFreeDoc(doc);
-        HILOG_INFO_I18N("parse language data file failed");
+        HILOG_ERROR_I18N("parse language data file failed");
         return;
     }
     cur = cur->xmlChildrenNode;
@@ -1026,16 +1028,13 @@ void LocaleConfig::ReadRegionData(const char *regionDataPath)
     }
     xmlDocPtr doc = xmlParseFile(regionDataPath);
     if (!doc) {
-        HILOG_INFO_I18N("can not open region data file");
+        HILOG_ERROR_I18N("can not open region data file");
         return;
     }
     xmlNodePtr cur = xmlDocGetRootElement(doc);
-    if (cur) {
-        HILOG_INFO_I18N("cur pointer is true");
-    }
     if (!cur || xmlStrcmp(cur->name, reinterpret_cast<const xmlChar *>(rootRegion))) {
         xmlFreeDoc(doc);
-        HILOG_INFO_I18N("parse region data file failed");
+        HILOG_ERROR_I18N("parse region data file failed");
         return;
     }
     cur = cur->xmlChildrenNode;
@@ -1128,6 +1127,9 @@ string LocaleConfig::GetDisplayOverrideRegion(const std::string &region, const s
         } else {
             originLocale = icu::Locale::forLanguageTag(region, status);
         }
+        if (U_FAILURE(status)) {
+            return "";
+        }
         originLocale.getDisplayCountry(locale, displayRegion);
         std::string result;
         displayRegion.toUTF8String(result);
@@ -1145,11 +1147,11 @@ string LocaleConfig::GetDisplayRegion(const string &region, const string &displa
     } else {
         originLocale = icu::Locale::forLanguageTag(region, status);
     }
-    std::string country(originLocale.getCountry());
-    if (country.length() == 0) {
+    if (U_FAILURE(status)) {
         return PseudoLocalizationProcessor("");
     }
-    if (U_FAILURE(status)) {
+    std::string country(originLocale.getCountry());
+    if (country.empty()) {
         return PseudoLocalizationProcessor("");
     }
     icu::Locale locale = icu::Locale::forLanguageTag(displayLocale, status);
@@ -1340,19 +1342,19 @@ bool LocaleConfig::Is24HourLocale(const std::string& systemLocale)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(icu::StringPiece(systemLocale), status);
     if (U_FAILURE(status)) {
-        HILOG_INFO_I18N("Is24HourLocale: %{public}s create locale failed", systemLocale.c_str());
+        HILOG_ERROR_I18N("Is24HourLocale: %{public}s create locale failed", systemLocale.c_str());
         return false;
     }
 
     icu::UnicodeString formatPattern;
     icu::DateFormat* dateFormat = icu::DateFormat::createTimeInstance(icu::DateFormat::EStyle::kLong, locale);
     if (dateFormat == nullptr) {
-        HILOG_INFO_I18N("Is24HourLocale: createTimeInstance failed");
+        HILOG_ERROR_I18N("Is24HourLocale: createTimeInstance failed");
         return false;
     }
     icu::SimpleDateFormat* simDateFormat = static_cast<icu::SimpleDateFormat*>(dateFormat);
     if (simDateFormat == nullptr) {
-        HILOG_INFO_I18N("Is24HourLocale: failed to convert dateFormat");
+        HILOG_ERROR_I18N("Is24HourLocale: failed to convert dateFormat");
         return false;
     }
     simDateFormat->toPattern(formatPattern);
@@ -1367,7 +1369,7 @@ bool LocaleConfig::Is24HourLocale(const std::string& systemLocale)
 bool LocaleConfig::HasDesignator(const std::string& pattern, const char designator)
 {
     if (pattern.empty()) {
-        HILOG_INFO_I18N("HasDesignator: pattern is empty");
+        HILOG_ERROR_I18N("HasDesignator: pattern is empty");
         return false;
     }
     bool insideQuote = false;
@@ -1767,7 +1769,7 @@ std::string LocaleConfig::UpdateRegionOfLocale(const std::string &regionTag)
 {
     std::string localeTag = GetSystemLocale();
     // if current system locale is null, contruct a locale from region tag.
-    if (localeTag.length() == 0) {
+    if (localeTag.empty()) {
         return CreateLocaleFromRegion(regionTag);
     }
     std::string extParam;

@@ -40,7 +40,6 @@ void SystemLocaleManagerAddon::Destructor(napi_env env, void *nativeObject, void
 
 napi_value SystemLocaleManagerAddon::InitSystemLocaleManager(napi_env env, napi_value exports)
 {
-    napi_status status = napi_ok;
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("getLanguageInfoArray", GetLanguageInfoArray),
         DECLARE_NAPI_FUNCTION("getRegionInfoArray", GetCountryInfoArray),
@@ -48,8 +47,9 @@ napi_value SystemLocaleManagerAddon::InitSystemLocaleManager(napi_env env, napi_
     };
 
     napi_value constructor = nullptr;
-    status = napi_define_class(env, "SystemLocaleManager", NAPI_AUTO_LENGTH, SystemLocaleManagerConstructor, nullptr,
-        sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
+    napi_status status = napi_define_class(env, "SystemLocaleManager", NAPI_AUTO_LENGTH,
+        SystemLocaleManagerConstructor, nullptr, sizeof(properties) / sizeof(napi_property_descriptor),
+        properties, &constructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Define class failed when InitSystemLocaleManager");
         return nullptr;
@@ -76,6 +76,9 @@ napi_value SystemLocaleManagerAddon::SystemLocaleManagerConstructor(napi_env env
         return nullptr;
     }
     std::unique_ptr<SystemLocaleManagerAddon> obj = std::make_unique<SystemLocaleManagerAddon>();
+    if (obj == nullptr) {
+        return nullptr;
+    }
     status = napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), SystemLocaleManagerAddon::Destructor,
         nullptr, nullptr);
     if (status != napi_ok) {

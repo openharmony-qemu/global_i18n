@@ -39,6 +39,10 @@ int64_t FfiOHOSEntityImplConstructor(char* locale, int32_t* errcode)
 CEntityInfoItemArr FfiOHOSEntityFindEntityInfo(int64_t id, char* text)
 {
     auto instance = FFIData::GetData<CEntity>(id);
+    if (!instance) {
+        HILOG_ERROR_I18N("The CEntity instance is nullptr");
+        return { 0, nullptr };
+    }
     return instance->FindEntityInfo(std::string(text));
 }
 }

@@ -40,14 +40,13 @@ void HolidayManagerAddon::Destructor(napi_env env, void *nativeObject, void *hin
 
 napi_value HolidayManagerAddon::InitHolidayManager(napi_env env, napi_value exports)
 {
-    napi_status status = napi_ok;
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("isHoliday", IsHoliday),
         DECLARE_NAPI_FUNCTION("getHolidayInfoItemArray", GetHolidayInfoItemArray)
     };
 
     napi_value constructor = nullptr;
-    status = napi_define_class(env, "HolidayManager", NAPI_AUTO_LENGTH, HolidayManagerConstructor, nullptr,
+    napi_status status = napi_define_class(env, "HolidayManager", NAPI_AUTO_LENGTH, HolidayManagerConstructor, nullptr,
         sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Define class failed when InitHolidayManager");
@@ -76,7 +75,10 @@ napi_value HolidayManagerAddon::HolidayManagerConstructor(napi_env env, napi_cal
         return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     if (valueType != napi_valuetype::napi_string) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "icsPath", "string", true);
         return nullptr;
@@ -142,6 +144,9 @@ napi_value HolidayManagerAddon::IsHoliday(napi_env env, napi_callback_info info)
         res = obj->holidayManager_->IsHoliday();
     }
     status = napi_get_boolean(env, res, &result);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     return result;
 }
 
@@ -166,10 +171,9 @@ napi_value HolidayManagerAddon::GetHolidayInfoItemArray(napi_env env, napi_callb
         int32_t year = ValidateParamNumber(env, argv[0]);
         std::vector<HolidayInfoItem> itemList = obj->holidayManager_->GetHolidayInfoItemArray(year);
         return GetHolidayInfoItemResult(env, itemList);
-    } else {
-        std::vector<HolidayInfoItem> itemList = obj->holidayManager_->GetHolidayInfoItemArray();
-        return GetHolidayInfoItemResult(env, itemList);
     }
+    std::vector<HolidayInfoItem> itemList = obj->holidayManager_->GetHolidayInfoItemArray();
+    return GetHolidayInfoItemResult(env, itemList);
 }
 
 napi_value HolidayManagerAddon::GetHolidayInfoItemResult(napi_env env, std::vector<HolidayInfoItem> itemList)
@@ -195,7 +199,10 @@ std::vector<int> HolidayManagerAddon::ValidateParamDate(napi_env &env, napi_valu
 {
     std::vector<int> list;
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv, &valueType);
+    napi_status status = napi_typeof(env, argv, &valueType);
+    if (status != napi_ok) {
+        return list;
+    }
     if (valueType != napi_valuetype::napi_object) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "date", "Date object", true);
         return list;
@@ -236,13 +243,16 @@ int HolidayManagerAddon::GetDateValue(napi_env env, napi_value value, const std:
 int32_t HolidayManagerAddon::ValidateParamNumber(napi_env &env, napi_value &argv)
 {
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv, &valueType);
+    napi_status status = napi_typeof(env, argv, &valueType);
+    if (status != napi_ok) {
+        return -1;
+    }
     if (valueType != napi_valuetype::napi_number) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "year", "number", true);
         return -1;
     }
     int32_t val = 0;
-    napi_status status = napi_get_value_int32(env, argv, &val);
+    status = napi_get_value_int32(env, argv, &val);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("ValidateParamNumber: Retrieve field failed");
         return -1;

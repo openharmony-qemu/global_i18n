@@ -79,11 +79,11 @@ extern "C"
         if (!LocaleConfig::IsValidRegion(countryStr) && localeInfo.GetRegion().empty()) {
             HILOG_ERROR_I18N("GetDisplayCountry: Failed to get display country, because param country is invalid!");
             *errcode = I18N_NOT_VALID;
-            return MallocCString("");
+            return nullptr;
         } else if (!LocaleConfig::IsValidTag(locale)) {
             HILOG_ERROR_I18N("GetDisplayCountry: Failed to get display country, because param locale is invalid!");
             *errcode = I18N_NOT_VALID;
-            return MallocCString("");
+            return nullptr;
         }
         std::string region = LocaleConfig::GetDisplayRegion(countryStr, localeStr, sentenceCase);
         return MallocCString(region);
@@ -144,7 +144,7 @@ extern "C"
         if (!LocaleConfig::IsValidTag(localeStr)) {
             HILOG_ERROR_I18N("GetDisplayLanguage: Failed to get display language, because param locale is invalid!");
             *errCode = I18N_NOT_VALID;
-            return MallocCString("");
+            return nullptr;
         }
         std::string value = LocaleConfig::GetDisplayLanguage(languageStr, localeStr, sentenceCase);
         if (value.length() == 0) {

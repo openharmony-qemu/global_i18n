@@ -45,6 +45,9 @@ std::string I18nNormalizer::Normalize(const char *text, int32_t length, I18nErro
         return result;
     }
     icu::UnicodeString input(text, length);
+    if (normalizer == nullptr) {
+        return "";
+    }
     icu::UnicodeString output = normalizer->normalize(input, status);
     if (U_FAILURE(status)) {
         errorCode = I18nErrorCode::FAILED;

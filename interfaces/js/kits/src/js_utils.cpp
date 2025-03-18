@@ -115,51 +115,6 @@ void JSUtils::GetBoolOptionValue(napi_env env, napi_value options, const std::st
     }
 }
 
-std::string JSUtils::GetLocaleTag(napi_env env, napi_value argv)
-{
-    if (argv == nullptr) {
-        return "";
-    }
-    napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv, &valueType);
-    if (valueType != napi_valuetype::napi_string) {
-        HILOG_ERROR_I18N("GetLocaleTag: Parameter type does not match");
-        return "";
-    }
-    size_t len = 0;
-    napi_status status = napi_get_value_string_utf8(env, argv, nullptr, 0, &len);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("GetLocaleTag -> string: Get locale tag length failed");
-        return "";
-    }
-    std::vector<char> buf;
-    buf.resize(len + 1);
-    status = napi_get_value_string_utf8(env, argv, buf.data(), len + 1, &len);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("GetLocaleTag: Get locale tag failed");
-        return "";
-    }
-    std::string result(buf.data());
-    return result;
-}
-
-void JSUtils::GetLocaleTags(napi_env env, napi_value rawLocaleTag, std::vector<std::string> &localeTags)
-{
-    size_t len = 0;
-    napi_status status = napi_get_value_string_utf8(env, rawLocaleTag, nullptr, 0, &len);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("GetLocaleTag -> void: Get locale tag length failed");
-        return;
-    }
-    std::vector<char> buf(len + 1);
-    status = napi_get_value_string_utf8(env, rawLocaleTag, buf.data(), len + 1, &len);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("GetLocaleTags: Get locale tag failed");
-        return;
-    }
-    localeTags.push_back(buf.data());
-}
-
 void JSUtils::GetNumberOptionValues(napi_env env, napi_value options, std::map<std::string, std::string> &map)
 {
     JSUtils::GetOptionValue(env, options, "currency", map);
@@ -220,12 +175,26 @@ void JSUtils::SetOptionProperties(napi_env env, napi_value &result, std::map<std
     if (options.count(option) > 0) {
         std::string optionValue = options[option];
         napi_value optionJsValue = nullptr;
-        napi_create_string_utf8(env, optionValue.c_str(), NAPI_AUTO_LENGTH, &optionJsValue);
-        napi_set_named_property(env, result, option.c_str(), optionJsValue);
+        napi_status status = napi_create_string_utf8(env, optionValue.c_str(), NAPI_AUTO_LENGTH, &optionJsValue);
+        if (status != napi_ok) {
+            return;
+        }
+        status = napi_set_named_property(env, result, option.c_str(), optionJsValue);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("JSUtils::SetOptionProperties: Set property failed.");
+            return;
+        }
     } else {
         napi_value undefined = nullptr;
-        napi_get_undefined(env, &undefined);
-        napi_set_named_property(env, result, option.c_str(), undefined);
+        napi_status status = napi_get_undefined(env, &undefined);
+        if (status != napi_ok) {
+            return;
+        }
+        status = napi_set_named_property(env, result, option.c_str(), undefined);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("JSUtils::SetOptionProperties: Set property failed.");
+            return;
+        }
     }
 }
 
@@ -236,32 +205,170 @@ void JSUtils::SetBooleanOptionProperties(napi_env env, napi_value &result, std::
         std::string optionValue = options[option];
         bool optionBoolValue = (optionValue == "true");
         napi_value optionJsValue = nullptr;
-        napi_get_boolean(env, optionBoolValue, &optionJsValue);
-        napi_set_named_property(env, result, option.c_str(), optionJsValue);
+        napi_status status = napi_get_boolean(env, optionBoolValue, &optionJsValue);
+        if (status != napi_ok) {
+            return;
+        }
+        status = napi_set_named_property(env, result, option.c_str(), optionJsValue);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("JSUtils::SetBooleanOptionProperties: Set property failed.");
+            return;
+        }
     } else {
         napi_value undefined = nullptr;
-        napi_get_undefined(env, &undefined);
-        napi_set_named_property(env, result, option.c_str(), undefined);
+        napi_status status = napi_get_undefined(env, &undefined);
+        if (status != napi_ok) {
+            return;
+        }
+        status = napi_set_named_property(env, result, option.c_str(), undefined);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("JSUtils::SetBooleanOptionProperties: Set property failed.");
+            return;
+        }
     }
 }
 
 void JSUtils::SetIntegerOptionProperties(napi_env env, napi_value &result, std::map<std::string, std::string> &options,
     const std::string &option)
 {
+    napi_status status;
     if (options.count(option) > 0) {
         std::string optionValue = options[option];
         napi_value optionJsValue = nullptr;
         int32_t status = 0;
         int64_t integerValue = ConvertString2Int(optionValue, status);
         if (status != -1) {
-            napi_create_int64(env, integerValue, &optionJsValue);
-            napi_set_named_property(env, result, option.c_str(), optionJsValue);
+            status = napi_create_int64(env, integerValue, &optionJsValue);
+            if (status != napi_ok) {
+                return;
+            }
+            status = napi_set_named_property(env, result, option.c_str(), optionJsValue);
+            if (status != napi_ok) {
+                HILOG_ERROR_I18N("JSUtils::SetIntegerOptionProperties: Set property failed.");
+                return;
+            }
             return;
         }
     }
     napi_value undefined = nullptr;
-    napi_get_undefined(env, &undefined);
-    napi_set_named_property(env, result, option.c_str(), undefined);
+    status = napi_get_undefined(env, &undefined);
+    if (status != napi_ok) {
+        return;
+    }
+    status = napi_set_named_property(env, result, option.c_str(), undefined);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("JSUtils::SetIntegerOptionProperties: Set property failed.");
+        return;
+    }
+}
+
+std::string JSUtils::GetString(napi_env env, napi_value value, int32_t& code)
+{
+    size_t len = 0;
+    napi_status status = napi_get_value_string_utf8(env, value, nullptr, 0, &len);
+    if (status != napi_ok) {
+        code = 1;
+        HILOG_ERROR_I18N("JSUtils::GetString: Get string len failed.");
+        return "";
+    }
+    std::vector<char> buffer(len + 1);
+    status = napi_get_value_string_utf8(env, value, buffer.data(), len + 1, &len);
+    if (status != napi_ok) {
+        code = 1;
+        HILOG_ERROR_I18N("JSUtils::GetString: Get string value failed.");
+        return "";
+    }
+    std::string result(buffer.data());
+    code = 0;
+    return result;
+}
+
+std::vector<std::string> JSUtils::GetStringArray(napi_env env, napi_value value, int32_t& code)
+{
+    std::vector<std::string> result;
+    uint32_t arrayLength = 0;
+    napi_status status = napi_get_array_length(env, value, &arrayLength);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("JSUtils::GetStringArray: Get array length failed.");
+        code = 1;
+        return result;
+    }
+    result.resize(arrayLength);
+    for (uint32_t i = 0; i < arrayLength; i++) {
+        napi_value element = nullptr;
+        status = napi_get_element(env, value, i, &element);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("JSUtils::GetStringArray: Get element %{public}d failed.", i);
+            code = 1;
+            return result;
+        }
+        std::string locale = JSUtils::GetString(env, element, code);
+        if (code != 0) {
+            HILOG_ERROR_I18N("JSUtils::GetStringArray: Get string failed.");
+            return result;
+        }
+        result[i] = locale;
+    }
+    code = 0;
+    return result;
+}
+
+std::vector<std::string> JSUtils::GetLocaleArray(napi_env env, napi_value value, int32_t& code)
+{
+    std::vector<std::string> result;
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    napi_status status = napi_typeof(env, value, &valueType);
+    if (status != napi_ok) {
+        code = 1;
+        HILOG_ERROR_I18N("JSUtils::GetLocaleVector: Get type of value failed.");
+        return result;
+    }
+    if (valueType == napi_valuetype::napi_string) {
+        std::string locale = JSUtils::GetString(env, value, code);
+        if (code != 0) {
+            HILOG_ERROR_I18N("JSUtils::GetLocaleVector: Get string failed.");
+            return result;
+        }
+        result.emplace_back(locale);
+        code = 0;
+        return result;
+    }
+    bool isArray = false;
+    status = napi_is_array(env, value, &isArray);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("JSUtils::GetLocaleVector: Check value is array failed.");
+        code = 1;
+        return result;
+    }
+    if (!isArray) {
+        HILOG_ERROR_I18N("JSUtils::GetLocaleVector: Type of value is invalid.");
+        code = 1;
+        return result;
+    }
+    return JSUtils::GetStringArray(env, value, code);
+}
+
+napi_value JSUtils::CreateObject(napi_env env, std::unordered_map<std::string, napi_value>& propertys, int32_t& code)
+{
+    napi_value object = nullptr;
+    napi_status status = napi_create_object(env, &object);
+    if (status != napi_ok) {
+        code = 1;
+        HILOG_ERROR_I18N("JSUtils::CreateObject: Create object failed.");
+        return nullptr;
+    }
+    for (const auto& property : propertys) {
+        std::string key = property.first;
+        napi_value value = property.second;
+        status = napi_set_named_property(env, object, key.c_str(), value);
+        if (status != napi_ok) {
+            code = 1;
+            HILOG_ERROR_I18N("JSUtils::CreateObject: Set property failed, key %{public}s.", key.c_str());
+            return nullptr;
+        }
+    }
+    code = 0;
+    return object;
 }
 } // namespace I18n
 } // namespace Global

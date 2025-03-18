@@ -40,7 +40,6 @@ void NumberFormatAddon::Destructor(napi_env env, void *nativeObject, void *hint)
 
 napi_value NumberFormatAddon::InitNumberFormat(napi_env env, napi_value exports)
 {
-    napi_status status = napi_ok;
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("format", FormatNumber),
         DECLARE_NAPI_FUNCTION("formatRange", FormatRangeNumber),
@@ -48,7 +47,7 @@ napi_value NumberFormatAddon::InitNumberFormat(napi_env env, napi_value exports)
     };
 
     napi_value constructor = nullptr;
-    status = napi_define_class(env, "NumberFormat", NAPI_AUTO_LENGTH, NumberFormatConstructor, nullptr,
+    napi_status status = napi_define_class(env, "NumberFormat", NAPI_AUTO_LENGTH, NumberFormatConstructor, nullptr,
         sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Define class failed when InitNumberFormat");
@@ -75,29 +74,21 @@ napi_value NumberFormatAddon::NumberFormatConstructor(napi_env env, napi_callbac
     }
     std::vector<std::string> localeTags;
     if (argc > 0) {
-        napi_valuetype valueType = napi_valuetype::napi_undefined;
-        napi_typeof(env, argv[0], &valueType);
-        bool isArray = false;
-        napi_is_array(env, argv[0], &isArray);
-
-        if (valueType == napi_valuetype::napi_string) {
-            JSUtils::GetLocaleTags(env, argv[0], localeTags);
-        } else if (isArray) {
-            uint32_t arrayLength = 0;
-            napi_get_array_length(env, argv[0], &arrayLength);
-            napi_value element = nullptr;
-            for (uint32_t i = 0; i < arrayLength; i++) {
-                napi_get_element(env, argv[0], i, &element);
-                JSUtils::GetLocaleTags(env, element, localeTags);
-            }
+        int32_t code = 0;
+        std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argv[0], code);
+        if (code != 0) {
+            return nullptr;
         }
+        localeTags.assign(localeArray.begin(), localeArray.end());
     }
     std::map<std::string, std::string> map = {};
     if (argc > 1) {
         JSUtils::GetNumberOptionValues(env, argv[1], map);
     }
-    std::unique_ptr<NumberFormatAddon> obj = nullptr;
-    obj = std::make_unique<NumberFormatAddon>();
+    std::unique_ptr<NumberFormatAddon> obj = std::make_unique<NumberFormatAddon>();
+    if (obj == nullptr) {
+        return nullptr;
+    }
     status =
         napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), NumberFormatAddon::Destructor, nullptr, nullptr);
     if (status != napi_ok) {
@@ -132,11 +123,17 @@ napi_value NumberFormatAddon::FormatNumber(napi_env env, napi_callback_info info
     napi_value argv[1] = { 0 };
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     double number = 0;
-    napi_get_value_double(env, argv[0], &number);
+    status = napi_get_value_double(env, argv[0], &number);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     NumberFormatAddon *obj = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->numberfmt_) {
         HILOG_ERROR_I18N("FormatNumber: Get NumberFormat object failed");
         return nullptr;
@@ -198,16 +195,21 @@ napi_value NumberFormatAddon::GetNumberResolvedOptions(napi_env env, napi_callba
 {
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
-
+    napi_status status = napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     NumberFormatAddon *obj = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->numberfmt_) {
         HILOG_ERROR_I18N("GetNumberResolvedOptions: Get NumberFormat object failed");
         return nullptr;
     }
     napi_value result = nullptr;
-    napi_create_object(env, &result);
+    status = napi_create_object(env, &result);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     std::map<std::string, std::string> options = {};
     obj->numberfmt_->GetResolvedOptions(options);
     JSUtils::SetOptionProperties(env, result, options, "locale");

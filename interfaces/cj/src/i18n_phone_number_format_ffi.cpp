@@ -56,17 +56,29 @@ extern "C"
     char* FfiI18nPhoneNumberFormatFormat(int64_t remoteDataID, char* number)
     {
         auto format = FFIData::GetData<FfiI18nPhoneNumberFormat>(remoteDataID);
+        if (!format) {
+            HILOG_ERROR_I18N("The FfiI18nPhoneNumberFormat instance is nullptr");
+            return nullptr;
+        }
         return format->format(std::string(number));
     }
     bool FfiI18nPhoneNumberFormatIsValidNumber(int64_t remoteDataID, char* number)
     {
         auto format = FFIData::GetData<FfiI18nPhoneNumberFormat>(remoteDataID);
+        if (!format) {
+            HILOG_ERROR_I18N("The FfiI18nPhoneNumberFormat instance is nullptr");
+            return false;
+        }
         return format->isValidNumber(std::string(number));
     }
     char* FfiI18nPhoneNumberFormatGetLocationName(int64_t remoteDataID, char* number, char* locale)
     {
         auto format = FFIData::GetData<FfiI18nPhoneNumberFormat>(remoteDataID);
-        return format->getLocationNmae(std::string(number), std::string(locale));
+        if (!format) {
+            HILOG_ERROR_I18N("The FfiI18nPhoneNumberFormat instance is nullptr");
+            return nullptr;
+        }
+        return format->getLocationName(std::string(number), std::string(locale));
     }
 }
 }  // namespace I18n

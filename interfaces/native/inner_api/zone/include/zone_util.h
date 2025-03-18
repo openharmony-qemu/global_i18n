@@ -67,7 +67,7 @@ public:
      * @return Returns the default timezone if the country code is valid, otherwise
      * returns an empty string.
      */
-    std::string GetDefaultZone(const std::string &country);
+    std::string GetDefaultZone(const std::string& country);
 
     /**
      * @brief Get the default timezone for the given region code
@@ -77,7 +77,7 @@ public:
      * @return Returns the default timezone name if the region code is valid, otherwise
      * returns an empty string.
      */
-    std::string GetDefaultZone(const int32_t number);
+    std::string GetDefaultZone(int32_t number);
 
     /**
      * @brief Get the default timezone name for the given country code
@@ -87,7 +87,7 @@ public:
      * @return Returns the default timezone name if the country code is valid, otherwise
      * returns an empty string.
      */
-    std::string GetDefaultZone(const std::string country, const int32_t offset);
+    std::string GetDefaultZone(const std::string& country, int32_t offset);
 
     /**
      * @brief Get the default timezone name for the given region code
@@ -98,7 +98,7 @@ public:
      * @return Returns the default timezone name if the country code is valid, otherwise
      * returns an empty string.
      */
-    std::string GetDefaultZone(const int32_t number, const int32_t offset);
+    std::string GetDefaultZone(int32_t number, int32_t offset);
 
     /**
      * @brief Get the timezone list for the given country code
@@ -106,7 +106,7 @@ public:
      * @param country Indicating the country code
      * @param retVec used to store the returned timezones
      */
-    void GetZoneList(const std::string country, std::vector<std::string> &retVec);
+    void GetZoneList(const std::string& country, std::vector<std::string>& retVec);
 
     /**
      * @brief Get the timezone list for the given country code
@@ -115,7 +115,7 @@ public:
      * @param offset Indicating the offset from GMT(in milliseconds)
      * @param retVec used to store the returned timezones
      */
-    void GetZoneList(const std::string country, const int32_t offset, std::vector<std::string> &retVec);
+    void GetZoneList(const std::string& country, int32_t offset, std::vector<std::string> &retVec);
 
     /**
      * @brief Get recommended timezone by country and nitz information.

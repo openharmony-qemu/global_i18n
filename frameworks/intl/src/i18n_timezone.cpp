@@ -640,6 +640,9 @@ icu::TimeZone* I18nTimeZone::GetTimeZone()
 std::unique_ptr<I18nTimeZone> I18nTimeZone::CreateInstance(std::string &id, bool isZoneID)
 {
     std::unique_ptr<I18nTimeZone> i18nTimeZone = std::make_unique<I18nTimeZone>(id, isZoneID);
+    if (i18nTimeZone == nullptr) {
+        return nullptr;
+    }
     if (i18nTimeZone->GetTimeZone() == nullptr) {
         return nullptr;
     }
@@ -648,13 +651,13 @@ std::unique_ptr<I18nTimeZone> I18nTimeZone::CreateInstance(std::string &id, bool
 
 int32_t I18nTimeZone::GetOffset(double date)
 {
+    if (timezone == nullptr) {
+        return 0;
+    }
     int32_t rawOffset = 0;
     int32_t dstOffset = 0;
     bool local = false;
     UErrorCode status = U_ZERO_ERROR;
-    if (timezone == nullptr) {
-        return 0;
-    }
     timezone->getOffset(date, (UBool)local, rawOffset, dstOffset, status);
     if (U_FAILURE(status)) {
         return 0;
@@ -707,17 +710,22 @@ std::string I18nTimeZone::GetDisplayName(
 {
     icu::TimeZone::EDisplayType style = icu::TimeZone::EDisplayType::LONG_GENERIC;
     UErrorCode status = U_ZERO_ERROR;
-    std::string systemLocale = LocaleConfig::GetSystemLocale();
-    icu::Locale locale = icu::Locale::forLanguageTag(systemLocale, status);
+    icu::Locale locale;
     std::string result;
     if (LocaleConfig::IsValidTag(localeStr)) {
         locale = icu::Locale::forLanguageTag(localeStr, status);
+    } else {
+        std::string systemLocale = LocaleConfig::GetSystemLocale();
+        locale = icu::Locale::forLanguageTag(systemLocale, status);
     }
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("create icu Locale for %{public}s failed.", localeStr.c_str());
         return PseudoLocalizationProcessor(result);
     }
     icu::UnicodeString name;
+    if (timezone == nullptr) {
+        return PseudoLocalizationProcessor(result);
+    }
     timezone->getDisplayName((UBool)isDST, style, locale, name);
     name.toUTF8String(result);
     return PseudoLocalizationProcessor(GetDisplayNameByTaboo(localeStr, result));
@@ -1063,9 +1071,8 @@ std::string I18nTimeZone::GetTimezoneIdByCityId(const std::string &cityId)
     GetAvailableZoneCityIDs();
     if (city2TimeZoneID.find(cityId) == city2TimeZoneID.end()) {
         return "";
-    } else {
-        return city2TimeZoneID.at(cityId);
     }
+    return city2TimeZoneID.at(cityId);
 }
 
 std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, const double y)
@@ -1249,18 +1256,17 @@ std::string I18nTimeZone::GetPreferredPath(const double x,
 {
     if (filePaths.size() == 1) {
         return filePaths.at(0);
-    } else {
-        int fixedX = static_cast<int>(x + TZ_X_PLUS);
-        for (unsigned int i = 0; i < filePaths.size(); i++) {
-            std::string path = filePaths.at(i);
-            std::string left = path.substr(path.find("-") + 1, 3);
-            std::string right = path.substr(path.find("-") + 4, 3);
-            if (fixedX >= atoi(left.c_str()) && fixedX < atoi(right.c_str())) {
-                return path;
-            }
-        }
-        return "";
     }
+    int fixedX = static_cast<int>(x + TZ_X_PLUS);
+    for (unsigned int i = 0; i < filePaths.size(); i++) {
+        std::string path = filePaths.at(i);
+        std::string left = path.substr(path.find("-") + 1, 3);
+        std::string right = path.substr(path.find("-") + 4, 3);
+        if (fixedX >= atoi(left.c_str()) && fixedX < atoi(right.c_str())) {
+            return path;
+        }
+    }
+    return "";
 }
 
 std::vector<std::string> I18nTimeZone::FindTzData()

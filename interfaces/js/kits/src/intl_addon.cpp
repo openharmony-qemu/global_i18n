@@ -46,7 +46,6 @@ void IntlAddon::Destructor(napi_env env, void *nativeObject, void *hint)
 
 napi_value IntlAddon::InitDateTimeFormat(napi_env env, napi_value exports)
 {
-    napi_status status = napi_ok;
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("format", FormatDateTime),
         DECLARE_NAPI_FUNCTION("formatRange", FormatDateTimeRange),
@@ -54,8 +53,8 @@ napi_value IntlAddon::InitDateTimeFormat(napi_env env, napi_value exports)
     };
 
     napi_value constructor = nullptr;
-    status = napi_define_class(env, "DateTimeFormat", NAPI_AUTO_LENGTH, DateTimeFormatConstructor, nullptr,
-        sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
+    napi_status status = status = napi_define_class(env, "DateTimeFormat", NAPI_AUTO_LENGTH, DateTimeFormatConstructor,
+        nullptr, sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Define class failed when InitDateTimeFormat");
         return nullptr;
@@ -71,7 +70,6 @@ napi_value IntlAddon::InitDateTimeFormat(napi_env env, napi_value exports)
 
 napi_value IntlAddon::InitRelativeTimeFormat(napi_env env, napi_value exports)
 {
-    napi_status status = napi_ok;
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("format", FormatRelativeTime),
         DECLARE_NAPI_FUNCTION("formatToParts", FormatToParts),
@@ -79,8 +77,9 @@ napi_value IntlAddon::InitRelativeTimeFormat(napi_env env, napi_value exports)
     };
 
     napi_value constructor = nullptr;
-    status = napi_define_class(env, "RelativeTimeFormat", NAPI_AUTO_LENGTH, RelativeTimeFormatConstructor, nullptr,
-        sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
+    napi_status status = status = napi_define_class(env, "RelativeTimeFormat", NAPI_AUTO_LENGTH,
+        RelativeTimeFormatConstructor, nullptr, sizeof(properties) / sizeof(napi_property_descriptor),
+        properties, &constructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Define class failed when InitRelativeTimeFormat");
         return nullptr;
@@ -130,13 +129,16 @@ std::string GetLocaleTag(napi_env env, napi_value argv)
     std::vector<char> buf;
     if (argv != nullptr) {
         napi_valuetype valueType = napi_valuetype::napi_undefined;
-        napi_typeof(env, argv, &valueType);
+        napi_status status = napi_typeof(env, argv, &valueType);
+        if (status != napi_ok) {
+            return "";
+        }
         if (valueType != napi_valuetype::napi_string) {
             HILOG_ERROR_I18N("GetLocaleTag: Parameter type does not match");
             return "";
         }
         size_t len = 0;
-        napi_status status = napi_get_value_string_utf8(env, argv, nullptr, 0, &len);
+        status = napi_get_value_string_utf8(env, argv, nullptr, 0, &len);
         if (status != napi_ok) {
             HILOG_ERROR_I18N("GetLocaleTag -> string: Get locale tag length failed");
             return "";
@@ -166,28 +168,21 @@ napi_value IntlAddon::DateTimeFormatConstructor(napi_env env, napi_callback_info
     }
     std::vector<std::string> localeTags;
     if (argc > 0) {
-        napi_valuetype valueType = napi_valuetype::napi_undefined;
-        napi_typeof(env, argv[0], &valueType);
-        bool isArray = false;
-        napi_is_array(env, argv[0], &isArray);
-        if (valueType == napi_valuetype::napi_string) {
-            JSUtils::GetLocaleTags(env, argv[0], localeTags);
-        } else if (isArray) {
-            uint32_t arrayLength = 0;
-            napi_get_array_length(env, argv[0], &arrayLength);
-            napi_value element = nullptr;
-            for (uint32_t i = 0; i < arrayLength; i++) {
-                napi_get_element(env, argv[0], i, &element);
-                JSUtils::GetLocaleTags(env, element, localeTags);
-            }
+        int32_t code = 0;
+        std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argv[0], code);
+        if (code != 0) {
+            return nullptr;
         }
+        localeTags.assign(localeArray.begin(), localeArray.end());
     }
     std::map<std::string, std::string> map = {};
     if (argc > 1) {
         GetDateOptionValues(env, argv[1], map);
     }
-    std::unique_ptr<IntlAddon> obj = nullptr;
-    obj = std::make_unique<IntlAddon>();
+    std::unique_ptr<IntlAddon> obj = std::make_unique<IntlAddon>();
+    if (obj == nullptr) {
+        return nullptr;
+    }
     status =
         napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), IntlAddon::Destructor, nullptr, nullptr);
     if (status != napi_ok) {
@@ -229,28 +224,21 @@ napi_value IntlAddon::RelativeTimeFormatConstructor(napi_env env, napi_callback_
     }
     std::vector<std::string> localeTags;
     if (argc > 0) {
-        napi_valuetype valueType = napi_valuetype::napi_undefined;
-        napi_typeof(env, argv[0], &valueType);
-        bool isArray = false;
-        napi_is_array(env, argv[0], &isArray);
-        if (valueType == napi_valuetype::napi_string) {
-            JSUtils::GetLocaleTags(env, argv[0], localeTags);
-        } else if (isArray) {
-            uint32_t arrayLength = 0;
-            napi_get_array_length(env, argv[0], &arrayLength);
-            napi_value element = nullptr;
-            for (uint32_t i = 0; i < arrayLength; i++) {
-                napi_get_element(env, argv[0], i, &element);
-                JSUtils::GetLocaleTags(env, element, localeTags);
-            }
+        int32_t code = 0;
+        std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argv[0], code);
+        if (code != 0) {
+            return nullptr;
         }
+        localeTags.assign(localeArray.begin(), localeArray.end());
     }
     std::map<std::string, std::string> map = {};
     if (argc > 1) {
         GetRelativeTimeOptionValues(env, argv[1], map);
     }
-    std::unique_ptr<IntlAddon> obj = nullptr;
-    obj = std::make_unique<IntlAddon>();
+    std::unique_ptr<IntlAddon> obj = std::make_unique<IntlAddon>();
+    if (obj == nullptr) {
+        return nullptr;
+    }
     status =
         napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), IntlAddon::Destructor, nullptr, nullptr);
     if (status != napi_ok) {
@@ -280,14 +268,16 @@ napi_value IntlAddon::FormatDateTime(napi_env env, napi_callback_info info)
     napi_value argv[1] = { 0 };
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
-    
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     int64_t milliseconds = GetMilliseconds(env, argv, 0);
     if (milliseconds == -1) {
         return nullptr;
     }
     IntlAddon *obj = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->datefmt_) {
         HILOG_ERROR_I18N("FormatDateTime: Get DateTimeFormat object failed");
         return nullptr;
@@ -308,7 +298,10 @@ napi_value IntlAddon::FormatDateTimeRange(napi_env env, napi_callback_info info)
     napi_value argv[2] = { nullptr };
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     if (argc < FUNC_ARGS_COUNT) {
         HILOG_ERROR_I18N("Parameter wrong");
         return nullptr;
@@ -319,7 +312,7 @@ napi_value IntlAddon::FormatDateTimeRange(napi_env env, napi_callback_info info)
         return nullptr;
     }
     IntlAddon *obj = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->datefmt_) {
         HILOG_ERROR_I18N("FormatDateTimeRange: Get DateTimeFormat object failed");
         return nullptr;
@@ -361,16 +354,21 @@ napi_value IntlAddon::GetRelativeTimeResolvedOptions(napi_env env, napi_callback
 {
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
-
+    napi_status status = napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     IntlAddon *obj = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->relativetimefmt_) {
         HILOG_ERROR_I18N("GetRelativeTimeResolvedOptions: Get RelativeTimeFormat object failed");
         return nullptr;
     }
     napi_value result = nullptr;
-    napi_create_object(env, &result);
+    status = napi_create_object(env, &result);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     std::map<std::string, std::string> options = {};
     obj->relativetimefmt_->GetResolvedOptions(options);
     JSUtils::SetOptionProperties(env, result, options, "locale");
@@ -384,16 +382,21 @@ napi_value IntlAddon::GetDateTimeResolvedOptions(napi_env env, napi_callback_inf
 {
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
-
+    napi_status status = napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     IntlAddon *obj = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->datefmt_) {
         HILOG_ERROR_I18N("GetDateTimeResolvedOptions: Get DateTimeFormat object failed");
         return nullptr;
     }
     napi_value result = nullptr;
-    napi_create_object(env, &result);
+    status = napi_create_object(env, &result);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     std::map<std::string, std::string> options = {};
     obj->datefmt_->GetResolvedOptions(options);
     JSUtils::SetOptionProperties(env, result, options, "locale");
@@ -547,14 +550,13 @@ void GetCollatorOptionValue(napi_env env, napi_value options, std::map<std::stri
 
 napi_value IntlAddon::InitCollator(napi_env env, napi_value exports)
 {
-    napi_status status = napi_ok;
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("compare", CompareString),
         DECLARE_NAPI_FUNCTION("resolvedOptions", GetCollatorResolvedOptions)
     };
 
     napi_value constructor;
-    status = napi_define_class(env, "Collator", NAPI_AUTO_LENGTH, CollatorConstructor, nullptr,
+    napi_status status = napi_define_class(env, "Collator", NAPI_AUTO_LENGTH, CollatorConstructor, nullptr,
         sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Define class failed when InitCollator");
@@ -581,28 +583,21 @@ napi_value IntlAddon::CollatorConstructor(napi_env env, napi_callback_info info)
     }
     std::vector<std::string> localeTags;
     if (argc > 0) {
-        napi_valuetype valueType = napi_valuetype::napi_undefined;
-        napi_typeof(env, argv[0], &valueType);
-        bool isArray = false;
-        napi_is_array(env, argv[0], &isArray);
-        if (valueType == napi_valuetype::napi_string) {
-            JSUtils::GetLocaleTags(env, argv[0], localeTags);
-        } else if (isArray) {
-            uint32_t arrayLength = 0;
-            napi_get_array_length(env, argv[0], &arrayLength);
-            napi_value element = nullptr;
-            for (uint32_t i = 0; i < arrayLength; i++) {
-                napi_get_element(env, argv[0], i, &element);
-                JSUtils::GetLocaleTags(env, element, localeTags);
-            }
+        int32_t code = 0;
+        std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argv[0], code);
+        if (code != 0) {
+            return nullptr;
         }
+        localeTags.assign(localeArray.begin(), localeArray.end());
     }
     std::map<std::string, std::string> map = {};
     if (argc > 1) {
         GetCollatorOptionValue(env, argv[1], map);
     }
-    std::unique_ptr<IntlAddon> obj = nullptr;
-    obj = std::make_unique<IntlAddon>();
+    std::unique_ptr<IntlAddon> obj = std::make_unique<IntlAddon>();
+    if (obj == nullptr) {
+        return nullptr;
+    }
     status =
         napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), IntlAddon::Destructor, nullptr, nullptr);
     if (status != napi_ok) {
@@ -635,13 +630,16 @@ bool IntlAddon::InitCollatorContext(napi_env env, napi_callback_info info, std::
 bool GetStringParameter(napi_env env, napi_value value, std::vector<char> &buf)
 {
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, value, &valueType);
+    napi_status status = napi_typeof(env, value, &valueType);
+    if (status != napi_ok) {
+        return false;
+    }
     if (valueType != napi_valuetype::napi_string) {
         HILOG_ERROR_I18N("Parameter type does not match");
         return false;
     }
     size_t len = 0;
-    napi_status status = napi_get_value_string_utf8(env, value, nullptr, 0, &len);
+    status = napi_get_value_string_utf8(env, value, nullptr, 0, &len);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Get first length failed");
         return false;
@@ -662,8 +660,10 @@ napi_value IntlAddon::FormatRelativeTime(napi_env env, napi_callback_info info)
     napi_value argv[2] = { 0 };
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
-    napi_status status;
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     double number;
     status = napi_get_value_double(env, argv[0], &number);
     if (status != napi_ok) {
@@ -715,17 +715,21 @@ void IntlAddon::FillInArrayElement(napi_env env, napi_value &result, napi_status
                 return;
             }
         } else {
-            napi_get_undefined(env, &unit);
+            status = napi_get_undefined(env, &unit);
+            if (status != napi_ok) {
+                return;
+            }
         }
-        napi_value formatInfo;
-        status = napi_create_object(env, &formatInfo);
-        if (status != napi_ok) {
-            HILOG_ERROR_I18N("Failed to create format info object.");
+        std::unordered_map<std::string, napi_value> propertys {
+            { "type", type },
+            { "value", value },
+            { "unit", unit }
+        };
+        int32_t code = 0;
+        napi_value formatInfo = JSUtils::CreateObject(env, propertys, code);
+        if (code != 0) {
             return;
         }
-        napi_set_named_property(env, formatInfo, "type", type);
-        napi_set_named_property(env, formatInfo, "value", value);
-        napi_set_named_property(env, formatInfo, "unit", unit);
         status = napi_set_element(env, result, i, formatInfo);
         if (status != napi_ok) {
             HILOG_ERROR_I18N("Failed to set array item");
@@ -740,15 +744,21 @@ napi_value IntlAddon::FormatToParts(napi_env env, napi_callback_info info)
     napi_value argv[2] = { 0 };
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     double number = 0;
-    napi_get_value_double(env, argv[0], &number);
+    status = napi_get_value_double(env, argv[0], &number);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     std::vector<char> unit;
     if (!GetStringParameter(env, argv[1], unit)) {
         return nullptr;
     }
     IntlAddon *obj = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->relativetimefmt_) {
         HILOG_ERROR_I18N("FormatToParts: Get RelativeTimeFormat object failed");
         return nullptr;
@@ -771,8 +781,10 @@ napi_value IntlAddon::CompareString(napi_env env, napi_callback_info info)
     napi_value argv[2] = { 0 };
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
-
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     std::vector<char> first;
     if (!GetStringParameter(env, argv[0], first)) {
         return nullptr;
@@ -784,7 +796,7 @@ napi_value IntlAddon::CompareString(napi_env env, napi_callback_info info)
     }
 
     IntlAddon *obj = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->collator_) {
         HILOG_ERROR_I18N("CompareString: Get Collator object failed");
         return nullptr;
@@ -805,16 +817,21 @@ napi_value IntlAddon::GetCollatorResolvedOptions(napi_env env, napi_callback_inf
 {
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
-
+    napi_status status = napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     IntlAddon *obj = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->collator_) {
         HILOG_ERROR_I18N("GetCollatorResolvedOptions: Get Collator object failed");
         return nullptr;
     }
     napi_value result = nullptr;
-    napi_create_object(env, &result);
+    status = napi_create_object(env, &result);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     std::map<std::string, std::string> options = {};
     obj->collator_->ResolvedOptions(options);
     JSUtils::SetOptionProperties(env, result, options, "localeMatcher");
@@ -931,13 +948,12 @@ void GetPluralRulesOptionValues(napi_env env, napi_value options, std::map<std::
 
 napi_value IntlAddon::InitPluralRules(napi_env env, napi_value exports)
 {
-    napi_status status = napi_ok;
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("select", Select)
     };
 
     napi_value constructor = nullptr;
-    status = napi_define_class(env, "PluralRules", NAPI_AUTO_LENGTH, PluralRulesConstructor, nullptr,
+    napi_status status = napi_define_class(env, "PluralRules", NAPI_AUTO_LENGTH, PluralRulesConstructor, nullptr,
         sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Define class failed when InitPluralRules");
@@ -962,30 +978,23 @@ napi_value IntlAddon::PluralRulesConstructor(napi_env env, napi_callback_info in
     if (status != napi_ok) {
         return nullptr;
     }
-    napi_valuetype valueType = napi_valuetype::napi_undefined;
     std::vector<std::string> localeTags;
     if (argc > 0) {
-        napi_typeof(env, argv[0], &valueType);
-        bool isArray = false;
-        napi_is_array(env, argv[0], &isArray);
-        if (valueType == napi_valuetype::napi_string) {
-            JSUtils::GetLocaleTags(env, argv[0], localeTags);
-        } else if (isArray) {
-            uint32_t arrayLength = 0;
-            napi_get_array_length(env, argv[0], &arrayLength);
-            napi_value element = nullptr;
-            for (uint32_t i = 0; i < arrayLength; i++) {
-                napi_get_element(env, argv[0], i, &element);
-                JSUtils::GetLocaleTags(env, element, localeTags);
-            }
+        int32_t code = 0;
+        std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argv[0], code);
+        if (code != 0) {
+            return nullptr;
         }
+        localeTags.assign(localeArray.begin(), localeArray.end());
     }
     std::map<std::string, std::string> map = {};
     if (argc > 1) {
         GetPluralRulesOptionValues(env, argv[1], map);
     }
-    std::unique_ptr<IntlAddon> obj = nullptr;
-    obj = std::make_unique<IntlAddon>();
+    std::unique_ptr<IntlAddon> obj = std::make_unique<IntlAddon>();
+    if (obj == nullptr) {
+        return nullptr;
+    }
     status =
         napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), IntlAddon::Destructor, nullptr, nullptr);
     if (status != napi_ok) {
@@ -1021,16 +1030,22 @@ napi_value IntlAddon::Select(napi_env env, napi_callback_info info)
     napi_value argv[1] = { 0 };
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     if (valueType != napi_valuetype::napi_number) {
         HILOG_ERROR_I18N("Select: Parameter type does not match");
         return nullptr;
     }
 
     double number = 0;
-    napi_status status = napi_get_value_double(env, argv[0], &number);
+    status = napi_get_value_double(env, argv[0], &number);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Select: Get number failed");
         return nullptr;

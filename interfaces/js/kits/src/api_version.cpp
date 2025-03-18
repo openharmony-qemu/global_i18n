@@ -37,12 +37,12 @@ ApiCompareResult ApiVersion::CheckApiTargetVersion(const std::string &apiName)
         HILOG_ERROR_I18N("CheckApiTargetVersion: invalid api name: %{public}s", apiName.c_str());
         return ApiCompareResult::INVALID_PARAM;
     }
-    int32_t version = iter->second;
     int32_t currentVersion = InitSystemApiVersion();
     if (currentVersion == 0) {
         HILOG_ERROR_I18N("CheckApiTargetVersion: get api target version is 0.");
         return ApiCompareResult::SYS_ERROR;
     }
+    int32_t version = iter->second;
     return currentVersion >= version ? ApiCompareResult::GREATER_THAN : ApiCompareResult::LESS_THAN;
 }
 

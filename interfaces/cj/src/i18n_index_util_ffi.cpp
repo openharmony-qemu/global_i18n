@@ -49,18 +49,30 @@ extern "C"
     void FfiI18nIndexUtilAddLocale(int64_t remoteDataID, char* locale)
     {
         auto ffiIndexUtilInstance = FFIData::GetData<FfiI18nIndexUtil>(remoteDataID);
+        if (!ffiIndexUtilInstance) {
+            HILOG_ERROR_I18N("The FfiI18nIndexUtil instance is nullptr");
+            return;
+        }
         ffiIndexUtilInstance->addLocale(std::string(locale));
     }
 
     char* FfiI18nIndexUtilGetIndex(int64_t remoteDataID, char* text)
     {
         auto ffiIndexUtilInstance = FFIData::GetData<FfiI18nIndexUtil>(remoteDataID);
+        if (!ffiIndexUtilInstance) {
+            HILOG_ERROR_I18N("The FfiI18nIndexUtil instance is nullptr");
+            return nullptr;
+        }
         return ffiIndexUtilInstance->getIndex(std::string(text));
     }
 
     CArrStr FfiI18nIndexUtilGetIndexList(int64_t remoteDataID)
     {
         auto ffiIndexUtilInstance = FFIData::GetData<FfiI18nIndexUtil>(remoteDataID);
+        if (!ffiIndexUtilInstance) {
+            HILOG_ERROR_I18N("The FfiI18nIndexUtil instance is nullptr");
+            return { nullptr, 0 };
+        }
         return ffiIndexUtilInstance->getIndexList();
     }
 }

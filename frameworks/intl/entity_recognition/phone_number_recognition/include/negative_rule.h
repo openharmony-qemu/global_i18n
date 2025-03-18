@@ -28,7 +28,6 @@ public:
 
 private:
     void ReplaceSpecifiedPos(icu::UnicodeString& chs, int start, int end);
-    UErrorCode status;
     icu::UnicodeString regex;
     std::string insensitive;
 };

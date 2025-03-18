@@ -52,14 +52,13 @@ std::unordered_map<DateTimeFormat::DefaultStyle, DateFormat::EStyle> DateTimeFor
 DateTimeFormat::DateTimeFormat(const std::vector<std::string> &localeTags, std::map<std::string, std::string> &configs)
 {
     defaultStyle = GetDefaultStyle();
-    UErrorCode status = U_ZERO_ERROR;
     ParseConfigsPartOne(configs);
     ParseConfigsPartTwo(configs);
     for (size_t i = 0; i < localeTags.size(); i++) {
         std::string curLocale = localeTags[i];
+        UErrorCode status = U_ZERO_ERROR;
         locale = Locale::forLanguageTag(StringPiece(curLocale), status);
         if (U_FAILURE(status)) {
-            status = U_ZERO_ERROR;
             continue;
         }
         if (LocaleInfo::allValidLocales.count(locale.getLanguage()) > 0) {
@@ -107,7 +106,7 @@ std::unique_ptr<DateTimeFormat> DateTimeFormat::CreateInstance(const std::vector
                                                                std::map<std::string, std::string> &configs)
 {
     std::unique_ptr<DateTimeFormat> dateTimeFormat = std::make_unique<DateTimeFormat>(localeTags, configs);
-    if (!dateTimeFormat->CheckInitSuccess()) {
+    if (dateTimeFormat == nullptr || !dateTimeFormat->CheckInitSuccess()) {
         return nullptr;
     }
     return dateTimeFormat;
@@ -302,7 +301,7 @@ void DateTimeFormat::InitDateFormat(UErrorCode &status)
     } else {
         auto patternGenerator =
             std::unique_ptr<DateTimePatternGenerator>(DateTimePatternGenerator::createInstance(locale, status));
-        if (!U_SUCCESS(status)) {
+        if (!U_SUCCESS(status) || patternGenerator == nullptr) {
             return;
         }
         ComputePattern();
@@ -547,7 +546,7 @@ void DateTimeFormat::ComputeEraOfPattern(std::string option, char16_t character,
 
 std::string DateTimeFormat::Format(int64_t milliseconds)
 {
-    if (!createSuccess) {
+    if (!createSuccess || calendar == nullptr || dateFormat == nullptr) {
         return PseudoLocalizationProcessor("");
     }
     UErrorCode status = U_ZERO_ERROR;
@@ -568,7 +567,7 @@ std::string DateTimeFormat::Format(int64_t milliseconds)
 
 std::string DateTimeFormat::FormatRange(int64_t fromMilliseconds, int64_t toMilliseconds)
 {
-    if (!createSuccess || calendar == nullptr) {
+    if (!createSuccess || calendar == nullptr || dateIntvFormat == nullptr) {
         return PseudoLocalizationProcessor("");
     }
     UErrorCode status = U_ZERO_ERROR;
@@ -582,7 +581,9 @@ std::string DateTimeFormat::FormatRange(int64_t fromMilliseconds, int64_t toMill
         dateIntvFormat->setTimeZone(*zone);
     }
     calendar->setTime((UDate)fromMilliseconds, status);
-
+    if (U_FAILURE(status)) {
+        return PseudoLocalizationProcessor("");
+    }
     auto toCalendar = std::unique_ptr<Calendar>(Calendar::createInstance(locale, status));
     if (U_FAILURE(status) || toCalendar == nullptr) {
         return PseudoLocalizationProcessor("");
@@ -592,8 +593,14 @@ std::string DateTimeFormat::FormatRange(int64_t fromMilliseconds, int64_t toMill
         toCalendar->setTimeZone(*zone);
     }
     toCalendar->setTime((UDate)toMilliseconds, status);
+    if (U_FAILURE(status)) {
+        return PseudoLocalizationProcessor("");
+    }
     FieldPosition pos = 0;
     dateIntvFormat->format(*calendar, *toCalendar, dateString, pos, status);
+    if (U_FAILURE(status)) {
+        return PseudoLocalizationProcessor("");
+    }
     dateString.toUTF8String(result);
     return PseudoLocalizationProcessor(result);
 }

@@ -250,6 +250,16 @@ char *RelativeTimeFormatImpl::Format(double number, char *unit)
     return res;
 }
 
+void FreeCArrArrString(CArrString *arr, size_t index)
+{
+    for (size_t i = 0; i < index; i++) {
+        for (int64_t j = 0; j < arr[i].size; j++) {
+            free(arr[i].head[j]);
+        }
+        free(arr[i].head);
+    }
+}
+
 CArrArrString RelativeTimeFormatImpl::FormatToParts(double number, char *unit)
 {
     std::string unitStr = unit;
@@ -269,9 +279,7 @@ CArrArrString RelativeTimeFormatImpl::FormatToParts(double number, char *unit)
         char **time = static_cast<char **>(malloc(sizeof(char *) * timeVector.size()));
         if (time == nullptr) {
             HILOG_ERROR_I18N("The char** is nullptr");
-            for (size_t k = 0; k < i; k++) {
-                free(res[k].head);
-            }
+            FreeCArrArrString(res, i);
             free(res);
             return ret;
         }

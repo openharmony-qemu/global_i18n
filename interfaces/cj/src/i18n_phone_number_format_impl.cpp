@@ -36,7 +36,7 @@ extern "C"
         return phoneNumberFormat_->isValidPhoneNumber(number);
     }
 
-    char* FfiI18nPhoneNumberFormat::getLocationNmae(std::string number, std::string locale)
+    char* FfiI18nPhoneNumberFormat::getLocationName(std::string number, std::string locale)
     {
         return MallocCString(phoneNumberFormat_->getLocationName(number, locale));
     }

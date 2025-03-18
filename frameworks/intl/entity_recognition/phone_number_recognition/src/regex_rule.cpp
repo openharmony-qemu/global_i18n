@@ -39,13 +39,9 @@ RegexRule::RegexRule(icu::UnicodeString& regex, std::string& isValidType, std::s
     } else {
         this->type = 0;
     }
-    this->status = U_ZERO_ERROR;
     this->isValidType = isValidType;
     this->handleType = handleType;
     this->insensitive = insensitive;
-    if (regex.length() == 0) {
-        return;
-    }
 }
 
 RegexRule::~RegexRule()
@@ -71,12 +67,19 @@ int RegexRule::GetType()
 
 icu::RegexPattern* RegexRule::GetPattern()
 {
+    UErrorCode status = U_ZERO_ERROR;
+    icu::RegexPattern* pattern;
     // Sets whether regular expression matching is case sensitive
     if (insensitive == "True") {
-        return icu::RegexPattern::compile(this->regex, URegexpFlag::UREGEX_CASE_INSENSITIVE, this->status);
+        pattern = icu::RegexPattern::compile(this->regex, URegexpFlag::UREGEX_CASE_INSENSITIVE, status);
     } else {
-        return icu::RegexPattern::compile(this->regex, 0, this->status);
+        pattern = icu::RegexPattern::compile(this->regex, 0, status);
     }
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("RegexRule::GetPattern: Compile regex pattern failed.");
+        return nullptr;
+    }
+    return pattern;
 }
 
 PhoneNumberMatch* RegexRule::IsValid(PhoneNumberMatch* possibleNumber, icu::UnicodeString& message)
@@ -108,6 +111,9 @@ PhoneNumberMatch* RegexRule::IsValidPreSuf(PhoneNumberMatch* possibleNumber, icu
 // check the suffix of possibleNumber
 PhoneNumberMatch* RegexRule::IsValidEnd(PhoneNumberMatch* possibleNumber, icu::UnicodeString& message)
 {
+    if (possibleNumber == nullptr) {
+        return possibleNumber;
+    }
     icu::UnicodeString after = message.tempSubString(possibleNumber->end());
     bool isTwo = true;
     int len = after.length();
@@ -148,6 +154,9 @@ PhoneNumberMatch* RegexRule::IsValidEnd(PhoneNumberMatch* possibleNumber, icu::U
 // check the prefix of possibleNumber
 PhoneNumberMatch* RegexRule::IsValidStart(PhoneNumberMatch* possibleNumber, icu::UnicodeString& message)
 {
+    if (possibleNumber == nullptr) {
+        return possibleNumber;
+    }
     icu::UnicodeString before = message.tempSubString(0, possibleNumber->start());
     bool isTwo = true;
     int len = before.length();
@@ -240,7 +249,9 @@ bool RegexRule::NumberValid(icu::UnicodeString& number)
 
 PhoneNumberMatch* RegexRule::IsValidCode(PhoneNumberMatch* possibleNumber, icu::UnicodeString& message)
 {
-    bool isValid = true;
+    if (possibleNumber == nullptr) {
+        return possibleNumber;
+    }
     icu::UnicodeString number = possibleNumber->raw_string().c_str();
     // Processes the ;ext= extention number format
     int32_t ind = number.trim().indexOf(";ext=");
@@ -250,17 +261,14 @@ PhoneNumberMatch* RegexRule::IsValidCode(PhoneNumberMatch* possibleNumber, icu::
     if (number[0] == '(' || number[0] == '[') {
         StartWithBrackets(number);
     }
-    isValid = NumberValid(number);
-    if (isValid) {
-        return possibleNumber;
-    } else {
+    if (!NumberValid(number)) {
         return nullptr;
     }
+    return possibleNumber;
 }
 
 PhoneNumberMatch* RegexRule::IsValidRawstr(PhoneNumberMatch* possibleNumber, icu::UnicodeString& message)
 {
-    bool isValid = true;
     icu::UnicodeString number = possibleNumber->raw_string().c_str();
     // Processes the ;ext= extention number format
     int32_t ind = number.trim().indexOf(";ext=");
@@ -270,19 +278,11 @@ PhoneNumberMatch* RegexRule::IsValidRawstr(PhoneNumberMatch* possibleNumber, icu
     if (number[0] == '(' || number[0] == '[') {
         number = number.tempSubString(1);
     }
-    // 8 is the number of digits in the phone number.
-    if (number[0] != '0' && CountDigits(number) == 8) {
-        isValid = false;
-    }
-    // 4 is the number of digits in the phone number.
-    if (CountDigits(number) <= 4) {
-        isValid = false;
-    }
-    if (isValid) {
-        return possibleNumber;
-    } else {
+    // 8 and 4 is the number of digits in the phone number.
+    if ((number[0] != '0' && CountDigits(number) == 8) || CountDigits(number) <= 4) {
         return nullptr;
     }
+    return possibleNumber;
 }
 
 std::vector<MatchedNumberInfo> RegexRule::Handle(PhoneNumberMatch *possibleNumber, icu::UnicodeString& message)
@@ -315,6 +315,10 @@ std::vector<MatchedNumberInfo> RegexRule::HandleDefault(PhoneNumberMatch* possib
 
 std::vector<MatchedNumberInfo> RegexRule::HandleOperator(PhoneNumberMatch* possibleNumber, icu::UnicodeString& message)
 {
+    std::vector<MatchedNumberInfo> matchedNumberInfoList;
+    if (possibleNumber == nullptr) {
+        return matchedNumberInfoList;
+    }
     MatchedNumberInfo matcher;
     if (possibleNumber->raw_string()[0] == '(' || possibleNumber->raw_string()[0] == '[') {
         matcher.SetBegin(possibleNumber->start() + 1);
@@ -323,35 +327,40 @@ std::vector<MatchedNumberInfo> RegexRule::HandleOperator(PhoneNumberMatch* possi
     }
     matcher.SetEnd(possibleNumber->end());
     matcher.SetContent(message);
-    std::vector<MatchedNumberInfo> matchedNumberInfoList;
     matchedNumberInfoList.push_back(matcher);
     return matchedNumberInfoList;
 }
 
 std::vector<MatchedNumberInfo> RegexRule::HandleBlank(PhoneNumberMatch* possibleNumber, icu::UnicodeString& message)
 {
-    // exclude phone number 5201314
-    icu::UnicodeString speString = "5201314";
     std::vector<MatchedNumberInfo> matchedNumberInfoList;
-    MatchedNumberInfo matchedNumberInfo;
-    icu::UnicodeString number = possibleNumber->raw_string().c_str();
+    if (possibleNumber == nullptr) {
+        return matchedNumberInfoList;
+    }
     icu::RegexPattern* pattern = GetPattern();
     if (pattern == nullptr) {
         return matchedNumberInfoList;
     }
-    UErrorCode status;
+    UErrorCode status = U_ZERO_ERROR;
+    icu::UnicodeString number = possibleNumber->raw_string().c_str();
     icu::RegexMatcher* matcher = pattern->matcher(number, status);
-    UErrorCode negativeStatus = U_ZERO_ERROR;
+    if (U_FAILURE(status) || matcher == nullptr) {
+        HILOG_ERROR_I18N("RegexRule::HandleBlank: Pattern match failed.");
+        return matchedNumberInfoList;
+    }
     // exclude phone number 2333333
     icu::UnicodeString negativeRegex = "(?<![-\\d])(23{6,7})(?![-\\d])";
-    icu::RegexMatcher negativePattern(negativeRegex, 0, negativeStatus);
+    icu::RegexMatcher negativePattern(negativeRegex, 0, status);
     negativePattern.reset(number);
-    if (matcher != nullptr && matcher->find()) {
+    if (matcher->find()) {
+        // exclude phone number 5201314
+        icu::UnicodeString speString = "5201314";
         if (negativePattern.find() || number == speString) {
             delete matcher;
             delete pattern;
             return matchedNumberInfoList;
         }
+        MatchedNumberInfo matchedNumberInfo;
         if (possibleNumber->raw_string()[0] != '(' && possibleNumber->raw_string()[0] != '[') {
             matchedNumberInfo.SetBegin(matcher->start(status) + possibleNumber->start());
         } else {
@@ -368,17 +377,22 @@ std::vector<MatchedNumberInfo> RegexRule::HandleBlank(PhoneNumberMatch* possible
 
 std::vector<MatchedNumberInfo> RegexRule::HandleSlant(PhoneNumberMatch* possibleNumber, icu::UnicodeString& message)
 {
-    MatchedNumberInfo matchedNumberInfo;
-    MatchedNumberInfo numberInfo;
     std::vector<MatchedNumberInfo> matchedNumberInfoList;
-    icu::UnicodeString number = possibleNumber->raw_string().c_str();
+    if (possibleNumber == nullptr) {
+        return matchedNumberInfoList;
+    }
     icu::RegexPattern* pattern = GetPattern();
     if (pattern == nullptr) {
         return matchedNumberInfoList;
     }
-    UErrorCode status;
+    UErrorCode status = U_ZERO_ERROR;
+    icu::UnicodeString number = possibleNumber->raw_string().c_str();
     icu::RegexMatcher* matcher = pattern->matcher(number, status);
-    if (matcher != nullptr && matcher->find()) {
+    if (U_FAILURE(status) || matcher == nullptr) {
+        HILOG_ERROR_I18N("RegexRule::HandleSlant: Pattern match failed.");
+        return matchedNumberInfoList;
+    }
+    if (matcher->find()) {
         int start = matcher->start(status);
         std::vector<MatchedNumberInfo> tempList = GetNumbersWithSlant(number);
         // 2 is the size of tempList.
@@ -386,6 +400,7 @@ std::vector<MatchedNumberInfo> RegexRule::HandleSlant(PhoneNumberMatch* possible
             start = 0;
         }
         if (tempList.size() > 0) {
+            MatchedNumberInfo matchedNumberInfo;
             matchedNumberInfo.SetBegin(tempList[0].GetBegin() + start + possibleNumber->start());
             matchedNumberInfo.SetEnd(tempList[0].GetEnd() + possibleNumber->start());
             icu::UnicodeString contentFirst = tempList[0].GetContent();
@@ -393,6 +408,7 @@ std::vector<MatchedNumberInfo> RegexRule::HandleSlant(PhoneNumberMatch* possible
             matchedNumberInfoList.push_back(matchedNumberInfo);
             // 2 is the size of tempList.
             if (tempList.size() == 2) {
+                MatchedNumberInfo numberInfo;
                 numberInfo.SetBegin(tempList[1].GetBegin() + start + possibleNumber->start());
                 numberInfo.SetEnd(tempList[1].GetEnd() + possibleNumber->start());
                 icu::UnicodeString contentSecond = tempList[1].GetContent();
@@ -449,7 +465,6 @@ void RegexRule::StartWithBrackets(icu::UnicodeString& number)
 std::vector<MatchedNumberInfo> RegexRule::GetNumbersWithSlant(icu::UnicodeString& testStr)
 {
     std::vector<MatchedNumberInfo> shortList;
-    PhoneNumberUtil* pnu = PhoneNumberUtil::GetInstance();
     ShortNumberInfo* shortInfo = new (std::nothrow) ShortNumberInfo();
     if (shortInfo == nullptr) {
         HILOG_ERROR_I18N("ShortNumberInfo construct failed.");
@@ -464,6 +479,11 @@ std::vector<MatchedNumberInfo> RegexRule::GetNumbersWithSlant(icu::UnicodeString
             testStr.tempSubString(0, i).toUTF8String(numberFisrt);
             testStr.tempSubString(i + 1).toUTF8String(numberEnd);
         }
+    }
+    PhoneNumberUtil* pnu = PhoneNumberUtil::GetInstance();
+    if (pnu == nullptr) {
+        HILOG_ERROR_I18N("RegexRule::GetNumbersWithSlant: Get phone number util failed.");
+        return shortList;
     }
     PhoneNumber phoneNumberFirst;
     PhoneNumber phoneNumberEnd;
@@ -492,16 +512,23 @@ std::vector<MatchedNumberInfo> RegexRule::GetNumbersWithSlant(icu::UnicodeString
 std::vector<MatchedNumberInfo> RegexRule::HandlePossibleNumberWithPattern(PhoneNumberMatch* possibleNumber,
     icu::UnicodeString& message, bool isStartsWithNumber)
 {
-    UErrorCode status = U_ZERO_ERROR;
     std::vector<MatchedNumberInfo> matchedList;
-    icu::UnicodeString possible = possibleNumber->raw_string().c_str();
+    if (possibleNumber == nullptr) {
+        return matchedList;
+    }
     icu::RegexPattern* pattern = GetPattern();
     if (pattern == nullptr) {
         HILOG_ERROR_I18N("RegexPattern is nullptr.");
         return matchedList;
     }
+    UErrorCode status = U_ZERO_ERROR;
     icu::RegexMatcher* mat = pattern->matcher(message, status);
-    while (mat != nullptr && mat->find(status)) {
+    if (U_FAILURE(status) || mat == nullptr) {
+        HILOG_ERROR_I18N("RegexRule::HandlePossibleNumberWithPattern: Pattern match failed.");
+        return matchedList;
+    }
+    icu::UnicodeString possible = possibleNumber->raw_string().c_str();
+    while (mat->find(status)) {
         int start = mat->start(status);
         int end = mat->end(status);
         icu::UnicodeString matched = message.tempSubString(start, end - start);

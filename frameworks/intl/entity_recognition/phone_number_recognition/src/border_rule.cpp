@@ -35,14 +35,7 @@ BorderRule::BorderRule(icu::UnicodeString& regex, std::string& insensitive, std:
     } else {
         this->type = 0;
     }
-    this->status = U_ZERO_ERROR;
     this->insensitive = insensitive;
-    if (regex.length() == 0) {
-        return;
-    }
-    if (U_FAILURE(this->status)) {
-        HILOG_ERROR_I18N("member pattern construct failed.");
-    }
 }
 
 int BorderRule::GetType()
@@ -53,11 +46,18 @@ int BorderRule::GetType()
 icu::RegexPattern* BorderRule::GetPattern()
 {
     // Sets whether regular expression matching is case sensitive
+    UErrorCode status = U_ZERO_ERROR;
+    icu::RegexPattern* pattern;
     if (insensitive.compare(TRUE_STR) == 0) {
-        return icu::RegexPattern::compile(this->regex, URegexpFlag::UREGEX_CASE_INSENSITIVE, this->status);
+        pattern = icu::RegexPattern::compile(this->regex, URegexpFlag::UREGEX_CASE_INSENSITIVE, status);
     } else {
-        return icu::RegexPattern::compile(this->regex, 0, this->status);
+        pattern = icu::RegexPattern::compile(this->regex, 0, status);
     }
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("BorderRule::GetPattern: Compile regex pattern failed.");
+        return nullptr;
+    }
+    return pattern;
 }
 
 bool BorderRule::Handle(PhoneNumberMatch* match, icu::UnicodeString& message)
@@ -73,8 +73,13 @@ bool BorderRule::Handle(PhoneNumberMatch* match, icu::UnicodeString& message)
     if (pattern == nullptr) {
         return false;
     }
-    UErrorCode status;
+    UErrorCode status = U_ZERO_ERROR;
     icu::RegexMatcher* mat = pattern->matcher(borderStr, status);
+    if (U_FAILURE(status) || mat == nullptr) {
+        HILOG_ERROR_I18N("BorderRule::Handle: Pattern matcher failed.");
+        delete pattern;
+        return false;
+    }
     int type = this->GetType();
     while (mat->find()) {
         int borderBegin = mat->start(status) + beginSubTen;

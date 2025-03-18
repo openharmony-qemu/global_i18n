@@ -105,8 +105,10 @@ napi_value I18nNormalizerAddon::I18nNormalizerConstructor(napi_env env, napi_cal
         return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
-    
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     if (valueType != napi_valuetype::napi_number) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "mode", "number", true);
         return nullptr;
@@ -123,6 +125,9 @@ napi_value I18nNormalizerAddon::I18nNormalizerConstructor(napi_env env, napi_cal
     }
 
     std::unique_ptr<I18nNormalizerAddon> obj = std::make_unique<I18nNormalizerAddon>();
+    if (obj == nullptr) {
+        return nullptr;
+    }
     status =
         napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), I18nNormalizerAddon::Destructor, nullptr, nullptr);
     if (status != napi_ok) {
@@ -153,7 +158,10 @@ napi_value I18nNormalizerAddon::Normalize(napi_env env, napi_callback_info info)
         return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        return nullptr;
+    }
     if (valueType != napi_valuetype::napi_string) {
         HILOG_ERROR_I18N("Invalid parameter type");
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "text", "string", true);

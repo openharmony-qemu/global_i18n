@@ -118,6 +118,12 @@
                         ],
                         "header_base": "//base/global/i18n/interfaces/native/inner_api/preferred_language/include"
                     }
+                },
+                {
+                    "name": "//base/global/i18n/interfaces/cj:cj_i18n_ffi"
+                },
+                {
+                    "name": "//base/global/i18n/interfaces/cj/intl:cj_intl_ffi"
                 }
             ],
             "test": [
