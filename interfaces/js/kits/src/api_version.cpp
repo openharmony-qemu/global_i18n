@@ -27,7 +27,7 @@ const int32_t ApiVersion::API_VERSION_MOD = 1000;
 std::mutex ApiVersion::initMutex;
 thread_local int32_t sysApiVersion = 0;
 std::unordered_map<std::string, int32_t> ApiVersion::versionMap {
-    {"isSuggested", 16},
+    {"isSuggested", 18},
 };
 
 ApiCompareResult ApiVersion::CheckApiTargetVersion(const std::string &apiName)
