@@ -32,6 +32,11 @@ namespace I18n {
 using namespace OHOS::HiviewDFX;
 extern "C"
 {
+    char* FfiOHOSGetAppPreferredLanguage()
+    {
+        return FfiI18nSystemGetAppPreferredLanguage();
+    }
+
     char* FfiI18nSystemGetAppPreferredLanguage()
     {
         #ifdef SUPPORT_APP_PREFERRED_LANGUAGE

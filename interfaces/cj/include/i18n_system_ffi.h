@@ -22,6 +22,8 @@
 #define FFI_EXPORT __attribute__((visibility("default")))
 
 extern "C" {
+    FFI_EXPORT char* FfiOHOSGetAppPreferredLanguage();
+
     FFI_EXPORT char* FfiI18nSystemGetAppPreferredLanguage();
     FFI_EXPORT char* FfiI18nSystemGetSystemLanguage();
     FFI_EXPORT char* FfiI18nSystemGetSystemRegion();
