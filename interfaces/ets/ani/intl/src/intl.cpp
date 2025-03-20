@@ -106,7 +106,7 @@ static bool getBooleanMember(ani_env *env, ani_object options,
 
     ani_ref ref;
     if (ANI_OK != env->Object_CallMethod_Ref(options, getter, &ref)) {
-        std::cerr << "Object_CallMethod_Boolean Fail" << std::endl;
+        std::cerr << "Object_CallMethod_Ref Fail" << std::endl;
         return false;
     }
 
@@ -142,7 +142,7 @@ static bool getDoubleMember(ani_env *env, ani_object options,
 
     ani_ref ret;
     if (ANI_OK != env->Object_CallMethod_Ref(options, getter, &ret)) {
-        std::cerr << "Object_CallMethod_Double Fail" << std::endl;
+        std::cerr << "Object_CallMethod_Ref Fail" << std::endl;
         return false;
     }
 
@@ -198,19 +198,19 @@ ani_string IntlAniAddon::DateTimeFormat_format([[maybe_unused]] ani_env *env, [[
     env->String_NewUTF8(str.c_str(), str.size(), &ret);
     ani_class cls;
     if (ANI_OK != env->FindClass("Lescompat/Date;", &cls)) {
-        std::cerr << "Not found '" << "Lescompat/Date" << "'" << std::endl;
+        std::cerr << "Not found 'Lescompat/Date'" << std::endl;
         return ret;
     }
 
     ani_method getms;
     if (ANI_OK != env->Class_FindMethod(cls, "valueOf", nullptr, &getms)) {
-        std::cerr << "Find Method Fail" << "'" << std::endl;
+        std::cerr << "Find Method Fail 'valueOf'" << std::endl;
         return ret;
     }
 
     ani_double milliseconds;
     if (ANI_OK != env->Object_CallMethod_Double(Date, getms, &milliseconds)) {
-        std::cerr << "Object_CallMethod_Long Fail" << std::endl;
+        std::cerr << "Object_CallMethod_Double Fail" << std::endl;
         return ret;
     }
 
@@ -248,7 +248,7 @@ ani_object IntlAniAddon::DateTimeFormat_resolvedOptions([[maybe_unused]] ani_env
 
     ani_method hour12Setter;
     if (ANI_OK != env->Class_FindSetter(cls, "hour12", &hour12Setter)) {
-        std::cerr << "Class_FindMethod Fail'" << className << "'" << std::endl;
+        std::cerr << "Class_FindSetter Fail'" << className << "'" << std::endl;
     }
 
     ani_boolean hour12 = options["hour12"] == "true";
@@ -310,7 +310,7 @@ ani_object IntlAniAddon::NumberFormat_resolvedOptions([[maybe_unused]] ani_env *
 
     ani_method useGroupingSetter;
     if (ANI_OK != env->Class_FindSetter(cls, "useGrouping", &useGroupingSetter)) {
-        std::cerr << "Class_FindMethod Fail'" << className << "'" << std::endl;
+        std::cerr << "Class_FindSetter Fail'" << className << "'" << std::endl;
     }
 
     ani_boolean useGrouping = options["useGrouping"] == "true";
@@ -357,7 +357,7 @@ ani_object IntlAniAddon::Locale_create0([[maybe_unused]] ani_env *env, [[maybe_u
 
     ani_method ctor;
     if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "J:V", &ctor)) {
-        std::cerr << "Not found '" << "ctor" << "'" << std::endl;
+        std::cerr << "get ctor Failed'" << className << "'" << std::endl;
         ani_object nullobj = nullptr;
         return nullobj;
     }
@@ -412,7 +412,7 @@ ani_object IntlAniAddon::Locale_create1([[maybe_unused]] ani_env *env, [[maybe_u
 
     ani_method ctor;
     if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "J:V", &ctor)) {
-        std::cerr << "Not found '" << "ctor" << "'" << std::endl;
+        std::cerr << "get ctor Failed'" << className << "'" << std::endl;
         ani_object nullobj = nullptr;
         return nullobj;
     }
@@ -483,7 +483,7 @@ ani_object IntlAniAddon::DateTimeFormat_create0([[maybe_unused]] ani_env *env, [
 
     ani_method ctor;
     if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "J:V", &ctor)) {
-        std::cerr << "Not found '" << "ctor" << "'" << std::endl;
+        std::cerr << "get ctor Failed'" << className << "'" << std::endl;
         ani_object nullobj = nullptr;
         return nullobj;
     }
@@ -548,7 +548,7 @@ ani_object IntlAniAddon::DateTimeFormat_create1(ani_env *env, ani_class clazz, a
 
     ani_method ctor;
     if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "J:V", &ctor)) {
-        std::cerr << "Not found '" << "ctor" << "'" << std::endl;
+        std::cerr << "get ctor Failed'" << className << "'" << std::endl;
         ani_object nullobj = nullptr;
         return nullobj;
     }
@@ -578,7 +578,7 @@ ani_object IntlAniAddon::NumberFormat_create0([[maybe_unused]] ani_env *env, [[m
 
     ani_method ctor;
     if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "J:V", &ctor)) {
-        std::cerr << "Not found '" << "ctor" << "'" << std::endl;
+        std::cerr << "get ctor Failed'" << className << "'" << std::endl;
         ani_object nullobj = nullptr;
         return nullobj;
     }
@@ -645,7 +645,7 @@ ani_object IntlAniAddon::NumberFormat_create1(ani_env *env, ani_class clazz, ani
 
     ani_method ctor;
     if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "J:V", &ctor)) {
-        std::cerr << "Not found '" << "ctor" << "'" << std::endl;
+        std::cerr << "get ctor Failed'" << className << "'" << std::endl;
         ani_object nullobj = nullptr;
         return nullobj;
     }
