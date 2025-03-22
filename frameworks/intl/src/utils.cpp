@@ -162,21 +162,22 @@ void GetAllValidLocalesTag(std::unordered_set<std::string>& allValidLocalesLangu
     init = true;
 }
 
-bool CheckFilePath(const std::string &filePath)
+std::string GetAbsoluteFilePath(const std::string &filePath)
 {
     char* result = realpath(filePath.c_str(), nullptr);
     if (result == nullptr) {
-        HILOG_ERROR_I18N("utils: CheckFilePath realpath error, error message: %{public}s.", strerror(errno));
-        return false;
+        HILOG_ERROR_I18N("utils: GetAbsoluteFilePath realpath error, error message: %{public}s.", strerror(errno));
+        return "";
     }
     std::ifstream file(result);
-    free(result);
-    result = nullptr;
     if (!file.good()) {
         HILOG_ERROR_I18N("utils: file open is not good.");
-        return false;
+        return "";
     }
-    return true;
+    std::string absolutePath(result);
+    free(result);
+    result = nullptr;
+    return absolutePath;
 }
 
 std::string StrReplaceAll(const std::string& str,
@@ -353,7 +354,8 @@ std::set<std::string> GetTimeZoneAvailableIDs(I18nErrorCode &errorCode)
     struct stat s;
     const char *tzIdConfigPath = stat(DISTRO_TIMEZONE_LIST_CONFIG, &s) == 0 ?
         DISTRO_TIMEZONE_LIST_CONFIG : TIMEZONE_LIST_CONFIG_PATH;
-    if (!CheckFilePath(tzIdConfigPath)) {
+    std::string absolutePath = GetAbsoluteFilePath(tzIdConfigPath);
+    if (absolutePath.empty()) {
         HILOG_ERROR_I18N("GetTimeZoneAvailableIDs: check file %{public}s failed.", tzIdConfigPath);
         return availableIDs;
     }

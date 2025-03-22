@@ -41,11 +41,12 @@ HolidayManager::HolidayManager(const char* path)
         HILOG_ERROR_I18N("Failed: parameter path is NULL.");
         return;
     }
-    if (!CheckFilePath(path)) {
+    std::string absolutePath = GetAbsoluteFilePath(path);
+    if (absolutePath.empty()) {
         HILOG_ERROR_I18N("Failed: holiday file path: %{public}s invalid.", path);
         return;
     }
-    std::vector<HolidayInfoItem> items = ReadHolidayFile(path);
+    std::vector<HolidayInfoItem> items = ReadHolidayFile(absolutePath);
     for (size_t i = 0; i < items.size(); i++) {
         struct tm tmObj = {.tm_mday = items[i].day, .tm_mon = items[i].month, .tm_year = items[i].year};
         char strDate[10];

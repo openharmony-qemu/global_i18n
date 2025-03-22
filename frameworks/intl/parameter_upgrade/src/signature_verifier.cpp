@@ -73,21 +73,24 @@ bool SignatureVerifier::VerifyCertFile(const std::string& certPath, const std::s
 bool SignatureVerifier::VerifyFileSign(const std::string& pubkeyPath, const std::string& signPath,
     const std::string& digestPath)
 {
-    if (!CheckFilePath(pubkeyPath)) {
+    std::string validPubkeyPath = GetAbsoluteFilePath(pubkeyPath);
+    if (validPubkeyPath.empty()) {
         HILOG_ERROR_I18N("SignatureVerifier::VerifyFileSign: Check pubkey file failed.");
         return false;
     }
-    if (!CheckFilePath(signPath)) {
+    std::string validSignPath = GetAbsoluteFilePath(signPath);
+    if (validSignPath.empty()) {
         HILOG_ERROR_I18N("SignatureVerifier::VerifyFileSign: Check sign file failed.");
         return false;
     }
-    if (!CheckFilePath(digestPath)) {
+    std::string validDigestPath = GetAbsoluteFilePath(digestPath);
+    if (validDigestPath.empty()) {
         HILOG_ERROR_I18N("SignatureVerifier::VerifyFileSign: Check digest file failed.");
         return false;
     }
 
-    std::string signStr = GetFileStream(signPath);
-    std::string digestStr = GetFileStream(digestPath);
+    std::string signStr = GetFileStream(validSignPath);
+    std::string digestStr = GetFileStream(validDigestPath);
     if (signStr.empty() || digestStr.empty()) {
         HILOG_ERROR_I18N("SignatureVerifier::VerifyFileSign: sign (%{public}s), digest (%{public}s).",
             signStr.c_str(), digestStr.c_str());
@@ -98,7 +101,7 @@ bool SignatureVerifier::VerifyFileSign(const std::string& pubkeyPath, const std:
         HILOG_ERROR_I18N("SignatureVerifier::VerifyFileSign: Create RSA failed.");
         return false;
     }
-    BIO* bio = BIO_new_file(pubkeyPath.c_str(), "r");
+    BIO* bio = BIO_new_file(validPubkeyPath.c_str(), "r");
     if (bio == nullptr) {
         RSA_free(pubkey);
         HILOG_ERROR_I18N("SignatureVerifier::VerifyFileSign: Create BIO failed.");
@@ -153,7 +156,8 @@ bool SignatureVerifier::VerifyUpdateFile(const std::string& filePath, const std:
         std::string fileName = line.substr(PREFIX_NAME.size());
         filesList.push_back(fileName);
         std::string absFilePath = filePath + trim(fileName);
-        if (!CheckFilePath(absFilePath)) {
+        absFilePath = GetAbsoluteFilePath(absFilePath);
+        if (absFilePath.empty()) {
             HILOG_ERROR_I18N("VerifyUpdateFile: File %{public}s is not exist.", fileName.c_str());
             return false;
         }
@@ -237,7 +241,12 @@ bool SignatureVerifier::CalcFileShaOriginal(const std::string& filePath, unsigne
         HILOG_ERROR_I18N("SignatureVerifier::CalcFileShaOriginal: Invalid input parameter.");
         return false;
     }
-    FILE* fp = fopen(filePath.c_str(), "rb");
+    char* resolvedPath = realpath(filePath.c_str(), nullptr);
+    if (resolvedPath == nullptr) {
+        HILOG_ERROR_I18N("SignatureVerifier::CalcFileShaOriginal: Input parameter filePath invalid.");
+        return false;
+    }
+    FILE* fp = fopen(resolvedPath, "rb");
     if (fp == nullptr) {
         HILOG_ERROR_I18N("SignatureVerifier::CalcFileShaOriginal: Close file failed.");
         return false;

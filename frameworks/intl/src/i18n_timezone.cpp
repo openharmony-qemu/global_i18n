@@ -1117,7 +1117,7 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
     }
     uint32_t width = 0;
     uint32_t height = 0;
-    GetTzDataWidth(filePaths, &width, &height);
+    std::tie(width, height) = GetTzDataWidth(filePaths);
     double calculateX = y * width / (TZ_X_PLUS * 1.0) + width / (TZ_HALF_OF_SIZE * 1.0);
     double calculateY = x * ((height * fileCount) / (TZ_X_PLUS * TZ_HALF_OF_SIZE * 1.0)) +
                         (height * fileCount) / (TZ_HALF_OF_SIZE * 1.0);
@@ -1211,46 +1211,48 @@ std::vector<int> I18nTimeZone::GetColorData(const uint16_t x, const uint16_t y,
     return result;
 }
 
-void I18nTimeZone::GetTzDataWidth(std::vector<std::string> filePaths, uint32_t *width, uint32_t *height)
+std::tuple<uint32_t, uint32_t> I18nTimeZone::GetTzDataWidth(std::vector<std::string> filePaths)
 {
-    if (filePaths.size() == 0 || !CheckFilePath(filePaths.at(0))) {
-        return;
+    if (filePaths.size() == 0) {
+        HILOG_ERROR_I18N("I18nTimeZone::GetTzDataWidth: filePaths is empty.");
+        return std::make_tuple(0, 0);
+    }
+    std::string firstPath = filePaths.at(0);
+    firstPath = GetAbsoluteFilePath(firstPath.c_str());
+    if (firstPath.empty()) {
+        HILOG_ERROR_I18N("I18nTimeZone::GetTzDataWidth: firstPath %{public}s is invalid.", firstPath.c_str());
+        return std::make_tuple(0, 0);
     }
     FILE* fp;
     png_structp png_ptr;
     png_infop info_ptr;
-    try {
-        std::string path = filePaths.at(0);
-        fp = fopen(path.c_str(), "rb");
-        if (fp == NULL) {
-            return;
-        }
-        png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-        info_ptr = png_create_info_struct(png_ptr);
-        rewind(fp);
-        png_init_io(png_ptr, fp);
-        png_read_info(png_ptr, info_ptr);
-        unsigned int w, h;
-        png_get_IHDR(png_ptr, info_ptr, &w, &h, NULL, NULL, NULL, NULL, NULL);
-        *width = w;
-        *height = h;
-        png_destroy_read_struct(&png_ptr, &info_ptr, 0);
-        CloseFile(fp);
-    } catch(...) {
-        png_destroy_read_struct(&png_ptr, &info_ptr, 0);
-        CloseFile(fp);
+    fp = fopen(firstPath.c_str(), "rb");
+    if (fp == NULL) {
+        HILOG_ERROR_I18N("I18nTimeZone::GetTzDataWidth: fopen(%{public}s) return NULL.", firstPath.c_str());
+        return std::make_tuple(0, 0);
     }
+    png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    info_ptr = png_create_info_struct(png_ptr);
+    rewind(fp);
+    png_init_io(png_ptr, fp);
+    png_read_info(png_ptr, info_ptr);
+    unsigned int w;
+    unsigned int h;
+    png_get_IHDR(png_ptr, info_ptr, &w, &h, NULL, NULL, NULL, NULL, NULL);
+    png_destroy_read_struct(&png_ptr, &info_ptr, 0);
+    CloseFile(fp);
+    return std::make_tuple(w, h);
 }
 
 int I18nTimeZone::InitPngptr(png_structp &png_ptr, png_infop &info_ptr, FILE **fp,
                              std::string preferredPath)
 {
-    bool validFilePath = CheckFilePath(preferredPath);
-    if (!validFilePath) {
+    std::string validFilePath = GetAbsoluteFilePath(preferredPath);
+    if (validFilePath.empty()) {
         HILOG_ERROR_I18N("timezone data filepath invalid.");
         return 1;
     }
-    *fp = fopen(preferredPath.c_str(), "rb");
+    *fp = fopen(validFilePath.c_str(), "rb");
     if (*fp == NULL) {
         HILOG_ERROR_I18N("timezone data resource file not exists.");
         return 1;

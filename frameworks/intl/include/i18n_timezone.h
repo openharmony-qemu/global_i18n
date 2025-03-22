@@ -113,7 +113,7 @@ private:
     static std::string GetPreferredPath(const double x, const std::vector<std::string> &filePaths);
     static void SetVersionPathMap(std::string verison, std::string path,
             std::map<std::string, std::vector<std::string>> *pathMap);
-    static void GetTzDataWidth(std::vector<std::string> filePaths, uint32_t *width, uint32_t *height);
+    static std::tuple<uint32_t, uint32_t> GetTzDataWidth(std::vector<std::string> filePaths);
     static void CloseFile(FILE *fp);
     static bool ValidateDataIntegrity(const std::vector<std::string> &pathList);
     static bool CheckLatitudeAndLongitude(const double x, const double y);

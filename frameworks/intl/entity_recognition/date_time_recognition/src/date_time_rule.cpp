@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "date_time_rule.h"
+#include "i18n_hilog.h"
 #include "utils.h"
 
 namespace OHOS {
@@ -50,7 +51,8 @@ void DateTimeRule::Init(std::string& locale)
 {
     InitRules(XML_COMMON_PATH);
     std::string xmlPath = "/system/usr/ohos_locale_config/datetime/" + locale + ".xml";
-    if (!CheckFilePath(xmlPath)) {
+    std::string validXmlPath = GetAbsoluteFilePath(xmlPath);
+    if (validXmlPath.empty()) {
         this->locale = this->localeMap["locale"];
     } else {
         this->locale = locale;
@@ -90,11 +92,13 @@ void DateTimeRule::RuleLevel()
 
 void DateTimeRule::InitRules(const std::string& xmlPath)
 {
-    if (!CheckFilePath(xmlPath)) {
+    std::string validXmlPath = GetAbsoluteFilePath(xmlPath);
+    if (validXmlPath.empty()) {
+        HILOG_ERROR_I18N("DateTimeRule::InitRules: invalid xmlPath: %{public}s.", xmlPath.c_str());
         return;
     }
     xmlKeepBlanksDefault(0);
-    xmlDocPtr doc = xmlParseFile(xmlPath.c_str());
+    xmlDocPtr doc = xmlParseFile(validXmlPath.c_str());
     if (doc == nullptr) {
         return;
     }
@@ -132,11 +136,13 @@ void DateTimeRule::InitRules(const std::string& xmlPath)
 
 void DateTimeRule::InitRuleBackup(std::string& xmlPathBackup)
 {
-    if (!CheckFilePath(xmlPathBackup)) {
+    std::string validXmlPath = GetAbsoluteFilePath(xmlPathBackup);
+    if (validXmlPath.empty()) {
+        HILOG_ERROR_I18N("DateTimeRule::InitRuleBackup: invalid xmlPathBackup: %{public}s.", xmlPathBackup.c_str());
         return;
     }
     xmlKeepBlanksDefault(0);
-    xmlDocPtr doc = xmlParseFile(xmlPathBackup.c_str());
+    xmlDocPtr doc = xmlParseFile(validXmlPath.c_str());
     if (doc == nullptr) {
         return;
     }
