@@ -913,11 +913,11 @@ std::string I18nTimeZone::FindCityDisplayNameFromXmlInner(std::string &cityID, s
 void I18nTimeZone::AddCityDisplayNameCache(const char* xmlCityId, const char* xmlValue, std::string &locale)
 {
     if (xmlCityId == nullptr) {
-        HILOG_ERROR_I18N("I18nTimeZone::AddCityDisplayNameCache: xmlCityId is NULL.");       
+        HILOG_ERROR_I18N("I18nTimeZone::AddCityDisplayNameCache: xmlCityId is NULL.");
         return;
     }
     if (xmlValue == nullptr) {
-        HILOG_ERROR_I18N("I18nTimeZone::AddCityDisplayNameCache: xmlValue is NULL.");       
+        HILOG_ERROR_I18N("I18nTimeZone::AddCityDisplayNameCache: xmlValue is NULL.");
         return;
     }
     std::string cityId(xmlCityId);
@@ -925,7 +925,7 @@ void I18nTimeZone::AddCityDisplayNameCache(const char* xmlCityId, const char* xm
     if (!cityId.empty() && !cityDispName.empty() && cityDisplayNameCache.size() < MAX_CACHE_SIZE) {
         std::string key = cityId + ":" + locale;
         cityDisplayNameCache.insert(std::make_pair(key, cityDispName));
-    }    
+    }
 }
 
 std::string I18nTimeZone::GetCityDisplayNameFromCache(std::string &key)
