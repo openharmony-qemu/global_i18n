@@ -69,7 +69,8 @@ const char *I18nTimeZone::CITY_DISPLAYNAME_SECOND_ROOT_TAG = "display_name";
 std::set<std::string> I18nTimeZone::supportedLocales {};
 std::unordered_set<std::string> I18nTimeZone::availableZoneCityIDs {};
 std::unordered_map<std::string, std::string> I18nTimeZone::city2TimeZoneID {};
-std::unordered_map<std::string, std::unordered_map<std::string, std::string>> I18nTimeZone::cityDisplayNameCache {};
+std::unordered_map<std::string, std::string> I18nTimeZone::cityDisplayNameCache {};
+std::string I18nTimeZone::cityDisplayNameCacheLocale = "";
 std::map<std::string, std::string> I18nTimeZone::BEST_MATCH_LOCALE {};
 std::mutex I18nTimeZone::matchLocaleMutex;
 std::mutex I18nTimeZone::initZoneInfoMutex;
@@ -851,9 +852,12 @@ std::unordered_set<std::string> I18nTimeZone::GetAvailableZoneCityIDs()
 
 std::string I18nTimeZone::FindCityDisplayNameFromXml(std::string &cityID, std::string &locale)
 {
-    std::string tempDisplayName = GetCityDisplayNameFromCache(cityID, locale);
-    if (!tempDisplayName.empty()) {
-        return tempDisplayName;
+    if (cityDisplayNameCacheLocale.compare(locale) == 0) {
+        return GetCityDisplayNameFromCache(cityID);
+    }
+    std::lock_guard<std::mutex> lock(cityDisplayNameMutex);
+    if (cityDisplayNameCacheLocale.compare(locale) == 0) {
+        return GetCityDisplayNameFromCache(cityID);
     }
     std::string displayName = FindCityDisplayNameFromXmlInner(cityID, locale);
     return displayName;
@@ -861,7 +865,6 @@ std::string I18nTimeZone::FindCityDisplayNameFromXml(std::string &cityID, std::s
 
 std::string I18nTimeZone::FindCityDisplayNameFromXmlInner(std::string &cityID, std::string &locale)
 {
-    std::lock_guard<std::mutex> lock(cityDisplayNameMutex);
     xmlKeepBlanksDefault(0);
     std::string xmlPath = GetCityDisplayNameXmlPath(locale);
     xmlDocPtr doc = xmlParseFile(xmlPath.c_str());
@@ -894,7 +897,7 @@ std::string I18nTimeZone::FindCityDisplayNameFromXmlInner(std::string &cityID, s
         if (!xmlNodeIsNull) {
             const char* xmlKey = reinterpret_cast<const char *>(contents[0]);
             const char* xmlValue = reinterpret_cast<const char *>(contents[1]);
-            AddCityDisplayNameCache(xmlKey, xmlValue, cityIdMap);
+            AddCityDisplayNameCache(xmlKey, xmlValue);
         }
         for (size_t i = 0; i < ELEMENT_NUM; i++) {
             if (contents[i] != nullptr) {
@@ -904,22 +907,19 @@ std::string I18nTimeZone::FindCityDisplayNameFromXmlInner(std::string &cityID, s
         cur = cur->next;
     }
     xmlFreeDoc(doc);
-    return ResetCityDisplayNameCache(cityID, locale, cityIdMap);
+    return ResetCityDisplayNameCache(cityID, locale);
 }
 
-std::string I18nTimeZone::ResetCityDisplayNameCache(std::string &cityID, std::string &locale,
-    std::unordered_map<std::string, std::string> &cityIdMap)
+std::string I18nTimeZone::ResetCityDisplayNameCache(std::string &cityID, std::string &locale)
 {
-    cityDisplayNameCache.clear();
-    cityDisplayNameCache.insert(std::make_pair(locale, cityIdMap));
-    if (cityIdMap.find(cityID) != cityIdMap.end()) {
-        return cityIdMap.at(cityID);
+    cityDisplayNameCacheLocale = locale;
+    if (cityDisplayNameCache.find(cityID) != cityDisplayNameCache.end()) {
+        return cityDisplayNameCache.at(cityID);
     }
     return "";
 }
 
-void I18nTimeZone::AddCityDisplayNameCache(const char* xmlCityId, const char* xmlValue,
-    std::unordered_map<std::string, std::string> &cityIdMap)
+void I18nTimeZone::AddCityDisplayNameCache(const char* xmlCityId, const char* xmlValue)
 {
     if (xmlCityId == nullptr) {
         HILOG_ERROR_I18N("I18nTimeZone::AddCityDisplayNameCache: xmlCityId is NULL.");
@@ -932,18 +932,14 @@ void I18nTimeZone::AddCityDisplayNameCache(const char* xmlCityId, const char* xm
     std::string cityId(xmlCityId);
     std::string cityDispName(xmlValue);
     if (!cityId.empty() && !cityDispName.empty()) {
-        cityIdMap.insert(std::make_pair(cityId, cityDispName));
+        cityDisplayNameCache.insert(std::make_pair(cityId, cityDispName));
     }
 }
 
-std::string I18nTimeZone::GetCityDisplayNameFromCache(std::string &cityID, std::string &locale)
+std::string I18nTimeZone::GetCityDisplayNameFromCache(std::string &cityID)
 {
-    if (cityDisplayNameCache.find(locale) == cityDisplayNameCache.end()) {
-        return "";
-    }
-    std::unordered_map<std::string, std::string> map = cityDisplayNameCache.at(locale);
-    if (map.find(cityID) != map.end()) {
-        return map.at(cityID);
+    if (cityDisplayNameCache.find(cityID) != cityDisplayNameCache.end()) {
+        return cityDisplayNameCache.at(cityID);
     }
     return "";
 }
