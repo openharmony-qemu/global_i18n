@@ -80,18 +80,18 @@ private:
     static std::set<std::string> supportedLocales;
     static std::unordered_set<std::string> availableZoneCityIDs;
     static std::unordered_map<std::string, std::string> city2TimeZoneID;
-    static std::unordered_map<std::string, std::string> cityDisplayNameCache;
+    static std::unordered_map<std::string, std::unordered_map<std::string, std::string>> cityDisplayNameCache;
     static std::map<int, std::string> categoryNum2TimezoneWN;
     static std::map<int, std::string> categoryNum2TimezoneEN;
     static std::map<int, std::string> categoryNum2TimezoneWS;
     static std::map<int, std::string> categoryNum2TimezoneES;
     static std::map<std::string, std::string> BEST_MATCH_LOCALE;
     static constexpr int SYS_PARAM_LEN = 128;
-    static constexpr size_t MAX_CACHE_SIZE = 700;
     icu::TimeZone *timezone = nullptr;
     static std::mutex matchLocaleMutex;
     static std::mutex initZoneInfoMutex;
     static std::mutex initSupportedLocalesMutex;
+    static std::mutex cityDisplayNameMutex;
     static bool initAvailableZoneInfo;
     static bool initSupportedLocales;
     static bool ReadTimeZoneData(const char *xmlPath);
@@ -99,8 +99,11 @@ private:
     icu::TimeZone* GetTimeZone();
     static std::string FindCityDisplayNameFromXml(std::string &cityID, std::string &locale);
     static std::string FindCityDisplayNameFromXmlInner(std::string &cityID, std::string &locale);
-    static void AddCityDisplayNameCache(const char* xmlCityId, const char* xmlValue, std::string &locale);
-    static std::string GetCityDisplayNameFromCache(std::string &key);
+    static void AddCityDisplayNameCache(const char* xmlCityId, const char* xmlValue,
+        std::unordered_map<std::string, std::string> &cityIdMap);
+    static std::string ResetCityDisplayNameCache(std::string &cityID, std::string &locale,
+        std::unordered_map<std::string, std::string> &cityIdMap);
+    static std::string GetCityDisplayNameFromCache(std::string &cityID, std::string &locale);
     static std::string GetCityDisplayNameXmlPath(const std::string &locale);
     static bool GetSupportedLocales();
     static std::string GetFallBack(std::string &localeStr);
