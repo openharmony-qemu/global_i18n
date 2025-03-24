@@ -913,11 +913,11 @@ std::string I18nTimeZone::FindCityDisplayNameFromXmlInner(std::string &cityID, s
 void I18nTimeZone::AddCityDisplayNameCache(const char* xmlCityId, const char* xmlValue, std::string &locale)
 {
     if (xmlCityId == nullptr) {
-        HILOG_ERROR_I18N("AddCityDisplayNameCache: xmlCityId is NULL.");       
+        HILOG_ERROR_I18N("I18nTimeZone::AddCityDisplayNameCache: xmlCityId is NULL.");       
         return;
     }
     if (xmlValue == nullptr) {
-        HILOG_ERROR_I18N("AddCityDisplayNameCache: xmlValue is NULL.");       
+        HILOG_ERROR_I18N("I18nTimeZone::AddCityDisplayNameCache: xmlValue is NULL.");       
         return;
     }
     std::string cityId(xmlCityId);
