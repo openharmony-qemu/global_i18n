@@ -891,7 +891,7 @@ std::string I18nTimeZone::FindCityDisplayNameFromXmlInner(std::string &cityID, s
             }
             value = value->next;
         }
-        if (!xmlNodeIsNull && cityID.compare(xmlKey) == 0) {
+        if (!xmlNodeIsNull) {
             const char* xmlKey = reinterpret_cast<const char *>(contents[0]);
             const char* xmlValue = reinterpret_cast<const char *>(contents[1]);
             AddCityDisplayNameCache(xmlKey, xmlValue, cityIdMap);
