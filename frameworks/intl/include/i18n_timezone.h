@@ -80,7 +80,7 @@ private:
     static std::set<std::string> supportedLocales;
     static std::unordered_set<std::string> availableZoneCityIDs;
     static std::unordered_map<std::string, std::string> city2TimeZoneID;
-    static std::unordered_map<std::string, std::unordered_map<std::string, std::string>> cityDisplayNameCache;
+    static std::unordered_map<std::string, std::string> cityDisplayNameCache;
     static std::map<int, std::string> categoryNum2TimezoneWN;
     static std::map<int, std::string> categoryNum2TimezoneEN;
     static std::map<int, std::string> categoryNum2TimezoneWS;
