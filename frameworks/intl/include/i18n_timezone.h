@@ -87,7 +87,7 @@ private:
     static std::map<int, std::string> categoryNum2TimezoneES;
     static std::map<std::string, std::string> BEST_MATCH_LOCALE;
     static constexpr int SYS_PARAM_LEN = 128;
-    static constexpr size_t MAX_CACHE_SIZE = 600;
+    static constexpr size_t MAX_CACHE_SIZE = 700;
     icu::TimeZone *timezone = nullptr;
     static std::mutex matchLocaleMutex;
     static std::mutex initZoneInfoMutex;
@@ -99,6 +99,7 @@ private:
     icu::TimeZone* GetTimeZone();
     static std::string FindCityDisplayNameFromXml(std::string &cityID, std::string &locale);
     static std::string FindCityDisplayNameFromXmlInner(std::string &cityID, std::string &locale);
+    static void AddCityDisplayNameCache(const char* xmlCityId, const char* xmlValue, std::string &locale);
     static std::string GetCityDisplayNameFromCache(std::string &key);
     static std::string GetCityDisplayNameXmlPath(const std::string &locale);
     static bool GetSupportedLocales();

@@ -856,9 +856,6 @@ std::string I18nTimeZone::FindCityDisplayNameFromXml(std::string &cityID, std::s
         return tempDisplayName;
     }
     std::string displayName = FindCityDisplayNameFromXmlInner(cityID, locale);
-    if (!displayName.empty() && cityDisplayNameCache.size() < MAX_CACHE_SIZE) {
-        cityDisplayNameCache.insert(std::make_pair(key, displayName));
-    }
     return displayName;
 }
 
@@ -893,9 +890,12 @@ std::string I18nTimeZone::FindCityDisplayNameFromXmlInner(std::string &cityID, s
             }
             value = value->next;
         }
-        if (!xmlNodeIsNull && cityID.compare(reinterpret_cast<const char *>(contents[0])) == 0) {
-            displayName = reinterpret_cast<const char *>(contents[1]);
+        const char* xmlKey = reinterpret_cast<const char *>(contents[0]);
+        const char* xmlValue = reinterpret_cast<const char *>(contents[1]);
+        if (!xmlNodeIsNull && cityID.compare(xmlKey) == 0) {
+            displayName = xmlValue;
         }
+        AddCityDisplayNameCache(xmlKey, xmlValue, locale);
         for (size_t i = 0; i < ELEMENT_NUM; i++) {
             if (contents[i] != nullptr) {
                 xmlFree(contents[i]);
@@ -908,6 +908,24 @@ std::string I18nTimeZone::FindCityDisplayNameFromXmlInner(std::string &cityID, s
     }
     xmlFreeDoc(doc);
     return displayName;
+}
+
+void I18nTimeZone::AddCityDisplayNameCache(const char* xmlCityId, const char* xmlValue, std::string &locale)
+{
+    if (xmlCityId == nullptr) {
+        HILOG_ERROR_I18N("AddCityDisplayNameCache: xmlCityId is NULL.");       
+        return;
+    }
+    if (xmlValue == nullptr) {
+        HILOG_ERROR_I18N("AddCityDisplayNameCache: xmlValue is NULL.");       
+        return;
+    }
+    std::string cityId(xmlCityId);
+    std::string cityDispName(xmlValue);
+    if (!cityId.empty() && !cityDispName.empty() && cityDisplayNameCache.size() < MAX_CACHE_SIZE) {
+        std::string key = cityId + ":" + locale;
+        cityDisplayNameCache.insert(std::make_pair(key, cityDispName));
+    }    
 }
 
 std::string I18nTimeZone::GetCityDisplayNameFromCache(std::string &key)
