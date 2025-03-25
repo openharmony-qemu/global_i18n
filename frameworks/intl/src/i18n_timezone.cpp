@@ -916,6 +916,8 @@ std::string I18nTimeZone::ResetCityDisplayNameCache(std::string &cityID, std::st
     if (cityDisplayNameCache.find(cityID) != cityDisplayNameCache.end()) {
         return cityDisplayNameCache.at(cityID);
     }
+    HILOG_ERROR_I18N("I18nTimeZone::ResetCityDisplayNameCache: not found cityID:%{public}s in locale:%{public}s",
+        cityID.c_str(), locale.c_str());
     return "";
 }
 
