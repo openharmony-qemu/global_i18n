@@ -70,10 +70,12 @@ std::set<std::string> I18nTimeZone::supportedLocales {};
 std::unordered_set<std::string> I18nTimeZone::availableZoneCityIDs {};
 std::unordered_map<std::string, std::string> I18nTimeZone::city2TimeZoneID {};
 std::unordered_map<std::string, std::string> I18nTimeZone::cityDisplayNameCache {};
+std::string I18nTimeZone::cityDisplayNameCacheLocale = "";
 std::map<std::string, std::string> I18nTimeZone::BEST_MATCH_LOCALE {};
 std::mutex I18nTimeZone::matchLocaleMutex;
 std::mutex I18nTimeZone::initZoneInfoMutex;
 std::mutex I18nTimeZone::initSupportedLocalesMutex;
+std::mutex I18nTimeZone::cityDisplayNameMutex;
 bool I18nTimeZone::initAvailableZoneInfo = false;
 bool I18nTimeZone::initSupportedLocales = false;
 
@@ -850,15 +852,14 @@ std::unordered_set<std::string> I18nTimeZone::GetAvailableZoneCityIDs()
 
 std::string I18nTimeZone::FindCityDisplayNameFromXml(std::string &cityID, std::string &locale)
 {
-    std::string key = cityID + ":" + locale;
-    std::string tempDisplayName = GetCityDisplayNameFromCache(key);
-    if (!tempDisplayName.empty()) {
-        return tempDisplayName;
+    if (cityDisplayNameCacheLocale.compare(locale) == 0) {
+        return GetCityDisplayNameFromCache(cityID);
+    }
+    std::lock_guard<std::mutex> lock(cityDisplayNameMutex);
+    if (cityDisplayNameCacheLocale.compare(locale) == 0) {
+        return GetCityDisplayNameFromCache(cityID);
     }
     std::string displayName = FindCityDisplayNameFromXmlInner(cityID, locale);
-    if (!displayName.empty() && cityDisplayNameCache.size() < MAX_CACHE_SIZE) {
-        cityDisplayNameCache.insert(std::make_pair(key, displayName));
-    }
     return displayName;
 }
 
@@ -879,7 +880,7 @@ std::string I18nTimeZone::FindCityDisplayNameFromXmlInner(std::string &cityID, s
         return "";
     }
     cur = cur->xmlChildrenNode;
-    std::string displayName;
+    cityDisplayNameCache.clear();
     while (cur != nullptr && !xmlStrcmp(cur->name,
         reinterpret_cast<const xmlChar *>(CITY_DISPLAYNAME_SECOND_ROOT_TAG))) {
         xmlNodePtr value = cur->xmlChildrenNode;
@@ -893,28 +894,57 @@ std::string I18nTimeZone::FindCityDisplayNameFromXmlInner(std::string &cityID, s
             }
             value = value->next;
         }
-        if (!xmlNodeIsNull && cityID.compare(reinterpret_cast<const char *>(contents[0])) == 0) {
-            displayName = reinterpret_cast<const char *>(contents[1]);
+        if (!xmlNodeIsNull) {
+            const char* xmlKey = reinterpret_cast<const char *>(contents[0]);
+            const char* xmlValue = reinterpret_cast<const char *>(contents[1]);
+            AddCityDisplayNameCache(xmlKey, xmlValue);
         }
         for (size_t i = 0; i < ELEMENT_NUM; i++) {
             if (contents[i] != nullptr) {
                 xmlFree(contents[i]);
             }
         }
-        if (displayName.length() != 0) {
-            break;
-        }
         cur = cur->next;
     }
     xmlFreeDoc(doc);
-    return displayName;
+    return ResetCityDisplayNameCache(cityID, locale);
 }
 
-std::string I18nTimeZone::GetCityDisplayNameFromCache(std::string &key)
+std::string I18nTimeZone::ResetCityDisplayNameCache(std::string &cityID, std::string &locale)
 {
-    if (cityDisplayNameCache.find(key) != cityDisplayNameCache.end()) {
-        return cityDisplayNameCache.at(key);
+    cityDisplayNameCacheLocale = locale;
+    if (cityDisplayNameCache.find(cityID) != cityDisplayNameCache.end()) {
+        return cityDisplayNameCache.at(cityID);
     }
+    HILOG_ERROR_I18N("I18nTimeZone::ResetCityDisplayNameCache: not found cityID:%{public}s in locale:%{public}s",
+        cityID.c_str(), locale.c_str());
+    return "";
+}
+
+void I18nTimeZone::AddCityDisplayNameCache(const char* xmlCityId, const char* xmlValue)
+{
+    if (xmlCityId == nullptr) {
+        HILOG_ERROR_I18N("I18nTimeZone::AddCityDisplayNameCache: xmlCityId is NULL.");
+        return;
+    }
+    if (xmlValue == nullptr) {
+        HILOG_ERROR_I18N("I18nTimeZone::AddCityDisplayNameCache: xmlValue is NULL.");
+        return;
+    }
+    std::string cityId(xmlCityId);
+    std::string cityDispName(xmlValue);
+    if (!cityId.empty() && !cityDispName.empty()) {
+        cityDisplayNameCache.insert(std::make_pair(cityId, cityDispName));
+    }
+}
+
+std::string I18nTimeZone::GetCityDisplayNameFromCache(std::string &cityID)
+{
+    if (cityDisplayNameCache.find(cityID) != cityDisplayNameCache.end()) {
+        return cityDisplayNameCache.at(cityID);
+    }
+    HILOG_ERROR_I18N("I18nTimeZone::GetCityDisplayNameFromCache: not found cityID:%{public}s in locale:%{public}s",
+        cityID.c_str(), cityDisplayNameCacheLocale.c_str());
     return "";
 }
 
