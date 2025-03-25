@@ -880,7 +880,7 @@ std::string I18nTimeZone::FindCityDisplayNameFromXmlInner(std::string &cityID, s
         return "";
     }
     cur = cur->xmlChildrenNode;
-    std::unordered_map<std::string, std::string> cityIdMap;
+    cityDisplayNameCache.clear();
     while (cur != nullptr && !xmlStrcmp(cur->name,
         reinterpret_cast<const xmlChar *>(CITY_DISPLAYNAME_SECOND_ROOT_TAG))) {
         xmlNodePtr value = cur->xmlChildrenNode;
