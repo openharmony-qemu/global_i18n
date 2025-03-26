@@ -168,13 +168,13 @@ ani_object I18nCalendarAddon::getCalendar([[maybe_unused]] ani_env *env, [[maybe
     }
     ani_method ctor;
     if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "J:V", &ctor)) {
-        std::cerr << "Not found '" << "ctor" << "'" << std::endl;
+        std::cerr << "get ctor Failed'" << className << "'" << std::endl;
         ani_object nullobj = nullptr;
         return nullobj;
     }
     ani_object calendar_object;
     if (ANI_OK != env->Object_New(cls, ctor, &calendar_object, reinterpret_cast<ani_long>(obj.get()))) {
-        std::cerr << "New ResMgr Fail" << std::endl;
+        std::cerr << "New calendar Fail" << std::endl;
     }
     obj.release();
     return calendar_object;
@@ -206,13 +206,13 @@ ani_object I18nTimeZoneAddon::i18nGetTimeZone([[maybe_unused]] ani_env *env, [[m
     }
     ani_method ctor;
     if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "J:V", &ctor)) {
-        std::cerr << "Not found '" << "ctor" << "'" << std::endl;
+        std::cerr << "get ctor Failed'" << className << "'" << std::endl;
         ani_object nullobj = nullptr;
         return nullobj;
     }
     ani_object timeZone_object;
     if (ANI_OK != env->Object_New(cls, ctor, &timeZone_object, reinterpret_cast<ani_long>(obj.get()))) {
-        std::cerr << "New ResMgr Fail" << std::endl;
+        std::cerr << "New timeZone Fail" << std::endl;
     }
     obj.release();
     return timeZone_object;

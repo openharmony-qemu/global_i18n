@@ -14,6 +14,8 @@
  */
 
 namespace i18n {
+    loadLibrary("i18n_ani.z");
+
     export class System {
         static { loadLibrary("i18n_ani.z"); }
 
