@@ -54,6 +54,7 @@ ohos_unittest("intl_test") {
     "c_utils:utils",
     "googletest:gmock",
     "googletest:gtest",
+    "hilog:libhilog",
     "icu:shared_icui18n",
     "icu:shared_icuuc",
     "init:libbegetutil",
