@@ -85,6 +85,10 @@ napi_value SimpleNumberFormatAddon::GetSimpleNumberFormatBySkeleton(napi_env env
     }
 
     napi_value constructor = nullptr;
+    if (g_SimpleNumberFormatConstructor == nullptr) {
+        HILOG_ERROR_I18N("Failed to create g_SimpleNumberFormatConstructor");
+        return nullptr;
+    }
     status = napi_get_reference_value(env, *g_SimpleNumberFormatConstructor, &constructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("GetSimpleNumberFormatBySkeleton: Failed to create reference.");

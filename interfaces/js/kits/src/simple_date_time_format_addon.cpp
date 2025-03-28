@@ -84,6 +84,10 @@ napi_value SimpleDateTimeFormatAddon::GetSimpleDateTimeFormatByPattern(napi_env 
         return nullptr;
     }
     napi_value constructor = nullptr;
+    if (g_SimpleDateTimeFormatConstructor == nullptr) {
+        HILOG_ERROR_I18N("Failed to create g_SimpleDateTimeFormatConstructor");
+        return nullptr;
+    }
     napi_status status = napi_get_reference_value(env, *g_SimpleDateTimeFormatConstructor, &constructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("GetSimpleDateTimeFormatByPattern: Failed to create reference.");
