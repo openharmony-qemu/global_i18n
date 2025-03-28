@@ -482,6 +482,7 @@ std::vector<MatchedNumberInfo> RegexRule::GetNumbersWithSlant(icu::UnicodeString
     }
     PhoneNumberUtil* pnu = PhoneNumberUtil::GetInstance();
     if (pnu == nullptr) {
+        delete shortInfo;
         HILOG_ERROR_I18N("RegexRule::GetNumbersWithSlant: Get phone number util failed.");
         return shortList;
     }
