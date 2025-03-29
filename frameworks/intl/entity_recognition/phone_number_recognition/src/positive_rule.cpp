@@ -289,6 +289,7 @@ std::vector<MatchedNumberInfo> PositiveRule::GetNumbersWithSlant(icu::UnicodeStr
     PhoneNumber phoneNumberEnd;
     PhoneNumberUtil* pnu = PhoneNumberUtil::GetInstance();
     if (pnu == nullptr) {
+        delete shortInfo;
         HILOG_ERROR_I18N("PositiveRule::GetNumbersWithSlant: Get phone number util failed.");
         return shortList;
     }
