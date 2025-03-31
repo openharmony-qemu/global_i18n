@@ -80,6 +80,7 @@ private:
     static std::set<std::string> supportedLocales;
     static std::unordered_set<std::string> availableZoneCityIDs;
     static std::unordered_map<std::string, std::string> city2TimeZoneID;
+    static std::unordered_map<std::string, std::string> cityDisplayNameCache;
     static std::map<int, std::string> categoryNum2TimezoneWN;
     static std::map<int, std::string> categoryNum2TimezoneEN;
     static std::map<int, std::string> categoryNum2TimezoneWS;
@@ -90,12 +91,18 @@ private:
     static std::mutex matchLocaleMutex;
     static std::mutex initZoneInfoMutex;
     static std::mutex initSupportedLocalesMutex;
+    static std::mutex cityDisplayNameMutex;
+    static std::string cityDisplayNameCacheLocale;
     static bool initAvailableZoneInfo;
     static bool initSupportedLocales;
     static bool ReadTimeZoneData(const char *xmlPath);
     static std::string ComputeLocale(std::string &locale);
     icu::TimeZone* GetTimeZone();
     static std::string FindCityDisplayNameFromXml(std::string &cityID, std::string &locale);
+    static std::string FindCityDisplayNameFromXmlInner(std::string &cityID, std::string &locale);
+    static void AddCityDisplayNameCache(const char* xmlCityId, const char* xmlValue);
+    static std::string ResetCityDisplayNameCache(std::string &cityID, std::string &locale);
+    static std::string GetCityDisplayNameFromCache(std::string &cityID);
     static std::string GetCityDisplayNameXmlPath(const std::string &locale);
     static bool GetSupportedLocales();
     static std::string GetFallBack(std::string &localeStr);
