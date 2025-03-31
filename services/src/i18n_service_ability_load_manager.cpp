@@ -21,6 +21,11 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 static constexpr int32_t I18N_LOAD_SA_TIMEOUT_MS = 1000;
+#ifdef DEVICE_WATCH
+static constexpr int32_t I18N_LOAD_SA_TRY_TIMES = 8;
+#else
+static constexpr int32_t I18N_LOAD_SA_TRY_TIMES = 4;
+#endif
 
 I18nServiceAbilityLoadManager::I18nServiceAbilityLoadManager()
 {
@@ -32,10 +37,14 @@ I18nServiceAbilityLoadManager::~I18nServiceAbilityLoadManager()
 
 sptr<IRemoteObject> I18nServiceAbilityLoadManager::GetI18nServiceAbility(int32_t systemAbilityId)
 {
-    sptr<ISystemAbilityManager> samgr = LoadI18nServiceAbility(systemAbilityId);
-    if (samgr == nullptr) {
-        // try again
+    sptr<ISystemAbilityManager> samgr = nullptr;
+    for (int32_t times = 0; times < I18N_LOAD_SA_TRY_TIMES; times++) {
         samgr = LoadI18nServiceAbility(systemAbilityId);
+        if (samgr != nullptr) {
+            break;
+        }
+        HILOG_ERROR_I18N("I18nServiceAbilityLoadManager::GetI18nServiceAbility: Load i18n service failed, "
+            "times is %{public}d.", times);
     }
     if (samgr == nullptr) {
         return nullptr;
