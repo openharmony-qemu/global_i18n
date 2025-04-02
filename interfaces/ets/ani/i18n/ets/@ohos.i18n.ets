@@ -43,7 +43,7 @@ namespace i18n {
     export class Unicode {
         static { loadLibrary("i18n_ani.z"); }
 
-        native static isRTL(char: string): boolean;
+        native static isRTL(ch: string): boolean;
     }
 
     export class TimeZone {
