@@ -63,7 +63,6 @@ unordered_map<string, string> ZoneUtil::defaultMap = {
     {"IC", "Atlantic/Canary"},
     {"ID", "Asia/Jakarta"},
     {"IN", "Asia/Kolkata"}, // alias Asia/Calcutta
-    {"KE", "Africa/Nairobi"},
     {"KI", "Pacific/Tarawa"},
     {"KZ", "Asia/Almaty"},
     {"MH", "Pacific/Majuro"},
@@ -72,7 +71,6 @@ unordered_map<string, string> ZoneUtil::defaultMap = {
     {"MY", "Asia/Kuala_Lumpur"},
     {"NP", "Asia/Kathmandu"}, // alias Asia/Katmandu
     {"NZ", "Pacific/Auckland"},
-    {"PA", "America/Panama"},
     {"PF", "Pacific/Tahiti"},
     {"PG", "Pacific/Port_Moresby"},
     {"PS", "Asia/Gaza"},
