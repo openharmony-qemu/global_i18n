@@ -95,6 +95,7 @@ ohos_shared_library("i18n") {
     "libxml2:libxml2",
     "napi:ace_napi",
     "preferences:native_preferences",
+    "protobuf:protobuf_lite",
     "samgr:samgr_proxy",
   ]
 
