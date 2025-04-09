@@ -247,6 +247,7 @@ bool SignatureVerifier::CalcFileShaOriginal(const std::string& filePath, unsigne
         return false;
     }
     FILE* fp = fopen(resolvedPath, "rb");
+    free(resolvedPath);
     if (fp == nullptr) {
         HILOG_ERROR_I18N("SignatureVerifier::CalcFileShaOriginal: Close file failed.");
         return false;
