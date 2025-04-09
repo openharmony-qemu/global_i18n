@@ -145,8 +145,7 @@ ani_double I18nCalendarAddon::Get([[maybe_unused]] ani_env *env, [[maybe_unused]
     return obj->calendar_->Get(g_fieldsMap[str]);
 }
 
-ani_object I18nCalendarAddon::getCalendar([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
-    ani_string locale, ani_string type)
+ani_object I18nCalendarAddon::getCalendar([[maybe_unused]] ani_env *env, ani_string locale, ani_string type)
 {
     std::unique_ptr<I18nCalendarAddon> obj = std::make_unique<I18nCalendarAddon>();
     ani_boolean isUndefined;

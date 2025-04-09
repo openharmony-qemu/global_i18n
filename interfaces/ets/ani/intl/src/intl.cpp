@@ -22,9 +22,6 @@ using namespace OHOS;
 using namespace Global;
 using namespace I18n;
 
-extern "C" const DataHeader U_DATA_API U_ICUDATA_ENTRY_POINT;
-bool g_icuInit = false;
-
 static std::string AniStrToString(ani_env *env, ani_ref aniStr)
 {
     ani_string ani_str = static_cast<ani_string>(aniStr);
@@ -465,12 +462,6 @@ ani_object IntlAniAddon::DateTimeFormat_create0([[maybe_unused]] ani_env *env, [
     std::vector<std::string> localeTags;
     std::map<std::string, std::string> map = {};
 
-    if (!g_icuInit) {
-        UErrorCode err;
-        udata_setCommonDataAfterClean(&U_ICUDATA_ENTRY_POINT, &err);
-        g_icuInit = true;
-    }
-
     obj->datefmt_ = DateTimeFormat::CreateInstance(localeTags, map);
 
     static const char *className = "L@ohos/intl/intl/DateTimeFormat;";
@@ -528,12 +519,6 @@ ani_object IntlAniAddon::DateTimeFormat_create1(ani_env *env, ani_class clazz, a
     std::vector<std::string> localeTags = getLocaleTags(env, locale);
     std::map<std::string, std::string> map =
         getDateTimeFormatOptions(env, options, "L@ohos/intl/intl/DateTimeOptions;");
-
-    if (!g_icuInit) {
-        UErrorCode err;
-        udata_setCommonDataAfterClean(&U_ICUDATA_ENTRY_POINT, &err);
-        g_icuInit = true;
-    }
 
     std::unique_ptr<IntlAniAddon> obj = std::make_unique<IntlAniAddon>();
     obj->datefmt_ = DateTimeFormat::CreateInstance(localeTags, map);
