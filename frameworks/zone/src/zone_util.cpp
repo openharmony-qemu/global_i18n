@@ -306,7 +306,6 @@ const char *ZoneUtil::GetCountryCodeTimezoneCfgPath()
     }
 }
 
-
 bool ZoneUtil::IsFindCountry(xmlDocPtr &doc, xmlNodePtr &cur, xmlNodePtr &value,
     std::string &region)
 {
