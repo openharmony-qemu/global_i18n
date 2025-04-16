@@ -33,6 +33,7 @@ ohos_unittest("intl_test") {
     "unittest/number_format_test.cpp",
     "unittest/number_format_test_extend.cpp",
     "unittest/phone_number_format_test.cpp",
+    "unittest/timezone_location_test.cpp",
     "unittest/translit_test.cpp",
   ]
   include_dirs = [
@@ -65,6 +66,8 @@ ohos_unittest("intl_test") {
     "libxml2:libxml2",
     "openssl:libssl_shared",
     "preferences:native_preferences",
+    "protobuf:protobuf_lite",
+    "selinux_adapter:librestorecon",
   ]
   defines = []
   if (i18n_support_app_preferred_language) {

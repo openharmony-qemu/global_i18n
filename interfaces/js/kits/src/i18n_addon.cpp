@@ -726,6 +726,10 @@ napi_value I18nAddon::GetTransliteratorInstance(napi_env env, napi_callback_info
         return nullptr;
     }
     napi_value constructor = nullptr;
+    if (g_transConstructor == nullptr) {
+        HILOG_ERROR_I18N("Failed to create g_transConstructor");
+        return nullptr;
+    }
     status = napi_get_reference_value(env, *g_transConstructor, &constructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Failed to create reference at GetCalendar");
@@ -1199,6 +1203,10 @@ napi_value I18nAddon::GetLineInstance(napi_env env, napi_callback_info info)
         return nullptr;
     }
     napi_value constructor = nullptr;
+    if (g_brkConstructor == nullptr) {
+        HILOG_ERROR_I18N("Failed to create g_brkConstructor");
+        return nullptr;
+    }
     status = napi_get_reference_value(env, *g_brkConstructor, &constructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Failed to create reference at GetLineInstance");

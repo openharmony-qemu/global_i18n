@@ -235,6 +235,10 @@ napi_value I18nNormalizerAddon::GetI18nNormalizerInstance(napi_env env, napi_cal
     }
 
     napi_value constructor = nullptr;
+    if (g_normalizerConstructor == nullptr) {
+        HILOG_ERROR_I18N("Failed to create g_normalizerConstructor");
+        return nullptr;
+    }
     status = napi_get_reference_value(env, *g_normalizerConstructor, &constructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Failed to create reference of normalizer Constructor");
