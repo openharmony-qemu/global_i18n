@@ -728,6 +728,7 @@ bool I18nTimeZone::ReadNumTimezoneConfigFile(const char* configPath)
     std::string curIndex;
     while (fgets(buffer, READ_BUFFER_SIZE - 1, configFile) != nullptr) {
         std::string line(buffer);
+        line.resize(line.find_last_not_of("\r\n") + 1);
         line = trim(line);
         if (line.find("::") != std::string::npos) {
             curIndex = line.substr(0, 1);
@@ -736,6 +737,7 @@ bool I18nTimeZone::ReadNumTimezoneConfigFile(const char* configPath)
         size_t start = line.find_first_of(",");
         std::string numStr = line.substr(0, start);
         std::string tzId = line.substr(start + 1);
+        tzId = trim(tzId);
         AddNumTimezoneCategoryMap(curIndex, numStr, tzId);
     }
     numTimezoneCategoryInitialized = true;
@@ -754,7 +756,7 @@ void I18nTimeZone::AddNumTimezoneCategoryMap(std::string &curIndex, std::string 
     }
     int32_t status = 0;
     int32_t num = ConvertString2Int(numStr, status);
-    if (num != 0) {
+    if (status != 0) {
         HILOG_ERROR_I18N("I18nTimeZone::AddNumTimezoneCategoryMap numStr:%{public}s is not digit.", numStr.c_str());
         return;
     }
