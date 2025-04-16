@@ -1986,6 +1986,9 @@ HWTEST_F(IntlTest, IntlFuncTest0046, TestSize.Level1)
     }
     EXPECT_TRUE(containsShanghai);
     EXPECT_TRUE(containsUrumqi);
+    //科伊艾克
+    vector<std::string> coyhaique = I18nTimeZone::GetTimezoneIdByLocation(-72.04, -45.34);
+    EXPECT_TRUE(coyhaique.size() == 1 && coyhaique[0] == "America/Coyhaique");
 }
 } // namespace I18n
 } // namespace Global

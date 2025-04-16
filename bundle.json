@@ -71,6 +71,7 @@
                 "openssl",
                 "os_account",
                 "preferences",
+                "protobuf",
                 "resource_management",
                 "safwk",
                 "samgr"

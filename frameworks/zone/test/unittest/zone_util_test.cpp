@@ -133,7 +133,7 @@ HWTEST_F(ZoneUtilTest,  ZoneUtilFuncTest004, TestSize.Level1)
  */
 HWTEST_F(ZoneUtilTest,  ZoneUtilFuncTest005, TestSize.Level1)
 {
-    vector<string> expects = { "Europe/Berlin", "Europe/Busingen" };
+    vector<string> expects = { "Arctic/Longyearbyen", "Europe/Berlin", "Europe/Busingen" };
     string country = "DE";
     vector<string> out;
     ZoneUtil util;

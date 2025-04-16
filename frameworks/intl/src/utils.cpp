@@ -171,6 +171,7 @@ std::string GetAbsoluteFilePath(const std::string &filePath)
     }
     std::ifstream file(result);
     if (!file.good()) {
+        free(result);
         HILOG_ERROR_I18N("utils: file open is not good.");
         return "";
     }

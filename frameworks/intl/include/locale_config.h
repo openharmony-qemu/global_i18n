@@ -24,21 +24,12 @@
 #include <unordered_set>
 #include "i18n_types.h"
 #include "taboo_utils.h"
-#include "unicode/calendar.h"
-#include "locale_info.h"
-#include "unicode/locid.h"
-#include "unicode/utypes.h"
 
 namespace OHOS {
-
-#ifdef SUPPORT_GRAPHICS
-template <typename T>
-class sptr;
-class IRemoteObject;
-#endif
-
 namespace Global {
 namespace I18n {
+class LocaleInfo;
+
 class LocaleConfig {
 public:
     LocaleConfig() = default;
@@ -123,9 +114,6 @@ public:
         bool sentenceCase);
     static bool IsRTL(const std::string &locale);
     static std::string GetValidLocale(const std::string &localeTag);
-#ifdef SUPPORT_GRAPHICS
-    static bool Is24HourClock(sptr<IRemoteObject> &proxy);
-#endif
     static bool IsEmpty24HourClock();
     static bool Is24HourClock();
     static std::string GetSystemHour();
@@ -300,7 +288,6 @@ private:
     static std::unordered_set<std::string> fahrenheitUsingRegions;
     static std::unordered_map<WeekDay, std::string> weekDayToName;
     static std::unordered_map<std::string, WeekDay> nameToWeekDay;
-    static std::unordered_map<icu::Calendar::EDaysOfWeek, WeekDay> eDaysOfWeekToWeekDay;
     static std::map<std::string, std::string> locale2DisplayName;
     static std::map<std::string, std::string> region2DisplayName;
     static std::unordered_map<std::string, std::vector<std::string>> dialectLanguages;

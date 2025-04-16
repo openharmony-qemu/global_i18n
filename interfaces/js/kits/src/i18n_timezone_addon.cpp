@@ -500,6 +500,10 @@ napi_value I18nTimeZoneAddon::GetOffset(napi_env env, napi_callback_info info)
 napi_value I18nTimeZoneAddon::StaticGetTimeZone(napi_env env, napi_value *argv, bool isZoneID)
 {
     napi_value constructor = nullptr;
+    if (g_timezoneConstructor == nullptr) {
+        HILOG_ERROR_I18N("Failed to create g_timezoneConstructor");
+        return nullptr;
+    }
     napi_status status = napi_get_reference_value(env, *g_timezoneConstructor, &constructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Failed to create reference at StaticGetTimeZone");

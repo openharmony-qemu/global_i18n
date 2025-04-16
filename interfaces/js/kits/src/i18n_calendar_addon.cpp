@@ -154,6 +154,10 @@ napi_value I18nCalendarAddon::GetCalendar(napi_env env, napi_callback_info info)
         return nullptr;
     }
     napi_value constructor = nullptr;
+    if (g_constructor == nullptr) {
+        HILOG_ERROR_I18N("Failed to create g_constructor");
+        return nullptr;
+    }
     status = napi_get_reference_value(env, *g_constructor, &constructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Failed to create reference at GetCalendar");
