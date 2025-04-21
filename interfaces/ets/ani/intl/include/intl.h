@@ -29,6 +29,19 @@ namespace Global {
 namespace I18n {
 class IntlAniAddon {
 public:
+    template<typename T>
+    static T GetLocaleProperty(ani_env *env, ani_object object,
+        const std::string& propertyName, T (LocaleInfo::*getter)() const);
+    static ani_string Locale_getLanguage(ani_env *env, ani_object object);
+    static ani_string Locale_getScript(ani_env *env, ani_object object);
+    static ani_string Locale_getRegion(ani_env *env, ani_object object);
+    static ani_string Locale_getBaseName(ani_env *env, ani_object object);
+    static ani_string Locale_getCaseFirst(ani_env *env, ani_object object);
+    static ani_string Locale_getCalendar(ani_env *env, ani_object object);
+    static ani_string Locale_getCollation(ani_env *env, ani_object object);
+    static ani_string Locale_getHourCycle(ani_env *env, ani_object object);
+    static ani_string Locale_getNumberingSystem(ani_env *env, ani_object object);
+    static ani_boolean Locale_getNumeric(ani_env *env, ani_object object);
     static ani_string DateTimeFormat_format([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
         ani_object Date);
     static ani_object DateTimeFormat_resolvedOptions([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object);
