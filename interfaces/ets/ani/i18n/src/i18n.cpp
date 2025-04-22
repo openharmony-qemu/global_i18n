@@ -65,7 +65,7 @@ static std::unordered_map<std::string, CalendarType> g_typeMap {
     { "persion", CalendarType::PERSIAN },
 };
 
-std::string ANIStringToString(ani_env *env, ani_string ani_str)
+static std::string ANIStringToString(ani_env *env, ani_string ani_str)
 {
     ani_size strSize;
     env->String_GetUTF8Size(ani_str, &strSize);
@@ -90,7 +90,7 @@ I18nCalendarAddon* I18nCalendarAddon::unwrapAddon(ani_env *env, ani_object objec
     return reinterpret_cast<I18nCalendarAddon*>(ptr);
 }
 
-ani_string getSystemLanguage([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
+static ani_string getSystemLanguage([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
 {
     std::string str = LocaleConfig::GetSystemLanguage();
     ani_string ret;
@@ -98,7 +98,7 @@ ani_string getSystemLanguage([[maybe_unused]] ani_env *env, [[maybe_unused]] ani
     return ret;
 }
 
-ani_string getSystemLocale([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
+static ani_string getSystemLocale([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
 {
     std::string str = LocaleConfig::GetSystemLocale();
     ani_string ret;
@@ -106,12 +106,12 @@ ani_string getSystemLocale([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_o
     return ret;
 }
 
-ani_boolean is24HourClock([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
+static ani_boolean is24HourClock([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
 {
     return LocaleConfig::Is24HourClock();
 }
 
-ani_string getSystemRegion([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
+static ani_string getSystemRegion([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
 {
     std::string str = LocaleConfig::GetSystemRegion();
     ani_string ret;
@@ -119,7 +119,7 @@ ani_string getSystemRegion([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_o
     return ret;
 }
 
-ani_boolean unicodeIsRTL([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object, ani_string ch)
+static ani_boolean unicodeIsRTL([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object, ani_string ch)
 {
     return IsRTLCharacter(ANIStringToString(env, ch));
 }
@@ -127,6 +127,9 @@ ani_boolean unicodeIsRTL([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_obj
 ani_string I18nCalendarAddon::CalendarGetTimeZone([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
 {
     I18nCalendarAddon* obj = unwrapAddon(env, object);
+    if (obj == nullptr || obj->calendar_ == nullptr) {
+        return nullptr;
+    }
     std::string str = obj->calendar_->GetTimeZone();
     ani_string ret;
     env->String_NewUTF8(str.c_str(), str.size(), &ret);
@@ -142,6 +145,9 @@ ani_double I18nCalendarAddon::Get([[maybe_unused]] ani_env *env, [[maybe_unused]
     }
 
     I18nCalendarAddon* obj = unwrapAddon(env, object);
+    if (obj == nullptr || obj->calendar_ == nullptr) {
+        return -1;
+    }
     return obj->calendar_->Get(g_fieldsMap[str]);
 }
 
@@ -179,7 +185,7 @@ ani_object I18nCalendarAddon::getCalendar([[maybe_unused]] ani_env *env, ani_str
     return calendar_object;
 }
 
-ani_boolean i18nIsRTL([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object, ani_string locale)
+static ani_boolean i18nIsRTL(ani_env *env, ani_string locale)
 {
     return LocaleConfig::IsRTL(ANIStringToString(env, locale));
 }

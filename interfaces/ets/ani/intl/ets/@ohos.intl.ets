@@ -196,17 +196,17 @@ namespace intl {
     export class Locale {
         static { loadLibrary("intl_ani.z"); }
 
-        private nativeLocale: long = 0;
-        private language: string;
-        private script: string;
-        private region: string;
-        private baseName: string;
-        private caseFirst: string;
-        private calendar: string;
-        private collation: string;
-        private hourCycle: string;
-        private numberingSystem: string;
-        private numeric: boolean;
+        _language: string;
+        _script: string;
+        _region: string;
+        _baseName: string;
+        _caseFirst: string;
+        _calendar: string;
+        _collation: string;
+        _hourCycle: string;
+        _numberingSystem: string;
+        _numeric: boolean;
+        private nativeLocale: long;
 
         constructor(context: long) {
             if (this.nativeLocale == 0) {
@@ -222,8 +222,77 @@ namespace intl {
             this.nativeLocale = Locale.create(locale, options).nativeLocale;
         }
 
+        get language(): string {
+            return this.getLanguage();
+        }
+
+        set language(value: string) {}
+
+        get script(): string {
+            return this.getScript();
+        }
+
+        set script(value: string) {}
+
+        get region(): string {
+            return this.getRegion();
+        }
+
+        set region(value: string) {}
+
+        get baseName(): string {
+            return this.getBaseName();
+        }
+
+        set baseName(value: string) {}
+
+        get caseFirst(): string {
+            return this.getCaseFirst();
+        }
+
+        set caseFirst(value: string) {}
+
+        get calendar(): string {
+            return this.getCalendar();
+        }
+
+        set calendar(value: string) {}
+
+        get collation(): string {
+            return this.getCollation();
+        }
+        set collation(value: string) {}
+
+        get hourCycle(): string {
+            return this.getHourCycle();
+        }
+
+        set hourCycle(value: string) {}
+
+        get numberingSystem(): string {
+            return this.getNumberingSystem();
+        }
+
+        set numberingSystem(value: string) {}
+
+        get numeric(): boolean {
+            return this.getNumeric();
+        }
+
+        set numeric(value: boolean) {}
+
         native static create(): Locale;
         native static create(locale: string, options?: LocaleOptions): Locale;
+        native getLanguage(): string;
+        native getScript(): string;
+        native getRegion(): string;
+        native getBaseName(): string;
+        native getCaseFirst(): string;
+        native getCalendar(): string;
+        native getCollation(): string;
+        native getHourCycle(): string;
+        native getNumberingSystem(): string;
+        native getNumeric(): boolean;
     }
 
     export class DateTimeFormat {

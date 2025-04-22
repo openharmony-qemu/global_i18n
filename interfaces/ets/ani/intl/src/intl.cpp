@@ -17,6 +17,7 @@
 #include "ucmndata.h"
 #include "unicode/udata.h"
 #include "unicode/utypes.h"
+#include "utils.h"
 
 using namespace OHOS;
 using namespace Global;
@@ -37,6 +38,16 @@ static std::string AniStrToString(ani_env *env, ani_ref aniStr)
     utf8Buffer[bytes_written] = '\0';
     std::string content = std::string(utf8Buffer);
     return content;
+}
+
+static ani_string StringToAniStr(ani_env *env, const std::string &str)
+{
+    ani_string ret;
+    if (ANI_OK != env->String_NewUTF8(str.c_str(), str.size(), &ret)) {
+        std::cerr << "Create string failed" << std::endl;
+        return nullptr;
+    }
+    return ret;
 }
 
 static IntlAniAddon* unwrapAddon(ani_env *env, ani_object object, std::string name)
@@ -75,11 +86,18 @@ static void setterNumber(ani_env *env, ani_class cls, std::string name, std::str
     ani_method setter;
     if (ANI_OK != env->Class_FindSetter(cls, name.c_str(), &setter)) {
         std::cerr << "Class_FindSetter failed '" << name << "'" << std::endl;
+        return;
     }
 
-    ani_double value_double = std::stod(value);
-    if (ANI_OK != env->Object_CallMethod_Void(obj, setter, value_double)) {
+    int32_t status = 0;
+    int32_t digits = ConvertString2Int(value, status);
+    if (status != 0) {
+        return;
+    }
+
+    if (ANI_OK != env->Object_CallMethod_Void(obj, setter, digits)) {
         std::cerr << "Object_CallMethod_Void Fail" << std::endl;
+        return;
     }
 }
 
@@ -187,32 +205,109 @@ static bool getStringMember(ani_env *env, ani_object options, std::string cName,
     return true;
 }
 
+template<typename T>
+T IntlAniAddon::GetLocaleProperty(ani_env *env, ani_object object,
+    const std::string& propertyName, T (LocaleInfo::*getter)() const)
+{
+    IntlAniAddon* obj = unwrapAddon(env, object, "nativeLocale");
+    if (obj == nullptr || obj->locale_ == nullptr) {
+        std::cerr << propertyName + ": Get Locale object failed" << std::endl;
+        return T{};
+    }
+    return (obj->locale_.get()->*getter)();
+}
+
+ani_string IntlAniAddon::Locale_getLanguage(ani_env *env, ani_object object)
+{
+    std::string value = GetLocaleProperty(env, object, "getLanguage", &LocaleInfo::GetLanguage);
+    return StringToAniStr(env, value);
+}
+
+ani_string IntlAniAddon::Locale_getScript(ani_env *env, ani_object object)
+{
+    std::string value = GetLocaleProperty(env, object, "getScript", &LocaleInfo::GetScript);
+    return StringToAniStr(env, value);
+}
+
+ani_string IntlAniAddon::Locale_getRegion(ani_env *env, ani_object object)
+{
+    std::string value = GetLocaleProperty(env, object, "getRegion", &LocaleInfo::GetRegion);
+    return StringToAniStr(env, value);
+}
+
+ani_string IntlAniAddon::Locale_getBaseName(ani_env *env, ani_object object)
+{
+    std::string value = GetLocaleProperty(env, object, "getBaseName", &LocaleInfo::GetBaseName);
+    return StringToAniStr(env, value);
+}
+
+ani_string IntlAniAddon::Locale_getCaseFirst(ani_env *env, ani_object object)
+{
+    std::string value = GetLocaleProperty(env, object, "getCaseFirst", &LocaleInfo::GetCaseFirst);
+    return StringToAniStr(env, value);
+}
+
+ani_string IntlAniAddon::Locale_getCalendar(ani_env *env, ani_object object)
+{
+    std::string value = GetLocaleProperty(env, object, "getCalendar", &LocaleInfo::GetCalendar);
+    return StringToAniStr(env, value);
+}
+
+ani_string IntlAniAddon::Locale_getCollation(ani_env *env, ani_object object)
+{
+    std::string value = GetLocaleProperty(env, object, "getCollation", &LocaleInfo::GetCollation);
+    return StringToAniStr(env, value);
+}
+
+ani_string IntlAniAddon::Locale_getHourCycle(ani_env *env, ani_object object)
+{
+    std::string value = GetLocaleProperty(env, object, "getHourCycle", &LocaleInfo::GetHourCycle);
+    return StringToAniStr(env, value);
+}
+
+ani_string IntlAniAddon::Locale_getNumberingSystem(ani_env *env, ani_object object)
+{
+    std::string value = GetLocaleProperty(env, object, "getNumberingSystem", &LocaleInfo::GetNumberingSystem);
+    return StringToAniStr(env, value);
+}
+
+ani_boolean IntlAniAddon::Locale_getNumeric(ani_env *env, ani_object object)
+{
+    IntlAniAddon* obj = unwrapAddon(env, object, "nativeLocale");
+    if (obj == nullptr || obj->locale_ == nullptr) {
+        std::cerr << "getNumeric: Get Locale object failed"  << std::endl;
+        return false;
+    }
+    return (obj->locale_->GetNumeric() == "true");
+}
+
 ani_string IntlAniAddon::DateTimeFormat_format([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
     ani_object Date)
 {
-    std::string str = "";
-    ani_string ret;
-    env->String_NewUTF8(str.c_str(), str.size(), &ret);
     ani_class cls;
     if (ANI_OK != env->FindClass("Lescompat/Date;", &cls)) {
         std::cerr << "Not found 'Lescompat/Date'" << std::endl;
-        return ret;
+        return nullptr;
     }
 
     ani_method getms;
     if (ANI_OK != env->Class_FindMethod(cls, "valueOf", nullptr, &getms)) {
         std::cerr << "Find Method Fail 'valueOf'" << std::endl;
-        return ret;
+        return nullptr;
     }
 
     ani_double milliseconds;
     if (ANI_OK != env->Object_CallMethod_Double(Date, getms, &milliseconds)) {
         std::cerr << "Object_CallMethod_Double Fail" << std::endl;
-        return ret;
+        return nullptr;
     }
 
     IntlAniAddon *obj = unwrapAddon(env, object, "nativeDateTimeFormat");
-    str = obj->datefmt_->Format(milliseconds);
+    if (obj == nullptr || obj->datefmt_ == nullptr) {
+        return nullptr;
+    }
+    std::string str = obj->datefmt_->Format(milliseconds);
+    ani_string ret;
     env->String_NewUTF8(str.c_str(), str.size(), &ret);
     return ret;
 }
@@ -220,27 +315,30 @@ ani_string IntlAniAddon::DateTimeFormat_format([[maybe_unused]] ani_env *env, [[
 ani_object IntlAniAddon::DateTimeFormat_resolvedOptions([[maybe_unused]] ani_env *env, [[maybe_unused]]
     ani_object object)
 {
-    IntlAniAddon *obj = unwrapAddon(env, object, "nativeDateTimeFormat");
     std::map<std::string, std::string> options = {};
+    IntlAniAddon *obj = unwrapAddon(env, object, "nativeDateTimeFormat");
+    if (obj == nullptr || obj->datefmt_ == nullptr) {
+        return nullptr;
+    }
     obj->datefmt_->GetResolvedOptions(options);
-    
-    ani_object DateTimeOptions = {};
+
     static const char *className = "L@ohos/intl/intl/DateTimeOptionsInner;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         std::cerr << "Not found '" << className << "'" << std::endl;
-        return DateTimeOptions;
+        return nullptr;
     }
 
     ani_method ctor;
     if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
         std::cerr << "get ctor Failed'" << className << "'" << std::endl;
-        return DateTimeOptions;
+        return nullptr;
     }
 
+    ani_object DateTimeOptions = {};
     if (ANI_OK != env->Object_New(cls, ctor, &DateTimeOptions)) {
         std::cerr << "Create Object Failed'" << className << "'" << std::endl;
-        return DateTimeOptions;
+        return nullptr;
     }
 
     ani_method hour12Setter;
@@ -273,6 +371,9 @@ ani_string IntlAniAddon::NumberFormat_format([[maybe_unused]] ani_env *env, [[ma
     ani_double number)
 {
     IntlAniAddon *obj = unwrapAddon(env, object, "nativeNumberFormat");
+    if (obj == nullptr || obj->numberfmt_ == nullptr) {
+        return nullptr;
+    }
     std::string str = obj->numberfmt_->Format(number);
     ani_string ret;
     env->String_NewUTF8(str.c_str(), str.size(), &ret);
@@ -281,38 +382,39 @@ ani_string IntlAniAddon::NumberFormat_format([[maybe_unused]] ani_env *env, [[ma
 
 ani_object IntlAniAddon::NumberFormat_resolvedOptions([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
 {
-    IntlAniAddon *obj = unwrapAddon(env, object, "nativeNumberFormat");
     std::map<std::string, std::string> options = {};
+    IntlAniAddon *obj = unwrapAddon(env, object, "nativeNumberFormat");
+    if (obj == nullptr || obj->numberfmt_ == nullptr) {
+        return nullptr;
+    }
     obj->numberfmt_->GetResolvedOptions(options);
     
-    ani_object NumberOptions = {};
-
-    static const char *className = "L@ohos/intl/intl/NumberOptionsInner;";
     ani_class cls;
-    if (ANI_OK != env->FindClass(className, &cls)) {
-        std::cerr << "Not found '" << className << "'" << std::endl;
-        return NumberOptions;
+    if (ANI_OK != env->FindClass("L@ohos/intl/intl/NumberOptionsInner;", &cls)) {
+        std::cerr << "Not found 'L@ohos/intl/intl/NumberOptionsInner;'" << std::endl;
+        return nullptr;
     }
 
     ani_method ctor;
     if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
-        std::cerr << "get ctor Failed'" << className << "'" << std::endl;
-        return NumberOptions;
+        std::cerr << "get ctor Failed'L@ohos/intl/intl/NumberOptionsInner;'" << std::endl;
+        return nullptr;
     }
 
+    ani_object NumberOptions = {};
     if (ANI_OK != env->Object_New(cls, ctor, &NumberOptions)) {
-        std::cerr << "Create Object Failed'" << className << "'" << std::endl;
-        return NumberOptions;
+        std::cerr << "Create Object Failed'L@ohos/intl/intl/NumberOptionsInner;'" << std::endl;
+        return nullptr;
     }
 
     ani_method useGroupingSetter;
     if (ANI_OK != env->Class_FindSetter(cls, "useGrouping", &useGroupingSetter)) {
-        std::cerr << "Class_FindSetter Fail'" << className << "'" << std::endl;
+        std::cerr << "Class_FindSetter Fail'L@ohos/intl/intl/NumberOptionsInner;'" << std::endl;
     }
 
     ani_boolean useGrouping = options["useGrouping"] == "true";
     if (ANI_OK != env->Object_CallMethod_Void(NumberOptions, useGroupingSetter, useGrouping)) {
-        std::cerr << "Object_CallMethod_Void Fail'" << className << "'" << std::endl;
+        std::cerr << "Object_CallMethod_Void Fail'L@ohos/intl/intl/NumberOptionsInner;'" << std::endl;
         return NumberOptions;
     }
 
@@ -422,7 +524,7 @@ ani_object IntlAniAddon::Locale_create1([[maybe_unused]] ani_env *env, [[maybe_u
     return Locale_object;
 }
 
-std::vector<std::string> getLocaleTags(ani_env *env, ani_object locale)
+static std::vector<std::string> getLocaleTags(ani_env *env, ani_object locale)
 {
     std::vector<std::string> localeTags;
     ani_class stringClass;
@@ -487,7 +589,7 @@ ani_object IntlAniAddon::DateTimeFormat_create0([[maybe_unused]] ani_env *env, [
     return DateTimeFormat_object;
 }
 
-std::map<std::string, std::string> getDateTimeFormatOptions(ani_env *env,
+static std::map<std::string, std::string> getDateTimeFormatOptions(ani_env *env,
     ani_object options, const std::string &className)
 {
     std::map<std::string, std::string> map;
@@ -576,7 +678,7 @@ ani_object IntlAniAddon::NumberFormat_create0([[maybe_unused]] ani_env *env, [[m
     return NumberFormat_object;
 }
 
-std::map<std::string, std::string> getNumberFormatOptions(ani_env *env,
+static std::map<std::string, std::string> getNumberFormatOptions(ani_env *env,
     ani_object options, const std::string &className)
 {
     std::map<std::string, std::string> map;
@@ -657,6 +759,16 @@ ani_status IntlAniAddon::BindContext_Locale(ani_env *env)
         ani_native_function {"create",
             "Lstd/core/String;L@ohos/intl/intl/LocaleOptions;:L@ohos/intl/intl/Locale;",
             reinterpret_cast<void *>(Locale_create1) },
+        ani_native_function {"getLanguage", nullptr, reinterpret_cast<void *>(Locale_getLanguage) },
+        ani_native_function {"getScript", nullptr, reinterpret_cast<void *>(Locale_getScript) },
+        ani_native_function {"getRegion", nullptr, reinterpret_cast<void *>(Locale_getRegion) },
+        ani_native_function {"getBaseName", nullptr, reinterpret_cast<void *>(Locale_getBaseName) },
+        ani_native_function {"getCaseFirst", nullptr, reinterpret_cast<void *>(Locale_getCaseFirst) },
+        ani_native_function {"getCalendar", nullptr, reinterpret_cast<void *>(Locale_getCalendar) },
+        ani_native_function {"getCollation", nullptr, reinterpret_cast<void *>(Locale_getCollation) },
+        ani_native_function {"getHourCycle", nullptr, reinterpret_cast<void *>(Locale_getHourCycle) },
+        ani_native_function {"getNumberingSystem", nullptr, reinterpret_cast<void *>(Locale_getNumberingSystem) },
+        ani_native_function {"getNumeric", nullptr, reinterpret_cast<void *>(Locale_getNumeric) },
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
