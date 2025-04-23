@@ -50,7 +50,7 @@ static ani_string StringToAniStr(ani_env *env, const std::string &str)
     return ret;
 }
 
-static IntlAniAddon* unwrapAddon(ani_env *env, ani_object object, std::string name)
+static IntlAniAddon* UnwrapAddon(ani_env *env, ani_object object, std::string name)
 {
     ani_long ptr;
     if (ANI_OK != env->Object_GetFieldByName_Long(object, name.c_str(), &ptr)) {
@@ -59,7 +59,7 @@ static IntlAniAddon* unwrapAddon(ani_env *env, ani_object object, std::string na
     return reinterpret_cast<IntlAniAddon*>(ptr);
 }
 
-static void setterString(ani_env *env, ani_class cls, std::string name, std::string value, ani_object obj)
+static void SetterString(ani_env *env, ani_class cls, std::string name, std::string value, ani_object obj)
 {
     if (value.empty()) {
         return;
@@ -77,7 +77,7 @@ static void setterString(ani_env *env, ani_class cls, std::string name, std::str
     }
 }
 
-static void setterNumber(ani_env *env, ani_class cls, std::string name, std::string value, ani_object obj)
+static void SetterNumber(ani_env *env, ani_class cls, std::string name, std::string value, ani_object obj)
 {
     if (value.empty()) {
         return;
@@ -101,27 +101,11 @@ static void setterNumber(ani_env *env, ani_class cls, std::string name, std::str
     }
 }
 
-static bool getBooleanMember(ani_env *env, ani_object options,
-    std::string cName, std::string mName, bool& member)
+static bool GetBooleanMember(ani_env *env, ani_object options, const std::string memberName, bool& member)
 {
-    ani_class cls;
-    const char *className = cName.c_str();
-    const char *memberName = mName.c_str();
-   
-    if (ANI_OK != env->FindClass(className, &cls)) {
-        std::cerr << "Not found '" << className << "'" << std::endl;
-        return false;
-    }
-   
-    ani_method getter;
-    if (ANI_OK != env->Class_FindGetter(cls, memberName, &getter)) {
-        std::cerr << "Class_FindGetter failed '" << memberName << "'" << std::endl;
-        return false;
-    }
-
     ani_ref ref;
-    if (ANI_OK != env->Object_CallMethod_Ref(options, getter, &ref)) {
-        std::cerr << "Object_CallMethod_Ref Fail" << std::endl;
+    if (ANI_OK != env->Object_GetPropertyByName_Ref(options, memberName.c_str(), &ref)) {
+        std::cerr << "Get property '" << memberName << "' failed" << std::endl;
         return false;
     }
 
@@ -137,79 +121,48 @@ static bool getBooleanMember(ani_env *env, ani_object options,
     return true;
 }
 
-static bool getDoubleMember(ani_env *env, ani_object options,
-    std::string cName, std::string mName, double& member)
+static bool GetDoubleMember(ani_env *env, ani_object options, const std::string memberName, double& member)
 {
-    ani_class cls;
-    const char *className = cName.c_str();
-    const char *memberName = mName.c_str();
-   
-    if (ANI_OK != env->FindClass(className, &cls)) {
-        std::cerr << "Not found '" << className << "'" << std::endl;
-        return false;
-    }
-   
-    ani_method getter;
-    if (ANI_OK != env->Class_FindGetter(cls, memberName, &getter)) {
-        std::cerr << "Class_FindGetter failed '" << memberName << "'" << std::endl;
-        return false;
-    }
-
-    ani_ref ret;
-    if (ANI_OK != env->Object_CallMethod_Ref(options, getter, &ret)) {
-        std::cerr << "Object_CallMethod_Ref Fail" << std::endl;
+    ani_ref ref;
+    if (ANI_OK != env->Object_GetPropertyByName_Ref(options, memberName.c_str(), &ref)) {
+        std::cerr << "Get property '" << memberName << "' failed" << std::endl;
         return false;
     }
 
     ani_boolean isUndefined;
-    env->Reference_IsUndefined(ret, &isUndefined);
+    env->Reference_IsUndefined(ref, &isUndefined);
     if (isUndefined) {
         return false;
     }
 
-    env->Object_CallMethodByName_Double(static_cast<ani_object>(ret), "unboxed", ":D", &member);
+    env->Object_CallMethodByName_Double(static_cast<ani_object>(ref), "unboxed", ":D", &member);
     return true;
 }
 
-static bool getStringMember(ani_env *env, ani_object options, std::string cName,
-    std::string mName, std::string& member)
+static bool GetStringMember(ani_env *env, ani_object options, const std::string memberName, std::string& member)
 {
-    ani_class cls;
-    const char *className = cName.c_str();
-    const char *memberName = mName.c_str();
-   
-    if (ANI_OK != env->FindClass(className, &cls)) {
-        std::cerr << "Not found '" << className << "'" << std::endl;
-        return false;
-    }
-   
-    ani_method getter;
-    if (ANI_OK != env->Class_FindGetter(cls, memberName, &getter)) {
-        std::cerr << "Class_FindGetter failed '" << memberName << "'" << std::endl;
-        return false;
-    }
-
-    ani_ref ret;
-    if (ANI_OK != env->Object_CallMethod_Ref(options, getter, &ret)) {
-        std::cerr << "Object_CallMethod_Ref Fail" << std::endl;
+    ani_ref ref;
+    if (ANI_OK != env->Object_GetPropertyByName_Ref(options, memberName.c_str(), &ref)) {
+        std::cerr << "Get property '" << memberName << "' failed" << std::endl;
         return false;
     }
 
     ani_boolean isUndefined;
-    env->Reference_IsUndefined(ret, &isUndefined);
+    env->Reference_IsUndefined(ref, &isUndefined);
     if (isUndefined) {
         return false;
     }
 
-    member = AniStrToString(env, ret);
+    member = AniStrToString(env, ref);
     return true;
 }
+
 
 template<typename T>
 T IntlAniAddon::GetLocaleProperty(ani_env *env, ani_object object,
     const std::string& propertyName, T (LocaleInfo::*getter)() const)
 {
-    IntlAniAddon* obj = unwrapAddon(env, object, "nativeLocale");
+    IntlAniAddon* obj = UnwrapAddon(env, object, "nativeLocale");
     if (obj == nullptr || obj->locale_ == nullptr) {
         std::cerr << propertyName + ": Get Locale object failed" << std::endl;
         return T{};
@@ -273,7 +226,7 @@ ani_string IntlAniAddon::Locale_getNumberingSystem(ani_env *env, ani_object obje
 
 ani_boolean IntlAniAddon::Locale_getNumeric(ani_env *env, ani_object object)
 {
-    IntlAniAddon* obj = unwrapAddon(env, object, "nativeLocale");
+    IntlAniAddon* obj = UnwrapAddon(env, object, "nativeLocale");
     if (obj == nullptr || obj->locale_ == nullptr) {
         std::cerr << "getNumeric: Get Locale object failed"  << std::endl;
         return false;
@@ -302,7 +255,7 @@ ani_string IntlAniAddon::DateTimeFormat_format([[maybe_unused]] ani_env *env, [[
         return nullptr;
     }
 
-    IntlAniAddon *obj = unwrapAddon(env, object, "nativeDateTimeFormat");
+    IntlAniAddon *obj = UnwrapAddon(env, object, "nativeDateTimeFormat");
     if (obj == nullptr || obj->datefmt_ == nullptr) {
         return nullptr;
     }
@@ -316,7 +269,7 @@ ani_object IntlAniAddon::DateTimeFormat_resolvedOptions([[maybe_unused]] ani_env
     ani_object object)
 {
     std::map<std::string, std::string> options = {};
-    IntlAniAddon *obj = unwrapAddon(env, object, "nativeDateTimeFormat");
+    IntlAniAddon *obj = UnwrapAddon(env, object, "nativeDateTimeFormat");
     if (obj == nullptr || obj->datefmt_ == nullptr) {
         return nullptr;
     }
@@ -360,7 +313,7 @@ ani_object IntlAniAddon::DateTimeFormat_resolvedOptions([[maybe_unused]] ani_env
 
     for (const auto& key : keys) {
         if (options.find(key) != options.end()) {
-            setterString(env, cls, key, options[key], DateTimeOptions);
+            SetterString(env, cls, key, options[key], DateTimeOptions);
         }
     }
 
@@ -370,7 +323,7 @@ ani_object IntlAniAddon::DateTimeFormat_resolvedOptions([[maybe_unused]] ani_env
 ani_string IntlAniAddon::NumberFormat_format([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
     ani_double number)
 {
-    IntlAniAddon *obj = unwrapAddon(env, object, "nativeNumberFormat");
+    IntlAniAddon *obj = UnwrapAddon(env, object, "nativeNumberFormat");
     if (obj == nullptr || obj->numberfmt_ == nullptr) {
         return nullptr;
     }
@@ -383,7 +336,7 @@ ani_string IntlAniAddon::NumberFormat_format([[maybe_unused]] ani_env *env, [[ma
 ani_object IntlAniAddon::NumberFormat_resolvedOptions([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
 {
     std::map<std::string, std::string> options = {};
-    IntlAniAddon *obj = unwrapAddon(env, object, "nativeNumberFormat");
+    IntlAniAddon *obj = UnwrapAddon(env, object, "nativeNumberFormat");
     if (obj == nullptr || obj->numberfmt_ == nullptr) {
         return nullptr;
     }
@@ -430,9 +383,9 @@ ani_object IntlAniAddon::NumberFormat_resolvedOptions([[maybe_unused]] ani_env *
             if (key == "minimumIntegerDigits" || key == "minimumFractionDigits" ||
                 key == "maximumFractionDigits" || key == "minimumSignificantDigits" ||
                 key == "maximumSignificantDigits" || key == "roundingIncrement") {
-                setterNumber(env, cls, key, options[key], NumberOptions);
+                SetterNumber(env, cls, key, options[key], NumberOptions);
             } else {
-                setterString(env, cls, key, options[key], NumberOptions);
+                SetterString(env, cls, key, options[key], NumberOptions);
             }
         }
     }
@@ -478,7 +431,6 @@ ani_object IntlAniAddon::Locale_create1([[maybe_unused]] ani_env *env, [[maybe_u
     std::string localeTag = std::string(buffer, s);
     std::map<std::string, std::string> map = {};
 
-    std::string className = "L@ohos/intl/intl/Locale;";
     ani_boolean isUndefined;
     env->Reference_IsUndefined(options, &isUndefined);
     if (!isUndefined) {
@@ -488,13 +440,13 @@ ani_object IntlAniAddon::Locale_create1([[maybe_unused]] ani_env *env, [[maybe_u
 
         for (const auto& key : keys) {
             std::string value;
-            if (getStringMember(env, options, className, key, value)) {
+            if (GetStringMember(env, options, key, value)) {
                 map.insert(std::make_pair(key, value));
             }
         }
     
         bool numeric;
-        if (getBooleanMember(env, options, className, "numeric", numeric)) {
+        if (GetBooleanMember(env, options, "numeric", numeric)) {
             map.insert(std::make_pair("numeric", numeric ? "true" : "false"));
         }
     }
@@ -502,6 +454,7 @@ ani_object IntlAniAddon::Locale_create1([[maybe_unused]] ani_env *env, [[maybe_u
     std::unique_ptr<IntlAniAddon> obj = std::make_unique<IntlAniAddon>();
     obj->locale_ = std::make_unique<LocaleInfo>(localeTag, map);
 
+    std::string className = "L@ohos/intl/intl/Locale;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className.c_str(), &cls)) {
         std::cerr << "Not found '" << className << "'" << std::endl;
@@ -524,7 +477,7 @@ ani_object IntlAniAddon::Locale_create1([[maybe_unused]] ani_env *env, [[maybe_u
     return Locale_object;
 }
 
-static std::vector<std::string> getLocaleTags(ani_env *env, ani_object locale)
+static std::vector<std::string> GetLocaleTags(ani_env *env, ani_object locale)
 {
     std::vector<std::string> localeTags;
     ani_class stringClass;
@@ -589,8 +542,7 @@ ani_object IntlAniAddon::DateTimeFormat_create0([[maybe_unused]] ani_env *env, [
     return DateTimeFormat_object;
 }
 
-static std::map<std::string, std::string> getDateTimeFormatOptions(ani_env *env,
-    ani_object options, const std::string &className)
+static std::map<std::string, std::string> GetDateTimeFormatOptions(ani_env *env, ani_object options)
 {
     std::map<std::string, std::string> map;
     ani_boolean isUndefined;
@@ -603,13 +555,13 @@ static std::map<std::string, std::string> getDateTimeFormatOptions(ani_env *env,
         };
         for (const auto& key : stringKeys) {
             std::string value;
-            if (getStringMember(env, options, className, key, value)) {
+            if (GetStringMember(env, options, key, value)) {
                 map.insert(std::make_pair(key, value));
             }
         }
 
         bool hour12;
-        if (getBooleanMember(env, options, className, "hour12", hour12)) {
+        if (GetBooleanMember(env, options, "hour12", hour12)) {
             map.insert(std::make_pair("hour12", hour12 ? "true" : "false"));
         }
     }
@@ -618,9 +570,8 @@ static std::map<std::string, std::string> getDateTimeFormatOptions(ani_env *env,
 
 ani_object IntlAniAddon::DateTimeFormat_create1(ani_env *env, ani_class clazz, ani_object locale, ani_object options)
 {
-    std::vector<std::string> localeTags = getLocaleTags(env, locale);
-    std::map<std::string, std::string> map =
-        getDateTimeFormatOptions(env, options, "L@ohos/intl/intl/DateTimeOptions;");
+    std::vector<std::string> localeTags = GetLocaleTags(env, locale);
+    std::map<std::string, std::string> map = GetDateTimeFormatOptions(env, options);
 
     std::unique_ptr<IntlAniAddon> obj = std::make_unique<IntlAniAddon>();
     obj->datefmt_ = DateTimeFormat::CreateInstance(localeTags, map);
@@ -678,8 +629,7 @@ ani_object IntlAniAddon::NumberFormat_create0([[maybe_unused]] ani_env *env, [[m
     return NumberFormat_object;
 }
 
-static std::map<std::string, std::string> getNumberFormatOptions(ani_env *env,
-    ani_object options, const std::string &className)
+static std::map<std::string, std::string> GetNumberFormatOptions(ani_env *env, ani_object options)
 {
     std::map<std::string, std::string> map;
     ani_boolean isUndefined;
@@ -691,7 +641,7 @@ static std::map<std::string, std::string> getNumberFormatOptions(ani_env *env,
         };
         for (const auto& key : stringKeys) {
             std::string value;
-            if (getStringMember(env, options, className, key, value)) {
+            if (GetStringMember(env, options, key, value)) {
                 map.insert(std::make_pair(key, value));
             }
         }
@@ -701,13 +651,13 @@ static std::map<std::string, std::string> getNumberFormatOptions(ani_env *env,
             {"minimumSignificantDigits", 0}, {"maximumSignificantDigits", 0}, {"roundingIncrement", 0}
         };
         for (auto& [key, value] : doubleKeys) {
-            if (getDoubleMember(env, options, className, key, value)) {
+            if (GetDoubleMember(env, options, key, value)) {
                 map.insert(std::make_pair(key, std::to_string(value)));
             }
         }
 
         bool useGrouping;
-        if (getBooleanMember(env, options, className, "useGrouping", useGrouping)) {
+        if (GetBooleanMember(env, options, "useGrouping", useGrouping)) {
             map.insert(std::make_pair("useGrouping", useGrouping ? "true" : "false"));
         }
     }
@@ -716,8 +666,8 @@ static std::map<std::string, std::string> getNumberFormatOptions(ani_env *env,
 
 ani_object IntlAniAddon::NumberFormat_create1(ani_env *env, ani_class clazz, ani_object locale, ani_object options)
 {
-    std::vector<std::string> localeTags = getLocaleTags(env, locale);
-    std::map<std::string, std::string> map = getNumberFormatOptions(env, options, "L@ohos/intl/intl/NumberOptions;");
+    std::vector<std::string> localeTags = GetLocaleTags(env, locale);
+    std::map<std::string, std::string> map = GetNumberFormatOptions(env, options);
 
     std::unique_ptr<IntlAniAddon> obj = std::make_unique<IntlAniAddon>();
     obj->numberfmt_ = std::make_unique<NumberFormat>(localeTags, map);
