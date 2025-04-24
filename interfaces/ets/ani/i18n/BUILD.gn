@@ -15,10 +15,27 @@ import("//build/config/components/ets_frontend/ets2abc_config.gni")
 import("//build/ohos.gni")
 
 ohos_shared_library("i18n_ani") {
-  include_dirs = [ "./include" ]
-  sources = [ "./src/i18n.cpp" ]
-  deps = [ "../../../../frameworks/intl:intl_util" ]
+  include_dirs = [
+    "./include",
+    "../intl/include",
+    "../../../../services/include",
+    "../../../native/inner_api/preferred_language/include",
+  ]
+  cflags_cc = [ "-frtti" ]
+  remove_configs = [ "//build/config/compiler:no_rtti" ]
+  sources = [
+    "./src/error_util.cpp",
+    "./src/i18n.cpp",
+  ]
+  deps = [
+    "../../../../frameworks/intl:intl_util",
+    "../../../../frameworks/intl:preferred_language",
+    "../../../../services:i18n_sa_client",
+  ]
   external_deps = [
+    "hilog:libhilog",
+    "icu:shared_icui18n",
+    "libphonenumber:phonenumber_standard",
     "libpng:libpng",
     "runtime_core:ani",
   ]

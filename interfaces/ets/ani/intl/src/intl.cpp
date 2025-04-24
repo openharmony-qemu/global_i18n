@@ -25,36 +25,29 @@ static std::string AniStrToString(ani_env *env, ani_ref aniStr)
 {
     ani_string ani_str = static_cast<ani_string>(aniStr);
     ani_size strSize;
-    env->String_GetUTF8Size(ani_str, &strSize);
-   
-    std::vector<char> buffer(strSize + 1);
-    char* utf8Buffer = buffer.data();
+    if (ANI_OK != env->String_GetUTF8Size(ani_str, &strSize)) {
+        HILOG_ERROR_I18N("Get utf8 size failed");
+        return "";
+    }
 
+    std::vector<char> buffer(strSize + 1);
     ani_size bytes_written = 0;
-    env->String_GetUTF8(ani_str, utf8Buffer, strSize + 1, &bytes_written);
     
-    utf8Buffer[bytes_written] = '\0';
-    std::string content = std::string(utf8Buffer);
-    return content;
+    if (ANI_OK != env->String_GetUTF8(ani_str, buffer.data(), buffer.size(), &bytes_written)) {
+        HILOG_ERROR_I18N("Create string failed");
+        return "";
+    }
+    return std::string(buffer.data(), bytes_written);
 }
 
 static ani_string StringToAniStr(ani_env *env, const std::string &str)
 {
     ani_string ret;
     if (ANI_OK != env->String_NewUTF8(str.c_str(), str.size(), &ret)) {
-        std::cerr << "Create string failed" << std::endl;
+        HILOG_ERROR_I18N("Create ani string failed");
         return nullptr;
     }
     return ret;
-}
-
-static IntlAniAddon* UnwrapAddon(ani_env *env, ani_object object, std::string name)
-{
-    ani_long ptr;
-    if (ANI_OK != env->Object_GetFieldByName_Long(object, name.c_str(), &ptr)) {
-        return nullptr;
-    }
-    return reinterpret_cast<IntlAniAddon*>(ptr);
 }
 
 static void SetBooleanMember(ani_env *env, ani_object obj, const std::string name, const std::string value)
@@ -196,6 +189,38 @@ static bool GetStringMember(ani_env *env, ani_object options, const std::string 
     return true;
 }
 
+static IntlAniAddon* UnwrapAddon(ani_env *env, ani_object object, const std::string name)
+{
+    ani_long ptr;
+    if (ANI_OK != env->Object_GetFieldByName_Long(object, name.c_str(), &ptr)) {
+        HILOG_ERROR_I18N("Get Long '%{public}s' failed", name.c_str());
+        return nullptr;
+    }
+    return reinterpret_cast<IntlAniAddon*>(ptr);
+}
+
+template<typename T>
+static ani_object CreateAniObject(ani_env* env, const char* className, T* ptr)
+{
+    ani_class cls;
+    if (ANI_OK != env->FindClass(className, &cls)) {
+        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        return nullptr;
+    }
+
+    ani_method ctor;
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "J:V", &ctor)) {
+        HILOG_ERROR_I18N("Find method '<ctor>' failed");
+        return nullptr;
+    }
+
+    ani_object obj;
+    if (ANI_OK != env->Object_New(cls, ctor, &obj, reinterpret_cast<ani_long>(ptr))) {
+        HILOG_ERROR_I18N("New object '%{public}s' failed", className);
+        return nullptr;
+    }
+    return obj;
+}
 
 template<typename T>
 T IntlAniAddon::GetLocaleProperty(ani_env *env, ani_object object,
@@ -203,10 +228,40 @@ T IntlAniAddon::GetLocaleProperty(ani_env *env, ani_object object,
 {
     IntlAniAddon* obj = UnwrapAddon(env, object, "nativeLocale");
     if (obj == nullptr || obj->locale_ == nullptr) {
-        std::cerr << propertyName + ": Get Locale object failed" << std::endl;
+        HILOG_ERROR_I18N("%{public}s: Get Locale object failed", propertyName.c_str());
         return T{};
     }
     return (obj->locale_.get()->*getter)();
+}
+
+ani_string IntlAniAddon::Locale_toString(ani_env *env, ani_object object)
+{
+    std::string value = GetLocaleProperty(env, object, "toString", &LocaleInfo::ToString);
+    return StringToAniStr(env, value);
+}
+
+ani_object IntlAniAddon::Locale_maximize(ani_env *env, ani_object object)
+{
+    IntlAniAddon* obj = UnwrapAddon(env, object, "nativeLocale");
+    if (obj == nullptr || obj->locale_ == nullptr) {
+        HILOG_ERROR_I18N("Maximize: Get Locale object failed");
+        return nullptr;
+    }
+
+    std::string localeTag = obj->locale_->Maximize();
+    return Locale_createWithParam(env, nullptr, StringToAniStr(env, localeTag), nullptr);
+}
+
+ani_object IntlAniAddon::Locale_minimize(ani_env *env, ani_object object)
+{
+    IntlAniAddon* obj = UnwrapAddon(env, object, "nativeLocale");
+    if (obj == nullptr || obj->locale_ == nullptr) {
+        HILOG_ERROR_I18N("Minimize: Get Locale object failed");
+        return nullptr;
+    }
+
+    std::string localeTag = obj->locale_->Minimize();
+    return Locale_createWithParam(env, nullptr, StringToAniStr(env, localeTag), nullptr);
 }
 
 ani_string IntlAniAddon::Locale_getLanguage(ani_env *env, ani_object object)
@@ -267,69 +322,108 @@ ani_boolean IntlAniAddon::Locale_getNumeric(ani_env *env, ani_object object)
 {
     IntlAniAddon* obj = UnwrapAddon(env, object, "nativeLocale");
     if (obj == nullptr || obj->locale_ == nullptr) {
-        std::cerr << "getNumeric: Get Locale object failed"  << std::endl;
+        HILOG_ERROR_I18N("getNumeric: Get Locale object failed");
         return false;
     }
     return (obj->locale_->GetNumeric() == "true");
 }
 
-ani_string IntlAniAddon::DateTimeFormat_format([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
-    ani_object Date)
+
+ani_string IntlAniAddon::DateTimeFormat_format(ani_env *env, ani_object object, ani_object date)
 {
+    static const char *className = "Lescompat/Date;";
     ani_class cls;
-    if (ANI_OK != env->FindClass("Lescompat/Date;", &cls)) {
-        std::cerr << "Not found 'Lescompat/Date'" << std::endl;
+    if (ANI_OK != env->FindClass(className, &cls)) {
+        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
         return nullptr;
     }
 
     ani_method getms;
     if (ANI_OK != env->Class_FindMethod(cls, "valueOf", nullptr, &getms)) {
-        std::cerr << "Find Method Fail 'valueOf'" << std::endl;
+        HILOG_ERROR_I18N("Find method 'valueOf' failed");
         return nullptr;
     }
 
     ani_double milliseconds;
-    if (ANI_OK != env->Object_CallMethod_Double(Date, getms, &milliseconds)) {
-        std::cerr << "Object_CallMethod_Double Fail" << std::endl;
+    if (ANI_OK != env->Object_CallMethod_Double(date, getms, &milliseconds)) {
+        HILOG_ERROR_I18N("Call method 'valueOf' failed");
         return nullptr;
     }
 
     IntlAniAddon *obj = UnwrapAddon(env, object, "nativeDateTimeFormat");
     if (obj == nullptr || obj->datefmt_ == nullptr) {
+        HILOG_ERROR_I18N("FormatDateTime: Get DateTimeFormat object failed");
         return nullptr;
     }
+
     std::string str = obj->datefmt_->Format(milliseconds);
-    ani_string ret;
-    env->String_NewUTF8(str.c_str(), str.size(), &ret);
-    return ret;
+    return StringToAniStr(env, str);
 }
 
-ani_object IntlAniAddon::DateTimeFormat_resolvedOptions([[maybe_unused]] ani_env *env, [[maybe_unused]]
-    ani_object object)
+ani_string IntlAniAddon::DateTimeFormat_formatRange(ani_env *env, ani_object object,
+    ani_object startDate, ani_object endDate)
 {
-    std::map<std::string, std::string> options = {};
-    IntlAniAddon *obj = UnwrapAddon(env, object, "nativeDateTimeFormat");
-    if (obj == nullptr || obj->datefmt_ == nullptr) {
+    static const char *className = "Lescompat/Date;";
+    ani_class cls;
+    if (ANI_OK != env->FindClass(className, &cls)) {
+        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
         return nullptr;
     }
+
+    ani_method getms;
+    if (ANI_OK != env->Class_FindMethod(cls, "valueOf", nullptr, &getms)) {
+        HILOG_ERROR_I18N("Find method 'valueOf' failed");
+        return nullptr;
+    }
+
+    ani_double firstMilliseconds;
+    if (ANI_OK != env->Object_CallMethod_Double(startDate, getms, &firstMilliseconds)) {
+        HILOG_ERROR_I18N("Call method 'valueOf' failed");
+        return nullptr;
+    }
+
+    ani_double secondMilliseconds;
+    if (ANI_OK != env->Object_CallMethod_Double(endDate, getms, &secondMilliseconds)) {
+        HILOG_ERROR_I18N("Call method 'valueOf' failed");
+        return nullptr;
+    }
+
+    IntlAniAddon *obj = UnwrapAddon(env, object, "nativeDateTimeFormat");
+    if (obj == nullptr || obj->datefmt_ == nullptr) {
+        HILOG_ERROR_I18N("FormatDateTimeRange: Get DateTimeFormat object failed");
+        return nullptr;
+    }
+
+    std::string str = obj->datefmt_->FormatRange(firstMilliseconds, secondMilliseconds);
+    return StringToAniStr(env, str);
+}
+
+ani_object IntlAniAddon::DateTimeFormat_resolvedOptions(ani_env *env, ani_object object)
+{
+    IntlAniAddon *obj = UnwrapAddon(env, object, "nativeDateTimeFormat");
+    if (obj == nullptr || obj->datefmt_ == nullptr) {
+        HILOG_ERROR_I18N("GetDateTimeResolvedOptions: Get DateTimeFormat object failed");
+        return nullptr;
+    }
+    std::map<std::string, std::string> options = {};
     obj->datefmt_->GetResolvedOptions(options);
 
     static const char *className = "L@ohos/intl/intl/DateTimeOptionsInner;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        std::cerr << "Not found '" << className << "'" << std::endl;
+        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
         return nullptr;
     }
 
     ani_method ctor;
     if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
-        std::cerr << "get ctor Failed'" << className << "'" << std::endl;
+        HILOG_ERROR_I18N("Find method '<ctor>' failed");
         return nullptr;
     }
 
-    ani_object dateTimeOptions = {};
+    ani_object dateTimeOptions;
     if (ANI_OK != env->Object_New(cls, ctor, &dateTimeOptions)) {
-        std::cerr << "Create Object Failed'" << className << "'" << std::endl;
+        HILOG_ERROR_I18N("New object '%{public}s' failed", className);
         return nullptr;
     }
 
@@ -348,20 +442,32 @@ ani_object IntlAniAddon::DateTimeFormat_resolvedOptions([[maybe_unused]] ani_env
     return dateTimeOptions;
 }
 
-ani_string IntlAniAddon::NumberFormat_format([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
-    ani_double number)
+ani_string IntlAniAddon::NumberFormat_format(ani_env *env, ani_object object, ani_double number)
 {
     IntlAniAddon *obj = UnwrapAddon(env, object, "nativeNumberFormat");
     if (obj == nullptr || obj->numberfmt_ == nullptr) {
+        HILOG_ERROR_I18N("FormatNumber: Get NumberFormat object failed");
         return nullptr;
     }
+
     std::string str = obj->numberfmt_->Format(number);
-    ani_string ret;
-    env->String_NewUTF8(str.c_str(), str.size(), &ret);
-    return ret;
+    return StringToAniStr(env, str);
 }
 
-ani_object IntlAniAddon::NumberFormat_resolvedOptions([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
+ani_string IntlAniAddon::NumberFormat_formatRange(ani_env *env, ani_object object,
+    ani_double startRange, ani_double endRange)
+{
+    IntlAniAddon *obj = UnwrapAddon(env, object, "nativeNumberFormat");
+    if (obj == nullptr || obj->numberfmt_ == nullptr) {
+        HILOG_ERROR_I18N("FormatRangeNumber: Get NumberFormat object failed");
+        return nullptr;
+    }
+
+    std::string str = obj->numberfmt_->FormatRange(startRange, endRange);
+    return StringToAniStr(env, str);
+}
+
+ani_object IntlAniAddon::NumberFormat_resolvedOptions(ani_env *env, ani_object object)
 {
     IntlAniAddon *obj = UnwrapAddon(env, object, "nativeNumberFormat");
     if (obj == nullptr || obj->numberfmt_ == nullptr) {
@@ -412,44 +518,218 @@ ani_object IntlAniAddon::NumberFormat_resolvedOptions([[maybe_unused]] ani_env *
     return numberOptions;
 }
 
-ani_object IntlAniAddon::Locale_create0([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_class clazz)
+ani_double IntlAniAddon::Collator_compare(ani_env *env, ani_object object, ani_string first, ani_string second)
+{
+    IntlAniAddon *obj = UnwrapAddon(env, object, "nativeCollator");
+    if (obj == nullptr || obj->collator_ == nullptr) {
+        HILOG_ERROR_I18N("CompareString: Get Collator object failed");
+        return -1;
+    }
+
+    CompareResult compareResult = obj->collator_->Compare(AniStrToString(env, first), AniStrToString(env, second));
+    return static_cast<double>(compareResult);
+}
+ani_object IntlAniAddon::Collator_resolvedOptions(ani_env *env, ani_object object)
+{
+    IntlAniAddon *obj = UnwrapAddon(env, object, "nativeCollator");
+    if (obj == nullptr || obj->collator_ == nullptr) {
+        HILOG_ERROR_I18N("GetCollatorResolvedOptions: Get Collator object failed");
+        return nullptr;
+    }
+    std::map<std::string, std::string> options = {};
+    obj->collator_->ResolvedOptions(options);
+
+    static const char *className = "L@ohos/intl/intl/CollatorOptionsInner;";
+    ani_class cls;
+    if (ANI_OK != env->FindClass(className, &cls)) {
+        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        return nullptr;
+    }
+
+    ani_method ctor;
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
+        HILOG_ERROR_I18N("Find method '<ctor>' failed");
+        return nullptr;
+    }
+
+    ani_object collatorOptions;
+    if (ANI_OK != env->Object_New(cls, ctor, &collatorOptions)) {
+        HILOG_ERROR_I18N("New object '%{public}s' failed", className);
+        return nullptr;
+    }
+
+    std::vector<std::string> keys = {"localeMatcher", "usage", "sensitivity", "collation", "caseFirst"};
+    for (const auto& key : keys) {
+        if (options.find(key) != options.end()) {
+            SetStringMember(env, collatorOptions, key, options[key]);
+        }
+    }
+    SetBooleanMember(env, collatorOptions, "ignorePunctuation", options["ignorePunctuation"]);
+    SetBooleanMember(env, collatorOptions, "numeric", options["numeric"]);
+    return collatorOptions;
+}
+
+ani_string IntlAniAddon::PluralRules_select(ani_env *env, ani_object object, ani_double number)
+{
+    IntlAniAddon *obj = UnwrapAddon(env, object, "nativePluralRules");
+    if (obj == nullptr || obj->pluralrules_ == nullptr) {
+        HILOG_ERROR_I18N("Get PluralRules object failed");
+        return nullptr;
+    }
+
+    std::string str = obj->pluralrules_->Select(number);
+    return StringToAniStr(env, str);
+}
+
+ani_string IntlAniAddon::RelativeTimeFormat_format(ani_env *env, ani_object object, ani_double value, ani_string unit)
+{
+    IntlAniAddon *obj = UnwrapAddon(env, object, "nativeRelativeTimeFormat");
+    if (obj == nullptr || obj->relativetimefmt_ == nullptr) {
+        HILOG_ERROR_I18N("FormatRelativeTime: Get RelativeTimeFormat object failed");
+        return nullptr;
+    }
+
+    std::string str = obj->relativetimefmt_->Format(value, AniStrToString(env, unit));
+    return StringToAniStr(env, str);
+}
+
+static void FillInArrayElement(ani_env *env, ani_class arrayCls, ani_object &result,
+    const std::vector<std::vector<std::string>> &timeVector)
+{
+    for (size_t i = 0; i < timeVector.size(); i++) {
+        std::string value = timeVector[i][1];
+        std::string type = timeVector[i][0];
+        std::string unit = "";
+        size_t unitIndex = 2;
+        if (timeVector[i].size() > unitIndex) {
+            unit = timeVector[i][unitIndex];
+        }
+
+        static const char *className = "L@ohos/intl/intl/RelativeTimeFormatPartInner;";
+        ani_class cls;
+        if (ANI_OK != env->FindClass(className, &cls)) {
+            HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+            return;
+        }
+
+        ani_method ctor;
+        if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
+            HILOG_ERROR_I18N("Find method '<ctor>' failed");
+            return;
+        }
+
+        ani_object obj;
+        if (ANI_OK != env->Object_New(cls, ctor, &obj)) {
+            HILOG_ERROR_I18N("New object '%{public}s' failed", className);
+            return;
+        }
+
+        SetStringMember(env, obj, "type", type);
+        SetStringMember(env, obj, "unit", unit);
+        SetNumberMember(env, obj, "value", value);
+
+        ani_method set;
+        if (ANI_OK != env->Class_FindMethod(arrayCls, "$_set", "ILstd/core/Object;:V", &set)) {
+            HILOG_ERROR_I18N("Find method '$_set' failed");
+            return;
+        }
+
+        if (ANI_OK != env->Object_CallMethod_Void(result, set, i, obj)) {
+            HILOG_ERROR_I18N("Call method '$_set' failed");
+            return;
+        }
+    }
+}
+
+ani_object IntlAniAddon::RelativeTimeFormat_formatToParts(ani_env *env, ani_object object,
+    ani_double value, ani_string unit)
+{
+    IntlAniAddon *obj = UnwrapAddon(env, object, "nativeRelativeTimeFormat");
+    if (obj == nullptr || obj->relativetimefmt_ == nullptr) {
+        HILOG_ERROR_I18N("FormatToParts: Get RelativeTimeFormat object failed");
+        return nullptr;
+    }
+
+    std::vector<std::vector<std::string>> timeVector;
+    obj->relativetimefmt_->FormatToParts(value, AniStrToString(env, unit), timeVector);
+
+    static const char *className = "Lescompat/Array;";
+    ani_class cls;
+    if (ANI_OK != env->FindClass(className, &cls)) {
+        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        return nullptr;
+    }
+
+    ani_method ctor;
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "I:V", &ctor)) {
+        HILOG_ERROR_I18N("Find method '<ctor>' failed");
+        return nullptr;
+    }
+
+    ani_object ret;
+    if (ANI_OK != env->Object_New(cls, ctor, &ret, timeVector.size())) {
+        HILOG_ERROR_I18N("New object '%{public}s' failed", className);
+        return nullptr;
+    }
+
+    FillInArrayElement(env, cls, ret, timeVector);
+    return ret;
+}
+
+ani_object IntlAniAddon::RelativeTimeFormat_resolvedOptions(ani_env *env, ani_object object)
+{
+    IntlAniAddon *obj = UnwrapAddon(env, object, "nativeRelativeTimeFormat");
+    if (obj == nullptr || obj->relativetimefmt_ == nullptr) {
+        HILOG_ERROR_I18N("GetRelativeTimeResolvedOptions: Get RelativeTimeFormat object failed");
+        return nullptr;
+    }
+    std::map<std::string, std::string> options = {};
+    obj->relativetimefmt_->GetResolvedOptions(options);
+
+    static const char *className = "L@ohos/intl/intl/RelativeTimeFormatResolvedOptionsInner;";
+    ani_class cls;
+    if (ANI_OK != env->FindClass(className, &cls)) {
+        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        return nullptr;
+    }
+
+    ani_method ctor;
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
+        HILOG_ERROR_I18N("Find method '<ctor>' failed");
+        return nullptr;
+    }
+
+    ani_object relativeTimeFormatResolvedOptions;
+    if (ANI_OK != env->Object_New(cls, ctor, &relativeTimeFormatResolvedOptions)) {
+        HILOG_ERROR_I18N("New object '%{public}s' failed", className);
+        return nullptr;
+    }
+
+    std::vector<std::string> keys = {"locale", "style", "numeric", "numberingSystem"};
+    for (const auto& key : keys) {
+        if (options.find(key) != options.end()) {
+            SetStringMember(env, relativeTimeFormatResolvedOptions, key, options[key]);
+        }
+    }
+    return relativeTimeFormatResolvedOptions;
+}
+
+ani_object IntlAniAddon::Locale_create(ani_env *env, [[maybe_unused]] ani_class clazz)
 {
     std::map<std::string, std::string> map = {};
     std::unique_ptr<IntlAniAddon> obj = std::make_unique<IntlAniAddon>();
     obj->locale_ = std::make_unique<LocaleInfo>("", map);
 
     static const char *className = "L@ohos/intl/intl/Locale;";
-    ani_class cls;
-    if (ANI_OK != env->FindClass(className, &cls)) {
-        std::cerr << "Not found '" << className << "'" << std::endl;
-        ani_object nullobj = nullptr;
-        return nullobj;
-    }
-
-    ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "J:V", &ctor)) {
-        std::cerr << "get ctor Failed'" << className << "'" << std::endl;
-        ani_object nullobj = nullptr;
-        return nullobj;
-    }
-
-    ani_object Locale_object;
-    if (ANI_OK != env->Object_New(cls, ctor, &Locale_object, reinterpret_cast<ani_long>(obj.get()))) {
-        std::cerr << "New Locale Fail" << std::endl;
-    }
+    ani_object locale_object = CreateAniObject(env, className, obj.get());
     obj.release();
-    return Locale_object;
+    return locale_object;
 }
 
-ani_object IntlAniAddon::Locale_create1([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_class clazz,
+ani_object IntlAniAddon::Locale_createWithParam(ani_env *env, [[maybe_unused]] ani_class clazz,
     ani_string locale, ani_object options)
 {
-    char buffer[256];
-    ani_size s;
-    env->String_GetUTF8(locale, buffer, sizeof(buffer), &s);
-    std::string localeTag = std::string(buffer, s);
     std::map<std::string, std::string> map = {};
-
     ani_boolean isUndefined;
     env->Reference_IsUndefined(options, &isUndefined);
     if (!isUndefined) {
@@ -463,7 +743,7 @@ ani_object IntlAniAddon::Locale_create1([[maybe_unused]] ani_env *env, [[maybe_u
                 map.insert(std::make_pair(key, value));
             }
         }
-    
+
         bool numeric;
         if (GetBooleanMember(env, options, "numeric", numeric)) {
             map.insert(std::make_pair("numeric", numeric ? "true" : "false"));
@@ -471,36 +751,22 @@ ani_object IntlAniAddon::Locale_create1([[maybe_unused]] ani_env *env, [[maybe_u
     }
 
     std::unique_ptr<IntlAniAddon> obj = std::make_unique<IntlAniAddon>();
-    obj->locale_ = std::make_unique<LocaleInfo>(localeTag, map);
-
-    std::string className = "L@ohos/intl/intl/Locale;";
-    ani_class cls;
-    if (ANI_OK != env->FindClass(className.c_str(), &cls)) {
-        std::cerr << "Not found '" << className << "'" << std::endl;
-        ani_object nullobj = nullptr;
-        return nullobj;
-    }
-
-    ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "J:V", &ctor)) {
-        std::cerr << "get ctor Failed'" << className << "'" << std::endl;
-        ani_object nullobj = nullptr;
-        return nullobj;
-    }
-
-    ani_object Locale_object;
-    if (ANI_OK != env->Object_New(cls, ctor, &Locale_object, reinterpret_cast<ani_long>(obj.get()))) {
-        std::cerr << "New Locale Fail" << std::endl;
-    }
+    obj->locale_ = std::make_unique<LocaleInfo>(AniStrToString(env, locale), map);
+    static const char *className = "L@ohos/intl/intl/Locale;";
+    ani_object locale_object = CreateAniObject(env, className, obj.get());
     obj.release();
-    return Locale_object;
+    return locale_object;
 }
 
-static std::vector<std::string> GetLocaleTags(ani_env *env, ani_object locale)
+static std::vector<std::string> getLocaleTags(ani_env *env, ani_object locale)
 {
     std::vector<std::string> localeTags;
     ani_class stringClass;
-    env->FindClass("Lstd/core/String;", &stringClass);
+    if (ANI_OK != env->FindClass("Lstd/core/String;", &stringClass)) {
+        HILOG_ERROR_I18N("Find class 'Lstd/core/String' failed");
+        return localeTags;
+    }
+
     ani_boolean isString;
     env->Object_InstanceOf(locale, stringClass, &isString);
     if (isString) {
@@ -509,59 +775,54 @@ static std::vector<std::string> GetLocaleTags(ani_env *env, ani_object locale)
         static const char *className = "Lescompat/Array;";
         ani_class cls;
         if (ANI_OK != env->FindClass(className, &cls)) {
+            HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
             return localeTags;
         }
 
         ani_method getLengthMethod;
         if (ANI_OK != env->Class_FindGetter(cls, "length", &getLengthMethod)) {
+            HILOG_ERROR_I18N("Find getter 'length' failed");
             return localeTags;
         }
 
         ani_double length;
-        env->Object_CallMethod_Double(locale, getLengthMethod, &length);
+        if (ANI_OK != env->Object_CallMethod_Double(locale, getLengthMethod, &length)) {
+            HILOG_ERROR_I18N("Get 'length' failed");
+            return localeTags;
+        }
+
         for (int i = 0; i < length; i++) {
             ani_method get;
-            env->Class_FindMethod(cls, "$_get", nullptr, &get);
+            if (ANI_OK != env->Class_FindMethod(cls, "$_get", "I:Lstd/core/Object;", &get)) {
+                HILOG_ERROR_I18N("Find method '$_get' failed");
+                return localeTags;
+            }
+
             ani_ref value;
-            env->Object_CallMethod_Ref(locale, get, &value, i);
+            if (ANI_OK != env->Object_CallMethod_Ref(locale, get, &value, i)) {
+                HILOG_ERROR_I18N("Call method '$_get' failed");
+                return localeTags;
+            }
             localeTags.push_back(AniStrToString(env, value));
         }
     }
     return localeTags;
 }
 
-ani_object IntlAniAddon::DateTimeFormat_create0([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_class clazz)
+ani_object IntlAniAddon::DateTimeFormat_create(ani_env *env, [[maybe_unused]] ani_class clazz)
 {
     std::unique_ptr<IntlAniAddon> obj = std::make_unique<IntlAniAddon>();
     std::vector<std::string> localeTags;
     std::map<std::string, std::string> map = {};
 
     obj->datefmt_ = DateTimeFormat::CreateInstance(localeTags, map);
-
     static const char *className = "L@ohos/intl/intl/DateTimeFormat;";
-    ani_class cls;
-    if (ANI_OK != env->FindClass(className, &cls)) {
-        std::cerr << "Not found '" << className << "'" << std::endl;
-        ani_object nullobj = nullptr;
-        return nullobj;
-    }
-
-    ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "J:V", &ctor)) {
-        std::cerr << "get ctor Failed'" << className << "'" << std::endl;
-        ani_object nullobj = nullptr;
-        return nullobj;
-    }
-
-    ani_object DateTimeFormat_object;
-    if (ANI_OK != env->Object_New(cls, ctor, &DateTimeFormat_object, reinterpret_cast<ani_long>(obj.get()))) {
-        std::cerr << "New DateTimeFormat Fail" << std::endl;
-    }
+    ani_object dateTimeFormat_object = CreateAniObject(env, className, obj.get());
     obj.release();
-    return DateTimeFormat_object;
+    return dateTimeFormat_object;
 }
 
-static std::map<std::string, std::string> GetDateTimeFormatOptions(ani_env *env, ani_object options)
+static std::map<std::string, std::string> getDateTimeFormatOptions(ani_env *env, ani_object options)
 {
     std::map<std::string, std::string> map;
     ani_boolean isUndefined;
@@ -587,38 +848,22 @@ static std::map<std::string, std::string> GetDateTimeFormatOptions(ani_env *env,
     return map;
 }
 
-ani_object IntlAniAddon::DateTimeFormat_create1(ani_env *env, ani_class clazz, ani_object locale, ani_object options)
+ani_object IntlAniAddon::DateTimeFormat_createWithParam(ani_env *env, [[maybe_unused]] ani_class clazz,
+    ani_object locale, ani_object options)
 {
-    std::vector<std::string> localeTags = GetLocaleTags(env, locale);
-    std::map<std::string, std::string> map = GetDateTimeFormatOptions(env, options);
+    std::vector<std::string> localeTags = getLocaleTags(env, locale);
+    std::map<std::string, std::string> map = getDateTimeFormatOptions(env, options);
 
     std::unique_ptr<IntlAniAddon> obj = std::make_unique<IntlAniAddon>();
     obj->datefmt_ = DateTimeFormat::CreateInstance(localeTags, map);
 
-    std::string className = "L@ohos/intl/intl/DateTimeFormat;";
-    ani_class cls;
-    if (ANI_OK != env->FindClass(className.c_str(), &cls)) {
-        std::cerr << "Not found '" << className << "'" << std::endl;
-        ani_object nullobj = nullptr;
-        return nullobj;
-    }
-
-    ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "J:V", &ctor)) {
-        std::cerr << "get ctor Failed'" << className << "'" << std::endl;
-        ani_object nullobj = nullptr;
-        return nullobj;
-    }
-
-    ani_object DateTimeFormat_object;
-    if (ANI_OK != env->Object_New(cls, ctor, &DateTimeFormat_object, reinterpret_cast<ani_long>(obj.get()))) {
-        std::cerr << "New DateTimeFormat Fail" << std::endl;
-    }
+    static const char *className = "L@ohos/intl/intl/DateTimeFormat;";
+    ani_object dateTimeFormat_object = CreateAniObject(env, className, obj.get());
     obj.release();
-    return DateTimeFormat_object;
+    return dateTimeFormat_object;
 }
 
-ani_object IntlAniAddon::NumberFormat_create0([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_class clazz)
+ani_object IntlAniAddon::NumberFormat_create(ani_env *env, [[maybe_unused]] ani_class clazz)
 {
     std::vector<std::string> localeTags;
     std::map<std::string, std::string> map = {};
@@ -626,29 +871,12 @@ ani_object IntlAniAddon::NumberFormat_create0([[maybe_unused]] ani_env *env, [[m
     obj->numberfmt_ = std::make_unique<NumberFormat>(localeTags, map);
 
     static const char *className = "L@ohos/intl/intl/NumberFormat;";
-    ani_class cls;
-    if (ANI_OK != env->FindClass(className, &cls)) {
-        std::cerr << "Not found '" << className << "'" << std::endl;
-        ani_object nullobj = nullptr;
-        return nullobj;
-    }
-
-    ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "J:V", &ctor)) {
-        std::cerr << "get ctor Failed'" << className << "'" << std::endl;
-        ani_object nullobj = nullptr;
-        return nullobj;
-    }
-
-    ani_object NumberFormat_object;
-    if (ANI_OK != env->Object_New(cls, ctor, &NumberFormat_object, reinterpret_cast<ani_long>(obj.get()))) {
-        std::cerr << "New NumberFormat Fail" << std::endl;
-    }
+    ani_object numberFormat_object = CreateAniObject(env, className, obj.get());
     obj.release();
-    return NumberFormat_object;
+    return numberFormat_object;
 }
 
-static std::map<std::string, std::string> GetNumberFormatOptions(ani_env *env, ani_object options)
+static std::map<std::string, std::string> getNumberFormatOptions(ani_env *env, ani_object options)
 {
     std::map<std::string, std::string> map;
     ani_boolean isUndefined;
@@ -683,35 +911,174 @@ static std::map<std::string, std::string> GetNumberFormatOptions(ani_env *env, a
     return map;
 }
 
-ani_object IntlAniAddon::NumberFormat_create1(ani_env *env, ani_class clazz, ani_object locale, ani_object options)
+ani_object IntlAniAddon::NumberFormat_createWithParam(ani_env *env, [[maybe_unused]] ani_class clazz,
+    ani_object locale, ani_object options)
 {
-    std::vector<std::string> localeTags = GetLocaleTags(env, locale);
-    std::map<std::string, std::string> map = GetNumberFormatOptions(env, options);
+    std::vector<std::string> localeTags = getLocaleTags(env, locale);
+    std::map<std::string, std::string> map = getNumberFormatOptions(env, options);
 
     std::unique_ptr<IntlAniAddon> obj = std::make_unique<IntlAniAddon>();
     obj->numberfmt_ = std::make_unique<NumberFormat>(localeTags, map);
 
     static const char *className = "L@ohos/intl/intl/NumberFormat;";
-    ani_class cls;
-    if (ANI_OK != env->FindClass(className, &cls)) {
-        std::cerr << "Not found '" << className << "'" << std::endl;
-        ani_object nullobj = nullptr;
-        return nullobj;
-    }
-
-    ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "J:V", &ctor)) {
-        std::cerr << "get ctor Failed'" << className << "'" << std::endl;
-        ani_object nullobj = nullptr;
-        return nullobj;
-    }
-
-    ani_object NumberFormat_object;
-    if (ANI_OK != env->Object_New(cls, ctor, &NumberFormat_object, reinterpret_cast<ani_long>(obj.get()))) {
-        std::cerr << "New NumberFormat Fail" << std::endl;
-    }
+    ani_object numberFormat_object = CreateAniObject(env, className, obj.get());
     obj.release();
-    return NumberFormat_object;
+    return numberFormat_object;
+}
+
+ani_object IntlAniAddon::Collator_create(ani_env *env, [[maybe_unused]] ani_class clazz)
+{
+    std::vector<std::string> localeTags;
+    std::map<std::string, std::string> map = {};
+    std::unique_ptr<IntlAniAddon> obj = std::make_unique<IntlAniAddon>();
+    obj->collator_ = std::make_unique<Collator>(localeTags, map);
+
+    static const char *className = "L@ohos/intl/intl/Collator;";
+    ani_object collator_object = CreateAniObject(env, className, obj.get());
+    obj.release();
+    return collator_object;
+}
+
+static std::map<std::string, std::string> getCollatorOptions(ani_env *env, ani_object options)
+{
+    std::map<std::string, std::string> map;
+    ani_boolean isUndefined;
+    env->Reference_IsUndefined(options, &isUndefined);
+    if (!isUndefined) {
+        std::vector<std::string> stringKeys = {"localeMatcher", "usage", "sensitivity", "collation", "caseFirst"};
+        for (const auto& key : stringKeys) {
+            std::string value;
+            if (GetStringMember(env, options, key, value)) {
+                map.insert(std::make_pair(key, value));
+            }
+        }
+
+        bool ignorePunctuation;
+        if (GetBooleanMember(env, options, "ignorePunctuation", ignorePunctuation)) {
+            map.insert(std::make_pair("ignorePunctuation", ignorePunctuation ? "true" : "false"));
+        }
+
+        bool numeric;
+        if (GetBooleanMember(env, options, "numeric", numeric)) {
+            map.insert(std::make_pair("numeric", numeric ? "true" : "false"));
+        }
+    }
+    return map;
+}
+
+ani_object IntlAniAddon::Collator_createWithParam(ani_env *env, [[maybe_unused]] ani_class clazz,
+    ani_object locale, ani_object options)
+{
+    std::vector<std::string> localeTags = getLocaleTags(env, locale);
+    std::map<std::string, std::string> map = getCollatorOptions(env, options);
+
+    std::unique_ptr<IntlAniAddon> obj = std::make_unique<IntlAniAddon>();
+    obj->collator_ = std::make_unique<Collator>(localeTags, map);
+
+    static const char *className = "L@ohos/intl/intl/Collator;";
+    ani_object collator_object = CreateAniObject(env, className, obj.get());
+    obj.release();
+    return collator_object;
+}
+
+ani_object IntlAniAddon::PluralRules_create(ani_env *env, [[maybe_unused]] ani_class clazz)
+{
+    std::vector<std::string> localeTags;
+    std::map<std::string, std::string> map = {};
+    std::unique_ptr<IntlAniAddon> obj = std::make_unique<IntlAniAddon>();
+    obj->pluralrules_ = std::make_unique<PluralRules>(localeTags, map);
+
+    static const char *className = "L@ohos/intl/intl/PluralRules;";
+    ani_object pluralRules_object = CreateAniObject(env, className, obj.get());
+    obj.release();
+    return pluralRules_object;
+}
+
+static std::map<std::string, std::string> getPluralRulesOptions(ani_env *env, ani_object options)
+{
+    std::map<std::string, std::string> map;
+    ani_boolean isUndefined;
+    env->Reference_IsUndefined(options, &isUndefined);
+    if (!isUndefined) {
+        std::vector<std::string> stringKeys = {"localeMatcher", "type"};
+        for (const auto& key : stringKeys) {
+            std::string value;
+            if (GetStringMember(env, options, key, value)) {
+                map.insert(std::make_pair(key, value));
+            }
+        }
+
+        std::vector<std::pair<std::string, int>> intKeys = {
+            {"minimumIntegerDigits", 0}, {"minimumFractionDigits", 0}, {"maximumFractionDigits", 0},
+            {"minimumSignificantDigits", 0}, {"maximumSignificantDigits", 0}
+        };
+        for (auto& [key, value] : intKeys) {
+            if (GetNumberMember(env, options, key, value)) {
+                map.insert(std::make_pair(key, std::to_string(value)));
+            }
+        }
+    }
+    return map;
+}
+
+ani_object IntlAniAddon::PluralRules_createWithParam(ani_env *env, [[maybe_unused]] ani_class clazz,
+    ani_object locale, ani_object options)
+{
+    std::vector<std::string> localeTags = getLocaleTags(env, locale);
+    std::map<std::string, std::string> map = getPluralRulesOptions(env, options);
+
+    std::unique_ptr<IntlAniAddon> obj = std::make_unique<IntlAniAddon>();
+    obj->pluralrules_ = std::make_unique<PluralRules>(localeTags, map);
+
+    static const char *className = "L@ohos/intl/intl/PluralRules;";
+    ani_object pluralRules_object = CreateAniObject(env, className, obj.get());
+    obj.release();
+    return pluralRules_object;
+}
+
+ani_object IntlAniAddon::RelativeTimeFormat_create(ani_env *env, [[maybe_unused]] ani_class clazz)
+{
+    std::vector<std::string> localeTags;
+    std::map<std::string, std::string> map = {};
+    std::unique_ptr<IntlAniAddon> obj = std::make_unique<IntlAniAddon>();
+    obj->relativetimefmt_ = std::make_unique<RelativeTimeFormat>(localeTags, map);
+
+    static const char *className = "L@ohos/intl/intl/RelativeTimeFormat;";
+    ani_object relativeTimeFormat_object = CreateAniObject(env, className, obj.get());
+    obj.release();
+    return relativeTimeFormat_object;
+}
+
+static std::map<std::string, std::string> getRelativeTimeFormatOptions(ani_env *env, ani_object options)
+{
+    std::map<std::string, std::string> map;
+    ani_boolean isUndefined;
+    env->Reference_IsUndefined(options, &isUndefined);
+    if (!isUndefined) {
+        std::vector<std::string> stringKeys = {"localeMatcher", "numeric", "style"};
+        for (const auto& key : stringKeys) {
+            std::string value;
+            if (GetStringMember(env, options, key, value)) {
+                map.insert(std::make_pair(key, value));
+            }
+        }
+    }
+    return map;
+}
+
+ani_object IntlAniAddon::RelativeTimeFormat_createWithParam(ani_env *env, [[maybe_unused]] ani_class clazz,
+    ani_object locale, ani_object options)
+{
+    std::vector<std::string> localeTags = getLocaleTags(env, locale);
+    std::map<std::string, std::string> map = getRelativeTimeFormatOptions(env, options);
+
+    std::unique_ptr<IntlAniAddon> obj = std::make_unique<IntlAniAddon>();
+    obj->relativetimefmt_= std::make_unique<RelativeTimeFormat>(localeTags, map);
+
+    static const char *className = "L@ohos/intl/intl/RelativeTimeFormat;";
+    ani_object relativeTimeFormat_object = CreateAniObject(env, className, obj.get());
+    obj.release();
+    return relativeTimeFormat_object;
 }
 
 ani_status IntlAniAddon::BindContext_Locale(ani_env *env)
@@ -719,15 +1086,17 @@ ani_status IntlAniAddon::BindContext_Locale(ani_env *env)
     static const char *className = "L@ohos/intl/intl/Locale;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        std::cerr << "Not found '" << className << "'" << std::endl;
+        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
         return (ani_status)ANI_ERROR;
     }
 
     std::array methods = {
-        ani_native_function {"create", ":L@ohos/intl/intl/Locale;", reinterpret_cast<void *>(Locale_create0) },
-        ani_native_function {"create",
-            "Lstd/core/String;L@ohos/intl/intl/LocaleOptions;:L@ohos/intl/intl/Locale;",
-            reinterpret_cast<void *>(Locale_create1) },
+        ani_native_function {"create", ":L@ohos/intl/intl/Locale;", reinterpret_cast<void *>(Locale_create) },
+        ani_native_function {"create", "Lstd/core/String;L@ohos/intl/intl/LocaleOptions;:L@ohos/intl/intl/Locale;",
+            reinterpret_cast<void *>(Locale_createWithParam) },
+        ani_native_function {"toString", nullptr, reinterpret_cast<void *>(Locale_toString) },
+        ani_native_function {"maximize", nullptr, reinterpret_cast<void *>(Locale_maximize) },
+        ani_native_function {"minimize", nullptr, reinterpret_cast<void *>(Locale_minimize) },
         ani_native_function {"getLanguage", nullptr, reinterpret_cast<void *>(Locale_getLanguage) },
         ani_native_function {"getScript", nullptr, reinterpret_cast<void *>(Locale_getScript) },
         ani_native_function {"getRegion", nullptr, reinterpret_cast<void *>(Locale_getRegion) },
@@ -741,7 +1110,7 @@ ani_status IntlAniAddon::BindContext_Locale(ani_env *env)
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        std::cerr << "Cannot bind native methods to '" << className << "'" << std::endl;
+        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
         return (ani_status)ANI_ERROR;
     };
     return ANI_OK;
@@ -752,24 +1121,23 @@ ani_status IntlAniAddon::BindContext_DateTimeFormat(ani_env *env)
     static const char *className = "L@ohos/intl/intl/DateTimeFormat;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        std::cerr << "Not found '" << className << "'" << std::endl;
+        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
         return (ani_status)ANI_ERROR;
     }
 
     std::array methods = {
         ani_native_function {"create", ":L@ohos/intl/intl/DateTimeFormat;",
-            reinterpret_cast<void *>(DateTimeFormat_create0) },
+            reinterpret_cast<void *>(DateTimeFormat_create) },
         ani_native_function {"create",
             "Lstd/core/Object;L@ohos/intl/intl/DateTimeOptions;:L@ohos/intl/intl/DateTimeFormat;",
-            reinterpret_cast<void *>(DateTimeFormat_create1) },
-        ani_native_function {"format", "Lescompat/Date;:Lstd/core/String;",
-            reinterpret_cast<void *>(DateTimeFormat_format) },
-        ani_native_function {"resolvedOptions", ":L@ohos/intl/intl/DateTimeOptions;",
-            reinterpret_cast<void *>(DateTimeFormat_resolvedOptions) },
+            reinterpret_cast<void *>(DateTimeFormat_createWithParam) },
+        ani_native_function {"format", nullptr, reinterpret_cast<void *>(DateTimeFormat_format) },
+        ani_native_function {"formatRange", nullptr, reinterpret_cast<void *>(DateTimeFormat_formatRange) },
+        ani_native_function {"resolvedOptions", nullptr, reinterpret_cast<void *>(DateTimeFormat_resolvedOptions) },
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        std::cerr << "Cannot bind native methods to '" << className << "'" << std::endl;
+        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
         return (ani_status)ANI_ERROR;
     };
     return ANI_OK;
@@ -780,23 +1148,99 @@ ani_status IntlAniAddon::BindContext_NumberFormat(ani_env *env)
     static const char *className = "L@ohos/intl/intl/NumberFormat;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        std::cerr << "Not found '" << className << "'" << std::endl;
+        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
         return (ani_status)ANI_ERROR;
     }
 
-    std::array methods_NumberFormat = {
+    std::array methods = {
         ani_native_function {"create", ":L@ohos/intl/intl/NumberFormat;",
-            reinterpret_cast<void *>(NumberFormat_create0) },
+            reinterpret_cast<void *>(NumberFormat_create) },
         ani_native_function {"create",
             "Lstd/core/Object;L@ohos/intl/intl/NumberOptions;:L@ohos/intl/intl/NumberFormat;",
-            reinterpret_cast<void *>(NumberFormat_create1) },
-        ani_native_function {"format", "D:Lstd/core/String;", reinterpret_cast<void *>(NumberFormat_format) },
-        ani_native_function {"resolvedOptions", ":L@ohos/intl/intl/NumberOptions;",
-            reinterpret_cast<void *>(NumberFormat_resolvedOptions) },
+            reinterpret_cast<void *>(NumberFormat_createWithParam) },
+        ani_native_function {"format", nullptr, reinterpret_cast<void *>(NumberFormat_format) },
+        ani_native_function {"formatRange", nullptr, reinterpret_cast<void *>(NumberFormat_formatRange) },
+        ani_native_function {"resolvedOptions", nullptr, reinterpret_cast<void *>(NumberFormat_resolvedOptions) },
     };
 
-    if (ANI_OK != env->Class_BindNativeMethods(cls, methods_NumberFormat.data(), methods_NumberFormat.size())) {
-        std::cerr << "Cannot bind native methods to '" << className << "'" << std::endl;
+    if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
+        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+        return (ani_status)ANI_ERROR;
+    };
+    return ANI_OK;
+}
+
+ani_status IntlAniAddon::BindContext_Collator(ani_env *env)
+{
+    static const char *className = "L@ohos/intl/intl/Collator;";
+    ani_class cls;
+    if (ANI_OK != env->FindClass(className, &cls)) {
+        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        return (ani_status)ANI_ERROR;
+    }
+
+    std::array methods = {
+        ani_native_function {"create", ":L@ohos/intl/intl/Collator;", reinterpret_cast<void *>(Collator_create) },
+        ani_native_function {"create",
+            "Lstd/core/Object;L@ohos/intl/intl/CollatorOptions;:L@ohos/intl/intl/Collator;",
+            reinterpret_cast<void *>(Collator_createWithParam) },
+        ani_native_function {"compare", nullptr, reinterpret_cast<void *>(Collator_compare) },
+        ani_native_function {"resolvedOptions", nullptr, reinterpret_cast<void *>(Collator_resolvedOptions) },
+    };
+
+    if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
+        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+        return (ani_status)ANI_ERROR;
+    };
+    return ANI_OK;
+}
+
+ani_status IntlAniAddon::BindContext_PluralRules(ani_env *env)
+{
+    static const char *className = "L@ohos/intl/intl/PluralRules;";
+    ani_class cls;
+    if (ANI_OK != env->FindClass(className, &cls)) {
+        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        return (ani_status)ANI_ERROR;
+    }
+
+    std::array methods = {
+        ani_native_function {"create", ":L@ohos/intl/intl/PluralRules;", reinterpret_cast<void *>(PluralRules_create) },
+        ani_native_function {"create",
+            "Lstd/core/Object;L@ohos/intl/intl/PluralRulesOptions;:L@ohos/intl/intl/PluralRules;",
+            reinterpret_cast<void *>(PluralRules_createWithParam) },
+        ani_native_function {"select", nullptr, reinterpret_cast<void *>(PluralRules_select) },
+    };
+
+    if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
+        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+        return (ani_status)ANI_ERROR;
+    };
+    return ANI_OK;
+}
+
+ani_status IntlAniAddon::BindContext_RelativeTimeFormat(ani_env *env)
+{
+    static const char *className = "L@ohos/intl/intl/RelativeTimeFormat;";
+    ani_class cls;
+    if (ANI_OK != env->FindClass(className, &cls)) {
+        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        return (ani_status)ANI_ERROR;
+    }
+
+    std::array methods = {
+        ani_native_function {"create", ":L@ohos/intl/intl/RelativeTimeFormat;",
+            reinterpret_cast<void *>(RelativeTimeFormat_create) },
+        ani_native_function {"create",
+            "Lstd/core/Object;L@ohos/intl/intl/RelativeTimeFormatInputOptions;:L@ohos/intl/intl/RelativeTimeFormat;",
+            reinterpret_cast<void *>(RelativeTimeFormat_createWithParam) },
+        ani_native_function {"format", nullptr, reinterpret_cast<void *>(RelativeTimeFormat_format) },
+        ani_native_function {"formatToParts", nullptr, reinterpret_cast<void *>(RelativeTimeFormat_formatToParts) },
+        ani_native_function {"resolvedOptions", nullptr, reinterpret_cast<void *>(RelativeTimeFormat_resolvedOptions) },
+    };
+
+    if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
+        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
         return (ani_status)ANI_ERROR;
     };
     return ANI_OK;
@@ -806,10 +1250,10 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
 {
     ani_env *env;
     if (ANI_OK != vm->GetEnv(ANI_VERSION_1, &env)) {
-        std::cerr << "Unsupported ANI_VERSION_1" << std::endl;
+        HILOG_ERROR_I18N("Unsupported ANI_VERSION_1");
         return (ani_status)ANI_ERROR;
     }
-    
+
     auto status = IntlAniAddon::BindContext_Locale(env);
     if (status != ANI_OK) {
         return status;
@@ -821,6 +1265,21 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
     }
 
     status = IntlAniAddon::BindContext_NumberFormat(env);
+    if (status != ANI_OK) {
+        return status;
+    }
+
+    status = IntlAniAddon::BindContext_Collator(env);
+    if (status != ANI_OK) {
+        return status;
+    }
+
+    status = IntlAniAddon::BindContext_PluralRules(env);
+    if (status != ANI_OK) {
+        return status;
+    }
+
+    status = IntlAniAddon::BindContext_RelativeTimeFormat(env);
     if (status != ANI_OK) {
         return status;
     }
