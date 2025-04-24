@@ -13,10 +13,8 @@
  * limitations under the License.
  */
 
+#include "i18n_hilog.h"
 #include "intl.h"
-#include "ucmndata.h"
-#include "unicode/udata.h"
-#include "unicode/utypes.h"
 #include "utils.h"
 
 using namespace OHOS;
@@ -59,53 +57,92 @@ static IntlAniAddon* UnwrapAddon(ani_env *env, ani_object object, std::string na
     return reinterpret_cast<IntlAniAddon*>(ptr);
 }
 
-static void SetterString(ani_env *env, ani_class cls, std::string name, std::string value, ani_object obj)
+static void SetBooleanMember(ani_env *env, ani_object obj, const std::string name, const std::string value)
 {
     if (value.empty()) {
         return;
     }
 
-    ani_method setter;
-    if (ANI_OK != env->Class_FindSetter(cls, name.c_str(), &setter)) {
-        std::cerr << "Class_FindSetter failed '" << name << "'" << std::endl;
+    static const char *className = "Lstd/core/Boolean;";
+    ani_class cls;
+    if (ANI_OK != env->FindClass(className, &cls)) {
+        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        return;
     }
 
-    ani_string value_string{};
-    env->String_NewUTF8(value.c_str(), value.size(), &value_string);
-    if (ANI_OK != env->Object_CallMethod_Void(obj, setter, value_string)) {
-        std::cerr << "Object_CallMethod_Void Fail" << std::endl;
+    ani_method ctor;
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "Z:V", &ctor)) {
+        HILOG_ERROR_I18N("Find method '<ctor>' failed");
+        return;
+    }
+
+    ani_boolean valueBool = value == "true";
+    ani_object boolObj;
+    if (ANI_OK != env->Object_New(cls, ctor, &boolObj, valueBool)) {
+        HILOG_ERROR_I18N("New object '%{public}s' failed", className);
+        return;
+    }
+
+    if (ANI_OK != env->Object_SetPropertyByName_Ref(obj, name.c_str(), boolObj)) {
+        HILOG_ERROR_I18N("Set property '%{public}s' failed", name.c_str());
+        return;
     }
 }
 
-static void SetterNumber(ani_env *env, ani_class cls, std::string name, std::string value, ani_object obj)
+static void SetNumberMember(ani_env *env, ani_object obj, const std::string name, const std::string value)
 {
     if (value.empty()) {
         return;
     }
 
-    ani_method setter;
-    if (ANI_OK != env->Class_FindSetter(cls, name.c_str(), &setter)) {
-        std::cerr << "Class_FindSetter failed '" << name << "'" << std::endl;
+    static const char *className = "Lstd/core/Int;";
+    ani_class cls;
+    if (ANI_OK != env->FindClass(className, &cls)) {
+        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        return;
+    }
+
+    ani_method ctor;
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "I:V", &ctor)) {
+        HILOG_ERROR_I18N("Find method '<ctor>' failed");
         return;
     }
 
     int32_t status = 0;
-    int32_t digits = ConvertString2Int(value, status);
+    ani_int digits = ConvertString2Int(value, status);
     if (status != 0) {
         return;
     }
 
-    if (ANI_OK != env->Object_CallMethod_Void(obj, setter, digits)) {
-        std::cerr << "Object_CallMethod_Void Fail" << std::endl;
+    ani_object intObj;
+    if (ANI_OK != env->Object_New(cls, ctor, &intObj, digits)) {
+        HILOG_ERROR_I18N("New object '%{public}s' failed", className);
+        return;
+    }
+
+    if (ANI_OK != env->Object_SetPropertyByName_Ref(obj, name.c_str(), intObj)) {
+        HILOG_ERROR_I18N("Set property '%{public}s' failed", name.c_str());
         return;
     }
 }
 
-static bool GetBooleanMember(ani_env *env, ani_object options, const std::string memberName, bool& member)
+static void SetStringMember(ani_env *env, ani_object obj, const std::string name, const std::string value)
+{
+    if (value.empty()) {
+        return;
+    }
+
+    if (ANI_OK != env->Object_SetPropertyByName_Ref(obj, name.c_str(), StringToAniStr(env, value))) {
+        HILOG_ERROR_I18N("Set property '%{public}s' failed", name.c_str());
+        return;
+    }
+}
+
+static bool GetBooleanMember(ani_env *env, ani_object options, const std::string name, bool& value)
 {
     ani_ref ref;
-    if (ANI_OK != env->Object_GetPropertyByName_Ref(options, memberName.c_str(), &ref)) {
-        std::cerr << "Get property '" << memberName << "' failed" << std::endl;
+    if (ANI_OK != env->Object_GetPropertyByName_Ref(options, name.c_str(), &ref)) {
+        HILOG_ERROR_I18N("Get property '%{public}s' failed", name.c_str());
         return false;
     }
 
@@ -117,15 +154,15 @@ static bool GetBooleanMember(ani_env *env, ani_object options, const std::string
 
     ani_boolean ret;
     env->Object_CallMethodByName_Boolean(static_cast<ani_object>(ref), "unboxed", ":Z", &ret);
-    member = ret;
+    value = ret;
     return true;
 }
 
-static bool GetDoubleMember(ani_env *env, ani_object options, const std::string memberName, double& member)
+static bool GetNumberMember(ani_env *env, ani_object options, const std::string name, int& value)
 {
     ani_ref ref;
-    if (ANI_OK != env->Object_GetPropertyByName_Ref(options, memberName.c_str(), &ref)) {
-        std::cerr << "Get property '" << memberName << "' failed" << std::endl;
+    if (ANI_OK != env->Object_GetPropertyByName_Ref(options, name.c_str(), &ref)) {
+        HILOG_ERROR_I18N("Get property '%{public}s' failed", name.c_str());
         return false;
     }
 
@@ -135,15 +172,17 @@ static bool GetDoubleMember(ani_env *env, ani_object options, const std::string 
         return false;
     }
 
-    env->Object_CallMethodByName_Double(static_cast<ani_object>(ref), "unboxed", ":D", &member);
+    ani_double valueDouble;
+    env->Object_CallMethodByName_Double(static_cast<ani_object>(ref), "unboxed", ":D", &valueDouble);
+    value = static_cast<int>(valueDouble);
     return true;
 }
 
-static bool GetStringMember(ani_env *env, ani_object options, const std::string memberName, std::string& member)
+static bool GetStringMember(ani_env *env, ani_object options, const std::string name, std::string& value)
 {
     ani_ref ref;
-    if (ANI_OK != env->Object_GetPropertyByName_Ref(options, memberName.c_str(), &ref)) {
-        std::cerr << "Get property '" << memberName << "' failed" << std::endl;
+    if (ANI_OK != env->Object_GetPropertyByName_Ref(options, name.c_str(), &ref)) {
+        HILOG_ERROR_I18N("Get property '%{public}s' failed", name.c_str());
         return false;
     }
 
@@ -153,7 +192,7 @@ static bool GetStringMember(ani_env *env, ani_object options, const std::string 
         return false;
     }
 
-    member = AniStrToString(env, ref);
+    value = AniStrToString(env, ref);
     return true;
 }
 
@@ -288,21 +327,10 @@ ani_object IntlAniAddon::DateTimeFormat_resolvedOptions([[maybe_unused]] ani_env
         return nullptr;
     }
 
-    ani_object DateTimeOptions = {};
-    if (ANI_OK != env->Object_New(cls, ctor, &DateTimeOptions)) {
+    ani_object dateTimeOptions = {};
+    if (ANI_OK != env->Object_New(cls, ctor, &dateTimeOptions)) {
         std::cerr << "Create Object Failed'" << className << "'" << std::endl;
         return nullptr;
-    }
-
-    ani_method hour12Setter;
-    if (ANI_OK != env->Class_FindSetter(cls, "hour12", &hour12Setter)) {
-        std::cerr << "Class_FindSetter Fail'" << className << "'" << std::endl;
-    }
-
-    ani_boolean hour12 = options["hour12"] == "true";
-    if (ANI_OK != env->Object_CallMethod_Void(DateTimeOptions, hour12Setter, hour12)) {
-        std::cerr << "Object_CallMethod_Void Fail'" << className << "'" << std::endl;
-        return DateTimeOptions;
     }
 
     std::vector<std::string> keys = {
@@ -313,11 +341,11 @@ ani_object IntlAniAddon::DateTimeFormat_resolvedOptions([[maybe_unused]] ani_env
 
     for (const auto& key : keys) {
         if (options.find(key) != options.end()) {
-            SetterString(env, cls, key, options[key], DateTimeOptions);
+            SetStringMember(env, dateTimeOptions, key, options[key]);
         }
     }
-
-    return DateTimeOptions;
+    SetBooleanMember(env, dateTimeOptions, "hour12", options["hour12"]);
+    return dateTimeOptions;
 }
 
 ani_string IntlAniAddon::NumberFormat_format([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
@@ -335,40 +363,31 @@ ani_string IntlAniAddon::NumberFormat_format([[maybe_unused]] ani_env *env, [[ma
 
 ani_object IntlAniAddon::NumberFormat_resolvedOptions([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
 {
-    std::map<std::string, std::string> options = {};
     IntlAniAddon *obj = UnwrapAddon(env, object, "nativeNumberFormat");
     if (obj == nullptr || obj->numberfmt_ == nullptr) {
+        HILOG_ERROR_I18N("GetNumberResolvedOptions: Get NumberFormat object failed");
         return nullptr;
     }
+    std::map<std::string, std::string> options = {};
     obj->numberfmt_->GetResolvedOptions(options);
-    
+
+    static const char *className = "L@ohos/intl/intl/NumberOptionsInner;";
     ani_class cls;
-    if (ANI_OK != env->FindClass("L@ohos/intl/intl/NumberOptionsInner;", &cls)) {
-        std::cerr << "Not found 'L@ohos/intl/intl/NumberOptionsInner;'" << std::endl;
+    if (ANI_OK != env->FindClass(className, &cls)) {
+        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
         return nullptr;
     }
 
     ani_method ctor;
     if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
-        std::cerr << "get ctor Failed'L@ohos/intl/intl/NumberOptionsInner;'" << std::endl;
+        HILOG_ERROR_I18N("Find method '<ctor>' failed");
         return nullptr;
     }
 
-    ani_object NumberOptions = {};
-    if (ANI_OK != env->Object_New(cls, ctor, &NumberOptions)) {
-        std::cerr << "Create Object Failed'L@ohos/intl/intl/NumberOptionsInner;'" << std::endl;
+    ani_object numberOptions;
+    if (ANI_OK != env->Object_New(cls, ctor, &numberOptions)) {
+        HILOG_ERROR_I18N("New object '%{public}s' failed", className);
         return nullptr;
-    }
-
-    ani_method useGroupingSetter;
-    if (ANI_OK != env->Class_FindSetter(cls, "useGrouping", &useGroupingSetter)) {
-        std::cerr << "Class_FindSetter Fail'L@ohos/intl/intl/NumberOptionsInner;'" << std::endl;
-    }
-
-    ani_boolean useGrouping = options["useGrouping"] == "true";
-    if (ANI_OK != env->Object_CallMethod_Void(NumberOptions, useGroupingSetter, useGrouping)) {
-        std::cerr << "Object_CallMethod_Void Fail'L@ohos/intl/intl/NumberOptionsInner;'" << std::endl;
-        return NumberOptions;
     }
 
     std::vector<std::string> keys = {
@@ -383,14 +402,14 @@ ani_object IntlAniAddon::NumberFormat_resolvedOptions([[maybe_unused]] ani_env *
             if (key == "minimumIntegerDigits" || key == "minimumFractionDigits" ||
                 key == "maximumFractionDigits" || key == "minimumSignificantDigits" ||
                 key == "maximumSignificantDigits" || key == "roundingIncrement") {
-                SetterNumber(env, cls, key, options[key], NumberOptions);
+                SetNumberMember(env, numberOptions, key, options[key]);
             } else {
-                SetterString(env, cls, key, options[key], NumberOptions);
+                SetStringMember(env, numberOptions, key, options[key]);
             }
         }
     }
-    
-    return NumberOptions;
+    SetBooleanMember(env, numberOptions, "useGrouping", options["useGrouping"]);
+    return numberOptions;
 }
 
 ani_object IntlAniAddon::Locale_create0([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_class clazz)
@@ -646,12 +665,12 @@ static std::map<std::string, std::string> GetNumberFormatOptions(ani_env *env, a
             }
         }
 
-        std::vector<std::pair<std::string, double>> doubleKeys = {
+        std::vector<std::pair<std::string, int>> intKeys = {
             {"minimumIntegerDigits", 0}, {"minimumFractionDigits", 0}, {"maximumFractionDigits", 0},
             {"minimumSignificantDigits", 0}, {"maximumSignificantDigits", 0}, {"roundingIncrement", 0}
         };
-        for (auto& [key, value] : doubleKeys) {
-            if (GetDoubleMember(env, options, key, value)) {
+        for (auto& [key, value] : intKeys) {
+            if (GetNumberMember(env, options, key, value)) {
                 map.insert(std::make_pair(key, std::to_string(value)));
             }
         }
