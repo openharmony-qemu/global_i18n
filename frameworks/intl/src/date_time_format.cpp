@@ -156,7 +156,7 @@ bool DateTimeFormat::InitWithDefaultLocale(std::map<std::string, std::string> &c
         delete dateFormat;
         dateFormat = nullptr;
     }
-    return InitWithLocale(LocaleConfig::GetSystemLocale(), configs);
+    return InitWithLocale(LocaleConfig::GetEffectiveLocale(), configs);
 }
 
 void DateTimeFormat::InitDateFormatWithoutConfigs(UErrorCode &status)

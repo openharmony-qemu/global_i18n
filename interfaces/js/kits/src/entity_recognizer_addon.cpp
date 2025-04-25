@@ -72,7 +72,7 @@ napi_value EntityRecognizerAddon::constructor(napi_env env, napi_callback_info i
     }
     std::string localeStr;
     if (argc < 1) {
-        localeStr = LocaleConfig::GetSystemLocale();
+        localeStr = LocaleConfig::GetEffectiveLocale();
     } else {
         napi_valuetype valueType = napi_valuetype::napi_undefined;
         status = napi_typeof(env, argv[0], &valueType);

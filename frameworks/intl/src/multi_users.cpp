@@ -175,7 +175,7 @@ I18nErrorCode MultiUsers::SaveIs24Hour(const std::string& localId, const std::st
 I18nErrorCode MultiUsers::SaveGlobalParam(const std::string& localId)
 {
     std::string language = LocaleConfig::GetSystemLanguage();
-    std::string locale = LocaleConfig::GetSystemLocale();
+    std::string locale = LocaleConfig::GetEffectiveLocale();
     std::string is24Hour = ReadSystemParameter(LocaleConfig::HOUR_KEY.c_str(), CONFIG_LEN);
     if (is24Hour.empty()) {
         HILOG_ERROR_I18N("SaveIs24Hour: Get is24Hour failed");
@@ -225,7 +225,8 @@ I18nErrorCode MultiUsers::LoadGlobalParam(const std::string& localId)
         HILOG_ERROR_I18N("LoadGlobalParam: convert userId failed");
         return I18nErrorCode::FAILED;
     }
-    UpdateConfiguration(newLocale, newIs24Hour, userId);
+    std::string effectiveLanguage = LocaleConfig::ComputeEffectiveLanguage(newLocale, newLanguage);
+    UpdateConfiguration(newLocale, effectiveLanguage, newIs24Hour, userId);
     return PublishCommonEvent(userId);
 #endif
     return I18nErrorCode::SUCCESS;
@@ -364,11 +365,12 @@ I18nErrorCode MultiUsers::SetParamFromPreferences(const std::string& paramKey, c
 }
 
 #ifdef SUPPORT_GRAPHICS
-void MultiUsers::UpdateConfiguration(const std::string& locale, const std::string& is24Hour,
-    int32_t userId)
+void MultiUsers::UpdateConfiguration(const std::string& locale, const std::string& language,
+    const std::string& is24Hour, int32_t userId)
 {
     AppExecFwk::Configuration configuration;
-    configuration.AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE, locale);
+    configuration.AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_LOCALE, locale);
+    configuration.AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE, language);
     configuration.AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_HOUR, is24Hour);
     auto appMgrClient = std::make_unique<AppExecFwk::AppMgrClient>();
 

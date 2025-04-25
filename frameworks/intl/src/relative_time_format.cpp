@@ -86,7 +86,7 @@ RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTag
         }
     }
     if (!createSuccess) {
-        localeInfo = std::make_unique<LocaleInfo>(LocaleConfig::GetSystemLocale(), configs);
+        localeInfo = std::make_unique<LocaleInfo>(LocaleConfig::GetEffectiveLocale(), configs);
         if (localeInfo != nullptr && localeInfo->InitSuccess()) {
             locale = localeInfo->GetLocale();
             localeBaseName = localeInfo->GetBaseName();

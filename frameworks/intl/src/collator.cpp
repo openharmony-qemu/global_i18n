@@ -74,7 +74,7 @@ Collator::Collator(std::vector<std::string> &localeTags, std::map<std::string, s
 {
     ParseAllOptions(options);
     
-    localeTags.push_back(LocaleConfig::GetSystemLocale());
+    localeTags.push_back(LocaleConfig::GetEffectiveLocale());
     for (size_t i = 0; i < localeTags.size(); i++) {
         std::string curLocale = localeTags[i];
         UErrorCode status = U_ZERO_ERROR;

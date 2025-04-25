@@ -64,7 +64,7 @@ void LocaleInfo::InitLocaleInfo(const std::string &localeTag, std::map<std::stri
         locale = icu::Locale::forLanguageTag(icu::StringPiece(finalLocaleTag), status);
     }
     if (localeTag.empty() || U_FAILURE(status)) {
-        std::string defaultLocaleTag = LocaleConfig::GetSystemLocale();
+        std::string defaultLocaleTag = LocaleConfig::GetEffectiveLocale();
         ResetFinalLocaleStatus();
         ComputeFinalLocaleTag(defaultLocaleTag);
         status = U_ZERO_ERROR;
