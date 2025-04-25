@@ -72,6 +72,23 @@ HWTEST_F(PhoneNumberFormatTest, PhoneNumberFormatTest0001, TestSize.Level1)
     EXPECT_EQ(phoneNumberFormat->getLocationName("+39021234", "en"), "Milan");
     EXPECT_EQ(phoneNumberFormat->getLocationName("+393123456789", "en"), "Italy");
 }
+
+/**
+ * @tc.name: PhoneNumberFormatTest0002
+ * @tc.desc: Test getLocationName
+ * @tc.type: FUNC
+ */
+HWTEST_F(PhoneNumberFormatTest, PhoneNumberFormatTest0002, TestSize.Level1)
+{
+    map<string, string> options;
+    std::unique_ptr<PhoneNumberFormat> phoneNumberFormat =
+        std::make_unique<PhoneNumberFormat>("CN", options);
+    EXPECT_EQ(phoneNumberFormat->getLocationName("+886370123456", "zh"), "中国苗栗");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("+886491234567", "zh"), "中国南投");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("+886370123456", "en"), "Miaoli (China)");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("+886491234567", "en"), "Nantou (China)");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("+88652123456", "zh"), "中国嘉义、中国云林");
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
