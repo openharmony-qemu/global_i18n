@@ -265,14 +265,14 @@ void SystemLocaleManagerAddon::GetSortOptionsFromJsParam(napi_env env, napi_valu
     bool isUseLocalName = true;
     bool isSuggestedFirst = true;
     if (jsOptions == nullptr) {
-        localeTag = LocaleConfig::GetSystemLocale();
+        localeTag = LocaleConfig::GetEffectiveLocale();
         if (isRegion) {
             isUseLocalName = false;
         }
     } else {
         VariableConvertor::GetOptionValue(env, jsOptions, "locale", localeTag);
         if (localeTag.length() == 0) {
-            localeTag = LocaleConfig::GetSystemLocale();
+            localeTag = LocaleConfig::GetEffectiveLocale();
         }
         bool isSuccess = VariableConvertor::GetBoolOptionValue(env, jsOptions, "isUseLocalName", isUseLocalName);
         if (!isSuccess && isRegion) {

@@ -47,7 +47,8 @@ private:
     static I18nErrorCode SetParamFromPreferences(const std::string& paramKey, const std::string& paramValue);
 
 #ifdef SUPPORT_GRAPHICS
-    static void UpdateConfiguration(const std::string& locale, const std::string& is24Hour, int32_t userId);
+    static void UpdateConfiguration(const std::string& locale, const std::string& language,
+        const std::string& is24Hour, int32_t userId);
     static I18nErrorCode PublishCommonEvent(int32_t userId);
 #endif
 

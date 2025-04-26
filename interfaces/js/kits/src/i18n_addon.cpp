@@ -324,7 +324,7 @@ int I18nAddon::GetParamOfGetTimePeriodName(napi_env env, napi_callback_info info
         return -1;
     }
     if (valueType == napi_valuetype::napi_null || valueType == napi_valuetype::napi_undefined) {
-        tag = LocaleConfig::GetSystemLocale();
+        tag = LocaleConfig::GetEffectiveLocale();
     } else if (valueType == napi_valuetype::napi_string) {
         int code = 0;
         tag = VariableConvertor::GetString(env, argv[1], code);

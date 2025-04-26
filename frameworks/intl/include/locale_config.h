@@ -107,6 +107,7 @@ public:
     static std::string GetTemperatureName(const TemperatureType& type);
     static WeekDay GetFirstDayOfWeek();
     static std::string GetEffectiveLanguage();
+    static std::string GetEffectiveLocale();
     static std::string GetSystemLanguage();
     static std::string GetSystemRegion();
     static std::string GetSystemLocale();
@@ -140,6 +141,7 @@ public:
     static std::string GetSimplifiedSystemLanguage();
     static std::string GetUnicodeWrappedFilePath(const std::string &path, const char delimiter,
         std::shared_ptr<LocaleInfo> localeInfo, std::string &invalidField);
+    static std::string ComputeEffectiveLanguage(const std::string& localeTag, const std::string& language);
     static const std::string HOUR_EVENT_DATA;
     static const std::string LANGUAGE_KEY;
     static const std::string LOCALE_KEY;
@@ -151,7 +153,6 @@ private:
     static void Split(const std::string &src, const std::string &sep, std::vector<std::string> &dest);
     static void Split(const std::string &src, const std::string &sep, std::unordered_set<std::string> &dest);
     static I18nErrorCode UpdateSystemLocale(const std::string &language);
-    static std::string ComputeEffectiveLanguage(const std::string& locale, const std::string& language);
     static constexpr uint32_t LANGUAGE_LEN = 2;
     static constexpr uint32_t LOCALE_ITEM_COUNT = 3;
     static constexpr uint32_t SCRIPT_OFFSET = 2;
@@ -223,14 +224,22 @@ private:
 
 #ifdef SUPPORT_GRAPHICS
     /**
-     * @brief Provided for updating i18n configuration include language and hour24.
+     * @brief Provided for updating i18n configuration include locale and language.
      *
-     * @param key Indicats configuration key.
-     * @param value Indicates configuration value.
+     * @param locale Indicats update locale.
+     * @param language Indicates update language.
      * @param userId Indicats update user id.
-     * @param isSwitchUser Indicates whether user switch.
      */
-    static void UpdateConfiguration(const char *key, const std::string &value, int32_t userId);
+    static void UpdateConfigurationLocaleAndLanguage(const std::string& locale, const std::string& language,
+        int32_t userId);
+
+    /**
+     * @brief Provided for updating i18n configuration include is24Hour.
+     *
+     * @param locale Indicats update is24Hour.
+     * @param userId Indicats update user id.
+     */
+    static void UpdateConfiguration24Hour(const std::string& is24Hour, int32_t userId);
 
     /**
      * @brief Provided for public i18n event include locale-change event and time-change event.

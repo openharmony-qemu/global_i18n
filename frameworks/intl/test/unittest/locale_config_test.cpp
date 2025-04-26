@@ -489,6 +489,27 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest022, TestSize.Level1)
         EXPECT_EQ(ret, LocaleConfigTest::simplifiedLanguage[index]);
     }
 }
+
+/**
+ * @tc.name: LocaleConfigFuncTest023
+ * @tc.desc: Test LocaleConfig GetEffectiveLanguage and GetEffectiveLocale
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest023, TestSize.Level1)
+{
+    std::string systemLanguage = LocaleConfig::GetSystemLanguage();
+    std::string systemLocale = LocaleConfig::GetSystemLocale();
+    std::string language = "zh-Hans";
+    std::string locale = "zh-Hans-CN-u-mu-celsius";
+    LocaleConfig::SetSystemLanguage(language);
+    LocaleConfig::SetSystemLocale(locale);
+    std::string effectiveLanguage = LocaleConfig::GetEffectiveLanguage();
+    std::string effectiveLocale = LocaleConfig::GetEffectiveLocale();
+    EXPECT_EQ(effectiveLanguage, "zh-Hans-CN");
+    EXPECT_EQ(effectiveLocale, "zh-Hans-CN-u-mu-celsius");
+    LocaleConfig::SetSystemLanguage(systemLanguage);
+    LocaleConfig::SetSystemLocale(systemLocale);
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

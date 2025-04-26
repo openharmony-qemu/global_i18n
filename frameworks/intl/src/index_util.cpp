@@ -28,7 +28,7 @@ IndexUtil::IndexUtil(const std::string &localeTag)
 {
     UErrorCode status = U_ZERO_ERROR;
     if (localeTag.empty()) {
-        std::string sysLocale = LocaleConfig::GetSystemLocale();
+        std::string sysLocale = LocaleConfig::GetEffectiveLocale();
         if (sysLocale.empty()) {
             HILOG_ERROR_I18N("IndexUtil::IndexUtil: get system locale failed.");
             return;
