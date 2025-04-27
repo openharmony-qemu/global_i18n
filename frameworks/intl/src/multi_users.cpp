@@ -172,6 +172,19 @@ I18nErrorCode MultiUsers::SaveIs24Hour(const std::string& localId, const std::st
     return I18nErrorCode::SUCCESS;
 }
 
+std::string MultiUsers::GetLanguageFromUserId(int32_t userId)
+{
+    std::string localId = std::to_string(userId);
+    std::string locale = ReadMultiUsersParameter(MULTI_USERS_LOCALE_KEY, localId);
+    std::string language = ReadMultiUsersParameter(MULTI_USERS_LANGUAGE_KEY, localId);
+    if (locale.empty() || language.empty()) {
+        HILOG_ERROR_I18N("MultiUsers::GetLanguageFromUserId: Get language from userId %{public}d failed, "
+            "locale %{public}s, language %{public}s.", userId, locale.c_str(), language.c_str());
+        return LocaleConfig::GetEffectiveLanguage();
+    }
+    return LocaleConfig::ComputeEffectiveLanguage(locale, language);
+}
+
 I18nErrorCode MultiUsers::SaveGlobalParam(const std::string& localId)
 {
     std::string language = LocaleConfig::GetSystemLanguage();
@@ -225,7 +238,8 @@ I18nErrorCode MultiUsers::LoadGlobalParam(const std::string& localId)
         HILOG_ERROR_I18N("LoadGlobalParam: convert userId failed");
         return I18nErrorCode::FAILED;
     }
-    UpdateConfiguration(newLocale, newIs24Hour, userId);
+    std::string updatedLanguage = LocaleConfig::ComputeEffectiveLanguage(newLocale, newLanguage);
+    UpdateConfiguration(updatedLanguage, newIs24Hour, userId);
     return PublishCommonEvent(userId);
 #endif
     return I18nErrorCode::SUCCESS;

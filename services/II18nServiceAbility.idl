@@ -23,4 +23,5 @@ interface OHOS.Global.I18n.II18nServiceAbility {
     void RemovePreferredLanguage([in] int index, [out] int code);
     void SetTemperatureType([in] int type, [out] int code);
     void SetFirstDayOfWeek([in] int type, [out] int code);
+    void GetLanguageFromUserId([in] int userId, [out] String language);
 };

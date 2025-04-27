@@ -41,6 +41,7 @@ public:
     ErrCode RemovePreferredLanguage(int32_t index, int32_t& code) override;
     ErrCode SetTemperatureType(int32_t type, int32_t& code) override;
     ErrCode SetFirstDayOfWeek(int32_t type, int32_t& code) override;
+    ErrCode GetLanguageFromUserId(int32_t userId, std::string& language) override;
 
 protected:
     /**
