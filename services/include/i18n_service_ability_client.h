@@ -105,6 +105,8 @@ public:
      */
     static I18nErrorCode SetFirstDayOfWeek(WeekDay type);
 
+    static std::string GetLanguageFromUserId(int32_t userId);
+
 private:
     /**
      * @brief Get the proxy of i18n service to access service.

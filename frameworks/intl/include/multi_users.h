@@ -32,6 +32,7 @@ public:
     static I18nErrorCode SaveLanguage(const std::string& localId, const std::string& language);
     static I18nErrorCode SaveLocale(const std::string& localId, const std::string& locale);
     static I18nErrorCode SaveIs24Hour(const std::string& localId, const std::string& is24Hour);
+    static std::string GetLanguageFromUserId(int32_t userId);
 
 private:
     static I18nErrorCode SaveGlobalParam(const std::string& localId);

@@ -121,6 +121,15 @@
                     }
                 },
                 {
+                    "name": "//base/global/i18n/services:i18n_sa_client",
+                    "header": {
+                        "header_files": [
+                            "i18n_service_ability_client.h"
+                        ],
+                        "header_base": "//base/global/i18n/services/include"
+                    }
+                },
+                {
                     "name": "//base/global/i18n/interfaces/cj:cj_i18n_ffi"
                 },
                 {
