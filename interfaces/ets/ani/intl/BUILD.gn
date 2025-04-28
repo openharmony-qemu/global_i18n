@@ -19,6 +19,7 @@ ohos_shared_library("intl_ani") {
   sources = [ "./src/intl.cpp" ]
   deps = [ "../../../../frameworks/intl:intl_util" ]
   external_deps = [
+    "hilog:libhilog",
     "icu:shared_icuuc",
     "runtime_core:ani",
   ]
