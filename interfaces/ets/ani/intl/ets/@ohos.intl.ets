@@ -24,13 +24,13 @@ namespace intl {
     }
 
     export class LocaleOptionsInner implements LocaleOptions {
-        calendar?: string | undefined = "";
-        collation?: string | undefined = "";
-        hourCycle?: string | undefined = "";
-        numberingSystem?: string | undefined = "";
-        numeric?: boolean | undefined = false;
-        caseFirst?: string | undefined = "";
-        locale?: string | undefined = "";
+        calendar?: string;
+        collation?: string;
+        hourCycle?: string;
+        numberingSystem?: string;
+        numeric?: boolean;
+        caseFirst?: string;
+        locale?: string;
     }
 
     export interface DateTimeOptions {
@@ -56,91 +56,25 @@ namespace intl {
     }
 
     export class DateTimeOptionsInner implements DateTimeOptions {
-        locale?: string | undefined = "";
-        dateStyle?: string | undefined = "";
-        timeStyle?: string | undefined = "";
-        hourCycle?: string | undefined = "";
-        timeZone?: string | undefined = "";
-        numberingSystem?: string | undefined = "";
-        hour12?: boolean | undefined = false;
-        weekday?: string | undefined = "";
-        era?: string | undefined = "";
-        year?: string | undefined = "";
-        month?: string | undefined = "";
-        day?: string | undefined = "";
-        hour?: string | undefined = "";
-        minute?: string | undefined = "";
-        second?: string | undefined = "";
-        timeZoneName?: string | undefined = "";
-        dayPeriod?: string | undefined = "";
-        localeMatcher?: string | undefined = "";
-        formatMatcher?: string | undefined = "";
-    }
-
-    export interface CollatorOptions {
+        locale?: string;
+        dateStyle?: string;
+        timeStyle?: string;
+        hourCycle?: string;
+        timeZone?: string;
+        numberingSystem?: string;
+        hour12?: boolean;
+        weekday?: string;
+        era?: string;
+        year?: string;
+        month?: string;
+        day?: string;
+        hour?: string;
+        minute?: string;
+        second?: string;
+        timeZoneName?: string;
+        dayPeriod?: string;
         localeMatcher?: string;
-        usage?: string;
-        sensitivity?: string;
-        ignorePunctuation?: boolean;
-        collation?: string;
-        numeric?: boolean;
-        caseFirst?: string;
-    }
-
-    export class CollatorOptionsInner implements CollatorOptions {
-        localeMatcher?: string | undefined = "";
-        usage?: string | undefined = "";
-        sensitivity?: string | undefined = "";
-        ignorePunctuation?: boolean | undefined = false;
-        collation?: string | undefined = "";
-        numeric?: boolean | undefined = false;
-        caseFirst?: string | undefined = "";
-    }
-
-    export interface PluralRulesOptions {
-        localeMatcher?: string;
-        type?: string;
-        minimumIntegerDigits?: number;
-        minimumFractionDigits?: number;
-        maximumFractionDigits?: number;
-        minimumSignificantDigits?: number;
-        maximumSignificantDigits?: number;
-    }
-
-    export class PluralRulesOptionsInner implements PluralRulesOptions {
-        localeMatcher?: string | undefined = "";
-        type?: string | undefined = "";
-        minimumIntegerDigits?: number | undefined = 0;
-        minimumFractionDigits?: number | undefined = 0;
-        maximumFractionDigits?: number | undefined = 0;
-        minimumSignificantDigits?: number | undefined = 0;
-        maximumSignificantDigits?: number | undefined = 0;
-    }
-
-    export interface RelativeTimeFormatResolvedOptions {
-        locale: string;
-        style: string;
-        numeric: string;
-        numberingSystem: string;
-    }
-
-    export class RelativeTimeFormatResolvedOptionsInner implements RelativeTimeFormatResolvedOptions {
-        locale: string = "";
-        style: string = "";
-        numeric: string = "";
-        numberingSystem: string = "";
-    }
-
-    export interface RelativeTimeFormatInputOptions {
-        localeMatcher?: string;
-        numeric?: string;
-        style?: string;
-    }
-
-    export class RelativeTimeFormatInputOptionsInner implements RelativeTimeFormatInputOptions {
-        localeMatcher?: string | undefined = "";
-        numeric?: string | undefined = "";
-        style?: string | undefined = "";
+        formatMatcher?: string;
     }
 
     export interface NumberOptions {
@@ -169,28 +103,106 @@ namespace intl {
     }
 
     export class NumberOptionsInner implements NumberOptions {
-        locale?: string | undefined = "";
-        currency?: string | undefined = "";
-        currencySign?: string | undefined = "";
-        currencyDisplay?: string | undefined = "";
-        unit?: string | undefined = "";
-        unitDisplay?: string | undefined = "";
-        unitUsage?: string | undefined = "";
-        signDisplay?: string | undefined = "";
-        compactDisplay?: string | undefined = "";
-        notation?: string | undefined = "";
-        localeMatcher?: string | undefined = "";
-        style?: string | undefined = "";
-        numberingSystem?: string | undefined = "";
-        useGrouping?: boolean | undefined = false;
-        minimumIntegerDigits?: number | undefined = 0;
-        minimumFractionDigits?: number | undefined = 0;
-        maximumFractionDigits?: number | undefined = 0;
-        minimumSignificantDigits?: number | undefined = 0;
-        maximumSignificantDigits?: number | undefined = 0;
-        roundingPriority?: string | undefined = "";
-        roundingIncrement?: number | undefined = 0;
-        roundingMode?: string | undefined = "";
+        locale?: string;
+        currency?: string;
+        currencySign?: string;
+        currencyDisplay?: string;
+        unit?: string;
+        unitDisplay?: string;
+        unitUsage?: string;
+        signDisplay?: string;
+        compactDisplay?: string;
+        notation?: string;
+        localeMatcher?: string;
+        style?: string;
+        numberingSystem?: string;
+        useGrouping?: boolean;
+        minimumIntegerDigits?: number;
+        minimumFractionDigits?: number;
+        maximumFractionDigits?: number;
+        minimumSignificantDigits?: number;
+        maximumSignificantDigits?: number;
+        roundingPriority?: string;
+        roundingIncrement?: number;
+        roundingMode?: string;
+    }
+
+    export interface CollatorOptions {
+        localeMatcher?: string;
+        usage?: string;
+        sensitivity?: string;
+        ignorePunctuation?: boolean;
+        collation?: string;
+        numeric?: boolean;
+        caseFirst?: string;
+    }
+
+    export class CollatorOptionsInner implements CollatorOptions {
+        localeMatcher?: string;
+        usage?: string;
+        sensitivity?: string;
+        ignorePunctuation?: boolean;
+        collation?: string;
+        numeric?: boolean;
+        caseFirst?: string;
+    }
+
+    export interface PluralRulesOptions {
+        localeMatcher?: string;
+        type?: string;
+        minimumIntegerDigits?: number;
+        minimumFractionDigits?: number;
+        maximumFractionDigits?: number;
+        minimumSignificantDigits?: number;
+        maximumSignificantDigits?: number;
+    }
+
+    export class PluralRulesOptionsInner implements PluralRulesOptions {
+        localeMatcher?: string;
+        type?: string;
+        minimumIntegerDigits?: number;
+        minimumFractionDigits?: number;
+        maximumFractionDigits?: number;
+        minimumSignificantDigits?: number;
+        maximumSignificantDigits?: number;
+    }
+
+    export interface RelativeTimeFormatInputOptions {
+        localeMatcher?: string;
+        numeric?: string;
+        style?: string;
+    }
+
+    export class RelativeTimeFormatInputOptionsInner implements RelativeTimeFormatInputOptions {
+        localeMatcher?: string;
+        numeric?: string;
+        style?: string;
+    }
+
+    export interface RelativeTimeFormatResolvedOptions {
+        locale: string;
+        style: string;
+        numeric: string;
+        numberingSystem: string;
+    }
+
+    export class RelativeTimeFormatResolvedOptionsInner implements RelativeTimeFormatResolvedOptions {
+        locale: string;
+        style: string;
+        numeric: string;
+        numberingSystem: string;
+    }
+
+    export interface RelativeTimeFormatPart {
+        type: string;
+        value: number;
+        unit?: string;
+    }
+
+    export class RelativeTimeFormatPartInner implements RelativeTimeFormatPart {
+        type: string;
+        value: number;
+        unit?: string;
     }
 
     export class Locale {
@@ -226,63 +238,66 @@ namespace intl {
             return this.getLanguage();
         }
 
-        set language(value: string) {}
+        set language(value: string) { }
 
         get script(): string {
             return this.getScript();
         }
 
-        set script(value: string) {}
+        set script(value: string) { }
 
         get region(): string {
             return this.getRegion();
         }
 
-        set region(value: string) {}
+        set region(value: string) { }
 
         get baseName(): string {
             return this.getBaseName();
         }
 
-        set baseName(value: string) {}
+        set baseName(value: string) { }
 
         get caseFirst(): string {
             return this.getCaseFirst();
         }
 
-        set caseFirst(value: string) {}
+        set caseFirst(value: string) { }
 
         get calendar(): string {
             return this.getCalendar();
         }
 
-        set calendar(value: string) {}
+        set calendar(value: string) { }
 
         get collation(): string {
             return this.getCollation();
         }
-        set collation(value: string) {}
+        set collation(value: string) { }
 
         get hourCycle(): string {
             return this.getHourCycle();
         }
 
-        set hourCycle(value: string) {}
+        set hourCycle(value: string) { }
 
         get numberingSystem(): string {
             return this.getNumberingSystem();
         }
 
-        set numberingSystem(value: string) {}
+        set numberingSystem(value: string) { }
 
         get numeric(): boolean {
             return this.getNumeric();
         }
 
-        set numeric(value: boolean) {}
+        set numeric(value: boolean) { }
 
         native static create(): Locale;
         native static create(locale: string, options?: LocaleOptions): Locale;
+        native toString(): string;
+        native maximize(): Locale;
+        native minimize(): Locale;
         native getLanguage(): string;
         native getScript(): string;
         native getRegion(): string;
@@ -298,7 +313,7 @@ namespace intl {
     export class DateTimeFormat {
         static { loadLibrary("intl_ani.z"); }
 
-        private nativeDateTimeFormat: long = 0;
+        private nativeDateTimeFormat: long;
 
         constructor(context: long) {
             if (this.nativeDateTimeFormat == 0) {
@@ -317,13 +332,14 @@ namespace intl {
         native static create(): DateTimeFormat;
         native static create(locale: string | Array<string>, options?: DateTimeOptions): DateTimeFormat;
         native format(date: Date): string;
+        native formatRange(startDate: Date, endDate: Date): string;
         native resolvedOptions(): DateTimeOptions;
     }
 
     export class NumberFormat {
         static { loadLibrary("intl_ani.z"); }
 
-        private nativeNumberFormat: long = 0;
+        private nativeNumberFormat: long;
 
         constructor(context: long) {
             if (this.nativeNumberFormat == 0) {
@@ -342,6 +358,83 @@ namespace intl {
         native static create(): NumberFormat;
         native static create(locale: string | Array<string>, options?: NumberOptions): NumberFormat;
         native format(number: number): string;
+        native formatRange(startRange: number, endRange: number): string;
         native resolvedOptions(): NumberOptions;
+    }
+
+    export class Collator {
+        static { loadLibrary("intl_ani.z"); }
+
+        private nativeCollator: long;
+
+        constructor(context: long) {
+            if (this.nativeCollator == 0) {
+                this.nativeCollator = context;
+            }
+        }
+
+        constructor() {
+            this.nativeCollator = Collator.create().nativeCollator;
+        }
+
+        constructor(locale: string | Array<string>, options?: CollatorOptions) {
+            this.nativeCollator = Collator.create(locale, options).nativeCollator;
+        }
+
+        native static create(): Collator;
+        native static create(locale: string | Array<string>, options?: CollatorOptions): Collator;
+        native compare(first: string, second: string): number;
+        native resolvedOptions(): CollatorOptions;
+    }
+
+    export class PluralRules {
+        static { loadLibrary("intl_ani.z"); }
+
+        private nativePluralRules: long;
+
+        constructor(context: long) {
+            if (this.nativePluralRules == 0) {
+                this.nativePluralRules = context;
+            }
+        }
+
+        constructor() {
+            this.nativePluralRules = PluralRules.create().nativePluralRules;
+        }
+
+        constructor(locale: string | Array<string>, options?: PluralRulesOptions) {
+            this.nativePluralRules = PluralRules.create(locale, options).nativePluralRules;
+        }
+
+        native static create(): PluralRules;
+        native static create(locale: string | Array<string>, options?: PluralRulesOptions): PluralRules;
+        native select(n: number): string;
+    }
+
+    export class RelativeTimeFormat {
+        static { loadLibrary("intl_ani.z"); }
+
+        private nativeRelativeTimeFormat: long;
+
+        constructor(context: long) {
+            if (this.nativeRelativeTimeFormat == 0) {
+                this.nativeRelativeTimeFormat = context;
+            }
+        }
+
+        constructor() {
+            this.nativeRelativeTimeFormat = RelativeTimeFormat.create().nativeRelativeTimeFormat;
+        }
+
+        constructor(locale: string | Array<string>, options?: RelativeTimeFormatInputOptions) {
+            this.nativeRelativeTimeFormat = RelativeTimeFormat.create(locale, options).nativeRelativeTimeFormat;
+        }
+
+        native static create(): RelativeTimeFormat;
+        native static create(locale: string | Array<string>,
+            options?: RelativeTimeFormatInputOptions): RelativeTimeFormat;
+        native format(value: number, unit: string): string;
+        native formatToParts(value: number, unit: string): Array<RelativeTimeFormatPart>;
+        native resolvedOptions(): RelativeTimeFormatResolvedOptions;
     }
 }
