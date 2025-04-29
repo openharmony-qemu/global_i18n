@@ -16,9 +16,11 @@
 #define OHOS_GLOBAL_I18N_LOCALE_INFO_ADDON_H
 
 #include <vector>
-#include "locale_info.h"
+
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+
+#include "locale_info.h"
 
 namespace OHOS {
 namespace Global {

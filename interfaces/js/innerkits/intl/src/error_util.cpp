@@ -16,6 +16,7 @@
 
 #include <string>
 #include <unordered_map>
+
 #include "i18n_hilog.h"
 
 namespace OHOS {

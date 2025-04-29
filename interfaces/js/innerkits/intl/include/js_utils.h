@@ -16,6 +16,7 @@
 #define JS_UTILS_H
 
 #include <map>
+
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 
