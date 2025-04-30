@@ -36,6 +36,10 @@ static const std::string NAME_OF_WEEKDAY = "type";
 static const std::string TYPE_OF_WEEKDAY = "WeekDay";
 static const int OFFSET_OF_ENUM = 1;
 static const char PATH_SEPARATOR = '/';
+static const int SIZE_OF_LIST = 3;
+static const int INDEX_ONE_OF_LIST = 0;
+static const int INDEX_TWO_OF_LIST = 1;
+static const int INDEX_THREE_OF_LIST = 2;
 
 static std::unordered_map<std::string, UCalendarDateFields> g_fieldsMap {
     { "era", UCAL_ERA },
@@ -2153,8 +2157,9 @@ ani_boolean I18nHolidayManagerAddon::IsHoliday(ani_env *env, ani_object object, 
         list.push_back(GetDateValue(env, date, "getFullYear"));
         list.push_back(GetDateValue(env, date, "getMonth") + MONTH_INCREASE_ONE);
         list.push_back(GetDateValue(env, date, "getDate"));
-        if (list.size() == 3) {
-            res = obj->holidayManager_->IsHoliday(list.at(0), list.at(1), list.at(2));
+        if (list.size() == SIZE_OF_LIST) {
+            res = obj->holidayManager_->IsHoliday(list.at(INDEX_ONE_OF_LIST),
+                list.at(INDEX_TWO_OF_LIST), list.at(INDEX_THREE_OF_LIST));
         }
     }
     return res;
