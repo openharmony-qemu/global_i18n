@@ -162,7 +162,7 @@ napi_value EntityRecognizerAddon::GetEntityInfoItem(napi_env env, std::vector<st
     int index = 0;
     for (std::string::size_type t = 0; t < types.size(); t++) {
         for (int i = 0; i < entityInfo[t][0]; i++) {
-            size_t posBegin = ENTITY_INFO_LEN * i + 1;
+            size_t posBegin = ENTITY_INFO_LEN * static_cast<size_t>(i) + 1;
             int begin = entityInfo[t][posBegin];
             int end = entityInfo[t][posBegin + 1];
             std::string type = types[t];
