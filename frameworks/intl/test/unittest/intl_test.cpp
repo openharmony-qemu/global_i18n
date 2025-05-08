@@ -151,10 +151,7 @@ HWTEST_F(IntlTest, IntlFuncTest001, TestSize.Level1)
                                     { "weekday", "long" },
                                     { "era", "short"} };
     DateTimeFormat *dateFormat = new (std::nothrow) DateTimeFormat(locales, options);
-    if (!dateFormat) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(dateFormat != nullptr);
     int64_t milliseconds = 1234567;
     string out = dateFormat->Format(milliseconds);
     EXPECT_EQ(out, expects);
@@ -182,10 +179,7 @@ HWTEST_F(IntlTest, IntlFuncTest002, TestSize.Level0)
                                     { "numeric", "true" },
                                     { "numberingSystem", "jpan" } };
     LocaleInfo *loc = new (std::nothrow) LocaleInfo(locale, options);
-    if (!loc) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(loc != nullptr);
     EXPECT_EQ(loc->GetLanguage(), "ja");
     EXPECT_EQ(loc->GetScript(), "Jpan");
     EXPECT_EQ(loc->GetRegion(), "JP");
@@ -209,10 +203,7 @@ HWTEST_F(IntlTest, IntlFuncTest003, TestSize.Level1)
 {
     string locale = "en-GB";
     LocaleInfo *loc = new (std::nothrow) LocaleInfo(locale);
-    if (!loc) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(loc != nullptr);
     string language = "en";
     string script = "";
     string region = "GB";
@@ -248,10 +239,7 @@ HWTEST_F(IntlTest, IntlFuncTest004, TestSize.Level1)
                                     { "hourCycle", hourCycle },
                                     { "timeStyle", timeStyle } };
     DateTimeFormat *dateFormat = new (std::nothrow) DateTimeFormat(locales, options);
-    if (!dateFormat) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(dateFormat != nullptr);
     int64_t fromMilliseconds = 123456789;
     int64_t toMilliseconds = 987654321;
     string out = dateFormat->FormatRange(fromMilliseconds, toMilliseconds);
@@ -277,10 +265,7 @@ HWTEST_F(IntlTest, IntlFuncTest005, TestSize.Level1)
                                     { "day", "numeric" },
                                     { "weekday", "long"} };
     DateTimeFormat *dateFormat = new (std::nothrow) DateTimeFormat(locales, options);
-    if (!dateFormat) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(dateFormat != nullptr);
     int64_t milliseconds = 123456789;
     string out = dateFormat->Format(milliseconds);
     EXPECT_EQ(out, expects);
@@ -315,10 +300,7 @@ HWTEST_F(IntlTest, IntlFuncTest006, TestSize.Level1)
                                     { "currencySign", "accounting" },
                                     { "signDisplay", "always" } };
     NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
-    if (!numFmt) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(numFmt != nullptr);
     string out = numFmt->Format(123456.789);
     EXPECT_EQ(out, expects);
     EXPECT_EQ(numFmt->GetUseGrouping(), useGrouping);
@@ -348,10 +330,7 @@ HWTEST_F(IntlTest, IntlFuncTest007, TestSize.Level1)
                                     { "unit", "meter" },
                                     { "unitDisplay", "long"} };
     NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
-    if (!numFmt) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(numFmt != nullptr);
     string out = numFmt->Format(123456.789);
     EXPECT_EQ(out, expects);
     EXPECT_EQ(numFmt->GetStyle(), style);
@@ -376,10 +355,7 @@ HWTEST_F(IntlTest, IntlFuncTest008, TestSize.Level1)
                                     { "minimumIntegerDigits", minimumIntegerDigits },
                                     { "maximumFractionDigits", maximumFractionDigits } };
     NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
-    if (!numFmt) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(numFmt != nullptr);
     string out = numFmt->Format(123456.789);
     EXPECT_EQ(out, expects);
     EXPECT_EQ(numFmt->GetStyle(), style);
@@ -404,10 +380,7 @@ HWTEST_F(IntlTest, IntlFuncTest009, TestSize.Level1)
                                     { "minimumIntegerDigits", minimumIntegerDigits },
                                     { "maximumFractionDigits", maximumFractionDigits } };
     NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
-    if (!numFmt) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(numFmt != nullptr);
     string out = numFmt->Format(123456.789);
     EXPECT_EQ(out, expects);
     EXPECT_EQ(numFmt->GetStyle(), style);
@@ -441,10 +414,7 @@ HWTEST_F(IntlTest, IntlFuncTest010, TestSize.Level1)
     map<string, string> options = { { "style", style },
                                     { "notation", "scientific" } };
     NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
-    if (!numFmt) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(numFmt != nullptr);
     string out = numFmt->Format(123456.789);
     EXPECT_EQ(out, expects);
     EXPECT_EQ(numFmt->GetStyle(), style);
@@ -467,10 +437,7 @@ HWTEST_F(IntlTest, IntlFuncTest011, TestSize.Level1)
                                     { "notation", "compact" },
                                     { "compactDisplay", "long" } };
     NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
-    if (!numFmt) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(numFmt != nullptr);
     string out = numFmt->Format(123456.789);
     EXPECT_EQ(out, expects);
     EXPECT_EQ(numFmt->GetStyle(), style);
@@ -492,10 +459,7 @@ HWTEST_F(IntlTest, IntlFuncTest0012, TestSize.Level1)
     locales.push_back(locale);
     std::string expects = "3/11/82";
     DateTimeFormat *dateFormat = new (std::nothrow) DateTimeFormat(locales, options);
-    if (!dateFormat) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(dateFormat != nullptr);
     int64_t milliseconds = 123456789123456;
     string out = dateFormat->Format(milliseconds);
     EXPECT_EQ(out, expects);
@@ -544,10 +508,7 @@ HWTEST_F(IntlTest, IntlFuncTest0013, TestSize.Level1)
     map<string, string> options = {};
     std::string expects = "123,456.789";
     NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
-    if (!numFmt) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(numFmt != nullptr);
     string out = numFmt->Format(123456.789);
     EXPECT_EQ(out, expects);
     delete numFmt;
@@ -567,10 +528,7 @@ HWTEST_F(IntlTest, IntlFuncTest0014, TestSize.Level1)
     locales.push_back(locale);
     map<string, string> options = { { "timeZone", "America/Los_Angeles"  }, { "timeZoneName", "long" } };
     DateTimeFormat *dateFormat = new (std::nothrow) DateTimeFormat(locales, options);
-    if (!dateFormat) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(dateFormat != nullptr);
     int64_t milliseconds = 123456789;
     string out = dateFormat->Format(milliseconds);
     EXPECT_TRUE(out.find(expects) != out.npos);
@@ -593,10 +551,7 @@ HWTEST_F(IntlTest, IntlFuncTest0015, TestSize.Level1)
         { "timeZoneName", "short" }
     };
     DateTimeFormat *dateFormat = new (std::nothrow) DateTimeFormat(locales, options);
-    if (!dateFormat) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(dateFormat != nullptr);
     EXPECT_EQ(dateFormat->GetTimeZone(), "America/Los_Angeles");
     EXPECT_EQ(dateFormat->GetTimeZoneName(), "short");
     delete dateFormat;
