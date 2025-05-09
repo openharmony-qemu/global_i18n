@@ -195,13 +195,13 @@ namespace intl {
 
     export interface RelativeTimeFormatPart {
         type: string;
-        value: number;
+        value: string;
         unit?: string;
     }
 
     export class RelativeTimeFormatPartInner implements RelativeTimeFormatPart {
         type: string;
-        value: number;
+        value: string;
         unit?: string;
     }
 
