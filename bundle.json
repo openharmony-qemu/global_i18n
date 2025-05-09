@@ -57,6 +57,7 @@
                 "bundle_framework",
                 "common_event_service",
                 "config_policy",
+                "cJSON",
                 "c_utils",
                 "eventhandler",
                 "hilog",
@@ -74,7 +75,8 @@
                 "protobuf",
                 "resource_management",
                 "safwk",
-                "samgr"
+                "samgr",
+                "selinux_adapter"
             ],
             "third_party": []
         },

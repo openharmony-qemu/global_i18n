@@ -264,7 +264,7 @@ private:
      * @return std::string Return locale Tag.
      */
     static std::string UpdateRegionOfLocale(const std::string &regionTag);
-    static std::string ModifyExtParam(const std::string& locale, const std::string& key, const std::string& value);;
+    static std::string ModifyExtParam(const std::string& locale, const std::string& key, const std::string& value);
     static std::unordered_map<std::string, std::string> ParseExtParam(const std::string& param);
     static std::string GenerateExtParam(const std::unordered_map<std::string, std::string>& paramMap);
     static void ExtendWhiteLanguages();
