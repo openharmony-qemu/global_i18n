@@ -12,13 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "locale_info_addon.h"
 
 #include <vector>
+
 #include "error_util.h"
 #include "i18n_hilog.h"
-#include "locale_config.h"
-#include "locale_info_addon.h"
 #include "js_utils.h"
+#include "locale_config.h"
 
 namespace OHOS {
 namespace Global {

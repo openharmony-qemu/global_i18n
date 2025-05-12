@@ -84,6 +84,7 @@
             "sub_component": [
                 "//base/global/i18n/frameworks/zone:zone_util",
                 "//base/global/i18n/frameworks/intl:build_module",
+                "//base/global/i18n/interfaces/js/innerkits/intl:intl_napi",
                 "//base/global/i18n/interfaces/js/kits:build_module",
                 "//base/global/i18n/interfaces/cj:build_module",
                 "//base/global/i18n/frameworks/intl:geocoding_depends",
@@ -129,6 +130,15 @@
                             "i18n_service_ability_client.h"
                         ],
                         "header_base": "//base/global/i18n/services/include"
+                    }
+                },
+                {
+                    "name": "//base/global/i18n/interfaces/js/innerkits/intl:intl_napi",
+                    "header": {
+                        "header_files": [
+                            "intl_addon.h"
+                        ],
+                        "header_base": "//base/global/i18n/interfaces/js/innerkits/intl/include"
                     }
                 },
                 {

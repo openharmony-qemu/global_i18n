@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "number_format_addon.h"
 
 #include "i18n_hilog.h"

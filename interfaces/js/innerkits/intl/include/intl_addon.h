@@ -20,12 +20,11 @@
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
-#include "locale_info.h"
-#include "date_time_format.h"
-#include "number_format.h"
-#include "relative_time_format.h"
+
 #include "collator.h"
+#include "date_time_format.h"
 #include "plural_rules.h"
+#include "relative_time_format.h"
 
 namespace OHOS {
 namespace Global {
@@ -37,6 +36,9 @@ void GetRelativeTimeOptionValues(napi_env env, napi_value options, std::map<std:
 
 class IntlAddon {
 public:
+    static napi_value Init(napi_env env, napi_value exports);
+    static bool RegisterIntl(napi_env env);
+
     static napi_value InitDateTimeFormat(napi_env env, napi_value exports);
     static napi_value InitCollator(napi_env env, napi_value exports);
     static napi_value InitRelativeTimeFormat(napi_env env, napi_value exports);

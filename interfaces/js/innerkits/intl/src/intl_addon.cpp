@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,23 +12,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "intl_addon.h"
 
-#include <vector>
 #include <set>
+#include <vector>
+
+#include "node_api.h"
+
 #include "error_util.h"
 #include "i18n_hilog.h"
 #include "js_utils.h"
-#include "node_api.h"
-#include "utils.h"
 #include "locale_info_addon.h"
 #include "number_format_addon.h"
+#include "utils.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-
 IntlAddon::IntlAddon() : env_(nullptr) {}
 
 IntlAddon::~IntlAddon()
@@ -1068,7 +1068,7 @@ napi_value IntlAddon::Select(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value Init(napi_env env, napi_value exports)
+napi_value IntlAddon::Init(napi_env env, napi_value exports)
 {
     napi_value val = LocaleInfoAddon::InitLocale(env, exports);
     val = IntlAddon::InitDateTimeFormat(env, val);
@@ -1079,19 +1079,33 @@ napi_value Init(napi_env env, napi_value exports)
     return val;
 }
 
-static napi_module g_intlModule = {
-    .nm_version = 1,
-    .nm_flags = 0,
-    .nm_filename = nullptr,
-    .nm_register_func = Init,
-    .nm_modname = "intl",
-    .nm_priv = nullptr,
-    .reserved = { 0 }
-};
-
-extern "C" __attribute__((constructor)) void AbilityRegister()
+bool IntlAddon::RegisterIntl(napi_env env)
 {
-    napi_module_register(&g_intlModule);
+    if (env == nullptr) {
+        HILOG_ERROR_I18N("RegisterIntl: env is null");
+        return false;
+    }
+
+    napi_value global = nullptr;
+    napi_status status = napi_get_global(env, &global);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("RegisterIntl: get global obj failed");
+        return false;
+    }
+
+    napi_value intlModule = nullptr;
+    status = napi_get_named_property(env, global, "Intl", &intlModule);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("RegisterIntl: get Buildin Intl Module failed");
+        return false;
+    }
+
+    intlModule = IntlAddon::Init(env, intlModule);
+    if (intlModule == nullptr) {
+        HILOG_ERROR_I18N("RegisterIntl: init Intl Module failed");
+    }
+
+    return true;
 }
 } // namespace I18n
 } // namespace Global
