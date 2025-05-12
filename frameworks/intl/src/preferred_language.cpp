@@ -183,11 +183,11 @@ std::string PreferredLanguage::GetAppPreferredLanguage()
     if (preferences == nullptr) {
         HILOG_ERROR_I18N(
             "PreferredLanguage::GetAppPreferredLanguage get i18n preferences failed, return system language.");
-        return LocaleConfig::GetSystemLocale();
+        return LocaleConfig::GetEffectiveLanguage();
     }
     std::string res = preferences->GetString(PreferredLanguage::APP_LANGUAGE_KEY, "");
     if (res.length() == 0 || res.compare("default") == 0) {
-        return LocaleConfig::GetSystemLocale();
+        return LocaleConfig::GetEffectiveLanguage();
     }
     return res;
 }

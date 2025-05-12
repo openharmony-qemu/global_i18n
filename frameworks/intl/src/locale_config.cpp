@@ -397,6 +397,21 @@ std::string LocaleConfig::GetEffectiveLanguage()
     return ComputeEffectiveLanguage(systemLocale, systemLanguage);
 }
 
+std::string LocaleConfig::GetEffectiveLocale()
+{
+    std::string systemLocale = ReadSystemParameter(LOCALE_KEY.c_str(), CONFIG_LEN);
+    if (!systemLocale.empty()) {
+        return systemLocale;
+    }
+    HILOG_ERROR_I18N("LocaleConfig::GetEffectiveLocale: Read system locale failed.");
+    systemLocale = ReadSystemParameter(DEFAULT_LOCALE_KEY, CONFIG_LEN);
+    if (systemLocale.empty()) {
+        HILOG_ERROR_I18N("LocaleConfig::GetEffectiveLocale: Read default system locale failed.");
+        return "zh-Hans-CN";
+    }
+    return systemLocale;
+}
+
 string LocaleConfig::GetSystemLanguage()
 {
     std::string systemLanguage = ReadSystemParameter(LANGUAGE_KEY.c_str(), CONFIG_LEN);
@@ -447,15 +462,10 @@ string LocaleConfig::GetCountry(const string& parameter)
 
 string LocaleConfig::GetSystemLocale()
 {
-    std::string systemLocale = ReadSystemParameter(LOCALE_KEY.c_str(), CONFIG_LEN);
-    if (!systemLocale.empty()) {
-        return systemLocale;
-    }
-    HILOG_ERROR_I18N("LocaleConfig::GetSystemLocale: Read system locale failed.");
-    systemLocale = ReadSystemParameter(DEFAULT_LOCALE_KEY, CONFIG_LEN);
-    if (systemLocale.empty()) {
-        HILOG_ERROR_I18N("LocaleConfig::GetSystemLocale: Read default system locale failed.");
-        return "zh-Hans-CN";
+    std::string systemLocale = GetEffectiveLocale();
+    size_t pos = systemLocale.find(EXT_PARAM_KEY);
+    if (pos != std::string::npos) {
+        systemLocale = systemLocale.substr(0, pos);
     }
     return systemLocale;
 }
@@ -1273,7 +1283,7 @@ std::string LocaleConfig::GetValidLocale(const std::string &localeTag)
         parseExtension(extension, extensionMap);
     }
 
-    std::string systemLocaleTag = GetSystemLocale();
+    std::string systemLocaleTag = GetEffectiveLocale();
     std::string defaultExtension = "";
     found = systemLocaleTag.find(EXT_PARAM_KEY);
     if (found != std::string::npos) {
@@ -1322,7 +1332,7 @@ bool LocaleConfig::Is24HourClock()
         return false;
     }
     if (is24Hour.compare("default") == 0) {
-        std::string systemLocale = GetSystemLocale();
+        std::string systemLocale = GetEffectiveLocale();
         return Is24HourLocale(systemLocale);
     }
     if (is24Hour.compare("true") == 0) {
@@ -1393,7 +1403,7 @@ bool LocaleConfig::HasDesignator(const std::string& pattern, const char designat
 
 bool LocaleConfig::GetUsingLocalDigit()
 {
-    std::string locale = GetSystemLocale();
+    std::string locale = GetEffectiveLocale();
     LocaleInfo localeInfo(locale);
     std::string language = localeInfo.GetLanguage();
     if (localDigitMap.find(language) == localDigitMap.end()) {
@@ -1472,11 +1482,16 @@ void LocaleConfig::QueryUpgradeLocale()
     }
 }
 
-std::string LocaleConfig::ComputeEffectiveLanguage(const std::string& locale, const std::string& language)
+std::string LocaleConfig::ComputeEffectiveLanguage(const std::string& localeTag, const std::string& language)
 {
-    if (locale.empty()) {
+    if (localeTag.empty()) {
         HILOG_ERROR_I18N("LocaleConfig::ComputeEffectiveLanguage: locale is empty.");
-        return locale;
+        return localeTag;
+    }
+    std::string locale = localeTag;
+    size_t pos = localeTag.find(EXT_PARAM_KEY);
+    if (pos != std::string::npos) {
+        locale = localeTag.substr(0, pos);
     }
     size_t prefixLength = 2;
     if (locale.compare(0, prefixLength, "es") != 0 && locale.compare(0, prefixLength, "pt") != 0) {
@@ -1530,7 +1545,7 @@ I18nErrorCode LocaleConfig::SetSystemLocale(const std::string &localeTag, int32_
     MultiUsers::SaveLocale(localId, localeTag);
 #endif
 #ifdef SUPPORT_GRAPHICS
-    UpdateConfiguration(AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE, effectiveLanguage, userId);
+    UpdateConfigurationLocaleAndLanguage(localeTag, effectiveLanguage, userId);
     return PublishCommonEvent(EventFwk::CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED, userId);
 #else
     return I18nErrorCode::SUCCESS;
@@ -1562,7 +1577,7 @@ I18nErrorCode LocaleConfig::Set24HourClock(const std::string &option, int32_t us
     MultiUsers::SaveIs24Hour(localId, option);
 #endif
 #ifdef SUPPORT_GRAPHICS
-    UpdateConfiguration(AAFwk::GlobalConfigurationKey::SYSTEM_HOUR, option, userId);
+    UpdateConfiguration24Hour(option, userId);
     return PublishCommonEvent(EventFwk::CommonEventSupport::COMMON_EVENT_TIME_CHANGED, userId);
 #else
     return I18nErrorCode::SUCCESS;
@@ -1572,7 +1587,7 @@ I18nErrorCode LocaleConfig::Set24HourClock(const std::string &option, int32_t us
 I18nErrorCode LocaleConfig::SetUsingLocalDigit(bool flag, int32_t userId)
 {
     // check whether current language support local digit.
-    std::string localeTag = GetSystemLocale();
+    std::string localeTag = GetEffectiveLocale();
     std::string languageTag = localeTag.substr(0, 2); // obtain 2 length language code.
     auto it = localDigitMap.find(languageTag);
     if (it == localDigitMap.end()) {
@@ -1591,7 +1606,7 @@ I18nErrorCode LocaleConfig::SetTemperatureType(const TemperatureType& type, int3
         return I18nErrorCode::INVALID_TEMPERATURE_TYPE;
     }
     std::string option = temperatureTypeToName[type];
-    std::string localeTag = GetSystemLocale();
+    std::string localeTag = GetEffectiveLocale();
     if (localeTag.empty()) {
         HILOG_ERROR_I18N("LocaleConfig::SetTemperatureType: get system locale failed.");
         return I18nErrorCode::UPDATE_TEMPERATURE_TYPE_FAILED;
@@ -1602,7 +1617,7 @@ I18nErrorCode LocaleConfig::SetTemperatureType(const TemperatureType& type, int3
 
 TemperatureType LocaleConfig::GetTemperatureType()
 {
-    std::string localeTag = GetSystemLocale();
+    std::string localeTag = GetEffectiveLocale();
     if (localeTag.empty()) {
         return TemperatureType::CELSIUS;
     }
@@ -1640,7 +1655,7 @@ I18nErrorCode LocaleConfig::SetFirstDayOfWeek(const WeekDay& type, int32_t userI
         return I18nErrorCode::INVALID_WEEK_DAY;
     }
     std::string option = weekDayToName[type];
-    std::string localeTag = GetSystemLocale();
+    std::string localeTag = GetEffectiveLocale();
     if (localeTag.empty()) {
         HILOG_ERROR_I18N("LocaleConfig::SetFirstDayOfWeek: get system locale failed.");
         return I18nErrorCode::UPDATE_WEEK_DAY_FAILED;
@@ -1651,7 +1666,7 @@ I18nErrorCode LocaleConfig::SetFirstDayOfWeek(const WeekDay& type, int32_t userI
 
 WeekDay LocaleConfig::GetFirstDayOfWeek()
 {
-    std::string localeTag = GetSystemLocale();
+    std::string localeTag = GetEffectiveLocale();
     if (localeTag.empty()) {
         HILOG_ERROR_I18N("LocaleConfig::GetFirstDayOfWeek: get system locale failed.");
         return WeekDay::MON;
@@ -1681,18 +1696,53 @@ WeekDay LocaleConfig::GetFirstDayOfWeek()
 }
 
 #ifdef SUPPORT_GRAPHICS
-void LocaleConfig::UpdateConfiguration(const char *key, const std::string &value, int32_t userId)
+void LocaleConfig::UpdateConfigurationLocaleAndLanguage(const std::string& locale, const std::string& language,
+    int32_t userId)
 {
+    if (locale.empty() && language.empty()) {
+        HILOG_ERROR_I18N("LocaleConfig::UpdateConfigurationLocaleAndLanguage: locale and language are empty.");
+        return;
+    }
     AppExecFwk::Configuration configuration;
-    configuration.AddItem(key, value);
+    if (!locale.empty()) {
+        configuration.AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_LOCALE, locale);
+    }
+    if (!language.empty()) {
+        configuration.AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE, language);
+    }
     auto appMgrClient = std::make_unique<AppExecFwk::AppMgrClient>();
+    if (appMgrClient == nullptr) {
+        HILOG_ERROR_I18N("LocaleConfig::UpdateConfigurationLocaleAndLanguage: Get appMgrClient failed.");
+        return;
+    }
 
     AppExecFwk::AppMgrResultCode status = appMgrClient->UpdateConfiguration(configuration, userId);
     if (status != AppExecFwk::AppMgrResultCode::RESULT_OK) {
-        HILOG_ERROR_I18N("LocaleConfig::UpdateConfiguration: Update configuration userId %{public}d failed.", userId);
+        HILOG_ERROR_I18N("LocaleConfig::UpdateConfigurationLocaleAndLanguage: Update configuration "
+            "userId %{public}d failed.", userId);
         return;
     }
-    HILOG_INFO_I18N("LocaleConfig::UpdateLanguageConfiguration: update userId %{public}d.", userId);
+    HILOG_INFO_I18N("LocaleConfig::UpdateConfigurationLocaleAndLanguage: update userId %{public}d, locale %{public}s, "
+        "language %{public}s.", userId, locale.c_str(), language.c_str());
+}
+
+void LocaleConfig::UpdateConfiguration24Hour(const std::string& is24Hour, int32_t userId)
+{
+    AppExecFwk::Configuration configuration;
+    configuration.AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_HOUR, is24Hour);
+    auto appMgrClient = std::make_unique<AppExecFwk::AppMgrClient>();
+    if (appMgrClient == nullptr) {
+        HILOG_ERROR_I18N("LocaleConfig::UpdateConfiguration24Hour: Get appMgrClient failed.");
+        return;
+    }
+    AppExecFwk::AppMgrResultCode status = appMgrClient->UpdateConfiguration(configuration, userId);
+    if (status != AppExecFwk::AppMgrResultCode::RESULT_OK) {
+        HILOG_ERROR_I18N("LocaleConfig::UpdateConfiguration24Hour: Update configuration userId %{public}d failed.",
+            userId);
+        return;
+    }
+    HILOG_INFO_I18N("LocaleConfig::UpdateConfiguration24Hour: update userId %{public}d, is24Hour %{public}s.",
+        userId, is24Hour.c_str());
 }
 
 I18nErrorCode LocaleConfig::PublishCommonEvent(const std::string &eventType, int32_t userId)
@@ -1736,7 +1786,7 @@ std::string LocaleConfig::UpdateLanguageOfLocale(const std::string &languageTag)
     std::string langTag = languageLocale.getLanguage();
     std::string scriptTag = languageLocale.getScript();
     // Compute region and extend param part from current system locale.
-    std::string systemLocaleTag = GetSystemLocale();
+    std::string systemLocaleTag = GetEffectiveLocale();
     icu::Locale systemLocale = icu::Locale::forLanguageTag(systemLocaleTag.c_str(), status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("LocaleConfig::UpdateSystemLocale init icu Locale for locale %{public}s failed.",
@@ -1773,7 +1823,7 @@ std::string LocaleConfig::CreateLocale(const std::string &languageTag, const std
 
 std::string LocaleConfig::UpdateRegionOfLocale(const std::string &regionTag)
 {
-    std::string localeTag = GetSystemLocale();
+    std::string localeTag = GetEffectiveLocale();
     // if current system locale is null, contruct a locale from region tag.
     if (localeTag.empty()) {
         return CreateLocaleFromRegion(regionTag);

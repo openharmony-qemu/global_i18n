@@ -143,7 +143,7 @@ NumberFormat::NumberFormat(const std::vector<std::string> &localeTags, std::map<
         }
     }
     if (!createSuccess) {
-        std::string systemLocale = LocaleConfig::GetSystemLocale();
+        std::string systemLocale = LocaleConfig::GetEffectiveLocale();
         localeInfo = std::make_unique<LocaleInfo>(systemLocale, configs);
         CreateRelativeTimeFormat(systemLocale);
         if (localeInfo != nullptr && localeInfo->InitSuccess()) {
