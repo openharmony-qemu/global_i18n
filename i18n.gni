@@ -14,4 +14,8 @@
 declare_args() {
   i18n_support_ui = true
   i18n_support_app_preferred_language = true
+  i18n_ext_part_exists = false
+  if (defined(global_parts_info.global_i18n_common_ext)) {
+    i18n_ext_part_exists = true
+  }
 }
