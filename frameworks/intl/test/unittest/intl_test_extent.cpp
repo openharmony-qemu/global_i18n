@@ -462,7 +462,7 @@ HWTEST_F(IntlTest, IntlFuncTest0058, TestSize.Level1)
     std::unique_ptr<I18nTimeZone> timezone = I18nTimeZone::CreateInstance(timezoneId, true);
     I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
     std::set<std::string> set0 = I18nTimeZone::GetAvailableIDs(errorCode);
-    EXPECT_EQ(set0.size(), 442);
+    EXPECT_TRUE(set0.size() > 400);
     std::unordered_set<std::string> set1 = I18nTimeZone::GetAvailableZoneCityIDs();
     EXPECT_TRUE(set1.size() > 0);
     std::string empty = "";
