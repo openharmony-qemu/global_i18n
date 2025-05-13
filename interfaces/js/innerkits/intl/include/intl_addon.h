@@ -33,11 +33,11 @@ void GetDateOptionValues(napi_env env, napi_value options, std::map<std::string,
 void GetCollatorOptionValue(napi_env env, napi_value options, std::map<std::string, std::string> &map);
 void GetPluralRulesOptionValues(napi_env env, napi_value options, std::map<std::string, std::string> &map);
 void GetRelativeTimeOptionValues(napi_env env, napi_value options, std::map<std::string, std::string> &map);
+bool GetStringParameter(napi_env env, napi_value value, std::vector<char> &buf);
 
 class IntlAddon {
 public:
     static napi_value Init(napi_env env, napi_value exports);
-    static bool RegisterIntl(napi_env env);
 
     static napi_value InitDateTimeFormat(napi_env env, napi_value exports);
     static napi_value InitCollator(napi_env env, napi_value exports);
@@ -88,4 +88,6 @@ private:
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
+
+extern "C" bool RegisterIntl(napi_env env);
 #endif

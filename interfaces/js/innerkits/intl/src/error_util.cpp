@@ -78,6 +78,29 @@ void ErrorUtil::NapiNotFoundError(napi_env env, int32_t errCode, const std::stri
 {
     NapiThrow(env, errCode, valueName, "", throwError);
 }
+
+void ErrorUtil::NapiThrowUndefined(napi_env env, const std::string& value)
+{
+    napi_value code = nullptr;
+    napi_status status = napi_create_string_latin1(env, "undefined", NAPI_AUTO_LENGTH, &code);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("ErrorUtil::NapiThrowUndefined: create string undefined failed");
+        return;
+    }
+    napi_value message = nullptr;
+    status = napi_create_string_latin1(env, value.c_str(), NAPI_AUTO_LENGTH, &message);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("ErrorUtil::NapiThrowUndefined: create string %{public}s failed", value.c_str());
+        return;
+    }
+    napi_value error = nullptr;
+    status = napi_create_error(env, code, message, &error);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("ErrorUtil::NapiThrowUndefined: create error failed");
+        return;
+    }
+    napi_throw(env, error);
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

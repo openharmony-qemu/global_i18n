@@ -14,26 +14,71 @@
  */
 #include "collator.h"
 
-#include <unicode/stringpiece.h>
+#include <map>
+#include <set>
+#include <string>
+#include <utility>
+#include <vector>
 
-#include "i18n_hilog.h"
-#include "locale_config.h"
-#include "map"
-#include "set"
 #include "unicode/strenum.h"
-#include "string"
 #include "unicode/errorcode.h"
 #include "unicode/locid.h"
+#include "unicode/stringpiece.h"
 #include "unicode/ucol.h"
 #include "unicode/uloc.h"
 #include "unicode/unistr.h"
 #include "unicode/urename.h"
-#include "utility"
-#include "vector"
+
+#include "i18n_hilog.h"
+#include "locale_config.h"
+#include "locale_helper.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
+std::vector<std::string> Collator::GetAvailableLocales()
+{
+    std::vector<std::string> allLocales;
+    int32_t count = 0;
+    const icu::Locale *localeList = icu::Collator::getAvailableLocales(count);
+    if (localeList == nullptr) {
+        HILOG_ERROR_I18N("Collator::GetAvailableLocales: getAvailableLocales nullptr.");
+        return allLocales;
+    }
+    for (int32_t i = 0; i < count; ++i) {
+        allLocales.push_back(localeList[i].getName());
+    }
+    return allLocales;
+}
+
+std::set<std::string> Collator::SupportedLocalesOf(const std::vector<std::string> &requestLocales,
+                                                   const std::map<std::string, std::string> &configs,
+                                                   I18nErrorCode &status)
+{
+    auto it = configs.find("localeMatcher");
+    if (it != configs.end() && 
+        !LocaleHelper::IsValidOptionName("localeMatcher", it->second)) {
+        status = I18nErrorCode::INVALID_PARAM;
+        std::set<std::string> result = {};
+        return result;
+    }
+    std::vector<std::string> availableLocales = GetAvailableLocales();
+    return Collator::LookupSupportedLocales(availableLocales, requestLocales);
+}
+
+std::set<std::string> Collator::LookupSupportedLocales(const std::vector<std::string> &availableLocales,
+                                                       const std::vector<std::string> &requestLocales)
+{
+    std::set<std::string> resultLocales;
+    for (auto candidateLocale : requestLocales) {
+        std::string availableLocale = LocaleHelper::BestAvailableLocale(availableLocales, candidateLocale);
+        if (!availableLocale.empty()) {
+            resultLocales.insert(candidateLocale);
+        }
+    }
+    return resultLocales;
+}
+
 std::string Collator::ParseOption(std::map<std::string, std::string> &options, const std::string &key)
 {
     std::map<std::string, std::string>::iterator it = options.find(key);
@@ -72,7 +117,9 @@ void Collator::ParseAllOptions(std::map<std::string, std::string> &options)
 
 Collator::Collator(std::vector<std::string> &localeTags, std::map<std::string, std::string> &options)
 {
+    i18nStatus = I18nErrorCode::SUCCESS;
     ParseAllOptions(options);
+    CheckValidOptions();
     
     localeTags.push_back(LocaleConfig::GetSystemLocale());
     for (size_t i = 0; i < localeTags.size(); i++) {
@@ -124,6 +171,47 @@ bool Collator::IsValidCollation(std::string &collation)
         }
     }
     return false;
+}
+
+void Collator::CheckValidOptions()
+{
+    if (!localeMatcher.empty() && 
+        !LocaleHelper::IsValidOptionName("localeMatcher", localeMatcher)) {
+        i18nStatus = I18nErrorCode::INVALID_PARAM;
+        HILOG_ERROR_I18N("Collator::CheckValidOptions: localeMatcher invalid: %{public}s", localeMatcher.c_str());
+        return;
+    }
+    if (!usage.empty() && 
+        !LocaleHelper::IsValidOptionName("usage", usage)) {
+        i18nStatus = I18nErrorCode::INVALID_PARAM;
+        HILOG_ERROR_I18N("Collator::CheckValidOptions: usage invalid: %{public}s", usage.c_str());
+        return;
+    }
+    if (!sensitivity.empty() && 
+        !LocaleHelper::IsValidOptionName("sensitivity", sensitivity)) {
+        i18nStatus = I18nErrorCode::INVALID_PARAM;
+        HILOG_ERROR_I18N("Collator::CheckValidOptions: sensitivity invalid: %{public}s", sensitivity.c_str());
+        return;
+    }
+    if (!ignorePunctuation.empty() && 
+        !LocaleHelper::IsValidOptionName("ignorePunctuation", ignorePunctuation)) {
+        i18nStatus = I18nErrorCode::INVALID_PARAM;
+        HILOG_ERROR_I18N("Collator::CheckValidOptions: ignorePunctuation invalid: %{public}s",
+            ignorePunctuation.c_str());
+        return;
+    }
+    if (!numeric.empty() && 
+        !LocaleHelper::IsValidOptionName("numeric", numeric)) {
+        i18nStatus = I18nErrorCode::INVALID_PARAM;
+        HILOG_ERROR_I18N("Collator::CheckValidOptions: numeric invalid: %{public}s", numeric.c_str());
+        return;
+    }
+    if (!caseFirst.empty() && 
+        !LocaleHelper::IsValidOptionName("caseFirst", caseFirst)) {
+        i18nStatus = I18nErrorCode::INVALID_PARAM;
+        HILOG_ERROR_I18N("Collator::CheckValidOptions: caseFirst invalid: %{public}s", caseFirst.c_str());
+        return;
+    }
 }
 
 void Collator::SetCollation()
@@ -306,6 +394,10 @@ void Collator::ResolvedOptions(std::map<std::string, std::string> &options)
     options.insert(std::pair<std::string, std::string>("numeric", numeric));
     options.insert(std::pair<std::string, std::string>("caseFirst", caseFirst));
     options.insert(std::pair<std::string, std::string>("collation", collation));
+}
+
+I18nErrorCode Collator::GetError() const {
+    return i18nStatus;
 }
 } // namespace I18n
 } // namespace Global

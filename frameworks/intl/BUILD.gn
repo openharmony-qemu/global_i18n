@@ -130,6 +130,7 @@ ohos_shared_library("intl_util") {
       "src/locale_compare.cpp",
       "src/locale_config.cpp",
       "src/locale_data.cpp",
+      "src/locale_helper.cpp",
       "src/locale_info.cpp",
       "src/locale_matcher.cpp",
       "src/locale_util.cpp",

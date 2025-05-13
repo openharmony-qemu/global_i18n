@@ -19,6 +19,7 @@
 
 #include "node_api.h"
 
+#include "collator_addon.h"
 #include "error_util.h"
 #include "i18n_hilog.h"
 #include "js_utils.h"
@@ -1078,8 +1079,54 @@ napi_value IntlAddon::Init(napi_env env, napi_value exports)
     val = NumberFormatAddon::InitNumberFormat(env, val);
     return val;
 }
+} // namespace I18n
+} // namespace Global
+} // namespace OHOS
 
-bool IntlAddon::RegisterIntl(napi_env env)
+bool SetBuildInIntlModule(napi_env &env, napi_value &intlModule, napi_value &buildinIntlModule, const std::string& key)
+{
+    napi_value buildinClass = nullptr;
+    napi_status status = napi_get_named_property(env, buildinIntlModule, key.c_str(), &buildinClass);
+    if (status != napi_ok || buildinClass == nullptr) {
+        HILOG_ERROR_I18N("RegisterIntl: get Buildin Intl class %{public}s failed", key.c_str());
+        return false;
+    }
+    status = napi_set_named_property(env, intlModule, key.c_str(), buildinClass);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("RegisterIntl: set Buildin Intl class %{public}s failed", key.c_str());
+        return false;
+    }
+    return true;
+}
+
+bool SetBuildInIntl(napi_env &env, napi_value &global, napi_value &intlModule)
+{
+    bool hasProperty = false;
+    napi_status status = napi_has_named_property(env, global, "Intl", &hasProperty);
+    if (status != napi_ok || !hasProperty) {
+        HILOG_ERROR_I18N("RegisterIntl: Has not named Intl property");
+        return false;
+    }
+
+    napi_value buildinIntlModule = nullptr;
+    status = napi_get_named_property(env, global, "Intl", &buildinIntlModule);
+    if (status != napi_ok || buildinIntlModule == nullptr) {
+        HILOG_ERROR_I18N("RegisterIntl: get Buildin Intl Module failed");
+        return false;
+    }
+
+    const std::vector<std::string> buildinClasses = {"DateTimeFormat", "DisplayNames", "DurationFormat", "ListFormat", 
+        "Locale", "NumberFormat","PluralRules", "RelativeTimeFormat", "Segmenter"};
+
+    for (std::string buildinClass : buildinClasses) {
+        if (!SetBuildInIntlModule(env, intlModule, buildinIntlModule, buildinClass)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool RegisterIntl(napi_env env)
 {
     if (env == nullptr) {
         HILOG_ERROR_I18N("RegisterIntl: env is null");
@@ -1088,25 +1135,32 @@ bool IntlAddon::RegisterIntl(napi_env env)
 
     napi_value global = nullptr;
     napi_status status = napi_get_global(env, &global);
-    if (status != napi_ok) {
+    if (status != napi_ok || global == nullptr) {
         HILOG_ERROR_I18N("RegisterIntl: get global obj failed");
         return false;
     }
 
     napi_value intlModule = nullptr;
-    status = napi_get_named_property(env, global, "Intl", &intlModule);
+    status = napi_create_object(env, &intlModule);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("RegisterIntl: get Buildin Intl Module failed");
+        HILOG_ERROR_I18N("RegisterIntl: Define Intl object failed.");
         return false;
     }
 
-    intlModule = IntlAddon::Init(env, intlModule);
+    intlModule = OHOS::Global::I18n::CollatorAddon::InitCollator(env, intlModule);
     if (intlModule == nullptr) {
         HILOG_ERROR_I18N("RegisterIntl: init Intl Module failed");
+        return false;
     }
 
+    if (!SetBuildInIntl(env, global, intlModule)){
+        return false;
+    }
+
+    status = napi_set_named_property(env, global, "Intl", intlModule);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("RegisterIntl: Set property failed when Init Intl module.");
+        return false;
+    }
     return true;
 }
-} // namespace I18n
-} // namespace Global
-} // namespace OHOS

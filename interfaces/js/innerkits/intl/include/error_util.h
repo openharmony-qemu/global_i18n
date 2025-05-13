@@ -39,6 +39,7 @@ public:
         const std::string& valueContent, bool throwError);
     static void NapiNotFoundError(napi_env env, int32_t errCode, const std::string& valueName,
         bool throwError);
+    static void NapiThrowUndefined(napi_env env, const std::string& value);
 };
 } // namespace I18n
 } // namespace Global
