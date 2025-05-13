@@ -67,6 +67,7 @@ const char *LocaleConfig::UPGRADE_LOCALE_KEY = "persist.global.upgrade_locale";
 const char *LocaleConfig::DEFAULT_LOCALE_KEY = "const.global.locale";
 const char *LocaleConfig::DEFAULT_LANGUAGE_KEY = "const.global.language";
 const char *LocaleConfig::DEFAULT_REGION_KEY = "const.global.region";
+const char *LocaleConfig::DEVELOPER_MODE_KEY = "const.security.developermode.state";
 const char *LocaleConfig::SIM_COUNTRY_CODE_KEY = "telephony.sim.countryCode0";
 const char *LocaleConfig::SUPPORTED_LOCALES_NAME = "supported_locales";
 const char *LocaleConfig::REGIONS_LANGUAGES_PATH = "etc/xml/i18n_param_config.xml";
@@ -566,6 +567,11 @@ const unordered_set<string>& LocaleConfig::GetSupportedRegions()
 std::unordered_set<std::string> LocaleConfig::GetSystemCountries(const std::string& language)
 {
     std::unordered_set<std::string> result(supportedRegions);
+    std::string developerMode = ReadSystemParameter(DEVELOPER_MODE_KEY.c_str(), CONFIG_LEN);
+    if (developerMode.compare("true") == 0) {
+        result.insert("XA");
+        result.insert("XB");
+    }
     std::unordered_set<std::string> blockedRegion = LocaleConfig::GetBlockedRegions(language);
     Expunge(result, blockedRegion);
     return result;

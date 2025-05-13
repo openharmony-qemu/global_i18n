@@ -316,6 +316,9 @@ HWTEST_F(ZoneUtilTest, ZoneUtilFuncTest0012, TestSize.Level1)
     std::set<std::string> timeZoneList = GetTimeZoneAvailableIDs(errorCode);
     std::unordered_set<std::string> systemCountries = LocaleConfig::GetSystemCountries();
     for (const auto& systemCountry : systemCountries) {
+        if (systemCountry.compare("XA") == 0 || systemCountry.compare("XB") == 0) {
+            continue;
+        }
         std::string timeZoneId = util.GetDefaultZone(systemCountry);
         EXPECT_TRUE(timeZoneList.find(timeZoneId) != timeZoneList.end());
         if (timeZoneList.find(timeZoneId) == timeZoneList.end()) {
