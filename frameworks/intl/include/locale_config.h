@@ -157,6 +157,7 @@ private:
     static const char *SUPPORT_LOCALES_PATH;
     static const char *SUPPORT_LOCALES_NAME;
     static const char *DEFAULT_LOCALE;
+    static const char *DEVELOPER_MODE_KEY;
     static const char *supportLocalesTag;
     static const char *LANG_PATH;
     static const char *rootTag;

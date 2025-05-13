@@ -567,7 +567,7 @@ const unordered_set<string>& LocaleConfig::GetSupportedRegions()
 std::unordered_set<std::string> LocaleConfig::GetSystemCountries(const std::string& language)
 {
     std::unordered_set<std::string> result(supportedRegions);
-    std::string developerMode = ReadSystemParameter(DEVELOPER_MODE_KEY.c_str(), CONFIG_LEN);
+    std::string developerMode = ReadSystemParameter(DEVELOPER_MODE_KEY, CONFIG_LEN);
     if (developerMode.compare("true") == 0) {
         result.insert("XA");
         result.insert("XB");
