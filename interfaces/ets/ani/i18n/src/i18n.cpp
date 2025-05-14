@@ -506,10 +506,12 @@ static void AddPreferredLanguage(ani_env *env, [[maybe_unused]] ani_object objec
         return;
     }
     if (!isUndefined) {
-        if (ANI_OK != env->Object_CallMethodByName_Int(number, "unboxed", ":I", &index)) {
-            HILOG_ERROR_I18N("Unboxed Boolean failed");
+        ani_double value;
+        if (ANI_OK != env->Object_CallMethodByName_Double(number, "unboxed", ":D", &value)) {
+            HILOG_ERROR_I18N("Unboxed Double failed");
             return;
         }
+        index = static_cast<int>(value);
     }
     I18nErrorCode err = I18nServiceAbilityClient::AddPreferredLanguage(AniStrToString(env, language), index);
     HILOG_INFO_I18N("I18nSystemAddon::AddPreferredLanguageImpl with code %{public}d", static_cast<int32_t>(err));
@@ -1343,10 +1345,12 @@ ani_double I18nBreakIteratorAddon::Next(ani_env *env, ani_object object, ani_obj
         return -1;
     }
     if (!isUndefined) {
-        if (ANI_OK != env->Object_CallMethodByName_Int(index, "unboxed", ":I", &value)) {
-            HILOG_ERROR_I18N("Unbox Int failed");
+        ani_double temp;
+        if (ANI_OK != env->Object_CallMethodByName_Double(index, "unboxed", ":D", &temp)) {
+            HILOG_ERROR_I18N("Unbox Double failed");
             return -1;
         }
+        value = static_cast<int>(temp);
     }
     return obj->brkiter_->Next(value);
 }
@@ -2249,9 +2253,18 @@ static ani_object CreateHolidayInfoItem(ani_env *env, HolidayInfoItem item)
     }
 
     SetStringMember(env, ret, "baseName", item.baseName);
-    SetNumberMember(env, ret, "year", item.year);
-    SetNumberMember(env, ret, "month", item.month);
-    SetNumberMember(env, ret, "day", item.day);
+
+    if (ANI_OK != env->Object_SetPropertyByName_Double(ret, "year", item.year)) {
+        HILOG_ERROR_I18N("Set property 'year' failed");
+    }
+
+    if (ANI_OK != env->Object_SetPropertyByName_Double(ret, "month", item.month)) {
+        HILOG_ERROR_I18N("Set property 'month' failed");
+    }
+
+    if (ANI_OK != env->Object_SetPropertyByName_Double(ret, "day", item.day)) {
+        HILOG_ERROR_I18N("Set property 'day' failed");
+    }
 
     if (ANI_OK != env->Object_SetPropertyByName_Ref(ret, "localNames",
         CreateHolidayLocalNameArray(env, item.localNames))) {
@@ -2313,16 +2326,16 @@ ani_object I18nHolidayManagerAddon::GetHolidayInfoItemArray(ani_env *env, ani_ob
     if (isUndefined) {
         itemList = obj->holidayManager_->GetHolidayInfoItemArray();
     } else {
-        ani_int yearInt;
-        if (ANI_OK != env->Object_CallMethodByName_Int(year, "unboxed", ":I", &yearInt)) {
-            HILOG_ERROR_I18N("Unbox Int failed");
+        ani_double yearValue;
+        if (ANI_OK != env->Object_CallMethodByName_Double(year, "unboxed", ":D", &yearValue)) {
+            HILOG_ERROR_I18N("Unbox Double failed");
             return nullptr;
         }
-        if (yearInt < 0) {
+        if (yearValue < 0) {
             ErrorUtil::AniThrow(env, I18N_NOT_VALID, "year", "a non-negative number");
             itemList = obj->holidayManager_->GetHolidayInfoItemArray(-1);
         } else {
-            itemList = obj->holidayManager_->GetHolidayInfoItemArray(yearInt);
+            itemList = obj->holidayManager_->GetHolidayInfoItemArray(yearValue);
         }
     }
     return GetHolidayInfoItemResult(env, itemList);

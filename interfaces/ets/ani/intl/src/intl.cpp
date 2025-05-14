@@ -646,8 +646,8 @@ static void FillInArrayElement(ani_env *env, ani_class arrayCls, ani_object &res
         }
 
         SetStringMember(env, obj, "type", type);
+        SetStringMember(env, obj, "value", value);
         SetStringMember(env, obj, "unit", unit);
-        SetNumberMember(env, obj, "value", value);
 
         if (ANI_OK != env->Object_CallMethod_Void(result, set, i, obj)) {
             HILOG_ERROR_I18N("Call method '$_set' failed");
