@@ -22,6 +22,7 @@ ohos_unittest("intl_test") {
   cflags_cc = [ "-Wno-inconsistent-missing-override" ]
 
   sources = [
+    "unittest/collator_test.cpp",
     "unittest/convert_test.cpp",
     "unittest/i18n_test.cpp",
     "unittest/intl_test.cpp",

@@ -14,19 +14,43 @@
 import("//base/global/i18n/i18n.gni")
 import("//build/ohos.gni")
 
-
-config("intl_napi_config") {
-  include_dirs = [
-    "//base/global/i18n/frameworks/intl/include",
-    "//base/global/i18n/interfaces/js/innerkits/intl/include",
+group("build_module") {
+  deps = [
+    ":intl_napi",
+    ":intl_register",
   ]
+}
+
+config("intl_register_config") {
+  include_dirs = [ "//base/global/i18n/interfaces/js/innerkits/intl/include" ]
+}
+
+ohos_shared_library("intl_register") {
+  branch_protector_ret = "pac_ret"
+  public_configs = [ ":intl_register_config" ]
+  include_dirs = [ "//base/global/i18n/frameworks/intl/include" ]
+  sources = [ "src/replace_intl_module.cpp" ]
+  version_script = "libintl_napi.map"
+  external_deps = [
+    "hilog:libhilog",
+    "napi:ace_napi",
+  ]
+  install_images = [ system_base_dir ]
+  relative_install_dir = "platformsdk"
+  subsystem_name = "global"
+  innerapi_tags = [ "platformsdk" ]
+  part_name = "i18n"
 }
 
 ohos_shared_library("intl_napi") {
   branch_protector_ret = "pac_ret"
-  public_configs = [ ":intl_napi_config" ]
+  include_dirs = [
+    "//base/global/i18n/frameworks/intl/include",
+    "//base/global/i18n/interfaces/js/innerkits/intl/include",
+  ]
 
   sources = [
+    "src/collator_addon.cpp",
     "src/error_util.cpp",
     "src/intl_addon.cpp",
     "src/js_utils.cpp",

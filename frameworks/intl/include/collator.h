@@ -15,16 +15,19 @@
 #ifndef GLOBAL_I18N_COLLATOR_H
 #define GLOBAL_I18N_COLLATOR_H
 
-#include <string>
 #include <map>
-#include <vector>
+#include <memory>
 #include <set>
+#include <string>
+#include <unordered_set>
+#include <vector>
 
-#include "locale_info.h"
-#include "memory"
 #include "unicode/coll.h"
 #include "unicode/locid.h"
 #include "unicode/utypes.h"
+
+#include "i18n_types.h"
+#include "locale_info.h"
 
 namespace OHOS {
 namespace Global {
@@ -38,10 +41,15 @@ typedef enum CompareResult {
 
 class Collator {
 public:
+    static std::set<std::string> SupportedLocalesOf(const std::vector<std::string> &requestLocales,
+                                                    const std::map<std::string, std::string> &configs,
+                                                    I18nErrorCode &status);
+
     Collator(std::vector<std::string> &localeTags, std::map<std::string, std::string> &options);
     ~Collator();
     CompareResult Compare(const std::string &first, const std::string &second);
     void ResolvedOptions(std::map<std::string, std::string> &options);
+    I18nErrorCode GetError() const;
 
 private:
     std::string localeStr;
@@ -57,11 +65,15 @@ private:
     icu::Locale locale;
     icu::Collator *collatorPtr = nullptr;
     bool createSuccess = false;
+    I18nErrorCode i18nStatus = I18nErrorCode::SUCCESS;
 
-    std::set<std::string> GetValidLocales();
+    static std::vector<std::string> GetAvailableLocales();
+    static std::set<std::string> LookupSupportedLocales(const std::vector<std::string> &availableLocales,
+                                                        const std::vector<std::string> &requestLocales);
     std::string ParseOption(std::map<std::string, std::string> &options, const std::string &key);
     void ParseAllOptions(std::map<std::string, std::string> &options);
     bool IsValidCollation(std::string &collation);
+    void CheckValidOptions();
     void SetCollation();
     void SetUsage();
     void SetNumeric();
