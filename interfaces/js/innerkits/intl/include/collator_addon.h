@@ -39,7 +39,7 @@ private:
 
     bool InitCollatorContext(napi_env env, napi_callback_info info, std::vector<std::string> localeTags,
         std::map<std::string, std::string> &map);
-    
+
     napi_env env_;
     std::unique_ptr<Collator> collator_ = nullptr;
 };

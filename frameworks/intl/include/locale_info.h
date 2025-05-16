@@ -29,7 +29,7 @@ namespace I18n {
 class LocaleInfo {
 public:
     explicit LocaleInfo(const std::string &localeTag);
-    LocaleInfo(const std::string &localeTag, std::map<std::string, std::string> &configs);
+    LocaleInfo(const std::string &localeTag, const std::map<std::string, std::string> &configs);
     virtual ~LocaleInfo();
     std::string GetLanguage() const;
     std::string GetScript() const;
@@ -78,7 +78,7 @@ private:
     void ParseConfigs();
     void ParseLocaleTag(const std::string &localeTag);
     void ResetFinalLocaleStatus();
-    void InitLocaleInfo(const std::string &localeTag, std::map<std::string, std::string> &configMap);
+    void InitLocaleInfo(const std::string &localeTag, const std::map<std::string, std::string> &configMap);
 };
 } // namespace I18n
 } // namespace Global

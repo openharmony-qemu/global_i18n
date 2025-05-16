@@ -67,13 +67,9 @@ private:
     bool createSuccess = false;
     I18nErrorCode i18nStatus = I18nErrorCode::SUCCESS;
 
-    static std::vector<std::string> GetAvailableLocales();
-    static std::set<std::string> LookupSupportedLocales(const std::vector<std::string> &availableLocales,
-                                                        const std::vector<std::string> &requestLocales);
-    std::string ParseOption(std::map<std::string, std::string> &options, const std::string &key);
+    static std::set<std::string> GetAvailableLocales();
     void ParseAllOptions(std::map<std::string, std::string> &options);
     bool IsValidCollation(std::string &collation);
-    void CheckValidOptions();
     void SetCollation();
     void SetUsage();
     void SetNumeric();
