@@ -16,7 +16,12 @@
 #define GLOBAL_LOCALE_HELPER_H
 
 #include <string>
+#include <map>
+#include <set>
 #include <unordered_set>
+#include <vector>
+
+#include "i18n_types.h"
 
 namespace OHOS {
 namespace Global {
@@ -24,9 +29,24 @@ namespace I18n {
 class LocaleHelper {
 public:
     static bool IsValidOptionName(const std::string& key, const std::string& option);
-
-    static std::string BestAvailableLocale(const std::vector<std::string> &availableLocales, 
+    static std::string ParseOptionWithoutCheck(const std::map<std::string, std::string> &options,
+                                               const std::string &key,
+                                               const std::string &defaultOption);
+    static std::string ParseOption(const std::map<std::string, std::string> &options,
+                                   const std::string &key,
+                                   const std::string &defaultOption,
+                                   bool isOptional,
+                                   I18nErrorCode &status);
+    static std::string BestAvailableLocale(const std::set<std::string> &availableLocales,
                                            const std::string &locale);
+    static std::set<std::string> LookupSupportedLocales(const std::set<std::string> &availableLocales,
+                                                        const std::vector<std::string> &requestLocales);
+    static bool IsUnicodeScriptSubtag(const std::string &value);
+    static bool IsUnicodeRegionSubtag(const std::string &value);
+    static bool IsWellFormedCurrencyCode(const std::string &currency);
+    static bool IsWellFormedCalendarCode(const std::string &calendar);
+    static bool IsStructurallyValidLanguageTag(const std::string& tag);
+    static bool DealwithLanguageTag(const std::vector<std::string> &containers, size_t &address);
 
 private:
     static const std::unordered_map<std::string, std::unordered_set<std::string>> KEY_TO_OPTION_NAME;

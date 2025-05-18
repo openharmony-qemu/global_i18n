@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 #include "replace_intl_module.h"
-#include <dlfcn.h> 
+#include <dlfcn.h>
 #include "i18n_hilog.h"
 
 namespace OHOS {

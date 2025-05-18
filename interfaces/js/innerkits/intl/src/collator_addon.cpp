@@ -105,17 +105,13 @@ napi_value CollatorAddon::CollatorConstructor(napi_env env, napi_callback_info i
 bool CollatorAddon::InitCollatorContext(napi_env env, napi_callback_info info, std::vector<std::string> localeTags,
     std::map<std::string, std::string> &map)
 {
-    napi_value global = nullptr;
-    napi_status status = napi_get_global(env, &global);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("InitCollatorContext: Get global failed");
-        return false;
-    }
     env_ = env;
     collator_ = std::make_unique<Collator>(localeTags, map);
+    if (collator_ == nullptr) {
+        return false;
+    }
     I18nErrorCode errorCode = collator_->GetError();
-
-    return collator_ != nullptr && errorCode == I18nErrorCode::SUCCESS;
+    return errorCode == I18nErrorCode::SUCCESS;
 }
 
 napi_value CollatorAddon::SupportedLocalesOf(napi_env env, napi_callback_info info)
@@ -147,28 +143,7 @@ napi_value CollatorAddon::SupportedLocalesOf(napi_env env, napi_callback_info in
         HILOG_ERROR_I18N("SupportedLocalesOf: SupportedLocalesOf status fail");
         ErrorUtil::NapiThrowUndefined(env, "getStringOption failed");
     }
-    napi_value result = nullptr;
-    status = napi_create_array_with_length(env, resultLocales.size(), &result);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("SupportedLocalesOf: Failed to create array");
-        return nullptr;
-    }
-    size_t pos = 0;
-    for (const auto& language : resultLocales) {
-        napi_value value = nullptr;
-        status = napi_create_string_utf8(env, language.c_str(), NAPI_AUTO_LENGTH, &value);
-        if (status != napi_ok) {
-            HILOG_ERROR_I18N("SupportedLocalesOf: Failed to create string item");
-            return nullptr;
-        }
-        status = napi_set_element(env, result, pos, value);
-        if (status != napi_ok) {
-            HILOG_ERROR_I18N("SupportedLocalesOf: Failed to set array item");
-            return nullptr;
-        }
-        pos++;
-    }
-    return result;
+    return JSUtils::CreateArray(env, resultLocales);
 }
 
 napi_value CollatorAddon::CompareString(napi_env env, napi_callback_info info)

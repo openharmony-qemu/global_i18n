@@ -51,6 +51,7 @@ ohos_shared_library("intl_napi") {
 
   sources = [
     "src/collator_addon.cpp",
+    "src/displaynames_addon.cpp",
     "src/error_util.cpp",
     "src/intl_addon.cpp",
     "src/js_utils.cpp",
