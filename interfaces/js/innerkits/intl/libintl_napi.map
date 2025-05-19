@@ -13,6 +13,9 @@
 
 1.0 {
     global:
+        extern "C" {
+            RegisterIntl;
+        };
         extern "C++" {
             OHOS::Global::I18n::*;
         };

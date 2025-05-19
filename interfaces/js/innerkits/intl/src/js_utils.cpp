@@ -370,6 +370,43 @@ napi_value JSUtils::CreateObject(napi_env env, std::unordered_map<std::string, n
     code = 0;
     return object;
 }
+
+napi_value JSUtils::CreateArray(napi_env env, const std::set<std::string>& value)
+{
+    napi_value result = nullptr;
+    napi_status status = napi_create_array_with_length(env, value.size(), &result);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("JSUtils::CreateArray: Failed to create array");
+        return nullptr;
+    }
+    size_t pos = 0;
+    for (const auto& language : value) {
+        napi_value value = nullptr;
+        status = napi_create_string_utf8(env, language.c_str(), NAPI_AUTO_LENGTH, &value);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("JSUtils::CreateArray: Failed to create string item");
+            return nullptr;
+        }
+        status = napi_set_element(env, result, pos, value);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("JSUtils::CreateArray: Failed to set array item");
+            return nullptr;
+        }
+        pos++;
+    }
+    return result;
+}
+
+napi_value JSUtils::CreateString(napi_env env, const std::string &str)
+{
+    napi_value result;
+    napi_status status = napi_create_string_utf8(env, str.c_str(), NAPI_AUTO_LENGTH, &result);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("JSUtils::CreateString : create string js variable failed.");
+        return nullptr;
+    }
+    return result;
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

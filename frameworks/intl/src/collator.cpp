@@ -14,64 +14,70 @@
  */
 #include "collator.h"
 
-#include <unicode/stringpiece.h>
+#include <map>
+#include <set>
+#include <string>
+#include <utility>
+#include <vector>
 
-#include "i18n_hilog.h"
-#include "locale_config.h"
-#include "map"
-#include "set"
 #include "unicode/strenum.h"
-#include "string"
 #include "unicode/errorcode.h"
 #include "unicode/locid.h"
+#include "unicode/stringpiece.h"
 #include "unicode/ucol.h"
 #include "unicode/uloc.h"
 #include "unicode/unistr.h"
 #include "unicode/urename.h"
-#include "utility"
-#include "vector"
+
+#include "i18n_hilog.h"
+#include "locale_config.h"
+#include "locale_helper.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-std::string Collator::ParseOption(std::map<std::string, std::string> &options, const std::string &key)
+std::set<std::string> Collator::GetAvailableLocales()
 {
-    std::map<std::string, std::string>::iterator it = options.find(key);
-    if (it != options.end()) {
-        return it->second;
+    std::set<std::string> allLocales;
+    int32_t count = 0;
+    const icu::Locale *localeList = icu::Collator::getAvailableLocales(count);
+    if (localeList == nullptr) {
+        HILOG_ERROR_I18N("Collator::GetAvailableLocales: getAvailableLocales nullptr.");
+        return allLocales;
     }
-    return "";
+    for (int32_t i = 0; i < count; ++i) {
+        allLocales.insert(localeList[i].getName());
+    }
+    return allLocales;
+}
+
+std::set<std::string> Collator::SupportedLocalesOf(const std::vector<std::string> &requestLocales,
+                                                   const std::map<std::string, std::string> &configs,
+                                                   I18nErrorCode &status)
+{
+    std::string localeMatcher = LocaleHelper::ParseOption(configs, "localeMatcher", "best fit", true, status);
+    if (status != I18nErrorCode::SUCCESS) {
+        std::set<std::string> result = {};
+        return result;
+    }
+    std::set<std::string> availableLocales = GetAvailableLocales();
+    return LocaleHelper::LookupSupportedLocales(availableLocales, requestLocales);
 }
 
 void Collator::ParseAllOptions(std::map<std::string, std::string> &options)
 {
-    localeMatcher = ParseOption(options, "localeMatcher");
-    if (localeMatcher.empty()) {
-        localeMatcher = "best fit";
-    }
-
-    usage = ParseOption(options, "usage");
-    if (usage.empty()) {
-        usage = "sort";
-    }
-
-    sensitivity = ParseOption(options, "sensitivity");
-    if (sensitivity.empty()) {
-        sensitivity = "variant";
-    }
-
-    ignorePunctuation = ParseOption(options, "ignorePunctuation");
-    if (ignorePunctuation.empty()) {
-        ignorePunctuation = "false";
-    }
-
-    numeric = ParseOption(options, "numeric");
-    caseFirst = ParseOption(options, "caseFirst");
-    collation = ParseOption(options, "collation");
+    localeMatcher = LocaleHelper::ParseOption(options, "localeMatcher", "best fit", true, i18nStatus);
+    usage = LocaleHelper::ParseOption(options, "usage", "sort", true, i18nStatus);
+    sensitivity = LocaleHelper::ParseOption(options, "sensitivity", "variant", true, i18nStatus);
+    ignorePunctuation = LocaleHelper::ParseOption(options, "ignorePunctuation", "false", true, i18nStatus);
+    numeric = LocaleHelper::ParseOption(options, "numeric", "", true, i18nStatus);
+    caseFirst = LocaleHelper::ParseOption(options, "caseFirst", "", true, i18nStatus);
+    collation = LocaleHelper::ParseOptionWithoutCheck(options, "collation", "");
 }
 
 Collator::Collator(std::vector<std::string> &localeTags, std::map<std::string, std::string> &options)
 {
+    i18nStatus = I18nErrorCode::SUCCESS;
     ParseAllOptions(options);
     
     localeTags.push_back(LocaleConfig::GetEffectiveLocale());
@@ -306,6 +312,11 @@ void Collator::ResolvedOptions(std::map<std::string, std::string> &options)
     options.insert(std::pair<std::string, std::string>("numeric", numeric));
     options.insert(std::pair<std::string, std::string>("caseFirst", caseFirst));
     options.insert(std::pair<std::string, std::string>("collation", collation));
+}
+
+I18nErrorCode Collator::GetError() const
+{
+    return i18nStatus;
 }
 } // namespace I18n
 } // namespace Global

@@ -1,0 +1,339 @@
+/*
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+#include "locale_helper.h"
+#include "unicode/localebuilder.h"
+#include "i18n_hilog.h"
+
+namespace OHOS {
+namespace Global {
+namespace I18n {
+namespace {
+constexpr uint8_t INTL_INDEX_TWO = 2;
+constexpr uint8_t INTL_INDEX_THREE = 3;
+constexpr uint8_t INTL_INDEX_FOUR = 4;
+constexpr uint8_t INTL_INDEX_FIVE = 5;
+constexpr uint8_t INTL_INDEX_EIGHT = 8;
+const int32_t MIN_CALENDAR_LENGTH = 3;
+const int32_t MAX_CALENDAR_LENGTH = 8;
+const int32_t CURRENCY_LENGTH = 3;
+
+inline constexpr int AsciiAlphaToLower(uint32_t c)
+{
+    constexpr uint32_t FLAG = 0x20;
+    return static_cast<int>(c | FLAG);
+}
+
+template<typename T, typename U>
+bool InRange(T value, U start, U end)
+{
+    if (start > end || sizeof(T) < sizeof(U)) {
+        return false;
+    }
+    return (value >= static_cast<T>(start)) && (value <= static_cast<T>(end));
+}
+
+bool IsDigit(const std::string &str, size_t min, size_t max)
+{
+    if (!InRange(str.length(), min, max)) {
+        return false;
+    }
+    for (char i : str) {
+        if (!InRange(i, '0', '9')) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool IsAsciiAlpha(char ch)
+{
+    return InRange(ch, 'A', 'Z') || InRange(ch, 'a', 'z');
+}
+
+bool IsAlpha(const std::string &str, size_t min, size_t max)
+{
+    if (!InRange(str.length(), min, max)) {
+        return false;
+    }
+    for (char c : str) {
+        if (!IsAsciiAlpha(c)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool IsAlphanum(const std::string &str, size_t min, size_t max)
+{
+    if (!InRange(str.length(), min, max)) {
+        return false;
+    }
+    for (char i : str) {
+        if (!IsAsciiAlpha(i) && !InRange(i, '0', '9')) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool IsThirdDigitAlphanum(const std::string &value)
+{
+    return value.length() == INTL_INDEX_FOUR && InRange(value[0], '0', '9') &&
+        IsAlphanum(value.substr(1), INTL_INDEX_THREE, INTL_INDEX_THREE);
+}
+
+bool IsVariantSubtag(const std::string &value)
+{
+    return IsThirdDigitAlphanum(value) || IsAlphanum(value, INTL_INDEX_FIVE, INTL_INDEX_EIGHT);
+}
+
+bool IsLanguageSubtag(const std::string &value)
+{
+    return IsAlpha(value, INTL_INDEX_TWO, INTL_INDEX_THREE) || IsAlpha(value, INTL_INDEX_FIVE, INTL_INDEX_EIGHT);
+}
+
+bool IsScriptSubtag(const std::string &value)
+{
+    return IsAlpha(value, INTL_INDEX_FOUR, INTL_INDEX_FOUR);
+}
+
+bool IsRegionSubtag(const std::string &value)
+{
+    return IsAlpha(value, INTL_INDEX_TWO, INTL_INDEX_TWO) || IsDigit(value, INTL_INDEX_THREE, INTL_INDEX_THREE);
+}
+
+bool IsExtensionSingleton(const std::string &value)
+{
+    return IsAlphanum(value, 1, 1);
+}
+}
+
+const std::unordered_map<std::string, std::unordered_set<std::string>> LocaleHelper::KEY_TO_OPTION_NAME = {
+    { "localeMatcher", { "best fit", "lookup" } },
+    { "style", { "narrow", "short", "long" }},
+    { "type", { "language", "region", "script", "currency", "calendar", "dateTimeField" } },
+    { "fallback", { "code", "none" } },
+    { "languageDisplay", { "dialect", "standard" } },
+    { "usage", { "sort", "search" } },
+    { "numeric", {  "false", "true" } },
+    { "caseFirst", { "false", "upper", "lower" } },
+    { "sensitivity", { "base", "accent", "case", "variant" } },
+    { "ignorePunctuation", { "true", "false" } },
+};
+
+bool LocaleHelper::IsValidOptionName(const std::string& key, const std::string& option)
+{
+    auto optionIter = KEY_TO_OPTION_NAME.find(key);
+    if (optionIter == KEY_TO_OPTION_NAME.end()) {
+        return false;
+    }
+    return optionIter->second.find(option) != optionIter->second.end();
+}
+
+std::string LocaleHelper::ParseOptionWithoutCheck(const std::map<std::string, std::string> &options,
+                                                  const std::string &key,
+                                                  const std::string &defaultOption)
+{
+    auto optionsIter = options.find(key);
+    if (optionsIter == options.end()) {
+        return defaultOption;
+    }
+    return optionsIter->second;
+}
+
+std::string LocaleHelper::ParseOption(const std::map<std::string, std::string>& options,
+                                      const std::string& key,
+                                      const std::string& defaultOption,
+                                      bool isOptional,
+                                      I18nErrorCode& status)
+{
+    auto optionsMapIter = KEY_TO_OPTION_NAME.find(key);
+    if (optionsMapIter == KEY_TO_OPTION_NAME.end()) {
+        return defaultOption;
+    }
+    auto optionsIter = options.find(key);
+    if (optionsIter == options.end()) {
+        if (!isOptional) {
+            status = I18nErrorCode::MISSING_PARAM;
+            HILOG_ERROR_I18N("LocaleHelper::ParseOption: missing param %{public}s.", key.c_str());
+        }
+        return defaultOption;
+    }
+    std::string option = optionsIter->second;
+    const std::unordered_set<std::string>& optionsName = optionsMapIter->second;
+    auto nameIter = optionsName.find(option);
+    if (nameIter == optionsName.end()) {
+        status = I18nErrorCode::INVALID_PARAM;
+        return option;
+    }
+    return option;
+}
+
+std::string LocaleHelper::BestAvailableLocale(const std::set<std::string> &availableLocales,
+                                              const std::string &locale)
+{
+    std::string localeCandidate = locale;
+    std::string undefined = std::string();
+    while (true) {
+        for (const std::string& itemStr : availableLocales) {
+            if (itemStr == localeCandidate) {
+                return localeCandidate;
+            }
+        }
+        size_t pos = localeCandidate.rfind('-');
+        if (pos == std::string::npos) {
+            return undefined;
+        }
+        if (pos >= INTL_INDEX_TWO && localeCandidate[pos - INTL_INDEX_TWO] == '-') {
+            pos -= INTL_INDEX_TWO;
+        }
+        localeCandidate.resize(pos);
+    }
+}
+
+std::set<std::string> LocaleHelper::LookupSupportedLocales(const std::set<std::string> &availableLocales,
+                                                           const std::vector<std::string> &requestLocales)
+{
+    std::set<std::string> resultLocales;
+    for (const auto& candidateLocale : requestLocales) {
+        std::string availableLocale = LocaleHelper::BestAvailableLocale(availableLocales, candidateLocale);
+        if (!availableLocale.empty()) {
+            resultLocales.insert(candidateLocale);
+        }
+    }
+    return resultLocales;
+}
+
+bool LocaleHelper::IsUnicodeScriptSubtag(const std::string& value)
+{
+    UErrorCode status = U_ZERO_ERROR;
+    icu::LocaleBuilder builder;
+    builder.setScript(value).build(status);
+    return U_SUCCESS(status);
+}
+
+bool LocaleHelper::IsUnicodeRegionSubtag(const std::string& value)
+{
+    UErrorCode status = U_ZERO_ERROR;
+    icu::LocaleBuilder builder;
+    builder.setRegion(value).build(status);
+    return U_SUCCESS(status);
+}
+
+bool LocaleHelper::IsWellFormedCurrencyCode(const std::string &currency)
+{
+    if (currency.length() != CURRENCY_LENGTH) {
+        return false;
+    }
+    for (char c : currency) {
+        if (!IsAsciiAlpha(c)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LocaleHelper::IsWellFormedCalendarCode(const std::string &calendar)
+{
+    std::string value = calendar;
+    while (true) {
+        std::size_t found_dash = value.find('-');
+        if (found_dash == std::string::npos) {
+            return IsAlphanum(value, MIN_CALENDAR_LENGTH, MAX_CALENDAR_LENGTH);
+        }
+        if (!IsAlphanum(value.substr(0, found_dash), MIN_CALENDAR_LENGTH, MAX_CALENDAR_LENGTH)) {
+            return false;
+        }
+        value = value.substr(found_dash + 1);
+    }
+}
+
+bool LocaleHelper::IsStructurallyValidLanguageTag(const std::string& tag)
+{
+    std::string tagCollection = tag;
+    std::vector<std::string> containers;
+    std::string substring;
+    std::set<std::string> uniqueSubtags;
+    size_t address = 1;
+    for (auto it = tagCollection.begin(); it != tagCollection.end(); it++) {
+        if (*it != '-' && it != tagCollection.end() - 1) {
+            substring += *it;
+        } else {
+            if (it == tagCollection.end() - 1) {
+                substring += *it;
+            }
+            containers.push_back(substring);
+            if (IsVariantSubtag(substring)) {
+                std::transform(substring.begin(), substring.end(), substring.begin(), AsciiAlphaToLower);
+                if (!uniqueSubtags.insert(substring).second) {
+                    return false;
+                }
+            }
+            substring.clear();
+        }
+    }
+    bool result = DealwithLanguageTag(containers, address);
+    return result;
+}
+
+bool LocaleHelper::DealwithLanguageTag(const std::vector<std::string> &containers, size_t &address)
+{
+    // The abstract operation returns true if locale can be generated from the ABNF grammar in section 2.1 of the RFC,
+    // starting with Language-Tag, and does not contain duplicate variant or singleton subtags
+    // If language tag is empty, return false.
+    if (containers.empty()) {
+        return false;
+    }
+
+    // a. if the first tag is not language, return false.
+    if (!IsLanguageSubtag(containers[0])) {
+        return false;
+    }
+
+    // if the tag include language only, like "zh" or "de", return true;
+    if (containers.size() == 1) {
+        return true;
+    }
+
+    // Else, then
+    // if is unique singleton subtag, script and region tag.
+    if (IsExtensionSingleton(containers[1])) {
+        return true;
+    }
+
+    if (IsScriptSubtag(containers[address])) {
+        address++;
+        if (containers.size() == address) {
+            return true;
+        }
+    }
+
+    if (IsRegionSubtag(containers[address])) {
+        address++;
+    }
+
+    for (size_t i = address; i < containers.size(); i++) {
+        if (IsExtensionSingleton(containers[i])) {
+            return true;
+        }
+        if (!IsVariantSubtag(containers[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+} // namespace I18n
+} // namespace Global
+} // namespace OHOS

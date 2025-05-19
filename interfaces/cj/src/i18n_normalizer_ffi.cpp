@@ -30,7 +30,7 @@ extern "C"
     int64_t FfiI18nNormalizerConstructor(int32_t mode)
     {
         I18nNormalizerMode normalizerMode = I18nNormalizerMode(mode);
-        I18nErrorCode errorCode = SUCCESS;
+        I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
         std::unique_ptr<I18nNormalizer> normalizer_ = std::make_unique<I18nNormalizer>(normalizerMode, errorCode);
         if (errorCode != I18nErrorCode::SUCCESS || !normalizer_) {
             HILOG_ERROR_I18N("Create I18nNormalizer fail, error code: %d", errorCode);

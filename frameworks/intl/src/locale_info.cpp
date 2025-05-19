@@ -55,7 +55,7 @@ void LocaleInfo::ResetFinalLocaleStatus()
     configs = {};
 }
 
-void LocaleInfo::InitLocaleInfo(const std::string &localeTag, std::map<std::string, std::string> &configMap)
+void LocaleInfo::InitLocaleInfo(const std::string &localeTag, const std::map<std::string, std::string> &configMap)
 {
     UErrorCode status = U_ZERO_ERROR;
     configs = configMap;
@@ -86,7 +86,7 @@ LocaleInfo::LocaleInfo(const std::string &localeTag)
     InitLocaleInfo(localeTag, configMap);
 }
 
-LocaleInfo::LocaleInfo(const std::string &localeTag, std::map<std::string, std::string> &configMap)
+LocaleInfo::LocaleInfo(const std::string &localeTag, const std::map<std::string, std::string> &configMap)
 {
     InitLocaleInfo(localeTag, configMap);
 }
