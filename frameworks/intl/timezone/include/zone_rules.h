@@ -37,8 +37,6 @@ private:
     static const int32_t YEAR_ADDITION = 1900; // 1900 is tm_year start
     icu::BasicTimeZone *btz;
     void InitBasicTimeZone();
-    static UDate GetTimeMillis(int32_t year, int32_t month, int32_t day,
-        int32_t hour, int32_t minute, int32_t second);
 };
 } // namespace I18n
 } // namespace Global

@@ -62,10 +62,10 @@ std::unique_ptr<ZoneOffsetTransition> ZoneRules::NextTransition()
         HILOG_ERROR_I18N("ZoneRules::GetTimezoneTransition: get current time failed.");
         return std::make_unique<ZoneOffsetTransition>();
     }
-    int32_t year = timObj->tm_year + YEAR_ADDITION;
-    int32_t month = timObj->tm_mon;
-    int32_t day = timObj->tm_mday;
-    UDate currentTime = GetTimeMillis(year, month, day, timObj->tm_hour, timObj->tm_min, timObj->tm_sec);
+    auto time = std::chrono::system_clock::now();
+    auto since_epoch = time.time_since_epoch();
+    auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(since_epoch);
+    UDate currentTime = static_cast<double>(millis.count());
     return NextTransition(currentTime);
 }
 
@@ -89,27 +89,6 @@ std::unique_ptr<ZoneOffsetTransition> ZoneRules::NextTransition(double date)
     int32_t offsetBefore = from->getRawOffset() + from->getDSTSavings();
     int32_t offsetAfter = to->getRawOffset() + to->getDSTSavings();
     return std::make_unique<ZoneOffsetTransition>(time, offsetBefore, offsetAfter);
-}
-
-UDate ZoneRules::GetTimeMillis(int32_t year, int32_t month, int32_t day,
-    int32_t hour, int32_t minute, int32_t second)
-{
-    UErrorCode status = U_ZERO_ERROR;
-    const icu::TimeZone *tz = icu::TimeZone::getGMT();
-    icu::Calendar *cal = icu::Calendar::createInstance(*tz, status);
-    if (U_FAILURE(status)) {
-        delete cal;
-        return 0.0;
-    }
-    cal->set(year, month, day, hour, minute, second);
-    cal->set(UCAL_MILLISECOND, 0);
-    UDate utc = cal->getTime(status);
-    if (U_FAILURE(status)) {
-        delete cal;
-        return 0.0;
-    }
-    delete cal;
-    return utc;
 }
 } // namespace I18n
 } // namespace Global
