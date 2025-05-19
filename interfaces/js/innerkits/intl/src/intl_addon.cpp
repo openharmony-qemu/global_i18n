@@ -1117,7 +1117,7 @@ bool SetBuildInIntl(napi_env &env, napi_value &global, napi_value &intlModule)
     }
 
     const std::vector<std::string> buildinClasses = {"DateTimeFormat", "DurationFormat", "ListFormat", "Locale",
-        "NumberFormat", "PluralRules", "RelativeTimeFormat", "Segmenter"};
+        "NumberFormat", "PluralRules", "RelativeTimeFormat", "Segmenter", "getCanonicalLocales", "supportedValuesOf"};
 
     for (std::string buildinClass : buildinClasses) {
         if (!SetBuildInIntlModule(env, intlModule, buildinIntlModule, buildinClass)) {

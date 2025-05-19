@@ -51,17 +51,22 @@ std::set<std::string> Collator::GetAvailableLocales()
     return allLocales;
 }
 
-std::set<std::string> Collator::SupportedLocalesOf(const std::vector<std::string> &requestLocales,
-                                                   const std::map<std::string, std::string> &configs,
-                                                   I18nErrorCode &status)
+std::vector<std::string> Collator::SupportedLocalesOf(const std::vector<std::string> &requestLocales,
+                                                      const std::map<std::string, std::string> &configs,
+                                                      I18nErrorCode &status)
 {
+    std::vector<std::string> undefined = {};
+    auto requestedLocales = LocaleHelper::CanonicalizeLocaleList(requestLocales, status);
+    if (status != I18nErrorCode::SUCCESS) {
+        return undefined;
+    }
+
     std::string localeMatcher = LocaleHelper::ParseOption(configs, "localeMatcher", "best fit", true, status);
     if (status != I18nErrorCode::SUCCESS) {
-        std::set<std::string> result = {};
-        return result;
+        return undefined;
     }
     std::set<std::string> availableLocales = GetAvailableLocales();
-    return LocaleHelper::LookupSupportedLocales(availableLocales, requestLocales);
+    return LocaleHelper::LookupSupportedLocales(availableLocales, requestedLocales);
 }
 
 void Collator::ParseAllOptions(std::map<std::string, std::string> &options)
@@ -75,12 +80,29 @@ void Collator::ParseAllOptions(std::map<std::string, std::string> &options)
     collation = LocaleHelper::ParseOptionWithoutCheck(options, "collation", "");
 }
 
+Collator::Collator(std::vector<std::string> &localeTags, std::map<std::string, std::string> &options,
+    const std::string &defaultLocale)
+{
+    i18nStatus = I18nErrorCode::SUCCESS;
+    auto requestedLocales = LocaleHelper::CanonicalizeLocaleList(localeTags, i18nStatus);
+    if (i18nStatus != I18nErrorCode::SUCCESS) {
+        return;
+    }
+    Init(requestedLocales, options, defaultLocale);
+}
+
 Collator::Collator(std::vector<std::string> &localeTags, std::map<std::string, std::string> &options)
+{
+    Init(localeTags, options, LocaleConfig::GetEffectiveLocale());
+}
+
+void Collator::Init(std::vector<std::string> &localeTags, std::map<std::string, std::string> &options,
+    const std::string &defaultLocale)
 {
     i18nStatus = I18nErrorCode::SUCCESS;
     ParseAllOptions(options);
 
-    localeTags.push_back(LocaleConfig::GetEffectiveLocale());
+    localeTags.push_back(defaultLocale);
     for (size_t i = 0; i < localeTags.size(); i++) {
         std::string curLocale = localeTags[i];
         UErrorCode status = U_ZERO_ERROR;

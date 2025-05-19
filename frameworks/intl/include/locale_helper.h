@@ -20,7 +20,7 @@
 #include <set>
 #include <unordered_set>
 #include <vector>
-
+#include "unicode/locid.h"
 #include "i18n_types.h"
 
 namespace OHOS {
@@ -39,8 +39,10 @@ public:
                                    I18nErrorCode &status);
     static std::string BestAvailableLocale(const std::set<std::string> &availableLocales,
                                            const std::string &locale);
-    static std::set<std::string> LookupSupportedLocales(const std::set<std::string> &availableLocales,
-                                                        const std::vector<std::string> &requestLocales);
+    static std::vector<std::string> LookupSupportedLocales(const std::set<std::string> &availableLocales,
+                                                           const std::vector<std::string> &requestLocales);
+    static std::vector<std::string> CanonicalizeLocaleList(const std::vector<std::string> &locales,
+                                                           I18nErrorCode &status);
     static bool IsUnicodeScriptSubtag(const std::string &value);
     static bool IsUnicodeRegionSubtag(const std::string &value);
     static bool IsWellFormedCurrencyCode(const std::string &currency);

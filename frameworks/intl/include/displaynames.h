@@ -29,9 +29,9 @@ namespace Global {
 namespace I18n {
 class DisplayNames {
 public:
-    static std::set<std::string> SupportedLocalesOf(const std::vector<std::string> &requestLocales,
-                                                    const std::map<std::string, std::string> &configs,
-                                                    I18nErrorCode &status);
+    static std::vector<std::string> SupportedLocalesOf(const std::vector<std::string> &requestLocales,
+                                                       const std::map<std::string, std::string> &configs,
+                                                       I18nErrorCode &status);
 
     DisplayNames(const std::vector<std::string> &localeTags, const std::map<std::string, std::string> &options);
     std::string Display(const std::string &code);

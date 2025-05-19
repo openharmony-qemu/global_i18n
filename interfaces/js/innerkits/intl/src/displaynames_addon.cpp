@@ -33,6 +33,7 @@ void DisplayNamesAddon::Destructor(napi_env env, void *nativeObject, void *hint)
     if (!nativeObject) {
         return;
     }
+    delete reinterpret_cast<DisplayNamesAddon *>(nativeObject);
     nativeObject = nullptr;
 }
 
@@ -54,7 +55,7 @@ napi_value DisplayNamesAddon::InitDisplayNames(napi_env env, napi_value exports)
 
     status = napi_set_named_property(env, exports, "DisplayNames", constructor);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("InitDisplayNames: Set property failed when InitCollator");
+        HILOG_ERROR_I18N("InitDisplayNames: Set property failed when InitDisplayNames");
         return nullptr;
     }
     return exports;
@@ -72,27 +73,23 @@ napi_value DisplayNamesAddon::DisplayNamesConstructor(napi_env env, napi_callbac
         return nullptr;
     }
     std::vector<std::string> localeTags;
-    if (argc < 2) {
-        HILOG_ERROR_I18N("DisplayNamesConstructor: Two arguments are needed, but only %{public}d is obtained.", argc);
+    if (argc < 2) {  // 2 indicates the number of parameters
+        HILOG_ERROR_I18N("DisplayNamesConstructor: Two arguments are needed, but only get %{public}zu.", argc);
         ErrorUtil::NapiThrowUndefined(env, "options is undefined");
         return nullptr;
     }
     int32_t code = 0;
     std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argv[0], code);
-    if (code != 0) {
-        HILOG_ERROR_I18N("DisplayNamesConstructor: JSUtils:GetLocaleArray failed.");
-        return nullptr;
-    }
     localeTags.assign(localeArray.begin(), localeArray.end());
     std::map<std::string, std::string> map = {};
     GetOptionValues(env, argv[1], map);
-    std::unique_ptr<DisplayNamesAddon> obj = std::make_unique<DisplayNamesAddon>();
+    DisplayNamesAddon* obj = new(std::nothrow) DisplayNamesAddon();
     if (obj == nullptr) {
         HILOG_ERROR_I18N("DisplayNamesConstructor: make unique ptr failed.");
         return nullptr;
     }
     status =
-        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), DisplayNamesAddon::Destructor, nullptr, nullptr);
+        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj), DisplayNamesAddon::Destructor, nullptr, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("DisplayNamesConstructor: Wrap DisplayNamesAddon failed");
         return nullptr;
@@ -100,7 +97,6 @@ napi_value DisplayNamesAddon::DisplayNamesConstructor(napi_env env, napi_callbac
     if (!obj->InitDisplayNamesContext(env, info, localeTags, map)) {
         return nullptr;
     }
-    obj.release();
     return thisVar;
 }
 
@@ -118,10 +114,13 @@ bool DisplayNamesAddon::InitDisplayNamesContext(napi_env env, napi_callback_info
         HILOG_ERROR_I18N("InitDisplayNamesContext: MISSING_PARAM failed");
         ErrorUtil::NapiThrowUndefined(env, "type is undefined");
         return false;
-    }
-    if (errorCode == I18nErrorCode::INVALID_PARAM) {
+    } else if (errorCode == I18nErrorCode::INVALID_PARAM) {
         HILOG_ERROR_I18N("InitDisplayNamesContext: INVALID_PARAM failed");
         ErrorUtil::NapiThrowUndefined(env, "getStringOption failed");
+        return false;
+    } else if (errorCode == I18nErrorCode::INVALID_LOCALE_TAG) {
+        HILOG_ERROR_I18N("InitDisplayNamesContext: invalid locale");
+        ErrorUtil::NapiThrowUndefined(env, "invalid locale");
         return false;
     }
     return errorCode == I18nErrorCode::SUCCESS;
@@ -133,11 +132,11 @@ napi_value DisplayNamesAddon::SupportedLocalesOf(napi_env env, napi_callback_inf
     napi_value argv[2] = { nullptr };
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    std::set<std::string> resultLocales = {};
+    std::vector<std::string> resultLocales = {};
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("DisplayNamesAddon::SupportedLocalesOf: napi get callback info failed.");
-        JSUtils::CreateArray(env, resultLocales);
+        return JSUtils::CreateArray(env, resultLocales);
     }
     std::vector<std::string> localeTags;
     if (argc > 0) {
@@ -145,7 +144,8 @@ napi_value DisplayNamesAddon::SupportedLocalesOf(napi_env env, napi_callback_inf
         std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argv[0], code);
         if (code != 0) {
             HILOG_ERROR_I18N("DisplayNamesAddon::SupportedLocalesOf: JSUtils:GetLocaleArray failed.");
-            JSUtils::CreateArray(env, resultLocales);
+            ErrorUtil::NapiThrowUndefined(env, "kValue is not String or Object.");
+            return JSUtils::CreateArray(env, resultLocales);
         }
         localeTags.assign(localeArray.begin(), localeArray.end());
     }
@@ -155,9 +155,12 @@ napi_value DisplayNamesAddon::SupportedLocalesOf(napi_env env, napi_callback_inf
     }
     I18nErrorCode i18nStatus = I18nErrorCode::SUCCESS;
     resultLocales = DisplayNames::SupportedLocalesOf(localeTags, map, i18nStatus);
-    if (i18nStatus != I18nErrorCode::SUCCESS) {
-        HILOG_ERROR_I18N("DisplayNamesAddon::SupportedLocalesOf: SupportedLocalesOf status fail");
+    if (i18nStatus == I18nErrorCode::INVALID_PARAM) {
+        HILOG_ERROR_I18N("DisplayNamesAddon::SupportedLocalesOf: SupportedLocalesOf invalid param");
         ErrorUtil::NapiThrowUndefined(env, "getStringOption failed");
+    } else if (i18nStatus == I18nErrorCode::INVALID_LOCALE_TAG) {
+        HILOG_ERROR_I18N("DisplayNamesAddon::SupportedLocalesOf: SupportedLocalesOf invalid locale");
+        ErrorUtil::NapiThrowUndefined(env, "invalid locale");
     }
     return JSUtils::CreateArray(env, resultLocales);
 }
