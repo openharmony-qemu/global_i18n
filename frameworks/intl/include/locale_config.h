@@ -98,6 +98,7 @@ public:
     static std::string GetTemperatureName(const TemperatureType& type);
     static WeekDay GetFirstDayOfWeek();
     static std::string GetEffectiveLanguage();
+    static std::string GetEffectiveLocale();
     static std::string GetSystemLanguage();
     static std::string GetSystemRegion();
     static std::string GetSystemLocale();
@@ -128,7 +129,7 @@ public:
     static std::string GetSimplifiedSystemLanguage();
     static std::string GetUnicodeWrappedFilePath(const std::string &path, const char delimiter,
         std::shared_ptr<LocaleInfo> localeInfo, std::string &invalidField);
-    static std::string ComputeEffectiveLanguage(const std::string& locale, const std::string& language);
+    static std::string ComputeEffectiveLanguage(const std::string& localeTag, const std::string& language);
     static const std::string HOUR_EVENT_DATA;
     static const std::string LANGUAGE_KEY;
     static const std::string LOCALE_KEY;
@@ -211,14 +212,22 @@ private:
 
 #ifdef SUPPORT_GRAPHICS
     /**
-     * @brief Provided for updating i18n configuration include language and hour24.
+     * @brief Provided for updating i18n configuration include locale and language.
      *
-     * @param key Indicats configuration key.
-     * @param value Indicates configuration value.
-     * @param userId Indicats update user id.
-     * @param isSwitchUser Indicates whether user switch.
+     * @param locale Indicates update locale.
+     * @param language Indicates update language.
+     * @param userId Indicates update user id.
      */
-    static void UpdateConfiguration(const char *key, const std::string &value, int32_t userId);
+    static void UpdateConfigurationLocaleAndLanguage(const std::string& locale, const std::string& language,
+        int32_t userId);
+
+    /**
+     * @brief Provided for updating i18n configuration include is24Hour.
+     *
+     * @param is24Hour Indicates update is24Hour.
+     * @param userId Indicates update user id.
+     */
+    static void UpdateConfiguration24Hour(const std::string& is24Hour, int32_t userId);
 
     /**
      * @brief Provided for public i18n event include locale-change event and time-change event.
@@ -232,7 +241,7 @@ private:
     /**
      * @brief Change language part of system locale to languageTag.
      *
-     * @param languageTag Indicats language tag use to update locale.
+     * @param languageTag Indicates language tag use to update locale.
      * @return std::string Return locale tag.
      */
     static std::string UpdateLanguageOfLocale(const std::string &languageTag);
@@ -252,7 +261,7 @@ private:
     /**
      * @brief Create a locale tag from region tag. Use icu to fill in missing parts.
      *
-     * @param regionTag Indicats region tag used to create locale.
+     * @param regionTag Indicates region tag used to create locale.
      * @return std::string Return locale tag.
      */
     static std::string CreateLocaleFromRegion(const std::string &regionTag);

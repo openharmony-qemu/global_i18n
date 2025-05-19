@@ -35,7 +35,7 @@ SimpleNumberFormat::SimpleNumberFormat(const std::string& skeleton, std::shared_
     }
     std::string locale;
     if (localeInfo == nullptr) {
-        locale = LocaleConfig::GetSystemLocale();
+        locale = LocaleConfig::GetEffectiveLocale();
     } else {
         locale = localeInfo->GetBaseName();
     }

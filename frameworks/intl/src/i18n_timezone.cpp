@@ -580,13 +580,13 @@ std::string I18nTimeZone::GetDisplayName()
     if (timezone == nullptr) {
         return "";
     }
-    std::string localeStr = LocaleConfig::GetSystemLocale();
+    std::string localeStr = LocaleConfig::GetEffectiveLocale();
     return GetDisplayName(localeStr, false);
 }
 
 std::string I18nTimeZone::GetDisplayName(bool isDST)
 {
-    std::string localeStr = LocaleConfig::GetSystemLocale();
+    std::string localeStr = LocaleConfig::GetEffectiveLocale();
     return GetDisplayName(localeStr, isDST);
 }
 
@@ -605,7 +605,7 @@ std::string I18nTimeZone::GetDisplayName(
     if (LocaleConfig::IsValidTag(localeStr)) {
         locale = icu::Locale::forLanguageTag(localeStr, status);
     } else {
-        std::string systemLocale = LocaleConfig::GetSystemLocale();
+        std::string systemLocale = LocaleConfig::GetEffectiveLocale();
         locale = icu::Locale::forLanguageTag(systemLocale, status);
     }
     if (U_FAILURE(status)) {
