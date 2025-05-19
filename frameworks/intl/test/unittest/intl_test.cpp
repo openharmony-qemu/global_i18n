@@ -48,6 +48,8 @@
 #include "intl_test.h"
 #include "generate_ics_file.h"
 #include <unistd.h>
+#include "zone_offset_transition.h"
+#include "zone_rules.h"
 
 using namespace OHOS::Global::I18n;
 using testing::ext::TestSize;
@@ -1909,41 +1911,39 @@ HWTEST_F(IntlTest, IntlFuncTest0045, TestSize.Level1)
 
 /**
  * @tc.name: IntlFuncTest0046
- * @tc.desc: Test Intl GetTimezoneIdByLocation
+ * @tc.desc: Test Intl NextTransition
  * @tc.type: FUNC
  */
 HWTEST_F(IntlTest, IntlFuncTest0046, TestSize.Level1)
 {
-    //北京
-    vector<std::string> Beijing = I18nTimeZone::GetTimezoneIdByLocation(116.3, 39.5);
-    EXPECT_TRUE(Beijing.size() == 1 && Beijing[0] == "Asia/Shanghai");
-    //洛杉矶
-    vector<std::string> LosAngeles = I18nTimeZone::GetTimezoneIdByLocation(-118.1, 34.0);
-    EXPECT_TRUE(LosAngeles.size() == 1 && LosAngeles[0] == "America/Los_Angeles");
-    //里约热内卢
-    vector<std::string> RIO = I18nTimeZone::GetTimezoneIdByLocation(-43.1, -22.5);
-    EXPECT_TRUE(RIO.size() == 1 && RIO[0] == "America/Sao_Paulo");
-    //悉尼
-    vector<std::string> Sydney = I18nTimeZone::GetTimezoneIdByLocation(150.5, -33.55);
-    EXPECT_TRUE(Sydney.size() == 1 && Sydney[0] == "Australia/Sydney");
-    //乌鲁木齐
-    vector<std::string> Urumqi = I18nTimeZone::GetTimezoneIdByLocation(87.7, 43.8);
-    EXPECT_TRUE(Urumqi.size() == 2);
-    bool containsShanghai = false;
-    bool containsUrumqi = false;
-    for (unsigned int i = 0; i < Urumqi.size(); i++) {
-        if (Urumqi[i] == "Asia/Shanghai") {
-            containsShanghai = true;
-        }
-        if (Urumqi[i] == "Asia/Urumqi") {
-            containsUrumqi = true;
-        }
-    }
-    EXPECT_TRUE(containsShanghai);
-    EXPECT_TRUE(containsUrumqi);
-    //科伊艾克
-    vector<std::string> coyhaique = I18nTimeZone::GetTimezoneIdByLocation(-72.04, -45.34);
-    EXPECT_TRUE(coyhaique.size() == 1 && coyhaique[0] == "America/Coyhaique");
+    std::string tzId = "America/Tijuana";
+    std::unique_ptr<ZoneRules> zoneRules = std::make_unique<ZoneRules>(tzId);
+    ASSERT_TRUE(zoneRules != nullptr);
+    double date = 1738339200000.0; // 2025/2/1
+    std::unique_ptr<ZoneOffsetTransition> zoneTrans = zoneRules->NextTransition(date);
+    ASSERT_TRUE(zoneTrans != nullptr);
+    vector<string> locales;
+    locales.push_back("en-US");
+    string dateStyle = "long";
+    string timeStyle = "long";
+    string hourCycle = "h24";
+    string hour12 = "false";
+    map<string, string> options = { { "dateStyle", dateStyle },
+                                    { "hour12", hour12 },
+                                    { "hourCycle", hourCycle },
+                                    { "timeStyle", timeStyle },
+                                    { "timeZone", tzId } };
+    DateTimeFormat *dateFormat = new (std::nothrow) DateTimeFormat(locales, options);
+    double milliseconds = zoneTrans->GetMilliseconds();
+    std::string result = dateFormat->Format(static_cast<int64_t>(milliseconds));
+    EXPECT_EQ(result, "March 9, 2025, 3:00:00 PDT");
+
+    std::unique_ptr<ZoneOffsetTransition> zoneOffsetTrans = zoneRules->NextTransition(milliseconds);
+    ASSERT_TRUE(zoneOffsetTrans != nullptr);
+    milliseconds = zoneOffsetTrans->GetMilliseconds();
+    result = dateFormat->Format(static_cast<int64_t>(milliseconds));
+    EXPECT_EQ(result, "November 2, 2025, 1:00:00 PST");
+    delete dateFormat;
 }
 } // namespace I18n
 } // namespace Global

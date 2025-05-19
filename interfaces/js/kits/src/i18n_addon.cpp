@@ -42,6 +42,8 @@
 #include "i18n_addon.h"
 #include "date_time_sequence.h"
 #include "locale_info_addon.h"
+#include "zone_offset_transition_addon.h"
+#include "zone_rules_addon.h"
 
 namespace OHOS {
 namespace Global {
@@ -1854,6 +1856,8 @@ napi_value Init(napi_env env, napi_value exports)
     val = SimpleNumberFormatAddon::InitSimpleNumberFormat(env, val);
     val = SimpleDateTimeFormatAddon::InitSimpleDateTimeFormat(env, val);
     val = StyledNumberFormatAddon::InitStyledNumberFormat(env, val);
+    val = ZoneRulesAddon::InitI18nZoneRules(env, val);
+    val = ZoneOffsetTransitionAddon::InitZoneOffsetTransition(env, val);
     return val;
 }
 

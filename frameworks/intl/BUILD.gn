@@ -79,6 +79,7 @@ config("intl_util_config") {
     "//base/global/i18n/frameworks/intl/entity_recognition/phone_number_recognition/include",
     "//base/global/i18n/frameworks/intl/include",
     "//base/global/i18n/frameworks/intl/parameter_upgrade/include",
+    "//base/global/i18n/frameworks/intl/timezone/include",
     "//base/global/i18n/interfaces/native/inner_api/i18n/include",
   ]
 }
@@ -148,6 +149,8 @@ ohos_shared_library("intl_util") {
       "src/taboo.cpp",
       "src/taboo_utils.cpp",
       "src/utils.cpp",
+      "timezone/src/zone_offset_transition.cpp",
+      "timezone/src/zone_rules.cpp",
     ]
     version_script = "libintl_util.map"
     deps = [
