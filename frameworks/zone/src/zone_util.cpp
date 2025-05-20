@@ -555,15 +555,19 @@ bool ZoneUtil::InitDefaultMap()
 bool ZoneUtil::ReadDefaultTimezoneConfigFile(const char* configPath)
 {
     if (configPath == nullptr) {
-        HILOG_ERROR_I18N("ZoneUtil::ReadDefaultTimezoneConfigFile configPath is NULL.");
+        HILOG_ERROR_I18N("ZoneUtil::ReadDefaultTimezoneConfigFile: configPath is NULL.");
         return false;
     }
     std::string absPath = GetAbsoluteFilePath(configPath);
     if (absPath.empty()) {
-        HILOG_ERROR_I18N("ZoneUtil::ReadDefaultTimezoneConfigFile get %{public}s absolute path failed.", configPath);
+        HILOG_ERROR_I18N("ZoneUtil::ReadDefaultTimezoneConfigFile: get %{public}s absolute path failed.", configPath);
         return false;
     }
     FILE* configFile = fopen(absPath.c_str(), "r");
+    if (configFile == nullptr) {
+        HILOG_ERROR_I18N("ZoneUtil::ReadDefaultTimezoneConfigFile: configFile is nullptr.");
+        return false;
+    }
     char buffer[READ_BUFFER_SIZE];
     while (fgets(buffer, READ_BUFFER_SIZE - 1, configFile) != nullptr) {
         std::string line(buffer);

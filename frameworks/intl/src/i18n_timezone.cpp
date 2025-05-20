@@ -84,18 +84,10 @@ bool I18nTimeZone::initSupportedLocales = false;
 bool I18nTimeZone::numTimezoneCategoryInitialized = false;
 std::mutex I18nTimeZone::initNumTimezoneCategoryMutex;
 
-std::map<int, std::string> I18nTimeZone::categoryNum2TimezoneWN {
-
-};
-std::map<int, std::string> I18nTimeZone::categoryNum2TimezoneEN {
-
-};
-std::map<int, std::string> I18nTimeZone::categoryNum2TimezoneWS {
-
-};
-std::map<int, std::string> I18nTimeZone::categoryNum2TimezoneES {
-
-};
+std::map<int, std::string> I18nTimeZone::categoryNum2TimezoneWN {};
+std::map<int, std::string> I18nTimeZone::categoryNum2TimezoneEN {};
+std::map<int, std::string> I18nTimeZone::categoryNum2TimezoneWS {};
+std::map<int, std::string> I18nTimeZone::categoryNum2TimezoneES {};
 
 I18nTimeZone::I18nTimeZone(std::string &id, bool isZoneID)
 {
@@ -715,15 +707,19 @@ bool I18nTimeZone::InitTimezoneCategoryMap()
 bool I18nTimeZone::ReadNumTimezoneConfigFile(const char* configPath)
 {
     if (configPath == nullptr) {
-        HILOG_ERROR_I18N("I18nTimeZone::ReadNumTimezoneConfigFile configPath is NULL.");
+        HILOG_ERROR_I18N("I18nTimeZone::ReadNumTimezoneConfigFile: configPath is NULL.");
         return false;
     }
     std::string absPath = GetAbsoluteFilePath(configPath);
     if (absPath.empty()) {
-        HILOG_ERROR_I18N("I18nTimeZone::ReadNumTimezoneConfigFile get %{public}s absolute path failed.", configPath);
+        HILOG_ERROR_I18N("I18nTimeZone::ReadNumTimezoneConfigFile: get %{public}s absolute path failed.", configPath);
         return false;
     }
     FILE* configFile = fopen(absPath.c_str(), "r");
+    if (configFile == nullptr) {
+        HILOG_ERROR_I18N("I18nTimeZone::ReadNumTimezoneConfigFile: configFile is nullptr.");
+        return false;
+    }
     char buffer[READ_BUFFER_SIZE];
     std::string curIndex;
     while (fgets(buffer, READ_BUFFER_SIZE - 1, configFile) != nullptr) {
@@ -752,6 +748,14 @@ void I18nTimeZone::AddNumTimezoneCategoryMap(std::string &curIndex, std::string 
 {
     if (curIndex.empty()) {
         HILOG_ERROR_I18N("I18nTimeZone::AddNumTimezoneCategoryMap: curIndex is empty");
+        return;
+    }
+    if (numStr.empty()) {
+        HILOG_ERROR_I18N("I18nTimeZone::AddNumTimezoneCategoryMap: numStr is empty");
+        return;
+    }
+    if (tzId.empty()) {
+        HILOG_ERROR_I18N("I18nTimeZone::AddNumTimezoneCategoryMap: tzId is empty");
         return;
     }
     int32_t status = 0;
