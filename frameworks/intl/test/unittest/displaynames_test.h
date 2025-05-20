@@ -22,7 +22,7 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-class DispalynamesTest : public testing::Test {
+class DisplaynamesTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
@@ -30,15 +30,15 @@ public:
     void TearDown();
 };
 
-int DispalynamesTest0001(void);
-int DispalynamesTest0002(void);
-int DispalynamesTest0003(void);
-int DispalynamesTest0004(void);
-int DispalynamesTest0005(void);
-int DispalynamesTest0006(void);
-int DispalynamesTest0007(void);
-int DispalynamesTest0008(void);
-int DispalynamesTest0009(void);
+int DisplaynamesTest0001(void);
+int DisplaynamesTest0002(void);
+int DisplaynamesTest0003(void);
+int DisplaynamesTest0004(void);
+int DisplaynamesTest0005(void);
+int DisplaynamesTest0006(void);
+int DisplaynamesTest0007(void);
+int DisplaynamesTest0008(void);
+int DisplaynamesTest0009(void);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

@@ -41,11 +41,13 @@ typedef enum CompareResult {
 
 class Collator {
 public:
-    static std::set<std::string> SupportedLocalesOf(const std::vector<std::string> &requestLocales,
-                                                    const std::map<std::string, std::string> &configs,
-                                                    I18nErrorCode &status);
+    static std::vector<std::string> SupportedLocalesOf(const std::vector<std::string> &requestLocales,
+                                                       const std::map<std::string, std::string> &configs,
+                                                       I18nErrorCode &status);
 
     Collator(std::vector<std::string> &localeTags, std::map<std::string, std::string> &options);
+    Collator(std::vector<std::string> &localeTags, std::map<std::string, std::string> &options,
+        const std::string &defaultLocale);
     ~Collator();
     CompareResult Compare(const std::string &first, const std::string &second);
     void ResolvedOptions(std::map<std::string, std::string> &options);
@@ -77,6 +79,8 @@ private:
     void SetSensitivity();
     void SetIgnorePunctuation();
     bool InitCollator();
+    void Init(std::vector<std::string> &localeTags, std::map<std::string, std::string> &options,
+        const std::string &defaultLocale);
 };
 } // namespace I18n
 } // namespace Global

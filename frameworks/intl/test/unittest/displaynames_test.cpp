@@ -27,24 +27,24 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 
-void DispalynamesTest::SetUpTestCase(void)
+void DisplaynamesTest::SetUpTestCase(void)
 {}
 
-void DispalynamesTest::TearDownTestCase(void)
+void DisplaynamesTest::TearDownTestCase(void)
 {}
 
-void DispalynamesTest::SetUp(void)
+void DisplaynamesTest::SetUp(void)
 {}
 
-void DispalynamesTest::TearDown(void)
+void DisplaynamesTest::TearDown(void)
 {}
 
 /**
- * @tc.name: DispalynamesTest0001
+ * @tc.name: DisplaynamesTest0001
  * @tc.desc: Test Intl DisplayNames.SupportedLocalesOf
  * @tc.type: FUNC
  */
-HWTEST_F(DispalynamesTest, DispalynamesTest0001, TestSize.Level1)
+HWTEST_F(DisplaynamesTest, DisplaynamesTest0001, TestSize.Level1)
 {
     std::vector<std::string> localeTags = {};
     std::map<std::string, std::string> options = {{"type", "language"}};
@@ -59,39 +59,39 @@ HWTEST_F(DispalynamesTest, DispalynamesTest0001, TestSize.Level1)
     std::vector<std::string> requestLocales = {"zxx"};
     requestLocales.push_back(defaultLocale);
     status = I18nErrorCode::SUCCESS;
-    std::set<std::string> resultLocales = DisplayNames::SupportedLocalesOf(requestLocales, options, status);
+    std::vector<std::string> resultLocales = DisplayNames::SupportedLocalesOf(requestLocales, options, status);
     EXPECT_EQ(status, I18nErrorCode::SUCCESS);
     EXPECT_EQ(resultLocales.size(), 1);
-    EXPECT_TRUE(resultLocales.find(defaultLocale) != resultLocales.end());
+    EXPECT_EQ(resultLocales[0], defaultLocale);
 }
 
 /**
- * @tc.name: DispalynamesTest0002
+ * @tc.name: DisplaynamesTest0002
  * @tc.desc: Test Intl DisplayNames.SupportedLocalesOf
  * @tc.type: FUNC
  */
-HWTEST_F(DispalynamesTest, DispalynamesTest0002, TestSize.Level1)
+HWTEST_F(DisplaynamesTest, DisplaynamesTest0002, TestSize.Level1)
 {
     std::vector<std::string> localeTags = {"ban", "id-u-co-pinyin", "de-ID"};
     std::map<std::string, std::string> options = {{"localeMatcher", "lookup"}};
     I18nErrorCode status = I18nErrorCode::SUCCESS;
-    std::set<std::string> resultLocales = DisplayNames::SupportedLocalesOf(localeTags, options, status);
+    std::vector<std::string> resultLocales = DisplayNames::SupportedLocalesOf(localeTags, options, status);
     EXPECT_EQ(status, I18nErrorCode::SUCCESS);
     EXPECT_EQ(resultLocales.size(), 2);
-    EXPECT_TRUE(resultLocales.find("id-u-co-pinyin") != resultLocales.end());
-    EXPECT_TRUE(resultLocales.find("de-ID") != resultLocales.end());
+    EXPECT_EQ(resultLocales[0], "id-u-co-pinyin");
+    EXPECT_EQ(resultLocales[1], "de-ID");
     std::map<std::string, std::string> optionsBogus = {{"localeMatcher", "bogus"}};
-    std::set<std::string> resultLocalesBogus = DisplayNames::SupportedLocalesOf(localeTags, optionsBogus, status);
+    std::vector<std::string> resultLocalesBogus = DisplayNames::SupportedLocalesOf(localeTags, optionsBogus, status);
     EXPECT_EQ(status, I18nErrorCode::INVALID_PARAM);
     EXPECT_EQ(resultLocalesBogus.size(), 0);
 }
 
 /**
- * @tc.name: DispalynamesTest0003
+ * @tc.name: DisplaynamesTest0003
  * @tc.desc: Test Intl DisplayNames.Display
  * @tc.type: FUNC
  */
-HWTEST_F(DispalynamesTest, DispalynamesTest0003, TestSize.Level1)
+HWTEST_F(DisplaynamesTest, DisplaynamesTest0003, TestSize.Level1)
 {
     std::vector<std::string> localeTags = {"ban", "zxx", "zh"};
     std::map<std::string, std::string> options = {{"type", "calendar"}};
@@ -124,11 +124,11 @@ HWTEST_F(DispalynamesTest, DispalynamesTest0003, TestSize.Level1)
 }
 
 /**
- * @tc.name: DispalynamesTest0004
+ * @tc.name: DisplaynamesTest0004
  * @tc.desc: Test Intl DisplayNames.Display
  * @tc.type: FUNC
  */
-HWTEST_F(DispalynamesTest, DispalynamesTest0004, TestSize.Level1)
+HWTEST_F(DisplaynamesTest, DisplaynamesTest0004, TestSize.Level1)
 {
     std::vector<std::string> localeTags = {"ban", "zxx", "en"};
     std::map<std::string, std::string> options = {{"type", "dateTimeField"}};
@@ -162,11 +162,11 @@ HWTEST_F(DispalynamesTest, DispalynamesTest0004, TestSize.Level1)
 }
 
 /**
- * @tc.name: DispalynamesTest0005
+ * @tc.name: DisplaynamesTest0005
  * @tc.desc: Test Intl DisplayNames.ResolvedOptions deafault
  * @tc.type: FUNC
  */
-HWTEST_F(DispalynamesTest, DispalynamesTest0005, TestSize.Level1)
+HWTEST_F(DisplaynamesTest, DisplaynamesTest0005, TestSize.Level1)
 {
     std::vector<std::string> localeTags = {"en-US"};
     std::map<std::string, std::string> options = {{"type", "language"}};
@@ -180,11 +180,11 @@ HWTEST_F(DispalynamesTest, DispalynamesTest0005, TestSize.Level1)
 }
 
 /**
- * @tc.name: DispalynamesTest0006
+ * @tc.name: DisplaynamesTest0006
  * @tc.desc: Test Intl DisplayNames.ResolvedOptions fallback
  * @tc.type: FUNC
  */
-HWTEST_F(DispalynamesTest, DispalynamesTest0006, TestSize.Level1)
+HWTEST_F(DisplaynamesTest, DisplaynamesTest0006, TestSize.Level1)
 {
     std::vector<std::string> localeTags = {"en-US"};
     const std::vector<std::string> fallbackOptions = { "code", "none" };
@@ -205,11 +205,11 @@ HWTEST_F(DispalynamesTest, DispalynamesTest0006, TestSize.Level1)
 }
 
 /**
- * @tc.name: DispalynamesTest0007
+ * @tc.name: DisplaynamesTest0007
  * @tc.desc: Test Intl DisplayNames.ResolvedOptions languageDisplay
  * @tc.type: FUNC
  */
-HWTEST_F(DispalynamesTest, DispalynamesTest0007, TestSize.Level1)
+HWTEST_F(DisplaynamesTest, DisplaynamesTest0007, TestSize.Level1)
 {
     std::vector<std::string> localeTags = {"en-US"};
     const std::vector<std::string> languageDisplayOptions = { "dialect", "standard" };
@@ -228,11 +228,11 @@ HWTEST_F(DispalynamesTest, DispalynamesTest0007, TestSize.Level1)
 }
 
 /**
- * @tc.name: DispalynamesTest0008
+ * @tc.name: DisplaynamesTest0008
  * @tc.desc: Test Intl DisplayNames.ResolvedOptions style
  * @tc.type: FUNC
  */
-HWTEST_F(DispalynamesTest, DispalynamesTest0008, TestSize.Level1)
+HWTEST_F(DisplaynamesTest, DisplaynamesTest0008, TestSize.Level1)
 {
     std::vector<std::string> localeTags = {"en-US"};
     const std::vector<std::string> styleOptions = { "narrow", "short", "long" };
@@ -251,11 +251,11 @@ HWTEST_F(DispalynamesTest, DispalynamesTest0008, TestSize.Level1)
 }
 
 /**
- * @tc.name: DispalynamesTest0009
+ * @tc.name: DisplaynamesTest0009
  * @tc.desc: Test Intl DisplayNames.ResolvedOptions type
  * @tc.type: FUNC
  */
-HWTEST_F(DispalynamesTest, DispalynamesTest0009, TestSize.Level1)
+HWTEST_F(DisplaynamesTest, DisplaynamesTest0009, TestSize.Level1)
 {
     std::vector<std::string> localeTags = {"en-US"};
     const std::vector<std::string> typeOptions = { "language", "region", "script", "currency",

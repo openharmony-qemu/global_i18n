@@ -53,29 +53,39 @@ const std::unordered_map<std::string, UDateTimePGDisplayWidth> DisplayNames::ICU
     { "narrow", UDATPG_NARROW }
 };
 
-std::set<std::string> DisplayNames::SupportedLocalesOf(const std::vector<std::string> &requestLocales,
-                                                       const std::map<std::string, std::string> &configs,
-                                                       I18nErrorCode &status)
+std::vector<std::string> DisplayNames::SupportedLocalesOf(const std::vector<std::string> &requestLocales,
+                                                          const std::map<std::string, std::string> &configs,
+                                                          I18nErrorCode &status)
 {
+    std::vector<std::string> undefined = {};
+    auto requestedLocales = LocaleHelper::CanonicalizeLocaleList(requestLocales, status);
+    if (status != I18nErrorCode::SUCCESS) {
+        return undefined;
+    }
+
     std::string localeMatcher = LocaleHelper::ParseOption(configs, "localeMatcher", "best fit", true, status);
     if (status != I18nErrorCode::SUCCESS) {
-        std::set<std::string> result = {};
-        return result;
+        return undefined;
     }
     std::set<std::string> availableLocales = LocaleInfo::GetValidLocales();
-    return LocaleHelper::LookupSupportedLocales(availableLocales, requestLocales);
+    return LocaleHelper::LookupSupportedLocales(availableLocales, requestedLocales);
 }
 
 DisplayNames::DisplayNames(const std::vector<std::string> &localeTags,
                            const std::map<std::string, std::string> &options)
 {
     status = I18nErrorCode::SUCCESS;
+    auto requestedLocales = LocaleHelper::CanonicalizeLocaleList(localeTags, status);
+    if (status != I18nErrorCode::SUCCESS) {
+        return;
+    }
+
     ParseAllOptions(options);
     if (status != I18nErrorCode::SUCCESS) {
         return;
     }
-    for (size_t i = 0; i < localeTags.size(); i++) {
-        std::string curLocale = localeTags[i];
+    for (size_t i = 0; i < requestedLocales.size(); i++) {
+        std::string curLocale = requestedLocales[i];
         UErrorCode icuStatus = U_ZERO_ERROR;
         locale = icu::Locale::forLanguageTag(icu::StringPiece(curLocale), icuStatus);
         if (U_FAILURE(icuStatus)) {
@@ -90,7 +100,7 @@ DisplayNames::DisplayNames(const std::vector<std::string> &localeTags,
         }
     }
     if (status != I18nErrorCode::SUCCESS || icuDisplaynames == nullptr) {
-        InitDisplayNames(LocaleConfig::GetSystemLocale(), options);
+        InitDisplayNames("en-US", options);
     }
 }
 
@@ -122,6 +132,7 @@ void DisplayNames::InitDisplayNames(const std::string &curLocale, const std::map
     }
 
     UDisplayContext displayContext[] = { icuStyle, icuLanguageDisplay, UDISPCTX_NO_SUBSTITUTE };
+    // 3 indicates the array length
     icuDisplaynames.reset(icu::LocaleDisplayNames::createInstance(locale, displayContext, 3));
     if (icuDisplaynames == nullptr) {
         status = I18nErrorCode::FAILED;

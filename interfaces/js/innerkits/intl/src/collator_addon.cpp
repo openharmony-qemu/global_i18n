@@ -33,6 +33,7 @@ void CollatorAddon::Destructor(napi_env env, void *nativeObject, void *hint)
     if (!nativeObject) {
         return;
     }
+    delete reinterpret_cast<CollatorAddon *>(nativeObject);
     nativeObject = nullptr;
 }
 
@@ -74,31 +75,28 @@ napi_value CollatorAddon::CollatorConstructor(napi_env env, napi_callback_info i
     if (argc > 0) {
         int32_t code = 0;
         std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argv[0], code);
-        if (code != 0) {
-            return nullptr;
-        }
         localeTags.assign(localeArray.begin(), localeArray.end());
     }
     std::map<std::string, std::string> map = {};
     if (argc > 1) {
         GetCollatorOptionValue(env, argv[1], map);
     }
-    std::unique_ptr<CollatorAddon> obj = std::make_unique<CollatorAddon>();
+    CollatorAddon* obj = new(std::nothrow) CollatorAddon();
     if (obj == nullptr) {
+        HILOG_ERROR_I18N("CollatorConstructor: make_unique CollatorAddon failed");
         return nullptr;
     }
     status =
-        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), CollatorAddon::Destructor, nullptr, nullptr);
+        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj), CollatorAddon::Destructor, nullptr, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("CollatorConstructor: Wrap CollatorAddon failed");
+        delete obj;
         return nullptr;
     }
     if (!obj->InitCollatorContext(env, info, localeTags, map)) {
         HILOG_ERROR_I18N("CollatorConstructor: Init CollatorAddon failed");
-        ErrorUtil::NapiThrowUndefined(env, "getStringOption failed");
         return nullptr;
     }
-    obj.release();
     return thisVar;
 }
 
@@ -106,11 +104,21 @@ bool CollatorAddon::InitCollatorContext(napi_env env, napi_callback_info info, s
     std::map<std::string, std::string> &map)
 {
     env_ = env;
-    collator_ = std::make_unique<Collator>(localeTags, map);
+    collator_ = std::make_unique<Collator>(localeTags, map, "en-US");
     if (collator_ == nullptr) {
+        HILOG_ERROR_I18N("CollatorAddon: CollatorConstructor make_unique Collator failed");
         return false;
     }
     I18nErrorCode errorCode = collator_->GetError();
+    if (errorCode == I18nErrorCode::INVALID_PARAM) {
+        HILOG_ERROR_I18N("CollatorAddon: CollatorConstructor invalid param");
+        ErrorUtil::NapiThrowUndefined(env, "getStringOption failed");
+        return false;
+    } else if (errorCode == I18nErrorCode::INVALID_LOCALE_TAG) {
+        HILOG_ERROR_I18N("CollatorAddon: CollatorConstructor invalid locale");
+        ErrorUtil::NapiThrowUndefined(env, "invalid locale");
+        return false;
+    }
     return errorCode == I18nErrorCode::SUCCESS;
 }
 
@@ -120,16 +128,20 @@ napi_value CollatorAddon::SupportedLocalesOf(napi_env env, napi_callback_info in
     napi_value argv[2] = { nullptr };
     napi_value thisVar = nullptr;
     void *data = nullptr;
+    std::vector<std::string> resultLocales = {};
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
-        return nullptr;
+        HILOG_ERROR_I18N("SupportedLocalesOf: napi get callback info failed.");
+        return JSUtils::CreateArray(env, resultLocales);
     }
     std::vector<std::string> localeTags;
     if (argc > 0) {
         int32_t code = 0;
         std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argv[0], code);
         if (code != 0) {
-            return nullptr;
+            HILOG_ERROR_I18N("SupportedLocalesOf: JSUtils:GetLocaleArray failed.");
+            ErrorUtil::NapiThrowUndefined(env, "kValue is not String or Object.");
+            return JSUtils::CreateArray(env, resultLocales);
         }
         localeTags.assign(localeArray.begin(), localeArray.end());
     }
@@ -138,10 +150,13 @@ napi_value CollatorAddon::SupportedLocalesOf(napi_env env, napi_callback_info in
         GetCollatorOptionValue(env, argv[1], map);
     }
     I18nErrorCode i18nStatus = I18nErrorCode::SUCCESS;
-    std::set<std::string> resultLocales = Collator::SupportedLocalesOf(localeTags, map, i18nStatus);
-    if (i18nStatus != I18nErrorCode::SUCCESS) {
-        HILOG_ERROR_I18N("SupportedLocalesOf: SupportedLocalesOf status fail");
+    resultLocales = Collator::SupportedLocalesOf(localeTags, map, i18nStatus);
+    if (i18nStatus == I18nErrorCode::INVALID_PARAM) {
+        HILOG_ERROR_I18N("SupportedLocalesOf: SupportedLocalesOf invalid param");
         ErrorUtil::NapiThrowUndefined(env, "getStringOption failed");
+    } else if (i18nStatus == I18nErrorCode::INVALID_LOCALE_TAG) {
+        HILOG_ERROR_I18N("SupportedLocalesOf: SupportedLocalesOf invalid locale");
+        ErrorUtil::NapiThrowUndefined(env, "invalid locale");
     }
     return JSUtils::CreateArray(env, resultLocales);
 }

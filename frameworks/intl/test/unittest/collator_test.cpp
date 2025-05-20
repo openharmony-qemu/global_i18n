@@ -58,10 +58,10 @@ HWTEST_F(CollatorTest, CollatorFuncTest001, TestSize.Level1)
     std::vector<std::string> requestLocales = {"zxx"};
     requestLocales.push_back(defaultLocale);
     I18nErrorCode status = I18nErrorCode::SUCCESS;
-    std::set<std::string> resultLocales = Collator::SupportedLocalesOf(requestLocales, options, status);
+    std::vector<std::string> resultLocales = Collator::SupportedLocalesOf(requestLocales, options, status);
     EXPECT_EQ(status, I18nErrorCode::SUCCESS);
     EXPECT_EQ(resultLocales.size(), 1);
-    EXPECT_TRUE(resultLocales.find(defaultLocale) != resultLocales.end());
+    EXPECT_EQ(resultLocales[0], defaultLocale);
 }
 
 /**
@@ -74,7 +74,7 @@ HWTEST_F(CollatorTest, CollatorFuncTest002, TestSize.Level1)
     std::vector<std::string> localeTags = {"de", "en", "es", "fr", "it"};
     std::map<std::string, std::string> options = {{"localeMatcher", "lookup"}};
     I18nErrorCode status = I18nErrorCode::SUCCESS;
-    std::set<std::string> resultLocales = Collator::SupportedLocalesOf(localeTags, options, status);
+    std::vector<std::string> resultLocales = Collator::SupportedLocalesOf(localeTags, options, status);
     EXPECT_EQ(status, I18nErrorCode::SUCCESS);
     for (auto locale : resultLocales) {
         std::vector<std::string> locales;
@@ -98,13 +98,13 @@ HWTEST_F(CollatorTest, CollatorFuncTest003, TestSize.Level1)
     std::vector<std::string> localeTags = {"ban", "id-u-co-pinyin", "de-ID"};
     std::map<std::string, std::string> options = {{"localeMatcher", "lookup"}};
     I18nErrorCode status = I18nErrorCode::SUCCESS;
-    std::set<std::string> resultLocales = Collator::SupportedLocalesOf(localeTags, options, status);
+    std::vector<std::string> resultLocales = Collator::SupportedLocalesOf(localeTags, options, status);
     EXPECT_EQ(status, I18nErrorCode::SUCCESS);
     EXPECT_EQ(resultLocales.size(), 2);
-    EXPECT_TRUE(resultLocales.find("id-u-co-pinyin") != resultLocales.end());
-    EXPECT_TRUE(resultLocales.find("de-ID") != resultLocales.end());
+    EXPECT_EQ(resultLocales[0], "id-u-co-pinyin");
+    EXPECT_EQ(resultLocales[1], "de-ID");
     std::map<std::string, std::string> optionsBogus = {{"localeMatcher", "bogus"}};
-    std::set<std::string> resultLocalesBogus = Collator::SupportedLocalesOf(localeTags, optionsBogus, status);
+    std::vector<std::string> resultLocalesBogus = Collator::SupportedLocalesOf(localeTags, optionsBogus, status);
     EXPECT_EQ(status, I18nErrorCode::INVALID_PARAM);
     EXPECT_EQ(resultLocalesBogus.size(), 0);
 }

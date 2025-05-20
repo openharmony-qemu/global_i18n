@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "locale_helper.h"
+#include <sstream>
 #include "unicode/localebuilder.h"
 #include "i18n_hilog.h"
 
@@ -203,15 +204,51 @@ std::string LocaleHelper::BestAvailableLocale(const std::set<std::string> &avail
     }
 }
 
-std::set<std::string> LocaleHelper::LookupSupportedLocales(const std::set<std::string> &availableLocales,
-                                                           const std::vector<std::string> &requestLocales)
+std::vector<std::string> LocaleHelper::LookupSupportedLocales(const std::set<std::string> &availableLocales,
+                                                              const std::vector<std::string> &requestLocales)
 {
-    std::set<std::string> resultLocales;
+    std::vector<std::string> resultLocales;
+    std::unordered_set<std::string> visitedLocales;
     for (const auto& candidateLocale : requestLocales) {
         std::string availableLocale = LocaleHelper::BestAvailableLocale(availableLocales, candidateLocale);
-        if (!availableLocale.empty()) {
-            resultLocales.insert(candidateLocale);
+        if (!availableLocale.empty() && visitedLocales.find(candidateLocale) == visitedLocales.end()) {
+            resultLocales.push_back(candidateLocale);
+            visitedLocales.insert(candidateLocale);
         }
+    }
+    return resultLocales;
+}
+
+std::vector<std::string> LocaleHelper::CanonicalizeLocaleList(const std::vector<std::string> &locales,
+                                                              I18nErrorCode &status)
+{
+    std::vector<std::string> resultLocales;
+    for (const std::string& locale : locales) {
+        if (!LocaleHelper::IsStructurallyValidLanguageTag(locale) || locale.empty()) {
+            status = I18nErrorCode::INVALID_LOCALE_TAG;
+            return {};
+        }
+        std::string localeStr = locale;
+        std::transform(localeStr.begin(), localeStr.end(), localeStr.begin(), AsciiAlphaToLower);
+        UErrorCode icuStatus = U_ZERO_ERROR;
+        icu::Locale formalLocale = icu::Locale::forLanguageTag(localeStr.c_str(), icuStatus);
+        if (U_FAILURE(icuStatus) || formalLocale.isBogus()) {
+            status = I18nErrorCode::INVALID_LOCALE_TAG;
+            return {};
+        }
+        formalLocale = icu::LocaleBuilder().setLocale(formalLocale).build(icuStatus);
+        // Canonicalize the locale ID of this object according to CLDR.
+        formalLocale.canonicalize(icuStatus);
+        if ((U_FAILURE(icuStatus) != 0) || (formalLocale.isBogus() != 0)) {
+            status = I18nErrorCode::INVALID_LOCALE_TAG;
+            return {};
+        }
+        std::string languageTag = formalLocale.toLanguageTag<std::string>(icuStatus);
+        if (U_FAILURE(icuStatus) != 0) {
+            status = I18nErrorCode::INVALID_LOCALE_TAG;
+            return {};
+        }
+        resultLocales.push_back(languageTag);
     }
     return resultLocales;
 }
@@ -270,19 +307,19 @@ bool LocaleHelper::IsStructurallyValidLanguageTag(const std::string& tag)
     for (auto it = tagCollection.begin(); it != tagCollection.end(); it++) {
         if (*it != '-' && it != tagCollection.end() - 1) {
             substring += *it;
-        } else {
-            if (it == tagCollection.end() - 1) {
-                substring += *it;
-            }
-            containers.push_back(substring);
-            if (IsVariantSubtag(substring)) {
-                std::transform(substring.begin(), substring.end(), substring.begin(), AsciiAlphaToLower);
-                if (!uniqueSubtags.insert(substring).second) {
-                    return false;
-                }
-            }
-            substring.clear();
+            continue;
         }
+        if (it == tagCollection.end() - 1) {
+            substring += *it;
+        }
+        containers.push_back(substring);
+        if (IsVariantSubtag(substring)) {
+            std::transform(substring.begin(), substring.end(), substring.begin(), AsciiAlphaToLower);
+            if (!uniqueSubtags.insert(substring).second) {
+                return false;
+            }
+        }
+        substring.clear();
     }
     bool result = DealwithLanguageTag(containers, address);
     return result;

@@ -371,7 +371,7 @@ napi_value JSUtils::CreateObject(napi_env env, std::unordered_map<std::string, n
     return object;
 }
 
-napi_value JSUtils::CreateArray(napi_env env, const std::set<std::string>& value)
+napi_value JSUtils::CreateArray(napi_env env, const std::vector<std::string>& value)
 {
     napi_value result = nullptr;
     napi_status status = napi_create_array_with_length(env, value.size(), &result);
