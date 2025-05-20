@@ -21,23 +21,15 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-ZoneOffsetTransition::ZoneOffsetTransition(double time, int32_t offsetBefore, int32_t offsetAfter)
-{
-    this->time = time;
-    this->offsetBefore = offsetBefore;
-    this->offsetAfter = offsetAfter;
-}
+ZoneOffsetTransition::ZoneOffsetTransition(double time, int32_t offsetBefore, int32_t offsetAfter) :
+    time(time), offsetBefore(offsetBefore), offsetAfter(offsetAfter)
+{}
 
 ZoneOffsetTransition::ZoneOffsetTransition()
-{
-    this->time = 0.0;
-    this->offsetBefore = 0;
-    this->offsetAfter = 0;
-}
+{}
 
 ZoneOffsetTransition::~ZoneOffsetTransition()
-{
-}
+{}
 
 double ZoneOffsetTransition::GetMilliseconds()
 {

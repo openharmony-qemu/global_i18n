@@ -33,9 +33,9 @@ public:
     int32_t GetOffsetBefore();
 
 private:
-    double time;
-    int32_t offsetBefore;
-    int32_t offsetAfter;
+    double time = 0.0;
+    int32_t offsetBefore = 0;
+    int32_t offsetAfter = 0;
 };
 } // namespace I18n
 } // namespace Global

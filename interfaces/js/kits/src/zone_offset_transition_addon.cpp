@@ -22,7 +22,7 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static thread_local napi_ref* g_zoneOffsetTransConstructor = nullptr;
+static thread_local napi_ref g_zoneOffsetTransConstructor = nullptr;
 
 ZoneOffsetTransitionAddon::ZoneOffsetTransitionAddon() {}
 
@@ -52,17 +52,12 @@ napi_value ZoneOffsetTransitionAddon::InitZoneOffsetTransition(napi_env env, nap
         HILOG_ERROR_I18N("InitZoneOffsetTransition: Failed to define class ZoneOffsetTransition at Init");
         return nullptr;
     }
-    g_zoneOffsetTransConstructor = new (std::nothrow) napi_ref;
-    if (!g_zoneOffsetTransConstructor) {
-        HILOG_ERROR_I18N("InitZoneOffsetTransition: Failed to create ZoneOffsetTransition ref at init");
-        return nullptr;
-    }
     status = napi_set_named_property(env, exports, "ZoneOffsetTransition", constructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("InitZoneOffsetTransition: Set property ZoneOffsetTransition failed.");
         return nullptr;
     }
-    status = napi_create_reference(env, constructor, 1, g_zoneOffsetTransConstructor);
+    status = napi_create_reference(env, constructor, 1, &g_zoneOffsetTransConstructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("InitZoneOffsetTransition: Failed to create reference g_timezoneConstructor at init");
         return nullptr;
@@ -142,10 +137,10 @@ napi_value ZoneOffsetTransitionAddon::GetZoneOffsetTransObject(napi_env env, nap
     argv[2] = param2;
     napi_value constructor = nullptr;
     if (g_zoneOffsetTransConstructor == nullptr) {
-        HILOG_ERROR_I18N("Failed to create g_zoneOffsetTransConstructor");
+        HILOG_ERROR_I18N("GetZoneOffsetTransObject: g_zoneOffsetTransConstructor is nullptr");
         return nullptr;
     }
-    status = napi_get_reference_value(env, *g_zoneOffsetTransConstructor, &constructor);
+    status = napi_get_reference_value(env, g_zoneOffsetTransConstructor, &constructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Failed to create reference of normalizer Constructor");
         return nullptr;

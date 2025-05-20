@@ -52,7 +52,6 @@ napi_value ZoneRulesAddon::InitI18nZoneRules(napi_env env, napi_value exports)
         HILOG_ERROR_I18N("InitI18nZoneRules: Define class failed when InitI18nZoneRules.");
         return nullptr;
     }
-    //exports = ZoneRulesAddon::InitZoneRules(env, exports);
     status = napi_set_named_property(env, exports, "ZoneRules", constructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("InitI18nZoneRules: Set property ZoneRules failed.");
@@ -122,7 +121,7 @@ napi_value ZoneRulesAddon::NextTransition(napi_env env, napi_callback_info info)
     ZoneRulesAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->zoneRules_) {
-        HILOG_ERROR_I18N("NextTransition: Get ZoneRulesAddon object failed");
+        HILOG_ERROR_I18N("ZoneRulesAddon::NextTransition, Get ZoneRulesAddon object failed");
         return nullptr;
     }
     std::unique_ptr<ZoneOffsetTransition> zoneOffsetTrans;
@@ -176,7 +175,7 @@ napi_value ZoneRulesAddon::GetZoneRulesObject(napi_env env, napi_callback_info i
     argv[0] = param0;
     napi_value constructor = nullptr;
     if (g_zoneRulesConstructor == nullptr) {
-        HILOG_ERROR_I18N("Failed to create g_zoneRulesConstructor");
+        HILOG_ERROR_I18N("ZoneRulesAddon::GetZoneRulesObject: g_zoneRulesConstructor is nullptr");
         return nullptr;
     }
     status = napi_get_reference_value(env, g_zoneRulesConstructor, &constructor);

@@ -717,34 +717,34 @@ HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0001, TestSize.Level1)
  */
 HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0002, TestSize.Level1)
 {
-    //±±æ©
-    vector<std::string> Beijing = I18nTimeZone::GetTimezoneIdByLocation(116.3, 39.5);
-    EXPECT_TRUE(Beijing.size() == 1 && Beijing[0] == "Asia/Shanghai");
-    //¬Â…ºÌ∂
-    vector<std::string> LosAngeles = I18nTimeZone::GetTimezoneIdByLocation(-118.1, 34.0);
-    EXPECT_TRUE(LosAngeles.size() == 1 && LosAngeles[0] == "America/Los_Angeles");
-    //¿Ô‘º»»ƒ⁄¬¨
-    vector<std::string> RIO = I18nTimeZone::GetTimezoneIdByLocation(-43.1, -22.5);
-    EXPECT_TRUE(RIO.size() == 1 && RIO[0] == "America/Sao_Paulo");
-    //œ§ƒ·
-    vector<std::string> Sydney = I18nTimeZone::GetTimezoneIdByLocation(150.5, -33.55);
-    EXPECT_TRUE(Sydney.size() == 1 && Sydney[0] == "Australia/Sydney");
-    //Œ⁄¬≥ƒæ∆Î
-    vector<std::string> Urumqi = I18nTimeZone::GetTimezoneIdByLocation(87.7, 43.8);
-    EXPECT_TRUE(Urumqi.size() == 2);
+    //Âåó‰∫¨
+    vector<std::string> beijing = I18nTimeZone::GetTimezoneIdByLocation(116.3, 39.5);
+    EXPECT_TRUE(beijing.size() == 1 && beijing[0] == "Asia/Shanghai");
+    //Ê¥õÊùâÁü∂
+    vector<std::string> losAngeles = I18nTimeZone::GetTimezoneIdByLocation(-118.1, 34.0);
+    EXPECT_TRUE(losAngeles.size() == 1 && losAngeles[0] == "America/Los_Angeles");
+    //ÈáåÁ∫¶ÁÉ≠ÂÜÖÂç¢
+    vector<std::string> rio = I18nTimeZone::GetTimezoneIdByLocation(-43.1, -22.5);
+    EXPECT_TRUE(rio.size() == 1 && rio[0] == "America/Sao_Paulo");
+    //ÊÇâÂ∞º
+    vector<std::string> sydney = I18nTimeZone::GetTimezoneIdByLocation(150.5, -33.55);
+    EXPECT_TRUE(sydney.size() == 1 && sydney[0] == "Australia/Sydney");
+    //‰πåÈ≤ÅÊú®ÈΩê
+    vector<std::string> urumqi = I18nTimeZone::GetTimezoneIdByLocation(87.7, 43.8);
+    EXPECT_TRUE(urumqi.size() == 2);
     bool containsShanghai = false;
     bool containsUrumqi = false;
-    for (unsigned int i = 0; i < Urumqi.size(); i++) {
-        if (Urumqi[i] == "Asia/Shanghai") {
+    for (unsigned int i = 0; i < urumqi.size(); i++) {
+        if (urumqi[i] == "Asia/Shanghai") {
             containsShanghai = true;
         }
-        if (Urumqi[i] == "Asia/Urumqi") {
+        if (urumqi[i] == "Asia/Urumqi") {
             containsUrumqi = true;
         }
     }
     EXPECT_TRUE(containsShanghai);
     EXPECT_TRUE(containsUrumqi);
-    //ø∆“¡∞¨øÀ
+    //Áßë‰ºäËâæÂÖã
     vector<std::string> coyhaique = I18nTimeZone::GetTimezoneIdByLocation(-72.04, -45.34);
     EXPECT_TRUE(coyhaique.size() == 1 && coyhaique[0] == "America/Coyhaique");
 }
