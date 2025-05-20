@@ -73,6 +73,7 @@ napi_value ZoneOffsetTransitionAddon::I18nZoneOffsetTransitionConstructor(napi_e
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
+        HILOG_ERROR_I18N("ZoneOffsetTransitionAddon: Get parameter info failed");
         return nullptr;
     }
     if (argc < CONSTRUCTOR_ARGS_COUNT) {
@@ -94,10 +95,11 @@ napi_value ZoneOffsetTransitionAddon::I18nZoneOffsetTransitionConstructor(napi_e
     }
     std::unique_ptr<ZoneOffsetTransitionAddon> obj = std::make_unique<ZoneOffsetTransitionAddon>();
     if (obj == nullptr) {
+        HILOG_ERROR_I18N("ZoneOffsetTransitionAddon: Create ZoneOffsetTransitionAddon object failed");
         return nullptr;
     }
-    status =
-        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), ZoneOffsetTransitionAddon::Destructor, nullptr, nullptr);
+    status = napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()),
+        ZoneOffsetTransitionAddon::Destructor, nullptr, nullptr);
     if (status != napi_ok) {
         return nullptr;
     }
