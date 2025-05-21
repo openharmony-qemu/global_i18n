@@ -56,12 +56,6 @@ void ZoneRules::InitBasicTimeZone()
 
 std::unique_ptr<ZoneOffsetTransition> ZoneRules::NextTransition()
 {
-    time_t timeStamp = time(NULL);
-    struct tm* timObj = localtime(&timeStamp);
-    if (timObj == nullptr) {
-        HILOG_ERROR_I18N("ZoneRules::GetTimezoneTransition: get current time failed.");
-        return std::make_unique<ZoneOffsetTransition>();
-    }
     auto time = std::chrono::system_clock::now();
     auto since_epoch = time.time_since_epoch();
     auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(since_epoch);

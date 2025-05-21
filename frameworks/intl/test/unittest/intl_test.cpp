@@ -1943,6 +1943,20 @@ HWTEST_F(IntlTest, IntlFuncTest0046, TestSize.Level1)
     milliseconds = zoneOffsetTrans->GetMilliseconds();
     result = dateFormat->Format(static_cast<int64_t>(milliseconds));
     EXPECT_EQ(result, "November 2, 2025, 1:00:00 PST");
+
+    tzId = "America/Santiago";
+    std::unique_ptr<ZoneRules> zoneRules2 = std::make_unique<ZoneRules>(tzId);
+    ASSERT_TRUE(zoneRules2 != nullptr);
+    std::unique_ptr<ZoneOffsetTransition> zoneTrans2 = zoneRules2->NextTransition(date);
+    ASSERT_TRUE(zoneTrans2 != nullptr);
+    milliseconds = zoneTrans2->GetMilliseconds();
+    result = dateFormat->Format(static_cast<int64_t>(milliseconds));
+    EXPECT_EQ(result, "April 5, 2025, 20:00:00 PDT");
+    std::unique_ptr<ZoneOffsetTransition> zoneOffsetTrans2 = zoneRules->NextTransition(milliseconds);
+    ASSERT_TRUE(zoneOffsetTrans2 != nullptr);
+    milliseconds = zoneOffsetTrans2->GetMilliseconds();
+    result = dateFormat->Format(static_cast<int64_t>(milliseconds));
+    EXPECT_EQ(result, "November 2, 2025, 1:00:00 PST");
     delete dateFormat;
 }
 } // namespace I18n
