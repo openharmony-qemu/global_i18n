@@ -244,8 +244,6 @@ ErrCode I18nServiceAbility::GetLanguageFromUserId(int32_t userId, std::string& l
     StartTask(pid);
 #ifdef SUPPORT_MULTI_USER
     language = MultiUsers::GetLanguageFromUserId(userId);
-#else
-    language = LocaleConfig::GetEffectiveLanguage();
 #endif
     FinishTask(pid);
     return ERR_OK;
