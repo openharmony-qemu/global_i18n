@@ -22,6 +22,8 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
+static thread_local napi_ref g_constructor = nullptr;
+
 CollatorAddon::CollatorAddon() : env_(nullptr) {}
 
 CollatorAddon::~CollatorAddon()
@@ -58,6 +60,13 @@ napi_value CollatorAddon::InitCollator(napi_env env, napi_value exports)
         HILOG_ERROR_I18N("Set property failed when InitCollator");
         return nullptr;
     }
+
+    status = napi_create_reference(env, constructor, 1, &g_constructor);
+    if (status != napi_ok || g_constructor == nullptr) {
+        HILOG_ERROR_I18N("tnapi_create_reference failed");
+        return nullptr;
+    }
+
     return exports;
 }
 
@@ -69,8 +78,16 @@ napi_value CollatorAddon::CollatorConstructor(napi_env env, napi_callback_info i
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
+        HILOG_ERROR_I18N("CollatorConstructor: napi_get_cb_info failed");
         return nullptr;
     }
+
+    napi_value new_target;
+    status = napi_get_new_target(env, info, &new_target);
+    if (status == napi_pending_exception || new_target == nullptr) {
+        return CreateCollatorWithoutNew(env, argc, argv);
+    }
+
     std::vector<std::string> localeTags;
     if (argc > 0) {
         int32_t code = 0;
@@ -98,6 +115,31 @@ napi_value CollatorAddon::CollatorConstructor(napi_env env, napi_callback_info i
         return nullptr;
     }
     return thisVar;
+}
+
+napi_value CollatorAddon::CreateCollatorWithoutNew(napi_env env, size_t argc, napi_value *argv)
+{
+    napi_value exception;
+    napi_status status = napi_get_and_clear_last_exception(env, &exception);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("CreateCollatorWithoutNew: napi_get_and_clear_last_exception failed");
+        return nullptr;
+    }
+
+    napi_value constructor = nullptr;
+    status = napi_get_reference_value(env, g_constructor, &constructor);
+    if (status != napi_ok || constructor == nullptr) {
+        HILOG_ERROR_I18N("CreateCollatorWithoutNew: napi_get_reference_value failed");
+        return nullptr;
+    }
+
+    napi_value instance = nullptr;
+    status = napi_new_instance(env, constructor, argc, argv, &instance);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("CreateCollatorWithoutNew: napi_new_instance failed");
+        return nullptr;
+    }
+    return instance;
 }
 
 bool CollatorAddon::InitCollatorContext(napi_env env, napi_callback_info info, std::vector<std::string> localeTags,
@@ -140,7 +182,7 @@ napi_value CollatorAddon::SupportedLocalesOf(napi_env env, napi_callback_info in
         std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argv[0], code);
         if (code != 0) {
             HILOG_ERROR_I18N("SupportedLocalesOf: JSUtils:GetLocaleArray failed.");
-            ErrorUtil::NapiThrowUndefined(env, "kValue is not String or Object.");
+            ErrorUtil::NapiThrowUndefined(env, "kValue is not String or Object");
             return JSUtils::CreateArray(env, resultLocales);
         }
         localeTags.assign(localeArray.begin(), localeArray.end());

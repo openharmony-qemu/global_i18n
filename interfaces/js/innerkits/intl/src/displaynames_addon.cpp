@@ -92,6 +92,7 @@ napi_value DisplayNamesAddon::DisplayNamesConstructor(napi_env env, napi_callbac
         napi_wrap(env, thisVar, reinterpret_cast<void *>(obj), DisplayNamesAddon::Destructor, nullptr, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("DisplayNamesConstructor: Wrap DisplayNamesAddon failed");
+        delete obj;
         return nullptr;
     }
     if (!obj->InitDisplayNamesContext(env, info, localeTags, map)) {
@@ -144,7 +145,7 @@ napi_value DisplayNamesAddon::SupportedLocalesOf(napi_env env, napi_callback_inf
         std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argv[0], code);
         if (code != 0) {
             HILOG_ERROR_I18N("DisplayNamesAddon::SupportedLocalesOf: JSUtils:GetLocaleArray failed.");
-            ErrorUtil::NapiThrowUndefined(env, "kValue is not String or Object.");
+            ErrorUtil::NapiThrowUndefined(env, "kValue is not String or Object");
             return JSUtils::CreateArray(env, resultLocales);
         }
         localeTags.assign(localeArray.begin(), localeArray.end());
