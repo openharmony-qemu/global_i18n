@@ -15,10 +15,7 @@
 #ifndef GLOBAL_I18N_TIMEZONE_ZONE_OFFSET_TRANSITION_H
 #define GLOBAL_I18N_TIMEZONE_ZONE_OFFSET_TRANSITION_H
 
-#include <string>
-#include <map>
-#include <vector>
-#include <set>
+#include <cstdint>
 
 namespace OHOS {
 namespace Global {

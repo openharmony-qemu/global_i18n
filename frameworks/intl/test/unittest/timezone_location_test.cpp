@@ -717,19 +717,19 @@ HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0001, TestSize.Level1)
  */
 HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0002, TestSize.Level1)
 {
-    //北京
+    // 北京
     vector<std::string> beijing = I18nTimeZone::GetTimezoneIdByLocation(116.3, 39.5);
     EXPECT_TRUE(beijing.size() == 1 && beijing[0] == "Asia/Shanghai");
-    //洛杉矶
+    // 洛杉矶
     vector<std::string> losAngeles = I18nTimeZone::GetTimezoneIdByLocation(-118.1, 34.0);
     EXPECT_TRUE(losAngeles.size() == 1 && losAngeles[0] == "America/Los_Angeles");
-    //里约热内卢
+    // 里约热内卢
     vector<std::string> rio = I18nTimeZone::GetTimezoneIdByLocation(-43.1, -22.5);
     EXPECT_TRUE(rio.size() == 1 && rio[0] == "America/Sao_Paulo");
-    //悉尼
+    // 悉尼
     vector<std::string> sydney = I18nTimeZone::GetTimezoneIdByLocation(150.5, -33.55);
     EXPECT_TRUE(sydney.size() == 1 && sydney[0] == "Australia/Sydney");
-    //乌鲁木齐
+    // 乌鲁木齐
     vector<std::string> urumqi = I18nTimeZone::GetTimezoneIdByLocation(87.7, 43.8);
     EXPECT_TRUE(urumqi.size() == 2);
     bool containsShanghai = false;
@@ -744,7 +744,7 @@ HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0002, TestSize.Level1)
     }
     EXPECT_TRUE(containsShanghai);
     EXPECT_TRUE(containsUrumqi);
-    //科伊艾克
+    // 科伊艾克
     vector<std::string> coyhaique = I18nTimeZone::GetTimezoneIdByLocation(-72.04, -45.34);
     EXPECT_TRUE(coyhaique.size() == 1 && coyhaique[0] == "America/Coyhaique");
 }

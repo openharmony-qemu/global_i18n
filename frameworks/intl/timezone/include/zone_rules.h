@@ -15,10 +15,7 @@
 #ifndef GLOBAL_I18N_TIMEZONE_ZONE_RULES_H
 #define GLOBAL_I18N_TIMEZONE_ZONE_RULES_H
 
-#include <string>
-#include <map>
-#include <vector>
-#include <set>
+#include <cstring>
 #include "unicode/basictz.h"
 #include "zone_offset_transition.h"
 
