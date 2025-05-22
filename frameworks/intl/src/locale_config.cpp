@@ -546,7 +546,6 @@ std::unordered_set<std::string> LocaleConfig::GetSystemLanguages()
     std::unordered_set<std::string> result(whiteLanguages);
     std::string developerMode = ReadSystemParameter(DEVELOPER_MODE_KEY, CONFIG_LEN);
     if (developerMode.compare("true") == 0) {
-        result.insert("en");
         result.insert("ar");
     }
     std::unordered_set<string> blockedLanguages = GetBlockedLanguages();
