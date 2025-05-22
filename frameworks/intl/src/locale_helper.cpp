@@ -63,19 +63,6 @@ bool IsAsciiAlpha(char ch)
     return InRange(ch, 'A', 'Z') || InRange(ch, 'a', 'z');
 }
 
-bool IsAlpha(const std::string &str, size_t min, size_t max)
-{
-    if (!InRange(str.length(), min, max)) {
-        return false;
-    }
-    for (char c : str) {
-        if (!IsAsciiAlpha(c)) {
-            return false;
-        }
-    }
-    return true;
-}
-
 bool IsAlphanum(const std::string &str, size_t min, size_t max)
 {
     if (!InRange(str.length(), min, max)) {
@@ -102,17 +89,19 @@ bool IsVariantSubtag(const std::string &value)
 
 bool IsLanguageSubtag(const std::string &value)
 {
-    return IsAlpha(value, INTL_INDEX_TWO, INTL_INDEX_THREE) || IsAlpha(value, INTL_INDEX_FIVE, INTL_INDEX_EIGHT);
+    return LocaleHelper::IsAlpha(value, INTL_INDEX_TWO, INTL_INDEX_THREE) ||
+        LocaleHelper::IsAlpha(value, INTL_INDEX_FIVE, INTL_INDEX_EIGHT);
 }
 
 bool IsScriptSubtag(const std::string &value)
 {
-    return IsAlpha(value, INTL_INDEX_FOUR, INTL_INDEX_FOUR);
+    return LocaleHelper::IsAlpha(value, INTL_INDEX_FOUR, INTL_INDEX_FOUR);
 }
 
 bool IsRegionSubtag(const std::string &value)
 {
-    return IsAlpha(value, INTL_INDEX_TWO, INTL_INDEX_TWO) || IsDigit(value, INTL_INDEX_THREE, INTL_INDEX_THREE);
+    return LocaleHelper::IsAlpha(value, INTL_INDEX_TWO, INTL_INDEX_TWO) ||
+        IsDigit(value, INTL_INDEX_THREE, INTL_INDEX_THREE);
 }
 
 bool IsExtensionSingleton(const std::string &value)
@@ -366,6 +355,19 @@ bool LocaleHelper::DealwithLanguageTag(const std::vector<std::string> &container
             return true;
         }
         if (!IsVariantSubtag(containers[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LocaleHelper::IsAlpha(const std::string &str, size_t min, size_t max)
+{
+    if (!InRange(str.length(), min, max)) {
+        return false;
+    }
+    for (char c : str) {
+        if (!IsAsciiAlpha(c)) {
             return false;
         }
     }

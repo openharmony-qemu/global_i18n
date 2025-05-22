@@ -50,6 +50,8 @@ public:
         int32_t& code);
     static napi_value CreateArray(napi_env env, const std::vector<std::string>& value);
     static napi_value CreateString(napi_env env, const std::string &str);
+    static bool GetPropertyFormObject(napi_env env, napi_value object, const std::string& property,
+        napi_valuetype type, std::string& value);
 };
 } // namespace I18n
 } // namespace Global
