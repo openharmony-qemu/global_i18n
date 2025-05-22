@@ -1945,19 +1945,24 @@ HWTEST_F(IntlTest, IntlFuncTest0046, TestSize.Level1)
     EXPECT_EQ(result, "November 2, 2025, 1:00:00 PST");
 
     tzId = "America/Santiago";
+    options["timeZone"] = tzId;
+    DateTimeFormat *dateFormat2 = new (std::nothrow) DateTimeFormat(locales, options);
     std::unique_ptr<ZoneRules> zoneRules2 = std::make_unique<ZoneRules>(tzId);
     ASSERT_TRUE(zoneRules2 != nullptr);
     std::unique_ptr<ZoneOffsetTransition> zoneTrans2 = zoneRules2->NextTransition(date);
     ASSERT_TRUE(zoneTrans2 != nullptr);
     milliseconds = zoneTrans2->GetMilliseconds();
-    result = dateFormat->Format(static_cast<int64_t>(milliseconds));
-    EXPECT_EQ(result, "April 5, 2025, 20:00:00 PDT");
-    std::unique_ptr<ZoneOffsetTransition> zoneOffsetTrans2 = zoneRules->NextTransition(milliseconds);
+    result = dateFormat2->Format(static_cast<int64_t>(milliseconds));
+    EXPECT_EQ(result, "April 5, 2025, 23:00:00 GMT-4");
+    std::unique_ptr<ZoneOffsetTransition> zoneOffsetTrans2 = zoneRules2->NextTransition(milliseconds);
     ASSERT_TRUE(zoneOffsetTrans2 != nullptr);
     milliseconds = zoneOffsetTrans2->GetMilliseconds();
-    result = dateFormat->Format(static_cast<int64_t>(milliseconds));
-    EXPECT_EQ(result, "November 2, 2025, 1:00:00 PST");
+    result = dateFormat2->Format(static_cast<int64_t>(milliseconds));
+    EXPECT_EQ(result, "September 7, 2025, 1:00:00 GMT-3");
+    EXPECT_EQ(zoneOffsetTrans2->GetOffsetAfter(), -10800000);
+    EXPECT_EQ(zoneOffsetTrans2->GetOffsetBefore(), -14400000);
     delete dateFormat;
+    delete dateFormat2;
 }
 } // namespace I18n
 } // namespace Global
