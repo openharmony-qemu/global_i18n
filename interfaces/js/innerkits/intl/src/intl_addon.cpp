@@ -1169,5 +1169,6 @@ bool RegisterIntl(napi_env env)
         HILOG_ERROR_I18N("RegisterIntl: Set property failed when Init Intl module.");
         return false;
     }
+    HILOG_INFO_I18N("RegisterIntl: Replace buildin Intl Success.");
     return true;
 }

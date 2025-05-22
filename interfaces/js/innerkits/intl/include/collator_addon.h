@@ -32,7 +32,7 @@ public:
     virtual ~CollatorAddon();
 
 private:
-    static napi_value CreateCollator(napi_env env, size_t argc, napi_value *argv);
+    static napi_value CreateCollatorWithoutNew(napi_env env, size_t argc, napi_value *argv);
     static napi_value CollatorConstructor(napi_env env, napi_callback_info info);
     static napi_value SupportedLocalesOf(napi_env env, napi_callback_info info);
     static napi_value CompareString(napi_env env, napi_callback_info info);
