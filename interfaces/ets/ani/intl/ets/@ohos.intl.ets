@@ -30,7 +30,6 @@ namespace intl {
         numberingSystem?: string;
         numeric?: boolean;
         caseFirst?: string;
-        locale?: string;
     }
 
     export interface DateTimeOptions {
