@@ -97,6 +97,8 @@ const std::string LocaleConfig::TEMPERATURE_UNIT_KEY = "mu";
 const std::string LocaleConfig::WEEK_DAY_KEY = "fw";
 const std::string LocaleConfig::TIMEZONE_KEY = "persist.time.timezone";
 const std::string LocaleConfig::DEFAULT_TIMEZONE = "GMT";
+const std::string LocaleConfig::PSEUDO_REGION_XA = "XA";
+const std::string LocaleConfig::PSEUDO_REGION_XB = "XB";
 unordered_set<string> LocaleConfig::supportedLocales;
 unordered_set<string> LocaleConfig::supportedLocalesV15;
 unordered_set<string> LocaleConfig::supportLocales;
@@ -546,7 +548,8 @@ std::unordered_set<std::string> LocaleConfig::GetSystemLanguages()
     std::unordered_set<std::string> result(whiteLanguages);
     std::string developerMode = ReadSystemParameter(DEVELOPER_MODE_KEY, CONFIG_LEN);
     if (developerMode.compare("true") == 0) {
-        result.insert("ar");
+        result.insert("en-XA");
+        result.insert("ar-XB");
     }
     std::unordered_set<string> blockedLanguages = GetBlockedLanguages();
     Expunge(result, blockedLanguages);
@@ -571,11 +574,6 @@ const unordered_set<string>& LocaleConfig::GetSupportedRegions()
 std::unordered_set<std::string> LocaleConfig::GetSystemCountries(const std::string& language)
 {
     std::unordered_set<std::string> result(supportedRegions);
-    std::string developerMode = ReadSystemParameter(DEVELOPER_MODE_KEY, CONFIG_LEN);
-    if (developerMode.compare("true") == 0) {
-        result.insert("XA");
-        result.insert("XB");
-    }
     std::unordered_set<std::string> blockedRegion = LocaleConfig::GetBlockedRegions(language);
     Expunge(result, blockedRegion);
     return result;
@@ -1754,6 +1752,8 @@ std::string LocaleConfig::UpdateLanguageOfLocale(const std::string &languageTag)
         return systemLocaleTag;
     }
     std::string regionTag = systemLocale.getCountry();
+    const char* country = languageLocale.getCountry();
+    regionTag = GetPseudoCountryTag(country, regionTag);
     std::string extendParamTag;
     size_t pos = systemLocaleTag.find(EXT_PARAM_KEY);
     if (pos != std::string::npos) {
@@ -1761,6 +1761,20 @@ std::string LocaleConfig::UpdateLanguageOfLocale(const std::string &languageTag)
     }
     // Combine above elements.
     return CreateLocale(langTag, scriptTag, regionTag, extendParamTag);
+}
+
+std::string LocaleConfig::GetPseudoCountryTag(const char* countryTag, std::string &regionTag)
+{
+    if (countryTag == nullptr) {
+        return regionTag;
+    }
+    if (PSEUDO_REGION_XA.compare(countryTag) == 0) {
+        return PSEUDO_REGION_XA;
+    }
+    if (PSEUDO_REGION_XB.compare(countryTag) == 0) {
+        return PSEUDO_REGION_XB;
+    }
+    return regionTag;
 }
 
 std::string LocaleConfig::CreateLocale(const std::string &languageTag, const std::string &scriptTag,
