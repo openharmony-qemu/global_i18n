@@ -29,7 +29,7 @@ public:
     ~ZoneRulesAddon();
     static void Destructor(napi_env env, void *nativeObject, void *hint);
     static napi_value InitI18nZoneRules(napi_env env, napi_value exports);
-    static napi_value GetZoneRulesObject(napi_env env, napi_callback_info info, std::string tzId);
+    static napi_value GetZoneRulesObject(napi_env env, std::string tzId);
     static napi_value NextTransition(napi_env env, napi_callback_info info);
 
 private:

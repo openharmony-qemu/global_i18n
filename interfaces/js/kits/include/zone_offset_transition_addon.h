@@ -29,8 +29,7 @@ public:
     ~ZoneOffsetTransitionAddon();
     static void Destructor(napi_env env, void *nativeObject, void *hint);
     static napi_value InitZoneOffsetTransition(napi_env env, napi_value exports);
-    static napi_value GetZoneOffsetTransObject(napi_env env, napi_callback_info info,
-        ZoneOffsetTransition* zoneOffsetTrans);
+    static napi_value GetZoneOffsetTransObject(napi_env env, ZoneOffsetTransition* zoneOffsetTrans);
     static napi_value GetMilliseconds(napi_env env, napi_callback_info info);
     static napi_value GetOffsetAfter(napi_env env, napi_callback_info info);
     static napi_value GetOffsetBefore(napi_env env, napi_callback_info info);

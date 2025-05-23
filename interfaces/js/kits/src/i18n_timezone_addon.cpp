@@ -502,11 +502,12 @@ napi_value I18nTimeZoneAddon::GetOffset(napi_env env, napi_callback_info info)
 napi_value I18nTimeZoneAddon::GetZoneRules(napi_env env, napi_callback_info info)
 {
     size_t argc = 1;
-    napi_value argv[1] = { 0 };
+    napi_value argv[1] = { nullptr };
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
+        HILOG_ERROR_I18N("GetZoneRules: Get param info failed");
         return nullptr;
     }
     I18nTimeZoneAddon *obj = nullptr;
@@ -516,7 +517,7 @@ napi_value I18nTimeZoneAddon::GetZoneRules(napi_env env, napi_callback_info info
         return nullptr;
     }
     std::string tzid = obj->timezone_->GetID();
-    return ZoneRulesAddon::GetZoneRulesObject(env, info, tzid);
+    return ZoneRulesAddon::GetZoneRulesObject(env, tzid);
 }
 
 napi_value I18nTimeZoneAddon::StaticGetTimeZone(napi_env env, napi_value *argv, bool isZoneID)

@@ -70,8 +70,7 @@ napi_value ZoneOffsetTransitionAddon::I18nZoneOffsetTransitionConstructor(napi_e
     size_t argc = 3;
     napi_value argv[3] = { nullptr };
     napi_value thisVar = nullptr;
-    void *data = nullptr;
-    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("ZoneOffsetTransitionAddon: Get parameter info failed");
         return nullptr;
@@ -101,47 +100,48 @@ napi_value ZoneOffsetTransitionAddon::I18nZoneOffsetTransitionConstructor(napi_e
     status = napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()),
         ZoneOffsetTransitionAddon::Destructor, nullptr, nullptr);
     if (status != napi_ok) {
+        HILOG_ERROR_I18N("ZoneOffsetTransitionAddon: Wrap ZoneOffsetTransition failed");
         return nullptr;
     }
     obj->zoneOffsetTransition_ = std::make_unique<ZoneOffsetTransition>(milliSecond, offsetBefore, offsetAfter);
     if (!obj->zoneOffsetTransition_) {
+        HILOG_ERROR_I18N("ZoneOffsetTransitionAddon: Create ZoneOffsetTransition failed");
         return nullptr;
     }
     obj.release();
     return thisVar;
 }
 
-napi_value ZoneOffsetTransitionAddon::GetZoneOffsetTransObject(napi_env env, napi_callback_info info,
-    ZoneOffsetTransition* zoneOffsetTrans)
+napi_value ZoneOffsetTransitionAddon::GetZoneOffsetTransObject(napi_env env, ZoneOffsetTransition* zoneOffsetTrans)
 {
-    size_t argc = 3;
-    napi_value argv[3] = { nullptr };
-    napi_value param0 = nullptr;
-    napi_status status = napi_create_double(env, zoneOffsetTrans->GetMilliseconds(), &param0);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("ErrorUtil::NapiThrow: create napi double failed");
-        return nullptr;
-    }
-    argv[0] = param0;
-    napi_value param1 = nullptr;
-    status = napi_create_int32(env, zoneOffsetTrans->GetOffsetBefore(), &param1);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("ErrorUtil::NapiThrow: create int32 failed");
-        return nullptr;
-    }
-    argv[1] = param1;
-    napi_value param2 = nullptr;
-    status = napi_create_int32(env, zoneOffsetTrans->GetOffsetAfter(), &param2);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("ErrorUtil::NapiThrow: create int32 failed");
-        return nullptr;
-    }
-    argv[2] = param2;
-    napi_value constructor = nullptr;
     if (g_zoneOffsetTransConstructor == nullptr) {
         HILOG_ERROR_I18N("GetZoneOffsetTransObject: g_zoneOffsetTransConstructor is nullptr");
         return nullptr;
     }
+    size_t argc = 3;
+    napi_value argv[3] = { nullptr };
+    napi_value milliSeconds = nullptr;
+    napi_status status = napi_create_double(env, zoneOffsetTrans->GetMilliseconds(), &milliSeconds);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("ErrorUtil::NapiThrow: create napi double failed");
+        return nullptr;
+    }
+    argv[0] = milliSeconds;
+    napi_value offsetBefore = nullptr;
+    status = napi_create_int32(env, zoneOffsetTrans->GetOffsetBefore(), &offsetBefore);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("ErrorUtil::NapiThrow: create int32 failed");
+        return nullptr;
+    }
+    argv[1] = offsetBefore;
+    napi_value offsetAfter = nullptr;
+    status = napi_create_int32(env, zoneOffsetTrans->GetOffsetAfter(), &offsetAfter);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("ErrorUtil::NapiThrow: create int32 failed");
+        return nullptr;
+    }
+    argv[2] = offsetAfter;
+    napi_value constructor = nullptr;
     status = napi_get_reference_value(env, g_zoneOffsetTransConstructor, &constructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Failed to create reference of normalizer Constructor");
@@ -161,9 +161,9 @@ napi_value ZoneOffsetTransitionAddon::GetMilliseconds(napi_env env, napi_callbac
     size_t argc = 0;
     napi_value *argv = nullptr;
     napi_value thisVar = nullptr;
-    void *data = nullptr;
-    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (status != napi_ok) {
+        HILOG_ERROR_I18N("GetMilliseconds: Get parameter info failed");
         return nullptr;
     }
     ZoneOffsetTransitionAddon *obj = nullptr;
@@ -187,9 +187,9 @@ napi_value ZoneOffsetTransitionAddon::GetOffsetAfter(napi_env env, napi_callback
     size_t argc = 0;
     napi_value *argv = nullptr;
     napi_value thisVar = nullptr;
-    void *data = nullptr;
-    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (status != napi_ok) {
+        HILOG_ERROR_I18N("GetOffsetAfter: Get parameter info failed");
         return nullptr;
     }
     ZoneOffsetTransitionAddon *obj = nullptr;
@@ -207,9 +207,9 @@ napi_value ZoneOffsetTransitionAddon::GetOffsetBefore(napi_env env, napi_callbac
     size_t argc = 0;
     napi_value *argv = nullptr;
     napi_value thisVar = nullptr;
-    void *data = nullptr;
-    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (status != napi_ok) {
+        HILOG_ERROR_I18N("GetOffsetBefore: Get parameter info failed");
         return nullptr;
     }
     ZoneOffsetTransitionAddon *obj = nullptr;

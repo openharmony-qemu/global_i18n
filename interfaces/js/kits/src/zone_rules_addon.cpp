@@ -70,9 +70,9 @@ napi_value ZoneRulesAddon::ZoneRulesConstructor(napi_env env, napi_callback_info
     size_t argc = 1;
     napi_value argv[1] = { nullptr };
     napi_value thisVar = nullptr;
-    void *data = nullptr;
-    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (status != napi_ok) {
+        HILOG_ERROR_I18N("ZoneRulesConstructor: Get parameter info failed");
         return nullptr;
     }
     std::string tzId;
@@ -82,7 +82,11 @@ napi_value ZoneRulesAddon::ZoneRulesConstructor(napi_env env, napi_callback_info
         return nullptr;
     }
     status = napi_typeof(env, argv[0], &valueType);
-    if (status != napi_ok || valueType != napi_valuetype::napi_string) {
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("ZoneRulesConstructor: Get param type failed.");
+        return nullptr;
+    }
+    if (valueType != napi_valuetype::napi_string) {
         HILOG_ERROR_I18N("ZoneRulesConstructor: Param type error.");
         return nullptr;
     }
@@ -93,15 +97,18 @@ napi_value ZoneRulesAddon::ZoneRulesConstructor(napi_env env, napi_callback_info
     }
     std::unique_ptr<ZoneRulesAddon> obj = std::make_unique<ZoneRulesAddon>();
     if (obj == nullptr) {
+        HILOG_ERROR_I18N("ZoneRulesConstructor: Create ZoneRulesAddon failed.");
         return nullptr;
     }
     status =
         napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), ZoneRulesAddon::Destructor, nullptr, nullptr);
     if (status != napi_ok) {
+        HILOG_ERROR_I18N("ZoneRulesConstructor: warp ZoneRulesAddon failed.");
         return nullptr;
     }
     obj->zoneRules_ = std::make_unique<ZoneRules>(tzId);
     if (!obj->zoneRules_) {
+        HILOG_ERROR_I18N("ZoneRulesConstructor: Param type error.");
         return nullptr;
     }
     obj.release();
@@ -113,9 +120,9 @@ napi_value ZoneRulesAddon::NextTransition(napi_env env, napi_callback_info info)
     size_t argc = 1;
     napi_value argv[1] = { nullptr };
     napi_value thisVar = nullptr;
-    void *data = nullptr;
-    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (status != napi_ok) {
+        HILOG_ERROR_I18N("ZoneRulesAddon::NextTransition: Get parameter info failed");
         return nullptr;
     }
     ZoneRulesAddon *obj = nullptr;
@@ -135,7 +142,7 @@ napi_value ZoneRulesAddon::NextTransition(napi_env env, napi_callback_info info)
         }
         zoneOffsetTrans = obj->zoneRules_->NextTransition(paramDate);
     }
-    return ZoneOffsetTransitionAddon::GetZoneOffsetTransObject(env, info, zoneOffsetTrans.get());
+    return ZoneOffsetTransitionAddon::GetZoneOffsetTransObject(env, zoneOffsetTrans.get());
 }
 
 double ZoneRulesAddon::GetFirstParamter(napi_env env, napi_value argValue, int32_t &errorCode)
@@ -147,7 +154,12 @@ double ZoneRulesAddon::GetFirstParamter(napi_env env, napi_value argValue, int32
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_status status = napi_typeof(env, argValue, &valueType);
-    if (status != napi_ok || valueType != napi_valuetype::napi_number) {
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("ZoneRulesAddon::GetFirstParamter, get parameter type failed.");
+        errorCode = -1;
+        return 0;
+    }
+    if (valueType != napi_valuetype::napi_number) {
         HILOG_ERROR_I18N("ZoneRulesAddon::GetFirstParamter, parameter type error.");
         errorCode = -1;
         return 0;
@@ -162,22 +174,22 @@ double ZoneRulesAddon::GetFirstParamter(napi_env env, napi_value argValue, int32
     return date;
 }
 
-napi_value ZoneRulesAddon::GetZoneRulesObject(napi_env env, napi_callback_info info, std::string tzId)
+napi_value ZoneRulesAddon::GetZoneRulesObject(napi_env env, std::string tzId)
 {
-    size_t argc = 1;
-    napi_value argv[1] = { nullptr };
-    napi_value param0 = nullptr;
-    napi_status status = napi_create_string_latin1(env, tzId.c_str(), NAPI_AUTO_LENGTH, &param0);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("ErrorUtil::NapiThrow: create string failed");
-        return nullptr;
-    }
-    argv[0] = param0;
-    napi_value constructor = nullptr;
     if (g_zoneRulesConstructor == nullptr) {
         HILOG_ERROR_I18N("ZoneRulesAddon::GetZoneRulesObject: g_zoneRulesConstructor is nullptr");
         return nullptr;
     }
+    size_t argc = 1;
+    napi_value argv[1] = { nullptr };
+    napi_value param = nullptr;
+    napi_status status = napi_create_string_latin1(env, tzId.c_str(), NAPI_AUTO_LENGTH, &param);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("ErrorUtil::NapiThrow: create string failed");
+        return nullptr;
+    }
+    argv[0] = param;
+    napi_value constructor = nullptr;
     status = napi_get_reference_value(env, g_zoneRulesConstructor, &constructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Failed to create reference of normalizer Constructor");
