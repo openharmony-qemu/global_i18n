@@ -31,7 +31,6 @@ public:
 
 private:
     std::string tzId;
-    static const int32_t YEAR_ADDITION = 1900; // 1900 is tm_year start
     icu::BasicTimeZone *btz;
     void InitBasicTimeZone();
 };

@@ -122,34 +122,34 @@ napi_value ZoneOffsetTransitionAddon::GetZoneOffsetTransObject(napi_env env, Zon
     napi_value argv[3] = { nullptr };
     napi_value milliSeconds = nullptr;
     napi_status status = napi_create_double(env, zoneOffsetTrans->GetMilliseconds(), &milliSeconds);
-    if (status != napi_ok) {
+    if (status != napi_ok || milliSeconds == nullptr) {
         HILOG_ERROR_I18N("ErrorUtil::NapiThrow: create napi double failed");
         return nullptr;
     }
     argv[0] = milliSeconds;
     napi_value offsetBefore = nullptr;
     status = napi_create_int32(env, zoneOffsetTrans->GetOffsetBefore(), &offsetBefore);
-    if (status != napi_ok) {
+    if (status != napi_ok || offsetBefore == nullptr) {
         HILOG_ERROR_I18N("ErrorUtil::NapiThrow: create int32 failed");
         return nullptr;
     }
     argv[1] = offsetBefore;
     napi_value offsetAfter = nullptr;
     status = napi_create_int32(env, zoneOffsetTrans->GetOffsetAfter(), &offsetAfter);
-    if (status != napi_ok) {
+    if (status != napi_ok || offsetAfter == nullptr) {
         HILOG_ERROR_I18N("ErrorUtil::NapiThrow: create int32 failed");
         return nullptr;
     }
     argv[2] = offsetAfter;
     napi_value constructor = nullptr;
     status = napi_get_reference_value(env, g_zoneOffsetTransConstructor, &constructor);
-    if (status != napi_ok) {
+    if (status != napi_ok || constructor == nullptr) {
         HILOG_ERROR_I18N("Failed to create reference of normalizer Constructor");
         return nullptr;
     }
     napi_value result = nullptr;
     status = napi_new_instance(env, constructor, argc, argv, &result);
-    if (status != napi_ok) {
+    if (status != napi_ok || result == nullptr) {
         HILOG_ERROR_I18N("create normalizer instance failed");
         return nullptr;
     }
@@ -173,9 +173,9 @@ napi_value ZoneOffsetTransitionAddon::GetMilliseconds(napi_env env, napi_callbac
         return nullptr;
     }
     double time = obj->zoneOffsetTransition_->GetMilliseconds();
-    napi_value result;
+    napi_value result = nullptr;
     status = napi_create_double(env, time, &result);
-    if (status != napi_ok) {
+    if (status != napi_ok || result == nullptr) {
         HILOG_ERROR_I18N("GetMilliseconds: create double js variable failed.");
         return nullptr;
     }

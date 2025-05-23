@@ -191,13 +191,13 @@ napi_value ZoneRulesAddon::GetZoneRulesObject(napi_env env, std::string tzId)
     argv[0] = param;
     napi_value constructor = nullptr;
     status = napi_get_reference_value(env, g_zoneRulesConstructor, &constructor);
-    if (status != napi_ok) {
+    if (status != napi_ok || constructor == nullptr) {
         HILOG_ERROR_I18N("Failed to create reference of normalizer Constructor");
         return nullptr;
     }
     napi_value result = nullptr;
     status = napi_new_instance(env, constructor, argc, argv, &result);
-    if (status != napi_ok) {
+    if (status != napi_ok || result == nullptr) {
         HILOG_ERROR_I18N("create normalizer instance failed");
         return nullptr;
     }
