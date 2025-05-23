@@ -158,6 +158,7 @@ private:
     static const char *SUPPORT_LOCALES_PATH;
     static const char *SUPPORT_LOCALES_NAME;
     static const char *DEFAULT_LOCALE;
+    static const char *DEVELOPER_MODE_KEY;
     static const char *supportLocalesTag;
     static const char *LANG_PATH;
     static const char *rootTag;
@@ -183,6 +184,8 @@ private:
     static const std::string NUMBER_SYSTEM_KEY;
     static const std::string TEMPERATURE_UNIT_KEY;
     static const std::string WEEK_DAY_KEY;
+    static const std::string PSEUDO_REGION_XA;
+    static const std::string PSEUDO_REGION_XB;
 
     static const std::unordered_set<std::string>& GetSupportedLocales();
     static const std::unordered_set<std::string>& GetSupportedLocalesV15();
@@ -209,6 +212,7 @@ private:
     static bool Is24HourLocale(const std::string& systemLocale);
     static bool HasDesignator(const std::string& inFormat, const char designator);
     static void QueryUpgradeLocale();
+    static std::string GetPseudoCountryTag(const char* countryTag, std::string &regionTag);
 
 #ifdef SUPPORT_GRAPHICS
     /**
