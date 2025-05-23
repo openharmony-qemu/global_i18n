@@ -95,14 +95,15 @@ napi_value ZoneRulesAddon::ZoneRulesConstructor(napi_env env, napi_callback_info
     if (code != 0) {
         return nullptr;
     }
-    std::unique_ptr<ZoneRulesAddon> obj = std::make_unique<ZoneRulesAddon>();
+    ZoneRulesAddon* obj = new (std::nothrow) ZoneRulesAddon();
     if (obj == nullptr) {
         HILOG_ERROR_I18N("ZoneRulesConstructor: Create ZoneRulesAddon failed.");
         return nullptr;
     }
     status =
-        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), ZoneRulesAddon::Destructor, nullptr, nullptr);
+        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj), ZoneRulesAddon::Destructor, nullptr, nullptr);
     if (status != napi_ok) {
+        delete obj;
         HILOG_ERROR_I18N("ZoneRulesConstructor: warp ZoneRulesAddon failed.");
         return nullptr;
     }
@@ -111,7 +112,6 @@ napi_value ZoneRulesAddon::ZoneRulesConstructor(napi_env env, napi_callback_info
         HILOG_ERROR_I18N("ZoneRulesConstructor: Param type error.");
         return nullptr;
     }
-    obj.release();
     return thisVar;
 }
 

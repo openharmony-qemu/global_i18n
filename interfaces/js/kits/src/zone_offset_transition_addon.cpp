@@ -92,14 +92,15 @@ napi_value ZoneOffsetTransitionAddon::I18nZoneOffsetTransitionConstructor(napi_e
     if (code != 0) {
         return nullptr;
     }
-    std::unique_ptr<ZoneOffsetTransitionAddon> obj = std::make_unique<ZoneOffsetTransitionAddon>();
+    ZoneOffsetTransitionAddon* obj = new (std::nothrow) ZoneOffsetTransitionAddon();
     if (obj == nullptr) {
         HILOG_ERROR_I18N("ZoneOffsetTransitionAddon: Create ZoneOffsetTransitionAddon object failed");
         return nullptr;
     }
-    status = napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()),
+    status = napi_wrap(env, thisVar, reinterpret_cast<void *>(obj),
         ZoneOffsetTransitionAddon::Destructor, nullptr, nullptr);
     if (status != napi_ok) {
+        delete obj;
         HILOG_ERROR_I18N("ZoneOffsetTransitionAddon: Wrap ZoneOffsetTransition failed");
         return nullptr;
     }
@@ -108,7 +109,6 @@ napi_value ZoneOffsetTransitionAddon::I18nZoneOffsetTransitionConstructor(napi_e
         HILOG_ERROR_I18N("ZoneOffsetTransitionAddon: Create ZoneOffsetTransition failed");
         return nullptr;
     }
-    obj.release();
     return thisVar;
 }
 
