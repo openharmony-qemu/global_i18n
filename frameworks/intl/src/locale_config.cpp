@@ -1752,8 +1752,7 @@ std::string LocaleConfig::UpdateLanguageOfLocale(const std::string &languageTag)
         return systemLocaleTag;
     }
     std::string regionTag = systemLocale.getCountry();
-    const char* country = languageLocale.getCountry();
-    regionTag = GetPseudoCountryTag(country, regionTag);
+    regionTag = GetPseudoCountryTag(languageLocale.getCountry(), regionTag);
     std::string extendParamTag;
     size_t pos = systemLocaleTag.find(EXT_PARAM_KEY);
     if (pos != std::string::npos) {
