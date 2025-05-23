@@ -407,6 +407,56 @@ napi_value JSUtils::CreateString(napi_env env, const std::string &str)
     }
     return result;
 }
+
+bool JSUtils::GetPropertyFormObject(napi_env env, napi_value object, const std::string& property,
+    napi_valuetype type, std::string& value)
+{
+    bool hasProperty = false;
+    napi_status status = napi_has_named_property(env, object, property.c_str(), &hasProperty);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("JSUtils::GetPropertyFormObject: Call napi_has_named_property failed, "
+            "property is %{public}s.", property.c_str());
+        return false;
+    }
+    if (!hasProperty) {
+        return false;
+    }
+    napi_value propertyValue = nullptr;
+    status = napi_get_named_property(env, object, property.c_str(), &propertyValue);
+    if (status != napi_ok || propertyValue == nullptr) {
+        HILOG_ERROR_I18N("JSUtils::GetPropertyFormObject: Call napi_get_named_property failed, "
+            "property is %{public}s.", property.c_str());
+        return false;
+    }
+    switch (type) {
+        case napi_valuetype::napi_boolean:
+        {
+            bool boolValue = false;
+            status = napi_get_value_bool(env, propertyValue, &boolValue);
+            if (status != napi_ok) {
+                HILOG_ERROR_I18N("JSUtils::GetPropertyFormObject: Get bool failed, property is %{public}s.",
+                    property.c_str());
+                return false;
+            }
+            value = boolValue ? "true" : "false";
+            break;
+        }
+        case napi_valuetype::napi_string:
+        {
+            int32_t code = 0;
+            value = JSUtils::GetString(env, propertyValue, code);
+            if (code != 0) {
+                HILOG_ERROR_I18N("JSUtils::GetPropertyFormObject: Get string failed, property is %{public}s.",
+                    property.c_str());
+                return false;
+            }
+            break;
+        }
+        default:
+            return false;
+    }
+    return true;
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

@@ -23,6 +23,7 @@
 #include "displaynames_addon.h"
 #include "error_util.h"
 #include "i18n_hilog.h"
+#include "intl_locale_addon.h"
 #include "js_utils.h"
 #include "locale_info_addon.h"
 #include "number_format_addon.h"
@@ -1116,7 +1117,7 @@ bool SetBuildInIntl(napi_env &env, napi_value &global, napi_value &intlModule)
         return false;
     }
 
-    const std::vector<std::string> buildinClasses = {"DateTimeFormat", "DurationFormat", "ListFormat", "Locale",
+    const std::vector<std::string> buildinClasses = {"DateTimeFormat", "DurationFormat", "ListFormat",
         "NumberFormat", "PluralRules", "RelativeTimeFormat", "Segmenter", "getCanonicalLocales", "supportedValuesOf"};
 
     for (std::string buildinClass : buildinClasses) {
@@ -1157,6 +1158,12 @@ bool RegisterIntl(napi_env env)
     intlModule = OHOS::Global::I18n::DisplayNamesAddon::InitDisplayNames(env, intlModule);
     if (intlModule == nullptr) {
         HILOG_ERROR_I18N("RegisterIntl: init Intl DisplayNames Module failed");
+        return false;
+    }
+
+    intlModule = OHOS::Global::I18n::IntlLocaleAddon::InitIntlLocale(env, intlModule);
+    if (intlModule == nullptr) {
+        HILOG_ERROR_I18N("RegisterIntl: init Intl Locale Module failed");
         return false;
     }
 
