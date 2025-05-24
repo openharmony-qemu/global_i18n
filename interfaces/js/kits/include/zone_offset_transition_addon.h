@@ -36,6 +36,7 @@ public:
 
 private:
     static napi_value I18nZoneOffsetTransitionConstructor(napi_env env, napi_callback_info info);
+
     static const size_t CONSTRUCTOR_ARGS_COUNT = 3;    // Function input parameter count
     std::unique_ptr<ZoneOffsetTransition> zoneOffsetTransition_ = nullptr;
 };
