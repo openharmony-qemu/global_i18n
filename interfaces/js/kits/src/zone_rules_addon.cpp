@@ -109,6 +109,7 @@ napi_value ZoneRulesAddon::ZoneRulesConstructor(napi_env env, napi_callback_info
     }
     obj->zoneRules_ = std::make_unique<ZoneRules>(tzId);
     if (!obj->zoneRules_) {
+        delete obj;
         HILOG_ERROR_I18N("ZoneRulesConstructor: Param type error.");
         return nullptr;
     }

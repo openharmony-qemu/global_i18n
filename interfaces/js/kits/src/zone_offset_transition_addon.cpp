@@ -106,6 +106,7 @@ napi_value ZoneOffsetTransitionAddon::I18nZoneOffsetTransitionConstructor(napi_e
     }
     obj->zoneOffsetTransition_ = std::make_unique<ZoneOffsetTransition>(milliSecond, offsetBefore, offsetAfter);
     if (!obj->zoneOffsetTransition_) {
+        delete obj;
         HILOG_ERROR_I18N("ZoneOffsetTransitionAddon: Create ZoneOffsetTransition failed");
         return nullptr;
     }
@@ -120,13 +121,13 @@ napi_value ZoneOffsetTransitionAddon::GetZoneOffsetTransObject(napi_env env, Zon
     }
     size_t argc = 3;
     napi_value argv[3] = { nullptr };
-    napi_value milliSeconds = nullptr;
-    napi_status status = napi_create_double(env, zoneOffsetTrans->GetMilliseconds(), &milliSeconds);
-    if (status != napi_ok || milliSeconds == nullptr) {
+    napi_value milliseconds = nullptr;
+    napi_status status = napi_create_double(env, zoneOffsetTrans->GetMilliseconds(), &milliseconds);
+    if (status != napi_ok || milliseconds == nullptr) {
         HILOG_ERROR_I18N("ErrorUtil::NapiThrow: create napi double failed");
         return nullptr;
     }
-    argv[0] = milliSeconds;
+    argv[0] = milliseconds;
     napi_value offsetBefore = nullptr;
     status = napi_create_int32(env, zoneOffsetTrans->GetOffsetBefore(), &offsetBefore);
     if (status != napi_ok || offsetBefore == nullptr) {
