@@ -801,24 +801,33 @@ napi_value I18nAddon::GetUnicodeWrappedFilePath(napi_env env, napi_callback_info
             return nullptr;
         }
     }
-    LocaleInfoAddon *obj = nullptr;
-    if (argc == 3) { // 3 is parameter count
-        napi_status status = napi_unwrap(env,
-            argv[2], reinterpret_cast<void **>(&obj)); // 2 is the last parameter index
-        if (status != napi_ok || !obj || !obj->GetLocaleInfo()) {
-            HILOG_ERROR_I18N("GetUnicodeWrappedFilePath: Get Locale object failed");
-            return nullptr;
-        }
-    }
     std::string errorCode;
-    std::shared_ptr<LocaleInfo> localeInfoPtr = obj == nullptr ? nullptr : obj->GetLocaleInfo();
-    std::string result = LocaleConfig::GetUnicodeWrappedFilePath(path, delimiter,
-        localeInfoPtr, errorCode);
+    napi_value locale = (argc == 3) ? argv[2] : nullptr; // 3 is parameter count, 2 is the last parameter index
+    std::string result = I18nAddon::GetUnicodeWrappedFilePathInner(env, locale, path, delimiter, errorCode);
     if (!errorCode.empty()) {
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, errorCode, "valid", true);
         return nullptr;
     }
     return VariableConvertor::CreateString(env, result);
+}
+
+std::string I18nAddon::GetUnicodeWrappedFilePathInner(napi_env env, napi_value locale, const std::string& path,
+    const char delimiter, std::string& errorCode)
+{
+    if (locale == nullptr) {
+        std::shared_ptr<LocaleInfo> localeInfo = nullptr;
+        return LocaleConfig::GetUnicodeWrappedFilePath(path, delimiter, localeInfo, errorCode);
+    }
+
+    if (VariableConvertor::GetLocaleType(env, locale) == LocaleType::INTL_LOCALE) {
+        std::shared_ptr<IntlLocale> intllocale = VariableConvertor::ParseIntlLocale(env, locale);
+        return LocaleConfig::GetUnicodeWrappedFilePath(path, delimiter, intllocale, errorCode);
+    } else if (VariableConvertor::GetLocaleType(env, locale) == LocaleType::LOCALE_INFO) {
+        std::shared_ptr<LocaleInfo> localeInfo = VariableConvertor::ParseLocaleInfo(env, locale);
+        return LocaleConfig::GetUnicodeWrappedFilePath(path, delimiter, localeInfo, errorCode);
+    }
+    HILOG_ERROR_I18N("I18nAddon::GetUnicodeWrappedFilePathInner: Get file path failed.");
+    return "";
 }
 
 char I18nAddon::GetDelimiter(napi_env env, napi_value argVal)

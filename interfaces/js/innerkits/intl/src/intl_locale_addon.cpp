@@ -151,27 +151,27 @@ napi_value IntlLocaleAddon::IntlLocaleConstructor(napi_env env, napi_callback_in
     return thisVar;
 }
 
-bool IntlLocaleAddon::IsIntlLoale(napi_env env, napi_value argv)
+bool IntlLocaleAddon::IsIntlLocale(napi_env env, napi_value argv)
 {
     napi_value constructor = nullptr;
     if (g_IntlLocaleConstructor == nullptr) {
-        HILOG_ERROR_I18N("IntlLocaleAddon::IsIntlLoale: g_IntlLocaleConstructor is nullptr.");
+        HILOG_ERROR_I18N("IntlLocaleAddon::IsIntlLocale: g_IntlLocaleConstructor is nullptr.");
         return false;
     }
 
     napi_status status = napi_get_reference_value(env, *g_IntlLocaleConstructor, &constructor);
     if (status != napi_ok || constructor == nullptr) {
-        HILOG_ERROR_I18N("IntlLocaleAddon::IsIntlLoale: Failed to create reference.");
+        HILOG_ERROR_I18N("IntlLocaleAddon::IsIntlLocale: Failed to create reference.");
         return false;
     }
 
-    bool isIntlLoale = false;
-    status = napi_instanceof(env, argv, constructor, &isIntlLoale);
+    bool isIntlLocale = false;
+    status = napi_instanceof(env, argv, constructor, &isIntlLocale);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("IntlLocaleAddon::IsIntlLoale: Failed to get instance of argv.");
+        HILOG_ERROR_I18N("IntlLocaleAddon::IsIntlLocale: Failed to get instance of argv.");
         return false;
     }
-    return isIntlLoale;
+    return isIntlLocale;
 }
 
 bool IntlLocaleAddon::InitLocaleContext(napi_env env, const std::string localeTag,
@@ -420,8 +420,7 @@ napi_value IntlLocaleAddon::GetIntlLocaleAttribute(napi_env env, napi_callback_i
     }
     napi_value result = nullptr;
     switch (type) {
-        case napi_valuetype::napi_boolean:
-        {
+        case napi_valuetype::napi_boolean: {
             bool boolValue = (value.compare("true") == 0);
             status = napi_get_boolean(env, boolValue, &result);
             if (status != napi_ok || result == nullptr) {
@@ -430,8 +429,7 @@ napi_value IntlLocaleAddon::GetIntlLocaleAttribute(napi_env env, napi_callback_i
             }
             break;
         }
-        case napi_valuetype::napi_string:
-        {
+        case napi_valuetype::napi_string: {
             status = napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &result);
             if (status != napi_ok || result == nullptr) {
                 HILOG_ERROR_I18N("IntlLocaleAddon::GetIntlLocaleAttribute: Create attribute string failed.");
@@ -474,7 +472,7 @@ napi_value IntlLocaleAddon::CreateIntlLocaleObject(napi_env env, napi_value argv
 std::string IntlLocaleAddon::ParseLocaleTag(napi_env env, napi_value value, napi_valuetype type)
 {
     std::string localeTag;
-    if (type == napi_valuetype::napi_object && IntlLocaleAddon::IsIntlLoale(env, value)) {
+    if (type == napi_valuetype::napi_object && IntlLocaleAddon::IsIntlLocale(env, value)) {
         localeTag = IntlLocaleAddon::LocaleToString(env, value);
     } else {
         int32_t code = 0;
@@ -531,6 +529,14 @@ void IntlLocaleAddon::ParseConfigs(napi_env env, napi_value options,
     if (JSUtils::GetPropertyFormObject(env, options, IntlLocale::caseFirstTag, napi_string, value)) {
         configs.insert({IntlLocale::caseFirstTag, value});
     }
+}
+
+std::shared_ptr<IntlLocale> IntlLocaleAddon::GetIntlLocale()
+{
+    if (!this->intlLocale) {
+        return nullptr;
+    }
+    return this->intlLocale;
 }
 } // namespace I18n
 } // namespace Global

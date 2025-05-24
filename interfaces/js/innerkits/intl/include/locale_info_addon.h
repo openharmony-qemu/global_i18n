@@ -34,6 +34,7 @@ public:
     static void Destructor(napi_env env, void *nativeObject, void *hint);
     static napi_value InitLocale(napi_env env, napi_value exports);
     std::shared_ptr<LocaleInfo> GetLocaleInfo();
+    static bool IsLocaleInfo(napi_env env, napi_value argv);
 
 private:
     static napi_value LocaleConstructor(napi_env env, napi_callback_info info);

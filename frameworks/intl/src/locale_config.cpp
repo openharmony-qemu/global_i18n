@@ -2036,6 +2036,26 @@ std::string LocaleConfig::GetSimplifiedSystemLanguage()
 std::string LocaleConfig::GetUnicodeWrappedFilePath(const std::string &path, const char delimiter,
     std::shared_ptr<LocaleInfo> localeInfo, std::string &invalidField)
 {
+    std::string locale;
+    if (localeInfo != nullptr) {
+        locale = localeInfo->GetBaseName();
+    }
+    return LocaleConfig::GetUnicodeWrappedFilePathInner(path, delimiter, locale, invalidField);
+}
+
+std::string LocaleConfig::GetUnicodeWrappedFilePath(const std::string &path, const char delimiter,
+    std::shared_ptr<IntlLocale> IntlLocale, std::string &invalidField)
+{
+    std::string locale;
+    if (IntlLocale != nullptr) {
+        locale = IntlLocale->GetBaseName();
+    }
+    return LocaleConfig::GetUnicodeWrappedFilePathInner(path, delimiter, locale, invalidField);
+}
+
+std::string LocaleConfig::GetUnicodeWrappedFilePathInner(const std::string &path, const char delimiter,
+    const std::string& localeTag, std::string &invalidField)
+{
     if (delimiter == '\0') {
         invalidField = "delimiter";
         return path;
@@ -2044,10 +2064,7 @@ std::string LocaleConfig::GetUnicodeWrappedFilePath(const std::string &path, con
         invalidField = "path";
         return path;
     }
-    std::string locale;
-    if (localeInfo != nullptr) {
-        locale = localeInfo->GetBaseName();
-    }
+    std::string locale = localeTag;
     if (!IsValidTag(locale)) {
         locale = GetSystemLocale();
     }

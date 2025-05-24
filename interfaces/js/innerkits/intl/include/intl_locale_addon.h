@@ -30,13 +30,14 @@ public:
     IntlLocaleAddon();
     virtual ~IntlLocaleAddon();
 
+    std::shared_ptr<IntlLocale> GetIntlLocale();
     static napi_value InitIntlLocale(napi_env env, napi_value exports);
+    static bool IsIntlLocale(napi_env env, napi_value argv);
 
 private:
     static void Destructor(napi_env env, void *nativeObject, void *hint);
     static napi_value SetProperty(napi_env env, napi_callback_info info);
     static napi_value IntlLocaleConstructor(napi_env env, napi_callback_info info);
-    static bool IsIntlLoale(napi_env env, napi_value argv);
     static std::string LocaleToString(napi_env env, napi_value argv);
     bool InitLocaleContext(napi_env env, const std::string localeTag,
         std::unordered_map<std::string, std::string>& map);

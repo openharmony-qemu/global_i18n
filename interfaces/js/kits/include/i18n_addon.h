@@ -96,6 +96,8 @@ private:
     static napi_value I18nTransliteratorConstructor(napi_env env, napi_callback_info info);
     static std::string ModifyOrder(std::string &pattern);
     static void ProcessNormal(char ch, int *order, size_t orderSize, int *lengths, size_t lengsSize);
+    static std::string GetUnicodeWrappedFilePathInner(napi_env env, napi_value locale, const std::string& path,
+        const char delimiter, std::string& errorCode);
     static char GetDelimiter(napi_env env, napi_value argVal);
 
     static int GetParamOfGetTimePeriodName(napi_env env, napi_callback_info info, std::string &tag, int32_t &hour);

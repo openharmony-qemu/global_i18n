@@ -38,6 +38,8 @@ private:
         size_t& num);
     static bool GetDateTime(napi_env env, napi_value date, int64_t& milliseconds);
     static napi_value SimpleDateTimeFormatConstructor(napi_env env, napi_callback_info info);
+    static std::unique_ptr<SimpleDateTimeFormat> InitSimpleDateTimeFormatContext(napi_env env, napi_value locale,
+        const std::string& skeleton, bool isBestPattern, I18nErrorCode& errCode);
     std::unique_ptr<SimpleDateTimeFormat> simpleDateTimeFormat_ = nullptr;
 };
 } // namespace I18n

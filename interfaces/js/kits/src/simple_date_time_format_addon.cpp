@@ -235,9 +235,6 @@ napi_value SimpleDateTimeFormatAddon::SimpleDateTimeFormatConstructor(napi_env e
         return nullptr;
     }
 
-    std::shared_ptr<LocaleInfo> localeInfo = (argc > SIZE_WITHOUR_LOCALE)?
-        VariableConvertor::ParseIntlLocale(env, argv[SIZE_WITH_LOCALE - 1]) : nullptr;
-
     std::unique_ptr<SimpleDateTimeFormatAddon> obj = std::make_unique<SimpleDateTimeFormatAddon>();
     if (obj == nullptr) {
         HILOG_ERROR_I18N("SimpleDateTimeFormatConstructor: Cerate SimpleDateTimeFormatAddon failed.");
@@ -250,7 +247,9 @@ napi_value SimpleDateTimeFormatAddon::SimpleDateTimeFormatConstructor(napi_env e
         return nullptr;
     }
     I18nErrorCode errCode = I18nErrorCode::SUCCESS;
-    obj->simpleDateTimeFormat_ = std::make_unique<SimpleDateTimeFormat>(skeleton, localeInfo, isBestPattern, errCode);
+    napi_value locale = (argc > SIZE_WITHOUR_LOCALE) ? argv[SIZE_WITH_LOCALE - 1] : nullptr;
+    obj->simpleDateTimeFormat_ =
+        SimpleDateTimeFormatAddon::InitSimpleDateTimeFormatContext(env, locale, skeleton, isBestPattern, errCode);
     if (errCode == I18nErrorCode::INVALID_DATE_TIME_FORMAT_SKELETON) {
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "skeleton", "a valid date time format skeleton", true);
         return nullptr;
@@ -263,6 +262,25 @@ napi_value SimpleDateTimeFormatAddon::SimpleDateTimeFormatConstructor(napi_env e
     }
     obj.release();
     return thisVar;
+}
+
+std::unique_ptr<SimpleDateTimeFormat> SimpleDateTimeFormatAddon::InitSimpleDateTimeFormatContext(napi_env env,
+    napi_value locale, const std::string& skeleton, bool isBestPattern, I18nErrorCode& errCode)
+{
+    if (locale == nullptr) {
+        std::shared_ptr<LocaleInfo> localeInfo = nullptr;
+        return std::make_unique<SimpleDateTimeFormat>(skeleton, localeInfo, isBestPattern, errCode);
+    }
+
+    if (VariableConvertor::GetLocaleType(env, locale) == LocaleType::INTL_LOCALE) {
+        std::shared_ptr<IntlLocale> intllocale = VariableConvertor::ParseIntlLocale(env, locale);
+        return std::make_unique<SimpleDateTimeFormat>(skeleton, intllocale, isBestPattern, errCode);
+    } else if (VariableConvertor::GetLocaleType(env, locale) == LocaleType::LOCALE_INFO) {
+        std::shared_ptr<LocaleInfo> localeInfo = VariableConvertor::ParseLocaleInfo(env, locale);
+        return std::make_unique<SimpleDateTimeFormat>(skeleton, localeInfo, isBestPattern, errCode);
+    }
+    HILOG_ERROR_I18N("SimpleDateTimeFormatAddon::InitSimpleDateTimeFormatContext: Init context failed.");
+    return nullptr;
 }
 
 bool SimpleDateTimeFormatAddon::GetDateTime(napi_env env, napi_value date, int64_t& milliseconds)

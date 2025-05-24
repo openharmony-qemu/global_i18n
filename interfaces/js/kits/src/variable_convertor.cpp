@@ -15,6 +15,7 @@
 
 #include "error_util.h"
 #include "i18n_hilog.h"
+#include "intl_locale_addon.h"
 #include "locale_info_addon.h"
 #include "variable_convertor.h"
 
@@ -226,22 +227,35 @@ napi_status VariableConvertor::SetEnumValue(napi_env env, napi_value enumObj, co
     return napi_ok;
 }
 
-std::shared_ptr<LocaleInfo> VariableConvertor::ParseIntlLocale(napi_env env, napi_value intlLocale)
+LocaleType VariableConvertor::GetLocaleType(napi_env env, napi_value locale)
 {
     napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_status status = napi_typeof(env, intlLocale, &valueType);
+    napi_status status = napi_typeof(env, locale, &valueType);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("ParseIntlLocale: Failed to get type of intlLocale.");
-        return nullptr;
+        HILOG_ERROR_I18N("VariableConvertor::GetLocaleType: Failed to get type of intlLocale.");
+        return LocaleType::INVALID;
     } else if (valueType != napi_valuetype::napi_object) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "intl.Locale", true);
-        return nullptr;
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "Locale", true);
+        return LocaleType::INVALID;
     }
+    bool isIntlLocale = IntlLocaleAddon::IsIntlLocale(env, locale);
+    if (isIntlLocale) {
+        return LocaleType::INTL_LOCALE;
+    }
+    bool isLocaleInfo = LocaleInfoAddon::IsLocaleInfo(env, locale);
+    if (isLocaleInfo) {
+        return LocaleType::LOCALE_INFO;
+    }
+    ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "Locale", true);
+    return LocaleType::INVALID;
+}
 
+std::shared_ptr<LocaleInfo> VariableConvertor::ParseLocaleInfo(napi_env env, napi_value localeInfo)
+{
     LocaleInfoAddon *localeInfoAddon = nullptr;
-    status = napi_unwrap(env, intlLocale, reinterpret_cast<void **>(&localeInfoAddon));
+    napi_status status = napi_unwrap(env, localeInfo, reinterpret_cast<void **>(&localeInfoAddon));
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("ParseIntlLocale: Failed to unwrap intlLocale.");
+        HILOG_ERROR_I18N("VariableConvertor::ParseLocaleInfo: Failed to unwrap localeInfo.");
         return nullptr;
     } else if (!localeInfoAddon) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "intl.Locale", true);
@@ -251,6 +265,23 @@ std::shared_ptr<LocaleInfo> VariableConvertor::ParseIntlLocale(napi_env env, nap
         return nullptr;
     }
     return localeInfoAddon->GetLocaleInfo();
+}
+
+std::shared_ptr<IntlLocale> VariableConvertor::ParseIntlLocale(napi_env env, napi_value intlLocale)
+{
+    IntlLocaleAddon *IntlLocaleAddon = nullptr;
+    napi_status status = napi_unwrap(env, intlLocale, reinterpret_cast<void **>(&IntlLocaleAddon));
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("VariableConvertor::ParseIntlLocale: Failed to unwrap intlLocale.");
+        return nullptr;
+    } else if (!IntlLocaleAddon) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "Intl.Locale", true);
+        return nullptr;
+    } else if (!IntlLocaleAddon->GetIntlLocale()) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "locale", "a valid Intl.Locale", true);
+        return nullptr;
+    }
+    return IntlLocaleAddon->GetIntlLocale();
 }
 } // namespace I18n
 } // namespace Global
