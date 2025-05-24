@@ -23,6 +23,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include "i18n_types.h"
+#include "intl_locale.h"
 #include "taboo_utils.h"
 
 namespace OHOS {
@@ -129,6 +130,8 @@ public:
     static std::string GetSimplifiedSystemLanguage();
     static std::string GetUnicodeWrappedFilePath(const std::string &path, const char delimiter,
         std::shared_ptr<LocaleInfo> localeInfo, std::string &invalidField);
+    static std::string GetUnicodeWrappedFilePath(const std::string &path, const char delimiter,
+        std::shared_ptr<IntlLocale> IntlLocale, std::string &invalidField);
     static std::string ComputeEffectiveLanguage(const std::string& localeTag, const std::string& language);
     static const std::string HOUR_EVENT_DATA;
     static const std::string LANGUAGE_KEY;
@@ -213,6 +216,8 @@ private:
     static bool HasDesignator(const std::string& inFormat, const char designator);
     static void QueryUpgradeLocale();
     static std::string GetPseudoCountryTag(const char* countryTag, std::string &regionTag);
+    static std::string GetUnicodeWrappedFilePathInner(const std::string &path, const char delimiter,
+        const std::string& localeTag, std::string &invalidField);
 
 #ifdef SUPPORT_GRAPHICS
     /**

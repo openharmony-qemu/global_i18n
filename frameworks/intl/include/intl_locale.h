@@ -55,22 +55,14 @@ public:
     static const std::string caseFirstTag;
 
 private:
-    bool ApplyOptionsToTag(const std::string& localeTag, const std::unordered_map<std::string, std::string>& configs);
-    bool BuildOptionsTags(const std::string& localeTag, const std::unordered_map<std::string, std::string>& configs,
+    bool CheckLocaleParam(const std::string& localeTag, const std::unordered_map<std::string, std::string>& configs);
+    bool SetLocaleParam(const std::string& localeTag, const std::unordered_map<std::string, std::string>& configs,
         icu::LocaleBuilder* builder);
-    bool CheckOption(const std::unordered_map<std::string, std::string>& configs);
-    bool InsertOptions(const std::unordered_map<std::string, std::string>& configs, icu::LocaleBuilder* builder);
+    bool CheckConfigsExtParam(const std::unordered_map<std::string, std::string>& configs);
+    bool SetConfigsExtParam(const std::unordered_map<std::string, std::string>& configs, icu::LocaleBuilder* builder);
+    bool SetExtParam(const std::unordered_map<std::string, std::string>& configs, const std::string paramTag,
+        const std::string paramExtTag, icu::LocaleBuilder* builder);
 
-    std::string language;
-    std::string baseName;
-    std::string region;
-    std::string script;
-    std::string calendar;
-    std::string collation;
-    std::string hourCycle;
-    std::string numberingSystem;
-    std::string numeric;
-    std::string caseFirst;
     bool initSuccess = false;
     icu::Locale icuLocale;
 

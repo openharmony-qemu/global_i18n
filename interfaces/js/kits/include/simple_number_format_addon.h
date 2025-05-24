@@ -36,6 +36,8 @@ public:
 private:
     static napi_value Format(napi_env env, napi_callback_info info);
     static napi_value SimpleNumberFormatConstructor(napi_env env, napi_callback_info info);
+    static std::unique_ptr<SimpleNumberFormat> InitSimpleNumberFormatContext(napi_env env, napi_value locale,
+        const std::string& skeleton, I18nErrorCode& errCode);
     std::shared_ptr<SimpleNumberFormat> simpleNumberFormat_ = nullptr;
 };
 } // namespace I18n

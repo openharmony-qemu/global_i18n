@@ -49,38 +49,25 @@ constexpr uint8_t INTL_INDEX_FOUR = 4;
 IntlLocale::IntlLocale(const std::string& localeTag, const std::unordered_map<std::string, std::string>& configs,
     std::string& errMessage)
 {
-    if (!ApplyOptionsToTag(localeTag, configs)) {
+    if (!CheckLocaleParam(localeTag, configs)) {
         errMessage = APPLY_OPTION_ERROR_MESSAGE;
         HILOG_ERROR_I18N("IntlLocale::IntlLocale: ApplyOptionsToTag failed.");
         return;
     }
     icu::LocaleBuilder builder;
-    if (!BuildOptionsTags(localeTag, configs, &builder)) {
+    if (!SetLocaleParam(localeTag, configs, &builder)) {
         errMessage = APPLY_OPTION_ERROR_MESSAGE;
         HILOG_ERROR_I18N("IntlLocale::IntlLocale: BuildOptionsTags failed.");
         return;
     }
-    if (!CheckOption(configs)) {
+    if (!CheckConfigsExtParam(configs)) {
         errMessage = OUT_OF_RANGE_ERROR_MESSAGE;
         HILOG_ERROR_I18N("IntlLocale::IntlLocale: CheckOption failed.");
         return;
     }
-    if (!InsertOptions(configs, &builder)) {
+    if (!SetConfigsExtParam(configs, &builder)) {
         errMessage = INSERT_OR_BUILD_ERROR_MESSAGE;
         HILOG_ERROR_I18N("IntlLocale::IntlLocale: InsertOptions failed.");
-        return;
-    }
-    UErrorCode status = U_ZERO_ERROR;
-    icuLocale = builder.build(status);
-    if (U_FAILURE(status)) {
-        errMessage = INSERT_OR_BUILD_ERROR_MESSAGE;
-        HILOG_ERROR_I18N("IntlLocale::IntlLocale: Build icuLocale failed.");
-        return;
-    }
-    icuLocale.canonicalize(status);
-    if (U_FAILURE(status)) {
-        errMessage = INSERT_OR_BUILD_ERROR_MESSAGE;
-        HILOG_ERROR_I18N("IntlLocale::IntlLocale: icuLocale canonicalize failed.");
         return;
     }
     initSuccess = true;
@@ -90,173 +77,170 @@ IntlLocale::~IntlLocale()
 {
 }
 
-bool IntlLocale::ApplyOptionsToTag(const std::string& localeTag, const std::unordered_map<std::string, std::string>& configs)
+bool IntlLocale::CheckLocaleParam(const std::string& localeTag,
+    const std::unordered_map<std::string, std::string>& configs)
 {
     if (localeTag.empty()) {
-        HILOG_ERROR_I18N("IntlLocale::ApplyOptionsToTag: localeTag is empty.");
+        HILOG_ERROR_I18N("IntlLocale::CheckLocaleParam: localeTag is empty.");
         return false;
     }
     if (!LocaleHelper::IsStructurallyValidLanguageTag(localeTag)) {
-        HILOG_ERROR_I18N("IntlLocale::ApplyOptionsToTag: Verify structurally valid languageTag failed.");
+        HILOG_ERROR_I18N("IntlLocale::CheckLocaleParam: Verify structurally valid languageTag failed.");
         return false;
     }
-    if (configs.find(languageTag) != configs.end()) {
-        language = configs.at(languageTag);
+    auto languageIterator = configs.find(languageTag);
+    if (languageIterator != configs.end()) {
+        std::string language = languageIterator->second;
         if (language.empty() || LocaleHelper::IsAlpha(language, INTL_INDEX_FOUR, INTL_INDEX_FOUR)) {
-            HILOG_ERROR_I18N("IntlLocale::ApplyOptionsToTag: language is %{public}s.", language.c_str());
+            HILOG_ERROR_I18N("IntlLocale::CheckLocaleParam: language is %{public}s.", language.c_str());
             return false;
         }
     }
-    if (configs.find(scriptTag) != configs.end()) {
-        script = configs.at(scriptTag);
+    auto scriptIterator = configs.find(scriptTag);
+    if (scriptIterator != configs.end()) {
+        std::string script = scriptIterator->second;
         if (script.empty()) {
-            HILOG_ERROR_I18N("IntlLocale::ApplyOptionsToTag: script is empty.");
+            HILOG_ERROR_I18N("IntlLocale::CheckLocaleParam: script is empty.");
             return false;
         }
     }
-    if (configs.find(regionTag) != configs.end()) {
-        region = configs.at(regionTag);
+    auto regionIterator = configs.find(regionTag);
+    if (regionIterator != configs.end()) {
+        std::string region = regionIterator->second;
         if (region.empty()) {
-            HILOG_ERROR_I18N("IntlLocale::ApplyOptionsToTag: region is empty.");
+            HILOG_ERROR_I18N("IntlLocale::CheckLocaleParam: region is empty.");
             return false;
         }
     }
     return true;
 }
 
-bool IntlLocale::BuildOptionsTags(const std::string& localeTag,
+bool IntlLocale::SetLocaleParam(const std::string& localeTag,
     const std::unordered_map<std::string, std::string>& configs, icu::LocaleBuilder* builder)
 {
     if (builder == nullptr) {
-        HILOG_ERROR_I18N("IntlLocale::BuildOptionsTags: builder is nullptr.");
+        HILOG_ERROR_I18N("IntlLocale::SetLocaleParam: builder is nullptr.");
         return false;
     }
     builder->setLanguageTag(localeTag);
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = builder->build(status);
     if (U_FAILURE(status)) {
-        HILOG_ERROR_I18N("IntlLocale::BuildOptionsTags: Build locale failed, localeTag is %{public}s.",
+        HILOG_ERROR_I18N("IntlLocale::SetLocaleParam: Build locale failed, localeTag is %{public}s.",
             localeTag.c_str());
         return false;
     }
     locale.canonicalize(status);
     if (U_FAILURE(status)) {
-        HILOG_ERROR_I18N("IntlLocale::BuildOptionsTags: locale canonicalize failed.");
+        HILOG_ERROR_I18N("IntlLocale::SetLocaleParam: locale canonicalize failed.");
         return false;
     }
     builder->setLocale(locale);
 
-    if (configs.find(languageTag) != configs.end()) {
+    auto languageIterator = configs.find(languageTag);
+    if (languageIterator != configs.end()) {
+        std::string language = languageIterator->second;
         builder->setLanguage(language);
     }
-    if (configs.find(scriptTag) != configs.end()) {
+
+    auto scriptIterator = configs.find(scriptTag);
+    if (scriptIterator != configs.end()) {
+        std::string script = scriptIterator->second;
         builder->setScript(script);
     }
-    if (configs.find(regionTag) != configs.end()) {
+
+    auto regionIterator = configs.find(regionTag);
+    if (regionIterator != configs.end()) {
+        std::string region = regionIterator->second;
         builder->setRegion(region);
     }
 
     builder->build(status);
     if (U_FAILURE(status)) {
-        HILOG_ERROR_I18N("IntlLocale::BuildOptionsTags: Build locale failed, language is %{public}s, "
-            "script is %{public}s, region is %{public}s.", language.c_str(), script.c_str(), region.c_str());
+        HILOG_ERROR_I18N("IntlLocale::SetLocaleParam: Build locale failed.");
         return false;
     }
     return true;
 }
 
-bool IntlLocale::CheckOption(const std::unordered_map<std::string, std::string>& configs)
+bool IntlLocale::CheckConfigsExtParam(const std::unordered_map<std::string, std::string>& configs)
 {
-    if (configs.find(calendarTag) != configs.end()) {
-        calendar = configs.at(calendarTag);
-    }
-
-    if (configs.find(collationTag) != configs.end()) {
-        collation = configs.at(collationTag);
-    }
-
-    if (configs.find(hourCycleTag) != configs.end()) {
-        hourCycle = configs.at(hourCycleTag);
+    auto hourCycleIterator = configs.find(hourCycleTag);
+    if (hourCycleIterator != configs.end()) {
+        std::string hourCycle = hourCycleIterator->second;
         if (HOUR_CYCLE.find(hourCycle) == HOUR_CYCLE.end()) {
-            HILOG_ERROR_I18N("IntlLocale::CheckOption: Check hourCycle failed, hourCycle is %{public}s.",
+            HILOG_ERROR_I18N("IntlLocale::CheckConfigsExtParam: Check hourCycle failed, hourCycle is %{public}s.",
                 hourCycle.c_str());
             return false;
         }
     }
 
-    if (configs.find(numberingSystemTag) != configs.end()) {
-        numberingSystem = configs.at(numberingSystemTag);
-    }
-
-    if (configs.find(numericTag) != configs.end()) {
-        numeric = configs.at(numericTag);
-    }
-
-    if (configs.find(caseFirstTag) != configs.end()) {
-        caseFirst = configs.at(caseFirstTag);
+    auto caseFirstIterator = configs.find(caseFirstTag);
+    if (caseFirstIterator != configs.end()) {
+        std::string caseFirst = caseFirstIterator->second;
         if (CASE_FIRST.find(caseFirst) == CASE_FIRST.end()) {
-            HILOG_ERROR_I18N("IntlLocale::CheckOption: Check caseFirst failed, caseFirst is %{public}s.",
+            HILOG_ERROR_I18N("IntlLocale::CheckConfigsExtParam: Check caseFirst failed, caseFirst is %{public}s.",
                 caseFirst.c_str());
             return false;
         }
+    }
+
+    return true;
+}
+
+bool IntlLocale::SetConfigsExtParam(const std::unordered_map<std::string, std::string>& configs,
+    icu::LocaleBuilder* builder)
+{
+    if (!IntlLocale::SetExtParam(configs, calendarTag, calendarExtTag, builder)) {
+        return false;
+    }
+
+    if (!IntlLocale::SetExtParam(configs, collationTag, collationExtTag, builder)) {
+        return false;
+    }
+
+    if (!IntlLocale::SetExtParam(configs, hourCycleTag, hourCycleExtTag, builder)) {
+        return false;
+    }
+
+    if (!IntlLocale::SetExtParam(configs, caseFirstTag, caseFirstExtTag, builder)) {
+        return false;
+    }
+
+    if (!IntlLocale::SetExtParam(configs, numericTag, numericExtTag, builder)) {
+        return false;
+    }
+
+    if (!IntlLocale::SetExtParam(configs, numberingSystemTag, numberingSystemExtTag, builder)) {
+        return false;
+    }
+
+    UErrorCode status = U_ZERO_ERROR;
+    icuLocale = builder->build(status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("IntlLocale::IntlLocale: Build icuLocale failed.");
+        return false;
+    }
+    icuLocale.canonicalize(status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("IntlLocale::IntlLocale: icuLocale canonicalize failed.");
+        return false;
     }
     return true;
 }
 
-bool IntlLocale::InsertOptions(const std::unordered_map<std::string, std::string>& configs, icu::LocaleBuilder* builder)
+bool IntlLocale::SetExtParam(const std::unordered_map<std::string, std::string>& configs, const std::string paramTag,
+    const std::string paramExtTag, icu::LocaleBuilder* builder)
 {
-    if (configs.find(calendarTag) != configs.end()) {
-        if (!uloc_toLegacyType(uloc_toLegacyKey(calendarExtTag.c_str()), calendar.c_str())) {
-            HILOG_ERROR_I18N("IntlLocale::InsertOptions: Check calendar failed, calendar is %{public}s.",
-                calendar.c_str());
+    auto paramIterator = configs.find(paramTag);
+    if (paramIterator != configs.end()) {
+        std::string param = paramIterator->second;
+        if (!uloc_toLegacyType(uloc_toLegacyKey(paramExtTag.c_str()), param.c_str())) {
+            HILOG_ERROR_I18N("IntlLocale::SetExtParam: Set %{public}s failed, calendar is %{public}s.",
+                paramTag.c_str(), param.c_str());
             return false;
         }
-        builder->setUnicodeLocaleKeyword(calendarExtTag.c_str(), calendar.c_str());
-    }
-
-    if (configs.find(collationTag) != configs.end()) {
-        if (!uloc_toLegacyType(uloc_toLegacyKey(collationExtTag.c_str()), collation.c_str())) {
-            HILOG_ERROR_I18N("IntlLocale::InsertOptions: Check collation failed, collation is %{public}s.",
-                collation.c_str());
-            return false;
-        }
-        builder->setUnicodeLocaleKeyword(collationExtTag.c_str(), collation.c_str());
-    }
-
-    if (configs.find(hourCycleTag) != configs.end()) {
-        if (!uloc_toLegacyType(uloc_toLegacyKey(hourCycleExtTag.c_str()), hourCycle.c_str())) {
-            HILOG_ERROR_I18N("IntlLocale::InsertOptions: Check hourCycle failed, hourCycle is %{public}s.",
-                hourCycle.c_str());
-            return false;
-        }
-        builder->setUnicodeLocaleKeyword(hourCycleExtTag.c_str(), hourCycle.c_str());
-    }
-
-    if (configs.find(caseFirstTag) != configs.end()) {
-        if (!uloc_toLegacyType(uloc_toLegacyKey(caseFirstExtTag.c_str()), caseFirst.c_str())) {
-            HILOG_ERROR_I18N("IntlLocale::InsertOptions: Check caseFirst failed, caseFirst is %{public}s.",
-                caseFirst.c_str());
-            return false;
-        }
-        builder->setUnicodeLocaleKeyword(caseFirstExtTag.c_str(), caseFirst.c_str());
-    }
-
-    if (configs.find(numericTag) != configs.end()) {
-        if (!uloc_toLegacyType(uloc_toLegacyKey(numericExtTag.c_str()), numeric.c_str())) {
-            HILOG_ERROR_I18N("IntlLocale::InsertOptions: Check numeric failed, numeric is %{public}s.",
-                numeric.c_str());
-            return false;
-        }
-        builder->setUnicodeLocaleKeyword(numericExtTag.c_str(), numeric.c_str());
-    }
-
-    if (configs.find(numberingSystemTag) != configs.end()) {
-        if (!uloc_toLegacyType(uloc_toLegacyKey(numberingSystemExtTag.c_str()), numberingSystem.c_str())) {
-            HILOG_ERROR_I18N("IntlLocale::InsertOptions: Check numberingSystem failed, numberingSystem is %{public}s.",
-                numberingSystem.c_str());
-            return false;
-        }
-        builder->setUnicodeLocaleKeyword(numberingSystemExtTag.c_str(), numberingSystem.c_str());
+        builder->setUnicodeLocaleKeyword(paramExtTag.c_str(), param.c_str());
     }
     return true;
 }
@@ -301,7 +285,7 @@ std::string IntlLocale::GetCalendar()
         return "";
     }
     UErrorCode status = U_ZERO_ERROR;
-    calendar = icuLocale.getUnicodeKeywordValue<std::string>(calendarExtTag, status);
+    std::string calendar = icuLocale.getUnicodeKeywordValue<std::string>(calendarExtTag, status);
     if (U_FAILURE(status)) {
         return "";
     }
@@ -314,7 +298,7 @@ std::string IntlLocale::GetCollation()
         return "";
     }
     UErrorCode status = U_ZERO_ERROR;
-    collation = icuLocale.getUnicodeKeywordValue<std::string>(collationExtTag, status);
+    std::string collation = icuLocale.getUnicodeKeywordValue<std::string>(collationExtTag, status);
     if (U_FAILURE(status)) {
         return "";
     }
@@ -327,7 +311,7 @@ std::string IntlLocale::GetHourCycle()
         return "";
     }
     UErrorCode status = U_ZERO_ERROR;
-    hourCycle = icuLocale.getUnicodeKeywordValue<std::string>(hourCycleExtTag, status);
+    std::string hourCycle = icuLocale.getUnicodeKeywordValue<std::string>(hourCycleExtTag, status);
     if (U_FAILURE(status)) {
         return "";
     }
@@ -340,7 +324,7 @@ std::string IntlLocale::GetNumberingSystem()
         return "";
     }
     UErrorCode status = U_ZERO_ERROR;
-    numberingSystem = icuLocale.getUnicodeKeywordValue<std::string>(numberingSystemExtTag, status);
+    std::string numberingSystem = icuLocale.getUnicodeKeywordValue<std::string>(numberingSystemExtTag, status);
     if (U_FAILURE(status)) {
         return "";
     }
@@ -353,7 +337,7 @@ std::string IntlLocale::GetNumeric()
         return "";
     }
     UErrorCode status = U_ZERO_ERROR;
-    numeric = icuLocale.getUnicodeKeywordValue<std::string>(numericExtTag, status);
+    std::string numeric = icuLocale.getUnicodeKeywordValue<std::string>(numericExtTag, status);
     if (U_FAILURE(status)) {
         return "";
     }
@@ -366,7 +350,7 @@ std::string IntlLocale::GetCaseFirst()
         return "";
     }
     UErrorCode status = U_ZERO_ERROR;
-    caseFirst = icuLocale.getUnicodeKeywordValue<std::string>(caseFirstExtTag, status);
+    std::string caseFirst = icuLocale.getUnicodeKeywordValue<std::string>(caseFirstExtTag, status);
     if (U_FAILURE(status)) {
         return "";
     }

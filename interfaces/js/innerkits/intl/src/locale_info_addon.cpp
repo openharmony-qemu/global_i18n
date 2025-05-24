@@ -149,6 +149,29 @@ bool LocaleInfoAddon::InitLocaleContext(napi_env env, napi_callback_info info, c
     return locale_ != nullptr;
 }
 
+bool LocaleInfoAddon::IsLocaleInfo(napi_env env, napi_value argv)
+{
+    napi_value constructor = nullptr;
+    if (g_constructor == nullptr) {
+        HILOG_ERROR_I18N("LocaleInfoAddon::IsLocaleInfo: g_constructor is nullptr.");
+        return false;
+    }
+
+    napi_status status = napi_get_reference_value(env, *g_constructor, &constructor);
+    if (status != napi_ok || constructor == nullptr) {
+        HILOG_ERROR_I18N("LocaleInfoAddon::IsLocaleInfo: Failed to create reference.");
+        return false;
+    }
+
+    bool isLocaleInfo = false;
+    status = napi_instanceof(env, argv, constructor, &isLocaleInfo);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("LocaleInfoAddon::IsLocaleInfo: Failed to get instance of argv.");
+        return false;
+    }
+    return isLocaleInfo;
+}
+
 std::string LocaleInfoAddon::GetLanguageInner(std::shared_ptr<LocaleInfo> localeInfo)
 {
     if (localeInfo != nullptr) {

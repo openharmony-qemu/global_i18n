@@ -429,8 +429,7 @@ bool JSUtils::GetPropertyFormObject(napi_env env, napi_value object, const std::
         return false;
     }
     switch (type) {
-        case napi_valuetype::napi_boolean:
-        {
+        case napi_valuetype::napi_boolean: {
             bool boolValue = false;
             status = napi_get_value_bool(env, propertyValue, &boolValue);
             if (status != napi_ok) {
@@ -441,8 +440,7 @@ bool JSUtils::GetPropertyFormObject(napi_env env, napi_value object, const std::
             value = boolValue ? "true" : "false";
             break;
         }
-        case napi_valuetype::napi_string:
-        {
+        case napi_valuetype::napi_string: {
             int32_t code = 0;
             value = JSUtils::GetString(env, propertyValue, code);
             if (code != 0) {

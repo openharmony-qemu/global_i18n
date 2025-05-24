@@ -174,8 +174,6 @@ napi_value SimpleNumberFormatAddon::SimpleNumberFormatConstructor(napi_env env, 
         return nullptr;
     }
 
-    std::shared_ptr<LocaleInfo> localeInfo = (argc > 1)? VariableConvertor::ParseIntlLocale(env, argv[1]) : nullptr;
-
     std::unique_ptr<SimpleNumberFormatAddon> obj = std::make_unique<SimpleNumberFormatAddon>();
     if (!obj) {
         HILOG_ERROR_I18N("SimpleNumberFormatConstructor: create SimpleNumberFormatAddon failed.");
@@ -189,7 +187,9 @@ napi_value SimpleNumberFormatAddon::SimpleNumberFormatConstructor(napi_env env, 
     }
 
     I18nErrorCode errCode = I18nErrorCode::SUCCESS;
-    obj->simpleNumberFormat_ = std::make_shared<SimpleNumberFormat>(skeleton, localeInfo, errCode);
+    napi_value locale = (argc > 1) ? argv[1] : nullptr;
+    obj->simpleNumberFormat_ =
+        SimpleNumberFormatAddon::InitSimpleNumberFormatContext(env, locale, skeleton, errCode);
     if (errCode == I18nErrorCode::INVALID_NUMBER_FORMAT_SKELETON) {
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "skeleton", "a valid number format skeleton", true);
         return nullptr;
@@ -199,6 +199,25 @@ napi_value SimpleNumberFormatAddon::SimpleNumberFormatConstructor(napi_env env, 
     }
     obj.release();
     return thisVar;
+}
+
+std::unique_ptr<SimpleNumberFormat> SimpleNumberFormatAddon::InitSimpleNumberFormatContext(napi_env env,
+    napi_value locale, const std::string& skeleton, I18nErrorCode& errCode)
+{
+    if (locale == nullptr) {
+        std::shared_ptr<LocaleInfo> localeInfo = nullptr;
+        return std::make_unique<SimpleNumberFormat>(skeleton, localeInfo, errCode);
+    }
+
+    if (VariableConvertor::GetLocaleType(env, locale) == LocaleType::INTL_LOCALE) {
+        std::shared_ptr<IntlLocale> intllocale = VariableConvertor::ParseIntlLocale(env, locale);
+        return std::make_unique<SimpleNumberFormat>(skeleton, intllocale, errCode);
+    } else if (VariableConvertor::GetLocaleType(env, locale) == LocaleType::LOCALE_INFO) {
+        std::shared_ptr<LocaleInfo> localeInfo = VariableConvertor::ParseLocaleInfo(env, locale);
+        return std::make_unique<SimpleNumberFormat>(skeleton, localeInfo, errCode);
+    }
+    HILOG_ERROR_I18N("SimpleNumberFormatAddon::InitSimpleNumberFormatContext: Init context failed.");
+    return nullptr;
 }
 
 std::shared_ptr<SimpleNumberFormat> SimpleNumberFormatAddon::CopySimpleNumberFormat()

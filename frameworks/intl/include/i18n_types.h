@@ -72,6 +72,12 @@ enum WeekDay {
     SAT = 6,
     SUN = 7,
 };
+
+enum class LocaleType {
+    INVALID = 0,
+    INTL_LOCALE = 1,
+    LOCALE_INFO = 2,
+};
 }
 }
 }

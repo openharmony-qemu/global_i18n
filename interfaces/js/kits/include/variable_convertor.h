@@ -18,6 +18,8 @@
 #include <map>
 #include <string>
 #include <vector>
+#include "i18n_types.h"
+#include "intl_locale.h"
 #include "locale_info.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
@@ -42,8 +44,9 @@ public:
     static napi_value CreateNumber(napi_env env, const int32_t &num);
     static void VerifyType(napi_env env, const std::string& valueName, napi_valuetype napiType, napi_value argv);
     static napi_status SetEnumValue(napi_env env, napi_value enumObj, const std::string& enumName, int32_t enumVal);
-    static std::shared_ptr<LocaleInfo> ParseIntlLocale(napi_env env, napi_value intlLocale);
-
+    static LocaleType GetLocaleType(napi_env env, napi_value locale);
+    static std::shared_ptr<LocaleInfo> ParseLocaleInfo(napi_env env, napi_value localeInfo);
+    static std::shared_ptr<IntlLocale> ParseIntlLocale(napi_env env, napi_value intlLocale);
 private:
     static const std::map<napi_valuetype, std::string> NAPI_TYPE_MAP;
 };
