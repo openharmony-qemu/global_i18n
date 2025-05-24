@@ -108,6 +108,55 @@ bool VariableConvertor::GetBoolOptionValue(napi_env env, napi_value &options, co
     return true;
 }
 
+double VariableConvertor::GetDouble(napi_env &env, napi_value &value, int32_t &code)
+{
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    napi_status status = napi_typeof(env, value, &valueType);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("VariableConvertor::GetDouble Get napi_value type failed");
+        code = 1;
+        return 0;
+    }
+    if (valueType != napi_valuetype::napi_number) {
+        HILOG_ERROR_I18N("VariableConvertor::GetDouble check napi_type_number failed");
+        code = 1;
+        return 0;
+    }
+    double result = 0;
+    status = napi_get_value_double(env, value, &result);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("VariableConvertor::GetDouble Get double failed");
+        code = 1;
+        return 0;
+    }
+    return result;
+}
+
+int32_t VariableConvertor::GetInt(napi_env &env, napi_value &value, int32_t &code)
+{
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    napi_status status = napi_typeof(env, value, &valueType);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("VariableConvertor::GetInt: Get napi_value type failed");
+        code = 1;
+        return 0;
+    }
+    if (valueType != napi_valuetype::napi_number) {
+        HILOG_ERROR_I18N("VariableConvertor::GetInt: check napi_type_number failed");
+        code = 1;
+        return 0;
+    }
+    int32_t result = 0;
+    status = napi_get_value_int32(env, value, &result);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("VariableConvertor::GetInt: get int value failed");
+        code = 1;
+        return 0;
+    }
+    return result;
+}
+
+
 std::string VariableConvertor::GetString(napi_env &env, napi_value &value, int32_t &code)
 {
     size_t len = 0;

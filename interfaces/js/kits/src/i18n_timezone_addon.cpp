@@ -18,6 +18,7 @@
 #include "i18n_timezone_addon.h"
 #include "js_utils.h"
 #include "variable_convertor.h"
+#include "zone_rules_addon.h"
 
 namespace OHOS {
 namespace Global {
@@ -64,6 +65,7 @@ napi_value I18nTimeZoneAddon::InitI18nTimeZone(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getDisplayName", GetTimeZoneDisplayName),
         DECLARE_NAPI_FUNCTION("getRawOffset", GetRawOffset),
         DECLARE_NAPI_FUNCTION("getOffset", GetOffset),
+        DECLARE_NAPI_FUNCTION("getZoneRules", GetZoneRules),
     };
     napi_value constructor = nullptr;
     napi_status status = napi_define_class(env, "TimeZone", NAPI_AUTO_LENGTH, I18nTimeZoneConstructor, nullptr,
@@ -495,6 +497,27 @@ napi_value I18nTimeZoneAddon::GetOffset(napi_env env, napi_callback_info info)
         return nullptr;
     }
     return value;
+}
+
+napi_value I18nTimeZoneAddon::GetZoneRules(napi_env env, napi_callback_info info)
+{
+    size_t argc = 1;
+    napi_value argv[1] = { nullptr };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("GetZoneRules: Get param info failed");
+        return nullptr;
+    }
+    I18nTimeZoneAddon *obj = nullptr;
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    if (status != napi_ok || !obj || !obj->timezone_) {
+        HILOG_ERROR_I18N("GetZoneRules: Get TimeZone object failed");
+        return nullptr;
+    }
+    std::string tzid = obj->timezone_->GetID();
+    return ZoneRulesAddon::GetZoneRulesObject(env, tzid);
 }
 
 napi_value I18nTimeZoneAddon::StaticGetTimeZone(napi_env env, napi_value *argv, bool isZoneID)

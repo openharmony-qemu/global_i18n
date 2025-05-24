@@ -45,6 +45,7 @@ private:
     static napi_value GetTimeZoneDisplayName(napi_env env, napi_callback_info info);
     static napi_value GetRawOffset(napi_env env, napi_callback_info info);
     static napi_value GetOffset(napi_env env, napi_callback_info info);
+    static napi_value GetZoneRules(napi_env env, napi_callback_info info);
 
     static napi_value StaticGetTimeZone(napi_env, napi_value *argv, bool isZoneID);
     static int32_t GetParameter(napi_env env, napi_value *argv, std::string &localeStr, bool &isDST);
