@@ -30,10 +30,6 @@ ZoneRules::ZoneRules(const std::string &tzid)
 
 ZoneRules::~ZoneRules()
 {
-    if (btz != nullptr) {
-        delete btz;
-        btz = nullptr;
-    }
 }
 
 void ZoneRules::InitBasicTimeZone()
@@ -48,7 +44,12 @@ void ZoneRules::InitBasicTimeZone()
         HILOG_ERROR_I18N("ZoneRules::InitBasicTimeZone: param tzid: %{public}s invalid.", tzId.c_str());
         return;
     }
-    this->btz = static_cast<icu::BasicTimeZone*>(icuTz);
+    icu::BasicTimeZone* btzPtr = static_cast<icu::BasicTimeZone*>(icuTz);
+    if (btzPtr == nullptr) {
+        HILOG_ERROR_I18N("ZoneRules::InitBasicTimeZone: static_cast icu::TimeZone failed.");
+        return;
+    }
+    this->btz = std::unique_ptr<icu::BasicTimeZone>(btzPtr);
     if (btz == nullptr) {
         HILOG_ERROR_I18N("ZoneRules::InitBasicTimeZone: btz is nullptr.");
     }

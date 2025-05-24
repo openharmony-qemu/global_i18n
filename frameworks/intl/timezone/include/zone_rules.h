@@ -31,7 +31,7 @@ public:
 
 private:
     std::string tzId;
-    icu::BasicTimeZone *btz;
+    std::unique_ptr<icu::BasicTimeZone> btz;
     void InitBasicTimeZone();
 };
 } // namespace I18n
