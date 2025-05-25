@@ -505,6 +505,8 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest023, TestSize.Level1)
     LocaleConfig::SetSystemLocale(locale);
     std::string effectiveLanguage = LocaleConfig::GetEffectiveLanguage();
     std::string effectiveLocale = LocaleConfig::GetEffectiveLocale();
+    std::string systemHour = LocaleConfig::GetSystemHour();   
+    EXPECT_EQ(systemHour, "false");
     EXPECT_EQ(effectiveLanguage, "zh-Hans-CN");
     EXPECT_EQ(effectiveLocale, "zh-Hans-CN-u-mu-celsius");
     LocaleConfig::SetSystemLanguage(systemLanguage);

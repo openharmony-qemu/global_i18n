@@ -137,7 +137,7 @@ napi_value ZoneRulesAddon::NextTransition(napi_env env, napi_callback_info info)
         zoneOffsetTrans = obj->zoneRules_->NextTransition();
     } else {
         int32_t errorCode = 0;
-        double paramDate = GetFirstParamter(env, argv[0], errorCode);
+        double paramDate = GetFirstParameter(env, argv[0], errorCode);
         if (errorCode != 0) {
             return nullptr;
         }
@@ -146,29 +146,29 @@ napi_value ZoneRulesAddon::NextTransition(napi_env env, napi_callback_info info)
     return ZoneOffsetTransitionAddon::GetZoneOffsetTransObject(env, zoneOffsetTrans.get());
 }
 
-double ZoneRulesAddon::GetFirstParamter(napi_env env, napi_value argValue, int32_t &errorCode)
+double ZoneRulesAddon::GetFirstParameter(napi_env env, napi_value argValue, int32_t &errorCode)
 {
     if (!VariableConvertor::CheckNapiIsNull(env, argValue)) {
-        HILOG_ERROR_I18N("ZoneRulesAddon::GetFirstParamter, parameter is null.");
+        HILOG_ERROR_I18N("ZoneRulesAddon::GetFirstParameter, parameter is null.");
         errorCode = -1;
         return 0;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_status status = napi_typeof(env, argValue, &valueType);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("ZoneRulesAddon::GetFirstParamter, get parameter type failed.");
+        HILOG_ERROR_I18N("ZoneRulesAddon::GetFirstParameter, get parameter type failed.");
         errorCode = -1;
         return 0;
     }
     if (valueType != napi_valuetype::napi_number) {
-        HILOG_ERROR_I18N("ZoneRulesAddon::GetFirstParamter, parameter type error.");
+        HILOG_ERROR_I18N("ZoneRulesAddon::GetFirstParameter, parameter type error.");
         errorCode = -1;
         return 0;
     }
     double date = 0;
     status = napi_get_value_double(env, argValue, &date);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("ZoneRulesAddon::GetFirstParamter, Get parameter date failed");
+        HILOG_ERROR_I18N("ZoneRulesAddon::GetFirstParameter, Get parameter date failed");
         errorCode = -1;
         return 0;
     }
