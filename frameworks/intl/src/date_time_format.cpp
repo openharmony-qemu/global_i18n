@@ -294,6 +294,11 @@ void DateTimeFormat::InitDateFormatWithDateTimeStyle(UErrorCode &status)
         }
     }
     icu::DateFormat *tempDateFormat = DateFormat::createDateTimeInstance(dateStyleValue, timeStyleValue, locale);
+    if (tempDateFormat == nullptr) {
+        status = U_INVALID_FORMAT_ERROR;
+        HILOG_ERROR_I18N("DateTimeFormat::InitDateFormatWithDateTimeStyle: Create DateFormat instance failed.");
+        return;
+    }
     SimpleDateFormat* simpleDateFormat = static_cast<SimpleDateFormat*>(tempDateFormat);
     std::unique_ptr<SimpleDateFormat> simDateFormatPtr = std::unique_ptr<SimpleDateFormat>(simpleDateFormat);
     if (simDateFormatPtr != nullptr) {
