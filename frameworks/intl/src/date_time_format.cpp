@@ -135,7 +135,7 @@ bool DateTimeFormat::InitWithLocale(const std::string &curLocale, std::map<std::
 
 void DateTimeFormat::InitDateFormatWithoutConfigs(UErrorCode &status)
 {
-    DateTimeFormat::DefaultStyle style = DefaultDTStyle[defaultStyle];
+    DateFormat::EStyle style = DefaultDTStyle[defaultStyle];
     dateFormat = std::unique_ptr<icu::DateFormat>(DateFormat::createDateInstance(style, locale));
     SimpleDateFormat *simDateFormat = static_cast<SimpleDateFormat*>(dateFormat.get());
     if (simDateFormat != nullptr) {
