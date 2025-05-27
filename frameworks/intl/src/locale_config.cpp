@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -232,11 +232,13 @@ std::unordered_map<std::string, WeekDay> LocaleConfig::nameToWeekDay {
 std::map<std::string, std::string> LocaleConfig::supportedDialectLocales;
 std::map<string, string> LocaleConfig::locale2DisplayName {};
 std::map<string, string> LocaleConfig::region2DisplayName {};
+std::unordered_map<std::string, bool> LocaleConfig::is24HourLocaleMap {};
 std::string LocaleConfig::currentDialectLocale = "";
 std::string LocaleConfig::currentOverrideRegion = "";
 std::mutex LocaleConfig::dialectLocaleMutex;
 std::mutex LocaleConfig::region2DisplayNameMutex;
 std::mutex LocaleConfig::locale2DisplayNameMutex;
+std::shared_mutex LocaleConfig::is24HourLocaleMapMutex;
 
 set<std::string> LocaleConfig::validCaTag {
     "buddhist",
@@ -1359,7 +1361,13 @@ std::string LocaleConfig::GetSystemHour()
 
 bool LocaleConfig::Is24HourLocale(const std::string& systemLocale)
 {
-    static std::unordered_map<std::string, bool> is24HourLocaleMap;
+    {
+        std::shared_lock<std::shared_mutex> lock(is24HourLocaleMapMutex);
+        if (is24HourLocaleMap.find(systemLocale) != is24HourLocaleMap.end()) {
+            return is24HourLocaleMap[systemLocale];
+        }
+    }
+    std::unique_lock<std::shared_mutex> lock(is24HourLocaleMapMutex);
     if (is24HourLocaleMap.find(systemLocale) != is24HourLocaleMap.end()) {
         return is24HourLocaleMap[systemLocale];
     }
