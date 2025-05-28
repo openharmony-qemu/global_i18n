@@ -78,10 +78,10 @@ private:
     std::string dayPeriod;
     std::string localeMatcher;
     std::string formatMatcher;
-    icu::DateFormat *dateFormat = nullptr;
+    std::unique_ptr<icu::DateFormat> dateFormat = nullptr;
     std::unique_ptr<icu::DateIntervalFormat> dateIntvFormat = nullptr;
-    icu::Calendar *calendar = nullptr;
-    LocaleInfo *localeInfo = nullptr;
+    std::unique_ptr<icu::Calendar> calendar = nullptr;
+    std::unique_ptr<LocaleInfo> localeInfo = nullptr;
     icu::Locale locale;
     icu::UnicodeString pattern;
     char16_t yearChar = 'Y';
@@ -126,7 +126,6 @@ private:
     static std::unordered_map<std::string, DefaultStyle> DeviceToStyle;
     DefaultStyle defaultStyle;
     bool InitWithLocale(const std::string &curLocale, std::map<std::string, std::string> &configs);
-    bool InitWithDefaultLocale(std::map<std::string, std::string> &configs);
     void ParseConfigsPartOne(std::map<std::string, std::string> &configs);
     void ParseConfigsPartTwo(std::map<std::string, std::string> &configs);
     void AddOptions(std::string option, char16_t optionChar);
@@ -145,12 +144,12 @@ private:
         std::string shortChar, std::string narrowChar);
     void InitDateFormatWithoutConfigs(UErrorCode &status);
     void InitDateFormat(UErrorCode &status);
+    void InitDateFormatWithDateTimeStyle(UErrorCode &status);
     void GetAdditionalResolvedOptions(std::map<std::string, std::string> &map);
     void FixPatternPartOne();
     void FixPatternPartTwo();
     void RemoveAmPmChar();
     bool CheckInitSuccess();
-    void FreeDateTimeFormat();
 };
 } // namespace I18n
 } // namespace Global
