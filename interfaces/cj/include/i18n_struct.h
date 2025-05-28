@@ -48,7 +48,6 @@ extern "C" {
         int32_t year;
         int32_t month;
         int32_t day;
-        char* language;
         HolidayLocalNameArr localNames;
     };
 
