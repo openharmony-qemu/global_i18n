@@ -187,6 +187,7 @@ private:
     static const std::string NUMBER_SYSTEM_KEY;
     static const std::string TEMPERATURE_UNIT_KEY;
     static const std::string WEEK_DAY_KEY;
+    static std::string prevNotPseudoRegion;
     static const std::string PSEUDO_REGION_XA;
     static const std::string PSEUDO_REGION_XB;
 

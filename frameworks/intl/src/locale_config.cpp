@@ -99,6 +99,7 @@ const std::string LocaleConfig::TIMEZONE_KEY = "persist.time.timezone";
 const std::string LocaleConfig::DEFAULT_TIMEZONE = "GMT";
 const std::string LocaleConfig::PSEUDO_REGION_XA = "XA";
 const std::string LocaleConfig::PSEUDO_REGION_XB = "XB";
+std::string LocaleConfig::prevNotPseudoRegion = "";
 unordered_set<string> LocaleConfig::supportedLocales;
 unordered_set<string> LocaleConfig::supportedLocalesV15;
 unordered_set<string> LocaleConfig::supportLocales;
@@ -1818,10 +1819,17 @@ std::string LocaleConfig::GetPseudoCountryTag(const char* countryTag, std::strin
         return regionTag;
     }
     if (PSEUDO_REGION_XA.compare(countryTag) == 0) {
+        prevNotPseudoRegion = regionTag;
         return PSEUDO_REGION_XA;
     }
     if (PSEUDO_REGION_XB.compare(countryTag) == 0) {
+        prevNotPseudoRegion = regionTag;
         return PSEUDO_REGION_XB;
+    }
+    if (PSEUDO_REGION_XA.compare(regionTag) == 0 || PSEUDO_REGION_XB.compare(regionTag) == 0) {
+        if (!prevNotPseudoRegion.empty()) {
+            return prevNotPseudoRegion;
+        }
     }
     return regionTag;
 }
