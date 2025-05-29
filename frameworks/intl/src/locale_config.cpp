@@ -1819,11 +1819,11 @@ std::string LocaleConfig::GetPseudoCountryTag(const char* countryTag, std::strin
         return regionTag;
     }
     if (PSEUDO_REGION_XA.compare(countryTag) == 0) {
-        prevNotPseudoRegion = regionTag;
+        prevNotPseudoRegion = std::string(regionTag);
         return PSEUDO_REGION_XA;
     }
     if (PSEUDO_REGION_XB.compare(countryTag) == 0) {
-        prevNotPseudoRegion = regionTag;
+        prevNotPseudoRegion = std::string(regionTag);
         return PSEUDO_REGION_XB;
     }
     if (PSEUDO_REGION_XA.compare(regionTag) == 0 || PSEUDO_REGION_XB.compare(regionTag) == 0) {
