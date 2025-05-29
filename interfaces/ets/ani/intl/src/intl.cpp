@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -776,7 +776,7 @@ ani_object IntlAniAddon::Locale_createWithParam(ani_env *env, [[maybe_unused]] a
     return locale_object;
 }
 
-static std::vector<std::string> getLocaleTags(ani_env *env, ani_object locale)
+static std::vector<std::string> GetLocaleTags(ani_env *env, ani_object locale)
 {
     std::vector<std::string> localeTags;
     ani_class stringClass;
@@ -843,7 +843,7 @@ ani_object IntlAniAddon::DateTimeFormat_create(ani_env *env, [[maybe_unused]] an
     return dateTimeFormat_object;
 }
 
-static std::map<std::string, std::string> getDateTimeFormatOptions(ani_env *env, ani_object options)
+static std::map<std::string, std::string> GetDateTimeFormatOptions(ani_env *env, ani_object options)
 {
     std::map<std::string, std::string> map;
     ani_boolean isUndefined;
@@ -875,8 +875,8 @@ static std::map<std::string, std::string> getDateTimeFormatOptions(ani_env *env,
 ani_object IntlAniAddon::DateTimeFormat_createWithParam(ani_env *env, [[maybe_unused]] ani_class clazz,
     ani_object locale, ani_object options)
 {
-    std::vector<std::string> localeTags = getLocaleTags(env, locale);
-    std::map<std::string, std::string> map = getDateTimeFormatOptions(env, options);
+    std::vector<std::string> localeTags = GetLocaleTags(env, locale);
+    std::map<std::string, std::string> map = GetDateTimeFormatOptions(env, options);
 
     std::unique_ptr<IntlAniAddon> obj = std::make_unique<IntlAniAddon>();
     obj->datefmt_ = DateTimeFormat::CreateInstance(localeTags, map);
@@ -900,7 +900,7 @@ ani_object IntlAniAddon::NumberFormat_create(ani_env *env, [[maybe_unused]] ani_
     return numberFormat_object;
 }
 
-static std::map<std::string, std::string> getNumberFormatOptions(ani_env *env, ani_object options)
+static std::map<std::string, std::string> GetNumberFormatOptions(ani_env *env, ani_object options)
 {
     std::map<std::string, std::string> map;
     ani_boolean isUndefined;
@@ -941,8 +941,8 @@ static std::map<std::string, std::string> getNumberFormatOptions(ani_env *env, a
 ani_object IntlAniAddon::NumberFormat_createWithParam(ani_env *env, [[maybe_unused]] ani_class clazz,
     ani_object locale, ani_object options)
 {
-    std::vector<std::string> localeTags = getLocaleTags(env, locale);
-    std::map<std::string, std::string> map = getNumberFormatOptions(env, options);
+    std::vector<std::string> localeTags = GetLocaleTags(env, locale);
+    std::map<std::string, std::string> map = GetNumberFormatOptions(env, options);
 
     std::unique_ptr<IntlAniAddon> obj = std::make_unique<IntlAniAddon>();
     obj->numberfmt_ = std::make_unique<NumberFormat>(localeTags, map);
@@ -966,7 +966,7 @@ ani_object IntlAniAddon::Collator_create(ani_env *env, [[maybe_unused]] ani_clas
     return collator_object;
 }
 
-static std::map<std::string, std::string> getCollatorOptions(ani_env *env, ani_object options)
+static std::map<std::string, std::string> GetCollatorOptions(ani_env *env, ani_object options)
 {
     std::map<std::string, std::string> map;
     ani_boolean isUndefined;
@@ -999,8 +999,8 @@ static std::map<std::string, std::string> getCollatorOptions(ani_env *env, ani_o
 ani_object IntlAniAddon::Collator_createWithParam(ani_env *env, [[maybe_unused]] ani_class clazz,
     ani_object locale, ani_object options)
 {
-    std::vector<std::string> localeTags = getLocaleTags(env, locale);
-    std::map<std::string, std::string> map = getCollatorOptions(env, options);
+    std::vector<std::string> localeTags = GetLocaleTags(env, locale);
+    std::map<std::string, std::string> map = GetCollatorOptions(env, options);
 
     std::unique_ptr<IntlAniAddon> obj = std::make_unique<IntlAniAddon>();
     obj->collator_ = std::make_unique<Collator>(localeTags, map);
@@ -1024,7 +1024,7 @@ ani_object IntlAniAddon::PluralRules_create(ani_env *env, [[maybe_unused]] ani_c
     return pluralRules_object;
 }
 
-static std::map<std::string, std::string> getPluralRulesOptions(ani_env *env, ani_object options)
+static std::map<std::string, std::string> GetPluralRulesOptions(ani_env *env, ani_object options)
 {
     std::map<std::string, std::string> map;
     ani_boolean isUndefined;
@@ -1057,8 +1057,8 @@ static std::map<std::string, std::string> getPluralRulesOptions(ani_env *env, an
 ani_object IntlAniAddon::PluralRules_createWithParam(ani_env *env, [[maybe_unused]] ani_class clazz,
     ani_object locale, ani_object options)
 {
-    std::vector<std::string> localeTags = getLocaleTags(env, locale);
-    std::map<std::string, std::string> map = getPluralRulesOptions(env, options);
+    std::vector<std::string> localeTags = GetLocaleTags(env, locale);
+    std::map<std::string, std::string> map = GetPluralRulesOptions(env, options);
 
     std::unique_ptr<IntlAniAddon> obj = std::make_unique<IntlAniAddon>();
     obj->pluralrules_ = std::make_unique<PluralRules>(localeTags, map);
@@ -1082,7 +1082,7 @@ ani_object IntlAniAddon::RelativeTimeFormat_create(ani_env *env, [[maybe_unused]
     return relativeTimeFormat_object;
 }
 
-static std::map<std::string, std::string> getRelativeTimeFormatOptions(ani_env *env, ani_object options)
+static std::map<std::string, std::string> GetRelativeTimeFormatOptions(ani_env *env, ani_object options)
 {
     std::map<std::string, std::string> map;
     ani_boolean isUndefined;
@@ -1105,8 +1105,8 @@ static std::map<std::string, std::string> getRelativeTimeFormatOptions(ani_env *
 ani_object IntlAniAddon::RelativeTimeFormat_createWithParam(ani_env *env, [[maybe_unused]] ani_class clazz,
     ani_object locale, ani_object options)
 {
-    std::vector<std::string> localeTags = getLocaleTags(env, locale);
-    std::map<std::string, std::string> map = getRelativeTimeFormatOptions(env, options);
+    std::vector<std::string> localeTags = GetLocaleTags(env, locale);
+    std::map<std::string, std::string> map = GetRelativeTimeFormatOptions(env, options);
 
     std::unique_ptr<IntlAniAddon> obj = std::make_unique<IntlAniAddon>();
     obj->relativetimefmt_= std::make_unique<RelativeTimeFormat>(localeTags, map);
