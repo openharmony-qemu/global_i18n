@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -50,6 +50,7 @@ private:
     static napi_value SetNumberFormatParts(napi_env env, napi_status &status,
         const std::vector<std::vector<std::string>> &numberParts);
     static napi_value CreateNumberFormatWithoutNew(napi_env env, size_t argc, napi_value *argv);
+    static double GetFormatParam(napi_env env, napi_value param, int32_t &code);
 
     bool InitNumberFormatContext(napi_env env, napi_callback_info info, std::vector<std::string> localeTags,
         std::map<std::string, std::string> &map);

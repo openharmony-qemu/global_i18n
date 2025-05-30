@@ -553,7 +553,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0063, TestSize.Level1)
     locales.push_back(locale);
     map<string, string> options = { { "style", "currency" },
                                     { "currency", "EUR" } };
-    NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
+    std::unique_ptr<NumberFormat> numFmt = std::make_unique<NumberFormat>(locales, options);
     ASSERT_TRUE(numFmt != nullptr);
     std::vector<std::vector<std::string>> result;
     double start = 3500;
@@ -571,7 +571,8 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0063, TestSize.Level1)
     options = { { "style", "currency" },
                 { "currency", "USD" } };
     double amount = 654321.987;
-    NumberFormat *numFmt2 = new (std::nothrow) NumberFormat(locales, options);
+    std::unique_ptr<NumberFormat> numFmt2 = std::make_unique<NumberFormat>(locales, options);
+    ASSERT_TRUE(numFmt2 != nullptr);
     numFmt2->FormatToParts(amount, result2);
     std::string sss = numFmt2->Format(amount);
     printf("result: %s \r\n", sss.c_str());
@@ -583,14 +584,12 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0063, TestSize.Level1)
     locales.clear();
     locales.push_back("ar");
     options = {};
-    NumberFormat *numFmt3 = new (std::nothrow) NumberFormat(locales, options);
+    std::unique_ptr<NumberFormat> numFmt3 = std::make_unique<NumberFormat>(locales, options);
+    ASSERT_TRUE(numFmt3 != nullptr);
     numFmt3->FormatToParts(result3);
     for (auto iter = result3.begin(); iter != result3.end(); ++iter) {
         printf("type:%s,value:%s \r\n", (*iter)[0].c_str(), (*iter)[1].c_str());
-    }   
-    delete numFmt;
-    delete numFmt2;
-    delete numFmt3;
+    }
 }
 
 /**
@@ -610,7 +609,8 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0064, TestSize.Level1)
     locales.clear();
     locales.push_back("en-US");
     options = {};
-    NumberFormat *numFmt2 = new (std::nothrow) NumberFormat(locales, options);
+    std::unique_ptr<NumberFormat> numFmt2 = std::make_unique<NumberFormat>(locales, options);
+    ASSERT_TRUE(numFmt2 != nullptr);
     result.clear();
     //"87,654,321–98,765,432";
     numFmt2->FormatRangeToParts(87654321, 98765432, result);
@@ -624,7 +624,6 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0064, TestSize.Level1)
         printf("type:%s,value:%s \r\n", (*iter)[0].c_str(), (*iter)[1].c_str());
     }
     printf("result: -----------range 2 end-------------------\r\n");
-    delete numFmt2;
 }
 
 /**

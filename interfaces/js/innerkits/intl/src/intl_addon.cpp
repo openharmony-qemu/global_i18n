@@ -1178,8 +1178,8 @@ bool RegisterIntl(napi_env env)
         return false;
     }
 
-    if (!BindingIntlModlues(napi_env env, napi_value &intlModule)) {
-        retunr false;
+    if (!BindingIntlModules(env, intlModule)) {
+        return false;
     }
 
     if (!SetBuildInIntl(env, global, intlModule)) {

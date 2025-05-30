@@ -587,8 +587,7 @@ void NumberFormat::FormattedNumberParts(icu::number::FormattedNumber &formattedN
     std::vector<std::vector<std::string>> &result, const std::string &napiType, double number)
 {
     UErrorCode status = U_ZERO_ERROR;
-    icu::UnicodeString formatResult;
-    formatResult = formattedNumber.toString(status);
+    icu::UnicodeString formatResult = formattedNumber.toString(status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("NumberFormat::FormatToParts: UnicodeString toString failed.");
         return;
