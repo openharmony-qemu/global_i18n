@@ -20,6 +20,7 @@
 #include <set>
 #include <unordered_map>
 #include <vector>
+#include "unicode/formattedvalue.h"
 #include "unicode/numberformatter.h"
 #include "unicode/locid.h"
 #include "unicode/numfmt.h"
@@ -36,6 +37,7 @@
 #include "unicode/ulocdata.h"
 #include "number_utils.h"
 #include "number_utypes.h"
+#include "i18n_types.h"
 #include "locale_info.h"
 #include "measure_data.h"
 #include "relative_time_format.h"
@@ -44,11 +46,20 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
+struct FormatPartParam {
+    int previousLimit;
+    bool lastFieldGroup;
+    int groupLeapLength;
+    double number;
+    std::string napiType;
+};
+
 class NumberFormat {
 public:
     NumberFormat(const std::vector<std::string> &localeTag, std::map<std::string, std::string> &configs);
     virtual ~NumberFormat();
     std::string Format(double number);
+    std::string FormatBigInt(int64_t number);
     bool IsRelativeTimeFormat(double number);
     icu::number::FormattedNumber FormatToFormattedNumber(double number);
     icu::FormattedRelativeDateTime FormatToFormattedRelativeDateTime(double number);
@@ -65,6 +76,14 @@ public:
     std::string GetMinimumSignificantDigits() const;
     std::string GetMaximumSignificantDigits() const;
     std::string GetLocaleMatcher() const;
+    void FormatToParts(std::vector<std::vector<std::string>> &result);
+    void FormatToParts(double number, std::vector<std::vector<std::string>> &result);
+    void FormatBigIntToParts(int64_t number, std::vector<std::vector<std::string>> &result);
+    void FormatRangeToParts(double start, double end,
+        std::vector<std::vector<std::string>> &result);
+    static std::vector<std::string> SupportedLocalesOf(const std::vector<std::string> &requestLocales,
+        const std::map<std::string, std::string> &configs, I18nErrorCode &status);
+    static std::string GetIcuDefaultLocale();
 
 private:
     icu::Locale locale;
@@ -129,6 +148,7 @@ private:
     static std::vector<size_t> roundingIncrementList;
     static std::map<std::string, std::string> RelativeTimeFormatConfigs;
     static bool ReadISO4217Datas();
+    static std::set<std::string> GetNumberAvailableLocales();
     std::string GetCurrencyFromConfig(const std::string& currency);
     void CreateRelativeTimeFormat(const std::string& locale);
     void ParseConfigs(std::map<std::string, std::string> &configs);
@@ -153,6 +173,21 @@ private:
     int32_t GetMaximumSignificantDigitsIntValue();
     int32_t GetMaximumFractionDigitsValue();
     int32_t GetMinimumFractionDigitsValue();
+    void RelativeDateTimeFormatToParts(double number, std::string &finalUnit,
+        std::vector<std::vector<std::string>> &result);
+    bool IsRelativeTimeFormat(double number, std::string &unitForConvert);
+    void AddFormatParts(std::string typeString, std::vector<std::vector<std::string>> &result,
+        icu::UnicodeString &formatResult, int32_t start, int32_t end);
+    std::string GetSubString(icu::UnicodeString &formatResult, int32_t start, int32_t end);
+    std::string GetNumberFieldType(std::string napiType, int32_t fieldId, double number);
+    icu::number::FormattedNumber FormatDecimalToFormattedNumber(std::string number);
+    void FormattedNumberParts(icu::number::FormattedNumber &formattedNumber,
+        std::vector<std::vector<std::string>> &result, const std::string &napiType, double number);
+    void FindAllFormatParts(icu::FormattedValue &formattedNumber, std::vector<std::vector<std::string>> &result,
+        double number, const std::string &napiType, icu::UnicodeString &formatResult);
+    void SetEveryFormatPartItem(icu::ConstrainedFieldPosition &cfpo, icu::UnicodeString &formatResult,
+        std::vector<std::vector<std::string>> &result, FormatPartParam &param);
+
 };
 } // namespace I18n
 } // namespace Global

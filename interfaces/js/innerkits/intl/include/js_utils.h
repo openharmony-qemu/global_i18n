@@ -44,6 +44,7 @@ public:
     static void SetIntegerOptionProperties(napi_env env, napi_value &result,
         std::map<std::string, std::string> &options, const std::string &option);
     static std::string GetString(napi_env env, napi_value value, int32_t& code);
+    static int64_t GetBigInt(napi_env env, napi_value value, int32_t& code);
     static std::vector<std::string> GetStringArray(napi_env env, napi_value value, int32_t& code);
     static std::vector<std::string> GetLocaleArray(napi_env env, napi_value value, int32_t& code);
     static napi_value CreateObject(napi_env env, std::unordered_map<std::string, napi_value>& propertys,

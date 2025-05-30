@@ -540,6 +540,139 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0062, TestSize.Level1)
     EXPECT_EQ(gbRes, "23 GB");
     delete numFormat;
 }
+
+/**
+ * @tc.name: NumberFormatFuncTest0063
+ * @tc.desc: Test Intl NumberFormat.FormatRangeToParts
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0063, TestSize.Level1)
+{
+    std::string locale = "de-DE";
+    std::vector<std::string> locales;
+    locales.push_back(locale);
+    map<string, string> options = { { "style", "currency" },
+                                    { "currency", "EUR" } };
+    NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
+    ASSERT_TRUE(numFmt != nullptr);
+    std::vector<std::vector<std::string>> result;
+    double start = 3500;
+    double end = 9500;
+    numFmt->FormatRangeToParts(start, end, result);
+    printf("result: -----------range-------------------\r\n");
+    for (auto iter = result.begin(); iter != result.end(); ++iter) {
+        printf("type:%s,value:%s \r\n", (*iter)[0].c_str(), (*iter)[1].c_str());
+    }  
+    printf("result: -----------range end-------------------\r\n");
+    std::vector<std::vector<std::string>> result2;
+    locale = "en-US";
+    locales.clear();
+    locales.push_back(locale);
+    options = { { "style", "currency" },
+                { "currency", "USD" } };
+    double amount = 654321.987;
+    NumberFormat *numFmt2 = new (std::nothrow) NumberFormat(locales, options);
+    numFmt2->FormatToParts(amount, result2);
+    std::string sss = numFmt2->Format(amount);
+    printf("result: %s \r\n", sss.c_str());
+    for (auto iter = result2.begin(); iter != result2.end(); ++iter) {
+        printf("type:%s,value:%s \r\n", (*iter)[0].c_str(), (*iter)[1].c_str());
+    }
+    printf("result: ------------------------------\r\n");
+    std::vector<std::vector<std::string>> result3;
+    locales.clear();
+    locales.push_back("ar");
+    options = {};
+    NumberFormat *numFmt3 = new (std::nothrow) NumberFormat(locales, options);
+    numFmt3->FormatToParts(result3);
+    for (auto iter = result3.begin(); iter != result3.end(); ++iter) {
+        printf("type:%s,value:%s \r\n", (*iter)[0].c_str(), (*iter)[1].c_str());
+    }   
+    delete numFmt;
+    delete numFmt2;
+    delete numFmt3;
+}
+
+/**
+ * @tc.name: NumberFormatFuncTest0064
+ * @tc.desc: Test Intl NumberFormat.FormatRangeToParts
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0064, TestSize.Level1)
+{
+    std::string locale = "de-DE";
+    std::vector<std::string> locales;
+    locales.push_back(locale);
+    map<string, string> options = { { "style", "currency" },
+                                    { "currency", "EUR" } };
+    std::vector<std::vector<std::string>> result;
+    printf("result: -----------range-------------------\r\n");
+    locales.clear();
+    locales.push_back("en-US");
+    options = {};
+    NumberFormat *numFmt2 = new (std::nothrow) NumberFormat(locales, options);
+    result.clear();
+    //"87,654,321–98,765,432";
+    numFmt2->FormatRangeToParts(87654321, 98765432, result);
+    for (auto iter = result.begin(); iter != result.end(); ++iter) {
+        printf("type:%s,value:%s \r\n", (*iter)[0].c_str(), (*iter)[1].c_str());
+    }
+    printf("result: -----------range 2-------------------\r\n");
+    result.clear();
+    numFmt2->FormatRangeToParts(-100, -100, result);
+    for (auto iter = result.begin(); iter != result.end(); ++iter) {
+        printf("type:%s,value:%s \r\n", (*iter)[0].c_str(), (*iter)[1].c_str());
+    }
+    printf("result: -----------range 2 end-------------------\r\n");
+    delete numFmt2;
+}
+
+/**
+ * @tc.name: NumberFormatFuncTest0065
+ * @tc.desc: Test Intl NumberFormat.FormatRangeToParts
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0065, TestSize.Level1)
+{
+    std::string locale = "es-ES";
+    std::vector<std::string> locales;
+    locales.push_back(locale);
+    map<string, string> options = { { "style", "currency" },
+                                    { "currency", "EUR" },
+                                    { "maximumFractionDigits", "0" } };
+    std::vector<std::vector<std::string>> result;
+    printf("result: -----------range 65-------------------\r\n");
+    std::unique_ptr<NumberFormat> numFmt2 = std::make_unique<NumberFormat>(locales, options);
+    ASSERT_TRUE(numFmt2 != nullptr);
+    result.clear();
+    // "3-5 €"
+    numFmt2->FormatRangeToParts(3, 5, result);
+    for (auto iter = result.begin(); iter != result.end(); ++iter) {
+        printf("type:%s,value:%s \r\n", (*iter)[0].c_str(), (*iter)[1].c_str());
+    }
+    printf("result: -----------range 65-------------------\r\n");
+    result.clear();
+    // "~3 €"
+    numFmt2->FormatRangeToParts(2.9, 3.1, result);
+    for (auto iter = result.begin(); iter != result.end(); ++iter) {
+        printf("type:%s,value:%s \r\n", (*iter)[0].c_str(), (*iter)[1].c_str());
+    }
+    printf("result: -----------range 65 end-------------------\r\n");
+    numFmt2->FormatRangeToParts(-123, 65, result);
+    for (auto iter = result.begin(); iter != result.end(); ++iter) {
+        printf("type:%s,value:%s \r\n", (*iter)[0].c_str(), (*iter)[1].c_str());
+    }
+    printf("result: -----------range 65-111 end-------------------\r\n");
+    std::vector<std::string> localeTags = {"ban", "id-u-co-pinyin", "de-ID"};
+    std::map<std::string, std::string> map = {
+        {"localeMatcher", "lookup"}
+    };
+    I18nErrorCode i18nStatus = I18nErrorCode::SUCCESS;
+    std::vector<std::string> resultLocales = NumberFormat::SupportedLocalesOf(localeTags, map, i18nStatus);
+    for (auto iter = resultLocales.begin(); iter != resultLocales.end(); ++iter) {
+        printf("locale: %s, \r\n", (*iter).c_str());
+    }
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

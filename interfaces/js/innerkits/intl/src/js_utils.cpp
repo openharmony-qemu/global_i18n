@@ -283,6 +283,19 @@ std::string JSUtils::GetString(napi_env env, napi_value value, int32_t& code)
     return result;
 }
 
+int64_t JSUtils::GetBigInt(napi_env env, napi_value value, int32_t& code)
+{
+    int64_t result = 0;
+    bool lossLess = false;
+    napi_status status = napi_get_value_bigint_int64(env, value, &result, &lossLess);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("JSUtils::GetBigInt: Get bigint value failed.");
+        code = -1;
+        return 0;
+    }
+    return result;
+}
+
 std::vector<std::string> JSUtils::GetStringArray(napi_env env, napi_value value, int32_t& code)
 {
     std::vector<std::string> result;

@@ -16,6 +16,7 @@
 
 #include "i18n_hilog.h"
 #include "js_utils.h"
+#include "locale_helper.h"
 
 namespace OHOS {
 namespace Global {
@@ -41,8 +42,11 @@ napi_value NumberFormatAddon::InitNumberFormat(napi_env env, napi_value exports)
 {
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("format", FormatNumber),
+        DECLARE_NAPI_FUNCTION("formatToParts", FormatToParts),
         DECLARE_NAPI_FUNCTION("formatRange", FormatRangeNumber),
-        DECLARE_NAPI_FUNCTION("resolvedOptions", GetNumberResolvedOptions)
+        DECLARE_NAPI_FUNCTION("resolvedOptions", GetNumberResolvedOptions),
+        DECLARE_NAPI_STATIC_FUNCTION("supportedLocalesOf", SupportedLocalesOf),
+        
     };
 
     napi_value constructor = nullptr;
@@ -231,6 +235,79 @@ napi_value NumberFormatAddon::GetNumberResolvedOptions(napi_env env, napi_callba
     JSUtils::SetIntegerOptionProperties(env, result, options, "maximumSignificantDigits");
     JSUtils::SetOptionProperties(env, result, options, "localeMatcher");
     return result;
+}
+
+napi_value NumberFormatAddon::FormatToParts(napi_env env, napi_callback_info info)
+{
+    size_t argc = 1;
+    napi_value argv[1] = { nullptr };
+    napi_value thisVar = nullptr;
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (status != napi_ok) {
+        return nullptr;
+    }
+    if (argc < 1) {
+
+        return nullptr;
+    }
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("NumberFormatAddon::FormatToParts: Get param type failed.");
+        return nullptr;
+    }
+    if (valueType != napi_valuetype::napi_number && valueType != napi_valuetype::napi_bigint) {
+        HILOG_ERROR_I18N("NumberFormatAddon::FormatToParts: parameter type invalid");
+        ErrorUtil::NapiThrowUndefined(env, "parameter type invalid");
+    }
+    if (valueType == napi_valuetype::napi_bigint) {
+        int32_t code = 0;
+        int64_t bigintValue = JSUtils::GetBigInt(env, argv[0], code);
+        if (code != 0) {
+            HILOG_ERROR_I18N("NumberFormatAddon::FormatToParts: Get bigint parameter failed");
+            return nullptr;
+        }
+    }
+    if (valueType == napi_valuetype::napi_number) {
+        double number = 0;
+        status = napi_get_value_double(env, argv[0], &number);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("FormatRangeNumber: Get first param value failed");
+            return JSUtils::CreateEmptyString(env);
+        }
+    }
+}
+
+napi_value NumberFormatAddon::SupportedLocalesOf(napi_env env, napi_callback_info info)
+{
+    size_t argc = 2;
+    napi_value argv[2] = { nullptr };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
+    std::vector<std::string> localeTags;
+    if (argc > 0) {
+        int32_t code = 0;
+        std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argv[0], code);
+        if (code != 0) {
+            return nullptr;
+        }
+        localeTags.assign(localeArray.begin(), localeArray.end());
+    }
+    std::map<std::string, std::string> map = {};
+    if (argc > 1) {
+        JSUtils::GetNumberOptionValues(env, argv[1], map);
+    }
+    I18nErrorCode i18nStatus = I18nErrorCode::SUCCESS;
+    std::vector<std::string> resultLocales = NumberFormat::SupportedLocalesOf(localeTags, map, i18nStatus);
+    if (i18nStatus != I18nErrorCode::SUCCESS) {
+        HILOG_ERROR_I18N("NumberFormatAddon::SupportedLocalesOf: SupportedLocalesOf status fail");
+        ErrorUtil::NapiThrowUndefined(env, "getStringOption failed");
+    }
+    return CreateArray(env, resultLocales);
 }
 
 std::shared_ptr<NumberFormat> NumberFormatAddon::CopyNumberFormat()
