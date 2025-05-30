@@ -112,6 +112,20 @@ std::map<std::string, std::string> NumberFormat::RelativeTimeFormatConfigs = {
     { "numeric", "auto" }
 };
 
+std::unordered_map<UNumberFormatFields, std::string> NumberFormat::numberFormatFieldMap = {
+    { UNUM_FRACTION_FIELD, "fraction" },
+    { UNUM_DECIMAL_SEPARATOR_FIELD, "decimal" },
+    { UNUM_GROUPING_SEPARATOR_FIELD, "group" },
+    { UNUM_CURRENCY_FIELD, "currency" },
+    { UNUM_PERCENT_FIELD, "percent" },
+    { UNUM_EXPONENT_SYMBOL_FIELD, "exponentSymbol" },
+    { UNUM_EXPONENT_SIGN_FIELD, "exponentSign" },
+    { UNUM_EXPONENT_FIELD, "exponent" },
+    { UNUM_COMPACT_FIELD, "compact" },
+    { UNUM_MEASURE_UNIT_FIELD, "unit" },
+    { UNUM_APPROXIMATELY_SIGN_FIELD, "approximatelySign" },
+};
+
 NumberFormat::NumberFormat(const std::vector<std::string> &localeTags, std::map<std::string, std::string> &configs)
 {
     SetDefaultStyle();
@@ -547,7 +561,7 @@ void NumberFormat::FormatToParts(std::vector<std::vector<std::string>> &result)
 {
     double number = uprv_getNaN();
     icu::number::FormattedNumber formattedNumber = FormatToFormattedNumber(number);
-    FormattedNumberParts(formattedNumber, result, "nan", number);  
+    FormattedNumberParts(formattedNumber, result, "nan", number);
 }
 
 void NumberFormat::FormatBigIntToParts(int64_t number, std::vector<std::vector<std::string>> &result)
@@ -606,7 +620,7 @@ void NumberFormat::FindAllFormatParts(icu::FormattedValue &formattedNumber,
 }
 
 void NumberFormat::SetEveryFormatPartItem(icu::ConstrainedFieldPosition &cfpo, icu::UnicodeString &formatResult,
-        std::vector<std::vector<std::string>> &result, FormatPartParam &param)
+    std::vector<std::vector<std::string>> &result, FormatPartParam &param)
 {
     int32_t fieldId = cfpo.getField();
     int32_t start = cfpo.getStart();
@@ -652,9 +666,13 @@ void NumberFormat::SetEveryFormatPartItem(icu::ConstrainedFieldPosition &cfpo, i
 
 std::string NumberFormat::GetNumberFieldType(std::string napiType, int32_t fieldId, double number)
 {
+    UNumberFormatFields formatField = static_cast<UNumberFormatFields>(fieldId);
+    if (numberFormatFieldMap.find(formatField) != numberFormatFieldMap.end()) {
+        return numberFormatFieldMap[formatField];
+    }
     bool isBigint = napiType.compare("bigint") == 0;
     double tempNumber = 0;
-    switch (static_cast<UNumberFormatFields>(fieldId)) {
+    switch (formatField) {
         case UNUM_INTEGER_FIELD:
             tempNumber = isBigint ? tempNumber : number;
             if (isBigint || std::isfinite(tempNumber)) {
@@ -664,33 +682,11 @@ std::string NumberFormat::GetNumberFieldType(std::string napiType, int32_t field
                 return "nan";
             }
             return "infinity";
-        case UNUM_FRACTION_FIELD:
-            return "fraction";
-        case UNUM_DECIMAL_SEPARATOR_FIELD:
-            return "decimal";
-        case UNUM_GROUPING_SEPARATOR_FIELD:
-            return "group";
-        case UNUM_CURRENCY_FIELD:
-            return "currency";
-        case UNUM_PERCENT_FIELD:
-            return "percent";
         case UNUM_SIGN_FIELD:
             if (isBigint) {
                 return number < 0 ? "minusSign" : "plusSign";
             }
             return std::signbit(number) ? "minusSign" : "plusSign";
-        case UNUM_EXPONENT_SYMBOL_FIELD:
-            return "exponentSymbol";
-        case UNUM_EXPONENT_SIGN_FIELD:
-            return "exponentSign";
-        case UNUM_EXPONENT_FIELD:
-            return "exponent";
-        case UNUM_COMPACT_FIELD:
-            return "compact";
-        case UNUM_MEASURE_UNIT_FIELD:
-            return "unit";
-        case UNUM_APPROXIMATELY_SIGN_FIELD:
-            return "approximatelySign";
         default:
             return "";
     }
@@ -703,7 +699,7 @@ void NumberFormat::AddFormatParts(std::string typeString, std::vector<std::vecto
     std::vector<std::string> info;
     info.push_back(typeString);
     info.push_back(value);
-    result.push_back(info);   
+    result.push_back(info);
 }
 
 std::string NumberFormat::GetSubString(icu::UnicodeString &formatResult, int32_t start, int32_t end)
@@ -912,7 +908,7 @@ std::set<std::string> NumberFormat::GetNumberAvailableLocales()
     int32_t count = 0;
     const icu::Locale* locales = icu::NumberFormat::getAvailableLocales(count);
     if (count < 1 || locales == nullptr) {
-        HILOG_ERROR_I18N("NumberFormat::GetNumberAvailableLocales: Get available locales failed.");       
+        HILOG_ERROR_I18N("NumberFormat::GetNumberAvailableLocales: Get available locales failed.");
         return result;
     }
     for (int i = 0; i < count; i++) {
@@ -925,8 +921,7 @@ std::set<std::string> NumberFormat::GetNumberAvailableLocales()
 }
 
 std::vector<std::string> NumberFormat::SupportedLocalesOf(const std::vector<std::string> &requestLocales,
-                                                          const std::map<std::string, std::string> &configs,
-                                                          I18nErrorCode &status)
+    const std::map<std::string, std::string> &configs, I18nErrorCode &status)
 {
     std::vector<std::string> undefined = {};
     auto requestedLocales = LocaleHelper::CanonicalizeLocaleList(requestLocales, status);
@@ -938,7 +933,7 @@ std::vector<std::string> NumberFormat::SupportedLocalesOf(const std::vector<std:
         return undefined;
     }
     std::set<std::string> availableLocales = GetNumberAvailableLocales();
-    return LocaleHelper::LookupSupportedLocales(availableLocales, requestedLocales);  
+    return LocaleHelper::LookupSupportedLocales(availableLocales, requestedLocales);
 }
 
 void NumberFormat::GetDigitsResolvedOptions(std::map<std::string, std::string> &map)

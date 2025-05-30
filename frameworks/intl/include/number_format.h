@@ -147,6 +147,7 @@ private:
     static std::unordered_map<std::string, UNumberFormatRoundingMode> roundingModeStyle;
     static std::vector<size_t> roundingIncrementList;
     static std::map<std::string, std::string> RelativeTimeFormatConfigs;
+    static std::unordered_map<UNumberFormatFields, std::string> numberFormatFieldMap;
     static bool ReadISO4217Datas();
     static std::set<std::string> GetNumberAvailableLocales();
     std::string GetCurrencyFromConfig(const std::string& currency);
@@ -187,7 +188,6 @@ private:
         double number, const std::string &napiType, icu::UnicodeString &formatResult);
     void SetEveryFormatPartItem(icu::ConstrainedFieldPosition &cfpo, icu::UnicodeString &formatResult,
         std::vector<std::vector<std::string>> &result, FormatPartParam &param);
-
 };
 } // namespace I18n
 } // namespace Global
