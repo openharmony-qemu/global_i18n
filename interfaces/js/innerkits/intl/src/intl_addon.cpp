@@ -24,6 +24,7 @@
 #include "error_util.h"
 #include "i18n_hilog.h"
 #include "intl_locale_addon.h"
+#include "js_number_format_addon.h"
 #include "js_utils.h"
 #include "locale_info_addon.h"
 #include "number_format_addon.h"
