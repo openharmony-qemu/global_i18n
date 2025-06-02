@@ -562,7 +562,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0063, TestSize.Level1)
     printf("result: -----------range-------------------\r\n");
     for (auto iter = result.begin(); iter != result.end(); ++iter) {
         printf("type:%s,value:%s \r\n", (*iter)[0].c_str(), (*iter)[1].c_str());
-    }  
+    }
     printf("result: -----------range end-------------------\r\n");
     std::vector<std::vector<std::string>> result2;
     locale = "en-US";
