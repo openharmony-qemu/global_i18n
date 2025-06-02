@@ -79,12 +79,12 @@ napi_value StyledNumberFormatAddon::constructor(napi_env env, napi_callback_info
         return nullptr;
     }
 
-    NumberFormatAddon *numberFormatAddon = nullptr;
+    JSNumberFormatAddon *jsNumberFormatAddon = nullptr;
     SimpleNumberFormatAddon *simpleNumberFormatAddon = nullptr;
 
-    GetNumberFmtOrSimpleNumberFmt(env, argv[0], &numberFormatAddon, &simpleNumberFormatAddon);
+    GetNumberFmtOrSimpleNumberFmt(env, argv[0], &jsNumberFormatAddon, &simpleNumberFormatAddon);
 
-    if (!numberFormatAddon && !simpleNumberFormatAddon) {
+    if (!jsNumberFormatAddon && !simpleNumberFormatAddon) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "numberFormat", "intl.NumberFormat or SimpleNumberFormat", true);
         return nullptr;
     }
@@ -99,7 +99,7 @@ napi_value StyledNumberFormatAddon::constructor(napi_env env, napi_callback_info
         HILOG_ERROR_I18N("StyledNumberFormatAddon::constructor napi_wrap error");
         return nullptr;
     }
-    if (!obj->InitStyledNumberFormatContent(env, numberFormatAddon, simpleNumberFormatAddon, argv[1])) {
+    if (!obj->InitStyledNumberFormatContent(env, jsNumberFormatAddon, simpleNumberFormatAddon, argv[1])) {
         return nullptr;
     }
     obj.release();
@@ -149,12 +149,12 @@ napi_value StyledNumberFormatAddon::Format(napi_env env, napi_callback_info info
     return styledString;
 }
 
-bool StyledNumberFormatAddon::InitStyledNumberFormatContent(napi_env env, NumberFormatAddon* numberFormatAddon,
+bool StyledNumberFormatAddon::InitStyledNumberFormatContent(napi_env env, JSNumberFormatAddon* jsNumberFormatAddon,
     SimpleNumberFormatAddon* simpleNumberFormatAddon, napi_value options)
 {
-    if (numberFormatAddon) {
+    if (jsNumberFormatAddon) {
         styledNumberFormat_ =
-            std::make_unique<StyledNumberFormat>(true, numberFormatAddon->CopyNumberFormat(), nullptr);
+            std::make_unique<StyledNumberFormat>(true, jsNumberFormatAddon->CopyNumberFormat(), nullptr);
     } else if (simpleNumberFormatAddon) {
         styledNumberFormat_ =
             std::make_unique<StyledNumberFormat>(false, nullptr, simpleNumberFormatAddon->CopySimpleNumberFormat());
@@ -320,7 +320,7 @@ void StyledNumberFormatAddon::SetNamedProperty(napi_env env, napi_value &option,
 }
 
 void StyledNumberFormatAddon::GetNumberFmtOrSimpleNumberFmt(napi_env env, napi_value arg,
-    NumberFormatAddon **numberFormatAddon, SimpleNumberFormatAddon **simpleNumberFormatAddon)
+    JSNumberFormatAddon **jsNumberformataddon, SimpleNumberFormatAddon **simpleNumberFormatAddon)
 {
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_status status = napi_typeof(env, arg, &valueType);
@@ -334,7 +334,7 @@ void StyledNumberFormatAddon::GetNumberFmtOrSimpleNumberFmt(napi_env env, napi_v
 
     napi_value numFmtConstructor = nullptr;
     napi_value intlModule;
-    status = napi_load_module(env, "@ohos.intl", &intlModule);
+    status = napi_load_module(env, "Intl", &intlModule);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("StyledNumberFormatAddon::constructor Failed to get intl module.");
         return;
@@ -345,16 +345,16 @@ void StyledNumberFormatAddon::GetNumberFmtOrSimpleNumberFmt(napi_env env, napi_v
         return;
     }
 
-    bool isNumberFormat = true;
-    status = napi_instanceof(env, arg, numFmtConstructor, &isNumberFormat);
+    bool isJsNumberFormat = true;
+    status = napi_instanceof(env, arg, numFmtConstructor, &isJsNumberFormat);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("StyledNumberFormatAddon::constructor Failed to get instance of argv 0.");
         return;
     }
-    if (isNumberFormat) {
-        status = napi_unwrap(env, arg, reinterpret_cast<void **>(numberFormatAddon));
+    if (isJsNumberFormat) {
+        status = napi_unwrap(env, arg, reinterpret_cast<void **>(jsNumberformataddon));
         if (status != napi_ok) {
-            *numberFormatAddon = nullptr;
+            *jsNumberformataddon = nullptr;
         }
     } else {
         status = napi_unwrap(env, arg, reinterpret_cast<void **>(simpleNumberFormatAddon));
