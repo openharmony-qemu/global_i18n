@@ -17,6 +17,7 @@
 #include <cctype>
 #include <cmath>
 #include <sstream>
+#include <tuple>
 #include "i18n_hilog.h"
 #include "locale_helper.h"
 #include "ohos/init_data.h"
@@ -1157,6 +1158,94 @@ std::string NumberFormat::GetIcuDefaultLocale()
         return StrReplaceAll(baseNameStr, "_", "-");
     }
     return "en-US";
+}
+
+std::string NumberFormat::CheckParamLocales(std::vector<std::string> &localeArray)
+{
+    for (auto iter = localeArray.begin(); iter != localeArray.end(); ++iter) {
+        UErrorCode status = U_ZERO_ERROR;
+        icu::Locale locale = icu::Locale::forLanguageTag(icu::StringPiece(*iter), status);
+        if (U_FAILURE(status)) {
+            HILOG_ERROR_I18N("NumberFormat::CheckParamLocales: locale %{public}s invalid", (*iter).c_str());
+            return "invalid locale";
+            
+        }
+        if (LocaleInfo::allValidLocales.count(locale.getLanguage()) < 1) {
+            HILOG_ERROR_I18N("NumberFormat::CheckParamLocales: invalid locale: %{public}s ", (*iter).c_str());
+            return "invalid locale";
+        }
+    }
+    return "";
+}
+
+std::string NumberFormat::CheckNumberFormatOptions(std::map<std::string, std::string> &map, int32_t &code)
+{
+    if (map.find("style") != map.end()) {
+        std::string style = map["style"];
+        if (style.compare("currency") == 0 && map.find("currency") == map.end()) {
+            code = -1;
+            return "style is currency but currency is undefined";
+        }
+        if (style.compare("currency") == 0) {
+            std::string currency = map["currency"];
+            std::string checkCurr = GetCurrencyFromConfig(currency);
+            if (checkCurr.empty()) {
+                code = -1;
+                return "not a wellformed code";
+            }
+        }
+    }
+    if (map.find("localeMatcher") != map.end()) {
+        I18nErrorCode status = I18nErrorCode::SUCCESS;
+        std::string localeMatcher = LocaleHelper::ParseOption(map, "localeMatcher", "best fit", false, status);
+        if (status != I18nErrorCode::SUCCESS) {
+            code = -1;
+            return "getStringOption failed";
+        }
+    }
+    if (map.find("currencySign") != map.end()) {
+        std::string currencySign = map["currencySign"];
+        if (currencySign.compare("standard") != 0 && currencySign.compare("accounting") != 0) {
+            code = -1;
+            return "getStringOption failed";
+        }
+    }
+    std::vector<std::tuple<std::string, int, int>> vect = {
+        {"minimumIntegerDigits", 1, 21}, // 21 is maximum of minimumIntegerDigits
+        {"minimumFractionDigits", 0, 20}, // 20 is maximum of minimumFractionDigits
+        {"maximumFractionDigits", 1, 21}, // 21 is maximum of maximumFractionDigits
+        {"minimumSignificantDigits", 1, 21}, // 21 is maximum of minimumSignificantDigits
+        {"maximumSignificantDigits", 1, 21}, // 21 is maximum of maximumSignificantDigits
+    };
+    for (auto iter = vect.begin(); iter < vect.end(); ++iter) {
+        std::string optionName = std::get<0>(*iter);
+        int min = std::get<1>(*iter); // 1 is item index
+        int max = std::get<2>(*iter); // 2 is item index
+        std::string msg = CheckNumberFormatOptionsExt(map, code, optionName, min, max);
+        if (code != 0) {
+            return msg;
+        }
+    }
+    return "";
+}
+
+std::string NumberFormat::CheckNumberFormatOptionsExt(std::map<std::string, std::string> &map, int32_t &code,
+    const std::string &optionName, int min, int max)
+{
+    if (map.find(optionName) != map.end()) {
+        std::string optionNameStr = map[optionName];
+        int32_t status = 0;
+        int32_t optionValue = ConvertString2Int(optionNameStr, status);
+        if (status != 0) {
+            code = -1;
+            return "";
+        }
+        if (optionValue < min || optionValue > max) {
+            code = -1;
+            return "";
+        }
+    }
+    return "";
 }
 } // namespace I18n
 } // namespace Global

@@ -84,6 +84,8 @@ public:
     static std::vector<std::string> SupportedLocalesOf(const std::vector<std::string> &requestLocales,
         const std::map<std::string, std::string> &configs, I18nErrorCode &status);
     static std::string GetIcuDefaultLocale();
+    std::string CheckNumberFormatOptions(std::map<std::string, std::string> &map, int32_t &code);
+    static std::string CheckParamLocales(std::vector<std::string> &localeArray);
 
 private:
     icu::Locale locale;
@@ -126,6 +128,9 @@ private:
     static const int MAX_UNIT_NUM = 500;
     static const int DEFAULT_FRACTION_DIGITS = 3;
     static const int DEFAULT_MAX_SIGNIFICANT_DIGITS = 21;
+    static const int MAX_MINIMUM_INTEGER_DIGITS = 21;
+    static const int MAX_MINIMUM_FRACTION_DIGITS = 20;
+    static const int MAX_MAXIMUM_FRACTION_DIGITS = 21;
     static const char *DEVICE_TYPE_NAME;
     static const int BUFFER_LEN = 10;
     static const int POW_BASE_NUMBER = 10;
@@ -188,6 +193,8 @@ private:
         double number, const std::string &napiType, icu::UnicodeString &formatResult);
     void SetEveryFormatPartItem(icu::ConstrainedFieldPosition &cfpo, icu::UnicodeString &formatResult,
         std::vector<std::vector<std::string>> &result, FormatPartParam &param);
+    std::string CheckNumberFormatOptionsExt(std::map<std::string, std::string> &map, int32_t &code,
+        const std::string &optionName, int min, int max);
 };
 } // namespace I18n
 } // namespace Global

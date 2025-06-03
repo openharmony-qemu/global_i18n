@@ -19,6 +19,7 @@
 #include "i18n_hilog.h"
 #include "js_utils.h"
 #include "locale_helper.h"
+#include "utils.h"
 
 namespace OHOS {
 namespace Global {
@@ -57,12 +58,12 @@ napi_value JSNumberFormatAddon::InitJsNumberFormat(napi_env env, napi_value expo
     napi_status status = napi_define_class(env, "NumberFormat", NAPI_AUTO_LENGTH, NumberFormatConstructor, nullptr,
         sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("Define class failed when InitNumberFormat");
+        HILOG_ERROR_I18N("InitJsNumberFormat: Define class failed when InitNumberFormat");
         return nullptr;
     }
     status = napi_set_named_property(env, exports, "NumberFormat", constructor);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("Set property failed when InitNumberFormat");
+        HILOG_ERROR_I18N("InitJsNumberFormat: Set property failed when InitNumberFormat");
         return nullptr;
     }
     status = napi_create_reference(env, constructor, 1, &g_JsNumberFormatConstructor);
@@ -86,14 +87,25 @@ napi_value JSNumberFormatAddon::NumberFormatConstructor(napi_env env, napi_callb
     napi_value new_target;
     status = napi_get_new_target(env, info, &new_target);
     if (status == napi_pending_exception || new_target == nullptr) {
+        HILOG_ERROR_I18N("zdd--CreateNumberFormatWithoutNew %{public}d", argc);
         return CreateNumberFormatWithoutNew(env, argc, argv);
     }
     std::vector<std::string> localeTags;
+        HILOG_ERROR_I18N("zdd--NumberFormatConstructor");
     if (argc > 0) {
         int32_t code = 0;
+        HILOG_ERROR_I18N("zdd--argc > 0");
         std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argv[0], code);
         if (code != 0) {
             return nullptr;
+        }
+        std::string dest;
+        Merge(localeArray, ",", dest);
+        HILOG_ERROR_I18N("zdd--dest is %{public}s", dest.c_str());
+        std::string checkResult = NumberFormat::CheckParamLocales(localeArray);
+        HILOG_ERROR_I18N("zdd--checkResult is %{public}s", checkResult.c_str());
+        if (!checkResult.empty()) {
+            ErrorUtil::NapiThrowUndefined(env, checkResult);
         }
         localeTags.assign(localeArray.begin(), localeArray.end());
     } else {
@@ -133,6 +145,13 @@ bool JSNumberFormatAddon::InitNumberFormatContext(napi_env env, napi_callback_in
         return false;
     }
     numberfmt_ = std::make_shared<NumberFormat>(localeTags, map);
+    if (numberfmt_ != nullptr) {
+        int32_t code = 0;
+        std::string message = numberfmt_->CheckNumberFormatOptions(map, code);
+        if (code != 0) {
+            ErrorUtil::NapiThrowUndefined(env, message);
+        }
+    }
     return numberfmt_ != nullptr;
 }
 
