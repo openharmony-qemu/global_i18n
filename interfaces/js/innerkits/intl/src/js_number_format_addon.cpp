@@ -338,7 +338,7 @@ napi_value JSNumberFormatAddon::GetNumberResolvedOptions(napi_env env, napi_call
         return nullptr;
     }
     std::map<std::string, std::string> options = {};
-    obj->numberfmt_->GetResolvedOptions(options);
+    obj->numberfmt_->GetResolvedOptions(options, true);
     JSUtils::SetOptionProperties(env, result, options, "locale");
     JSUtils::SetOptionProperties(env, result, options, "currency");
     JSUtils::SetOptionProperties(env, result, options, "currencySign");
@@ -476,7 +476,7 @@ napi_value JSNumberFormatAddon::SupportedLocalesOf(napi_env env, napi_callback_i
     std::vector<std::string> resultLocales = NumberFormat::SupportedLocalesOf(localeTags, map, i18nStatus);
     if (i18nStatus != I18nErrorCode::SUCCESS) {
         HILOG_ERROR_I18N("JSNumberFormatAddon::SupportedLocalesOf: SupportedLocalesOf status fail");
-        ErrorUtil::NapiThrowUndefined(env, "getStringOption failed");
+        ErrorUtil::NapiThrowUndefined(env, "invalid locale");
     }
     return JSUtils::CreateArray(env, resultLocales);
 }
@@ -507,8 +507,9 @@ napi_value JSNumberFormatAddon::SetNumberFormatParts(napi_env env, napi_status &
             { "type", type },
             { "value", value }
         };
+        std::vector<std::string> keyVect = { "type", "value" };
         int32_t code = 0;
-        napi_value formatInfo = JSUtils::CreateObject(env, propertys, code);
+        napi_value formatInfo = JSUtils::CreateArrayItem(env, propertys, code, keyVect);
         if (code != 0) {
             return nullptr;
         }

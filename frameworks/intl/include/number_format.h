@@ -64,7 +64,7 @@ public:
     icu::number::FormattedNumber FormatToFormattedNumber(double number);
     icu::FormattedRelativeDateTime FormatToFormattedRelativeDateTime(double number);
     std::string FormatRange(double start, double end);
-    void GetResolvedOptions(std::map<std::string, std::string> &map);
+    void GetResolvedOptions(std::map<std::string, std::string> &map, bool setDefault = false);
     std::string GetCurrency() const;
     std::string GetCurrencySign() const;
     std::string GetStyle() const;
@@ -153,6 +153,7 @@ private:
     static std::vector<size_t> roundingIncrementList;
     static std::map<std::string, std::string> RelativeTimeFormatConfigs;
     static std::unordered_map<UNumberFormatFields, std::string> numberFormatFieldMap;
+    static std::unordered_map<std::string, int> defaultCurrencyFractionMap;
     static bool ReadISO4217Datas();
     static std::set<std::string> GetNumberAvailableLocales();
     std::string GetCurrencyFromConfig(const std::string& currency);
@@ -160,7 +161,11 @@ private:
     void ParseConfigs(std::map<std::string, std::string> &configs);
     void ParseDigitsConfigs(std::map<std::string, std::string> &configs);
     void ParseRoundingConfigs(std::map<std::string, std::string> &configs);
-    void GetDigitsResolvedOptions(std::map<std::string, std::string> &map);
+    void GetDigitsResolvedOptions(std::map<std::string, std::string> &map, bool setDefault);
+    void GetDigitsResolvedOptionsExt(std::map<std::string, std::string> &map, bool setDefault);
+    void GetMinimumFractionDigitsOption(std::map<std::string, std::string> &map);
+    void GetMaximumFractionDigitsOption(std::map<std::string, std::string> &map);
+    int GetCurrencyFractionDigits(std::map<std::string, std::string> &map);
     void InitProperties(icu::number::UnlocalizedNumberFormatter &formatter);
     void InitUnitProperties(icu::number::UnlocalizedNumberFormatter &formatter);
     void InitCurrencyProperties(icu::number::UnlocalizedNumberFormatter &formatter);
