@@ -904,7 +904,10 @@ string LocaleConfig::GetMainLanguage(const string &language,
 
 string LocaleConfig::GetDisplayLanguage(const string &language, const string &displayLocale, bool sentenceCase)
 {
-    std::string result;
+    std::string result = GetPseudoDisplayLanguage(language);
+    if (!result.empty()) {
+        return result;
+    }
     string adjust = Adjust(language);
     if (adjust == language) {
         UErrorCode status = U_ZERO_ERROR;
@@ -936,6 +939,17 @@ string LocaleConfig::GetDisplayLanguage(const string &language, const string &di
         return PseudoLocalizationProcessor(result.replace(0, 1, 1, ch));
     }
     return PseudoLocalizationProcessor(result);
+}
+
+std::string LocaleConfig::GetPseudoDisplayLanguage(const std::string &language)
+{
+    if (language.compare("en-XA") == 0) {
+        return "[Pseudo locale]";
+    }
+    if (language.compare("ar-XB") == 0) {
+        return "[Bidirection test locale]";
+    }
+    return "";
 }
 
 std::string LocaleConfig::ComputeLocale(const std::string &displayLocale)

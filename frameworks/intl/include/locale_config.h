@@ -289,6 +289,7 @@ private:
     static void ExtendWhiteLanguages();
     static void ExtendLanguageWithScript(const std::string &languageStr);
     static __attribute__((destructor)) void CleanupXmlResources();
+    static std::string GetPseudoDisplayLanguage(const std::string &language);
     static std::unordered_set<std::string> supportedLocales;
     static std::unordered_set<std::string> supportedLocalesV15;
     static std::unordered_set<std::string> supportedRegions;
