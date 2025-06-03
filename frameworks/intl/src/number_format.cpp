@@ -118,7 +118,7 @@ std::unordered_map<UNumberFormatFields, std::string> NumberFormat::numberFormatF
     { UNUM_DECIMAL_SEPARATOR_FIELD, "decimal" },
     { UNUM_GROUPING_SEPARATOR_FIELD, "group" },
     { UNUM_CURRENCY_FIELD, "currency" },
-    { UNUM_PERCENT_FIELD, "percent" },
+    { UNUM_PERCENT_FIELD, "percentSign" },
     { UNUM_EXPONENT_SYMBOL_FIELD, "exponentSymbol" },
     { UNUM_EXPONENT_SIGN_FIELD, "exponentSign" },
     { UNUM_EXPONENT_FIELD, "exponent" },
@@ -1073,12 +1073,12 @@ void NumberFormat::GetMaximumFractionDigitsOption(std::map<std::string, std::str
         style = map["style"];
     }
     if (style == "decimal") {
-        map.insert(std::make_pair("minimumFractionDigits", "3"));
+        map.insert(std::make_pair("maximumFractionDigits", "3"));
     } else if (style == "percent") {
-        map.insert(std::make_pair("minimumFractionDigits", "0"));
+        map.insert(std::make_pair("maximumFractionDigits", "0"));
     } else if (style == "currency") {
         int fraction = GetCurrencyFractionDigits(map);
-        map.insert(std::make_pair("minimumFractionDigits", std::to_string(fraction)));
+        map.insert(std::make_pair("maximumFractionDigits", std::to_string(fraction)));
     }
 }
 
@@ -1319,7 +1319,7 @@ std::string NumberFormat::CheckNumberFormatOptions(std::map<std::string, std::st
     std::vector<std::tuple<std::string, int, int>> vect = {
         {"minimumIntegerDigits", 1, 21}, // 21 is maximum of minimumIntegerDigits
         {"minimumFractionDigits", 0, 20}, // 20 is maximum of minimumFractionDigits
-        {"maximumFractionDigits", 1, 21}, // 21 is maximum of maximumFractionDigits
+        {"maximumFractionDigits", 0, 21}, // 21 is maximum of maximumFractionDigits
         {"minimumSignificantDigits", 1, 21}, // 21 is maximum of minimumSignificantDigits
         {"maximumSignificantDigits", 1, 21}, // 21 is maximum of maximumSignificantDigits
     };
