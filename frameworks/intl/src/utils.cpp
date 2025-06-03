@@ -287,6 +287,18 @@ bool IsDirExist(const char *path)
     return stat(resolvedPath, &buf) == 0 && S_ISDIR(buf.st_mode);
 }
 
+void ClearDir(const std::filesystem::path& dirPath)
+{
+    std::error_code errCode;
+    for (const auto& entry : std::filesystem::directory_iterator(dirPath)) {
+        std::filesystem::remove_all(entry.path(), errCode);
+        if (errCode) {
+            HILOG_ERROR_I18N("ClearDir: Error removing file: %{public}s, Error: %{public}s", entry.path().c_str(),
+                errCode.message().c_str());
+        }
+    }
+}
+
 std::string trim(std::string &s)
 {
     if (s.empty()) {

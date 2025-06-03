@@ -36,7 +36,6 @@ private:
     static bool CompareVersion(const std::string& preVersion, const std::string& curVersion);
     static bool CopySingleFile(const std::filesystem::path& srcFile, const std::filesystem::path& dstFile);
     static bool EnsureDirectoryExists(const std::filesystem::path& dirPath);
-    static void ClearDir(const std::filesystem::path& dirPath);
     static const std::string CERT_FILE;
     static const std::string VERIFY_FILE;
     static const std::string MANIFEST_FILE;

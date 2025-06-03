@@ -83,18 +83,6 @@ bool UpgradeUtils::CopyDataFile(const std::string& srcPath, const std::string& d
     return copySuccess;
 }
 
-void UpgradeUtils::ClearDir(const std::filesystem::path& dirPath)
-{
-    std::error_code errCode;
-    for (const auto& entry : std::filesystem::directory_iterator(dirPath)) {
-        std::filesystem::remove_all(entry.path(), errCode);
-        if (errCode) {
-            HILOG_ERROR_I18N("ClearDir: Error removing file: %{public}s, Error: %{public}s", entry.path().c_str(),
-                errCode.message().c_str());
-        }
-    }
-}
-
 bool UpgradeUtils::FileDirMount(const std::string& srcDirPath, const std::string& dstDirPath)
 {
     if (!IsDirExist(srcDirPath.c_str()) || !IsDirExist(dstDirPath.c_str())) {

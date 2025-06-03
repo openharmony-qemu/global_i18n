@@ -187,6 +187,9 @@ private:
     static const std::string NUMBER_SYSTEM_KEY;
     static const std::string TEMPERATURE_UNIT_KEY;
     static const std::string WEEK_DAY_KEY;
+    static std::string prevNotPseudoRegion;
+    static const std::string PSEUDO_REGION_XA;
+    static const std::string PSEUDO_REGION_XB;
 
     static const std::unordered_set<std::string>& GetSupportedLocales();
     static const std::unordered_set<std::string>& GetSupportedLocalesV15();
@@ -213,6 +216,7 @@ private:
     static bool Is24HourLocale(const std::string& systemLocale);
     static bool HasDesignator(const std::string& inFormat, const char designator);
     static void QueryUpgradeLocale();
+    static std::string GetPseudoCountryTag(const char* countryTag, std::string &regionTag);
     static std::string GetUnicodeWrappedFilePathInner(const std::string &path, const char delimiter,
         const std::string& localeTag, std::string &invalidField);
 

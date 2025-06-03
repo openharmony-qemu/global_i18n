@@ -46,6 +46,7 @@ bool FileExist(const std::string& path);
 bool FileCopy(const std::string& srcPath, const std::string& dstPath);
 bool IsLegalPath(const std::string& path);
 bool IsDirExist(const char *path);
+void ClearDir(const std::filesystem::path& dirPath);
 bool GetPseudoLocalizationEnforce();
 std::string PseudoLocalizationProcessor(const std::string &input);
 std::string PseudoLocalizationProcessor(const std::string &input, bool ifEnforce);
