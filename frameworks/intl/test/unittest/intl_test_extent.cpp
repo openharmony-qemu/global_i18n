@@ -594,6 +594,9 @@ HWTEST_F(IntlTest, IntlFuncTest0062, TestSize.Level1)
     Merge(resultVec, separator, source);
     EXPECT_EQ(source, "zh,en,fr,de,zh-Hant,fil");
 
+    std::filesystem::path pathDir("/data/log/faultlog");
+    ClearDir(pathDir);
+
     std::string localeRule = "zh-Hans";
     DateTimeRule* dateTimeRule = new DateTimeRule(localeRule);
     DateTimeFilter* dateTimeFilter = new DateTimeFilter(localeRule, dateTimeRule);
