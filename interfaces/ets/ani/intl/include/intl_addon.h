@@ -28,29 +28,29 @@ namespace I18n {
 class IntlAddon {
 public:
 public:
-    static ani_string DateTimeFormat_format(ani_env *env, ani_object object, ani_object date);
-    static ani_string DateTimeFormat_formatRange(ani_env *env, ani_object object,
+    static ani_string DateTimeFormat_Format(ani_env *env, ani_object object, ani_object date);
+    static ani_string DateTimeFormat_FormatRange(ani_env *env, ani_object object,
         ani_object startDate, ani_object endDate);
-    static ani_object DateTimeFormat_resolvedOptions(ani_env *env, ani_object object);
-    static ani_double Collator_compare(ani_env *env, ani_object object, ani_string first, ani_string second);
-    static ani_object Collator_resolvedOptions(ani_env *env, ani_object object);
-    static ani_string PluralRules_select(ani_env *env, ani_object object, ani_double number);
-    static ani_string RelativeTimeFormat_format(ani_env *env, ani_object object, ani_double value, ani_string unit);
-    static ani_object RelativeTimeFormat_formatToParts(ani_env *env, ani_object object,
+    static ani_object DateTimeFormat_ResolvedOptions(ani_env *env, ani_object object);
+    static ani_double Collator_Compare(ani_env *env, ani_object object, ani_string first, ani_string second);
+    static ani_object Collator_ResolvedOptions(ani_env *env, ani_object object);
+    static ani_string PluralRules_Select(ani_env *env, ani_object object, ani_double number);
+    static ani_string RelativeTimeFormat_Format(ani_env *env, ani_object object, ani_double value, ani_string unit);
+    static ani_object RelativeTimeFormat_FormatToParts(ani_env *env, ani_object object,
         ani_double value, ani_string unit);
-    static ani_object RelativeTimeFormat_resolvedOptions(ani_env *env, ani_object object);
+    static ani_object RelativeTimeFormat_ResolvedOptions(ani_env *env, ani_object object);
 
-    static ani_object DateTimeFormat_create(ani_env *env, [[maybe_unused]] ani_class clazz);
-    static ani_object DateTimeFormat_createWithParam(ani_env *env, [[maybe_unused]] ani_class clazz,
+    static ani_object DateTimeFormat_Create(ani_env *env, [[maybe_unused]] ani_object object);
+    static ani_object DateTimeFormat_CreateWithParam(ani_env *env, [[maybe_unused]] ani_object object,
         ani_object locale, ani_object options);
-    static ani_object Collator_create(ani_env *env, [[maybe_unused]] ani_class clazz);
-    static ani_object Collator_createWithParam(ani_env *env, [[maybe_unused]] ani_class clazz,
+    static ani_object Collator_Create(ani_env *env, [[maybe_unused]] ani_object object);
+    static ani_object Collator_CreateWithParam(ani_env *env, [[maybe_unused]] ani_object object,
         ani_object locale, ani_object options);
-    static ani_object PluralRules_create(ani_env *env, [[maybe_unused]] ani_class clazz);
-    static ani_object PluralRules_createWithParam(ani_env *env, [[maybe_unused]] ani_class clazz,
+    static ani_object PluralRules_Create(ani_env *env, [[maybe_unused]] ani_object object);
+    static ani_object PluralRules_CreateWithParam(ani_env *env, [[maybe_unused]] ani_object object,
         ani_object locale, ani_object options);
-    static ani_object RelativeTimeFormat_create(ani_env *env, [[maybe_unused]] ani_class clazz);
-    static ani_object RelativeTimeFormat_createWithParam(ani_env *env, [[maybe_unused]] ani_class clazz,
+    static ani_object RelativeTimeFormat_Create(ani_env *env, [[maybe_unused]] ani_object object);
+    static ani_object RelativeTimeFormat_CreateWithParam(ani_env *env, [[maybe_unused]] ani_object object,
         ani_object locale, ani_object options);
 
     static ani_status BindContext_DateTimeFormat(ani_env *env);

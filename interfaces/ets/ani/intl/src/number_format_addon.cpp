@@ -23,7 +23,7 @@ using namespace OHOS;
 using namespace Global;
 using namespace I18n;
 
-NumberFormatAddon* NumberFormatAddon::UnwrapAddon(ani_env *env, ani_object object, const std::string name)
+NumberFormatAddon* NumberFormatAddon::UnwrapAddon(ani_env *env, ani_object object, const std::string &name)
 {
     ani_long ptr;
     if (ANI_OK != env->Object_GetFieldByName_Long(object, name.c_str(), &ptr)) {
@@ -33,7 +33,7 @@ NumberFormatAddon* NumberFormatAddon::UnwrapAddon(ani_env *env, ani_object objec
     return reinterpret_cast<NumberFormatAddon*>(ptr);
 }
 
-ani_string NumberFormatAddon::NumberFormat_format(ani_env *env, ani_object object, ani_double number)
+ani_string NumberFormatAddon::NumberFormat_Format(ani_env *env, ani_object object, ani_double number)
 {
     NumberFormatAddon *obj = UnwrapAddon(env, object, "nativeNumberFormat");
     if (obj == nullptr || obj->numberfmt_ == nullptr) {
@@ -45,7 +45,7 @@ ani_string NumberFormatAddon::NumberFormat_format(ani_env *env, ani_object objec
     return VariableConvertor::StringToAniStr(env, str);
 }
 
-ani_string NumberFormatAddon::NumberFormat_formatRange(ani_env *env, ani_object object,
+ani_string NumberFormatAddon::NumberFormat_FormatRange(ani_env *env, ani_object object,
     ani_double startRange, ani_double endRange)
 {
     NumberFormatAddon *obj = UnwrapAddon(env, object, "nativeNumberFormat");
@@ -58,7 +58,7 @@ ani_string NumberFormatAddon::NumberFormat_formatRange(ani_env *env, ani_object 
     return VariableConvertor::StringToAniStr(env, str);
 }
 
-ani_object NumberFormatAddon::NumberFormat_resolvedOptions(ani_env *env, ani_object object)
+ani_object NumberFormatAddon::NumberFormat_ResolvedOptions(ani_env *env, ani_object object)
 {
     NumberFormatAddon *obj = UnwrapAddon(env, object, "nativeNumberFormat");
     if (obj == nullptr || obj->numberfmt_ == nullptr) {
@@ -109,7 +109,7 @@ ani_object NumberFormatAddon::NumberFormat_resolvedOptions(ani_env *env, ani_obj
     return numberOptions;
 }
 
-ani_object NumberFormatAddon::NumberFormat_create(ani_env *env, [[maybe_unused]] ani_class clazz)
+ani_object NumberFormatAddon::NumberFormat_Create(ani_env *env, [[maybe_unused]] ani_object object)
 {
     std::vector<std::string> localeTags;
     std::map<std::string, std::string> map = {};
@@ -117,9 +117,9 @@ ani_object NumberFormatAddon::NumberFormat_create(ani_env *env, [[maybe_unused]]
     obj->numberfmt_ = std::make_unique<NumberFormat>(localeTags, map);
 
     static const char *className = "L@ohos/intl/intl/NumberFormat;";
-    ani_object numberFormat_object = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object numberFormatObject = VariableConvertor::CreateAniObject(env, className, obj.get());
     obj.release();
-    return numberFormat_object;
+    return numberFormatObject;
 }
 
 static std::map<std::string, std::string> GetNumberFormatOptions(ani_env *env, ani_object options)
@@ -160,7 +160,7 @@ static std::map<std::string, std::string> GetNumberFormatOptions(ani_env *env, a
     return map;
 }
 
-ani_object NumberFormatAddon::NumberFormat_createWithParam(ani_env *env, [[maybe_unused]] ani_class clazz,
+ani_object NumberFormatAddon::NumberFormat_CreateWithParam(ani_env *env, [[maybe_unused]] ani_object object,
     ani_object locale, ani_object options)
 {
     std::vector<std::string> localeTags = VariableConvertor::GetLocaleTags(env, locale);
@@ -170,9 +170,9 @@ ani_object NumberFormatAddon::NumberFormat_createWithParam(ani_env *env, [[maybe
     obj->numberfmt_ = std::make_unique<NumberFormat>(localeTags, map);
 
     static const char *className = "L@ohos/intl/intl/NumberFormat;";
-    ani_object numberFormat_object = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object numberFormatObject = VariableConvertor::CreateAniObject(env, className, obj.get());
     obj.release();
-    return numberFormat_object;
+    return numberFormatObject;
 }
 
 ani_status NumberFormatAddon::BindContext_NumberFormat(ani_env *env)
@@ -186,13 +186,13 @@ ani_status NumberFormatAddon::BindContext_NumberFormat(ani_env *env)
 
     std::array methods = {
         ani_native_function {"create", ":L@ohos/intl/intl/NumberFormat;",
-            reinterpret_cast<void *>(NumberFormat_create) },
+            reinterpret_cast<void *>(NumberFormat_Create) },
         ani_native_function {"create",
             "Lstd/core/Object;L@ohos/intl/intl/NumberOptions;:L@ohos/intl/intl/NumberFormat;",
-            reinterpret_cast<void *>(NumberFormat_createWithParam) },
-        ani_native_function {"format", nullptr, reinterpret_cast<void *>(NumberFormat_format) },
-        ani_native_function {"formatRange", nullptr, reinterpret_cast<void *>(NumberFormat_formatRange) },
-        ani_native_function {"resolvedOptions", nullptr, reinterpret_cast<void *>(NumberFormat_resolvedOptions) },
+            reinterpret_cast<void *>(NumberFormat_CreateWithParam) },
+        ani_native_function {"format", nullptr, reinterpret_cast<void *>(NumberFormat_Format) },
+        ani_native_function {"formatRange", nullptr, reinterpret_cast<void *>(NumberFormat_FormatRange) },
+        ani_native_function {"resolvedOptions", nullptr, reinterpret_cast<void *>(NumberFormat_ResolvedOptions) },
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {

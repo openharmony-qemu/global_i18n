@@ -34,8 +34,8 @@ const size_t FUNC_ARGS_COUNT = 2; // Function input parameter count
 
 class ErrorUtil {
 public:
-    static void AniThrow(ani_env *env, int32_t errCode, const std::string& valueName,
-        const std::string& valueContent);
+    static void AniThrow(ani_env *env, int32_t errCode, const std::string &valueName,
+        const std::string &valueContent);
 private:
     static ani_object WrapAniError(ani_env *env, const std::string &msg);
     static ani_object CreateError(ani_env *env, ani_int code, const std::string &msg);

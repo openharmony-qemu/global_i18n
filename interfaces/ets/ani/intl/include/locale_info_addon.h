@@ -24,25 +24,25 @@ namespace Global {
 namespace I18n {
 class LocaleInfoAddon {
 public:
-    static LocaleInfoAddon* UnwrapAddon(ani_env *env, ani_object object, const std::string name);
+    static LocaleInfoAddon* UnwrapAddon(ani_env *env, ani_object object, const std::string &name);
     template<typename T>
     static T GetLocaleProperty(ani_env *env, ani_object object,
-        const std::string& propertyName, T (LocaleInfo::*getter)() const);
-    static ani_string Locale_toString(ani_env *env, ani_object object);
-    static ani_object Locale_maximize(ani_env *env, ani_object object);
-    static ani_object Locale_minimize(ani_env *env, ani_object object);
-    static ani_string Locale_getLanguage(ani_env *env, ani_object object);
-    static ani_string Locale_getScript(ani_env *env, ani_object object);
-    static ani_string Locale_getRegion(ani_env *env, ani_object object);
-    static ani_string Locale_getBaseName(ani_env *env, ani_object object);
-    static ani_string Locale_getCaseFirst(ani_env *env, ani_object object);
-    static ani_string Locale_getCalendar(ani_env *env, ani_object object);
-    static ani_string Locale_getCollation(ani_env *env, ani_object object);
-    static ani_string Locale_getHourCycle(ani_env *env, ani_object object);
-    static ani_string Locale_getNumberingSystem(ani_env *env, ani_object object);
-    static ani_boolean Locale_getNumeric(ani_env *env, ani_object object);
-    static ani_object Locale_create(ani_env *env, [[maybe_unused]] ani_class clazz);
-    static ani_object Locale_createWithParam(ani_env *env, [[maybe_unused]] ani_class clazz,
+        const std::string &propertyName, T (LocaleInfo::*getter)() const);
+    static ani_string Locale_ToString(ani_env *env, ani_object object);
+    static ani_object Locale_Maximize(ani_env *env, ani_object object);
+    static ani_object Locale_Minimize(ani_env *env, ani_object object);
+    static ani_string Locale_GetLanguage(ani_env *env, ani_object object);
+    static ani_string Locale_GetScript(ani_env *env, ani_object object);
+    static ani_string Locale_GetRegion(ani_env *env, ani_object object);
+    static ani_string Locale_GetBaseName(ani_env *env, ani_object object);
+    static ani_string Locale_GetCaseFirst(ani_env *env, ani_object object);
+    static ani_string Locale_GetCalendar(ani_env *env, ani_object object);
+    static ani_string Locale_GetCollation(ani_env *env, ani_object object);
+    static ani_string Locale_GetHourCycle(ani_env *env, ani_object object);
+    static ani_string Locale_GetNumberingSystem(ani_env *env, ani_object object);
+    static ani_boolean Locale_GetNumeric(ani_env *env, ani_object object);
+    static ani_object Locale_Create(ani_env *env, [[maybe_unused]] ani_object object);
+    static ani_object Locale_CreateWithParam(ani_env *env, [[maybe_unused]] ani_object object,
         ani_string locale, ani_object options);
     static ani_status BindContext_Locale(ani_env *env);
 

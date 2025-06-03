@@ -38,15 +38,15 @@ I18nHolidayManagerAddon* I18nHolidayManagerAddon::UnwrapAddon(ani_env *env, ani_
     return reinterpret_cast<I18nHolidayManagerAddon*>(ptr);
 }
 
-ani_object I18nHolidayManagerAddon::Create(ani_env *env, [[maybe_unused]] ani_class clazz, ani_string icsPath)
+ani_object I18nHolidayManagerAddon::Create(ani_env *env, [[maybe_unused]] ani_object object, ani_string icsPath)
 {
     std::unique_ptr<I18nHolidayManagerAddon> obj = std::make_unique<I18nHolidayManagerAddon>();
     obj->holidayManager_ = std::make_unique<HolidayManager>(VariableConvertor::AniStrToString(env, icsPath).c_str());
 
     static const char *className = "L@ohos/i18n/i18n/HolidayManager;";
-    ani_object HolidayManager_object = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object holidayManagerObject = VariableConvertor::CreateAniObject(env, className, obj.get());
     obj.release();
-    return HolidayManager_object;
+    return holidayManagerObject;
 }
 
 ani_boolean I18nHolidayManagerAddon::IsHoliday(ani_env *env, ani_object object, ani_object date)
@@ -131,7 +131,7 @@ static ani_object CreateHolidayLocalNameArray(ani_env *env, std::vector<HolidayL
         return ret;
     }
 
-    for (size_t i = 0; i < localNames.size(); i++) {
+    for (size_t i = 0; i < localNames.size(); ++i) {
         if (ANI_OK != env->Object_CallMethod_Void(ret, set, i, CreateHolidayLocalName(env, localNames[i]))) {
             HILOG_ERROR_I18N("Call method '$_set' failed");
             return ret;
@@ -209,7 +209,7 @@ static ani_object GetHolidayInfoItemResult(ani_env *env, std::vector<HolidayInfo
         return ret;
     }
 
-    for (size_t i = 0; i < itemList.size(); i++) {
+    for (size_t i = 0; i < itemList.size(); ++i) {
         if (ANI_OK != env->Object_CallMethod_Void(ret, set, i, CreateHolidayInfoItem(env, itemList[i]))) {
             HILOG_ERROR_I18N("Call method '$_set' failed");
             return ret;

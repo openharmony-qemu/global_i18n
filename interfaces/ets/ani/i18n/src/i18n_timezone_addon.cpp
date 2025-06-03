@@ -47,9 +47,9 @@ ani_object I18nTimeZoneAddon::GetTimeZone(ani_env *env, ani_string zoneID)
     obj->timezone_ = I18nTimeZone::CreateInstance(zoneIDStr, true);
 
     static const char* className = "L@ohos/i18n/i18n/TimeZone;";
-    ani_object timeZone_object = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object timeZoneObject = VariableConvertor::CreateAniObject(env, className, obj.get());
     obj.release();
-    return timeZone_object;
+    return timeZoneObject;
 }
 
 ani_string I18nTimeZoneAddon::GetID(ani_env *env, ani_object object)
@@ -68,7 +68,7 @@ ani_string I18nTimeZoneAddon::GetDisplayName(ani_env *env, ani_object object, an
 {
     I18nTimeZoneAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->timezone_ == nullptr) {
-        HILOG_ERROR_I18N("GetTimeZoneDisplayName: Get TimeZone object failed");
+        HILOG_ERROR_I18N("GetDisplayName: Get TimeZone object failed");
         return nullptr;
     }
 
@@ -142,7 +142,7 @@ ani_double I18nTimeZoneAddon::GetOffset(ani_env *env, ani_object object, ani_obj
         auto time = std::chrono::system_clock::now();
         auto since_epoch = time.time_since_epoch();
         auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(since_epoch);
-        dateDouble = (double)millis.count();
+        dateDouble = static_cast<double>(millis.count());
     }
     return obj->timezone_->GetOffset(dateDouble);
 }
@@ -216,7 +216,7 @@ ani_object I18nTimeZoneAddon::GetTimezonesByLocation(ani_env *env, [[maybe_unuse
         return nullptr;
     }
 
-    for (size_t i = 0; i < tempList.size(); i++) {
+    for (size_t i = 0; i < tempList.size(); ++i) {
         ani_object timezone = GetTimezoneFromCity(env, object, VariableConvertor::StringToAniStr(env, tempList[i]));
         if (ANI_OK != env->Object_CallMethod_Void(ret, set, i, timezone)) {
             HILOG_ERROR_I18N("Call method '$_set' failed");

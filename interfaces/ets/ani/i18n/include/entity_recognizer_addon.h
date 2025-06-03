@@ -25,7 +25,7 @@ namespace I18n {
 class I18nEntityRecognizerAddon {
 public:
     static I18nEntityRecognizerAddon* UnwrapAddon(ani_env *env, ani_object object);
-    static ani_object Create(ani_env *env, [[maybe_unused]] ani_class clazz, ani_string locale);
+    static ani_object Create(ani_env *env, [[maybe_unused]] ani_object object, ani_string locale);
     static ani_object FindEntityInfo(ani_env *env, ani_object object, ani_string text);
     static ani_status BindContextEntityRecognizer(ani_env *env);
 private:

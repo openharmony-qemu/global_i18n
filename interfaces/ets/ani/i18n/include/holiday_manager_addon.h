@@ -25,7 +25,7 @@ namespace I18n {
 class I18nHolidayManagerAddon {
 public:
     static I18nHolidayManagerAddon* UnwrapAddon(ani_env *env, ani_object object);
-    static ani_object Create(ani_env *env, [[maybe_unused]] ani_class clazz, ani_string icsPath);
+    static ani_object Create(ani_env *env, [[maybe_unused]] ani_object object, ani_string icsPath);
     static ani_boolean IsHoliday(ani_env *env, ani_object object, ani_object date);
     static ani_object GetHolidayInfoItemArray(ani_env *env, ani_object object, ani_object year);
     static ani_status BindContextHolidayManager(ani_env *env);

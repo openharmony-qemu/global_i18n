@@ -27,7 +27,7 @@ namespace I18n {
 class I18nStyledNumberFormatAddon {
 public:
     static I18nStyledNumberFormatAddon* UnwrapAddon(ani_env *env, ani_object object);
-    static ani_object Create(ani_env *env, [[maybe_unused]] ani_class clazz,
+    static ani_object Create(ani_env *env, [[maybe_unused]] ani_object object,
         ani_object numberFormat, ani_object options);
     static ani_object Format(ani_env *env, ani_object object, ani_double value);
     static ani_status BindContextStyledNumberFormat(ani_env *env);

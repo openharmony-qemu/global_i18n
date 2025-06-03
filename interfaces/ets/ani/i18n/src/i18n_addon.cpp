@@ -39,6 +39,7 @@ using namespace Global;
 using namespace I18n;
 
 static const char PATH_SEPARATOR = '/';
+static const int INDEX_ONE_OF_VECTOR = 0;
 
 I18nPhoneNumberFormatAddon* I18nPhoneNumberFormatAddon::UnwrapAddon(ani_env *env, ani_object object)
 {
@@ -50,7 +51,7 @@ I18nPhoneNumberFormatAddon* I18nPhoneNumberFormatAddon::UnwrapAddon(ani_env *env
     return reinterpret_cast<I18nPhoneNumberFormatAddon*>(ptr);
 }
 
-ani_object I18nPhoneNumberFormatAddon::Create(ani_env *env, [[maybe_unused]] ani_class clazz,
+ani_object I18nPhoneNumberFormatAddon::Create(ani_env *env, [[maybe_unused]] ani_object object,
     ani_string country, ani_object options)
 {
     std::map<std::string, std::string> optionsStr;
@@ -70,9 +71,9 @@ ani_object I18nPhoneNumberFormatAddon::Create(ani_env *env, [[maybe_unused]] ani
         VariableConvertor::AniStrToString(env, country), optionsStr);
 
     static const char *className = "L@ohos/i18n/i18n/PhoneNumberFormat;";
-    ani_object PhoneNumberFormat_object = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object phoneNumberFormatObject = VariableConvertor::CreateAniObject(env, className, obj.get());
     obj.release();
-    return PhoneNumberFormat_object;
+    return phoneNumberFormatObject;
 }
 
 ani_boolean I18nPhoneNumberFormatAddon::IsValidNumber(ani_env *env, ani_object object, ani_string number)
@@ -127,9 +128,9 @@ ani_object I18nBreakIteratorAddon::GetLineInstance(ani_env *env, ani_string loca
     obj->brkiter_ = std::make_unique<I18nBreakIterator>(VariableConvertor::AniStrToString(env, locale));
 
     static const char* className = "L@ohos/i18n/i18n/BreakIterator;";
-    ani_object breakIterator_object = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object breakIteratorObject = VariableConvertor::CreateAniObject(env, className, obj.get());
     obj.release();
-    return breakIterator_object;
+    return breakIteratorObject;
 }
 
 ani_double I18nBreakIteratorAddon::Current(ani_env *env, ani_object object)
@@ -266,9 +267,9 @@ ani_object I18nIndexUtilAddon::GetInstance(ani_env *env, ani_string string)
     obj->indexUtil_ = std::make_unique<IndexUtil>(localeTag);
 
     static const char* className = "L@ohos/i18n/i18n/IndexUtil;";
-    ani_object indexUtil_object = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object indexUtilObject = VariableConvertor::CreateAniObject(env, className, obj.get());
     obj.release();
-    return indexUtil_object;
+    return indexUtilObject;
 }
 
 ani_object I18nIndexUtilAddon::GetIndexList(ani_env *env, ani_object object)
@@ -355,9 +356,9 @@ ani_object I18nTransliteratorAddon::GetInstance(ani_env *env, [[maybe_unused]] a
 
     obj->transliterator_ = std::unique_ptr<icu::Transliterator>(trans);
     static const char* className = "L@ohos/i18n/i18n/Transliterator;";
-    ani_object transliterator_object = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object transliteratorObject = VariableConvertor::CreateAniObject(env, className, obj.get());
     obj.release();
-    return transliterator_object;
+    return transliteratorObject;
 }
 
 ani_string I18nTransliteratorAddon::Transform(ani_env *env, ani_object object, ani_string text)
@@ -545,7 +546,7 @@ ani_string I18nAddon::GetBestMatchLocale(ani_env *env, [[maybe_unused]] ani_obje
 
     std::string bestMatchLocaleTag = "";
     if (candidateLocales.size() > 0) {
-        LocaleInfo *bestMatch = candidateLocales[0];
+        LocaleInfo *bestMatch = candidateLocales[INDEX_ONE_OF_VECTOR];
         for (size_t i = 1; i < candidateLocales.size(); ++i) {
             if (LocaleMatcher::IsMoreSuitable(bestMatch, candidateLocales[i], requestLocale) < 0) {
                 bestMatch = candidateLocales[i];

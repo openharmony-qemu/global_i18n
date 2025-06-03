@@ -24,6 +24,9 @@ using namespace OHOS;
 using namespace Global;
 using namespace I18n;
 
+static const int INDEX_ONE_OF_VECTOR = 0;
+static const int INDEX_TWO_OF_VECTOR = 1;
+
 I18nEntityRecognizerAddon* I18nEntityRecognizerAddon::UnwrapAddon(ani_env *env, ani_object object)
 {
     ani_long ptr;
@@ -34,7 +37,7 @@ I18nEntityRecognizerAddon* I18nEntityRecognizerAddon::UnwrapAddon(ani_env *env, 
     return reinterpret_cast<I18nEntityRecognizerAddon*>(ptr);
 }
 
-ani_object I18nEntityRecognizerAddon::Create(ani_env *env, [[maybe_unused]] ani_class clazz, ani_string locale)
+ani_object I18nEntityRecognizerAddon::Create(ani_env *env, [[maybe_unused]] ani_object object, ani_string locale)
 {
     std::string localeStr;
     ani_boolean isUndefined;
@@ -50,7 +53,10 @@ ani_object I18nEntityRecognizerAddon::Create(ani_env *env, [[maybe_unused]] ani_
 
     UErrorCode localeStatus = U_ZERO_ERROR;
     icu::Locale icuLocale = icu::Locale::forLanguageTag(localeStr, localeStatus);
-    if (!IsValidLocaleTag(icuLocale)) {
+    if (U_FAILURE(localeStatus)) {
+        HILOG_ERROR_I18N("EntityRecognizerAddon::Create: Create icu::Locale failed.");
+        return nullptr;
+    } else if (!IsValidLocaleTag(icuLocale)) {
         ErrorUtil::AniThrow(env, I18N_NOT_VALID, "locale", "a valid locale");
         return nullptr;
     }
@@ -58,12 +64,12 @@ ani_object I18nEntityRecognizerAddon::Create(ani_env *env, [[maybe_unused]] ani_
     obj->entityRecognizer_ = std::make_unique<EntityRecognizer>(icuLocale);
 
     static const char *className = "L@ohos/i18n/i18n/EntityRecognizer;";
-    ani_object EntityRecognizer_object = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object entityRecognizerObject = VariableConvertor::CreateAniObject(env, className, obj.get());
     obj.release();
-    return EntityRecognizer_object;
+    return entityRecognizerObject;
 }
 
-static ani_object CreateEntityInfoItem(ani_env *env, const int begin, const int end, const std::string& type)
+static ani_object CreateEntityInfoItem(ani_env *env, const int begin, const int end, const std::string &type)
 {
     static const char *className = "L@ohos/i18n/i18n/EntityInfoItemInner;";
     ani_class cls;
@@ -86,10 +92,10 @@ static ani_object CreateEntityInfoItem(ani_env *env, const int begin, const int 
 
     VariableConvertor::SetStringMember(env, ret, "type", type);
     if (ANI_OK != env->Object_SetPropertyByName_Double(ret, "begin", begin)) {
-        HILOG_ERROR_I18N("Set property 'offset' failed");
+        HILOG_ERROR_I18N("Set property 'begin' failed");
     }
     if (ANI_OK != env->Object_SetPropertyByName_Double(ret, "end", end)) {
-        HILOG_ERROR_I18N("Set property 'offset' failed");
+        HILOG_ERROR_I18N("Set property 'end' failed");
     }
     return ret;
 }
@@ -110,7 +116,8 @@ static ani_object GetEntityInfoItem(ani_env *env, std::vector<std::vector<int>>&
     }
 
     ani_object ret;
-    if (ANI_OK != env->Object_New(cls, ctor, &ret, (entityInfo[0][0] + entityInfo[1][0]))) {
+    if (ANI_OK != env->Object_New(cls, ctor, &ret, (entityInfo[INDEX_ONE_OF_VECTOR][INDEX_ONE_OF_VECTOR] +
+            entityInfo[INDEX_TWO_OF_VECTOR][INDEX_ONE_OF_VECTOR]))) {
         HILOG_ERROR_I18N("New object '%{public}s' failed", className);
         return nullptr;
     }
@@ -123,16 +130,16 @@ static ani_object GetEntityInfoItem(ani_env *env, std::vector<std::vector<int>>&
 
     std::vector<std::string> types = {"phone_number", "date"};
     int index = 0;
-    for (std::string::size_type t = 0; t < types.size(); t++) {
-        for (int i = 0; i < entityInfo[t][0]; i++) {
+    for (size_t t = 0; t < types.size(); ++t) {
+        for (size_t i = 0; i < entityInfo[t][INDEX_ONE_OF_VECTOR]; ++i) {
             int begin = entityInfo[t][2 * i + 1];
             int end = entityInfo[t][2 * i + 2];
             std::string type = types[t];
-            if (ANI_OK != env->Object_CallMethod_Void(ret, set, i, CreateEntityInfoItem(env, begin, end, type))) {
+            if (ANI_OK != env->Object_CallMethod_Void(ret, set, index, CreateEntityInfoItem(env, begin, end, type))) {
                 HILOG_ERROR_I18N("Call method '$_set' failed");
                 return ret;
             }
-            index++;
+            ++index;
         }
     }
     return ret;

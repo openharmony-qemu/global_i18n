@@ -50,11 +50,14 @@ ani_object I18nNormalizerAddon::GetInstance(ani_env *env, [[maybe_unused]] ani_o
     I18nNormalizerMode modeEnum = I18nNormalizerMode(normalizerMode);
     I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
     obj->normalizer_ = std::make_unique<I18nNormalizer>(modeEnum, errorCode);
+    if (errorCode != I18nErrorCode::SUCCESS || !obj->normalizer_) {
+        return nullptr;
+    }
 
     static const char* className = "L@ohos/i18n/i18n/Normalizer;";
-    ani_object normalizer_object = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object normalizerObject = VariableConvertor::CreateAniObject(env, className, obj.get());
     obj.release();
-    return normalizer_object;
+    return normalizerObject;
 }
 
 ani_string I18nNormalizerAddon::Normalize(ani_env *env, ani_object object, ani_string text)

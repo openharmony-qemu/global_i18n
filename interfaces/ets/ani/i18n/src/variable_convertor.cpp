@@ -63,7 +63,8 @@ ani_string VariableConvertor::StringToAniStr(ani_env *env, const std::string &st
     return ret;
 }
 
-void VariableConvertor::SetBooleanMember(ani_env *env, ani_object obj, const std::string name, const std::string value)
+void VariableConvertor::SetBooleanMember(ani_env *env, ani_object obj,
+    const std::string &name, const std::string &value)
 {
     if (value.empty()) {
         return;
@@ -95,7 +96,7 @@ void VariableConvertor::SetBooleanMember(ani_env *env, ani_object obj, const std
     }
 }
 
-bool VariableConvertor::GetBooleanMember(ani_env *env, ani_object options, const std::string name, bool& value)
+bool VariableConvertor::GetBooleanMember(ani_env *env, ani_object options, const std::string &name, bool& value)
 {
     ani_ref ref;
     if (ANI_OK != env->Object_GetPropertyByName_Ref(options, name.c_str(), &ref)) {
@@ -121,7 +122,7 @@ bool VariableConvertor::GetBooleanMember(ani_env *env, ani_object options, const
     return true;
 }
 
-void VariableConvertor::SetNumberMember(ani_env *env, ani_object obj, const std::string name, const ani_int value)
+void VariableConvertor::SetNumberMember(ani_env *env, ani_object obj, const std::string &name, const ani_int value)
 {
     static const char *className = "Lstd/core/Int;";
     ani_class cls;
@@ -148,7 +149,7 @@ void VariableConvertor::SetNumberMember(ani_env *env, ani_object obj, const std:
     }
 }
 
-void VariableConvertor::SetNumberMember(ani_env *env, ani_object obj, const std::string name, const std::string value)
+void VariableConvertor::SetNumberMember(ani_env *env, ani_object obj, const std::string &name, const std::string &value)
 {
     if (value.empty()) {
         return;
@@ -185,7 +186,7 @@ void VariableConvertor::SetNumberMember(ani_env *env, ani_object obj, const std:
     }
 }
 
-bool VariableConvertor::GetNumberMember(ani_env *env, ani_object options, const std::string name, int& value)
+bool VariableConvertor::GetNumberMember(ani_env *env, ani_object options, const std::string &name, int& value)
 {
     ani_ref ref;
     if (ANI_OK != env->Object_GetPropertyByName_Ref(options, name.c_str(), &ref)) {
@@ -204,14 +205,14 @@ bool VariableConvertor::GetNumberMember(ani_env *env, ani_object options, const 
 
     ani_double valueDouble;
     if (ANI_OK != env->Object_CallMethodByName_Double(static_cast<ani_object>(ref), "unboxed", ":D", &valueDouble)) {
-        HILOG_ERROR_I18N("unboxed Double failed");
+        HILOG_ERROR_I18N("Unboxed Double failed");
         return false;
     }
     value = static_cast<int>(valueDouble);
     return true;
 }
 
-void VariableConvertor::SetStringMember(ani_env *env, ani_object obj, const std::string name, const std::string value)
+void VariableConvertor::SetStringMember(ani_env *env, ani_object obj, const std::string &name, const std::string &value)
 {
     if (value.empty()) {
         return;
@@ -223,7 +224,7 @@ void VariableConvertor::SetStringMember(ani_env *env, ani_object obj, const std:
     }
 }
 
-bool VariableConvertor::GetStringMember(ani_env *env, ani_object options, const std::string name, std::string& value)
+bool VariableConvertor::GetStringMember(ani_env *env, ani_object options, const std::string &name, std::string &value)
 {
     ani_ref ref;
     if (ANI_OK != env->Object_GetPropertyByName_Ref(options, name.c_str(), &ref)) {
@@ -271,7 +272,7 @@ ani_object VariableConvertor::CreateArray(ani_env *env, const std::vector<std::s
         return ret;
     }
 
-    for (size_t i = 0; i < strs.size(); i++) {
+    for (size_t i = 0; i < strs.size(); ++i) {
         if (ANI_OK != env->Object_CallMethod_Void(ret, set, i, VariableConvertor::StringToAniStr(env, strs[i]))) {
             HILOG_ERROR_I18N("Call method '$_set' failed");
             return ret;
@@ -307,7 +308,7 @@ bool VariableConvertor::ParseStringArray(ani_env *env, ani_object obj, std::vect
         return false;
     }
 
-    for (int i = 0; i < (int)length; i++) {
+    for (int i = 0; i < static_cast<int>(length); ++i) {
         ani_ref value;
         if (ANI_OK != env->Object_CallMethod_Ref(obj, get, &value, i)) {
             HILOG_ERROR_I18N("Call method '$_get' failed");
@@ -334,7 +335,7 @@ ani_enum_item VariableConvertor::GetEnumItemByIndex(ani_env* env, const char* en
     return enumItem;
 }
 
-ani_double VariableConvertor::GetDateValue(ani_env *env, ani_object date, const std::string method)
+ani_double VariableConvertor::GetDateValue(ani_env *env, ani_object date, const std::string &method)
 {
     static const char* className = "Lescompat/Date;";
     ani_class cls;
@@ -373,40 +374,40 @@ std::vector<std::string> VariableConvertor::GetLocaleTags(ani_env *env, ani_obje
     }
     if (isString) {
         localeTags.push_back(AniStrToString(env, locale));
-    } else {
-        static const char *className = "Lescompat/Array;";
-        ani_class cls;
-        if (ANI_OK != env->FindClass(className, &cls)) {
-            HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        return localeTags;
+    }
+    static const char *className = "Lescompat/Array;";
+    ani_class cls;
+    if (ANI_OK != env->FindClass(className, &cls)) {
+        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        return localeTags;
+    }
+
+    ani_method getLengthMethod;
+    if (ANI_OK != env->Class_FindGetter(cls, "length", &getLengthMethod)) {
+        HILOG_ERROR_I18N("Find getter 'length' failed");
+        return localeTags;
+    }
+
+    ani_double length;
+    if (ANI_OK != env->Object_CallMethod_Double(locale, getLengthMethod, &length)) {
+        HILOG_ERROR_I18N("Get 'length' failed");
+        return localeTags;
+    }
+
+    ani_method get;
+    if (ANI_OK != env->Class_FindMethod(cls, "$_get", "I:Lstd/core/Object;", &get)) {
+        HILOG_ERROR_I18N("Find method '$_get' failed");
+        return localeTags;
+    }
+
+    for (int i = 0; i < static_cast<int>(length); ++i) {
+        ani_ref value;
+        if (ANI_OK != env->Object_CallMethod_Ref(locale, get, &value, i)) {
+            HILOG_ERROR_I18N("Call method '$_get' failed");
             return localeTags;
         }
-
-        ani_method getLengthMethod;
-        if (ANI_OK != env->Class_FindGetter(cls, "length", &getLengthMethod)) {
-            HILOG_ERROR_I18N("Find getter 'length' failed");
-            return localeTags;
-        }
-
-        ani_double length;
-        if (ANI_OK != env->Object_CallMethod_Double(locale, getLengthMethod, &length)) {
-            HILOG_ERROR_I18N("Get 'length' failed");
-            return localeTags;
-        }
-
-        ani_method get;
-        if (ANI_OK != env->Class_FindMethod(cls, "$_get", "I:Lstd/core/Object;", &get)) {
-            HILOG_ERROR_I18N("Find method '$_get' failed");
-            return localeTags;
-        }
-
-        for (int i = 0; i < (int)length; i++) {
-            ani_ref value;
-            if (ANI_OK != env->Object_CallMethod_Ref(locale, get, &value, i)) {
-                HILOG_ERROR_I18N("Call method '$_get' failed");
-                return localeTags;
-            }
-            localeTags.push_back(AniStrToString(env, value));
-        }
+        localeTags.push_back(AniStrToString(env, value));
     }
     return localeTags;
 }

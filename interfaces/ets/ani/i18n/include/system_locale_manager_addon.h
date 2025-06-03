@@ -25,7 +25,7 @@ namespace I18n {
 class I18nSysLocaleMgrAddon {
 public:
     static I18nSysLocaleMgrAddon* UnwrapAddon(ani_env *env, ani_object object);
-    static ani_object Create(ani_env *env, [[maybe_unused]] ani_class clazz);
+    static ani_object Create(ani_env *env, [[maybe_unused]] ani_object object);
     static ani_object GetLanguageInfoArray(ani_env *env, ani_object object, ani_object languages, ani_object options);
     static ani_object GetRegionInfoArray(ani_env *env, ani_object object, ani_object regions, ani_object options);
     static ani_object GetTimeZoneCityItemArray(ani_env *env, [[maybe_unused]] ani_object object);

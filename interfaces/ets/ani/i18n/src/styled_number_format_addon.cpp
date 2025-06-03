@@ -73,7 +73,7 @@ void I18nStyledNumberFormatAddon::SetTextStyle(ani_env *env, ani_object options,
         return;
     }
     if (isUndefined) {
-        HILOG_ERROR_I18N("setTextStyle: %{public}s is nullptr.", optionName.c_str());
+        HILOG_ERROR_I18N("SetTextStyle: %{public}s is nullptr.", optionName.c_str());
         return;
     }
 
@@ -105,7 +105,7 @@ bool I18nStyledNumberFormatAddon::InitStyledNumberFormatContent(ani_env *env, Nu
     return styledNumberFormat_ != nullptr;
 }
 
-ani_object I18nStyledNumberFormatAddon::Create(ani_env *env, [[maybe_unused]] ani_class clazz,
+ani_object I18nStyledNumberFormatAddon::Create(ani_env *env, [[maybe_unused]] ani_object object,
     ani_object numberFormat, ani_object options)
 {
     NumberFormatAddon *numberFormatAddon = nullptr;
@@ -129,9 +129,9 @@ ani_object I18nStyledNumberFormatAddon::Create(ani_env *env, [[maybe_unused]] an
     }
 
     static const char *className = "L@ohos/i18n/i18n/StyledNumberFormat;";
-    ani_object StyledNumberFormat_object = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object styledNumberFormatObject = VariableConvertor::CreateAniObject(env, className, obj.get());
     obj.release();
-    return StyledNumberFormat_object;
+    return styledNumberFormatObject;
 }
 
 static ani_object CreateStyleOption(ani_env *env, StyledNumberFormat::NumberPart numberPart, ani_ref textStyleRef)
@@ -207,7 +207,7 @@ static ani_object CreateStyleOptions(ani_env *env,
         return nullptr;
     }
 
-    for (size_t i = 0; i < numberParts.size(); i++) {
+    for (size_t i = 0; i < numberParts.size(); ++i) {
         auto iter = styledNumberFormatOptions.find(numberParts[i].part_name);
         if (iter == styledNumberFormatOptions.end()) {
             continue;

@@ -100,9 +100,9 @@ ani_object I18nCalendarAddon::GetCalendar(ani_env *env, ani_string locale, ani_s
 
     obj->calendar_ = std::make_unique<I18nCalendar>(VariableConvertor::AniStrToString(env, locale), calendartype);
     static const char* className = "L@ohos/i18n/i18n/Calendar;";
-    ani_object calendar_object = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object calendarObject = VariableConvertor::CreateAniObject(env, className, obj.get());
     obj.release();
-    return calendar_object;
+    return calendarObject;
 }
 
 void I18nCalendarAddon::SetTimeByDate(ani_env *env, ani_object object, ani_object date)

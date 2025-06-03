@@ -24,13 +24,13 @@ namespace Global {
 namespace I18n {
 class NumberFormatAddon {
 public:
-    static NumberFormatAddon* UnwrapAddon(ani_env *env, ani_object object, const std::string name);
-    static ani_string NumberFormat_format(ani_env *env, ani_object object, ani_double number);
-    static ani_string NumberFormat_formatRange(ani_env *env, ani_object object,
+    static NumberFormatAddon* UnwrapAddon(ani_env *env, ani_object object, const std::string &name);
+    static ani_string NumberFormat_Format(ani_env *env, ani_object object, ani_double number);
+    static ani_string NumberFormat_FormatRange(ani_env *env, ani_object object,
         ani_double startRange, ani_double endRange);
-    static ani_object NumberFormat_resolvedOptions(ani_env *env, ani_object object);
-    static ani_object NumberFormat_create(ani_env *env, [[maybe_unused]] ani_class clazz);
-    static ani_object NumberFormat_createWithParam(ani_env *env, [[maybe_unused]] ani_class clazz,
+    static ani_object NumberFormat_ResolvedOptions(ani_env *env, ani_object object);
+    static ani_object NumberFormat_Create(ani_env *env, [[maybe_unused]] ani_object object);
+    static ani_object NumberFormat_CreateWithParam(ani_env *env, [[maybe_unused]] ani_object object,
         ani_object locale, ani_object options);
     static ani_status BindContext_NumberFormat(ani_env *env);
     std::shared_ptr<NumberFormat> CopyNumberFormat()

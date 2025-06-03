@@ -34,15 +34,15 @@ I18nSysLocaleMgrAddon* I18nSysLocaleMgrAddon::UnwrapAddon(ani_env *env, ani_obje
     return reinterpret_cast<I18nSysLocaleMgrAddon*>(ptr);
 }
 
-ani_object I18nSysLocaleMgrAddon::Create(ani_env *env, [[maybe_unused]] ani_class clazz)
+ani_object I18nSysLocaleMgrAddon::Create(ani_env *env, [[maybe_unused]] ani_object object)
 {
     std::unique_ptr<I18nSysLocaleMgrAddon> obj = std::make_unique<I18nSysLocaleMgrAddon>();
     obj->systemLocaleManager_ = std::make_unique<SystemLocaleManager>();
 
     static const char *className = "L@ohos/i18n/i18n/SystemLocaleManager;";
-    ani_object SysLocaleMgr_object = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object sysLocaleMgrObject = VariableConvertor::CreateAniObject(env, className, obj.get());
     obj.release();
-    return SysLocaleMgr_object;
+    return sysLocaleMgrObject;
 }
 
 static ani_object CreateLocaleItem(ani_env *env, LocaleItem localeItem)
@@ -105,7 +105,7 @@ static ani_object CreateLocaleItemArray(ani_env *env, std::vector<LocaleItem> Lo
         return ret;
     }
 
-    for (size_t i = 0; i < LocaleItemList.size(); i++) {
+    for (size_t i = 0; i < LocaleItemList.size(); ++i) {
         if (ANI_OK != env->Object_CallMethod_Void(ret, set, i, CreateLocaleItem(env, LocaleItemList[i]))) {
             HILOG_ERROR_I18N("Call method '$_set' failed");
             return ret;
@@ -206,7 +206,7 @@ ani_object I18nSysLocaleMgrAddon::GetRegionInfoArray(ani_env *env, ani_object ob
 
     I18nSysLocaleMgrAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->systemLocaleManager_ == nullptr) {
-        HILOG_ERROR_I18N("GetCountryInfoArray: Get SystemLocaleManager object failed");
+        HILOG_ERROR_I18N("GetRegionInfoArray: Get SystemLocaleManager object failed");
         return nullptr;
     }
 
@@ -287,7 +287,7 @@ ani_object I18nSysLocaleMgrAddon::GetTimeZoneCityItemArray(ani_env *env, [[maybe
         return ret;
     }
 
-    for (size_t i = 0; i < timezoneCityItemList.size(); i++) {
+    for (size_t i = 0; i < timezoneCityItemList.size(); ++i) {
         if (ANI_OK != env->Object_CallMethod_Void(ret, set, i, CreateTimeZoneCityItem(env, timezoneCityItemList[i]))) {
             HILOG_ERROR_I18N("Call method '$_set' failed");
             return ret;

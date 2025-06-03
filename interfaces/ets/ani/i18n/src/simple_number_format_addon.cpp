@@ -70,9 +70,9 @@ ani_object I18nSimpleNumberFormatAddon::GetSimpleNumberFormatBySkeleton(ani_env 
     }
 
     static const char *className = "L@ohos/i18n/i18n/SimpleNumberFormat;";
-    ani_object SimpleNumberFormat_object = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object simpleNumberFormatObject = VariableConvertor::CreateAniObject(env, className, obj.get());
     obj.release();
-    return SimpleNumberFormat_object;
+    return simpleNumberFormatObject;
 }
 
 ani_string I18nSimpleNumberFormatAddon::Format(ani_env *env, ani_object object, ani_double value)

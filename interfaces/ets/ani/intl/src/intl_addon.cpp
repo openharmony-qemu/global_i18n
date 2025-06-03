@@ -24,7 +24,10 @@ using namespace OHOS;
 using namespace Global;
 using namespace I18n;
 
-static IntlAddon* UnwrapAddon(ani_env *env, ani_object object, const std::string name)
+static const int INDEX_ONE_OF_VECTOR = 0;
+static const int INDEX_TWO_OF_VECTOR = 1;
+
+static IntlAddon* UnwrapAddon(ani_env *env, ani_object object, const std::string &name)
 {
     ani_long ptr;
     if (ANI_OK != env->Object_GetFieldByName_Long(object, name.c_str(), &ptr)) {
@@ -34,7 +37,7 @@ static IntlAddon* UnwrapAddon(ani_env *env, ani_object object, const std::string
     return reinterpret_cast<IntlAddon*>(ptr);
 }
 
-ani_string IntlAddon::DateTimeFormat_format(ani_env *env, ani_object object, ani_object date)
+ani_string IntlAddon::DateTimeFormat_Format(ani_env *env, ani_object object, ani_object date)
 {
     static const char *className = "Lescompat/Date;";
     ani_class cls;
@@ -65,7 +68,7 @@ ani_string IntlAddon::DateTimeFormat_format(ani_env *env, ani_object object, ani
     return VariableConvertor::StringToAniStr(env, str);
 }
 
-ani_string IntlAddon::DateTimeFormat_formatRange(ani_env *env, ani_object object,
+ani_string IntlAddon::DateTimeFormat_FormatRange(ani_env *env, ani_object object,
     ani_object startDate, ani_object endDate)
 {
     static const char *className = "Lescompat/Date;";
@@ -103,7 +106,7 @@ ani_string IntlAddon::DateTimeFormat_formatRange(ani_env *env, ani_object object
     return VariableConvertor::StringToAniStr(env, str);
 }
 
-ani_object IntlAddon::DateTimeFormat_resolvedOptions(ani_env *env, ani_object object)
+ani_object IntlAddon::DateTimeFormat_ResolvedOptions(ani_env *env, ani_object object)
 {
     IntlAddon *obj = UnwrapAddon(env, object, "nativeDateTimeFormat");
     if (obj == nullptr || obj->datefmt_ == nullptr) {
@@ -148,7 +151,7 @@ ani_object IntlAddon::DateTimeFormat_resolvedOptions(ani_env *env, ani_object ob
 }
 
 
-ani_double IntlAddon::Collator_compare(ani_env *env, ani_object object, ani_string first, ani_string second)
+ani_double IntlAddon::Collator_Compare(ani_env *env, ani_object object, ani_string first, ani_string second)
 {
     IntlAddon *obj = UnwrapAddon(env, object, "nativeCollator");
     if (obj == nullptr || obj->collator_ == nullptr) {
@@ -160,7 +163,7 @@ ani_double IntlAddon::Collator_compare(ani_env *env, ani_object object, ani_stri
         VariableConvertor::AniStrToString(env, first), VariableConvertor::AniStrToString(env, second));
     return static_cast<double>(compareResult);
 }
-ani_object IntlAddon::Collator_resolvedOptions(ani_env *env, ani_object object)
+ani_object IntlAddon::Collator_ResolvedOptions(ani_env *env, ani_object object)
 {
     IntlAddon *obj = UnwrapAddon(env, object, "nativeCollator");
     if (obj == nullptr || obj->collator_ == nullptr) {
@@ -200,7 +203,7 @@ ani_object IntlAddon::Collator_resolvedOptions(ani_env *env, ani_object object)
     return collatorOptions;
 }
 
-ani_string IntlAddon::PluralRules_select(ani_env *env, ani_object object, ani_double number)
+ani_string IntlAddon::PluralRules_Select(ani_env *env, ani_object object, ani_double number)
 {
     IntlAddon *obj = UnwrapAddon(env, object, "nativePluralRules");
     if (obj == nullptr || obj->pluralrules_ == nullptr) {
@@ -212,7 +215,7 @@ ani_string IntlAddon::PluralRules_select(ani_env *env, ani_object object, ani_do
     return VariableConvertor::StringToAniStr(env, str);
 }
 
-ani_string IntlAddon::RelativeTimeFormat_format(ani_env *env, ani_object object, ani_double value, ani_string unit)
+ani_string IntlAddon::RelativeTimeFormat_Format(ani_env *env, ani_object object, ani_double value, ani_string unit)
 {
     IntlAddon *obj = UnwrapAddon(env, object, "nativeRelativeTimeFormat");
     if (obj == nullptr || obj->relativetimefmt_ == nullptr) {
@@ -246,9 +249,9 @@ static void FillInArrayElement(ani_env *env, ani_class arrayCls, ani_object &res
         return;
     }
 
-    for (size_t i = 0; i < timeVector.size(); i++) {
-        std::string value = timeVector[i][1];
-        std::string type = timeVector[i][0];
+    for (size_t i = 0; i < timeVector.size(); ++i) {
+        std::string value = timeVector[i][INDEX_TWO_OF_VECTOR];
+        std::string type = timeVector[i][INDEX_ONE_OF_VECTOR];
         std::string unit = "";
         size_t unitIndex = 2;
         if (timeVector[i].size() > unitIndex) {
@@ -272,7 +275,7 @@ static void FillInArrayElement(ani_env *env, ani_class arrayCls, ani_object &res
     }
 }
 
-ani_object IntlAddon::RelativeTimeFormat_formatToParts(ani_env *env, ani_object object,
+ani_object IntlAddon::RelativeTimeFormat_FormatToParts(ani_env *env, ani_object object,
     ani_double value, ani_string unit)
 {
     IntlAddon *obj = UnwrapAddon(env, object, "nativeRelativeTimeFormat");
@@ -307,7 +310,7 @@ ani_object IntlAddon::RelativeTimeFormat_formatToParts(ani_env *env, ani_object 
     return ret;
 }
 
-ani_object IntlAddon::RelativeTimeFormat_resolvedOptions(ani_env *env, ani_object object)
+ani_object IntlAddon::RelativeTimeFormat_ResolvedOptions(ani_env *env, ani_object object)
 {
     IntlAddon *obj = UnwrapAddon(env, object, "nativeRelativeTimeFormat");
     if (obj == nullptr || obj->relativetimefmt_ == nullptr) {
@@ -345,7 +348,7 @@ ani_object IntlAddon::RelativeTimeFormat_resolvedOptions(ani_env *env, ani_objec
     return relativeTimeFormatResolvedOptions;
 }
 
-ani_object IntlAddon::DateTimeFormat_create(ani_env *env, [[maybe_unused]] ani_class clazz)
+ani_object IntlAddon::DateTimeFormat_Create(ani_env *env, [[maybe_unused]] ani_object object)
 {
     std::unique_ptr<IntlAddon> obj = std::make_unique<IntlAddon>();
     std::vector<std::string> localeTags;
@@ -353,9 +356,9 @@ ani_object IntlAddon::DateTimeFormat_create(ani_env *env, [[maybe_unused]] ani_c
 
     obj->datefmt_ = DateTimeFormat::CreateInstance(localeTags, map);
     static const char *className = "L@ohos/intl/intl/DateTimeFormat;";
-    ani_object dateTimeFormat_object = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object dateTimeFormatObject = VariableConvertor::CreateAniObject(env, className, obj.get());
     obj.release();
-    return dateTimeFormat_object;
+    return dateTimeFormatObject;
 }
 
 static std::map<std::string, std::string> GetDateTimeFormatOptions(ani_env *env, ani_object options)
@@ -387,7 +390,7 @@ static std::map<std::string, std::string> GetDateTimeFormatOptions(ani_env *env,
     return map;
 }
 
-ani_object IntlAddon::DateTimeFormat_createWithParam(ani_env *env, [[maybe_unused]] ani_class clazz,
+ani_object IntlAddon::DateTimeFormat_CreateWithParam(ani_env *env, [[maybe_unused]] ani_object object,
     ani_object locale, ani_object options)
 {
     std::vector<std::string> localeTags = VariableConvertor::GetLocaleTags(env, locale);
@@ -397,12 +400,12 @@ ani_object IntlAddon::DateTimeFormat_createWithParam(ani_env *env, [[maybe_unuse
     obj->datefmt_ = DateTimeFormat::CreateInstance(localeTags, map);
 
     static const char *className = "L@ohos/intl/intl/DateTimeFormat;";
-    ani_object dateTimeFormat_object = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object dateTimeFormatObject = VariableConvertor::CreateAniObject(env, className, obj.get());
     obj.release();
-    return dateTimeFormat_object;
+    return dateTimeFormatObject;
 }
 
-ani_object IntlAddon::Collator_create(ani_env *env, [[maybe_unused]] ani_class clazz)
+ani_object IntlAddon::Collator_Create(ani_env *env, [[maybe_unused]] ani_object object)
 {
     std::vector<std::string> localeTags;
     std::map<std::string, std::string> map = {};
@@ -410,9 +413,9 @@ ani_object IntlAddon::Collator_create(ani_env *env, [[maybe_unused]] ani_class c
     obj->collator_ = std::make_unique<Collator>(localeTags, map);
 
     static const char *className = "L@ohos/intl/intl/Collator;";
-    ani_object collator_object = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object collatorObject = VariableConvertor::CreateAniObject(env, className, obj.get());
     obj.release();
-    return collator_object;
+    return collatorObject;
 }
 
 static std::map<std::string, std::string> GetCollatorOptions(ani_env *env, ani_object options)
@@ -445,7 +448,7 @@ static std::map<std::string, std::string> GetCollatorOptions(ani_env *env, ani_o
     return map;
 }
 
-ani_object IntlAddon::Collator_createWithParam(ani_env *env, [[maybe_unused]] ani_class clazz,
+ani_object IntlAddon::Collator_CreateWithParam(ani_env *env, [[maybe_unused]] ani_object object,
     ani_object locale, ani_object options)
 {
     std::vector<std::string> localeTags = VariableConvertor::GetLocaleTags(env, locale);
@@ -455,12 +458,12 @@ ani_object IntlAddon::Collator_createWithParam(ani_env *env, [[maybe_unused]] an
     obj->collator_ = std::make_unique<Collator>(localeTags, map);
 
     static const char *className = "L@ohos/intl/intl/Collator;";
-    ani_object collator_object = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object collatorObject = VariableConvertor::CreateAniObject(env, className, obj.get());
     obj.release();
-    return collator_object;
+    return collatorObject;
 }
 
-ani_object IntlAddon::PluralRules_create(ani_env *env, [[maybe_unused]] ani_class clazz)
+ani_object IntlAddon::PluralRules_Create(ani_env *env, [[maybe_unused]] ani_object object)
 {
     std::vector<std::string> localeTags;
     std::map<std::string, std::string> map = {};
@@ -468,9 +471,9 @@ ani_object IntlAddon::PluralRules_create(ani_env *env, [[maybe_unused]] ani_clas
     obj->pluralrules_ = std::make_unique<PluralRules>(localeTags, map);
 
     static const char *className = "L@ohos/intl/intl/PluralRules;";
-    ani_object pluralRules_object = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object pluralRulesObject = VariableConvertor::CreateAniObject(env, className, obj.get());
     obj.release();
-    return pluralRules_object;
+    return pluralRulesObject;
 }
 
 static std::map<std::string, std::string> GetPluralRulesOptions(ani_env *env, ani_object options)
@@ -503,7 +506,7 @@ static std::map<std::string, std::string> GetPluralRulesOptions(ani_env *env, an
     return map;
 }
 
-ani_object IntlAddon::PluralRules_createWithParam(ani_env *env, [[maybe_unused]] ani_class clazz,
+ani_object IntlAddon::PluralRules_CreateWithParam(ani_env *env, [[maybe_unused]] ani_object object,
     ani_object locale, ani_object options)
 {
     std::vector<std::string> localeTags = VariableConvertor::GetLocaleTags(env, locale);
@@ -513,12 +516,12 @@ ani_object IntlAddon::PluralRules_createWithParam(ani_env *env, [[maybe_unused]]
     obj->pluralrules_ = std::make_unique<PluralRules>(localeTags, map);
 
     static const char *className = "L@ohos/intl/intl/PluralRules;";
-    ani_object pluralRules_object = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object pluralRulesObject = VariableConvertor::CreateAniObject(env, className, obj.get());
     obj.release();
-    return pluralRules_object;
+    return pluralRulesObject;
 }
 
-ani_object IntlAddon::RelativeTimeFormat_create(ani_env *env, [[maybe_unused]] ani_class clazz)
+ani_object IntlAddon::RelativeTimeFormat_Create(ani_env *env, [[maybe_unused]] ani_object object)
 {
     std::vector<std::string> localeTags;
     std::map<std::string, std::string> map = {};
@@ -526,9 +529,9 @@ ani_object IntlAddon::RelativeTimeFormat_create(ani_env *env, [[maybe_unused]] a
     obj->relativetimefmt_ = std::make_unique<RelativeTimeFormat>(localeTags, map);
 
     static const char *className = "L@ohos/intl/intl/RelativeTimeFormat;";
-    ani_object relativeTimeFormat_object = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object relativeTimeFormatObject = VariableConvertor::CreateAniObject(env, className, obj.get());
     obj.release();
-    return relativeTimeFormat_object;
+    return relativeTimeFormatObject;
 }
 
 static std::map<std::string, std::string> GetRelativeTimeFormatOptions(ani_env *env, ani_object options)
@@ -551,7 +554,7 @@ static std::map<std::string, std::string> GetRelativeTimeFormatOptions(ani_env *
     return map;
 }
 
-ani_object IntlAddon::RelativeTimeFormat_createWithParam(ani_env *env, [[maybe_unused]] ani_class clazz,
+ani_object IntlAddon::RelativeTimeFormat_CreateWithParam(ani_env *env, [[maybe_unused]] ani_object object,
     ani_object locale, ani_object options)
 {
     std::vector<std::string> localeTags = VariableConvertor::GetLocaleTags(env, locale);
@@ -561,9 +564,9 @@ ani_object IntlAddon::RelativeTimeFormat_createWithParam(ani_env *env, [[maybe_u
     obj->relativetimefmt_= std::make_unique<RelativeTimeFormat>(localeTags, map);
 
     static const char *className = "L@ohos/intl/intl/RelativeTimeFormat;";
-    ani_object relativeTimeFormat_object = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object relativeTimeFormatObject = VariableConvertor::CreateAniObject(env, className, obj.get());
     obj.release();
-    return relativeTimeFormat_object;
+    return relativeTimeFormatObject;
 }
 
 ani_status IntlAddon::BindContext_DateTimeFormat(ani_env *env)
@@ -577,13 +580,13 @@ ani_status IntlAddon::BindContext_DateTimeFormat(ani_env *env)
 
     std::array methods = {
         ani_native_function {"create", ":L@ohos/intl/intl/DateTimeFormat;",
-            reinterpret_cast<void *>(DateTimeFormat_create) },
+            reinterpret_cast<void *>(DateTimeFormat_Create) },
         ani_native_function {"create",
             "Lstd/core/Object;L@ohos/intl/intl/DateTimeOptions;:L@ohos/intl/intl/DateTimeFormat;",
-            reinterpret_cast<void *>(DateTimeFormat_createWithParam) },
-        ani_native_function {"format", nullptr, reinterpret_cast<void *>(DateTimeFormat_format) },
-        ani_native_function {"formatRange", nullptr, reinterpret_cast<void *>(DateTimeFormat_formatRange) },
-        ani_native_function {"resolvedOptions", nullptr, reinterpret_cast<void *>(DateTimeFormat_resolvedOptions) },
+            reinterpret_cast<void *>(DateTimeFormat_CreateWithParam) },
+        ani_native_function {"format", nullptr, reinterpret_cast<void *>(DateTimeFormat_Format) },
+        ani_native_function {"formatRange", nullptr, reinterpret_cast<void *>(DateTimeFormat_FormatRange) },
+        ani_native_function {"resolvedOptions", nullptr, reinterpret_cast<void *>(DateTimeFormat_ResolvedOptions) },
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
@@ -603,12 +606,12 @@ ani_status IntlAddon::BindContext_Collator(ani_env *env)
     }
 
     std::array methods = {
-        ani_native_function {"create", ":L@ohos/intl/intl/Collator;", reinterpret_cast<void *>(Collator_create) },
+        ani_native_function {"create", ":L@ohos/intl/intl/Collator;", reinterpret_cast<void *>(Collator_Create) },
         ani_native_function {"create",
             "Lstd/core/Object;L@ohos/intl/intl/CollatorOptions;:L@ohos/intl/intl/Collator;",
-            reinterpret_cast<void *>(Collator_createWithParam) },
-        ani_native_function {"compare", nullptr, reinterpret_cast<void *>(Collator_compare) },
-        ani_native_function {"resolvedOptions", nullptr, reinterpret_cast<void *>(Collator_resolvedOptions) },
+            reinterpret_cast<void *>(Collator_CreateWithParam) },
+        ani_native_function {"compare", nullptr, reinterpret_cast<void *>(Collator_Compare) },
+        ani_native_function {"resolvedOptions", nullptr, reinterpret_cast<void *>(Collator_ResolvedOptions) },
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
@@ -628,11 +631,11 @@ ani_status IntlAddon::BindContext_PluralRules(ani_env *env)
     }
 
     std::array methods = {
-        ani_native_function {"create", ":L@ohos/intl/intl/PluralRules;", reinterpret_cast<void *>(PluralRules_create) },
+        ani_native_function {"create", ":L@ohos/intl/intl/PluralRules;", reinterpret_cast<void *>(PluralRules_Create) },
         ani_native_function {"create",
             "Lstd/core/Object;L@ohos/intl/intl/PluralRulesOptions;:L@ohos/intl/intl/PluralRules;",
-            reinterpret_cast<void *>(PluralRules_createWithParam) },
-        ani_native_function {"select", nullptr, reinterpret_cast<void *>(PluralRules_select) },
+            reinterpret_cast<void *>(PluralRules_CreateWithParam) },
+        ani_native_function {"select", nullptr, reinterpret_cast<void *>(PluralRules_Select) },
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
@@ -653,13 +656,13 @@ ani_status IntlAddon::BindContext_RelativeTimeFormat(ani_env *env)
 
     std::array methods = {
         ani_native_function {"create", ":L@ohos/intl/intl/RelativeTimeFormat;",
-            reinterpret_cast<void *>(RelativeTimeFormat_create) },
+            reinterpret_cast<void *>(RelativeTimeFormat_Create) },
         ani_native_function {"create",
             "Lstd/core/Object;L@ohos/intl/intl/RelativeTimeFormatInputOptions;:L@ohos/intl/intl/RelativeTimeFormat;",
-            reinterpret_cast<void *>(RelativeTimeFormat_createWithParam) },
-        ani_native_function {"format", nullptr, reinterpret_cast<void *>(RelativeTimeFormat_format) },
-        ani_native_function {"formatToParts", nullptr, reinterpret_cast<void *>(RelativeTimeFormat_formatToParts) },
-        ani_native_function {"resolvedOptions", nullptr, reinterpret_cast<void *>(RelativeTimeFormat_resolvedOptions) },
+            reinterpret_cast<void *>(RelativeTimeFormat_CreateWithParam) },
+        ani_native_function {"format", nullptr, reinterpret_cast<void *>(RelativeTimeFormat_Format) },
+        ani_native_function {"formatToParts", nullptr, reinterpret_cast<void *>(RelativeTimeFormat_FormatToParts) },
+        ani_native_function {"resolvedOptions", nullptr, reinterpret_cast<void *>(RelativeTimeFormat_ResolvedOptions) },
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
