@@ -217,6 +217,7 @@ private:
     static bool HasDesignator(const std::string& inFormat, const char designator);
     static void QueryUpgradeLocale();
     static std::string GetPseudoCountryTag(const char* countryTag, std::string &regionTag);
+    static void SetPrevNotPseudoRegion(std::string &regionTag);
     static std::string GetUnicodeWrappedFilePathInner(const std::string &path, const char delimiter,
         const std::string& localeTag, std::string &invalidField);
 

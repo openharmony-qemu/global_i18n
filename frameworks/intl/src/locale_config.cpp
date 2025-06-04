@@ -1833,11 +1833,11 @@ std::string LocaleConfig::GetPseudoCountryTag(const char* countryTag, std::strin
         return regionTag;
     }
     if (PSEUDO_REGION_XA.compare(countryTag) == 0) {
-        prevNotPseudoRegion = std::string(regionTag);
+        SetPrevNotPseudoRegion(regionTag);
         return PSEUDO_REGION_XA;
     }
     if (PSEUDO_REGION_XB.compare(countryTag) == 0) {
-        prevNotPseudoRegion = std::string(regionTag);
+        SetPrevNotPseudoRegion(regionTag);
         return PSEUDO_REGION_XB;
     }
     if (PSEUDO_REGION_XA.compare(regionTag) == 0 || PSEUDO_REGION_XB.compare(regionTag) == 0) {
@@ -1846,6 +1846,13 @@ std::string LocaleConfig::GetPseudoCountryTag(const char* countryTag, std::strin
         }
     }
     return regionTag;
+}
+
+void LocaleConfig::SetPrevNotPseudoRegion(std::string &regionTag)
+{
+    if (PSEUDO_REGION_XA.compare(regionTag) != 0 && PSEUDO_REGION_XB.compare(regionTag) != 0) {
+        prevNotPseudoRegion = std::string(regionTag);
+    }
 }
 
 std::string LocaleConfig::CreateLocale(const std::string &languageTag, const std::string &scriptTag,
