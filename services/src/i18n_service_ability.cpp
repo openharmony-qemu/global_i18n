@@ -238,6 +238,63 @@ ErrCode I18nServiceAbility::SetFirstDayOfWeek(int32_t type, int32_t& code)
     return ERR_OK;
 }
 
+ErrCode I18nServiceAbility::GetSystemCollations(std::unordered_map<std::string, std::string>& systemCollations,
+    int32_t& code)
+{
+    int pid = getpid();
+    StartTask(pid);
+    I18nErrorCode errCode = CheckSystemPermission();
+    if (errCode != I18nErrorCode::SUCCESS) {
+        HILOG_ERROR_I18N("I18nServiceAbility::GetSystemCollations: Check system permission failed.");
+        code = static_cast<int32_t>(errCode);
+        FinishTask(pid);
+        return ERR_OK;
+    }
+    errCode = LocaleConfig::GetSystemCollations(systemCollations);
+    code = static_cast<int32_t>(errCode);
+    FinishTask(pid);
+    return ERR_OK;
+}
+
+ErrCode I18nServiceAbility::GetUsingCollation(std::string& usingCollation, int32_t& code)
+{
+    int pid = getpid();
+    StartTask(pid);
+    I18nErrorCode errCode = CheckSystemPermission();
+    if (errCode != I18nErrorCode::SUCCESS) {
+        HILOG_ERROR_I18N("I18nServiceAbility::GetUsingCollation: Check system permission failed.");
+        code = static_cast<int32_t>(errCode);
+        FinishTask(pid);
+        return ERR_OK;
+    }
+    errCode = LocaleConfig::GetUsingCollation(usingCollation);
+    code = static_cast<int32_t>(errCode);
+    FinishTask(pid);
+    return ERR_OK;
+}
+
+ErrCode I18nServiceAbility::SetSystemCollation(const std::string& identifier, int32_t& code)
+{
+    int pid = getpid();
+    StartTask(pid);
+    I18nErrorCode errCode = CheckPermission();
+    if (errCode != I18nErrorCode::SUCCESS) {
+        HILOG_ERROR_I18N("I18nServiceAbility::SetSystemCollation: Check permission failed.");
+        code = static_cast<int32_t>(errCode);
+        FinishTask(pid);
+        return ERR_OK;
+    }
+#ifdef SUPPORT_MULTI_USER
+    int32_t userId = GetCallingUserId();
+    errCode = LocaleConfig::SetSystemCollation(identifier, userId);
+#else
+    errCode = LocaleConfig::SetSystemCollation(identifier);
+#endif
+    code = static_cast<int32_t>(errCode);
+    FinishTask(pid);
+    return ERR_OK;
+}
+
 ErrCode I18nServiceAbility::GetLanguageFromUserId(int32_t userId, std::string& language)
 {
     int pid = getpid();
@@ -348,6 +405,15 @@ int32_t I18nServiceAbility::GetCallingUserId()
  */
 I18nErrorCode I18nServiceAbility::CheckPermission()
 {
+    I18nErrorCode errCode = I18nServiceAbility::CheckSystemPermission();
+    if (errCode != I18nErrorCode::SUCCESS) {
+        return errCode;
+    }
+    return I18nServiceAbility::CheckUpdatePermission();
+}
+
+I18nErrorCode I18nServiceAbility::CheckSystemPermission()
+{
     uint64_t callerFullToken = IPCSkeleton::GetCallingFullTokenID();
     uint32_t callerToken = IPCSkeleton::GetCallingTokenID();
     bool isSystemApp = Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(callerFullToken);
@@ -359,6 +425,12 @@ I18nErrorCode I18nServiceAbility::CheckPermission()
         HILOG_ERROR_I18N("I18nServiceAbility caller process is not System app, Shell or Native.");
         return I18nErrorCode::NOT_SYSTEM_APP;
     }
+    return I18nErrorCode::SUCCESS;
+}
+
+I18nErrorCode I18nServiceAbility::CheckUpdatePermission()
+{
+    uint32_t callerToken = IPCSkeleton::GetCallingTokenID();
     int result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken,
         "ohos.permission.UPDATE_CONFIGURATION");
     if (result != Security::AccessToken::PermissionState::PERMISSION_GRANTED) {

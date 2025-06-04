@@ -28,6 +28,7 @@ static const std::unordered_map<int32_t, std::string> ErrorCodeToMsg {
     {I18N_NOT_SYSTEM_APP,
         "Permission verification failed. A non-system application calls a system API."},
     {I18N_NOT_VALID, "Invalid parameter"},
+    {I18N_NOT_VALID_NEW, "Invalid parameter"},
     {I18N_NOT_FOUND, "Parameter error"},
     {I18N_OPTION_NOT_VALID, "Invalid option name"}
 };
@@ -51,7 +52,7 @@ void ErrorUtil::NapiThrow(napi_env env, int32_t errCode, const std::string& valu
 
     if (errCode == I18N_NO_PERMISSION || errCode == I18N_NOT_SYSTEM_APP) {
         allErrMsg = errMsg;
-    } else if (errCode == I18N_NOT_VALID) {
+    } else if (errCode == I18N_NOT_VALID || errCode == I18N_NOT_VALID_NEW) {
         allErrMsg = errMsg + ", the " + valueName + " must be " + valueContent + ".";
     } else if (valueContent.length() == 0) {
         allErrMsg = errMsg + ", the " + valueName + " cannot be empty.";

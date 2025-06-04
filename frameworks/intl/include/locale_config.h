@@ -96,6 +96,31 @@ public:
      */
     static I18nErrorCode SetFirstDayOfWeek(const WeekDay& type, int32_t userId = -1);
 
+    /**
+     * @brief Gets collations supported by system locale.
+     *
+     * @param systemCollations The map will containing the collation's identifier and name.
+     * @return I18nErrorCode Return SUCCESS indicates that the getting was successful.
+     */
+    static I18nErrorCode GetSystemCollations(std::unordered_map<std::string, std::string>& systemCollations);
+
+    /**
+     * @brief Gets collation currently used by system locale.
+     *
+     * @param usingCollation The identifier of the collation model used by system locale will be return.
+     * @return I18nErrorCode Return SUCCESS indicates that the getting was successful.
+     */
+    static I18nErrorCode GetUsingCollation(std::string& usingCollation);
+
+    /**
+     * @brief Sets the system collation mode.
+     *
+     * @param identifier Identifier of the collation mode.
+     * @param userId Indicates update user id.
+     * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
+     */
+    static I18nErrorCode SetSystemCollation(const std::string& identifier, int32_t userId = -1);
+
     static TemperatureType GetTemperatureType();
     static std::string GetTemperatureName(const TemperatureType& type);
     static WeekDay GetFirstDayOfWeek();
@@ -134,6 +159,12 @@ public:
     static std::string GetUnicodeWrappedFilePath(const std::string &path, const char delimiter,
         std::shared_ptr<IntlLocale> IntlLocale, std::string &invalidField);
     static std::string ComputeEffectiveLanguage(const std::string& localeTag, const std::string& language);
+    static std::string GetSystemLocaleInstanceTag();
+    static std::string RemoveCustExtParam(const std::string& locale);
+    static std::string ModifyExtParam(const std::string& locale, const std::string& key, const std::string& value,
+        const std::string& extParamKey);
+    static std::string QueryExtParam(const std::string& locale, const std::string& key,
+        const std::string& extParamKey);
     static const std::string HOUR_EVENT_DATA;
     static const std::string LANGUAGE_KEY;
     static const std::string LOCALE_KEY;
@@ -185,10 +216,14 @@ private:
     static std::mutex region2DisplayNameMutex;
     static std::mutex locale2DisplayNameMutex;
     static std::shared_mutex is24HourLocaleMapMutex;
-    static const std::string EXT_PARAM_KEY;
+    static const std::string STANDARD_EXT_PARAM_KEY;
+    static const std::string CUST_EXT_PARAM_KEY;
     static const std::string NUMBER_SYSTEM_KEY;
     static const std::string TEMPERATURE_UNIT_KEY;
     static const std::string WEEK_DAY_KEY;
+    static const std::string CASE_FIRST_KEY;
+    static const std::string COLLATION_KEY;
+    static const std::string NUNBER_PATTERN_KEY;
     static const std::string PSEUDO_REGION_XA;
     static const std::string PSEUDO_REGION_XB;
 
@@ -284,9 +319,18 @@ private:
      * @return std::string Return locale Tag.
      */
     static std::string UpdateRegionOfLocale(const std::string &regionTag);
+    static std::string GetBestMatchedLocaleOfCollation(const std::string& requestLocale);
+    static std::string QueryExtParam(const std::string& locale, const std::string& key);
     static std::string ModifyExtParam(const std::string& locale, const std::string& key, const std::string& value);
-    static std::unordered_map<std::string, std::string> ParseExtParam(const std::string& param);
-    static std::string GenerateExtParam(const std::unordered_map<std::string, std::string>& paramMap);
+    static std::unordered_map<std::string, std::unordered_map<std::string, std::string>> ParseAllExtParam(
+        std::string locale);
+    static std::unordered_map<std::string, std::string> ParseExtParam(const std::string& extParam,
+        const std::string& extParamKey);
+    static std::string GenerateAllExtParam(
+        const std::unordered_map<std::string, std::unordered_map<std::string, std::string>>& extParamMap);
+    static std::string GenerateExtParam(const std::unordered_map<std::string, std::string>& extParamMap,
+        const std::string& extParamKey);
+    static std::vector<std::pair<size_t, std::string>> GetExtParamPositions(const std::string& locale);
     static void ExtendWhiteLanguages();
     static void ExtendLanguageWithScript(const std::string &languageStr);
     static __attribute__((destructor)) void CleanupXmlResources();

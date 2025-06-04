@@ -185,6 +185,34 @@ std::string MultiUsers::GetLanguageFromUserId(int32_t userId)
     return LocaleConfig::ComputeEffectiveLanguage(locale, language);
 }
 
+std::string MultiUsers::GetSystemLanguageFromUserId(int32_t userId)
+{
+    if (userId == -1) {
+        return LocaleConfig::GetSystemLanguage();
+    }
+    std::string localId = std::to_string(userId);
+    std::string language = ReadMultiUsersParameter(MULTI_USERS_LANGUAGE_KEY, localId);
+    if (language.empty()) {
+        HILOG_ERROR_I18N("MultiUsers::GetSystemLanguageFromUserId: Get language failed.");
+        return LocaleConfig::GetSystemLanguage();
+    }
+    return language;
+}
+
+std::string MultiUsers::GetSystemLocaleFromUserId(int32_t userId)
+{
+    if (userId == -1) {
+        return LocaleConfig::GetEffectiveLocale();
+    }
+    std::string localId = std::to_string(userId);
+    std::string locale = ReadMultiUsersParameter(MULTI_USERS_LOCALE_KEY, localId);
+    if (locale.empty()) {
+        HILOG_ERROR_I18N("MultiUsers::GetSystemLocaleFromUserId: Get locale failed.");
+        return LocaleConfig::GetEffectiveLocale();
+    }
+    return locale;
+}
+
 I18nErrorCode MultiUsers::SaveGlobalParam(const std::string& localId)
 {
     std::string language = LocaleConfig::GetSystemLanguage();
