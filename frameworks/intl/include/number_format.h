@@ -128,9 +128,6 @@ private:
     static const int MAX_UNIT_NUM = 500;
     static const int DEFAULT_FRACTION_DIGITS = 3;
     static const int DEFAULT_MAX_SIGNIFICANT_DIGITS = 21;
-    static const int MAX_MINIMUM_INTEGER_DIGITS = 21;
-    static const int MAX_MINIMUM_FRACTION_DIGITS = 20;
-    static const int MAX_MAXIMUM_FRACTION_DIGITS = 21;
     static const char *DEVICE_TYPE_NAME;
     static const int BUFFER_LEN = 10;
     static const int POW_BASE_NUMBER = 10;
