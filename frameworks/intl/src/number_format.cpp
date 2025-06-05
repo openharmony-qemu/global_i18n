@@ -1274,7 +1274,6 @@ std::string NumberFormat::CheckParamLocales(std::vector<std::string> &localeArra
         if (U_FAILURE(status)) {
             HILOG_ERROR_I18N("NumberFormat::CheckParamLocales: locale %{public}s invalid", (*iter).c_str());
             return "invalid locale";
-            
         }
         if (LocaleInfo::allValidLocales.count(locale.getLanguage()) < 1) {
             HILOG_ERROR_I18N("NumberFormat::CheckParamLocales: invalid locale: %{public}s ", (*iter).c_str());
