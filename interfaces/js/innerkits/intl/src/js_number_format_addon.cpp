@@ -89,17 +89,17 @@ napi_value JSNumberFormatAddon::NumberFormatConstructor(napi_env env, napi_callb
     if (status == napi_pending_exception || new_target == nullptr) {
         return CreateNumberFormatWithoutNew(env, argc, argv);
     }
+    std::unique_ptr<JSNumberFormatAddon> obj = std::make_unique<JSNumberFormatAddon>();
+    if (obj == nullptr) {
+        return nullptr;
+    }
     std::vector<std::string> localeTags;
-    if (!HandleArguments(env, argv[0], localeTags)) {
+    if (!obj->HandleArguments(env, argv[0], argc, localeTags)) {
         return nullptr;
     }
     std::map<std::string, std::string> map = {};
     if (argc > 1) {
         JSUtils::GetNumberOptionValues(env, argv[1], map);
-    }
-    std::unique_ptr<JSNumberFormatAddon> obj = std::make_unique<JSNumberFormatAddon>();
-    if (obj == nullptr) {
-        return nullptr;
     }
     status =
         napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), JSNumberFormatAddon::Destructor, nullptr, nullptr);
@@ -115,25 +115,26 @@ napi_value JSNumberFormatAddon::NumberFormatConstructor(napi_env env, napi_callb
     return thisVar;
 }
 
-bool JSNumberFormatAddon::HandleArguments(napi_env env, napi_value argVal,
+bool JSNumberFormatAddon::HandleArguments(napi_env env, napi_value argVal, size_t argc,
     std::vector<std::string> &localeTags)
 {
-    if (argc > 0) {
-        int32_t code = 0;
-        std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argVal, code);
-        if (code != 0) {
-            HILOG_ERROR_I18N("JSNumberFormatAddon::HandleArguments: Get locale array failed.");
-            return false;
-        }
-        std::string checkResult = NumberFormat::CheckParamLocales(localeArray);
-        if (!checkResult.empty()) {
-            ErrorUtil::NapiThrowUndefined(env, checkResult);
-        }
-        localeTags.assign(localeArray.begin(), localeArray.end());
-    } else {
+    if (argc < 1) {
         std::string defaultLocale = NumberFormat::GetIcuDefaultLocale();
         localeTags.push_back(defaultLocale);
+        return true;
     }
+    int32_t code = 0;
+    std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argVal, code);
+    if (code != 0) {
+        HILOG_ERROR_I18N("JSNumberFormatAddon::HandleArguments: Get locale array failed.");
+        return false;
+    }
+    std::string checkResult = NumberFormat::CheckParamLocales(localeArray);
+    if (!checkResult.empty()) {
+        ErrorUtil::NapiThrowUndefined(env, checkResult);
+        return false;
+    }
+    localeTags.assign(localeArray.begin(), localeArray.end());
     return true;
 }
 
