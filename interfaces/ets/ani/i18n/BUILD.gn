@@ -24,8 +24,20 @@ ohos_shared_library("i18n_ani") {
   cflags_cc = [ "-frtti" ]
   remove_configs = [ "//build/config/compiler:no_rtti" ]
   sources = [
+    "./src/entity_recognizer_addon.cpp",
     "./src/error_util.cpp",
-    "./src/i18n.cpp",
+    "./src/holiday_manager_addon.cpp",
+    "./src/i18n_addon.cpp",
+    "./src/i18n_calendar_addon.cpp",
+    "./src/i18n_normalizer_addon.cpp",
+    "./src/i18n_system_addon.cpp",
+    "./src/i18n_timezone_addon.cpp",
+    "./src/i18n_unicode_addon.cpp",
+    "./src/simple_date_time_format_addon.cpp",
+    "./src/simple_number_format_addon.cpp",
+    "./src/styled_number_format_addon.cpp",
+    "./src/system_locale_manager_addon.cpp",
+    "./src/variable_convertor.cpp",
   ]
   deps = [
     "../../../../frameworks/intl:intl_util",
