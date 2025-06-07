@@ -45,6 +45,14 @@ public:
         int32_t& code) override;
     ErrCode GetUsingCollation(std::string& usingCollation, int32_t& code) override;
     ErrCode SetSystemCollation(const std::string& identifier, int32_t& code) override;
+    ErrCode GetSystemNumberingSystems(std::unordered_map<std::string, std::string>& systemNumberingSystems,
+        int32_t& code) override;
+    ErrCode GetUsingNumberingSystem(std::string& usingNumberingSystem, int32_t& code) override;
+    ErrCode SetSystemNumberingSystem(const std::string& identifier, int32_t& code) override;
+    ErrCode GetSystemNumberPatterns(std::unordered_map<std::string, std::string>& systemNumberPatterns,
+        int32_t& code) override;
+    ErrCode GetUsingNumberPattern(std::string& usingNumberPattern, int32_t& code) override;
+    ErrCode SetSystemNumberPattern(const std::string& pattern, int32_t& code) override;
     ErrCode GetLanguageFromUserId(int32_t userId, std::string& language) override;
 
 protected:

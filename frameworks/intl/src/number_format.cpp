@@ -119,7 +119,7 @@ NumberFormat::NumberFormat(const std::vector<std::string> &localeTags, std::map<
     builder = std::make_unique<icu::LocaleBuilder>();
     ParseConfigs(configs);
     for (size_t i = 0; i < localeTags.size(); i++) {
-        std::string curLocale = localeTags[i];
+        std::string curLocale = LocaleConfig::RemoveCustExtParam(localeTags[i]);
         locale = icu::Locale::forLanguageTag(icu::StringPiece(curLocale), status);
         if (U_FAILURE(status)) {
             status = U_ZERO_ERROR;
@@ -127,7 +127,7 @@ NumberFormat::NumberFormat(const std::vector<std::string> &localeTags, std::map<
         }
         if (LocaleInfo::allValidLocales.count(locale.getLanguage()) > 0) {
             localeInfo = std::make_unique<LocaleInfo>(curLocale, configs);
-            CreateRelativeTimeFormat(curLocale);
+            CreateRelativeTimeFormat(localeTags[i]);
             if (!localeInfo->InitSuccess()) {
                 continue;
             }
@@ -139,12 +139,14 @@ NumberFormat::NumberFormat(const std::vector<std::string> &localeTags, std::map<
                 continue;
             }
             createSuccess = true;
+            ParseNumberPattern(localeTags[i]);
             break;
         }
     }
     if (!createSuccess) {
         std::string systemLocale = LocaleConfig::GetEffectiveLocale();
-        localeInfo = std::make_unique<LocaleInfo>(systemLocale, configs);
+        std::string curLocale = LocaleConfig::RemoveCustExtParam(systemLocale);
+        localeInfo = std::make_unique<LocaleInfo>(curLocale, configs);
         CreateRelativeTimeFormat(systemLocale);
         if (localeInfo != nullptr && localeInfo->InitSuccess()) {
             locale = localeInfo->GetLocale();
@@ -152,6 +154,7 @@ NumberFormat::NumberFormat(const std::vector<std::string> &localeTags, std::map<
             icu::MeasureUnit::getAvailable(unitArray, MAX_UNIT_NUM, status);
             if (U_SUCCESS(status)) {
                 createSuccess = true;
+                ParseNumberPattern(systemLocale);
             }
         }
     }
@@ -185,6 +188,7 @@ void NumberFormat::CreateRelativeTimeFormat(const std::string& locale)
 
 void NumberFormat::InitProperties(icu::number::UnlocalizedNumberFormatter &formatter)
 {
+    InitNumberPattern(formatter);
     InitCurrencyProperties(formatter);
     InitPercentStyleProperties(formatter);
     InitUnitProperties(formatter);
@@ -192,6 +196,33 @@ void NumberFormat::InitProperties(icu::number::UnlocalizedNumberFormatter &forma
     InitSignProperties(formatter);
     InitNotationProperties(formatter);
     InitDigitsProperties(formatter);
+}
+
+void NumberFormat::InitNumberPattern(icu::number::UnlocalizedNumberFormatter &formatter)
+{
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale icuLocale = icu::Locale::forLanguageTag(effectiveLocale.c_str(), status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("NumberFormat::InitNumberPattern: Create icu::Locale failed.");
+        return;
+    }
+    icu::DecimalFormatSymbols* decimalFormatSymbols = new icu::DecimalFormatSymbols(icuLocale, status);
+    if (U_FAILURE(status) || decimalFormatSymbols == nullptr) {
+        HILOG_ERROR_I18N("NumberFormat::InitNumberPattern: Create icu::DecimalFormatSymbols failed.");
+        return;
+    }
+    if (groupingSymbol.empty()) {
+        formatter = formatter.grouping(UNumberGroupingStrategy::UNUM_GROUPING_OFF);
+    } else {
+        decimalFormatSymbols->setSymbol(icu::DecimalFormatSymbols::ENumberFormatSymbol::kGroupingSeparatorSymbol,
+            groupingSymbol.c_str());
+    }
+    if (!decimalSymbol.empty()) {
+        decimalFormatSymbols->setSymbol(icu::DecimalFormatSymbols::ENumberFormatSymbol::kDecimalSeparatorSymbol,
+            decimalSymbol.c_str());
+    }
+    formatter = formatter.symbols(*decimalFormatSymbols);
+    delete decimalFormatSymbols;
 }
 
 void NumberFormat::InitCurrencyProperties(icu::number::UnlocalizedNumberFormatter &formatter)
@@ -494,6 +525,20 @@ void NumberFormat::ParseRoundingConfigs(std::map<std::string, std::string> &conf
         if (iter != roundingIncrementList.end()) {
             roundingIncrement = *iter;
         }
+    }
+}
+
+void NumberFormat::ParseNumberPattern(const std::string& localeTag)
+{
+    std::pair<std::string, std::string> numberPattern = LocaleConfig::GetNumberPatternFromLocale(localeTag);
+    if (numberPattern.second.empty()) {
+        return;
+    }
+    groupingSymbol = numberPattern.first;
+    decimalSymbol = numberPattern.second;
+    effectiveLocale = LocaleConfig::RemoveCustExtParam(localeTag);
+    if (!numberingSystem.empty()) {
+        effectiveLocale = LocaleConfig::ModifyExtParam(effectiveLocale, "nu", numberingSystem, "-u-");
     }
 }
 

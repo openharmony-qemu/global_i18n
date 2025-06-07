@@ -14,6 +14,7 @@
  */
 #include "utils.h"
 #include <algorithm>
+#include <bitset>
 #include <cerrno>
 #include <climits>
 #include <filesystem>
@@ -415,6 +416,56 @@ bool Geq(double a, double b)
 bool Leq(double a, double b)
 {
     return a < b || Eq(a, b);
+}
+
+std::string StrToHex(const std::string& text, size_t num)
+{
+    std::string binary;
+    for (auto i : text) {
+        // 8-bit binary.
+        bitset<8> bs(i);
+        binary += bs.to_string();
+    }
+    std::stringstream ss;
+    // 2 means binary.
+    ss << std::hex << std::setw(num) << std::setfill('0') << std::stoi(binary, nullptr, 2);
+    std::string hex;
+    ss >> hex;
+    return hex;
+}
+
+std::string HexToStr(const std::string& hex)
+{
+    // The length of hex must be a multiple of 2.
+    size_t len = 2;
+    if (hex.length() % len != 0) {
+        return "";
+    }
+
+    bool flag = true;
+    std::string result;
+    for (size_t i = 0; i < hex.length(); i += len) {
+        std::string hexStr = hex.substr(i, len);
+        if (flag && hexStr.compare("00") == 0) {
+            continue;
+        }
+        flag = false;
+        int32_t value = 0;
+        try {
+            value = std::stoi(hexStr, nullptr, 16); // 16 represents hexadecimal.
+        } catch (const std::invalid_argument &except) {
+            HILOG_ERROR_I18N("HexToStr: invalid_argument, hexStr: %{public}s.", hexStr.c_str());
+            return "";
+        } catch (const std::out_of_range &except) {
+            HILOG_ERROR_I18N("HexToStr: out_of_range, hexStr: %{public}s.", hexStr.c_str());
+            return "";
+        } catch (...) {
+            HILOG_ERROR_I18N("HexToStr: unknow error, hexStr: %{public}s.", hexStr.c_str());
+            return "";
+        }
+        result += char(value);
+    }
+    return result;
 }
 } // namespace I18n
 } // namespace Global

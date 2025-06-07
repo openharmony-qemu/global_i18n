@@ -121,6 +121,57 @@ public:
      */
     static I18nErrorCode SetSystemCollation(const std::string& identifier, int32_t userId = -1);
 
+    /**
+     * @brief Gets numbering systems supported by system locale.
+     *
+     * @param systemNumberingSystems a map will containing the numbering system's identifier and sample.
+     * @return I18nErrorCode Return SUCCESS indicates that the getting was successful.
+     */
+    static I18nErrorCode GetSystemNumberingSystems(
+        std::unordered_map<std::string, std::string>& systemNumberingSystems);
+
+    /**
+     * @brief Gets numbering system currently used by system locale.
+     *
+     * @param usingNumberingSystem the numbering systems's identifier
+     * @return I18nErrorCode Return SUCCESS indicates that the getting was successful.
+     */
+    static I18nErrorCode GetUsingNumberingSystem(std::string& usingNumberingSystem);
+
+    /**
+     * @brief Sets the numbering system used by the system locale.
+     *
+     * @param identifier Identifier of the numbering system.
+     * @param userId Indicates update user id.
+     * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
+     */
+    static I18nErrorCode SetSystemNumberingSystem(const std::string& identifier, int32_t userId = -1);
+
+    /**
+     * @brief Gets commonly used number patterns for system locale.
+     *
+     * @param systemNumberPatterns a map containing the used number patterns and example of system locale.
+     * @return I18nErrorCode Return SUCCESS indicates that the getting was successful.
+     */
+    static I18nErrorCode GetSystemNumberPatterns(std::unordered_map<std::string, std::string>& systemNumberPatterns);
+
+    /**
+     * @brief Gets number pattern used by system locale.
+     *
+     * @param usingNumberPattern The number pattern identifier used by system locale.
+     * @return I18nErrorCode Return SUCCESS indicates that the getting was successful.
+     */
+    static I18nErrorCode GetUsingNumberPattern(std::string& usingNumberPattern);
+
+    /**
+     * @brief Sets the number pattern used by the system locale.
+     *
+     * @param pattern Identifier of the number pattern.
+     * @param userId Indicates update user id.
+     * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
+     */
+    static I18nErrorCode SetSystemNumberPattern(const std::string& pattern, int32_t userId = -1);
+
     static TemperatureType GetTemperatureType();
     static std::string GetTemperatureName(const TemperatureType& type);
     static WeekDay GetFirstDayOfWeek();
@@ -160,11 +211,13 @@ public:
         std::shared_ptr<IntlLocale> IntlLocale, std::string &invalidField);
     static std::string ComputeEffectiveLanguage(const std::string& localeTag, const std::string& language);
     static std::string GetSystemLocaleInstanceTag();
+    static std::pair<std::string, std::string> GetNumberPatternFromLocale(const std::string& localeTag);
     static std::string RemoveCustExtParam(const std::string& locale);
     static std::string ModifyExtParam(const std::string& locale, const std::string& key, const std::string& value,
         const std::string& extParamKey);
     static std::string QueryExtParam(const std::string& locale, const std::string& key,
         const std::string& extParamKey);
+    static std::string GetNumberingSystemDigit(const std::string& NumberingSystem);
     static const std::string HOUR_EVENT_DATA;
     static const std::string LANGUAGE_KEY;
     static const std::string LOCALE_KEY;
@@ -201,6 +254,7 @@ private:
     static const char *rootRegion;
     static const char *secondRootRegion;
     static const uint32_t ELEMENT_NUM = 2;
+    static const size_t SYMBOL_HEX_LEN = 4;
 
     static const char *SUPPORTED_LANGUAGE_EN_LATN_PATH;
     static const char *SUPPORTED_LANGUAGE_EN_LATN_NAME;
@@ -226,6 +280,7 @@ private:
     static const std::string NUNBER_PATTERN_KEY;
     static const std::string PSEUDO_REGION_XA;
     static const std::string PSEUDO_REGION_XB;
+    static const std::string DEFAULT_NUMBERING_SYSTEM_NAME;
 
     static const std::unordered_set<std::string>& GetSupportedLocales();
     static const std::unordered_set<std::string>& GetSupportedLocalesV15();
@@ -255,6 +310,8 @@ private:
     static std::string GetPseudoCountryTag(const char* countryTag, std::string &regionTag);
     static std::string GetUnicodeWrappedFilePathInner(const std::string &path, const char delimiter,
         const std::string& localeTag, std::string &invalidField);
+    static I18nErrorCode GetSystemNumberingSystemsFromLanguage(const std::string& language,
+        std::unordered_map<std::string, std::string>& systemNumberingSystems);
 
 #ifdef SUPPORT_GRAPHICS
     /**
@@ -320,8 +377,11 @@ private:
      */
     static std::string UpdateRegionOfLocale(const std::string &regionTag);
     static std::string GetBestMatchedLocaleOfCollation(const std::string& requestLocale);
-    static std::string QueryExtParam(const std::string& locale, const std::string& key);
-    static std::string ModifyExtParam(const std::string& locale, const std::string& key, const std::string& value);
+    static std::string GetBestMatchedLocaleOfNumberingSystem(const std::string& requestLocale);
+    static I18nErrorCode GetSystemNumberPatternsFromLocale(
+        std::unordered_map<std::string, std::string>& systemNumberPatterns, const std::string& locale);
+    static std::string NumberPatternToHex(const std::string& groupingSymbol, const std::string& decimalSymbol);
+    static std::pair<std::string, std::string> HexToNumberPattern(const std::string& hex);
     static std::unordered_map<std::string, std::unordered_map<std::string, std::string>> ParseAllExtParam(
         std::string locale);
     static std::unordered_map<std::string, std::string> ParseExtParam(const std::string& extParam,
