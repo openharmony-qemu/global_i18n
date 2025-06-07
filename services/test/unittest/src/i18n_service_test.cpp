@@ -492,6 +492,33 @@ HWTEST_F(I18nServiceTest, I18nServiceFuncTest030, TestSize.Level1)
     I18nErrorCode err = I18nServiceAbilityClient::SetFirstDayOfWeek(WeekDay::SUN);
     EXPECT_EQ(err, I18nErrorCode::SUCCESS);
 }
+
+/**
+ * @tc.name: I18nServiceFuncTest031
+ * @tc.desc: Test I18nServiceAbilityClient set and get Collation
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nServiceTest, I18nServiceFuncTest031, TestSize.Level1)
+{
+    InitTestEnvironment();
+    AddNativeTokenTypeAndPermissions();
+    I18nErrorCode err = I18nServiceAbilityClient::SetSystemLanguage("en-Latn-US");
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    err = I18nServiceAbilityClient::SetSystemLocale("en-Latn-US");
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+
+    std::unordered_map<std::string, std::string> systemCollations;
+    err = I18nServiceAbilityClient::GetSystemCollations(systemCollations);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    EXPECT_TRUE(systemCollations.find("lower") != systemCollations.end());
+    EXPECT_TRUE(systemCollations.find("upper") != systemCollations.end());
+    err = I18nServiceAbilityClient::SetSystemCollation("upper");
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    std::string usingCollation;
+    err = I18nServiceAbilityClient::GetUsingCollation(usingCollation);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    EXPECT_EQ(usingCollation, "upper");
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

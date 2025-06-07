@@ -33,6 +33,7 @@ public:
     std::shared_ptr<IntlLocale> GetIntlLocale();
     static napi_value InitIntlLocale(napi_env env, napi_value exports);
     static bool IsIntlLocale(napi_env env, napi_value argv);
+    static napi_value CreateIntlLocaleObject(napi_env env, napi_value argv);
 
 private:
     static void Destructor(napi_env env, void *nativeObject, void *hint);
@@ -70,7 +71,6 @@ private:
     static std::string MinimizeInner(std::shared_ptr<IntlLocale> intlLocale);
     static napi_value GetIntlLocaleAttribute(napi_env env, napi_callback_info info, GetIntlLocaleProperty func,
         napi_valuetype type);
-    static napi_value CreateIntlLocaleObject(napi_env env, napi_value argv);
     static std::string ParseLocaleTag(napi_env env, napi_value value, napi_valuetype type);
     static void ParseConfigs(napi_env env, napi_value options, std::unordered_map<std::string, std::string>& configs);
     std::shared_ptr<IntlLocale> intlLocale = nullptr;

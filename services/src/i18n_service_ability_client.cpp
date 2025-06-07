@@ -199,6 +199,61 @@ I18nErrorCode I18nServiceAbilityClient::SetFirstDayOfWeek(WeekDay type)
     return static_cast<I18nErrorCode>(code);
 }
 
+I18nErrorCode I18nServiceAbilityClient::GetSystemCollations(
+    std::unordered_map<std::string, std::string>& systemCollations)
+{
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetSystemCollations: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->GetSystemCollations(systemCollations, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetSystemCollations: Get system collations failed, "
+            "errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
+}
+
+I18nErrorCode I18nServiceAbilityClient::GetUsingCollation(std::string& usingCollation)
+{
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetUsingCollation: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->GetUsingCollation(usingCollation, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetUsingCollation: Get using collations failed, "
+            "errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
+}
+
+I18nErrorCode I18nServiceAbilityClient::SetSystemCollation(const std::string& identifier)
+{
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetSystemCollation: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->SetSystemCollation(identifier, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetSystemCollation: Set system collations failed, "
+            "errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
+}
+
 std::string I18nServiceAbilityClient::GetLanguageFromUserId(int32_t userId)
 {
     I18nErrorCode err = I18nErrorCode::SUCCESS;
