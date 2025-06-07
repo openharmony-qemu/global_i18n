@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,7 @@
 
 #include "locale_config.h"
 
+#include <algorithm>
 #include <regex>
 #include <cctype>
 
@@ -91,10 +92,14 @@ const char *LocaleConfig::rootTag = "languages";
 const char *LocaleConfig::secondRootTag = "lang";
 const char *LocaleConfig::rootRegion = "regions";
 const char *LocaleConfig::secondRootRegion = "region";
-const std::string LocaleConfig::EXT_PARAM_KEY = "-u-";
+const std::string LocaleConfig::STANDARD_EXT_PARAM_KEY = "-u-";
+const std::string LocaleConfig::CUST_EXT_PARAM_KEY = "-x-";
 const std::string LocaleConfig::NUMBER_SYSTEM_KEY = "nu";
 const std::string LocaleConfig::TEMPERATURE_UNIT_KEY = "mu";
 const std::string LocaleConfig::WEEK_DAY_KEY = "fw";
+const std::string LocaleConfig::CASE_FIRST_KEY = "kf";
+const std::string LocaleConfig::COLLATION_KEY = "co";
+const std::string LocaleConfig::NUNBER_PATTERN_KEY = "np";
 const std::string LocaleConfig::TIMEZONE_KEY = "persist.time.timezone";
 const std::string LocaleConfig::DEFAULT_TIMEZONE = "GMT";
 unordered_set<string> LocaleConfig::supportedLocales;
@@ -230,11 +235,13 @@ std::unordered_map<std::string, WeekDay> LocaleConfig::nameToWeekDay {
 std::map<std::string, std::string> LocaleConfig::supportedDialectLocales;
 std::map<string, string> LocaleConfig::locale2DisplayName {};
 std::map<string, string> LocaleConfig::region2DisplayName {};
+std::unordered_map<std::string, bool> LocaleConfig::is24HourLocaleMap {};
 std::string LocaleConfig::currentDialectLocale = "";
 std::string LocaleConfig::currentOverrideRegion = "";
 std::mutex LocaleConfig::dialectLocaleMutex;
 std::mutex LocaleConfig::region2DisplayNameMutex;
 std::mutex LocaleConfig::locale2DisplayNameMutex;
+std::shared_mutex LocaleConfig::is24HourLocaleMapMutex;
 
 set<std::string> LocaleConfig::validCaTag {
     "buddhist",
@@ -331,6 +338,30 @@ static std::unordered_map<icu::Calendar::EDaysOfWeek, WeekDay> eDaysOfWeekToWeek
     { icu::Calendar::EDaysOfWeek::FRIDAY, WeekDay::FRI },
     { icu::Calendar::EDaysOfWeek::SATURDAY, WeekDay::SAT },
     { icu::Calendar::EDaysOfWeek::SUNDAY, WeekDay::SUN }
+};
+
+static std::unordered_map<std::string, std::unordered_set<std::string>> languageToCollationValues {
+    { "zh-Hant-HK", { "zhuyin", "pinyin", "stroke" } },
+    { "zh-Hant-TW", { "zhuyin", "pinyin", "stroke" } },
+    { "en-Latn-US", { "upper", "lower" } }
+};
+
+static std::unordered_map<std::string, std::string> languageToCollationKey {
+    { "zh-Hant-HK", "collation" },
+    { "zh-Hant-TW", "collation" },
+    { "en-Latn-US", "colCaseFirst" }
+};
+
+static std::unordered_map<std::string, std::string> languageToExtParamKey {
+    { "zh-Hant-HK", "co" },
+    { "zh-Hant-TW", "co" },
+    { "en-Latn-US", "kf" }
+};
+
+static std::unordered_map<std::string, std::string> languageToDefaultCollationValue {
+    { "zh-Hant-HK", "stroke" },
+    { "zh-Hant-TW", "zhuyin" },
+    { "en-Latn-US", "lower" }
 };
 
 string Adjust(const string &origin)
@@ -464,9 +495,9 @@ string LocaleConfig::GetCountry(const string& parameter)
 string LocaleConfig::GetSystemLocale()
 {
     std::string systemLocale = GetEffectiveLocale();
-    size_t pos = systemLocale.find(EXT_PARAM_KEY);
-    if (pos != std::string::npos) {
-        systemLocale = systemLocale.substr(0, pos);
+    std::vector<std::pair<size_t, std::string>> positons = GetExtParamPositions(systemLocale);
+    if (positons[0].first != std::string::npos) {
+        systemLocale = systemLocale.substr(0, positons[0].first);
     }
     return systemLocale;
 }
@@ -1293,7 +1324,7 @@ std::string LocaleConfig::GetValidLocale(const std::string &localeTag)
 {
     std::string baseLocale = "";
     std::string extension = "";
-    std::size_t found = localeTag.find(EXT_PARAM_KEY);
+    std::size_t found = localeTag.find(STANDARD_EXT_PARAM_KEY);
     baseLocale = localeTag.substr(0, found);
     if (found != std::string::npos) {
         extension = localeTag.substr(found);
@@ -1305,7 +1336,7 @@ std::string LocaleConfig::GetValidLocale(const std::string &localeTag)
 
     std::string systemLocaleTag = GetEffectiveLocale();
     std::string defaultExtension = "";
-    found = systemLocaleTag.find(EXT_PARAM_KEY);
+    found = systemLocaleTag.find(STANDARD_EXT_PARAM_KEY);
     if (found != std::string::npos) {
         defaultExtension = systemLocaleTag.substr(found);
     }
@@ -1371,7 +1402,13 @@ std::string LocaleConfig::GetSystemHour()
 
 bool LocaleConfig::Is24HourLocale(const std::string& systemLocale)
 {
-    static std::unordered_map<std::string, bool> is24HourLocaleMap;
+    {
+        std::shared_lock<std::shared_mutex> lock(is24HourLocaleMapMutex);
+        if (is24HourLocaleMap.find(systemLocale) != is24HourLocaleMap.end()) {
+            return is24HourLocaleMap[systemLocale];
+        }
+    }
+    std::unique_lock<std::shared_mutex> lock(is24HourLocaleMapMutex);
     if (is24HourLocaleMap.find(systemLocale) != is24HourLocaleMap.end()) {
         return is24HourLocaleMap[systemLocale];
     }
@@ -1509,9 +1546,9 @@ std::string LocaleConfig::ComputeEffectiveLanguage(const std::string& localeTag,
         return localeTag;
     }
     std::string locale = localeTag;
-    size_t pos = localeTag.find(EXT_PARAM_KEY);
-    if (pos != std::string::npos) {
-        locale = localeTag.substr(0, pos);
+    std::vector<std::pair<size_t, std::string>> positons = GetExtParamPositions(localeTag);
+    if (positons[0].first != std::string::npos) {
+        locale = localeTag.substr(0, positons[0].first);
     }
     size_t prefixLength = 2;
     if (locale.compare(0, prefixLength, "es") != 0 && locale.compare(0, prefixLength, "pt") != 0) {
@@ -1616,7 +1653,7 @@ I18nErrorCode LocaleConfig::SetUsingLocalDigit(bool flag, int32_t userId)
     }
     std::string localDigit = flag ? it->second : "";
     // update system locale.
-    return SetSystemLocale(ModifyExtParam(localeTag, NUMBER_SYSTEM_KEY, localDigit), userId);
+    return SetSystemLocale(ModifyExtParam(localeTag, NUMBER_SYSTEM_KEY, localDigit, STANDARD_EXT_PARAM_KEY), userId);
 }
 
 I18nErrorCode LocaleConfig::SetTemperatureType(const TemperatureType& type, int32_t userId)
@@ -1632,7 +1669,7 @@ I18nErrorCode LocaleConfig::SetTemperatureType(const TemperatureType& type, int3
         return I18nErrorCode::UPDATE_TEMPERATURE_TYPE_FAILED;
     }
     // update system locale.
-    return SetSystemLocale(ModifyExtParam(localeTag, TEMPERATURE_UNIT_KEY, option), userId);
+    return SetSystemLocale(ModifyExtParam(localeTag, TEMPERATURE_UNIT_KEY, option, STANDARD_EXT_PARAM_KEY), userId);
 }
 
 TemperatureType LocaleConfig::GetTemperatureType()
@@ -1641,10 +1678,12 @@ TemperatureType LocaleConfig::GetTemperatureType()
     if (localeTag.empty()) {
         return TemperatureType::CELSIUS;
     }
-    std::unordered_map<std::string, std::string> extParamMap = ParseExtParam(localeTag);
+    std::unordered_map<std::string, std::unordered_map<std::string, std::string>> extParamMap =
+        ParseAllExtParam(localeTag);
+    std::unordered_map<std::string, std::string> stardardExtParamMap = extParamMap[STANDARD_EXT_PARAM_KEY];
     std::string type;
-    if (extParamMap.find(TEMPERATURE_UNIT_KEY) != extParamMap.end()) {
-        type = extParamMap[TEMPERATURE_UNIT_KEY];
+    if (stardardExtParamMap.find(TEMPERATURE_UNIT_KEY) != stardardExtParamMap.end()) {
+        type = stardardExtParamMap[TEMPERATURE_UNIT_KEY];
     }
     if (!type.empty() && nameToTemperatureType.find(type) != nameToTemperatureType.end()) {
         return nameToTemperatureType[type];
@@ -1681,7 +1720,7 @@ I18nErrorCode LocaleConfig::SetFirstDayOfWeek(const WeekDay& type, int32_t userI
         return I18nErrorCode::UPDATE_WEEK_DAY_FAILED;
     }
     // update system locale.
-    return SetSystemLocale(ModifyExtParam(localeTag, WEEK_DAY_KEY, option), userId);
+    return SetSystemLocale(ModifyExtParam(localeTag, WEEK_DAY_KEY, option, STANDARD_EXT_PARAM_KEY), userId);
 }
 
 WeekDay LocaleConfig::GetFirstDayOfWeek()
@@ -1691,10 +1730,12 @@ WeekDay LocaleConfig::GetFirstDayOfWeek()
         HILOG_ERROR_I18N("LocaleConfig::GetFirstDayOfWeek: get system locale failed.");
         return WeekDay::MON;
     }
-    std::unordered_map<std::string, std::string> extParamMap = ParseExtParam(localeTag);
+    std::unordered_map<std::string, std::unordered_map<std::string, std::string>> extParamMap =
+        ParseAllExtParam(localeTag);
+    std::unordered_map<std::string, std::string> stardardExtParamMap = extParamMap[STANDARD_EXT_PARAM_KEY];
     std::string type;
-    if (extParamMap.find(WEEK_DAY_KEY) != extParamMap.end()) {
-        type = extParamMap[WEEK_DAY_KEY];
+    if (stardardExtParamMap.find(WEEK_DAY_KEY) != stardardExtParamMap.end()) {
+        type = stardardExtParamMap[WEEK_DAY_KEY];
     }
     if (!type.empty() && nameToWeekDay.find(type) != nameToWeekDay.end()) {
         return nameToWeekDay[type];
@@ -1713,6 +1754,99 @@ WeekDay LocaleConfig::GetFirstDayOfWeek()
     icu::Calendar::EDaysOfWeek firstDay = calendar->getFirstDayOfWeek();
     delete calendar;
     return eDaysOfWeekToWeekDay[firstDay];
+}
+
+std::string LocaleConfig::GetBestMatchedLocaleOfCollation(const std::string& requestLocale)
+{
+    std::vector<std::string> candidateLocales;
+    for (const auto& languageToCollationValue : languageToCollationValues) {
+        candidateLocales.emplace_back(languageToCollationValue.first);
+    }
+    return LocaleMatcher::GetBestMatchedLocale(requestLocale, candidateLocales);
+}
+
+I18nErrorCode LocaleConfig::GetSystemCollations(std::unordered_map<std::string, std::string>& systemCollations)
+{
+    systemCollations.clear();
+    std::string requestLocale = LocaleConfig::GetSystemLocale();
+    std::string language = GetBestMatchedLocaleOfCollation(requestLocale);
+    auto it = languageToCollationValues.find(language);
+    if (it == languageToCollationValues.end()) {
+        return I18nErrorCode::SUCCESS;
+    }
+
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(icu::StringPiece(language), status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("LocaleConfig::GetSystemCollations: Create icu::Locale failed, language is %{public}s.",
+            language.c_str());
+        return I18nErrorCode::FAILED;
+    }
+    icu::LocaleDisplayNames* localeDisplayNames = icu::LocaleDisplayNames::createInstance(locale);
+    if (localeDisplayNames == nullptr) {
+        HILOG_ERROR_I18N("LocaleConfig::GetSystemCollations: Create icu::LocaleDisplayNames failed, language "
+            "is %{public}s.", language.c_str());
+        return I18nErrorCode::FAILED;
+    }
+
+    std::unordered_set<std::string> collationValues = it->second;
+    std::string collationKey = languageToCollationKey[language];
+    for (const auto& collationValue : collationValues) {
+        icu::UnicodeString displayName;
+        localeDisplayNames->keyValueDisplayName(collationKey.c_str(), collationValue.c_str(), displayName);
+        std::string value;
+        displayName.toUTF8String(value);
+        systemCollations.insert(std::make_pair(collationValue, value));
+    }
+    return I18nErrorCode::SUCCESS;
+}
+
+I18nErrorCode LocaleConfig::GetUsingCollation(std::string& usingCollation)
+{
+    usingCollation.clear();
+    std::string requestLocale = LocaleConfig::GetSystemLocale();
+    std::string language = LocaleConfig::GetBestMatchedLocaleOfCollation(requestLocale);
+    auto it = languageToCollationValues.find(language);
+    if (it == languageToCollationValues.end()) {
+        return I18nErrorCode::SUCCESS;
+    }
+    std::string effectiveLocale = LocaleConfig::GetEffectiveLocale();
+    std::string key = languageToExtParamKey[language];
+    std::string value = LocaleConfig::QueryExtParam(effectiveLocale, key, STANDARD_EXT_PARAM_KEY);
+    if (value.empty()) {
+        usingCollation = languageToDefaultCollationValue[language];
+        return I18nErrorCode::SUCCESS;
+    }
+    std::unordered_set<std::string> collationValues = it->second;
+    if (collationValues.find(value) == collationValues.end()) {
+        HILOG_ERROR_I18N("LocaleConfig::GetUsingCollation: ExtParam value is invalid, key is %{public}s, "
+            "value is %{public}s.", key.c_str(), value.c_str());
+        return I18nErrorCode::FAILED;
+    }
+    usingCollation = value;
+    return I18nErrorCode::SUCCESS;
+}
+
+I18nErrorCode LocaleConfig::SetSystemCollation(const std::string& identifier, int32_t userId)
+{
+    std::string systemLocale = MultiUsers::GetSystemLocaleFromUserId(userId);
+    std::string language = GetBestMatchedLocaleOfCollation(systemLocale);
+    auto it = languageToCollationValues.find(language);
+    if (it == languageToCollationValues.end()) {
+        HILOG_ERROR_I18N("LocaleConfig::SetSystemCollation: Invalid language %{public}s.", language.c_str());
+        return I18nErrorCode::FAILED;
+    }
+
+    std::unordered_set<std::string> collationValues = it->second;
+    if (collationValues.find(identifier) == collationValues.end()) {
+        HILOG_ERROR_I18N("LocaleConfig::SetSystemCollation: Invalid identifier %{public}s, language is %{public}s.",
+            identifier.c_str(), language.c_str());
+        return I18nErrorCode::INVALID_PARAM;
+    }
+
+    std::string localeTag = MultiUsers::GetSystemLocaleFromUserId(userId);
+    std::string key = languageToExtParamKey[language];
+    return SetSystemLocale(ModifyExtParam(localeTag, key, identifier, STANDARD_EXT_PARAM_KEY), userId);
 }
 
 #ifdef SUPPORT_GRAPHICS
@@ -1815,9 +1949,11 @@ std::string LocaleConfig::UpdateLanguageOfLocale(const std::string &languageTag)
     }
     std::string regionTag = systemLocale.getCountry();
     std::string extendParamTag;
-    size_t pos = systemLocaleTag.find(EXT_PARAM_KEY);
-    if (pos != std::string::npos) {
-        extendParamTag = systemLocaleTag.substr(pos);
+    systemLocaleTag = LocaleConfig::ModifyExtParam(systemLocaleTag, CASE_FIRST_KEY, "", STANDARD_EXT_PARAM_KEY);
+    systemLocaleTag = LocaleConfig::ModifyExtParam(systemLocaleTag, COLLATION_KEY, "", STANDARD_EXT_PARAM_KEY);
+    std::vector<std::pair<size_t, std::string>> positons = GetExtParamPositions(systemLocaleTag);
+    if (positons[0].first != std::string::npos) {
+        extendParamTag = systemLocaleTag.substr(positons[0].first);
     }
     // Combine above elements.
     return CreateLocale(langTag, scriptTag, regionTag, extendParamTag);
@@ -1849,9 +1985,9 @@ std::string LocaleConfig::UpdateRegionOfLocale(const std::string &regionTag)
         return CreateLocaleFromRegion(regionTag);
     }
     std::string extParam;
-    size_t pos = localeTag.find(EXT_PARAM_KEY);
-    if (pos != std::string::npos) {
-        extParam = localeTag.substr(pos);
+    std::vector<std::pair<size_t, std::string>> positons = GetExtParamPositions(localeTag);
+    if (positons[0].first != std::string::npos) {
+        extParam = localeTag.substr(positons[0].first);
     }
     // combine locale with origin locale's language and script with regionTag.
     UErrorCode status = U_ZERO_ERROR;
@@ -1873,7 +2009,6 @@ std::string LocaleConfig::UpdateRegionOfLocale(const std::string &regionTag)
         return localeTag;
     }
     ret += extParam;
-    ret = ModifyExtParam(ret, NUMBER_SYSTEM_KEY, "");
     return ret;
 }
 
@@ -1895,40 +2030,88 @@ std::string LocaleConfig::CreateLocaleFromRegion(const std::string &regionTag)
     return localeTag;
 }
 
-std::string LocaleConfig::ModifyExtParam(const std::string& locale, const std::string& key, const std::string& value)
+std::string LocaleConfig::RemoveCustExtParam(const std::string& locale)
+{
+    return ModifyExtParam(locale, NUNBER_PATTERN_KEY, "", CUST_EXT_PARAM_KEY);
+}
+
+std::string LocaleConfig::QueryExtParam(const std::string& locale, const std::string& key,
+    const std::string& extParamKey)
+{
+    if (locale.empty()) {
+        HILOG_ERROR_I18N("LocaleConfig::QueryExtParam: locale is empty.");
+        return "";
+    }
+    if (key.empty()) {
+        HILOG_ERROR_I18N("LocaleConfig::QueryExtParam: key is empty.");
+        return "";
+    }
+    std::unordered_map<std::string, std::unordered_map<std::string, std::string>> extParamMap =
+        ParseAllExtParam(locale);
+    std::unordered_map<std::string, std::string> paramMap = extParamMap[extParamKey];
+    auto it = paramMap.find(key);
+    if (it == paramMap.end()) {
+        return "";
+    }
+    return it->second;
+}
+
+std::string LocaleConfig::ModifyExtParam(const std::string& locale, const std::string& key, const std::string& value,
+    const std::string& extParamKey)
 {
     if (locale.empty()) {
         HILOG_ERROR_I18N("LocaleConfig::ModifyExtParam: locale is empty.");
         return locale;
     }
     if (key.empty()) {
-        HILOG_ERROR_I18N("LocaleConfig::ParseExtParam: key is empty.");
+        HILOG_ERROR_I18N("LocaleConfig::ModifyExtParam: key is empty.");
         return locale;
     }
     std::unordered_map<std::string, std::string> paramMap;
     std::string localeBase = locale;
-    size_t pos = locale.find(EXT_PARAM_KEY);
-    if (pos != std::string::npos) {
-        localeBase = locale.substr(0, pos);
-        std::string param = locale.substr(pos);
-        paramMap = ParseExtParam(param);
+    std::vector<std::pair<size_t, std::string>> positons = GetExtParamPositions(locale);
+    if (positons[0].first != std::string::npos) {
+        localeBase = locale.substr(0, positons[0].first);
     }
-    paramMap[key] = value;
-    std::string result = localeBase + GenerateExtParam(paramMap);
+    std::unordered_map<std::string, std::unordered_map<std::string, std::string>> extParamMap =
+        ParseAllExtParam(locale);
+    extParamMap[extParamKey][key] = value;
+    std::string result = localeBase + GenerateAllExtParam(extParamMap);
     return result;
 }
 
-std::unordered_map<std::string, std::string> LocaleConfig::ParseExtParam(const std::string& param)
+std::unordered_map<std::string, std::unordered_map<std::string, std::string>> LocaleConfig::ParseAllExtParam(
+    std::string locale)
+{
+    std::unordered_map<std::string, std::unordered_map<std::string, std::string>> allExtParamMap;
+    std::vector<std::pair<size_t, std::string>> positons = GetExtParamPositions(locale);
+    std::reverse(positons.begin(),positons.end());
+    for (size_t i = 0; i < positons.size(); i++) {
+        size_t pos = positons[i].first;
+        if (pos == std::string::npos) {
+            continue;
+        }
+        std::string extParam = locale.substr(pos);
+        locale = locale.substr(0, pos);
+        std::string extParamKey = positons[i].second;
+        std::unordered_map<std::string, std::string> extParamMap = ParseExtParam(extParam, extParamKey);
+        allExtParamMap.insert(std::make_pair(extParamKey, extParamMap));
+    }
+    return allExtParamMap;
+}
+
+std::unordered_map<std::string, std::string> LocaleConfig::ParseExtParam(const std::string& extParam,
+    const std::string& extParamKey)
 {
     std::unordered_map<std::string, std::string> result;
-    size_t pos = param.find(EXT_PARAM_KEY);
+    size_t pos = extParam.find(extParamKey);
     if (pos == std::string::npos) {
-        HILOG_INFO_I18N("LocaleConfig::ParseExtParam: param is invalid.");
+        HILOG_ERROR_I18N("LocaleConfig::ParseExtParam: extParam is invalid.");
         return result;
     }
-    std::string extParam = param.substr(pos + EXT_PARAM_KEY.length());
+    std::string param = extParam.substr(pos + extParamKey.length());
     std::vector<std::string> paramArray;
-    Split(extParam, "-", paramArray);
+    Split(param, "-", paramArray);
     size_t pairLen = 2;
     if (paramArray.size() % pairLen != 0) {
         HILOG_ERROR_I18N("LocaleConfig::ParseExtParam: parse ext param failed.");
@@ -1950,24 +2133,64 @@ std::unordered_map<std::string, std::string> LocaleConfig::ParseExtParam(const s
     return result;
 }
 
-std::string LocaleConfig::GenerateExtParam(const std::unordered_map<std::string, std::string>& paramMap)
+std::string LocaleConfig::GenerateAllExtParam(
+    const std::unordered_map<std::string, std::unordered_map<std::string, std::string>>& extParamMap)
 {
-    std::string result;
-    if (paramMap.size() == 0) {
-        return result;
+    std::string extParam;
+    auto it = extParamMap.find(STANDARD_EXT_PARAM_KEY);
+    if (it != extParamMap.end()) {
+        std::string standardExtParam = GenerateExtParam(it->second, STANDARD_EXT_PARAM_KEY);
+        extParam += standardExtParam;
     }
-    for (auto& param : paramMap) {
-        std::string key = param.first;
-        std::string value = param.second;
+    it = extParamMap.find(CUST_EXT_PARAM_KEY);
+    if (it != extParamMap.end()) {
+        std::string custExtParam = GenerateExtParam(it->second, CUST_EXT_PARAM_KEY);
+        extParam += custExtParam;
+    }
+    return extParam;
+}
+
+std::string LocaleConfig::GenerateExtParam(const std::unordered_map<std::string, std::string>& extParamMap,
+    const std::string& extParamKey)
+{
+    std::string extParam;
+    for (auto& item : extParamMap) {
+        std::string key = item.first;
+        std::string value = item.second;
         if (value.empty()) {
             HILOG_INFO_I18N("LocaleConfig::GenerateExtParam: erase key (%{public}s) ", key.c_str());
             continue;
         }
-        result += "-" + key + "-" + value;
+        extParam += "-" + key + "-" + value;
     }
-    if (!result.empty()) {
-        result = "-u" + result;
+    if (!extParam.empty()) {
+        extParam = extParamKey + extParam.substr(1);
     }
+    return extParam;
+}
+
+std::vector<std::pair<size_t, std::string>> LocaleConfig::GetExtParamPositions(const std::string& locale)
+{
+    std::vector<std::pair<size_t, std::string>> result;
+    size_t standardPosition = locale.find(STANDARD_EXT_PARAM_KEY);
+    size_t custPosition = locale.find(CUST_EXT_PARAM_KEY);
+    if (standardPosition != std::string::npos && custPosition != std::string::npos) {
+        if (standardPosition < custPosition) {
+            result.emplace_back(std::make_pair(standardPosition, STANDARD_EXT_PARAM_KEY));
+            result.emplace_back(std::make_pair(custPosition, CUST_EXT_PARAM_KEY));
+        } else {
+            result.emplace_back(std::make_pair(custPosition, CUST_EXT_PARAM_KEY));
+            result.emplace_back(std::make_pair(standardPosition, STANDARD_EXT_PARAM_KEY));
+        }
+        return result;
+    }
+    if (standardPosition == std::string::npos) {
+        result.emplace_back(std::make_pair(custPosition, CUST_EXT_PARAM_KEY));
+        result.emplace_back(std::make_pair(standardPosition, STANDARD_EXT_PARAM_KEY));
+        return result;
+    }
+    result.emplace_back(std::make_pair(standardPosition, STANDARD_EXT_PARAM_KEY));
+    result.emplace_back(std::make_pair(custPosition, CUST_EXT_PARAM_KEY));
     return result;
 }
 
@@ -2088,6 +2311,23 @@ std::string LocaleConfig::GetUnicodeWrappedFilePathInner(const std::string &path
     std::string newSep = "\u200f" + sep;
     Merge(dest, newSep, result);
     return result;
+}
+
+std::string LocaleConfig::GetSystemLocaleInstanceTag()
+{
+    std::string effectiveLocale = LocaleConfig::GetEffectiveLocale();
+    std::string language = GetBestMatchedLocaleOfCollation(effectiveLocale);
+    auto it = languageToDefaultCollationValue.find(language);
+    if (it == languageToDefaultCollationValue.end()) {
+        return effectiveLocale;
+    }
+    std::string key = languageToExtParamKey[language];
+    std::string value = QueryExtParam(effectiveLocale, key, STANDARD_EXT_PARAM_KEY);
+    if (!value.empty()) {
+        return ModifyExtParam(effectiveLocale, key, value, STANDARD_EXT_PARAM_KEY);
+    }
+    std::string defaultValue = languageToDefaultCollationValue[language];
+    return ModifyExtParam(effectiveLocale, key, defaultValue, STANDARD_EXT_PARAM_KEY);
 }
 } // namespace I18n
 } // namespace Global

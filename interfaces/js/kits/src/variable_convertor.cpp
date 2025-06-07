@@ -332,6 +332,49 @@ std::shared_ptr<IntlLocale> VariableConvertor::ParseIntlLocale(napi_env env, nap
     }
     return IntlLocaleAddon->GetIntlLocale();
 }
+
+napi_value VariableConvertor::CreateIntlLocaleObject(napi_env env, const std::string& locale)
+{
+    napi_value param = nullptr;
+    napi_status status = napi_create_string_utf8(env, locale.c_str(), NAPI_AUTO_LENGTH, &param);
+    if (status != napi_ok || param == nullptr) {
+        HILOG_ERROR_I18N("VariableConvertor::CreateIntlLocaleObject: Create string failed.");
+        return nullptr;
+    }
+    return IntlLocaleAddon::CreateIntlLocaleObject(env, param);
+}
+
+napi_value VariableConvertor::CreateMap(napi_env env, std::unordered_map<std::string, std::string>& ump)
+{
+    napi_value result = nullptr;
+    napi_status status = napi_create_map(env, &result);
+    if (status != napi_ok || result == nullptr) {
+        HILOG_ERROR_I18N("VariableConvertor::CreateMap: Create map failed.");
+        return nullptr;
+    }
+    for (const auto& item : ump) {
+        std::string key = item.first;
+        napi_value JSKey = nullptr;
+        status = napi_create_string_utf8(env, key.c_str(), NAPI_AUTO_LENGTH, &JSKey);
+        if (status != napi_ok || JSKey == nullptr) {
+            HILOG_ERROR_I18N("VariableConvertor::CreateMap: Create JSKey failed.");
+            return nullptr;
+        }
+        std::string value = item.second;
+        napi_value JSValue = nullptr;
+        status = napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &JSValue);
+        if (status != napi_ok || JSValue == nullptr) {
+            HILOG_ERROR_I18N("VariableConvertor::CreateMap: Create JSValue failed.");
+            return nullptr;
+        }
+        status = napi_map_set_property(env, result, JSKey, JSValue);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("VariableConvertor::CreateMap: Map set property failed.");
+            return nullptr;
+        }
+    }
+    return result;
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

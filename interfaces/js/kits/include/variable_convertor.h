@@ -49,6 +49,9 @@ public:
     static LocaleType GetLocaleType(napi_env env, napi_value locale);
     static std::shared_ptr<LocaleInfo> ParseLocaleInfo(napi_env env, napi_value localeInfo);
     static std::shared_ptr<IntlLocale> ParseIntlLocale(napi_env env, napi_value intlLocale);
+    static napi_value CreateIntlLocaleObject(napi_env env, const std::string& locale);
+    static napi_value CreateMap(napi_env env, std::unordered_map<std::string, std::string>& ump);
+
 private:
     static const std::map<napi_valuetype, std::string> NAPI_TYPE_MAP;
 };

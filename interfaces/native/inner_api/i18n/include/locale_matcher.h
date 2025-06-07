@@ -34,6 +34,16 @@ public:
         const std::vector<LocaleInfo*>& candidateLocales);
 
     /**
+     * @brief Obtain the best matching locale from candidateLocales for the requestLocale.
+     *
+     * @param requestLocale Represents request matching locale.
+     * @param candidateLocales Represents the list of locale to be matched.
+     * @return result Represents the best matching locale.
+     */
+    static std::string GetBestMatchedLocale(const std::string& requestLocale,
+        const std::vector<std::string>& candidateLocales);
+
+    /**
      * @brief compare current and other locale which is more matching with request.
      *
      * @param current Represents current resource locale.
