@@ -34,7 +34,7 @@ public:
 
 private:
     static napi_value ZoneRulesConstructor(napi_env env, napi_callback_info info);
-    static double GetFirstParamter(napi_env env, napi_value argValue, int32_t &errorCode);
+    static double GetFirstParameter(napi_env env, napi_value argValue, int32_t &errorCode);
 
     std::unique_ptr<ZoneRules> zoneRules_ = nullptr;
 };

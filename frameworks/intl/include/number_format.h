@@ -112,6 +112,9 @@ private:
     std::string unitMeasSys;
     std::string roundingPriorityStr;
     std::string roundingModeStr;
+    std::string groupingSymbol;
+    std::string decimalSymbol;
+    std::string effectiveLocale;
     size_t roundingIncrement = 1;
     bool createSuccess = false;
     bool isSetFraction = false;
@@ -163,8 +166,11 @@ private:
     void GetMinimumFractionDigitsOption(std::map<std::string, std::string> &map);
     void GetMaximumFractionDigitsOption(std::map<std::string, std::string> &map);
     int GetCurrencyFractionDigits(std::map<std::string, std::string> &map);
+    void ParseNumberPattern(const std::string& localeTag);
+    void GetDigitsResolvedOptions(std::map<std::string, std::string> &map);
     void InitProperties(icu::number::UnlocalizedNumberFormatter &formatter);
     void InitUnitProperties(icu::number::UnlocalizedNumberFormatter &formatter);
+    void InitNumberPattern(icu::number::UnlocalizedNumberFormatter &formatter);
     void InitCurrencyProperties(icu::number::UnlocalizedNumberFormatter &formatter);
     void InitPercentStyleProperties(icu::number::UnlocalizedNumberFormatter &formatter);
     void InitUseGroupingProperties(icu::number::UnlocalizedNumberFormatter &formatter);

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "date_time_format.h"
+#include "i18n_hilog.h"
 #include "locale_config.h"
 #include "ohos/init_data.h"
 #include "parameter.h"
@@ -54,6 +55,7 @@ DateTimeFormat::DateTimeFormat(const std::vector<std::string> &localeTags, std::
     defaultStyle = GetDefaultStyle();
     ParseConfigsPartOne(configs);
     ParseConfigsPartTwo(configs);
+    std::string finalLocale;
     for (size_t i = 0; i < localeTags.size(); i++) {
         std::string curLocale = localeTags[i];
         UErrorCode status = U_ZERO_ERROR;
@@ -62,38 +64,21 @@ DateTimeFormat::DateTimeFormat(const std::vector<std::string> &localeTags, std::
             continue;
         }
         if (LocaleInfo::allValidLocales.count(locale.getLanguage()) > 0) {
-            createSuccess = InitWithLocale(curLocale, configs);
-            if (!createSuccess || !dateFormat) {
-                FreeDateTimeFormat();
-                continue;
-            }
+            finalLocale = curLocale;
             break;
         }
     }
-    if (!localeInfo || !dateFormat) {
-        createSuccess = InitWithDefaultLocale(configs);
+    if (finalLocale.empty()) {
+        finalLocale = LocaleConfig::GetEffectiveLocale();
     }
-}
-
-void DateTimeFormat::FreeDateTimeFormat()
-{
-    if (calendar != nullptr) {
-        delete calendar;
-        calendar = nullptr;
-    }
-    if (dateFormat != nullptr) {
-        delete dateFormat;
-        dateFormat = nullptr;
-    }
-    if (localeInfo != nullptr) {
-        delete localeInfo;
-        localeInfo = nullptr;
+    createSuccess = InitWithLocale(finalLocale, configs);
+    if (!createSuccess) {
+        HILOG_ERROR_I18N("DateTimeFormat::DateTimeFormat: Init dateTimeFormat failed.");
     }
 }
 
 DateTimeFormat::~DateTimeFormat()
 {
-    FreeDateTimeFormat();
 }
 
 bool DateTimeFormat::CheckInitSuccess()
@@ -114,7 +99,7 @@ std::unique_ptr<DateTimeFormat> DateTimeFormat::CreateInstance(const std::vector
 
 bool DateTimeFormat::InitWithLocale(const std::string &curLocale, std::map<std::string, std::string> &configs)
 {
-    localeInfo = new LocaleInfo(curLocale, configs);
+    localeInfo = std::make_unique<LocaleInfo>(curLocale, configs);
     if (localeInfo == nullptr || !localeInfo->InitSuccess()) {
         return false;
     }
@@ -135,34 +120,24 @@ bool DateTimeFormat::InitWithLocale(const std::string &curLocale, std::map<std::
     } else {
         InitDateFormat(status);
     }
-    if (!U_SUCCESS(status)) {
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("DateTimeFormat::InitWithLocale: InitDateFormat failed.");
         return false;
     }
     status = U_ZERO_ERROR;
-    calendar = Calendar::createInstance(locale, status);
-    if (!U_SUCCESS(status)) {
+    calendar = std::unique_ptr<icu::Calendar>(Calendar::createInstance(locale, status));
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("DateTimeFormat::InitWithLocale: Create calendar instance failed.");
         return false;
     }
     return true;
 }
 
-bool DateTimeFormat::InitWithDefaultLocale(std::map<std::string, std::string> &configs)
-{
-    if (localeInfo != nullptr) {
-        delete localeInfo;
-        localeInfo = nullptr;
-    }
-    if (dateFormat != nullptr) {
-        delete dateFormat;
-        dateFormat = nullptr;
-    }
-    return InitWithLocale(LocaleConfig::GetEffectiveLocale(), configs);
-}
-
 void DateTimeFormat::InitDateFormatWithoutConfigs(UErrorCode &status)
 {
-    dateFormat = DateFormat::createDateInstance(DefaultDTStyle[defaultStyle], locale);
-    SimpleDateFormat *simDateFormat = static_cast<SimpleDateFormat*>(dateFormat);
+    DateFormat::EStyle style = DefaultDTStyle[defaultStyle];
+    dateFormat = std::unique_ptr<icu::DateFormat>(DateFormat::createDateInstance(style, locale));
+    SimpleDateFormat *simDateFormat = static_cast<SimpleDateFormat*>(dateFormat.get());
     if (simDateFormat != nullptr) {
         simDateFormat->toPattern(pattern);
     }
@@ -271,37 +246,16 @@ void DateTimeFormat::RemoveAmPmChar()
 void DateTimeFormat::InitDateFormat(UErrorCode &status)
 {
     if (!dateStyle.empty() || !timeStyle.empty()) {
-        DateFormat::EStyle dateStyleValue = DateFormat::EStyle::kNone;
-        DateFormat::EStyle timeStyleValue = DateFormat::EStyle::kNone;
-        if (!dateStyle.empty()) {
-            if (dateTimeStyle.count(dateStyle) > 0) {
-                dateStyleValue = dateTimeStyle[dateStyle];
-            } else if (dateStyle == "auto") {
-                dateStyleValue = DefaultDTStyle[defaultStyle];
-            }
-        }
-        if (!timeStyle.empty()) {
-            if (dateTimeStyle.count(timeStyle) > 0) {
-                timeStyleValue = dateTimeStyle[timeStyle];
-            } else if (timeStyle == "auto") {
-                timeStyleValue = DefaultDTStyle[defaultStyle];
-            }
-        }
-        dateFormat = DateFormat::createDateTimeInstance(dateStyleValue, timeStyleValue, locale);
-        SimpleDateFormat *simDateFormat = static_cast<SimpleDateFormat*>(dateFormat);
-        if (simDateFormat != nullptr) {
-            simDateFormat->toPattern(pattern);
-        }
-        FixPatternPartOne();
-        delete dateFormat;
-        dateFormat = new SimpleDateFormat(pattern, locale, status);
-        if (!U_SUCCESS(status)) {
+        InitDateFormatWithDateTimeStyle(status);
+        if (U_FAILURE(status)) {
+            HILOG_ERROR_I18N("DateTimeFormat::InitDateFormat: Create SimpleDateFormat instance failed.");
             return;
         }
     } else {
         auto patternGenerator =
             std::unique_ptr<DateTimePatternGenerator>(DateTimePatternGenerator::createInstance(locale, status));
-        if (!U_SUCCESS(status) || patternGenerator == nullptr) {
+        if (U_FAILURE(status) || patternGenerator == nullptr) {
+            HILOG_ERROR_I18N("DateTimeFormat::InitDateFormat: Create DateTimePatternGenerator instance failed.");
             return;
         }
         ComputePattern();
@@ -310,14 +264,48 @@ void DateTimeFormat::InitDateFormat(UErrorCode &status)
         pattern = patternGenerator->getBestPattern(pattern, status);
         SetDayPeriod();
         status = U_ZERO_ERROR;
-        dateFormat = new SimpleDateFormat(pattern, locale, status);
-        if (!U_SUCCESS(status)) {
+        dateFormat = std::make_unique<SimpleDateFormat>(pattern, locale, status);
+        if (U_FAILURE(status)) {
+            HILOG_ERROR_I18N("DateTimeFormat::InitDateFormat: Create SimpleDateFormat object failed.");
             return;
         }
     }
     status = U_ZERO_ERROR;
     dateIntvFormat =
         std::unique_ptr<DateIntervalFormat>(DateIntervalFormat::createInstance(pattern, locale, status));
+}
+
+void DateTimeFormat::InitDateFormatWithDateTimeStyle(UErrorCode &status)
+{
+    DateFormat::EStyle dateStyleValue = DateFormat::EStyle::kNone;
+    DateFormat::EStyle timeStyleValue = DateFormat::EStyle::kNone;
+    if (!dateStyle.empty()) {
+        if (dateTimeStyle.count(dateStyle) > 0) {
+            dateStyleValue = dateTimeStyle[dateStyle];
+        } else if (dateStyle == "auto") {
+            dateStyleValue = DefaultDTStyle[defaultStyle];
+        }
+    }
+    if (!timeStyle.empty()) {
+        if (dateTimeStyle.count(timeStyle) > 0) {
+            timeStyleValue = dateTimeStyle[timeStyle];
+        } else if (timeStyle == "auto") {
+            timeStyleValue = DefaultDTStyle[defaultStyle];
+        }
+    }
+    icu::DateFormat *tempDateFormat = DateFormat::createDateTimeInstance(dateStyleValue, timeStyleValue, locale);
+    if (tempDateFormat == nullptr) {
+        status = U_INVALID_FORMAT_ERROR;
+        HILOG_ERROR_I18N("DateTimeFormat::InitDateFormatWithDateTimeStyle: Create DateFormat instance failed.");
+        return;
+    }
+    SimpleDateFormat* simpleDateFormat = static_cast<SimpleDateFormat*>(tempDateFormat);
+    std::unique_ptr<SimpleDateFormat> simDateFormatPtr = std::unique_ptr<SimpleDateFormat>(simpleDateFormat);
+    if (simDateFormatPtr != nullptr) {
+        simDateFormatPtr->toPattern(pattern);
+    }
+    FixPatternPartOne();
+    dateFormat = std::make_unique<SimpleDateFormat>(pattern, locale, status);
 }
 
 void DateTimeFormat::SetDayPeriod()

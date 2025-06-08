@@ -505,10 +505,195 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest023, TestSize.Level1)
     LocaleConfig::SetSystemLocale(locale);
     std::string effectiveLanguage = LocaleConfig::GetEffectiveLanguage();
     std::string effectiveLocale = LocaleConfig::GetEffectiveLocale();
+    std::string systemHour = LocaleConfig::GetSystemHour();
+    EXPECT_EQ(systemHour, "false");
     EXPECT_EQ(effectiveLanguage, "zh-Hans-CN");
     EXPECT_EQ(effectiveLocale, "zh-Hans-CN-u-mu-celsius");
     LocaleConfig::SetSystemLanguage(systemLanguage);
     LocaleConfig::SetSystemLocale(systemLocale);
+}
+
+/**
+ * @tc.name: LocaleConfigFuncTest024
+ * @tc.desc: Test LocaleConfig Collations
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest024, TestSize.Level1)
+{
+    std::string systemLanguage = LocaleConfig::GetSystemLanguage();
+    std::string systemLocale = LocaleConfig::GetSystemLocale();
+    LocaleConfig::SetSystemLanguage("zh-Hant");
+    LocaleConfig::SetSystemRegion("HK");
+    std::unordered_map<std::string, std::string> systemCollations;
+    I18nErrorCode errCode = LocaleConfig::GetSystemCollations(systemCollations);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    EXPECT_TRUE(systemCollations.find("pinyin") != systemCollations.end());
+    EXPECT_TRUE(systemCollations.find("stroke") != systemCollations.end());
+    EXPECT_TRUE(systemCollations.find("zhuyin") != systemCollations.end());
+
+    std::string usingCollation;
+    errCode = LocaleConfig::GetUsingCollation(usingCollation);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    EXPECT_EQ(usingCollation, "stroke");
+    std::string systemLocaleInstanceTag = LocaleConfig::GetSystemLocaleInstanceTag();
+    EXPECT_EQ(systemLocaleInstanceTag, "zh-Hant-HK-u-co-stroke");
+
+    LocaleConfig::SetSystemRegion("TW");
+    errCode = LocaleConfig::GetUsingCollation(usingCollation);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    EXPECT_EQ(usingCollation, "zhuyin");
+    systemLocaleInstanceTag = LocaleConfig::GetSystemLocaleInstanceTag();
+    EXPECT_EQ(systemLocaleInstanceTag, "zh-Hant-TW-u-co-zhuyin");
+
+    LocaleConfig::SetSystemLanguage("en-Latn-US");
+    errCode = LocaleConfig::GetSystemCollations(systemCollations);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    EXPECT_TRUE(systemCollations.find("lower") != systemCollations.end());
+    EXPECT_TRUE(systemCollations.find("upper") != systemCollations.end());
+    errCode = LocaleConfig::GetUsingCollation(usingCollation);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    EXPECT_EQ(usingCollation, "lower");
+    systemLocaleInstanceTag = LocaleConfig::GetSystemLocaleInstanceTag();
+    EXPECT_EQ(systemLocaleInstanceTag, "en-Latn-TW-u-kf-lower");
+
+    LocaleConfig::SetSystemLanguage("zh-Hans");
+    errCode = LocaleConfig::GetSystemCollations(systemCollations);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    EXPECT_EQ(systemCollations.size(), 0);
+    errCode = LocaleConfig::GetUsingCollation(usingCollation);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    EXPECT_EQ(usingCollation, "");
+    systemLocaleInstanceTag = LocaleConfig::GetSystemLocaleInstanceTag();
+    EXPECT_EQ(systemLocaleInstanceTag, "zh-Hans-TW");
+    LocaleConfig::SetSystemLanguage(systemLanguage);
+    LocaleConfig::SetSystemLocale(systemLocale);
+}
+
+/**
+ * @tc.name: LocaleConfigFuncTest025
+ * @tc.desc: Test LocaleConfig Collations
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest025, TestSize.Level1)
+{
+    std::string systemLanguage = LocaleConfig::GetSystemLanguage();
+    std::string systemLocale = LocaleConfig::GetSystemLocale();
+    LocaleConfig::SetSystemLanguage("zh-Hans");
+    LocaleConfig::SetSystemRegion("HK");
+    I18nErrorCode errCode = LocaleConfig::SetSystemCollation("upper");
+    EXPECT_EQ(errCode, I18nErrorCode::FAILED);
+    std::string systemLocaleInstanceTag = LocaleConfig::GetSystemLocaleInstanceTag();
+    EXPECT_EQ(systemLocaleInstanceTag, "zh-Hans-HK");
+
+    LocaleConfig::SetSystemLanguage("zh-Hant");
+    errCode = LocaleConfig::SetSystemCollation("upper");
+    EXPECT_EQ(errCode, I18nErrorCode::INVALID_PARAM);
+    systemLocaleInstanceTag = LocaleConfig::GetSystemLocaleInstanceTag();
+    EXPECT_EQ(systemLocaleInstanceTag, "zh-Hant-HK-u-co-stroke");
+
+    errCode = LocaleConfig::SetSystemCollation("pinyin");
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    systemLocaleInstanceTag = LocaleConfig::GetSystemLocaleInstanceTag();
+    EXPECT_EQ(systemLocaleInstanceTag, "zh-Hant-HK-u-co-pinyin");
+    LocaleConfig::SetSystemLanguage(systemLanguage);
+    LocaleConfig::SetSystemLocale(systemLocale);
+}
+
+/**
+ * @tc.name: LocaleConfigFuncTest026
+ * @tc.desc: Test LocaleConfig numbering system
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest026, TestSize.Level1)
+{
+    std::string systemLanguage = LocaleConfig::GetSystemLanguage();
+    std::string systemLocale = LocaleConfig::GetSystemLocale();
+    LocaleConfig::SetSystemLanguage("ur");
+    LocaleConfig::SetSystemLocale("ur-CN");
+    std::unordered_map<std::string, std::string> systemNumberingSystems;
+    I18nErrorCode errCode = LocaleConfig::GetSystemNumberingSystems(systemNumberingSystems);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    EXPECT_TRUE(systemNumberingSystems.find("arabext") != systemNumberingSystems.end());
+    EXPECT_TRUE(systemNumberingSystems.find("latn") != systemNumberingSystems.end());
+
+    std::string usingNumberingSystem;
+    errCode = LocaleConfig::GetUsingNumberingSystem(usingNumberingSystem);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    EXPECT_EQ(usingNumberingSystem, "latn");
+    std::string systemLocaleInstanceTag = LocaleConfig::GetSystemLocaleInstanceTag();
+    EXPECT_EQ(systemLocaleInstanceTag, "ur-CN");
+
+    errCode = LocaleConfig::SetSystemNumberingSystem("latn");
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    errCode = LocaleConfig::GetUsingNumberingSystem(usingNumberingSystem);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    EXPECT_EQ(usingNumberingSystem, "latn");
+    systemLocaleInstanceTag = LocaleConfig::GetSystemLocaleInstanceTag();
+    EXPECT_EQ(systemLocaleInstanceTag, "ur-CN-u-nu-latn");
+
+    errCode = LocaleConfig::SetSystemNumberingSystem("arab");
+    EXPECT_EQ(errCode, I18nErrorCode::INVALID_PARAM);
+
+    LocaleConfig::SetSystemLanguage(systemLanguage);
+    LocaleConfig::SetSystemLocale(systemLocale);
+}
+
+/**
+ * @tc.name: LocaleConfigFuncTest027
+ * @tc.desc: Test LocaleConfig number pattern
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest027, TestSize.Level1)
+{
+    std::string systemLanguage = LocaleConfig::GetSystemLanguage();
+    std::string systemLocale = LocaleConfig::GetSystemLocale();
+    LocaleConfig::SetSystemLanguage("zh-Hans");
+    LocaleConfig::SetSystemRegion("CN");
+    std::unordered_map<std::string, std::string> systemNumberPatterns;
+    I18nErrorCode errCode = LocaleConfig::GetSystemNumberPatterns(systemNumberPatterns);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    EXPECT_TRUE(systemNumberPatterns.find("002c002e") != systemNumberPatterns.end());
+    EXPECT_TRUE(systemNumberPatterns.find("0000002e") != systemNumberPatterns.end());
+    EXPECT_TRUE(systemNumberPatterns.find("002e002c") != systemNumberPatterns.end());
+    EXPECT_TRUE(systemNumberPatterns.find("0000002c") != systemNumberPatterns.end());
+
+    std::string usingNumberPattern;
+    errCode = LocaleConfig::GetUsingNumberPattern(usingNumberPattern);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    EXPECT_EQ(usingNumberPattern, "002c002e");
+
+    errCode = LocaleConfig::SetSystemNumberPattern("0000002c");
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    errCode = LocaleConfig::GetUsingNumberPattern(usingNumberPattern);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    EXPECT_EQ(usingNumberPattern, "0000002c");
+ 
+    errCode = LocaleConfig::SetSystemNumberingSystem("002d002f");
+    EXPECT_EQ(errCode, I18nErrorCode::INVALID_PARAM);
+
+    LocaleConfig::SetSystemLanguage(systemLanguage);
+    LocaleConfig::SetSystemLocale(systemLocale);
+}
+
+/**
+ * @tc.name: LocaleConfigFuncTest028
+ * @tc.desc: Test LocaleConfig
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest028, TestSize.Level1)
+{
+    std::string localeTag = "zh-Hans-CN-x-np-002c002e";
+    std::pair<std::string, std::string> numberPattern = LocaleConfig::GetNumberPatternFromLocale(localeTag);
+    EXPECT_EQ(numberPattern.first, ",");
+    EXPECT_EQ(numberPattern.second, ".");
+    std::string removedLocale = LocaleConfig::RemoveCustExtParam(localeTag);
+    EXPECT_EQ(removedLocale, "zh-Hans-CN");
+    std::string modifiedLocale = LocaleConfig::ModifyExtParam(localeTag, "np", "0000002c", "-x-");
+    EXPECT_EQ(modifiedLocale, "zh-Hans-CN-x-np-0000002c");
+    std::string extParam = LocaleConfig::QueryExtParam(localeTag, "np", "-x-");
+    EXPECT_EQ(extParam, "002c002e");
+    std::string numberingSystemDigit = LocaleConfig::GetNumberingSystemDigit("latn");
+    EXPECT_EQ(numberingSystemDigit, "0123456789");
 }
 } // namespace I18n
 } // namespace Global

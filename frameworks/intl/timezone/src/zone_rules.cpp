@@ -72,7 +72,8 @@ std::unique_ptr<ZoneOffsetTransition> ZoneRules::NextTransition(double date)
     }
     icu::TimeZoneTransition trans;
     if (!btz->getNextTransition(date, false, trans)) {
-        HILOG_INFO_I18N("ZoneRules::nextTransition: get next transition after %{public}s failed.", std::to_string(date).c_str());
+        HILOG_ERROR_I18N("ZoneRules::nextTransition: get next transition after %{public}s failed.",
+            std::to_string(date).c_str());
         return std::make_unique<ZoneOffsetTransition>();
     }
     const icu::TimeZoneRule* from = trans.getFrom();

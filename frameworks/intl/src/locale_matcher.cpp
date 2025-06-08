@@ -12,9 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "locale_data.h"
 #include "locale_matcher.h"
+
+#include "i18n_hilog.h"
+#include "locale_data.h"
 #include "locale_util.h"
 
 namespace OHOS {
@@ -39,6 +40,37 @@ std::string LocaleMatcher::GetBestMatchedLocale(const LocaleInfo* requestLocale,
         }
     }
     return bestMatch->ToString();
+}
+
+std::string LocaleMatcher::GetBestMatchedLocale(const std::string& requestLocale,
+    const std::vector<std::string>& candidateLocales)
+{
+    LocaleInfo* requestLocaleInfo = new (std::nothrow) LocaleInfo(requestLocale);
+    if (requestLocaleInfo == nullptr) {
+        HILOG_ERROR_I18N("LocaleMatcher::GetBestMatchedLocale: Create requestLocaleInfo failed, locale is %{public}s.",
+            requestLocale.c_str());
+        return "";
+    }
+    std::vector<LocaleInfo*> candidateLocaleInfos;
+    for (const auto& candidateLocale : candidateLocales) {
+        LocaleInfo* tempLocaleInfo = new (std::nothrow) LocaleInfo(candidateLocale);
+        if (tempLocaleInfo == nullptr) {
+            HILOG_ERROR_I18N("LocaleMatcher::GetBestMatchedLocale: Create tempLocaleInfo failed, locale is %{public}s.",
+                candidateLocale.c_str());
+            continue;
+        }
+        if (LocaleMatcher::Match(requestLocaleInfo, tempLocaleInfo)) {
+            candidateLocaleInfos.emplace_back(tempLocaleInfo);
+        } else {
+            delete tempLocaleInfo;
+        }
+    }
+    std::string result = LocaleMatcher::GetBestMatchedLocale(requestLocaleInfo, candidateLocaleInfos);
+    delete requestLocaleInfo;
+    for (LocaleInfo* candidateLocaleInfo : candidateLocaleInfos) {
+        delete candidateLocaleInfo;
+    }
+    return result;
 }
 
 int8_t LocaleMatcher::IsMoreSuitable(const LocaleInfo *current, const LocaleInfo *other, const LocaleInfo *request)

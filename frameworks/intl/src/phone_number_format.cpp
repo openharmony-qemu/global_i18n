@@ -200,7 +200,27 @@ std::string PhoneNumberFormat::format(const std::string &number)
     } else {
         util->Format(phoneNumber, phoneNumberFormat, &formattedNumber);
     }
-    return PseudoLocalizationProcessor(formattedNumber);
+    std::string usingNumberingSystem;
+    LocaleConfig::GetUsingNumberingSystem(usingNumberingSystem);
+    icu::UnicodeString replaceDigit = LocaleConfig::GetNumberingSystemDigit(usingNumberingSystem).c_str();
+    if (replaceDigit.isEmpty() || usingNumberingSystem.compare("latn") == 0) {
+        return PseudoLocalizationProcessor(formattedNumber);
+    }
+    icu::UnicodeString replaceNumber;
+    for (auto& number : formattedNumber) {
+        if (number <= '9' && number >= '0') {
+            replaceNumber += replaceDigit.char32At(number - '0');
+            continue;
+        } else {
+            replaceNumber += number;
+        }
+    }
+    if (usingNumberingSystem.compare("arabext") == 0 || usingNumberingSystem.compare("arab") == 0) {
+        replaceNumber =  "\u202d" + replaceNumber + "\u202c";
+    }
+    std::string result;
+    replaceNumber.toUTF8String(result);
+    return PseudoLocalizationProcessor(result);
 }
 
 std::string PhoneNumberFormat::GetAsYouTypeFormatResult(const std::string &number)

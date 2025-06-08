@@ -15,9 +15,11 @@
 #ifndef OHOS_GLOBAL_I18N_SIGNATURE_VERIFIER_H
 #define OHOS_GLOBAL_I18N_SIGNATURE_VERIFIER_H
 
-#include <openssl/rsa.h>
 #include <string>
 #include <vector>
+
+struct rsa_st;
+typedef struct rsa_st RSA;
 
 namespace OHOS {
 namespace Global {
