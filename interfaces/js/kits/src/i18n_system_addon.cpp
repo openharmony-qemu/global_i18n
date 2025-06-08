@@ -81,6 +81,12 @@ napi_value I18nSystemAddon::InitI18nSystem(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getSystemCollations", GetSystemCollations),
         DECLARE_NAPI_STATIC_FUNCTION("getUsingCollation", GetUsingCollation),
         DECLARE_NAPI_STATIC_FUNCTION("setSystemCollation", SetSystemCollation),
+        DECLARE_NAPI_STATIC_FUNCTION("getSystemNumberingSystems", GetSystemNumberingSystems),
+        DECLARE_NAPI_STATIC_FUNCTION("getUsingNumberingSystem", GetUsingNumberingSystem),
+        DECLARE_NAPI_STATIC_FUNCTION("setSystemNumberingSystem", SetSystemNumberingSystem),
+        DECLARE_NAPI_STATIC_FUNCTION("getSystemNumberPatterns", GetSystemNumberPatterns),
+        DECLARE_NAPI_STATIC_FUNCTION("getUsingNumberPattern", GetUsingNumberPattern),
+        DECLARE_NAPI_STATIC_FUNCTION("setSystemNumberPattern", SetSystemNumberPattern),
     };
     napi_value constructor = nullptr;
     napi_status status = napi_define_class(env, "System", NAPI_AUTO_LENGTH, JSUtils::DefaultConstructor, nullptr,
@@ -1212,6 +1218,152 @@ napi_value I18nSystemAddon::SetSystemCollation(napi_env env, napi_callback_info 
             break;
         default:
             HILOG_ERROR_I18N("I18nSystemAddon::SetSystemCollation: Set system collation failed.");
+    }
+    return nullptr;
+}
+
+napi_value I18nSystemAddon::GetSystemNumberingSystems(napi_env env, napi_callback_info info)
+{
+    std::unordered_map<std::string, std::string> systemNumberingSystems;
+    I18nErrorCode err = I18nServiceAbilityClient::GetSystemNumberingSystems(systemNumberingSystems);
+    if (err == I18nErrorCode::NOT_SYSTEM_APP) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_SYSTEM_APP, "", "", true);
+        return nullptr;
+    }
+    return VariableConvertor::CreateMap(env, systemNumberingSystems);
+}
+
+napi_value I18nSystemAddon::GetUsingNumberingSystem(napi_env env, napi_callback_info info)
+{
+    std::string usingNumberingSystem;
+    I18nErrorCode err = I18nServiceAbilityClient::GetUsingNumberingSystem(usingNumberingSystem);
+    if (err == I18nErrorCode::NOT_SYSTEM_APP) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_SYSTEM_APP, "", "", true);
+        return nullptr;
+    }
+    return VariableConvertor::CreateString(env, usingNumberingSystem);
+}
+
+napi_value I18nSystemAddon::SetSystemNumberingSystem(napi_env env, napi_callback_info info)
+{
+    size_t argc = 1;
+    napi_value argv[1] = { nullptr };
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("I18nSystemAddon::SetSystemNumberingSystem: Get cb info failed.");
+        return nullptr;
+    } else if (argc < 1) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "identifier", "", true);
+        return nullptr;
+    }
+
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("I18nSystemAddon::SetSystemNumberingSystem: Failed to get type of argv[0].");
+        return nullptr;
+    } else if (valueType != napi_valuetype::napi_string) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "identifier", "string", true);
+        return nullptr;
+    }
+
+    int32_t code = 0;
+    std::string identifier = VariableConvertor::GetString(env, argv[0], code);
+    if (code != 0) {
+        HILOG_ERROR_I18N("I18nSystemAddon::SetSystemNumberingSystem: Get string from argv[0] failed.");
+        return nullptr;
+    }
+
+    I18nErrorCode err = I18nServiceAbilityClient::SetSystemNumberingSystem(identifier);
+    if (err == I18nErrorCode::SUCCESS) {
+        return nullptr;
+    }
+    switch (err) {
+        case I18nErrorCode::NOT_SYSTEM_APP:
+            ErrorUtil::NapiThrow(env, I18N_NOT_SYSTEM_APP, "", "", true);
+            break;
+        case I18nErrorCode::NO_PERMISSION:
+            ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, "", "", true);
+            break;
+        case I18nErrorCode::INVALID_PARAM:
+            ErrorUtil::NapiThrow(env, I18N_NOT_VALID_NEW, "identifier", "in a numbering system supported "
+                "by the system", true);
+            break;
+        default:
+            HILOG_ERROR_I18N("I18nSystemAddon::SetSystemNumberingSystem: Set system numbering system failed.");
+    }
+    return nullptr;
+}
+
+napi_value I18nSystemAddon::GetSystemNumberPatterns(napi_env env, napi_callback_info info)
+{
+    std::unordered_map<std::string, std::string> systemNumberPatterns;
+    I18nErrorCode err = I18nServiceAbilityClient::GetSystemNumberPatterns(systemNumberPatterns);
+    if (err == I18nErrorCode::NOT_SYSTEM_APP) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_SYSTEM_APP, "", "", true);
+        return nullptr;
+    }
+    return VariableConvertor::CreateMap(env, systemNumberPatterns);
+}
+
+napi_value I18nSystemAddon::GetUsingNumberPattern(napi_env env, napi_callback_info info)
+{
+    std::string usingNumberPattern;
+    I18nErrorCode err = I18nServiceAbilityClient::GetUsingNumberPattern(usingNumberPattern);
+    if (err == I18nErrorCode::NOT_SYSTEM_APP) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_SYSTEM_APP, "", "", true);
+        return nullptr;
+    }
+    return VariableConvertor::CreateString(env, usingNumberPattern);
+}
+
+napi_value I18nSystemAddon::SetSystemNumberPattern(napi_env env, napi_callback_info info)
+{
+    size_t argc = 1;
+    napi_value argv[1] = { nullptr };
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("I18nSystemAddon::SetSystemNumberPattern: Get cb info failed.");
+        return nullptr;
+    } else if (argc < 1) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "pattern", "", true);
+        return nullptr;
+    }
+
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("I18nSystemAddon::SetSystemNumberPattern: Failed to get type of argv[0].");
+        return nullptr;
+    } else if (valueType != napi_valuetype::napi_string) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "pattern", "string", true);
+        return nullptr;
+    }
+
+    int32_t code = 0;
+    std::string pattern = VariableConvertor::GetString(env, argv[0], code);
+    if (code != 0) {
+        HILOG_ERROR_I18N("I18nSystemAddon::SetSystemNumberPattern: Get string from argv[0] failed.");
+        return nullptr;
+    }
+
+    I18nErrorCode err = I18nServiceAbilityClient::SetSystemNumberPattern(pattern);
+    if (err == I18nErrorCode::SUCCESS) {
+        return nullptr;
+    }
+    switch (err) {
+        case I18nErrorCode::NOT_SYSTEM_APP:
+            ErrorUtil::NapiThrow(env, I18N_NOT_SYSTEM_APP, "", "", true);
+            break;
+        case I18nErrorCode::NO_PERMISSION:
+            ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, "", "", true);
+            break;
+        case I18nErrorCode::INVALID_PARAM:
+            ErrorUtil::NapiThrow(env, I18N_NOT_VALID_NEW, "pattern", "in a number pattern supported by the system",
+                true);
+            break;
+        default:
+            HILOG_ERROR_I18N("I18nSystemAddon::SetSystemNumberPattern: Set system number pattern failed.");
     }
     return nullptr;
 }

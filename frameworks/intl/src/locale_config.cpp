@@ -40,9 +40,11 @@
 #include "ucase.h"
 #include "ulocimp.h"
 #include "unicode/calendar.h"
+#include "unicode/dcfmtsym.h"
 #include "unicode/localebuilder.h"
 #include "unicode/locdspnm.h"
 #include "unicode/locid.h"
+#include <unicode/numsys.h>
 #include "unicode/smpdtfmt.h"
 #include "unicode/unistr.h"
 #include "unicode/ustring.h"
@@ -102,6 +104,7 @@ const std::string LocaleConfig::COLLATION_KEY = "co";
 const std::string LocaleConfig::NUNBER_PATTERN_KEY = "np";
 const std::string LocaleConfig::TIMEZONE_KEY = "persist.time.timezone";
 const std::string LocaleConfig::DEFAULT_TIMEZONE = "GMT";
+const std::string LocaleConfig::DEFAULT_NUMBERING_SYSTEM_NAME = "latn";
 unordered_set<string> LocaleConfig::supportedLocales;
 unordered_set<string> LocaleConfig::supportedLocalesV15;
 unordered_set<string> LocaleConfig::supportLocales;
@@ -364,6 +367,33 @@ static std::unordered_map<std::string, std::string> languageToDefaultCollationVa
     { "en-Latn-US", "lower" }
 };
 
+static std::unordered_map<std::string, std::string> languageToNumberingSystem {
+    { "ar", "arab" },
+    { "as", "beng" },
+    { "bn", "beng" },
+    { "fa", "arabext" },
+    { "mr", "deva" },
+    { "my", "mymr" },
+    { "ne", "deva" },
+    { "ur", "arabext" }
+};
+
+static std::unordered_map<std::string, std::string> NumberingSystemNameToDescription {
+    { "arab", "٠١٢٣٤٥٦٧٨٩" },
+    { "beng", "০১২৩৪৫৬৭৮৯" },
+    { "arabext", "۰۱۲۳۴۵۶۷۸۹" },
+    { "deva", "०१२३४५६७८९" },
+    { "mymr", "၀၁၂၃၄၅၆၇၈၉" },
+    { "latn", "0123456789" }
+};
+
+static std::unordered_map<std::string, std::string> NumberPatternToDescription {
+    { "002c002e", "12,345.67" },
+    { "0000002e", "12345.67" },
+    { "002e002c", "12.345,67" },
+    { "0000002c", "12345,67" }
+};
+
 string Adjust(const string &origin)
 {
     auto iter = g_languageMap.find(origin);
@@ -495,9 +525,9 @@ string LocaleConfig::GetCountry(const string& parameter)
 string LocaleConfig::GetSystemLocale()
 {
     std::string systemLocale = GetEffectiveLocale();
-    std::vector<std::pair<size_t, std::string>> positons = GetExtParamPositions(systemLocale);
-    if (positons[0].first != std::string::npos) {
-        systemLocale = systemLocale.substr(0, positons[0].first);
+    std::vector<std::pair<size_t, std::string>> positions = GetExtParamPositions(systemLocale);
+    if (positions[0].first != std::string::npos) {
+        systemLocale = systemLocale.substr(0, positions[0].first);
     }
     return systemLocale;
 }
@@ -1546,9 +1576,9 @@ std::string LocaleConfig::ComputeEffectiveLanguage(const std::string& localeTag,
         return localeTag;
     }
     std::string locale = localeTag;
-    std::vector<std::pair<size_t, std::string>> positons = GetExtParamPositions(localeTag);
-    if (positons[0].first != std::string::npos) {
-        locale = localeTag.substr(0, positons[0].first);
+    std::vector<std::pair<size_t, std::string>> positions = GetExtParamPositions(localeTag);
+    if (positions[0].first != std::string::npos) {
+        locale = localeTag.substr(0, positions[0].first);
     }
     size_t prefixLength = 2;
     if (locale.compare(0, prefixLength, "es") != 0 && locale.compare(0, prefixLength, "pt") != 0) {
@@ -1798,6 +1828,7 @@ I18nErrorCode LocaleConfig::GetSystemCollations(std::unordered_map<std::string, 
         displayName.toUTF8String(value);
         systemCollations.insert(std::make_pair(collationValue, value));
     }
+    delete localeDisplayNames;
     return I18nErrorCode::SUCCESS;
 }
 
@@ -1847,6 +1878,232 @@ I18nErrorCode LocaleConfig::SetSystemCollation(const std::string& identifier, in
     std::string localeTag = MultiUsers::GetSystemLocaleFromUserId(userId);
     std::string key = languageToExtParamKey[language];
     return SetSystemLocale(ModifyExtParam(localeTag, key, identifier, STANDARD_EXT_PARAM_KEY), userId);
+}
+
+std::string LocaleConfig::GetBestMatchedLocaleOfNumberingSystem(const std::string& requestLocale)
+{
+    std::vector<std::string> candidateLocales;
+    for (const auto& item : languageToNumberingSystem) {
+        candidateLocales.emplace_back(item.first);
+    }
+    return LocaleMatcher::GetBestMatchedLocale(requestLocale, candidateLocales);
+}
+
+I18nErrorCode LocaleConfig::GetSystemNumberingSystems(
+    std::unordered_map<std::string, std::string>& systemNumberingSystems)
+{
+    std::string systemLanguage = LocaleConfig::GetSystemLanguage();
+    return GetSystemNumberingSystemsFromLanguage(systemLanguage, systemNumberingSystems);
+}
+
+I18nErrorCode LocaleConfig::GetSystemNumberingSystemsFromLanguage(const std::string& language,
+    std::unordered_map<std::string, std::string>& systemNumberingSystems)
+{
+    systemNumberingSystems.clear();
+    std::vector<std::string> candidateLanguages;
+    for (const auto& item : languageToNumberingSystem) {
+        candidateLanguages.emplace_back(item.first);
+    }
+    std::string supportedLanguage = LocaleMatcher::GetBestMatchedLocale(language, candidateLanguages);
+    if (supportedLanguage.empty()) {
+        return I18nErrorCode::SUCCESS;
+    }
+    std::string numberingSystemName = languageToNumberingSystem[supportedLanguage];
+    std::string numberingSystemDescription = NumberingSystemNameToDescription[numberingSystemName];
+    systemNumberingSystems.insert(std::make_pair(numberingSystemName, numberingSystemDescription));
+    systemNumberingSystems.insert(std::make_pair(DEFAULT_NUMBERING_SYSTEM_NAME,
+        NumberingSystemNameToDescription[DEFAULT_NUMBERING_SYSTEM_NAME]));
+    return I18nErrorCode::SUCCESS;
+}
+
+I18nErrorCode LocaleConfig::GetUsingNumberingSystem(std::string& usingNumberingSystem)
+{
+    usingNumberingSystem.clear();
+    std::string effectiveLocale = LocaleConfig::GetEffectiveLocale();
+    UErrorCode status = U_ZERO_ERROR;
+    icu::NumberingSystem* numberingSystem = icu::NumberingSystem::createInstance(effectiveLocale.c_str(), status);
+    if (U_FAILURE(status) || numberingSystem == nullptr) {
+        HILOG_ERROR_I18N("LocaleConfig::GetUsingNumberingSystem: Create icu::NumberingSystem failed.");
+        usingNumberingSystem = DEFAULT_NUMBERING_SYSTEM_NAME;
+        return I18nErrorCode::FAILED;
+    }
+    usingNumberingSystem = numberingSystem->getName();
+    if (usingNumberingSystem.empty()) {
+        usingNumberingSystem = DEFAULT_NUMBERING_SYSTEM_NAME;
+        HILOG_ERROR_I18N("LocaleConfig::GetUsingNumberingSystem: Get name failed.");
+        return I18nErrorCode::FAILED;
+    }
+    return I18nErrorCode::SUCCESS;
+}
+
+I18nErrorCode LocaleConfig::SetSystemNumberingSystem(const std::string& identifier, int32_t userId)
+{
+    std::string language = MultiUsers::GetSystemLanguageFromUserId(userId);
+    std::unordered_map<std::string, std::string> systemNumberingSystems;
+    I18nErrorCode errCode = GetSystemNumberingSystemsFromLanguage(language, systemNumberingSystems);
+    if (errCode != I18nErrorCode::SUCCESS) {
+        HILOG_ERROR_I18N("LocaleConfig::SetSystemNumberingSystem: Get system numbering systems failed.");
+        return I18nErrorCode::FAILED;
+    }
+    if (systemNumberingSystems.find(identifier) == systemNumberingSystems.end()) {
+        HILOG_ERROR_I18N("LocaleConfig::SetSystemNumberingSystem: ExtParam value is invalid, language is %{public}s, "
+            "value is %{public}s.", language.c_str(), identifier.c_str());
+        return I18nErrorCode::INVALID_PARAM;
+    }
+
+    std::string localeTag = MultiUsers::GetSystemLocaleFromUserId(userId);
+    return SetSystemLocale(ModifyExtParam(localeTag, NUMBER_SYSTEM_KEY, identifier, STANDARD_EXT_PARAM_KEY), userId);
+}
+
+std::pair<std::string, std::string> LocaleConfig::GetNumberPatternFromLocale(const std::string& localeTag)
+{
+    std::pair<std::string, std::string> numberPattern;
+    std::string value = LocaleConfig::QueryExtParam(localeTag, NUNBER_PATTERN_KEY, CUST_EXT_PARAM_KEY);
+    if (!value.empty()) {
+        numberPattern = HexToNumberPattern(value);
+        return numberPattern;
+    }
+
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(localeTag.c_str(), status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("LocaleConfig::GetNumberPatternFromLocale: Create icu::Locale failed.");
+        return numberPattern;
+    }
+    icu::DecimalFormatSymbols* decimalFormatSymbols = new icu::DecimalFormatSymbols(locale, status);
+    if (U_FAILURE(status) || decimalFormatSymbols == nullptr) {
+        HILOG_ERROR_I18N("LocaleConfig::GetNumberPatternFromLocale: Create icu::DecimalFormatSymbols failed.");
+        return numberPattern;
+    }
+    icu::UnicodeString groupingSeparatorSymbol
+        = decimalFormatSymbols->getSymbol(icu::DecimalFormatSymbols::ENumberFormatSymbol::kGroupingSeparatorSymbol);
+    icu::UnicodeString decimalSeparatorSymbol
+        = decimalFormatSymbols->getSymbol(icu::DecimalFormatSymbols::ENumberFormatSymbol::kDecimalSeparatorSymbol);
+    delete decimalFormatSymbols;
+    std::string groupingPart;
+    groupingSeparatorSymbol.toUTF8String(groupingPart);
+    std::string decimalPart;
+    decimalSeparatorSymbol.toUTF8String(decimalPart);
+    numberPattern.first = groupingPart;
+    numberPattern.second = decimalPart;
+    return numberPattern;
+}
+
+I18nErrorCode LocaleConfig::GetSystemNumberPatterns(std::unordered_map<std::string, std::string>& systemNumberPatterns)
+{
+    std::string systemLocale = LocaleConfig::GetSystemLocale();
+    return GetSystemNumberPatternsFromLocale(systemNumberPatterns, systemLocale);
+}
+
+I18nErrorCode LocaleConfig::GetSystemNumberPatternsFromLocale(
+    std::unordered_map<std::string, std::string>& systemNumberPatterns, const std::string& locale)
+{
+    systemNumberPatterns.clear();
+    systemNumberPatterns = NumberPatternToDescription;
+    std::pair<std::string, std::string> numberPattern = GetNumberPatternFromLocale(locale);
+    std::string key = NumberPatternToHex(numberPattern.first, numberPattern.second);
+    if (key.empty()) {
+        HILOG_ERROR_I18N("LocaleConfig::GetSystemNumberPatterns: Get key failed, groupingSymbol is %{public}s, "
+            "decimalSymbol is %{public}s.", numberPattern.first.c_str(), numberPattern.second.c_str());
+        return I18nErrorCode::FAILED;
+    }
+    if (NumberPatternToDescription.find(key) == NumberPatternToDescription.end()) {
+        std::string description = "12" + numberPattern.first + "456" + numberPattern.second + "78";
+        systemNumberPatterns.insert(std::make_pair(key, description));
+    }
+    return I18nErrorCode::SUCCESS;
+}
+
+I18nErrorCode LocaleConfig::GetUsingNumberPattern(std::string& usingNumberPattern)
+{
+    usingNumberPattern.clear();
+    std::string effectiveLocale = LocaleConfig::GetEffectiveLocale();
+    std::pair<std::string, std::string> numberPattern = GetNumberPatternFromLocale(effectiveLocale);
+    std::string numberPatternHex = NumberPatternToHex(numberPattern.first, numberPattern.second);
+    if (numberPatternHex.empty()) {
+        HILOG_ERROR_I18N("LocaleConfig::GetUsingNumberPattern: Get numberPattern failed, groupingSymbol is %{public}s,"
+            " decimalSymbol is %{public}s.", numberPattern.first.c_str(), numberPattern.second.c_str());
+        return I18nErrorCode::FAILED;
+    }
+    usingNumberPattern = numberPatternHex;
+    return I18nErrorCode::SUCCESS;
+}
+
+I18nErrorCode LocaleConfig::SetSystemNumberPattern(const std::string& pattern, int32_t userId)
+{
+    std::string systemLocale = MultiUsers::GetSystemLocaleFromUserId(userId);
+    std::unordered_map<std::string, std::string> systemNumberPatterns;
+    I18nErrorCode errCode = GetSystemNumberPatternsFromLocale(systemNumberPatterns, systemLocale);
+    if (errCode != I18nErrorCode::SUCCESS) {
+        HILOG_ERROR_I18N("LocaleConfig::SetSystemNumberPattern: Get system number patterns failed.");
+        return I18nErrorCode::FAILED;
+    }
+
+    if (systemNumberPatterns.find(pattern) == systemNumberPatterns.end()) {
+        HILOG_ERROR_I18N("LocaleConfig::SetSystemNumberPattern: ExtParam value is invalid, locale is %{public}s, "
+            "value is %{public}s.", systemLocale.c_str(), pattern.c_str());
+        return I18nErrorCode::INVALID_PARAM;
+    }
+
+    return SetSystemLocale(ModifyExtParam(systemLocale, NUNBER_PATTERN_KEY, pattern, CUST_EXT_PARAM_KEY), userId);
+}
+
+std::string LocaleConfig::NumberPatternToHex(const std::string& groupingSymbol, const std::string& decimalSymbol)
+{
+    std::string hex;
+    if (groupingSymbol.empty()) {
+        hex += "0000";
+    } else {
+        std::string groupingSymbolHex = StrToHex(groupingSymbol, SYMBOL_HEX_LEN);
+        if (groupingSymbolHex.length() != SYMBOL_HEX_LEN) {
+            HILOG_ERROR_I18N("LocaleConfig::NumberPatternToHex: Check groupingSymbolHex failed, "
+                "groupingSymbolHex is %{public}s.", groupingSymbolHex.c_str());
+            return "";
+        }
+        hex += groupingSymbolHex;
+    }
+    if (decimalSymbol.empty()) {
+        HILOG_ERROR_I18N("LocaleConfig::NumberPatternToHex: decimalSymbol is empty.");
+        return "";
+    }
+    std::string decimalSymbolHex = StrToHex(decimalSymbol, SYMBOL_HEX_LEN);
+    if (decimalSymbolHex.length() != SYMBOL_HEX_LEN) {
+        HILOG_ERROR_I18N("LocaleConfig::NumberPatternToHex: Check decimalSymbolHex failed, "
+            "decimalSymbolHex is %{public}s.", decimalSymbolHex.c_str());
+        return "";
+    }
+    hex += decimalSymbolHex;
+    return hex;
+}
+
+std::pair<std::string, std::string> LocaleConfig::HexToNumberPattern(const std::string& hex)
+{
+    std::pair<std::string, std::string> numberPattern;
+    if (hex.length() != SYMBOL_HEX_LEN * ELEMENT_NUM) {
+        HILOG_ERROR_I18N("LocaleConfig::HexToNumberPattern: Check hex failed, hex is %{public}s.", hex.c_str());
+        return numberPattern;
+    }
+    std::string groupingSymbolHex = hex.substr(0, SYMBOL_HEX_LEN);
+    std::string groupingSymbol;
+    if (groupingSymbolHex.compare("0000") != 0) {
+        groupingSymbol = HexToStr(groupingSymbolHex);
+        if (groupingSymbol.empty()) {
+            HILOG_ERROR_I18N("LocaleConfig::HexToNumberPattern: Get groupingSymbol failed, "
+                "groupingSymbolHex is %{public}s.", groupingSymbolHex.c_str());
+            return numberPattern;
+        }
+    }
+
+    std::string decimalSymbolHex = hex.substr(SYMBOL_HEX_LEN);
+    std::string decimalSymbol = HexToStr(decimalSymbolHex);
+    if (decimalSymbol.empty()) {
+        HILOG_ERROR_I18N("LocaleConfig::HexToNumberPattern: Get decimalSymbol failed, "
+            "decimalSymbolHex is %{public}s.", decimalSymbolHex.c_str());
+        return numberPattern;
+    }
+    numberPattern.first = groupingSymbol;
+    numberPattern.second = decimalSymbol;
+    return numberPattern;
 }
 
 #ifdef SUPPORT_GRAPHICS
@@ -1951,9 +2208,14 @@ std::string LocaleConfig::UpdateLanguageOfLocale(const std::string &languageTag)
     std::string extendParamTag;
     systemLocaleTag = LocaleConfig::ModifyExtParam(systemLocaleTag, CASE_FIRST_KEY, "", STANDARD_EXT_PARAM_KEY);
     systemLocaleTag = LocaleConfig::ModifyExtParam(systemLocaleTag, COLLATION_KEY, "", STANDARD_EXT_PARAM_KEY);
-    std::vector<std::pair<size_t, std::string>> positons = GetExtParamPositions(systemLocaleTag);
-    if (positons[0].first != std::string::npos) {
-        extendParamTag = systemLocaleTag.substr(positons[0].first);
+    systemLocaleTag = LocaleConfig::ModifyExtParam(systemLocaleTag, NUMBER_SYSTEM_KEY, "", STANDARD_EXT_PARAM_KEY);
+    std::string numberPattern = LocaleConfig::QueryExtParam(systemLocaleTag, NUNBER_PATTERN_KEY, CUST_EXT_PARAM_KEY);
+    if (NumberPatternToDescription.find(numberPattern) != NumberPatternToDescription.end()) {
+        systemLocaleTag = LocaleConfig::ModifyExtParam(systemLocaleTag, NUNBER_PATTERN_KEY, "", CUST_EXT_PARAM_KEY);
+    }
+    std::vector<std::pair<size_t, std::string>> positions = GetExtParamPositions(systemLocaleTag);
+    if (positions[0].first != std::string::npos) {
+        extendParamTag = systemLocaleTag.substr(positions[0].first);
     }
     // Combine above elements.
     return CreateLocale(langTag, scriptTag, regionTag, extendParamTag);
@@ -1985,9 +2247,9 @@ std::string LocaleConfig::UpdateRegionOfLocale(const std::string &regionTag)
         return CreateLocaleFromRegion(regionTag);
     }
     std::string extParam;
-    std::vector<std::pair<size_t, std::string>> positons = GetExtParamPositions(localeTag);
-    if (positons[0].first != std::string::npos) {
-        extParam = localeTag.substr(positons[0].first);
+    std::vector<std::pair<size_t, std::string>> positions = GetExtParamPositions(localeTag);
+    if (positions[0].first != std::string::npos) {
+        extParam = localeTag.substr(positions[0].first);
     }
     // combine locale with origin locale's language and script with regionTag.
     UErrorCode status = U_ZERO_ERROR;
@@ -2009,6 +2271,10 @@ std::string LocaleConfig::UpdateRegionOfLocale(const std::string &regionTag)
         return localeTag;
     }
     ret += extParam;
+    std::string numberPattern = LocaleConfig::QueryExtParam(ret, NUNBER_PATTERN_KEY, CUST_EXT_PARAM_KEY);
+    if (NumberPatternToDescription.find(numberPattern) != NumberPatternToDescription.end()) {
+        ret = LocaleConfig::ModifyExtParam(ret, NUNBER_PATTERN_KEY, "", CUST_EXT_PARAM_KEY);
+    }
     return ret;
 }
 
@@ -2069,9 +2335,9 @@ std::string LocaleConfig::ModifyExtParam(const std::string& locale, const std::s
     }
     std::unordered_map<std::string, std::string> paramMap;
     std::string localeBase = locale;
-    std::vector<std::pair<size_t, std::string>> positons = GetExtParamPositions(locale);
-    if (positons[0].first != std::string::npos) {
-        localeBase = locale.substr(0, positons[0].first);
+    std::vector<std::pair<size_t, std::string>> positions = GetExtParamPositions(locale);
+    if (positions[0].first != std::string::npos) {
+        localeBase = locale.substr(0, positions[0].first);
     }
     std::unordered_map<std::string, std::unordered_map<std::string, std::string>> extParamMap =
         ParseAllExtParam(locale);
@@ -2084,16 +2350,16 @@ std::unordered_map<std::string, std::unordered_map<std::string, std::string>> Lo
     std::string locale)
 {
     std::unordered_map<std::string, std::unordered_map<std::string, std::string>> allExtParamMap;
-    std::vector<std::pair<size_t, std::string>> positons = GetExtParamPositions(locale);
-    std::reverse(positons.begin(),positons.end());
-    for (size_t i = 0; i < positons.size(); i++) {
-        size_t pos = positons[i].first;
+    std::vector<std::pair<size_t, std::string>> positions = GetExtParamPositions(locale);
+    std::reverse(positions.begin(), positions.end());
+    for (size_t i = 0; i < positions.size(); i++) {
+        size_t pos = positions[i].first;
         if (pos == std::string::npos) {
             continue;
         }
         std::string extParam = locale.substr(pos);
         locale = locale.substr(0, pos);
-        std::string extParamKey = positons[i].second;
+        std::string extParamKey = positions[i].second;
         std::unordered_map<std::string, std::string> extParamMap = ParseExtParam(extParam, extParamKey);
         allExtParamMap.insert(std::make_pair(extParamKey, extParamMap));
     }
@@ -2192,6 +2458,17 @@ std::vector<std::pair<size_t, std::string>> LocaleConfig::GetExtParamPositions(c
     result.emplace_back(std::make_pair(standardPosition, STANDARD_EXT_PARAM_KEY));
     result.emplace_back(std::make_pair(custPosition, CUST_EXT_PARAM_KEY));
     return result;
+}
+
+std::string LocaleConfig::GetNumberingSystemDigit(const std::string& NumberingSystem)
+{
+    auto it = NumberingSystemNameToDescription.find(NumberingSystem);
+    if (it == NumberingSystemNameToDescription.end()) {
+        HILOG_ERROR_I18N("LocaleConfig::GetNumberingSystemDigit: NumberingSystem is %{public}s.",
+            NumberingSystem.c_str());
+        return "";
+    }
+    return it->second;
 }
 
 std::string LocaleConfig::GetSimplifiedLanguage(const std::string& languageTag, int32_t &code)

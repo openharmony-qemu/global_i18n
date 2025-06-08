@@ -598,6 +598,103 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest025, TestSize.Level1)
     LocaleConfig::SetSystemLanguage(systemLanguage);
     LocaleConfig::SetSystemLocale(systemLocale);
 }
+
+/**
+ * @tc.name: LocaleConfigFuncTest026
+ * @tc.desc: Test LocaleConfig numbering system
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest026, TestSize.Level1)
+{
+    std::string systemLanguage = LocaleConfig::GetSystemLanguage();
+    std::string systemLocale = LocaleConfig::GetSystemLocale();
+    LocaleConfig::SetSystemLanguage("ur");
+    LocaleConfig::SetSystemLocale("ur-CN");
+    std::unordered_map<std::string, std::string> systemNumberingSystems;
+    I18nErrorCode errCode = LocaleConfig::GetSystemNumberingSystems(systemNumberingSystems);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    EXPECT_TRUE(systemNumberingSystems.find("arabext") != systemNumberingSystems.end());
+    EXPECT_TRUE(systemNumberingSystems.find("latn") != systemNumberingSystems.end());
+
+    std::string usingNumberingSystem;
+    errCode = LocaleConfig::GetUsingNumberingSystem(usingNumberingSystem);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    EXPECT_EQ(usingNumberingSystem, "latn");
+    std::string systemLocaleInstanceTag = LocaleConfig::GetSystemLocaleInstanceTag();
+    EXPECT_EQ(systemLocaleInstanceTag, "ur-CN");
+
+    errCode = LocaleConfig::SetSystemNumberingSystem("latn");
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    errCode = LocaleConfig::GetUsingNumberingSystem(usingNumberingSystem);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    EXPECT_EQ(usingNumberingSystem, "latn");
+    systemLocaleInstanceTag = LocaleConfig::GetSystemLocaleInstanceTag();
+    EXPECT_EQ(systemLocaleInstanceTag, "ur-CN-u-nu-latn");
+
+    errCode = LocaleConfig::SetSystemNumberingSystem("arab");
+    EXPECT_EQ(errCode, I18nErrorCode::INVALID_PARAM);
+
+    LocaleConfig::SetSystemLanguage(systemLanguage);
+    LocaleConfig::SetSystemLocale(systemLocale);
+}
+
+/**
+ * @tc.name: LocaleConfigFuncTest027
+ * @tc.desc: Test LocaleConfig number pattern
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest027, TestSize.Level1)
+{
+    std::string systemLanguage = LocaleConfig::GetSystemLanguage();
+    std::string systemLocale = LocaleConfig::GetSystemLocale();
+    LocaleConfig::SetSystemLanguage("zh-Hans");
+    LocaleConfig::SetSystemRegion("CN");
+    std::unordered_map<std::string, std::string> systemNumberPatterns;
+    I18nErrorCode errCode = LocaleConfig::GetSystemNumberPatterns(systemNumberPatterns);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    EXPECT_TRUE(systemNumberPatterns.find("002c002e") != systemNumberPatterns.end());
+    EXPECT_TRUE(systemNumberPatterns.find("0000002e") != systemNumberPatterns.end());
+    EXPECT_TRUE(systemNumberPatterns.find("002e002c") != systemNumberPatterns.end());
+    EXPECT_TRUE(systemNumberPatterns.find("0000002c") != systemNumberPatterns.end());
+
+    std::string usingNumberPattern;
+    errCode = LocaleConfig::GetUsingNumberPattern(usingNumberPattern);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    EXPECT_EQ(usingNumberPattern, "002c002e");
+
+    errCode = LocaleConfig::SetSystemNumberPattern("0000002c");
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    errCode = LocaleConfig::GetUsingNumberPattern(usingNumberPattern);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    EXPECT_EQ(usingNumberPattern, "0000002c");
+ 
+    errCode = LocaleConfig::SetSystemNumberingSystem("002d002f");
+    EXPECT_EQ(errCode, I18nErrorCode::INVALID_PARAM);
+
+    LocaleConfig::SetSystemLanguage(systemLanguage);
+    LocaleConfig::SetSystemLocale(systemLocale);
+}
+
+/**
+ * @tc.name: LocaleConfigFuncTest028
+ * @tc.desc: Test LocaleConfig
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest028, TestSize.Level1)
+{
+    std::string localeTag = "zh-Hans-CN-x-np-002c002e";
+    std::pair<std::string, std::string> numberPattern = LocaleConfig::GetNumberPatternFromLocale(localeTag);
+    EXPECT_EQ(numberPattern.first, ",");
+    EXPECT_EQ(numberPattern.second, ".");
+    std::string removedLocale = LocaleConfig::RemoveCustExtParam(localeTag);
+    EXPECT_EQ(removedLocale, "zh-Hans-CN");
+    std::string modifiedLocale = LocaleConfig::ModifyExtParam(localeTag, "np", "0000002c", "-x-");
+    EXPECT_EQ(modifiedLocale, "zh-Hans-CN-x-np-0000002c");
+    std::string extParam = LocaleConfig::QueryExtParam(localeTag, "np", "-x-");
+    EXPECT_EQ(extParam, "002c002e");
+    std::string numberingSystemDigit = LocaleConfig::GetNumberingSystemDigit("latn");
+    EXPECT_EQ(numberingSystemDigit, "0123456789");
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

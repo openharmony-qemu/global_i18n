@@ -20,6 +20,7 @@
 #include <filesystem>
 #include <fstream>
 #include <openssl/pem.h>
+#include <openssl/rsa.h>
 #include <openssl/sha.h>
 #include <sstream>
 #include <unistd.h>
