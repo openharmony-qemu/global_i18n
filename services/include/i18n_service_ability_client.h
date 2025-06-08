@@ -129,6 +129,55 @@ public:
      */
     static I18nErrorCode SetSystemCollation(const std::string& identifier);
 
+    /**
+     * @brief Gets numbering systems supported by system locale.
+     *
+     * @param systemNumberingSystems a map will containing the numbering system's identifier and sample.
+     * @return I18nErrorCode Return SUCCESS indicates that the getting was successful.
+     */
+    static I18nErrorCode GetSystemNumberingSystems(
+        std::unordered_map<std::string, std::string>& systemNumberingSystems);
+
+    /**
+     * @brief Gets numbering system currently used by system locale.
+     *
+     * @param usingNumberingSystem the numbering systems's identifier
+     * @return I18nErrorCode Return SUCCESS indicates that the getting was successful.
+     */
+    static I18nErrorCode GetUsingNumberingSystem(std::string& usingNumberingSystem);
+
+    /**
+     * @brief Sets the numbering system used by the system locale.
+     *
+     * @param identifier Identifier of the numbering system.
+     * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
+     */
+    static I18nErrorCode SetSystemNumberingSystem(const std::string& identifier);
+
+    /**
+     * @brief Gets commonly used number patterns for system locale.
+     *
+     * @param systemNumberPatterns a map containing the used number patterns and example of system locale.
+     * @return I18nErrorCode Return SUCCESS indicates that the getting was successful.
+     */
+    static I18nErrorCode GetSystemNumberPatterns(std::unordered_map<std::string, std::string>& systemNumberPatterns);
+
+    /**
+     * @brief Gets number pattern used by system locale.
+     *
+     * @param usingNumberPattern The number pattern identifier used by system locale.
+     * @return I18nErrorCode Return SUCCESS indicates that the getting was successful.
+     */
+    static I18nErrorCode GetUsingNumberPattern(std::string& usingNumberPattern);
+
+    /**
+     * @brief Sets the number pattern used by the system locale.
+     *
+     * @param pattern Identifier of the number pattern.
+     * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
+     */
+    static I18nErrorCode SetSystemNumberPattern(const std::string& pattern);
+
     static std::string GetLanguageFromUserId(int32_t userId);
 
 private:

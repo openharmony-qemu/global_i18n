@@ -60,11 +60,13 @@ void LocaleInfo::InitLocaleInfo(const std::string &localeTag, const std::map<std
     UErrorCode status = U_ZERO_ERROR;
     configs = configMap;
     if (!localeTag.empty()) {
-        ComputeFinalLocaleTag(localeTag);
+        std::string curLocale = LocaleConfig::RemoveCustExtParam(localeTag);
+        ComputeFinalLocaleTag(curLocale);
         locale = icu::Locale::forLanguageTag(icu::StringPiece(finalLocaleTag), status);
     }
     if (localeTag.empty() || U_FAILURE(status)) {
         std::string defaultLocaleTag = LocaleConfig::GetEffectiveLocale();
+        defaultLocaleTag = LocaleConfig::RemoveCustExtParam(defaultLocaleTag);
         ResetFinalLocaleStatus();
         ComputeFinalLocaleTag(defaultLocaleTag);
         status = U_ZERO_ERROR;

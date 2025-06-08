@@ -94,6 +94,12 @@ private:
     static napi_value GetSystemCollations(napi_env env, napi_callback_info info);
     static napi_value GetUsingCollation(napi_env env, napi_callback_info info);
     static napi_value SetSystemCollation(napi_env env, napi_callback_info info);
+    static napi_value GetSystemNumberingSystems(napi_env env, napi_callback_info info);
+    static napi_value GetUsingNumberingSystem(napi_env env, napi_callback_info info);
+    static napi_value SetSystemNumberingSystem(napi_env env, napi_callback_info info);
+    static napi_value GetSystemNumberPatterns(napi_env env, napi_callback_info info);
+    static napi_value GetUsingNumberPattern(napi_env env, napi_callback_info info);
+    static napi_value SetSystemNumberPattern(napi_env env, napi_callback_info info);
     static const std::string NAME_OF_TEMPERATURE;
     static const std::string TYPE_OF_TEMPERATURE;
     static const std::string NAME_OF_WEEKDAY;

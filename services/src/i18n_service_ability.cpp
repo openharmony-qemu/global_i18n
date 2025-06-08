@@ -295,6 +295,120 @@ ErrCode I18nServiceAbility::SetSystemCollation(const std::string& identifier, in
     return ERR_OK;
 }
 
+ErrCode I18nServiceAbility::GetSystemNumberingSystems(
+    std::unordered_map<std::string, std::string>& systemNumberingSystems, int32_t& code)
+{
+    int pid = getpid();
+    StartTask(pid);
+    I18nErrorCode errCode = CheckSystemPermission();
+    if (errCode != I18nErrorCode::SUCCESS) {
+        HILOG_ERROR_I18N("I18nServiceAbility::GetSystemNumberingSystems: Check system permission failed.");
+        code = static_cast<int32_t>(errCode);
+        FinishTask(pid);
+        return ERR_OK;
+    }
+    errCode = LocaleConfig::GetSystemNumberingSystems(systemNumberingSystems);
+    code = static_cast<int32_t>(errCode);
+    FinishTask(pid);
+    return ERR_OK;
+}
+
+ErrCode I18nServiceAbility::GetUsingNumberingSystem(std::string& usingNumberingSystem, int32_t& code)
+{
+    int pid = getpid();
+    StartTask(pid);
+    I18nErrorCode errCode = CheckSystemPermission();
+    if (errCode != I18nErrorCode::SUCCESS) {
+        HILOG_ERROR_I18N("I18nServiceAbility::GetUsingNumberingSystem: Check system permission failed.");
+        code = static_cast<int32_t>(errCode);
+        FinishTask(pid);
+        return ERR_OK;
+    }
+    errCode = LocaleConfig::GetUsingNumberingSystem(usingNumberingSystem);
+    code = static_cast<int32_t>(errCode);
+    FinishTask(pid);
+    return ERR_OK;
+}
+
+ErrCode I18nServiceAbility::SetSystemNumberingSystem(const std::string& identifier, int32_t& code)
+{
+    int pid = getpid();
+    StartTask(pid);
+    I18nErrorCode errCode = CheckPermission();
+    if (errCode != I18nErrorCode::SUCCESS) {
+        HILOG_ERROR_I18N("I18nServiceAbility::SetSystemNumberingSystem: Check permission failed.");
+        code = static_cast<int32_t>(errCode);
+        FinishTask(pid);
+        return ERR_OK;
+    }
+#ifdef SUPPORT_MULTI_USER
+    int32_t userId = GetCallingUserId();
+    errCode = LocaleConfig::SetSystemNumberingSystem(identifier, userId);
+#else
+    errCode = LocaleConfig::SetSystemNumberingSystem(identifier);
+#endif
+    code = static_cast<int32_t>(errCode);
+    FinishTask(pid);
+    return ERR_OK;
+}
+
+ErrCode I18nServiceAbility::GetSystemNumberPatterns(std::unordered_map<std::string, std::string>& systemNumberPatterns,
+    int32_t& code)
+{
+    int pid = getpid();
+    StartTask(pid);
+    I18nErrorCode errCode = CheckSystemPermission();
+    if (errCode != I18nErrorCode::SUCCESS) {
+        HILOG_ERROR_I18N("I18nServiceAbility::GetSystemNumberPatterns: Check system permission failed.");
+        code = static_cast<int32_t>(errCode);
+        FinishTask(pid);
+        return ERR_OK;
+    }
+    errCode = LocaleConfig::GetSystemNumberPatterns(systemNumberPatterns);
+    code = static_cast<int32_t>(errCode);
+    FinishTask(pid);
+    return ERR_OK;
+}
+
+ErrCode I18nServiceAbility::GetUsingNumberPattern(std::string& usingNumberPattern, int32_t& code)
+{
+    int pid = getpid();
+    StartTask(pid);
+    I18nErrorCode errCode = CheckSystemPermission();
+    if (errCode != I18nErrorCode::SUCCESS) {
+        HILOG_ERROR_I18N("I18nServiceAbility::GetUsingNumberPattern: Check system permission failed.");
+        code = static_cast<int32_t>(errCode);
+        FinishTask(pid);
+        return ERR_OK;
+    }
+    errCode = LocaleConfig::GetUsingNumberPattern(usingNumberPattern);
+    code = static_cast<int32_t>(errCode);
+    FinishTask(pid);
+    return ERR_OK;
+}
+
+ErrCode I18nServiceAbility::SetSystemNumberPattern(const std::string& pattern, int32_t& code)
+{
+    int pid = getpid();
+    StartTask(pid);
+    I18nErrorCode errCode = CheckPermission();
+    if (errCode != I18nErrorCode::SUCCESS) {
+        HILOG_ERROR_I18N("I18nServiceAbility::SetSystemNumberPattern: Check permission failed.");
+        code = static_cast<int32_t>(errCode);
+        FinishTask(pid);
+        return ERR_OK;
+    }
+#ifdef SUPPORT_MULTI_USER
+    int32_t userId = GetCallingUserId();
+    errCode = LocaleConfig::SetSystemNumberPattern(pattern, userId);
+#else
+    errCode = LocaleConfig::SetSystemNumberPattern(pattern);
+#endif
+    code = static_cast<int32_t>(errCode);
+    FinishTask(pid);
+    return ERR_OK;
+}
+
 ErrCode I18nServiceAbility::GetLanguageFromUserId(int32_t userId, std::string& language)
 {
     int pid = getpid();
