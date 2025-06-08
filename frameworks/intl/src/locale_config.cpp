@@ -104,8 +104,6 @@ const std::string LocaleConfig::COLLATION_KEY = "co";
 const std::string LocaleConfig::NUNBER_PATTERN_KEY = "np";
 const std::string LocaleConfig::TIMEZONE_KEY = "persist.time.timezone";
 const std::string LocaleConfig::DEFAULT_TIMEZONE = "GMT";
-const std::string LocaleConfig::PSEUDO_REGION_XA = "XA";
-const std::string LocaleConfig::PSEUDO_REGION_XB = "XB";
 const std::string LocaleConfig::DEFAULT_NUMBERING_SYSTEM_NAME = "latn";
 unordered_set<string> LocaleConfig::supportedLocales;
 unordered_set<string> LocaleConfig::supportedLocalesV15;
@@ -964,7 +962,10 @@ string LocaleConfig::GetMainLanguage(const string &language,
 
 string LocaleConfig::GetDisplayLanguage(const string &language, const string &displayLocale, bool sentenceCase)
 {
-    std::string result;
+    std::string result = GetPseudoDisplayLanguage(language);
+    if (!result.empty()) {
+        return result;
+    }
     string adjust = Adjust(language);
     if (adjust == language) {
         UErrorCode status = U_ZERO_ERROR;
@@ -996,6 +997,17 @@ string LocaleConfig::GetDisplayLanguage(const string &language, const string &di
         return PseudoLocalizationProcessor(result.replace(0, 1, 1, ch));
     }
     return PseudoLocalizationProcessor(result);
+}
+
+std::string LocaleConfig::GetPseudoDisplayLanguage(const std::string &language)
+{
+    if (language.compare("en-XA") == 0) {
+        return "[Pseudo locale]";
+    }
+    if (language.compare("ar-XB") == 0) {
+        return "[Bidirection test locale]";
+    }
+    return "";
 }
 
 std::string LocaleConfig::ComputeLocale(const std::string &displayLocale)
@@ -2193,7 +2205,6 @@ std::string LocaleConfig::UpdateLanguageOfLocale(const std::string &languageTag)
         return systemLocaleTag;
     }
     std::string regionTag = systemLocale.getCountry();
-    regionTag = GetPseudoCountryTag(languageLocale.getCountry(), regionTag);
     std::string extendParamTag;
     systemLocaleTag = LocaleConfig::ModifyExtParam(systemLocaleTag, CASE_FIRST_KEY, "", STANDARD_EXT_PARAM_KEY);
     systemLocaleTag = LocaleConfig::ModifyExtParam(systemLocaleTag, COLLATION_KEY, "", STANDARD_EXT_PARAM_KEY);
@@ -2208,20 +2219,6 @@ std::string LocaleConfig::UpdateLanguageOfLocale(const std::string &languageTag)
     }
     // Combine above elements.
     return CreateLocale(langTag, scriptTag, regionTag, extendParamTag);
-}
-
-std::string LocaleConfig::GetPseudoCountryTag(const char* countryTag, std::string &regionTag)
-{
-    if (countryTag == nullptr) {
-        return regionTag;
-    }
-    if (PSEUDO_REGION_XA.compare(countryTag) == 0) {
-        return PSEUDO_REGION_XA;
-    }
-    if (PSEUDO_REGION_XB.compare(countryTag) == 0) {
-        return PSEUDO_REGION_XB;
-    }
-    return regionTag;
 }
 
 std::string LocaleConfig::CreateLocale(const std::string &languageTag, const std::string &scriptTag,

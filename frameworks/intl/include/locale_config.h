@@ -278,8 +278,6 @@ private:
     static const std::string CASE_FIRST_KEY;
     static const std::string COLLATION_KEY;
     static const std::string NUNBER_PATTERN_KEY;
-    static const std::string PSEUDO_REGION_XA;
-    static const std::string PSEUDO_REGION_XB;
     static const std::string DEFAULT_NUMBERING_SYSTEM_NAME;
 
     static const std::unordered_set<std::string>& GetSupportedLocales();
@@ -307,7 +305,6 @@ private:
     static bool Is24HourLocale(const std::string& systemLocale);
     static bool HasDesignator(const std::string& inFormat, const char designator);
     static void QueryUpgradeLocale();
-    static std::string GetPseudoCountryTag(const char* countryTag, std::string &regionTag);
     static std::string GetUnicodeWrappedFilePathInner(const std::string &path, const char delimiter,
         const std::string& localeTag, std::string &invalidField);
     static I18nErrorCode GetSystemNumberingSystemsFromLanguage(const std::string& language,
@@ -394,6 +391,7 @@ private:
     static void ExtendWhiteLanguages();
     static void ExtendLanguageWithScript(const std::string &languageStr);
     static __attribute__((destructor)) void CleanupXmlResources();
+    static std::string GetPseudoDisplayLanguage(const std::string &language);
     static std::unordered_set<std::string> supportedLocales;
     static std::unordered_set<std::string> supportedLocalesV15;
     static std::unordered_set<std::string> supportedRegions;
