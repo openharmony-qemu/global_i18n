@@ -193,10 +193,10 @@ private:
     void AddFormatParts(std::string typeString, std::vector<std::vector<std::string>> &result,
         icu::UnicodeString &formatResult, int32_t start, int32_t end);
     std::string GetSubString(icu::UnicodeString &formatResult, int32_t start, int32_t end);
-    std::string GetNumberFieldType(std::string napiType, int32_t fieldId, double number);
-    icu::number::FormattedNumber FormatDecimalToFormattedNumber(std::string number);
+    std::string GetNumberFieldType(const std::string &napiType, const int32_t &fieldId, const double &number);
+    icu::number::FormattedNumber FormatDecimalToFormattedNumber(const std::string &number);
     void FormattedNumberParts(icu::number::FormattedNumber &formattedNumber,
-        std::vector<std::vector<std::string>> &result, const std::string &napiType, double number);
+        std::vector<std::vector<std::string>> &result, const std::string &napiType, const double &number);
     void FindAllFormatParts(icu::FormattedValue &formattedNumber, std::vector<std::vector<std::string>> &result,
         double number, const std::string &napiType, icu::UnicodeString &formatResult);
     void SetEveryFormatPartItem(icu::ConstrainedFieldPosition &cfpo, icu::UnicodeString &formatResult,

@@ -460,6 +460,7 @@ napi_value JSNumberFormatAddon::SupportedLocalesOf(napi_env env, napi_callback_i
     napi_value thisVar = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (status != napi_ok) {
+        HILOG_ERROR_I18N("JSNumberFormatAddon::SupportedLocalesOf: Get parameter info failed");
         return nullptr;
     }
     std::vector<std::string> localeTags;

@@ -673,7 +673,8 @@ void NumberFormat::FormatToParts(double number, std::vector<std::vector<std::str
 }
 
 void NumberFormat::FormattedNumberParts(icu::number::FormattedNumber &formattedNumber,
-    std::vector<std::vector<std::string>> &result, const std::string &napiType, double number)
+    std::vector<std::vector<std::string>> &result, const std::string &napiType,
+    const double &number)
 {
     UErrorCode status = U_ZERO_ERROR;
     icu::UnicodeString formatResult = formattedNumber.toString(status);
@@ -696,7 +697,8 @@ void NumberFormat::FindAllFormatParts(icu::FormattedValue &formattedNumber,
     struct FormatPartParam param = {previousLimit, lastFieldGroup, groupLeapLength, number, napiType};
     while (formattedNumber.nextPosition(cfpo, status)) {
         if (U_FAILURE(status)) {
-            HILOG_ERROR_I18N("NumberFormat::FormatToParts: Get next position failed.");
+            HILOG_ERROR_I18N("NumberFormat::FindAllFormatParts: Get next position failed.");
+            result.clear();
             return;
         }
         SetEveryFormatPartItem(cfpo, formatResult, result, param);
@@ -752,7 +754,8 @@ void NumberFormat::SetEveryFormatPartItem(icu::ConstrainedFieldPosition &cfpo, i
     param.previousLimit = limit;
 }
 
-std::string NumberFormat::GetNumberFieldType(std::string napiType, int32_t fieldId, double number)
+std::string NumberFormat::GetNumberFieldType(const std::string &napiType,
+    const int32_t &fieldId, const double &number)
 {
     UNumberFormatFields formatField = static_cast<UNumberFormatFields>(fieldId);
     if (numberFormatFieldMap.find(formatField) != numberFormatFieldMap.end()) {
@@ -825,7 +828,7 @@ bool NumberFormat::IsRelativeTimeFormat(double number, std::string &unitForConve
     return false;
 }
 
-icu::number::FormattedNumber NumberFormat::FormatDecimalToFormattedNumber(std::string number)
+icu::number::FormattedNumber NumberFormat::FormatDecimalToFormattedNumber(const std::string &number)
 {
     if (!createSuccess) {
         return {};
@@ -834,6 +837,7 @@ icu::number::FormattedNumber NumberFormat::FormatDecimalToFormattedNumber(std::s
     icu::number::FormattedNumber formattedNumber =
         numberFormat.formatDecimal(icu::StringPiece(number), status);
     if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("FormatDecimalToFormattedNumber: format %{public}s failed.", number.c_str());
         return {};
     }
     return formattedNumber;
@@ -1314,12 +1318,12 @@ std::string NumberFormat::GetIcuDefaultLocale()
 std::string NumberFormat::CheckParamLocales(std::vector<std::string> &localeArray)
 {
     for (auto iter = localeArray.begin(); iter != localeArray.end(); ++iter) {
-        UErrorCode status = U_ZERO_ERROR;
         std::string localeId = *iter;
         if (localeId.empty()) {
             HILOG_ERROR_I18N("NumberFormat::CheckParamLocales: locale is empty");
             return "invalid locale";
         }
+        UErrorCode status = U_ZERO_ERROR;
         icu::Locale locale = icu::Locale::forLanguageTag(icu::StringPiece(localeId), status);
         if (U_FAILURE(status)) {
             HILOG_ERROR_I18N("NumberFormat::CheckParamLocales: locale %{public}s invalid", localeId.c_str());
