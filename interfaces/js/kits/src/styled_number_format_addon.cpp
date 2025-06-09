@@ -78,14 +78,18 @@ napi_value StyledNumberFormatAddon::constructor(napi_env env, napi_callback_info
         ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, "numberFormat", true);
         return nullptr;
     }
-
+    NumberFormatAddon *numberFormatAddon = nullptr;
     JSNumberFormatAddon *jsNumberFormatAddon = nullptr;
     SimpleNumberFormatAddon *simpleNumberFormatAddon = nullptr;
 
-    GetNumberFmtOrSimpleNumberFmt(env, argv[0], &jsNumberFormatAddon, &simpleNumberFormatAddon);
+    GetNumberFmtOrSimpleNumberFmt(env, argv[0], &jsNumberFormatAddon, &simpleNumberFormatAddon, &numberFormatAddon);
 
-    if (!jsNumberFormatAddon && !simpleNumberFormatAddon) {
+    if (!numberFormatAddon && !simpleNumberFormatAddon) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "numberFormat", "intl.NumberFormat or SimpleNumberFormat", true);
+        return nullptr;
+    }
+    if (!jsNumberFormatAddon) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "numberFormat", "Intl.NumberFormatt", true);
         return nullptr;
     }
 
@@ -99,7 +103,8 @@ napi_value StyledNumberFormatAddon::constructor(napi_env env, napi_callback_info
         HILOG_ERROR_I18N("StyledNumberFormatAddon::constructor napi_wrap error");
         return nullptr;
     }
-    if (!obj->InitStyledNumberFormatContent(env, jsNumberFormatAddon, simpleNumberFormatAddon, argv[1])) {
+    if (!obj->InitStyledNumberFormatContent(env, jsNumberFormatAddon, simpleNumberFormatAddon,
+        numberFormatAddon, argv[1])) {
         return nullptr;
     }
     obj.release();
@@ -150,11 +155,14 @@ napi_value StyledNumberFormatAddon::Format(napi_env env, napi_callback_info info
 }
 
 bool StyledNumberFormatAddon::InitStyledNumberFormatContent(napi_env env, JSNumberFormatAddon* jsNumberFormatAddon,
-    SimpleNumberFormatAddon* simpleNumberFormatAddon, napi_value options)
+    SimpleNumberFormatAddon* simpleNumberFormatAddon, NumberFormatAddon *numberFormatAddon, napi_value options)
 {
     if (jsNumberFormatAddon) {
         styledNumberFormat_ =
             std::make_unique<StyledNumberFormat>(true, jsNumberFormatAddon->CopyNumberFormat(), nullptr);
+    } else if (numberFormatAddon) {
+        styledNumberFormat_ =
+            std::make_unique<StyledNumberFormat>(true, numberFormatAddon->CopyNumberFormat(), nullptr);
     } else if (simpleNumberFormatAddon) {
         styledNumberFormat_ =
             std::make_unique<StyledNumberFormat>(false, nullptr, simpleNumberFormatAddon->CopySimpleNumberFormat());
@@ -320,7 +328,8 @@ void StyledNumberFormatAddon::SetNamedProperty(napi_env env, napi_value &option,
 }
 
 void StyledNumberFormatAddon::GetNumberFmtOrSimpleNumberFmt(napi_env env, napi_value arg,
-    JSNumberFormatAddon **jsNumberformataddon, SimpleNumberFormatAddon **simpleNumberFormatAddon)
+    JSNumberFormatAddon **jsNumberformatAddon, SimpleNumberFormatAddon **simpleNumberFormatAddon,
+    NumberFormatAddon **numberFormatAddon)
 {
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_status status = napi_typeof(env, arg, &valueType);
@@ -331,37 +340,48 @@ void StyledNumberFormatAddon::GetNumberFmtOrSimpleNumberFmt(napi_env env, napi_v
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "intl.NumberFormat or SimpleNumberFormat", "", true);
         return;
     }
-
-    napi_value numFmtConstructor = nullptr;
-    napi_value intlModule;
-    status = napi_load_module(env, "Intl", &intlModule);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("StyledNumberFormatAddon::constructor Failed to get intl module.");
-        return;
-    }
-    status = napi_get_named_property(env, intlModule, "NumberFormat", &numFmtConstructor);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("StyledNumberFormatAddon::constructo: get NumberFormat  constructor failed");
-        return;
-    }
-
-    bool isJsNumberFormat = true;
-    status = napi_instanceof(env, arg, numFmtConstructor, &isJsNumberFormat);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("StyledNumberFormatAddon::constructor Failed to get instance of argv 0.");
-        return;
-    }
+    bool isNumberFormat = IsNumberFormatInstance(env, arg, "@ohos.intl");
+    bool isJsNumberFormat = IsNumberFormatInstance(env, arg, "Intl");
+   
     if (isJsNumberFormat) {
-        status = napi_unwrap(env, arg, reinterpret_cast<void **>(jsNumberformataddon));
-        if (status != napi_ok) {
-            *jsNumberformataddon = nullptr;
+        status = napi_unwrap(env, arg, reinterpret_cast<void **>(jsNumberformatAddon));
+        if (status != napi_ok && jsNumberformatAddon != nullptr) {
+            *jsNumberformatAddon = nullptr;
+        }
+    } else if (isNumberFormat) {
+        status = napi_unwrap(env, arg, reinterpret_cast<void **>(numberFormatAddon));
+        if (status != napi_ok && numberFormatAddon != nullptr) {
+            *numberFormatAddon = nullptr;
         }
     } else {
         status = napi_unwrap(env, arg, reinterpret_cast<void **>(simpleNumberFormatAddon));
-        if (status != napi_ok) {
+        if (status != napi_ok && simpleNumberFormatAddon != nullptr) {
             *simpleNumberFormatAddon = nullptr;
         }
     }
+}
+
+bool StyledNumberFormatAddon::IsNumberFormatInstance(napi_env env, napi_value arg, const std::string &moduleName)
+{
+    napi_value numFmtConstructor = nullptr;
+    napi_value intlModule;
+    napi_status status = napi_load_module(env, moduleName, &intlModule);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("StyledNumberFormatAddon::IsNumberFormatInstance Failed to get %{public}s module.", moduleName.c_str());
+        return false;
+    }
+    status = napi_get_named_property(env, intlModule, "NumberFormat", &numFmtConstructor);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("StyledNumberFormatAddon::IsNumberFormatInstance: get NumberFormat  constructor failed");
+        return false;
+    }
+    bool isInstance = true;
+    status = napi_instanceof(env, arg, numFmtConstructor, &isInstance);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("StyledNumberFormatAddon::IsNumberFormatInstance Failed to get instance of argv 0.");
+        return false;
+    }
+    return isInstance;
 }
 } // namespace I18n
 } // namespace Global
