@@ -653,14 +653,20 @@ void NumberFormat::FormatToParts(std::vector<std::vector<std::string>> &result)
     FormattedNumberParts(formattedNumber, result, "nan", number);
 }
 
-void NumberFormat::FormatBigIntToParts(std::string number, std::vector<std::vector<std::string>> &result)
+void NumberFormat::FormatBigIntToParts(std::string &number, std::vector<std::vector<std::string>> &result)
 {
     icu::number::FormattedNumber formattedNumber = FormatDecimalToFormattedNumber(number);
+    double numDouble = GetBigIntFieldType(number);
+    FormattedNumberParts(formattedNumber, result, "bigint", numDouble);
+}
+
+double NumberFormat::GetBigIntFieldType(const std::string &bigintStr)
+{
     double numDouble = 0;
-    if (!number.empty() && number.at(0) == '-') {
+    if (!bigintStr.empty() && bigintStr.at(0) == '-') {
         numDouble = -1.0; // -1 just means number is negative
     }
-    FormattedNumberParts(formattedNumber, result, "bigint", numDouble);
+    return numDouble;
 }
 
 void NumberFormat::FormatToParts(double number, std::vector<std::vector<std::string>> &result)
@@ -702,6 +708,41 @@ void NumberFormat::FindAllFormatParts(icu::FormattedValue &formattedNumber,
             HILOG_ERROR_I18N("NumberFormat::FindAllFormatParts: Get next position failed.");
             result.clear();
             return;
+        }
+        SetEveryFormatPartItem(cfpo, formatResult, result, param);
+    }
+    if (formatResult.length() > param.previousLimit) {
+        std::string typeString = "literal";
+        AddFormatParts(typeString, result, formatResult, param.previousLimit, formatResult.length());
+    }
+}
+
+void NumberFormat::FindAllFormatParts(icu::FormattedValue &formattedNumber,
+    std::vector<std::vector<std::string>> &result, FormatRangeArgItem &first,
+    FormatRangeArgItem &second, icu::UnicodeString &formatResult)
+{
+    icu::ConstrainedFieldPosition cfpo;
+    int previousLimit = 0;
+    bool lastFieldGroup = false;
+    int groupLeapLength = 0;
+    std::string napiType = first.isBigInt ? "bigint" : "number";
+    size_t rangeSpanCount = 0;
+    double number = first.isBigInt ? GetBigIntFieldType(first.bigintValue) : first.doubleValue;
+    double secondNumber = second.isBigInt ? GetBigIntFieldType(second.bigintValue) : second.doubleValue;
+    struct FormatPartParam param = {previousLimit, lastFieldGroup, groupLeapLength, number, napiType};
+    UErrorCode status = U_ZERO_ERROR;
+    while (formattedNumber.nextPosition(cfpo, status)) {
+        if (U_FAILURE(status)) {
+            HILOG_ERROR_I18N("NumberFormat::FindAllFormatParts: Get next position failed.");
+            result.clear();
+            return;
+        }
+        if (static_cast<UFieldCategory>(cfpo.getCategory()) == UFIELD_CATEGORY_NUMBER_RANGE_SPAN) {
+            ++rangeSpanCount;
+        }
+        if (rangeSpanCount > 1) {
+            param.napiType = second.isBigInt ? "bigint" : "number";
+            param.number = secondNumber;
         }
         SetEveryFormatPartItem(cfpo, formatResult, result, param);
     }
@@ -912,40 +953,17 @@ icu::FormattedRelativeDateTime NumberFormat::FormatToFormattedRelativeDateTime(d
 
 std::string NumberFormat::FormatRange(double start, double end)
 {
-    if (end < start) {
-        HILOG_ERROR_I18N("FormatRange: parameter:end less then parameter:start");
-        return PseudoLocalizationProcessor("");
-    }
-    icu::Formattable first(start);
-    icu::Formattable second(end);
-    return FormatableRange(first, second);
-}
-
-std::string NumberFormat::FormatRange(std::string &start, std::string &end)
-{
-    UErrorCode status = U_ZERO_ERROR;
-    icu::Formattable first(icu::StringPiece(start), status);
-    if (U_FAILURE(status)) {
-        HILOG_ERROR_I18N("FormatRange: Warp first paramter failed");
-        return PseudoLocalizationProcessor("");
-    }
-    icu::Formattable second(icu::StringPiece(end), status);
-    if (U_FAILURE(status)) {
-        HILOG_ERROR_I18N("FormatRange: Warp second paramter failed");
-        return PseudoLocalizationProcessor("");
-    }
-    return FormatableRange(first, second);
-}
-
-std::string NumberFormat::FormatableRange(const icu::Formattable &first, const icu::Formattable &second)
-{
     if (!createSuccess) {
         HILOG_ERROR_I18N("FormatRange: init numberRangeFormat failed.");
         return PseudoLocalizationProcessor("");
     }
+    if (end < start) {
+        HILOG_ERROR_I18N("FormatRange: parameter:end less then parameter:start");
+        return PseudoLocalizationProcessor("");
+    }
     UErrorCode status = U_ZERO_ERROR;
     icu::number::FormattedNumberRange numberRange =
-        numberRangeFormat.formatFormattableRange(first, second, status);
+        numberRangeFormat.formatFormattableRange(start, end, status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("FormatRange: formatFormattableRange failed.");
         return PseudoLocalizationProcessor("");
@@ -960,59 +978,99 @@ std::string NumberFormat::FormatableRange(const icu::Formattable &first, const i
     return PseudoLocalizationProcessor(result);
 }
 
-void NumberFormat::FormatRangeToParts(double start, double end,
+std::string NumberFormat::FormatRange(FormatRangeArgItem &start, FormatRangeArgItem &end)
+{
+    int32_t code = 0;
+    CreateFormattableArgument(start, code);
+    if (code != 0) {
+        HILOG_ERROR_I18N("NumberFormat::FormatRange: Warp first parameter failed");
+        return PseudoLocalizationProcessor("");
+    }
+    CreateFormattableArgument(end, code);
+    if (code != 0) {
+        HILOG_ERROR_I18N("NumberFormat::FormatRange: Warp second parameter failed");
+        return PseudoLocalizationProcessor("");
+    }
+    return FormatableRange(start, end);
+}
+
+std::string NumberFormat::FormatableRange(FormatRangeArgItem &first, FormatRangeArgItem &second)
+{
+    if (!createSuccess) {
+        HILOG_ERROR_I18N("FormatableRange: init numberRangeFormat failed.");
+        return PseudoLocalizationProcessor("");
+    }
+    UErrorCode status = U_ZERO_ERROR;
+    icu::number::FormattedNumberRange numberRange =
+        numberRangeFormat.formatFormattableRange(first.formatableVal, second.formatableVal, status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("FormatableRange: formatFormattableRange failed.");
+        return PseudoLocalizationProcessor("");
+    }
+    icu::UnicodeString res = numberRange.toString(status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("FormatableRange: icu::UnicodeString.toString() failed.");
+        return PseudoLocalizationProcessor("");
+    }
+    std::string result;
+    res.toUTF8String(result);
+    return PseudoLocalizationProcessor(result);
+}
+
+void NumberFormat::FormatRangeToParts(FormatRangeArgItem &first, FormatRangeArgItem &second,
     std::vector<std::vector<std::string>> &result)
 {
-    if (end < start) {
-        HILOG_ERROR_I18N("NumberFormat::FormatRangeToParts: parameter:end less then parameter:start");
+    int32_t code = 0;
+    CreateFormattableArgument(first, code);
+    if (code != 0) {
+        HILOG_ERROR_I18N("NumberFormat::FormatRangeToParts: Warp first parameter failed");
         return;
     }
-    icu::Formattable first(start);
-    icu::Formattable second(end);
+    CreateFormattableArgument(second, code);
+    if (code != 0) {
+        HILOG_ERROR_I18N("NumberFormat::FormatRangeToParts: Warp second parameter failed");
+        return;
+    }
     FormatableRangeToParts(first, second, result);
 }
 
-void NumberFormat::FormatRangeToParts(std::string &first, std::string &scond,
-    std::vector<std::vector<std::string>> &result)
+void NumberFormat::CreateFormattableArgument(FormatRangeArgItem &item, int32_t &code)
 {
+    if (!item.isBigInt) {
+        icu::Formattable param(item.doubleValue);
+        item.formatableVal = param;
+        return;
+    }
     UErrorCode status = U_ZERO_ERROR;
-    icu::Formattable before(icu::StringPiece(first), status);
+    icu::Formattable formatableArg(icu::StringPiece(item.bigintValue), status);
     if (U_FAILURE(status)) {
-        HILOG_ERROR_I18N("NumberFormat::FormatRangeToParts: Warp first paramter failed");
+        HILOG_ERROR_I18N("NumberFormat::CreateFormattableArgument: Warp parameter failed");
+        code = -1;
         return;
     }
-    icu::Formattable after(icu::StringPiece(scond), status);
-    if (U_FAILURE(status)) {
-        HILOG_ERROR_I18N("NumberFormat::FormatRangeToParts: Warp second paramter failed");
-        return;
-    }
-    FormatableRangeToParts(before, after, result);
+    item.formatableVal = formatableArg;
 }
 
-void NumberFormat::FormatableRangeToParts(const icu::Formattable &first, const icu::Formattable &second,
+void NumberFormat::FormatableRangeToParts(FormatRangeArgItem &first, FormatRangeArgItem &second,
     std::vector<std::vector<std::string>> &result)
 {
     if (!createSuccess) {
-        HILOG_ERROR_I18N("NumberFormat::FormatRangeToParts: init numberRangeFormat failed.");
+        HILOG_ERROR_I18N("NumberFormat::FormatableRangeToParts: init numberRangeFormat failed.");
         return;
     }
     UErrorCode status = U_ZERO_ERROR;
     icu::number::FormattedNumberRange numberRange =
-        numberRangeFormat.formatFormattableRange(first, second, status);
+        numberRangeFormat.formatFormattableRange(first.formatableVal, second.formatableVal, status);
     if (U_FAILURE(status)) {
-        HILOG_ERROR_I18N("NumberFormat::FormatRangeToParts: formatFormattableRange failed.");
+        HILOG_ERROR_I18N("NumberFormat::FormatableRangeToParts: formatFormattableRange failed.");
         return;
     }
     icu::UnicodeString res = numberRange.toString(status);
     if (U_FAILURE(status)) {
-        HILOG_ERROR_I18N("NumberFormat::FormatRangeToParts: icu::UnicodeString.toString() failed.");
+        HILOG_ERROR_I18N("NumberFormat::FormatableRangeToParts: icu::UnicodeString.toString() failed.");
         return;
     }
-    double start = first.getDouble(status);
-    if (U_FAILURE(status)) {
-        HILOG_ERROR_I18N("NumberFormat::FormatRangeToParts: getDouble value failed.");
-    }
-    FindAllFormatParts(numberRange, result, start, "number", res);
+    FindAllFormatParts(numberRange, result, first, second, res);
 }
 
 void NumberFormat::GetResolvedOptions(std::map<std::string, std::string> &map, bool setDefault)
