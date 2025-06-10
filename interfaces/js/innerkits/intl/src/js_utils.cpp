@@ -283,22 +283,31 @@ std::string JSUtils::GetString(napi_env env, napi_value value, int32_t& code)
     return result;
 }
 
-int64_t JSUtils::GetBigInt(napi_env env, napi_value value, int32_t& code)
+std::string JSUtils::GetBigIntStr(napi_env env, napi_value value, int32_t& code)
 {
-    int64_t result = 0;
-    bool lossLess = false;
-    napi_status status = napi_get_value_bigint_int64(env, value, &result, &lossLess);
+    napi_value global;
+    napi_status status = napi_get_global(env, &global);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("JSUtils::GetBigInt: Get bigint value failed.");
         code = -1;
-        return 0;
+        HILOG_ERROR_I18N("JSUtils::GetBigIntStr: Get global failed.");
+        return "";
     }
-    if (!lossLess) {
-        HILOG_ERROR_I18N("JSUtils::GetBigInt: BigInt values have not been lossless converted");
+    napi_value stringClass;
+    status = napi_get_named_property(env, global, "String", &stringClass);
+    if (status != napi_ok) {
         code = -1;
-        return 0;
+        HILOG_ERROR_I18N("JSUtils::GetBigIntStr: Get bigint value failed.");
+        return "";
     }
-    return result;
+    napi_value argv[1] = { value };
+    napi_value toStringResult;
+    status = napi_call_function(env, global, stringClass, 1, argv, &toStringResult);
+    if (status != napi_ok) {
+        code = -1;
+        HILOG_ERROR_I18N("JSUtils::GetBigIntStr: Get bigint value failed.");
+        return "";
+    }
+    return GetString(env, toStringResult, code);
 }
 
 std::vector<std::string> JSUtils::GetStringArray(napi_env env, napi_value value, int32_t& code)

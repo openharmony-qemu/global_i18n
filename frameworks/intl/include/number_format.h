@@ -20,6 +20,7 @@
 #include <set>
 #include <unordered_map>
 #include <vector>
+#include "unicode/fmtable.h"
 #include "unicode/formattedvalue.h"
 #include "unicode/numberformatter.h"
 #include "unicode/locid.h"
@@ -59,11 +60,12 @@ public:
     NumberFormat(const std::vector<std::string> &localeTag, std::map<std::string, std::string> &configs);
     virtual ~NumberFormat();
     std::string Format(double number);
-    std::string FormatBigInt(int64_t number);
+    std::string FormatBigInt(std::string number);
     bool IsRelativeTimeFormat(double number);
     icu::number::FormattedNumber FormatToFormattedNumber(double number);
     icu::FormattedRelativeDateTime FormatToFormattedRelativeDateTime(double number);
     std::string FormatRange(double start, double end);
+    std::string FormatRange(std::string &start, std::string &end);
     void GetResolvedOptions(std::map<std::string, std::string> &map, bool setDefault = false);
     std::string GetCurrency() const;
     std::string GetCurrencySign() const;
@@ -78,8 +80,9 @@ public:
     std::string GetLocaleMatcher() const;
     void FormatToParts(std::vector<std::vector<std::string>> &result);
     void FormatToParts(double number, std::vector<std::vector<std::string>> &result);
-    void FormatBigIntToParts(int64_t number, std::vector<std::vector<std::string>> &result);
-    void FormatRangeToParts(double start, double end,
+    void FormatBigIntToParts(std::string number, std::vector<std::vector<std::string>> &result);
+    void FormatRangeToParts(double start, double end, std::vector<std::vector<std::string>> &result);
+    void FormatRangeToParts(std::string &first, std::string &scond,
         std::vector<std::vector<std::string>> &result);
     static std::vector<std::string> SupportedLocalesOf(const std::vector<std::string> &requestLocales,
         const std::map<std::string, std::string> &configs, I18nErrorCode &status);
@@ -203,6 +206,9 @@ private:
         std::vector<std::vector<std::string>> &result, FormatPartParam &param);
     void CheckNumberFormatOptionsExt(std::map<std::string, std::string> &map, int32_t &code,
         const std::string &optionName, int min, int max);
+    std::string FormatableRange(const icu::Formattable &first, const icu::Formattable &second);
+    void FormatableRangeToParts(const icu::Formattable &first, const icu::Formattable &second,
+        std::vector<std::vector<std::string>> &result);
 };
 } // namespace I18n
 } // namespace Global
