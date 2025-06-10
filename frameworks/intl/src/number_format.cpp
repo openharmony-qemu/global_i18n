@@ -1380,15 +1380,15 @@ std::string NumberFormat::CheckNumberFormatOptions(std::map<std::string, std::st
         std::string optionName = std::get<0>(*iter);
         int min = std::get<1>(*iter); // 1 is item index
         int max = std::get<2>(*iter); // 2 is item index
-        std::string msg = CheckNumberFormatOptionsExt(map, code, optionName, min, max);
+        CheckNumberFormatOptionsExt(map, code, optionName, min, max);
         if (code != 0) {
-            return msg;
+            return "";
         }
     }
     return "";
 }
 
-std::string NumberFormat::CheckNumberFormatOptionsExt(std::map<std::string, std::string> &map, int32_t &code,
+void NumberFormat::CheckNumberFormatOptionsExt(std::map<std::string, std::string> &map, int32_t &code,
     const std::string &optionName, int min, int max)
 {
     if (map.find(optionName) != map.end()) {
@@ -1397,14 +1397,12 @@ std::string NumberFormat::CheckNumberFormatOptionsExt(std::map<std::string, std:
         int32_t optionValue = ConvertString2Int(optionNameStr, status);
         if (status != 0) {
             code = -1;
-            return "";
+            return;
         }
         if (optionValue < min || optionValue > max) {
             code = -1;
-            return "";
         }
     }
-    return "";
 }
 } // namespace I18n
 } // namespace Global

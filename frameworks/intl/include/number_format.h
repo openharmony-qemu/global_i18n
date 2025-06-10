@@ -201,7 +201,7 @@ private:
         double number, const std::string &napiType, icu::UnicodeString &formatResult);
     void SetEveryFormatPartItem(icu::ConstrainedFieldPosition &cfpo, icu::UnicodeString &formatResult,
         std::vector<std::vector<std::string>> &result, FormatPartParam &param);
-    std::string CheckNumberFormatOptionsExt(std::map<std::string, std::string> &map, int32_t &code,
+    void CheckNumberFormatOptionsExt(std::map<std::string, std::string> &map, int32_t &code,
         const std::string &optionName, int min, int max);
 };
 } // namespace I18n

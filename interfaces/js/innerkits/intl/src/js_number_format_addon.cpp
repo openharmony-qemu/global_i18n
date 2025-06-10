@@ -89,12 +89,14 @@ napi_value JSNumberFormatAddon::NumberFormatConstructor(napi_env env, napi_callb
     if (status == napi_pending_exception || new_target == nullptr) {
         return CreateNumberFormatWithoutNew(env, argc, argv);
     }
-    std::unique_ptr<JSNumberFormatAddon> obj = std::make_unique<JSNumberFormatAddon>();
+    JSNumberFormatAddon* obj = new (std::nothrow) JSNumberFormatAddon();
     if (obj == nullptr) {
+        HILOG_ERROR_I18N("NumberFormatConstructor: Create JSNumberFormatAddon object failed");
         return nullptr;
     }
     std::vector<std::string> localeTags;
     if (!obj->HandleArguments(env, argv[0], argc, localeTags)) {
+        delete obj;
         return nullptr;
     }
     std::map<std::string, std::string> map = {};
@@ -102,16 +104,17 @@ napi_value JSNumberFormatAddon::NumberFormatConstructor(napi_env env, napi_callb
         JSUtils::GetNumberOptionValues(env, argv[1], map);
     }
     status =
-        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), JSNumberFormatAddon::Destructor, nullptr, nullptr);
+        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj), JSNumberFormatAddon::Destructor, nullptr, nullptr);
     if (status != napi_ok) {
+        delete obj;
         HILOG_ERROR_I18N("NumberFormatConstructor: Wrap JSNumberFormatAddon failed");
         return nullptr;
     }
     if (!obj->InitNumberFormatContext(env, info, localeTags, map)) {
+        delete obj;
         HILOG_ERROR_I18N("Init NumberFormat failed");
         return nullptr;
     }
-    obj.release();
     return thisVar;
 }
 
@@ -141,12 +144,6 @@ bool JSNumberFormatAddon::HandleArguments(napi_env env, napi_value argVal, size_
 bool JSNumberFormatAddon::InitNumberFormatContext(napi_env env, napi_callback_info info,
     std::vector<std::string> localeTags, std::map<std::string, std::string> &map)
 {
-    napi_value global = nullptr;
-    napi_status status = napi_get_global(env, &global);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("InitNumberFormatContext: Get global failed");
-        return false;
-    }
     numberfmt_ = std::make_shared<NumberFormat>(localeTags, map);
     if (numberfmt_ != nullptr) {
         int32_t code = 0;
@@ -385,6 +382,7 @@ napi_value JSNumberFormatAddon::FormatToParts(napi_env env, napi_callback_info i
     if (valueType != napi_valuetype::napi_number && valueType != napi_valuetype::napi_bigint) {
         HILOG_ERROR_I18N("JSNumberFormatAddon::FormatToParts: parameter type invalid");
         ErrorUtil::NapiThrowUndefined(env, "parameter type invalid");
+        return nullptr;
     }
     return GetFormatToPartsInner(env, argv[0], valueType, thisVar);
 }
