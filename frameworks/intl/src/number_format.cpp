@@ -119,9 +119,9 @@ std::unordered_map<UNumberFormatFields, std::string> NumberFormat::numberFormatF
     { UNUM_GROUPING_SEPARATOR_FIELD, "group" },
     { UNUM_CURRENCY_FIELD, "currency" },
     { UNUM_PERCENT_FIELD, "percentSign" },
-    { UNUM_EXPONENT_SYMBOL_FIELD, "exponentSymbol" },
-    { UNUM_EXPONENT_SIGN_FIELD, "exponentSign" },
-    { UNUM_EXPONENT_FIELD, "exponent" },
+    { UNUM_EXPONENT_SYMBOL_FIELD, "exponentSeparator" },
+    { UNUM_EXPONENT_SIGN_FIELD, "exponentMinusSign" },
+    { UNUM_EXPONENT_FIELD, "exponentInteger" },
     { UNUM_COMPACT_FIELD, "compact" },
     { UNUM_MEASURE_UNIT_FIELD, "unit" },
     { UNUM_APPROXIMATELY_SIGN_FIELD, "approximatelySign" },
@@ -779,7 +779,7 @@ std::string NumberFormat::GetNumberFieldType(const std::string &napiType,
             }
             return std::signbit(number) ? "minusSign" : "plusSign";
         default:
-            return "";
+            return "unknown";
     }
 }
 

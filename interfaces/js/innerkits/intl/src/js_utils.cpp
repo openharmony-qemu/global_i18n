@@ -296,7 +296,7 @@ int64_t JSUtils::GetBigInt(napi_env env, napi_value value, int32_t& code)
     if (!lossLess) {
         HILOG_ERROR_I18N("JSUtils::GetBigInt: BigInt values have not been lossless converted");
         code = -1;
-        return 0;      
+        return 0;
     }
     return result;
 }
