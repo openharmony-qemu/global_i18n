@@ -17,8 +17,6 @@
 
 #include <string>
 
-#include "unicode/uchar.h"
-
 namespace OHOS {
 namespace Global {
 namespace I18n {

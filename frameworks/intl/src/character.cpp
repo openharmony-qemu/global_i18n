@@ -21,6 +21,7 @@
 #include "cctype"
 #include "map"
 #include "string"
+#include "unicode/uchar.h"
 #include "unicode/umachine.h"
 #include "unicode/unistr.h"
 #include "unicode/urename.h"

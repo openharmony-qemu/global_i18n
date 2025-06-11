@@ -19,6 +19,7 @@ ohos_shared_library("i18n_ani") {
   sources = [ "./src/i18n.cpp" ]
   deps = [ "../../../../frameworks/intl:intl_util" ]
   external_deps = [
+    "icu:shared_icuuc",
     "libpng:libpng",
     "runtime_core:ani",
   ]
