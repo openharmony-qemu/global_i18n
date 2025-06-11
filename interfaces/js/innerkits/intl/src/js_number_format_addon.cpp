@@ -241,7 +241,7 @@ napi_value JSNumberFormatAddon::FormatRangeNumber(napi_env env, napi_callback_in
         HILOG_ERROR_I18N("FormatRangeNumber: Get NumberFormat object failed");
         return JSUtils::CreateEmptyString(env);
     }
-    std::string value = obj->numberfmt_->FormatRange(start, end);
+    std::string value = obj->numberfmt_->FormatJsRange(start, end);
     napi_value result;
     status = napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &result);
     if (status != napi_ok) {

@@ -64,6 +64,7 @@ public:
     icu::number::FormattedNumber FormatToFormattedNumber(double number);
     icu::FormattedRelativeDateTime FormatToFormattedRelativeDateTime(double number);
     std::string FormatRange(double start, double end);
+    std::string FormatJsRange(double first, double second);
     void GetResolvedOptions(std::map<std::string, std::string> &map, bool setDefault = false);
     std::string GetCurrency() const;
     std::string GetCurrencySign() const;

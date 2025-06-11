@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -956,7 +956,7 @@ std::string NumberFormat::FormatRange(double start, double end)
     if (end < start) {
         HILOG_ERROR_I18N("FormatRange: parameter:end less then parameter:start");
         return PseudoLocalizationProcessor("");
-    }  
+    }
     UErrorCode status = U_ZERO_ERROR;
     icu::number::FormattedNumberRange numberRange =
         numberRangeFormat.formatFormattableRange(start, end, status);
@@ -971,6 +971,29 @@ std::string NumberFormat::FormatRange(double start, double end)
     }
     std::string result;
     res.toUTF8String(result);
+    return PseudoLocalizationProcessor(result);
+}
+
+std::string NumberFormat::FormatJsRange(double first, double second)
+{
+    if (!createSuccess) {
+        HILOG_ERROR_I18N("FormatRange: init numberRangeFormat failed.");
+        return PseudoLocalizationProcessor("");
+    }
+    UErrorCode status = U_ZERO_ERROR;
+    icu::number::FormattedNumberRange formatedNumberRange =
+        numberRangeFormat.formatFormattableRange(first, second, status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("FormatRange: formatFormattableRange failed.");
+        return PseudoLocalizationProcessor("");
+    }
+    icu::UnicodeString unicodeStr = formatedNumberRange.toString(status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("FormatRange: icu::UnicodeString.toString() failed.");
+        return PseudoLocalizationProcessor("");
+    }
+    std::string result;
+    unicodeStr.toUTF8String(result);
     return PseudoLocalizationProcessor(result);
 }
 
