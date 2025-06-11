@@ -223,7 +223,6 @@ napi_value JSNumberFormatAddon::FormatRangeNumber(napi_env env, napi_callback_in
         HILOG_ERROR_I18N("FormatRangeNumber: Insufficient parameters");
         return JSUtils::CreateEmptyString(env);
     }
-    int32_t code = 0;
     double start = 0;
     status = napi_get_value_double(env, argv[0], &start);
     if (status != napi_ok) {
