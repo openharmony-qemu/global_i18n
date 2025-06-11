@@ -52,7 +52,7 @@ private:
     static napi_value SetNumberFormatParts(napi_env env, napi_status &status,
         const std::vector<std::vector<std::string>> &numberParts);
     static napi_value CreateNumberFormatWithoutNew(napi_env env, size_t argc, napi_value *argv);
-    static FormatRangeArgItem GetFormatParam(napi_env env, napi_value param, int32_t &code);
+    static void GetFormatParam(napi_env env, napi_value param, int32_t &code, double &result);
 
     bool InitNumberFormatContext(napi_env env, napi_callback_info info, std::vector<std::string> localeTags,
         std::map<std::string, std::string> &map);

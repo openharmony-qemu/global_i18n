@@ -224,14 +224,16 @@ napi_value JSNumberFormatAddon::FormatRangeNumber(napi_env env, napi_callback_in
         return JSUtils::CreateEmptyString(env);
     }
     int32_t code = 0;
-    FormatRangeArgItem start = GetFormatParam(env, argv[0], code);
-    if (code != 0) {
-        HILOG_ERROR_I18N("FormatRangeToParts: Get first param value failed");
+    double start = 0;
+    status = napi_get_value_double(env, argv[0], &start);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("FormatRangeNumber: Get first param value failed");
         return JSUtils::CreateEmptyString(env);
     }
-    FormatRangeArgItem end = GetFormatParam(env, argv[1], code);
-    if (code != 0) {
-        HILOG_ERROR_I18N("FormatRangeToParts: Get second param value failed");
+    double end = 0;
+    status = napi_get_value_double(env, argv[1], &end);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("FormatRangeNumber: Get second param value failed");
         return JSUtils::CreateEmptyString(env);
     }
     JSNumberFormatAddon *obj = nullptr;
@@ -244,7 +246,7 @@ napi_value JSNumberFormatAddon::FormatRangeNumber(napi_env env, napi_callback_in
     napi_value result;
     status = napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &result);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("create string js variable failed.");
+        HILOG_ERROR_I18N("FormatRangeNumber: create string js variable failed.");
         return JSUtils::CreateEmptyString(env);
     }
     return result;
@@ -266,12 +268,14 @@ napi_value JSNumberFormatAddon::FormatRangeToParts(napi_env env, napi_callback_i
         return JSUtils::CreateEmptyString(env);
     }
     int32_t code = 0;
-    FormatRangeArgItem start = GetFormatParam(env, argv[0], code);
+    double start = 0;
+    GetFormatParam(env, argv[0], code, start);
     if (code != 0) {
         HILOG_ERROR_I18N("FormatRangeToParts: Get first param value failed");
         return JSUtils::CreateEmptyString(env);
     }
-    FormatRangeArgItem end = GetFormatParam(env, argv[1], code);
+    double end = 0;
+    GetFormatParam(env, argv[1], code, end);
     if (code != 0) {
         HILOG_ERROR_I18N("FormatRangeToParts: Get second param value failed");
         return JSUtils::CreateEmptyString(env);
@@ -287,42 +291,25 @@ napi_value JSNumberFormatAddon::FormatRangeToParts(napi_env env, napi_callback_i
     return SetNumberFormatParts(env, status, result);
 }
 
-FormatRangeArgItem JSNumberFormatAddon::GetFormatParam(napi_env env, napi_value param, int32_t &code)
+void JSNumberFormatAddon::GetFormatParam(napi_env env, napi_value param, int32_t &code, double &result)
 {
-    struct FormatRangeArgItem argItem;
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_status status = napi_typeof(env, param, &valueType);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("JSNumberFormatAddon::GetFormatParam: Get parameter type failed");
         code = -1;
-        return argItem;
+        return;
     }
-    if (valueType != napi_valuetype::napi_number && valueType != napi_valuetype::napi_bigint) {
+    if (valueType != napi_valuetype::napi_number) {
         HILOG_ERROR_I18N("JSNumberFormatAddon::GetFormatParam: parameter type invalid");
         ErrorUtil::NapiThrowUndefined(env, "parameter type invalid");
     }
-    if (valueType == napi_valuetype::napi_bigint) {
-        std::string resValue = JSUtils::GetBigIntStr(env, param, code);
-        if (code != 0) {
-            HILOG_ERROR_I18N("JSNumberFormatAddon::GetFormatParam: Get bigint parameter value failed");
-            return argItem;
-        }
-        argItem.bigintValue = resValue;
-        argItem.isBigInt = true;
-        return argItem;
-    } else if (valueType == napi_valuetype::napi_number) {
-        double number = 0;
-        status = napi_get_value_double(env, param, &number);
-        if (status != napi_ok) {
-            code = -1;
-            HILOG_ERROR_I18N("JSNumberFormatAddon::GetFormatParam: Get double parameter value failed");
-            return argItem;
-        }
-        argItem.doubleValue = number;
-        argItem.isBigInt = false;
-        return argItem;
+    status = napi_get_value_double(env, param, &result);
+    if (status != napi_ok) {
+        code = -1;
+        HILOG_ERROR_I18N("JSNumberFormatAddon::GetFormatParam: Get double parameter value failed");
+        return;
     }
-    return argItem;
 }
 
 napi_value JSNumberFormatAddon::GetNumberResolvedOptions(napi_env env, napi_callback_info info)

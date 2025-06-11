@@ -53,12 +53,6 @@ struct FormatPartParam {
     double number;
     std::string napiType;
 };
-struct FormatRangeArgItem {
-    double doubleValue;
-    std::string bigintValue;
-    icu::Formattable formatableVal;
-    bool isBigInt;
-};
 
 class NumberFormat {
 public:
@@ -70,7 +64,6 @@ public:
     icu::number::FormattedNumber FormatToFormattedNumber(double number);
     icu::FormattedRelativeDateTime FormatToFormattedRelativeDateTime(double number);
     std::string FormatRange(double start, double end);
-    std::string FormatRange(FormatRangeArgItem &start, FormatRangeArgItem &end);
     void GetResolvedOptions(std::map<std::string, std::string> &map, bool setDefault = false);
     std::string GetCurrency() const;
     std::string GetCurrencySign() const;
@@ -86,7 +79,7 @@ public:
     void FormatToParts(std::vector<std::vector<std::string>> &result);
     void FormatToParts(double number, std::vector<std::vector<std::string>> &result);
     void FormatBigIntToParts(std::string &number, std::vector<std::vector<std::string>> &result);
-    void FormatRangeToParts(FormatRangeArgItem &first, FormatRangeArgItem &second,
+    void FormatRangeToParts(const double &first, const double &second,
         std::vector<std::vector<std::string>> &result);
     static std::vector<std::string> SupportedLocalesOf(const std::vector<std::string> &requestLocales,
         const std::map<std::string, std::string> &configs, I18nErrorCode &status);
@@ -207,15 +200,13 @@ private:
     void FindAllFormatParts(icu::FormattedValue &formattedNumber, std::vector<std::vector<std::string>> &result,
         double number, const std::string &napiType, icu::UnicodeString &formatResult);
     void FindAllFormatParts(icu::FormattedValue &formattedNumber, std::vector<std::vector<std::string>> &result,
-        FormatRangeArgItem &first, FormatRangeArgItem &second, icu::UnicodeString &formatResult);
+        const double &first, const double &second, icu::UnicodeString &formatResult);
     void SetEveryFormatPartItem(icu::ConstrainedFieldPosition &cfpo, icu::UnicodeString &formatResult,
         std::vector<std::vector<std::string>> &result, FormatPartParam &param);
     void CheckNumberFormatOptionsExt(std::map<std::string, std::string> &map, int32_t &code,
         const std::string &optionName, int min, int max);
-    std::string FormatableRange(FormatRangeArgItem &first, FormatRangeArgItem &second);
-    void FormatableRangeToParts(FormatRangeArgItem &first, FormatRangeArgItem &second,
+    void FormatableRangeToParts(const double &first, const double &second,
         std::vector<std::vector<std::string>> &result);
-    void CreateFormattableArgument(FormatRangeArgItem &item, int32_t &code);
     double GetBigIntFieldType(const std::string &bigintStr);
 };
 } // namespace I18n
