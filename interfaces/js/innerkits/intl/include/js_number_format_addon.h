@@ -54,7 +54,8 @@ private:
     static napi_value CreateNumberFormatWithoutNew(napi_env env, size_t argc, napi_value *argv);
     static void GetFormatParam(napi_env env, napi_value param, int32_t &code, double &result);
 
-    bool InitNumberFormatContext(napi_env env, napi_callback_info info, std::vector<std::string> localeTags,
+    bool InitNumberFormatContext(napi_env env, napi_callback_info info,
+        const std::vector<std::string> &localeTags,
         std::map<std::string, std::string> &map);
 
     std::shared_ptr<NumberFormat> numberfmt_ = nullptr;

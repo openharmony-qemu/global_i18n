@@ -59,7 +59,7 @@ public:
     NumberFormat(const std::vector<std::string> &localeTag, std::map<std::string, std::string> &configs);
     virtual ~NumberFormat();
     std::string Format(double number);
-    std::string FormatBigInt(std::string number);
+    std::string FormatBigInt(const std::string &number);
     bool IsRelativeTimeFormat(double number);
     icu::number::FormattedNumber FormatToFormattedNumber(double number);
     icu::FormattedRelativeDateTime FormatToFormattedRelativeDateTime(double number);

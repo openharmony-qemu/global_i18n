@@ -142,7 +142,7 @@ bool JSNumberFormatAddon::HandleArguments(napi_env env, napi_value argVal, size_
 }
 
 bool JSNumberFormatAddon::InitNumberFormatContext(napi_env env, napi_callback_info info,
-    std::vector<std::string> localeTags, std::map<std::string, std::string> &map)
+    const std::vector<std::string> &localeTags, std::map<std::string, std::string> &map)
 {
     numberfmt_ = std::make_shared<NumberFormat>(localeTags, map);
     if (numberfmt_ != nullptr) {
@@ -150,6 +150,7 @@ bool JSNumberFormatAddon::InitNumberFormatContext(napi_env env, napi_callback_in
         std::string message = numberfmt_->CheckNumberFormatOptions(map, code);
         if (code != 0) {
             ErrorUtil::NapiThrowUndefined(env, message);
+            return false;
         }
     }
     return numberfmt_ != nullptr;
@@ -204,6 +205,7 @@ napi_value JSNumberFormatAddon::FormatNumber(napi_env env, napi_callback_info in
     if (valueType != napi_valuetype::napi_number && valueType != napi_valuetype::napi_bigint) {
         HILOG_ERROR_I18N("JSNumberFormatAddon::FormatNumber: parameter type invalid");
         ErrorUtil::NapiThrowUndefined(env, "parameter type invalid");
+        return nullptr;
     }
     return FormatWithDiffParamType(env, argv[0], valueType, thisVar);
 }
@@ -302,6 +304,7 @@ void JSNumberFormatAddon::GetFormatParam(napi_env env, napi_value param, int32_t
     if (valueType != napi_valuetype::napi_number) {
         HILOG_ERROR_I18N("JSNumberFormatAddon::GetFormatParam: parameter type invalid");
         ErrorUtil::NapiThrowUndefined(env, "parameter type invalid");
+        return;
     }
     status = napi_get_value_double(env, param, &result);
     if (status != napi_ok) {
@@ -472,6 +475,7 @@ napi_value JSNumberFormatAddon::SupportedLocalesOf(napi_env env, napi_callback_i
     if (i18nStatus != I18nErrorCode::SUCCESS) {
         HILOG_ERROR_I18N("JSNumberFormatAddon::SupportedLocalesOf: SupportedLocalesOf status fail");
         ErrorUtil::NapiThrowUndefined(env, "invalid locale");
+        return nullptr;
     }
     return JSUtils::CreateArray(env, resultLocales);
 }

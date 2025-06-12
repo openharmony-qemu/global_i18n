@@ -634,7 +634,7 @@ std::string NumberFormat::Format(double number)
     return PseudoLocalizationProcessor(result);
 }
 
-std::string NumberFormat::FormatBigInt(std::string number)
+std::string NumberFormat::FormatBigInt(const std::string &number)
 {
     std::string result;
     icu::number::FormattedNumber formattedNumber = FormatDecimalToFormattedNumber(number);
@@ -847,6 +847,9 @@ void NumberFormat::RelativeDateTimeFormatToParts(double number, std::string &fin
         return;
     }
     double finalNumber = number;
+    if (relativeTimeFormat == nullptr) {
+        return;
+    }
     relativeTimeFormat->FormatToParts(finalNumber, finalUnit, result);
 }
 
