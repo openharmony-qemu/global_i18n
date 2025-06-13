@@ -73,7 +73,6 @@ napi_value StyledNumberFormatAddon::constructor(napi_env env, napi_callback_info
         HILOG_ERROR_I18N("StyledNumberFormatAddon::constructor get callback info error");
         return nullptr;
     }
-
     if (argc < 1) {
         ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, "numberFormat", true);
         return nullptr;
@@ -81,18 +80,12 @@ napi_value StyledNumberFormatAddon::constructor(napi_env env, napi_callback_info
     NumberFormatAddon *numberFormatAddon = nullptr;
     JSNumberFormatAddon *jsNumberFormatAddon = nullptr;
     SimpleNumberFormatAddon *simpleNumberFormatAddon = nullptr;
-
     GetNumberFmtOrSimpleNumberFmt(env, argv[0], &jsNumberFormatAddon, &simpleNumberFormatAddon, &numberFormatAddon);
-
-    if (!numberFormatAddon && !simpleNumberFormatAddon) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "numberFormat", "intl.NumberFormat or SimpleNumberFormat", true);
+    if (!numberFormatAddon && !simpleNumberFormatAddon && !jsNumberFormatAddon) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "numberFormat",
+            "intl.NumberFormat or SimpleNumberFormat or Intl.NumberFormat", true);
         return nullptr;
     }
-    if (!jsNumberFormatAddon) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "numberFormat", "Intl.NumberFormatt", true);
-        return nullptr;
-    }
-
     std::unique_ptr<StyledNumberFormatAddon> obj = std::make_unique<StyledNumberFormatAddon>();
     if (!obj) {
         HILOG_ERROR_I18N("StyledNumberFormatAddon::constructor make unique ptr error");
@@ -340,14 +333,12 @@ void StyledNumberFormatAddon::GetNumberFmtOrSimpleNumberFmt(napi_env env, napi_v
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "intl.NumberFormat or SimpleNumberFormat", "", true);
         return;
     }
-    bool isNumberFormat = IsNumberFormatInstance(env, arg, "@ohos.intl");
-    bool isJsNumberFormat = IsNumberFormatInstance(env, arg, "Intl");
-    if (isJsNumberFormat) {
+    if (IsIntlNumberFormatInstance(env, arg)) {
         status = napi_unwrap(env, arg, reinterpret_cast<void **>(jsNumberformatAddon));
         if (status != napi_ok && jsNumberformatAddon != nullptr) {
             *jsNumberformatAddon = nullptr;
         }
-    } else if (isNumberFormat) {
+    } else if (IsNumberFormatInstance(env, arg, "@ohos.intl")) {
         status = napi_unwrap(env, arg, reinterpret_cast<void **>(numberFormatAddon));
         if (status != napi_ok && numberFormatAddon != nullptr) {
             *numberFormatAddon = nullptr;
@@ -370,6 +361,35 @@ bool StyledNumberFormatAddon::IsNumberFormatInstance(napi_env env, napi_value ar
             moduleName.c_str());
         return false;
     }
+    status = napi_get_named_property(env, intlModule, "NumberFormat", &numFmtConstructor);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("StyledNumberFormatAddon::IsNumberFormatInstance: get NumberFormat  constructor failed");
+        return false;
+    }
+    bool isInstance = true;
+    status = napi_instanceof(env, arg, numFmtConstructor, &isInstance);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("StyledNumberFormatAddon::IsNumberFormatInstance Failed to get instance of argv 0.");
+        return false;
+    }
+    return isInstance;
+}
+
+bool StyledNumberFormatAddon::IsIntlNumberFormatInstance(napi_env env, napi_value arg)
+{
+    napi_value global = nullptr;
+    napi_status status = napi_get_global(env, &global);
+    if (status != napi_ok || global == nullptr) {
+        HILOG_ERROR_I18N("RegisterIntl: get global obj failed");
+        return false;
+    }
+    napi_value intlModule;
+    status = napi_get_named_property(env, global, "Intl", &intlModule);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("Get Milliseconds property failed");
+        return false;
+    }
+    napi_value numFmtConstructor = nullptr;
     status = napi_get_named_property(env, intlModule, "NumberFormat", &numFmtConstructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("StyledNumberFormatAddon::IsNumberFormatInstance: get NumberFormat  constructor failed");

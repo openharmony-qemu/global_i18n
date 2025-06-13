@@ -50,6 +50,7 @@ private:
         JSNumberFormatAddon **jsNumberformatAddon, SimpleNumberFormatAddon **simpleNumberFormatAddon,
         NumberFormatAddon **numberFormatAddon);
     static bool IsNumberFormatInstance(napi_env env, napi_value arg, const std::string &moduleName);
+    static bool IsIntlNumberFormatInstance(napi_env env, napi_value arg);
     static void SetNamedProperty(napi_env env, napi_value &option, const std::string& name, napi_value &property);
 
     bool InitStyledNumberFormatContent(napi_env env, JSNumberFormatAddon* jsNumberFormatAddon,
