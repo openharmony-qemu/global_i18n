@@ -150,7 +150,6 @@ bool JSNumberFormatAddon::InitNumberFormatContext(napi_env env, napi_callback_in
         std::string message = numberfmt_->CheckNumberFormatOptions(map, code);
         if (code != 0) {
             ErrorUtil::NapiThrowUndefined(env, message);
-            return false;
         }
     }
     return numberfmt_ != nullptr;
@@ -304,7 +303,6 @@ void JSNumberFormatAddon::GetFormatParam(napi_env env, napi_value param, int32_t
     if (valueType != napi_valuetype::napi_number) {
         HILOG_ERROR_I18N("JSNumberFormatAddon::GetFormatParam: parameter type invalid");
         ErrorUtil::NapiThrowUndefined(env, "parameter type invalid");
-        return;
     }
     status = napi_get_value_double(env, param, &result);
     if (status != napi_ok) {
