@@ -55,6 +55,7 @@ ohos_shared_library("intl_napi") {
     "src/error_util.cpp",
     "src/intl_addon.cpp",
     "src/intl_locale_addon.cpp",
+    "src/js_number_format_addon.cpp",
     "src/js_utils.cpp",
     "src/locale_info_addon.cpp",
     "src/number_format_addon.cpp",

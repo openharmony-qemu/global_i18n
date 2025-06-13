@@ -283,6 +283,33 @@ std::string JSUtils::GetString(napi_env env, napi_value value, int32_t& code)
     return result;
 }
 
+std::string JSUtils::GetBigIntStr(napi_env env, napi_value value, int32_t& code)
+{
+    napi_value global;
+    napi_status status = napi_get_global(env, &global);
+    if (status != napi_ok) {
+        code = -1;
+        HILOG_ERROR_I18N("JSUtils::GetBigIntStr: Get global failed.");
+        return "";
+    }
+    napi_value stringClass;
+    status = napi_get_named_property(env, global, "String", &stringClass);
+    if (status != napi_ok) {
+        code = -1;
+        HILOG_ERROR_I18N("JSUtils::GetBigIntStr: Get bigint value failed.");
+        return "";
+    }
+    napi_value argv[1] = { value };
+    napi_value toStringResult;
+    status = napi_call_function(env, global, stringClass, 1, argv, &toStringResult);
+    if (status != napi_ok) {
+        code = -1;
+        HILOG_ERROR_I18N("JSUtils::GetBigIntStr: Get bigint value failed.");
+        return "";
+    }
+    return GetString(env, toStringResult, code);
+}
+
 std::vector<std::string> JSUtils::GetStringArray(napi_env env, napi_value value, int32_t& code)
 {
     std::vector<std::string> result;
@@ -364,6 +391,33 @@ napi_value JSUtils::CreateObject(napi_env env, std::unordered_map<std::string, n
         if (status != napi_ok) {
             code = 1;
             HILOG_ERROR_I18N("JSUtils::CreateObject: Set property failed, key %{public}s.", key.c_str());
+            return nullptr;
+        }
+    }
+    code = 0;
+    return object;
+}
+
+napi_value JSUtils::CreateArrayItem(napi_env env, std::unordered_map<std::string, napi_value>& propertys,
+    int32_t& code, std::vector<std::string> &keySequence)
+{
+    napi_value object = nullptr;
+    napi_status status = napi_create_object(env, &object);
+    if (status != napi_ok) {
+        code = 1;
+        HILOG_ERROR_I18N("JSUtils::CreateArrayItem: Create object failed.");
+        return nullptr;
+    }
+    for (auto iter = keySequence.begin(); iter != keySequence.end(); ++iter) {
+        std::string key = *iter;
+        if (propertys.find(key) == propertys.end()) {
+            continue;
+        }
+        napi_value value = propertys[key];
+        status = napi_set_named_property(env, object, key.c_str(), value);
+        if (status != napi_ok) {
+            code = 1;
+            HILOG_ERROR_I18N("JSUtils::CreateArrayItem: Set property failed, key %{public}s.", key.c_str());
             return nullptr;
         }
     }

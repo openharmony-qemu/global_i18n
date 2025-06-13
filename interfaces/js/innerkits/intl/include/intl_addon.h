@@ -90,4 +90,5 @@ private:
 } // namespace OHOS
 
 extern "C" bool RegisterIntl(napi_env env);
+extern "C" bool BindingIntlModules(napi_env env, napi_value &intlModule);
 #endif

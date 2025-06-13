@@ -17,6 +17,7 @@
 
 #include <map>
 #include <set>
+#include <vector>
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
@@ -44,10 +45,13 @@ public:
     static void SetIntegerOptionProperties(napi_env env, napi_value &result,
         std::map<std::string, std::string> &options, const std::string &option);
     static std::string GetString(napi_env env, napi_value value, int32_t& code);
+    static std::string GetBigIntStr(napi_env env, napi_value value, int32_t& code);
     static std::vector<std::string> GetStringArray(napi_env env, napi_value value, int32_t& code);
     static std::vector<std::string> GetLocaleArray(napi_env env, napi_value value, int32_t& code);
     static napi_value CreateObject(napi_env env, std::unordered_map<std::string, napi_value>& propertys,
         int32_t& code);
+    static napi_value CreateArrayItem(napi_env env, std::unordered_map<std::string, napi_value>& propertys,
+        int32_t& code, std::vector<std::string> &keySequence);
     static napi_value CreateArray(napi_env env, const std::vector<std::string>& value);
     static napi_value CreateString(napi_env env, const std::string &str);
     static bool GetPropertyFormObject(napi_env env, napi_value object, const std::string& property,

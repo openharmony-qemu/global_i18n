@@ -24,6 +24,7 @@
 #include "error_util.h"
 #include "i18n_hilog.h"
 #include "intl_locale_addon.h"
+#include "js_number_format_addon.h"
 #include "js_utils.h"
 #include "locale_info_addon.h"
 #include "number_format_addon.h"
@@ -1118,12 +1119,40 @@ bool SetBuildInIntl(napi_env &env, napi_value &global, napi_value &intlModule)
     }
 
     const std::vector<std::string> buildinClasses = {"DateTimeFormat", "DurationFormat", "ListFormat",
-        "NumberFormat", "PluralRules", "RelativeTimeFormat", "Segmenter", "getCanonicalLocales", "supportedValuesOf"};
+        "PluralRules", "RelativeTimeFormat", "Segmenter", "getCanonicalLocales", "supportedValuesOf"};
 
     for (std::string buildinClass : buildinClasses) {
         if (!SetBuildInIntlModule(env, intlModule, buildinIntlModule, buildinClass)) {
             return false;
         }
+    }
+    return true;
+}
+
+bool BindingIntlModules(napi_env env, napi_value &intlModule)
+{
+    intlModule = OHOS::Global::I18n::CollatorAddon::InitCollator(env, intlModule);
+    if (intlModule == nullptr) {
+        HILOG_ERROR_I18N("RegisterIntl: init Intl Collator Module failed");
+        return false;
+    }
+
+    intlModule = OHOS::Global::I18n::DisplayNamesAddon::InitDisplayNames(env, intlModule);
+    if (intlModule == nullptr) {
+        HILOG_ERROR_I18N("RegisterIntl: init Intl DisplayNames Module failed");
+        return false;
+    }
+
+    intlModule = OHOS::Global::I18n::IntlLocaleAddon::InitIntlLocale(env, intlModule);
+    if (intlModule == nullptr) {
+        HILOG_ERROR_I18N("RegisterIntl: init Intl Locale Module failed");
+        return false;
+    }
+
+    intlModule = OHOS::Global::I18n::JSNumberFormatAddon::InitJsNumberFormat(env, intlModule);
+    if (intlModule == nullptr) {
+        HILOG_ERROR_I18N("RegisterIntl: init Intl NumberFormat Module failed");
+        return false;
     }
     return true;
 }
@@ -1149,21 +1178,7 @@ bool RegisterIntl(napi_env env)
         return false;
     }
 
-    intlModule = OHOS::Global::I18n::CollatorAddon::InitCollator(env, intlModule);
-    if (intlModule == nullptr) {
-        HILOG_ERROR_I18N("RegisterIntl: init Intl Collator Module failed");
-        return false;
-    }
-
-    intlModule = OHOS::Global::I18n::DisplayNamesAddon::InitDisplayNames(env, intlModule);
-    if (intlModule == nullptr) {
-        HILOG_ERROR_I18N("RegisterIntl: init Intl DisplayNames Module failed");
-        return false;
-    }
-
-    intlModule = OHOS::Global::I18n::IntlLocaleAddon::InitIntlLocale(env, intlModule);
-    if (intlModule == nullptr) {
-        HILOG_ERROR_I18N("RegisterIntl: init Intl Locale Module failed");
+    if (!BindingIntlModules(env, intlModule)) {
         return false;
     }
 
