@@ -365,7 +365,7 @@ bool StyledNumberFormatAddon::IsNumberFormatInstance(napi_env env, napi_value ar
 {
     napi_value numFmtConstructor = nullptr;
     napi_value intlModule;
-    napi_status status = napi_load_module(env, moduleName, &intlModule);
+    napi_status status = napi_load_module(env, moduleName.c_str(), &intlModule);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("StyledNumberFormatAddon::IsNumberFormatInstance Failed to get %{public}s module.", moduleName.c_str());
         return false;
