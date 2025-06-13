@@ -173,28 +173,37 @@ void HolidayManager::ParseFileLine(const std::string &line, HolidayInfoItem *hol
     std::regex reg("([A-Z]+)[:;](.+)");
     std::smatch match;
     bool found = RegexSearchNoExcept(line, match, reg);
-    if (found) {
-        std::string tag = match[1].str();
-        std::string value = line.substr(line.find_last_of(":") + 1, line.length());
-        if (tag.compare(ITEM_DTSTART_TAG) == 0) {
-            std::string startDate = value.size() >= 8 ? value.substr(0, 8) : ""; // 8 is date formarted string length
-            if (startDate.size() == 8) {
-                struct tm timeObj;
-                strptime(startDate.c_str(), "%Y%m%d", &timeObj);
-                holidayItem->year = timeObj.tm_year;
-                holidayItem->month = timeObj.tm_mon;
-                holidayItem->day = timeObj.tm_mday;
-            }
-        } else if (tag.compare(ITEM_SUMMARY_TAG) == 0) {
-            holidayItem->baseName = value;
-        } else if (tag.compare(ITEM_RESOURCES_TAG) == 0) {
-            std::string displayName = line.substr(line.find_last_of("=") + 1, line.length());
-            std::string language = displayName.substr(0, displayName.find_first_of(":"));
-            std::string localName = displayName.substr(displayName.find_first_of(":") + 1, displayName.length());
-            transform(language.begin(), language.end(), language.begin(), ::tolower);
-            HolidayLocalName localeName = {language, PseudoLocalizationProcessor(localName)};
-            holidayItem->localNames.push_back(localeName);
+    if (!found) {
+        return;
+    }
+    std::string tag = match[1].str();
+    std::string value = line.substr(line.find_last_of(":") + 1, line.length());
+    if (tag.compare(ITEM_DTSTART_TAG) == 0) {
+        std::string startDate = value.size() >= 8 ? value.substr(0, 8) : ""; // 8 is date formarted string length
+        if (startDate.size() == 8) {
+            struct tm timeObj;
+            strptime(startDate.c_str(), "%Y%m%d", &timeObj);
+            holidayItem->year = timeObj.tm_year;
+            holidayItem->month = timeObj.tm_mon;
+            holidayItem->day = timeObj.tm_mday;
         }
+    } else if (tag.compare(ITEM_SUMMARY_TAG) == 0) {
+        holidayItem->baseName = value;
+    } else if (tag.compare(ITEM_RESOURCES_TAG) == 0) {
+        size_t displayNamesPos = line.find_last_of('=');
+        if (displayNamesPos == std::string::npos || displayNamesPos + 1 >= line.length()) {
+            return;
+        }
+        std::string displayName = line.substr(displayNamesPos + 1, line.length());
+        size_t languagePos = displayName.find_first_of(":");
+        if (languagePos == std::string::npos || languagePos + 1 >= displayName.length()) {
+            return;
+        }
+        std::string language = displayName.substr(0, languagePos);
+        std::string localName = displayName.substr(languagePos + 1, displayName.length());
+        transform(language.begin(), language.end(), language.begin(), ::tolower);
+        HolidayLocalName localeName = {language, PseudoLocalizationProcessor(localName)};
+        holidayItem->localNames.push_back(localeName);
     }
 }
 
