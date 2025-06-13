@@ -342,7 +342,6 @@ void StyledNumberFormatAddon::GetNumberFmtOrSimpleNumberFmt(napi_env env, napi_v
     }
     bool isNumberFormat = IsNumberFormatInstance(env, arg, "@ohos.intl");
     bool isJsNumberFormat = IsNumberFormatInstance(env, arg, "Intl");
-   
     if (isJsNumberFormat) {
         status = napi_unwrap(env, arg, reinterpret_cast<void **>(jsNumberformatAddon));
         if (status != napi_ok && jsNumberformatAddon != nullptr) {
@@ -367,7 +366,8 @@ bool StyledNumberFormatAddon::IsNumberFormatInstance(napi_env env, napi_value ar
     napi_value intlModule;
     napi_status status = napi_load_module(env, moduleName.c_str(), &intlModule);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("StyledNumberFormatAddon::IsNumberFormatInstance Failed to get %{public}s module.", moduleName.c_str());
+        HILOG_ERROR_I18N("StyledNumberFormatAddon::IsNumberFormatInstance Failed to get %{public}s module.",
+            moduleName.c_str());
         return false;
     }
     status = napi_get_named_property(env, intlModule, "NumberFormat", &numFmtConstructor);
