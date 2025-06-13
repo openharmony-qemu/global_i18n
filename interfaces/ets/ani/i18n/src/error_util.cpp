@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "error_util.h"
 
 #include <unordered_map>
@@ -103,8 +104,8 @@ ani_object ErrorUtil::CreateError(ani_env *env, ani_int code, const std::string 
     return obj;
 }
 
-void ErrorUtil::AniThrow(ani_env *env, int32_t errCode, const std::string& valueName,
-    const std::string& valueContent)
+void ErrorUtil::AniThrow(ani_env *env, int32_t errCode, const std::string &valueName,
+    const std::string &valueContent)
 {
     auto iter = ErrorCodeToMsg.find(errCode);
     std::string errMsg = iter != ErrorCodeToMsg.end() ? iter->second : "";
