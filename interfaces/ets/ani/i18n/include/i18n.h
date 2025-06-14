@@ -35,8 +35,7 @@ private:
 
 class I18nTimeZoneAddon {
 public:
-    static ani_object i18nGetTimeZone([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
-        ani_string zoneID);
+    static ani_object i18nGetTimeZone([[maybe_unused]] ani_env *env, ani_string zoneID);
 private:
     std::unique_ptr<I18nTimeZone> timezone_ = nullptr;
 };

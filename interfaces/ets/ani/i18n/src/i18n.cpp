@@ -190,8 +190,7 @@ static ani_boolean i18nIsRTL(ani_env *env, ani_string locale)
     return LocaleConfig::IsRTL(ANIStringToString(env, locale));
 }
 
-ani_object I18nTimeZoneAddon::i18nGetTimeZone([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
-    ani_string zoneID)
+ani_object I18nTimeZoneAddon::i18nGetTimeZone([[maybe_unused]] ani_env *env, ani_string zoneID)
 {
     std::unique_ptr<I18nTimeZoneAddon> obj = std::make_unique<I18nTimeZoneAddon>();
     ani_boolean isUndefined;
