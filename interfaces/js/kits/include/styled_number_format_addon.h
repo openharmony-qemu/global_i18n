@@ -26,6 +26,7 @@
 #include "styled_number_format.h"
 #include "number_format.h"
 #include "number_format_addon.h"
+#include "js_number_format_addon.h"
 
 namespace OHOS {
 namespace Global {
@@ -46,11 +47,15 @@ private:
     static napi_value CreateStyleOption(napi_env env, StyledNumberFormat::NumberPart numberPart,
         napi_ref textStyleRef);
     static void GetNumberFmtOrSimpleNumberFmt(napi_env env, napi_value arg,
-        NumberFormatAddon **numberformataddon, SimpleNumberFormatAddon **simpleNumberFormatAddon);
+        JSNumberFormatAddon **jsNumberformatAddon, SimpleNumberFormatAddon **simpleNumberFormatAddon,
+        NumberFormatAddon **numberFormatAddon);
+    static bool IsNumberFormatInstance(napi_env env, napi_value arg, const std::string &moduleName);
+    static bool IsIntlNumberFormatInstance(napi_env env, napi_value arg);
     static void SetNamedProperty(napi_env env, napi_value &option, const std::string& name, napi_value &property);
 
-    bool InitStyledNumberFormatContent(napi_env env, NumberFormatAddon* numberFormatAddon,
-        SimpleNumberFormatAddon* simpleNumberFormatAddon, napi_value options);
+    bool InitStyledNumberFormatContent(napi_env env, JSNumberFormatAddon* jsNumberFormatAddon,
+        SimpleNumberFormatAddon* simpleNumberFormatAddon, NumberFormatAddon *numberFormatAddon,
+        napi_value options);
     void SetTextStyle(napi_env env, napi_value options, const std::string &optionName);
 
     napi_env env_ = nullptr;
