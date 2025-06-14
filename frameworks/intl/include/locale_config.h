@@ -208,7 +208,7 @@ public:
     static std::string GetUnicodeWrappedFilePath(const std::string &path, const char delimiter,
         std::shared_ptr<LocaleInfo> localeInfo, std::string &invalidField);
     static std::string GetUnicodeWrappedFilePath(const std::string &path, const char delimiter,
-        std::shared_ptr<IntlLocale> IntlLocale, std::string &invalidField);
+        std::shared_ptr<IntlLocale> intlLocale, std::string &invalidField);
     static std::string ComputeEffectiveLanguage(const std::string& localeTag, const std::string& language);
     static std::string GetSystemLocaleInstanceTag();
     static std::pair<std::string, std::string> GetNumberPatternFromLocale(const std::string& localeTag);

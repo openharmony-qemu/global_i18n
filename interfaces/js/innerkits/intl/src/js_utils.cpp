@@ -465,23 +465,12 @@ napi_value JSUtils::CreateString(napi_env env, const std::string &str)
 bool JSUtils::GetPropertyFormObject(napi_env env, napi_value object, const std::string& property,
     napi_valuetype type, std::string& value)
 {
-    bool hasProperty = false;
-    napi_status status = napi_has_named_property(env, object, property.c_str(), &hasProperty);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("JSUtils::GetPropertyFormObject: Call napi_has_named_property failed, "
-            "property is %{public}s.", property.c_str());
+    int32_t errCode = 0;
+    napi_value propertyValue = JSUtils::GetNapiPropertyFormObject(env, object, property, errCode);
+    if (errCode != 0) {
         return false;
     }
-    if (!hasProperty) {
-        return false;
-    }
-    napi_value propertyValue = nullptr;
-    status = napi_get_named_property(env, object, property.c_str(), &propertyValue);
-    if (status != napi_ok || propertyValue == nullptr) {
-        HILOG_ERROR_I18N("JSUtils::GetPropertyFormObject: Call napi_get_named_property failed, "
-            "property is %{public}s.", property.c_str());
-        return false;
-    }
+    napi_status status = napi_ok;
     switch (type) {
         case napi_valuetype::napi_boolean: {
             bool boolValue = false;
@@ -504,10 +493,46 @@ bool JSUtils::GetPropertyFormObject(napi_env env, napi_value object, const std::
             }
             break;
         }
+        case napi_valuetype::napi_number: {
+            int32_t intValue = 0;
+            status = napi_get_value_int32(env, propertyValue, &intValue);
+            if (status != napi_ok) {
+                HILOG_ERROR_I18N("JSUtils::GetPropertyFormObject: Get int failed, property is %{public}s.",
+                    property.c_str());
+                return false;
+            }
+            value = std::to_string(intValue);
+            break;
+        }
         default:
             return false;
     }
     return true;
+}
+
+napi_value JSUtils::GetNapiPropertyFormObject(napi_env env, napi_value object, const std::string& property,
+    int32_t& errCode)
+{
+    errCode = -1;
+    bool hasProperty = false;
+    napi_status status = napi_has_named_property(env, object, property.c_str(), &hasProperty);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("JSUtils::GetNapiPropertyFormObject: Call napi_has_named_property failed, "
+            "property is %{public}s.", property.c_str());
+        return nullptr;
+    }
+    if (!hasProperty) {
+        return nullptr;
+    }
+    napi_value propertyValue = nullptr;
+    status = napi_get_named_property(env, object, property.c_str(), &propertyValue);
+    if (status != napi_ok || propertyValue == nullptr) {
+        HILOG_ERROR_I18N("JSUtils::GetPropertyFormObject: Call napi_get_named_property failed, "
+            "property is %{public}s.", property.c_str());
+        return nullptr;
+    }
+    errCode = 0;
+    return propertyValue;
 }
 } // namespace I18n
 } // namespace Global

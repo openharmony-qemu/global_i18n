@@ -16,6 +16,7 @@
 #include <sstream>
 #include "unicode/localebuilder.h"
 #include "i18n_hilog.h"
+#include "utils.h"
 
 namespace OHOS {
 namespace Global {
@@ -121,6 +122,7 @@ const std::unordered_map<std::string, std::unordered_set<std::string>> LocaleHel
     { "caseFirst", { "false", "upper", "lower" } },
     { "sensitivity", { "base", "accent", "case", "variant" } },
     { "ignorePunctuation", { "true", "false" } },
+    { "hourCycle", { "h11", "h12", "h23", "h24" } },
 };
 
 bool LocaleHelper::IsValidOptionName(const std::string& key, const std::string& option)
@@ -372,6 +374,51 @@ bool LocaleHelper::IsAlpha(const std::string &str, size_t min, size_t max)
         }
     }
     return true;
+}
+
+bool LocaleHelper::IsNormativeCalendar(const std::string &value)
+{
+    return IsWellAlphaNumList(value);
+}
+
+bool LocaleHelper::IsNormativeNumberingSystem(const std::string &value)
+{
+    return IsWellAlphaNumList(value);
+}
+
+bool LocaleHelper::IsWellAlphaNumList(const std::string &value)
+{
+    if (value.length() < INTL_INDEX_THREE) {
+        return false;
+    }
+    char lastChar = value[value.length() - 1];
+    if (lastChar == '-') {
+        return false;
+    }
+    std::vector<std::string> items;
+    Split(value, "-", items);
+    for (auto &item : items) {
+        if (!IsAlphanum(item, INTL_INDEX_THREE, INTL_INDEX_EIGHT)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+double LocaleHelper::TruncateDouble(double number)
+{
+    if (std::isnan(number)) {
+        return 0;
+    }
+    if (!std::isfinite(number)) {
+        return number;
+    }
+    // -0 to +0
+    if (Eq(number, 0)) {
+        return 0;
+    }
+    double ret = Geq(number, 0) ? std::floor(number) : std::ceil(number);
+    return ret;
 }
 } // namespace I18n
 } // namespace Global

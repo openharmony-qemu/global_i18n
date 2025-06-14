@@ -2541,11 +2541,11 @@ std::string LocaleConfig::GetUnicodeWrappedFilePath(const std::string &path, con
 }
 
 std::string LocaleConfig::GetUnicodeWrappedFilePath(const std::string &path, const char delimiter,
-    std::shared_ptr<IntlLocale> IntlLocale, std::string &invalidField)
+    std::shared_ptr<IntlLocale> intlLocale, std::string &invalidField)
 {
     std::string locale;
-    if (IntlLocale != nullptr) {
-        locale = IntlLocale->GetBaseName();
+    if (intlLocale != nullptr) {
+        locale = intlLocale->GetBaseName();
     }
     return LocaleConfig::GetUnicodeWrappedFilePathInner(path, delimiter, locale, invalidField);
 }

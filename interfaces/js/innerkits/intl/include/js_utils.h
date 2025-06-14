@@ -56,6 +56,8 @@ public:
     static napi_value CreateString(napi_env env, const std::string &str);
     static bool GetPropertyFormObject(napi_env env, napi_value object, const std::string& property,
         napi_valuetype type, std::string& value);
+    static napi_value GetNapiPropertyFormObject(napi_env env, napi_value object, const std::string& property,
+        int32_t& errCode);
 };
 } // namespace I18n
 } // namespace Global
