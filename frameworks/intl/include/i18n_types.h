@@ -19,7 +19,7 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-enum I18nErrorCode {
+enum class I18nErrorCode {
     SUCCESS = 0,
     FAILED = 1,
     NO_PERMISSION = 2,
@@ -45,7 +45,9 @@ enum I18nErrorCode {
     UPDATE_WEEK_DAY_FAILED = 22,
     INVALID_NUMBER_FORMAT_SKELETON = 23,
     INVALID_DATE_TIME_FORMAT_SKELETON = 24,
-    INVALID_DATE_TIME_FORMAT_PATTERN = 25
+    INVALID_DATE_TIME_FORMAT_PATTERN = 25,
+    INVALID_PARAM = 26,
+    MISSING_PARAM = 27
 };
 
 enum I18nNormalizerMode {
@@ -69,6 +71,12 @@ enum WeekDay {
     FRI = 5,
     SAT = 6,
     SUN = 7,
+};
+
+enum class LocaleType {
+    INVALID = 0,
+    INTL_LOCALE = 1,
+    LOCALE_INFO = 2,
 };
 }
 }

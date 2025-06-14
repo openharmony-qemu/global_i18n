@@ -314,7 +314,7 @@ std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray(I18n
         return result;
     }
     result = GetTimezoneCityInfoArray();
-    SortTimezoneCityItemList(LocaleConfig::GetSystemLocale(), result);
+    SortTimezoneCityItemList(LocaleConfig::GetEffectiveLocale(), result);
     return result;
 }
 
@@ -322,7 +322,7 @@ std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray()
 {
     std::vector<TimeZoneCityItem> result;
     std::unordered_set<std::string> zoneCityIds = I18nTimeZone::GetAvailableZoneCityIDs();
-    std::string locale = LocaleConfig::GetSystemLocale();
+    std::string locale = LocaleConfig::GetEffectiveLocale();
     std::string localeBaseName = I18nTimeZone::GetLocaleBaseName(locale);
     std::map<std::string, std::string> displayNameMap = I18nTimeZone::FindCityDisplayNameMap(localeBaseName);
     std::map<std::string, icu::TimeZone*> tzMap;

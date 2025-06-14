@@ -540,6 +540,140 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0062, TestSize.Level1)
     EXPECT_EQ(gbRes, "23 GB");
     delete numFormat;
 }
+
+/**
+ * @tc.name: NumberFormatFuncTest0063
+ * @tc.desc: Test Intl NumberFormat.FormatRangeToParts
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0063, TestSize.Level1)
+{
+    std::string locale = "de-DE";
+    std::vector<std::string> locales;
+    locales.push_back(locale);
+    map<string, string> options = { { "style", "currency" },
+                                    { "currency", "EUR" } };
+    std::unique_ptr<NumberFormat> numFmt = std::make_unique<NumberFormat>(locales, options);
+    ASSERT_TRUE(numFmt != nullptr);
+    std::vector<std::vector<std::string>> result;
+    numFmt->FormatRangeToParts(3500, 9500, result);
+    EXPECT_EQ(result.size(), 13);
+    ASSERT_TRUE(result.size() > 0 && result[0].size() > 1);
+    EXPECT_EQ(result[0][0], "integer");
+    EXPECT_EQ(result[0][1], "3");
+    std::vector<std::vector<std::string>> result2;
+    locale = "en-US";
+    locales.clear();
+    locales.push_back(locale);
+    options = { { "style", "currency" },
+                { "currency", "USD" } };
+    double amount = 654321.987;
+    std::unique_ptr<NumberFormat> numFmt2 = std::make_unique<NumberFormat>(locales, options);
+    ASSERT_TRUE(numFmt2 != nullptr);
+    numFmt2->FormatToParts(amount, result2);
+    EXPECT_EQ(result2.size(), 6);
+    std::string formatResult = numFmt2->Format(amount);
+    EXPECT_EQ(formatResult, "$654,321.99");
+
+    std::vector<std::vector<std::string>> result3;
+    locales.clear();
+    locales.push_back("ar");
+    options = {};
+    std::unique_ptr<NumberFormat> numFmt3 = std::make_unique<NumberFormat>(locales, options);
+    ASSERT_TRUE(numFmt3 != nullptr);
+    numFmt3->FormatToParts(result3);
+    EXPECT_EQ(result3.size(), 1);
+}
+
+/**
+ * @tc.name: NumberFormatFuncTest0064
+ * @tc.desc: Test Intl NumberFormat.FormatRangeToParts
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0064, TestSize.Level1)
+{
+    std::string locale = "de-DE";
+    std::vector<std::string> locales;
+    locales.push_back(locale);
+    map<string, string> options = { { "style", "currency" },
+                                    { "currency", "EUR" } };
+    std::vector<std::vector<std::string>> result;
+    locales.clear();
+    locales.push_back("en-US");
+    options = {};
+    std::unique_ptr<NumberFormat> numFmt2 = std::make_unique<NumberFormat>(locales, options);
+    ASSERT_TRUE(numFmt2 != nullptr);
+    result.clear();
+    //"87,654,321–98,765,432";
+    numFmt2->FormatRangeToParts(87654321, 98765432, result);
+    EXPECT_EQ(result.size(), 11);
+    ASSERT_TRUE(result.size() > 0 && result[0].size() > 1);
+    EXPECT_EQ(result[0][0], "integer");
+    EXPECT_EQ(result[0][1], "87");
+    result.clear();
+    numFmt2->FormatRangeToParts(-100, -100, result);
+    EXPECT_EQ(result.size(), 3);
+}
+
+/**
+ * @tc.name: NumberFormatFuncTest0065
+ * @tc.desc: Test Intl NumberFormat.FormatRangeToParts
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0065, TestSize.Level1)
+{
+    std::string locale = "es-ES";
+    std::vector<std::string> locales;
+    locales.push_back(locale);
+    map<string, string> options = { { "style", "currency" },
+                                    { "currency", "EUR" },
+                                    { "maximumFractionDigits", "0" } };
+    std::vector<std::vector<std::string>> result;
+    std::unique_ptr<NumberFormat> numFmt2 = std::make_unique<NumberFormat>(locales, options);
+    ASSERT_TRUE(numFmt2 != nullptr);
+    result.clear();
+    // "3-5 €"
+    numFmt2->FormatRangeToParts(3, 5, result);
+    EXPECT_EQ(result.size(), 5);
+    ASSERT_TRUE(result.size() > 4 && result[4].size() > 1);
+    EXPECT_EQ(result[4][0], "currency");
+    EXPECT_EQ(result[4][1], "€");
+    result.clear();
+
+    // "~3 €"
+    numFmt2->FormatRangeToParts(2.9, 3.1, result);
+    EXPECT_EQ(result.size(), 4);
+
+    result.clear();
+    numFmt2->FormatRangeToParts(-123, 65, result);
+    EXPECT_EQ(result.size(), 8);
+    std::vector<std::string> localeTags = {"ban", "id-u-co-pinyin", "de-ID"};
+    std::map<std::string, std::string> map = {
+        {"localeMatcher", "lookup"}
+    };
+    I18nErrorCode i18nStatus = I18nErrorCode::SUCCESS;
+    std::vector<std::string> resultLocales = NumberFormat::SupportedLocalesOf(localeTags, map, i18nStatus);
+    EXPECT_EQ(resultLocales.size(), 2);
+}
+
+/**
+ * @tc.name: NumberFormatFuncTest0066
+ * @tc.desc: Test Intl NumberFormat.FormatRange
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0066, TestSize.Level1)
+{
+    std::string locale = "en";
+    std::vector<std::string> locales;
+    locales.push_back(locale);
+    map<string, string> options = {};
+    std::unique_ptr<NumberFormat> numFmt2 = std::make_unique<NumberFormat>(locales, options);
+    ASSERT_TRUE(numFmt2 != nullptr);
+    std::string result = numFmt2->FormatRange(543.245, 100000000000000011);
+    EXPECT_EQ(result, "543.245–100,000,000,000,000,020");
+    std::string result2 = numFmt2->FormatRange(543.245, 543.245);
+    EXPECT_EQ(result2, "~543.245");
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

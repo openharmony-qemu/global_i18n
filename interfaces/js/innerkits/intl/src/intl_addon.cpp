@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,23 +12,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "intl_addon.h"
 
-#include <vector>
 #include <set>
+#include <vector>
+
+#include "node_api.h"
+
+#include "collator_addon.h"
+#include "displaynames_addon.h"
 #include "error_util.h"
 #include "i18n_hilog.h"
+#include "intl_locale_addon.h"
+#include "js_number_format_addon.h"
 #include "js_utils.h"
-#include "node_api.h"
-#include "utils.h"
 #include "locale_info_addon.h"
 #include "number_format_addon.h"
+#include "utils.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-
 IntlAddon::IntlAddon() : env_(nullptr) {}
 
 IntlAddon::~IntlAddon()
@@ -1068,7 +1072,7 @@ napi_value IntlAddon::Select(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value Init(napi_env env, napi_value exports)
+napi_value IntlAddon::Init(napi_env env, napi_value exports)
 {
     napi_value val = LocaleInfoAddon::InitLocale(env, exports);
     val = IntlAddon::InitDateTimeFormat(env, val);
@@ -1078,21 +1082,115 @@ napi_value Init(napi_env env, napi_value exports)
     val = NumberFormatAddon::InitNumberFormat(env, val);
     return val;
 }
-
-static napi_module g_intlModule = {
-    .nm_version = 1,
-    .nm_flags = 0,
-    .nm_filename = nullptr,
-    .nm_register_func = Init,
-    .nm_modname = "intl",
-    .nm_priv = nullptr,
-    .reserved = { 0 }
-};
-
-extern "C" __attribute__((constructor)) void AbilityRegister()
-{
-    napi_module_register(&g_intlModule);
-}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
+
+bool SetBuildInIntlModule(napi_env &env, napi_value &intlModule, napi_value &buildinIntlModule, const std::string& key)
+{
+    napi_value buildinClass = nullptr;
+    napi_status status = napi_get_named_property(env, buildinIntlModule, key.c_str(), &buildinClass);
+    if (status != napi_ok || buildinClass == nullptr) {
+        HILOG_ERROR_I18N("RegisterIntl: get Buildin Intl class %{public}s failed", key.c_str());
+        return false;
+    }
+    status = napi_set_named_property(env, intlModule, key.c_str(), buildinClass);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("RegisterIntl: set Buildin Intl class %{public}s failed", key.c_str());
+        return false;
+    }
+    return true;
+}
+
+bool SetBuildInIntl(napi_env &env, napi_value &global, napi_value &intlModule)
+{
+    bool hasProperty = false;
+    napi_status status = napi_has_named_property(env, global, "Intl", &hasProperty);
+    if (status != napi_ok || !hasProperty) {
+        HILOG_ERROR_I18N("RegisterIntl: Has not named Intl property");
+        return false;
+    }
+
+    napi_value buildinIntlModule = nullptr;
+    status = napi_get_named_property(env, global, "Intl", &buildinIntlModule);
+    if (status != napi_ok || buildinIntlModule == nullptr) {
+        HILOG_ERROR_I18N("RegisterIntl: get Buildin Intl Module failed");
+        return false;
+    }
+
+    const std::vector<std::string> buildinClasses = {"DateTimeFormat", "DurationFormat", "ListFormat",
+        "PluralRules", "RelativeTimeFormat", "Segmenter", "getCanonicalLocales", "supportedValuesOf"};
+
+    for (std::string buildinClass : buildinClasses) {
+        if (!SetBuildInIntlModule(env, intlModule, buildinIntlModule, buildinClass)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool BindingIntlModules(napi_env env, napi_value &intlModule)
+{
+    intlModule = OHOS::Global::I18n::CollatorAddon::InitCollator(env, intlModule);
+    if (intlModule == nullptr) {
+        HILOG_ERROR_I18N("RegisterIntl: init Intl Collator Module failed");
+        return false;
+    }
+
+    intlModule = OHOS::Global::I18n::DisplayNamesAddon::InitDisplayNames(env, intlModule);
+    if (intlModule == nullptr) {
+        HILOG_ERROR_I18N("RegisterIntl: init Intl DisplayNames Module failed");
+        return false;
+    }
+
+    intlModule = OHOS::Global::I18n::IntlLocaleAddon::InitIntlLocale(env, intlModule);
+    if (intlModule == nullptr) {
+        HILOG_ERROR_I18N("RegisterIntl: init Intl Locale Module failed");
+        return false;
+    }
+
+    intlModule = OHOS::Global::I18n::JSNumberFormatAddon::InitJsNumberFormat(env, intlModule);
+    if (intlModule == nullptr) {
+        HILOG_ERROR_I18N("RegisterIntl: init Intl NumberFormat Module failed");
+        return false;
+    }
+    return true;
+}
+
+bool RegisterIntl(napi_env env)
+{
+    if (env == nullptr) {
+        HILOG_ERROR_I18N("RegisterIntl: env is null");
+        return false;
+    }
+
+    napi_value global = nullptr;
+    napi_status status = napi_get_global(env, &global);
+    if (status != napi_ok || global == nullptr) {
+        HILOG_ERROR_I18N("RegisterIntl: get global obj failed");
+        return false;
+    }
+
+    napi_value intlModule = nullptr;
+    status = napi_create_object(env, &intlModule);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("RegisterIntl: Define Intl object failed.");
+        return false;
+    }
+
+    if (!BindingIntlModules(env, intlModule)) {
+        return false;
+    }
+
+    if (!SetBuildInIntl(env, global, intlModule)) {
+        return false;
+    }
+
+    status = napi_set_named_property(env, global, "Intl", intlModule);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("RegisterIntl: Set property failed when Init Intl module.");
+        return false;
+    }
+    HILOG_INFO_I18N("RegisterIntl: Replace buildin Intl Success.");
+    return true;
+}

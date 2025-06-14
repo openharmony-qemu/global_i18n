@@ -12,13 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "locale_info_addon.h"
 
 #include <vector>
+
 #include "error_util.h"
 #include "i18n_hilog.h"
-#include "locale_config.h"
-#include "locale_info_addon.h"
 #include "js_utils.h"
+#include "locale_config.h"
 
 namespace OHOS {
 namespace Global {
@@ -146,6 +147,29 @@ bool LocaleInfoAddon::InitLocaleContext(napi_env env, napi_callback_info info, c
     env_ = env;
     locale_ = std::make_unique<LocaleInfo>(localeTag, map);
     return locale_ != nullptr;
+}
+
+bool LocaleInfoAddon::IsLocaleInfo(napi_env env, napi_value argv)
+{
+    napi_value constructor = nullptr;
+    if (g_constructor == nullptr) {
+        HILOG_ERROR_I18N("LocaleInfoAddon::IsLocaleInfo: g_constructor is nullptr.");
+        return false;
+    }
+
+    napi_status status = napi_get_reference_value(env, *g_constructor, &constructor);
+    if (status != napi_ok || constructor == nullptr) {
+        HILOG_ERROR_I18N("LocaleInfoAddon::IsLocaleInfo: Failed to create reference.");
+        return false;
+    }
+
+    bool isLocaleInfo = false;
+    status = napi_instanceof(env, argv, constructor, &isLocaleInfo);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("LocaleInfoAddon::IsLocaleInfo: Failed to get instance of argv.");
+        return false;
+    }
+    return isLocaleInfo;
 }
 
 std::string LocaleInfoAddon::GetLanguageInner(std::shared_ptr<LocaleInfo> localeInfo)

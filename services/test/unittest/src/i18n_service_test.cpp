@@ -492,6 +492,89 @@ HWTEST_F(I18nServiceTest, I18nServiceFuncTest030, TestSize.Level1)
     I18nErrorCode err = I18nServiceAbilityClient::SetFirstDayOfWeek(WeekDay::SUN);
     EXPECT_EQ(err, I18nErrorCode::SUCCESS);
 }
+
+/**
+ * @tc.name: I18nServiceFuncTest031
+ * @tc.desc: Test I18nServiceAbilityClient set and get Collation
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nServiceTest, I18nServiceFuncTest031, TestSize.Level1)
+{
+    InitTestEnvironment();
+    AddNativeTokenTypeAndPermissions();
+    I18nErrorCode err = I18nServiceAbilityClient::SetSystemLanguage("en-Latn-US");
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    err = I18nServiceAbilityClient::SetSystemLocale("en-Latn-US");
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+
+    std::unordered_map<std::string, std::string> systemCollations;
+    err = I18nServiceAbilityClient::GetSystemCollations(systemCollations);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    EXPECT_TRUE(systemCollations.find("lower") != systemCollations.end());
+    EXPECT_TRUE(systemCollations.find("upper") != systemCollations.end());
+    err = I18nServiceAbilityClient::SetSystemCollation("upper");
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    std::string usingCollation;
+    err = I18nServiceAbilityClient::GetUsingCollation(usingCollation);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    EXPECT_EQ(usingCollation, "upper");
+}
+
+/**
+ * @tc.name: I18nServiceFuncTest032
+ * @tc.desc: Test I18nServiceAbilityClient set and get numbering system
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nServiceTest, I18nServiceFuncTest032, TestSize.Level1)
+{
+    InitTestEnvironment();
+    AddNativeTokenTypeAndPermissions();
+    I18nErrorCode err = I18nServiceAbilityClient::SetSystemLanguage("ar");
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    err = I18nServiceAbilityClient::SetSystemLocale("ar-CN");
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+
+    std::unordered_map<std::string, std::string> systemNumberingSystems;
+    err = I18nServiceAbilityClient::GetSystemNumberingSystems(systemNumberingSystems);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    EXPECT_TRUE(systemNumberingSystems.find("arab") != systemNumberingSystems.end());
+    EXPECT_TRUE(systemNumberingSystems.find("latn") != systemNumberingSystems.end());
+    err = I18nServiceAbilityClient::SetSystemNumberingSystem("latn");
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    std::string usingNumberingSystem;
+    err = I18nServiceAbilityClient::GetUsingNumberingSystem(usingNumberingSystem);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    EXPECT_EQ(usingNumberingSystem, "latn");
+}
+
+/**
+ * @tc.name: I18nServiceFuncTest033
+ * @tc.desc: Test I18nServiceAbilityClient set and get number pattern
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nServiceTest, I18nServiceFuncTest033, TestSize.Level1)
+{
+    InitTestEnvironment();
+    AddNativeTokenTypeAndPermissions();
+    I18nErrorCode err = I18nServiceAbilityClient::SetSystemLanguage("zh-Hans");
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    err = I18nServiceAbilityClient::SetSystemLocale("zh-Hans-CN");
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+
+    std::unordered_map<std::string, std::string> systemNumberPatterns;
+    err = I18nServiceAbilityClient::GetSystemNumberPatterns(systemNumberPatterns);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    EXPECT_TRUE(systemNumberPatterns.find("002c002e") != systemNumberPatterns.end());
+    EXPECT_TRUE(systemNumberPatterns.find("0000002e") != systemNumberPatterns.end());
+    EXPECT_TRUE(systemNumberPatterns.find("002e002c") != systemNumberPatterns.end());
+    EXPECT_TRUE(systemNumberPatterns.find("0000002c") != systemNumberPatterns.end());
+    err = I18nServiceAbilityClient::SetSystemNumberPattern("002e002c");
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    std::string usingNumberPattern;
+    err = I18nServiceAbilityClient::GetUsingNumberPattern(usingNumberPattern);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    EXPECT_EQ(usingNumberPattern, "002e002c");
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

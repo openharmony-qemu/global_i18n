@@ -16,9 +16,11 @@
 #define OHOS_GLOBAL_I18N_LOCALE_INFO_ADDON_H
 
 #include <vector>
-#include "locale_info.h"
+
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+
+#include "locale_info.h"
 
 namespace OHOS {
 namespace Global {
@@ -32,6 +34,7 @@ public:
     static void Destructor(napi_env env, void *nativeObject, void *hint);
     static napi_value InitLocale(napi_env env, napi_value exports);
     std::shared_ptr<LocaleInfo> GetLocaleInfo();
+    static bool IsLocaleInfo(napi_env env, napi_value argv);
 
 private:
     static napi_value LocaleConstructor(napi_env env, napi_callback_info info);

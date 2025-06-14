@@ -31,6 +31,7 @@ public:
 };
 
 int TimeZoneLocationTest0001(void);
+int TimeZoneLocationTest0002(void);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

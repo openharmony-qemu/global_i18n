@@ -1719,8 +1719,9 @@ HWTEST_F(I18nTest, I18nFuncTest068, TestSize.Level1)
     EXPECT_EQ(result, "10%");
 
     skeleton = "%";
+    std::shared_ptr<LocaleInfo> nullLocaleInfo = nullptr;
     std::unique_ptr<SimpleNumberFormat> formatterWithoutLocale =
-        std::make_unique<SimpleNumberFormat>(skeleton, nullptr, err);
+        std::make_unique<SimpleNumberFormat>(skeleton, nullLocaleInfo, err);
     EXPECT_EQ(err, I18nErrorCode::SUCCESS);
     ASSERT_TRUE(formatterWithoutLocale != nullptr);
     result = formatterWithoutLocale->Format(10);
@@ -1728,11 +1729,11 @@ HWTEST_F(I18nTest, I18nFuncTest068, TestSize.Level1)
 
     skeleton = "5%";
     std::unique_ptr<SimpleNumberFormat> formatterWithError =
-        std::make_unique<SimpleNumberFormat>(skeleton, nullptr, err);
+        std::make_unique<SimpleNumberFormat>(skeleton, nullLocaleInfo, err);
     EXPECT_EQ(err, I18nErrorCode::INVALID_NUMBER_FORMAT_SKELETON);
 
     std::unique_ptr<SimpleNumberFormat> formatterWithEmpty =
-        std::make_unique<SimpleNumberFormat>("", nullptr, err);
+        std::make_unique<SimpleNumberFormat>("", nullLocaleInfo, err);
     EXPECT_EQ(err, I18nErrorCode::INVALID_NUMBER_FORMAT_SKELETON);
 }
 
@@ -1756,9 +1757,9 @@ HWTEST_F(I18nTest, I18nFuncTest069, TestSize.Level1)
     int64_t milliseconds = 98765432100;
     std::string result = skeletonFormatter->Format(milliseconds);
     EXPECT_EQ(result, "1973/2/17");
-
+    std::shared_ptr<LocaleInfo> nullLocaleInfo = nullptr;
     std::unique_ptr<SimpleDateTimeFormat> formatterWithoutLocale =
-        std::make_unique<SimpleDateTimeFormat>(skeleton, nullptr, false, err);
+        std::make_unique<SimpleDateTimeFormat>(skeleton, nullLocaleInfo, false, err);
     EXPECT_EQ(err, I18nErrorCode::SUCCESS);
 
     skeleton = "y/M/d";
@@ -1808,6 +1809,103 @@ HWTEST_F(I18nTest, I18nFuncTest070, TestSize.Level1)
     std::unique_ptr<SimpleDateTimeFormat> formatterWithEmptyPattern =
         std::make_unique<SimpleDateTimeFormat>("", localeInfo, true, err);
     EXPECT_EQ(err, I18nErrorCode::INVALID_DATE_TIME_FORMAT_PATTERN);
+}
+
+/**
+ * @tc.name: I18nFuncTest071
+ * @tc.desc: Test I18n simple number format
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest071, TestSize.Level1)
+{
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    std::string skeleton = "percent";
+    std::unordered_map<std::string, std::string> configs;
+    std::string errMessage;
+    std::shared_ptr<IntlLocale> intlLocale = std::make_shared<IntlLocale>("zh-Hans-CN", configs, errMessage);
+    ASSERT_TRUE(intlLocale != nullptr);
+    std::unique_ptr<SimpleNumberFormat> formatter = std::make_unique<SimpleNumberFormat>(skeleton, intlLocale, err);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    ASSERT_TRUE(formatter != nullptr);
+    std::string result = formatter->Format(10);
+    EXPECT_EQ(result, "10%");
+
+    skeleton = "%";
+    std::shared_ptr<IntlLocale> nullIntlLocale = nullptr;
+    std::unique_ptr<SimpleNumberFormat> formatterWithoutLocale =
+        std::make_unique<SimpleNumberFormat>(skeleton, nullIntlLocale, err);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    ASSERT_TRUE(formatterWithoutLocale != nullptr);
+    result = formatterWithoutLocale->Format(10);
+    EXPECT_EQ(result, "10%");
+
+    skeleton = "5%";
+    std::unique_ptr<SimpleNumberFormat> formatterWithError =
+        std::make_unique<SimpleNumberFormat>(skeleton, nullIntlLocale, err);
+    EXPECT_EQ(err, I18nErrorCode::INVALID_NUMBER_FORMAT_SKELETON);
+
+    std::unique_ptr<SimpleNumberFormat> formatterWithEmpty =
+        std::make_unique<SimpleNumberFormat>("", nullIntlLocale, err);
+    EXPECT_EQ(err, I18nErrorCode::INVALID_NUMBER_FORMAT_SKELETON);
+}
+
+/**
+ * @tc.name: I18nFuncTest072
+ * @tc.desc: Test I18n simple date time format
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest072, TestSize.Level1)
+{
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    std::unordered_map<std::string, std::string> configs;
+    std::string errMessage;
+    std::shared_ptr<IntlLocale> intlLocale = std::make_shared<IntlLocale>("zh-Hans-CN", configs, errMessage);
+    ASSERT_TRUE(intlLocale != nullptr);
+
+    std::string pattern = "yMd";
+    std::unique_ptr<SimpleDateTimeFormat> patternFormatter =
+        std::make_unique<SimpleDateTimeFormat>(pattern, intlLocale, true, err);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    ASSERT_TRUE(patternFormatter != nullptr);
+
+    int64_t milliseconds = 98765432100;
+    std::string result = patternFormatter->Format(milliseconds);
+    EXPECT_EQ(result, "1973217");
+
+    pattern = "'year('y')month('M')day('d')'";
+    std::unique_ptr<SimpleDateTimeFormat> formatterWithContent =
+        std::make_unique<SimpleDateTimeFormat>(pattern, intlLocale, true, err);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    ASSERT_TRUE(formatterWithContent != nullptr);
+    result = formatterWithContent->Format(milliseconds);
+    EXPECT_EQ(result, "year(1973)month(2)day(17)");
+
+    pattern = "y''Md";
+    std::unique_ptr<SimpleDateTimeFormat> formatterInvalidPattern =
+        std::make_unique<SimpleDateTimeFormat>(pattern, intlLocale, true, err);
+    EXPECT_EQ(err, I18nErrorCode::INVALID_DATE_TIME_FORMAT_PATTERN);
+
+    std::unique_ptr<SimpleDateTimeFormat> formatterWithEmptyPattern =
+        std::make_unique<SimpleDateTimeFormat>("", intlLocale, true, err);
+    EXPECT_EQ(err, I18nErrorCode::INVALID_DATE_TIME_FORMAT_PATTERN);
+}
+
+/**
+ * @tc.name: I18nFuncTest073
+ * @tc.desc: Test I18n GetUnicodeWrappedFilePath
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest073, TestSize.Level1)
+{
+    std::unordered_map<std::string, std::string> configs;
+    std::string errMessage;
+    std::shared_ptr<IntlLocale> intlLocale = std::make_shared<IntlLocale>("ar", configs, errMessage);
+    ASSERT_TRUE(intlLocale != nullptr);
+    std::string path = "data>log>faultlog";
+    char delimiter = '>';
+    std::string errorCode;
+    std::string result = LocaleConfig::GetUnicodeWrappedFilePath(path, delimiter, intlLocale, errorCode);
+    EXPECT_EQ(result, "\u200f\u200edata\u200e\u200f>\u200elog\u200e\u200f>\u200efaultlog\u200e");
 }
 } // namespace I18n
 } // namespace Global

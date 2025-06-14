@@ -30,6 +30,7 @@ const int32_t I18N_NOT_FOUND     = 401;          // Input parameter is missing
 
 // I18N error code
 const int32_t I18N_NOT_VALID  = 890001;    // Unspported para value
+const int32_t I18N_NOT_VALID_NEW  = 8900001;    // Unspported para value
 const int32_t I18N_OPTION_NOT_VALID   = 890002;    // Unspported option value
 const size_t FUNC_ARGS_COUNT = 2;    // Function input parameter count
 
@@ -39,6 +40,7 @@ public:
         const std::string& valueContent, bool throwError);
     static void NapiNotFoundError(napi_env env, int32_t errCode, const std::string& valueName,
         bool throwError);
+    static void NapiThrowUndefined(napi_env env, const std::string& value);
 };
 } // namespace I18n
 } // namespace Global

@@ -48,6 +48,8 @@
 #include "intl_test.h"
 #include "generate_ics_file.h"
 #include <unistd.h>
+#include "zone_offset_transition.h"
+#include "zone_rules.h"
 
 using namespace OHOS::Global::I18n;
 using testing::ext::TestSize;
@@ -151,10 +153,7 @@ HWTEST_F(IntlTest, IntlFuncTest001, TestSize.Level1)
                                     { "weekday", "long" },
                                     { "era", "short"} };
     DateTimeFormat *dateFormat = new (std::nothrow) DateTimeFormat(locales, options);
-    if (!dateFormat) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(dateFormat != nullptr);
     int64_t milliseconds = 1234567;
     string out = dateFormat->Format(milliseconds);
     EXPECT_EQ(out, expects);
@@ -182,10 +181,7 @@ HWTEST_F(IntlTest, IntlFuncTest002, TestSize.Level0)
                                     { "numeric", "true" },
                                     { "numberingSystem", "jpan" } };
     LocaleInfo *loc = new (std::nothrow) LocaleInfo(locale, options);
-    if (!loc) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(loc != nullptr);
     EXPECT_EQ(loc->GetLanguage(), "ja");
     EXPECT_EQ(loc->GetScript(), "Jpan");
     EXPECT_EQ(loc->GetRegion(), "JP");
@@ -209,10 +205,7 @@ HWTEST_F(IntlTest, IntlFuncTest003, TestSize.Level1)
 {
     string locale = "en-GB";
     LocaleInfo *loc = new (std::nothrow) LocaleInfo(locale);
-    if (!loc) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(loc != nullptr);
     string language = "en";
     string script = "";
     string region = "GB";
@@ -236,7 +229,7 @@ HWTEST_F(IntlTest, IntlFuncTest003, TestSize.Level1)
 HWTEST_F(IntlTest, IntlFuncTest004, TestSize.Level1)
 {
     string locale = "en-GB";
-    string expects = "2 January 1970, 18:17 – 12 January 1970, 18:20";
+    string expects = "2 January 1970, 18:17 – 12 January 1970, 18:20";
     vector<string> locales;
     locales.push_back(locale);
     string dateStyle = "long";
@@ -248,10 +241,7 @@ HWTEST_F(IntlTest, IntlFuncTest004, TestSize.Level1)
                                     { "hourCycle", hourCycle },
                                     { "timeStyle", timeStyle } };
     DateTimeFormat *dateFormat = new (std::nothrow) DateTimeFormat(locales, options);
-    if (!dateFormat) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(dateFormat != nullptr);
     int64_t fromMilliseconds = 123456789;
     int64_t toMilliseconds = 987654321;
     string out = dateFormat->FormatRange(fromMilliseconds, toMilliseconds);
@@ -277,10 +267,7 @@ HWTEST_F(IntlTest, IntlFuncTest005, TestSize.Level1)
                                     { "day", "numeric" },
                                     { "weekday", "long"} };
     DateTimeFormat *dateFormat = new (std::nothrow) DateTimeFormat(locales, options);
-    if (!dateFormat) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(dateFormat != nullptr);
     int64_t milliseconds = 123456789;
     string out = dateFormat->Format(milliseconds);
     EXPECT_EQ(out, expects);
@@ -315,10 +302,7 @@ HWTEST_F(IntlTest, IntlFuncTest006, TestSize.Level1)
                                     { "currencySign", "accounting" },
                                     { "signDisplay", "always" } };
     NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
-    if (!numFmt) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(numFmt != nullptr);
     string out = numFmt->Format(123456.789);
     EXPECT_EQ(out, expects);
     EXPECT_EQ(numFmt->GetUseGrouping(), useGrouping);
@@ -348,10 +332,7 @@ HWTEST_F(IntlTest, IntlFuncTest007, TestSize.Level1)
                                     { "unit", "meter" },
                                     { "unitDisplay", "long"} };
     NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
-    if (!numFmt) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(numFmt != nullptr);
     string out = numFmt->Format(123456.789);
     EXPECT_EQ(out, expects);
     EXPECT_EQ(numFmt->GetStyle(), style);
@@ -376,10 +357,7 @@ HWTEST_F(IntlTest, IntlFuncTest008, TestSize.Level1)
                                     { "minimumIntegerDigits", minimumIntegerDigits },
                                     { "maximumFractionDigits", maximumFractionDigits } };
     NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
-    if (!numFmt) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(numFmt != nullptr);
     string out = numFmt->Format(123456.789);
     EXPECT_EQ(out, expects);
     EXPECT_EQ(numFmt->GetStyle(), style);
@@ -404,10 +382,7 @@ HWTEST_F(IntlTest, IntlFuncTest009, TestSize.Level1)
                                     { "minimumIntegerDigits", minimumIntegerDigits },
                                     { "maximumFractionDigits", maximumFractionDigits } };
     NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
-    if (!numFmt) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(numFmt != nullptr);
     string out = numFmt->Format(123456.789);
     EXPECT_EQ(out, expects);
     EXPECT_EQ(numFmt->GetStyle(), style);
@@ -441,10 +416,7 @@ HWTEST_F(IntlTest, IntlFuncTest010, TestSize.Level1)
     map<string, string> options = { { "style", style },
                                     { "notation", "scientific" } };
     NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
-    if (!numFmt) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(numFmt != nullptr);
     string out = numFmt->Format(123456.789);
     EXPECT_EQ(out, expects);
     EXPECT_EQ(numFmt->GetStyle(), style);
@@ -467,10 +439,7 @@ HWTEST_F(IntlTest, IntlFuncTest011, TestSize.Level1)
                                     { "notation", "compact" },
                                     { "compactDisplay", "long" } };
     NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
-    if (!numFmt) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(numFmt != nullptr);
     string out = numFmt->Format(123456.789);
     EXPECT_EQ(out, expects);
     EXPECT_EQ(numFmt->GetStyle(), style);
@@ -492,10 +461,7 @@ HWTEST_F(IntlTest, IntlFuncTest0012, TestSize.Level1)
     locales.push_back(locale);
     std::string expects = "3/11/82";
     DateTimeFormat *dateFormat = new (std::nothrow) DateTimeFormat(locales, options);
-    if (!dateFormat) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(dateFormat != nullptr);
     int64_t milliseconds = 123456789123456;
     string out = dateFormat->Format(milliseconds);
     EXPECT_EQ(out, expects);
@@ -544,10 +510,7 @@ HWTEST_F(IntlTest, IntlFuncTest0013, TestSize.Level1)
     map<string, string> options = {};
     std::string expects = "123,456.789";
     NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
-    if (!numFmt) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(numFmt != nullptr);
     string out = numFmt->Format(123456.789);
     EXPECT_EQ(out, expects);
     delete numFmt;
@@ -567,10 +530,7 @@ HWTEST_F(IntlTest, IntlFuncTest0014, TestSize.Level1)
     locales.push_back(locale);
     map<string, string> options = { { "timeZone", "America/Los_Angeles"  }, { "timeZoneName", "long" } };
     DateTimeFormat *dateFormat = new (std::nothrow) DateTimeFormat(locales, options);
-    if (!dateFormat) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(dateFormat != nullptr);
     int64_t milliseconds = 123456789;
     string out = dateFormat->Format(milliseconds);
     EXPECT_TRUE(out.find(expects) != out.npos);
@@ -593,10 +553,7 @@ HWTEST_F(IntlTest, IntlFuncTest0015, TestSize.Level1)
         { "timeZoneName", "short" }
     };
     DateTimeFormat *dateFormat = new (std::nothrow) DateTimeFormat(locales, options);
-    if (!dateFormat) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_TRUE(dateFormat != nullptr);
     EXPECT_EQ(dateFormat->GetTimeZone(), "America/Los_Angeles");
     EXPECT_EQ(dateFormat->GetTimeZoneName(), "short");
     delete dateFormat;
@@ -1520,7 +1477,7 @@ HWTEST_F(IntlTest, IntlFuncTest0036, TestSize.Level1)
     
     int64_t milliseconds2 = 987654321;
     res = formatter->FormatRange(milliseconds, milliseconds2);
-    EXPECT_EQ(res, "1/2/70 \xE2\x80\x93 1/12/70");
+    EXPECT_EQ(res, "1/2/70 – 1/12/70");
     delete formatter;
 }
 
@@ -1954,41 +1911,58 @@ HWTEST_F(IntlTest, IntlFuncTest0045, TestSize.Level1)
 
 /**
  * @tc.name: IntlFuncTest0046
- * @tc.desc: Test Intl GetTimezoneIdByLocation
+ * @tc.desc: Test Intl NextTransition
  * @tc.type: FUNC
  */
 HWTEST_F(IntlTest, IntlFuncTest0046, TestSize.Level1)
 {
-    //北京
-    vector<std::string> Beijing = I18nTimeZone::GetTimezoneIdByLocation(116.3, 39.5);
-    EXPECT_TRUE(Beijing.size() == 1 && Beijing[0] == "Asia/Shanghai");
-    //洛杉矶
-    vector<std::string> LosAngeles = I18nTimeZone::GetTimezoneIdByLocation(-118.1, 34.0);
-    EXPECT_TRUE(LosAngeles.size() == 1 && LosAngeles[0] == "America/Los_Angeles");
-    //里约热内卢
-    vector<std::string> RIO = I18nTimeZone::GetTimezoneIdByLocation(-43.1, -22.5);
-    EXPECT_TRUE(RIO.size() == 1 && RIO[0] == "America/Sao_Paulo");
-    //悉尼
-    vector<std::string> Sydney = I18nTimeZone::GetTimezoneIdByLocation(150.5, -33.55);
-    EXPECT_TRUE(Sydney.size() == 1 && Sydney[0] == "Australia/Sydney");
-    //乌鲁木齐
-    vector<std::string> Urumqi = I18nTimeZone::GetTimezoneIdByLocation(87.7, 43.8);
-    EXPECT_TRUE(Urumqi.size() == 2);
-    bool containsShanghai = false;
-    bool containsUrumqi = false;
-    for (unsigned int i = 0; i < Urumqi.size(); i++) {
-        if (Urumqi[i] == "Asia/Shanghai") {
-            containsShanghai = true;
-        }
-        if (Urumqi[i] == "Asia/Urumqi") {
-            containsUrumqi = true;
-        }
-    }
-    EXPECT_TRUE(containsShanghai);
-    EXPECT_TRUE(containsUrumqi);
-    //科伊艾克
-    vector<std::string> coyhaique = I18nTimeZone::GetTimezoneIdByLocation(-72.04, -45.34);
-    EXPECT_TRUE(coyhaique.size() == 1 && coyhaique[0] == "America/Coyhaique");
+    std::string tzId = "America/Tijuana";
+    std::unique_ptr<ZoneRules> zoneRules = std::make_unique<ZoneRules>(tzId);
+    ASSERT_TRUE(zoneRules != nullptr);
+    double date = 1738339200000.0; // 2025/2/1
+    std::unique_ptr<ZoneOffsetTransition> zoneTrans = zoneRules->NextTransition(date);
+    ASSERT_TRUE(zoneTrans != nullptr);
+    vector<string> locales;
+    locales.push_back("en-US");
+    string dateStyle = "long";
+    string timeStyle = "long";
+    string hourCycle = "h24";
+    string hour12 = "false";
+    map<string, string> options = { { "dateStyle", dateStyle },
+                                    { "hour12", hour12 },
+                                    { "hourCycle", hourCycle },
+                                    { "timeStyle", timeStyle },
+                                    { "timeZone", tzId } };
+    DateTimeFormat *dateFormat = new (std::nothrow) DateTimeFormat(locales, options);
+    double milliseconds = zoneTrans->GetMilliseconds();
+    std::string result = dateFormat->Format(static_cast<int64_t>(milliseconds));
+    EXPECT_EQ(result, "March 9, 2025, 03:00:00 PDT");
+
+    std::unique_ptr<ZoneOffsetTransition> zoneOffsetTrans = zoneRules->NextTransition(milliseconds);
+    ASSERT_TRUE(zoneOffsetTrans != nullptr);
+    milliseconds = zoneOffsetTrans->GetMilliseconds();
+    result = dateFormat->Format(static_cast<int64_t>(milliseconds));
+    EXPECT_EQ(result, "November 2, 2025, 01:00:00 PST");
+
+    tzId = "America/Santiago";
+    options["timeZone"] = tzId;
+    DateTimeFormat *dateFormat2 = new (std::nothrow) DateTimeFormat(locales, options);
+    std::unique_ptr<ZoneRules> zoneRules2 = std::make_unique<ZoneRules>(tzId);
+    ASSERT_TRUE(zoneRules2 != nullptr);
+    std::unique_ptr<ZoneOffsetTransition> zoneTrans2 = zoneRules2->NextTransition(date);
+    ASSERT_TRUE(zoneTrans2 != nullptr);
+    milliseconds = zoneTrans2->GetMilliseconds();
+    result = dateFormat2->Format(static_cast<int64_t>(milliseconds));
+    EXPECT_EQ(result, "April 5, 2025, 23:00:00 GMT-4");
+    std::unique_ptr<ZoneOffsetTransition> zoneOffsetTrans2 = zoneRules2->NextTransition(milliseconds);
+    ASSERT_TRUE(zoneOffsetTrans2 != nullptr);
+    milliseconds = zoneOffsetTrans2->GetMilliseconds();
+    result = dateFormat2->Format(static_cast<int64_t>(milliseconds));
+    EXPECT_EQ(result, "September 7, 2025, 01:00:00 GMT-3");
+    EXPECT_EQ(zoneOffsetTrans2->GetOffsetAfter(), -10800000);
+    EXPECT_EQ(zoneOffsetTrans2->GetOffsetBefore(), -14400000);
+    delete dateFormat;
+    delete dateFormat2;
 }
 } // namespace I18n
 } // namespace Global

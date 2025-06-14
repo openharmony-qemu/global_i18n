@@ -57,6 +57,8 @@ std::string LocaleEncode(const std::string& locale);
 bool Eq(double a, double b);
 bool Geq(double a, double b);
 bool Leq(double a, double b);
+std::string StrToHex(const std::string& text, size_t num);
+std::string HexToStr(const std::string& hex);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,10 +19,12 @@
 #include <mutex>
 #include <vector>
 #include <set>
+#include <shared_mutex>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include "i18n_types.h"
+#include "intl_locale.h"
 #include "taboo_utils.h"
 
 namespace OHOS {
@@ -94,10 +96,87 @@ public:
      */
     static I18nErrorCode SetFirstDayOfWeek(const WeekDay& type, int32_t userId = -1);
 
+    /**
+     * @brief Gets collations supported by system locale.
+     *
+     * @param systemCollations The map will containing the collation's identifier and name.
+     * @return I18nErrorCode Return SUCCESS indicates that the getting was successful.
+     */
+    static I18nErrorCode GetSystemCollations(std::unordered_map<std::string, std::string>& systemCollations);
+
+    /**
+     * @brief Gets collation currently used by system locale.
+     *
+     * @param usingCollation The identifier of the collation model used by system locale will be return.
+     * @return I18nErrorCode Return SUCCESS indicates that the getting was successful.
+     */
+    static I18nErrorCode GetUsingCollation(std::string& usingCollation);
+
+    /**
+     * @brief Sets the system collation mode.
+     *
+     * @param identifier Identifier of the collation mode.
+     * @param userId Indicates update user id.
+     * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
+     */
+    static I18nErrorCode SetSystemCollation(const std::string& identifier, int32_t userId = -1);
+
+    /**
+     * @brief Gets numbering systems supported by system locale.
+     *
+     * @param systemNumberingSystems a map will containing the numbering system's identifier and sample.
+     * @return I18nErrorCode Return SUCCESS indicates that the getting was successful.
+     */
+    static I18nErrorCode GetSystemNumberingSystems(
+        std::unordered_map<std::string, std::string>& systemNumberingSystems);
+
+    /**
+     * @brief Gets numbering system currently used by system locale.
+     *
+     * @param usingNumberingSystem the numbering systems's identifier
+     * @return I18nErrorCode Return SUCCESS indicates that the getting was successful.
+     */
+    static I18nErrorCode GetUsingNumberingSystem(std::string& usingNumberingSystem);
+
+    /**
+     * @brief Sets the numbering system used by the system locale.
+     *
+     * @param identifier Identifier of the numbering system.
+     * @param userId Indicates update user id.
+     * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
+     */
+    static I18nErrorCode SetSystemNumberingSystem(const std::string& identifier, int32_t userId = -1);
+
+    /**
+     * @brief Gets commonly used number patterns for system locale.
+     *
+     * @param systemNumberPatterns a map containing the used number patterns and example of system locale.
+     * @return I18nErrorCode Return SUCCESS indicates that the getting was successful.
+     */
+    static I18nErrorCode GetSystemNumberPatterns(std::unordered_map<std::string, std::string>& systemNumberPatterns);
+
+    /**
+     * @brief Gets number pattern used by system locale.
+     *
+     * @param usingNumberPattern The number pattern identifier used by system locale.
+     * @return I18nErrorCode Return SUCCESS indicates that the getting was successful.
+     */
+    static I18nErrorCode GetUsingNumberPattern(std::string& usingNumberPattern);
+
+    /**
+     * @brief Sets the number pattern used by the system locale.
+     *
+     * @param pattern Identifier of the number pattern.
+     * @param userId Indicates update user id.
+     * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
+     */
+    static I18nErrorCode SetSystemNumberPattern(const std::string& pattern, int32_t userId = -1);
+
     static TemperatureType GetTemperatureType();
     static std::string GetTemperatureName(const TemperatureType& type);
     static WeekDay GetFirstDayOfWeek();
     static std::string GetEffectiveLanguage();
+    static std::string GetEffectiveLocale();
     static std::string GetSystemLanguage();
     static std::string GetSystemRegion();
     static std::string GetSystemLocale();
@@ -128,6 +207,17 @@ public:
     static std::string GetSimplifiedSystemLanguage();
     static std::string GetUnicodeWrappedFilePath(const std::string &path, const char delimiter,
         std::shared_ptr<LocaleInfo> localeInfo, std::string &invalidField);
+    static std::string GetUnicodeWrappedFilePath(const std::string &path, const char delimiter,
+        std::shared_ptr<IntlLocale> IntlLocale, std::string &invalidField);
+    static std::string ComputeEffectiveLanguage(const std::string& localeTag, const std::string& language);
+    static std::string GetSystemLocaleInstanceTag();
+    static std::pair<std::string, std::string> GetNumberPatternFromLocale(const std::string& localeTag);
+    static std::string RemoveCustExtParam(const std::string& locale);
+    static std::string ModifyExtParam(const std::string& locale, const std::string& key, const std::string& value,
+        const std::string& extParamKey);
+    static std::string QueryExtParam(const std::string& locale, const std::string& key,
+        const std::string& extParamKey);
+    static std::string GetNumberingSystemDigit(const std::string& NumberingSystem);
     static const std::string HOUR_EVENT_DATA;
     static const std::string LANGUAGE_KEY;
     static const std::string LOCALE_KEY;
@@ -139,7 +229,6 @@ private:
     static void Split(const std::string &src, const std::string &sep, std::vector<std::string> &dest);
     static void Split(const std::string &src, const std::string &sep, std::unordered_set<std::string> &dest);
     static I18nErrorCode UpdateSystemLocale(const std::string &language);
-    static std::string ComputeEffectiveLanguage(const std::string& locale, const std::string& language);
     static constexpr uint32_t LANGUAGE_LEN = 2;
     static constexpr uint32_t LOCALE_ITEM_COUNT = 3;
     static constexpr uint32_t SCRIPT_OFFSET = 2;
@@ -157,6 +246,7 @@ private:
     static const char *SUPPORT_LOCALES_PATH;
     static const char *SUPPORT_LOCALES_NAME;
     static const char *DEFAULT_LOCALE;
+    static const char *DEVELOPER_MODE_KEY;
     static const char *supportLocalesTag;
     static const char *LANG_PATH;
     static const char *rootTag;
@@ -164,6 +254,7 @@ private:
     static const char *rootRegion;
     static const char *secondRootRegion;
     static const uint32_t ELEMENT_NUM = 2;
+    static const size_t SYMBOL_HEX_LEN = 4;
 
     static const char *SUPPORTED_LANGUAGE_EN_LATN_PATH;
     static const char *SUPPORTED_LANGUAGE_EN_LATN_NAME;
@@ -178,10 +269,16 @@ private:
     static std::mutex dialectLocaleMutex;
     static std::mutex region2DisplayNameMutex;
     static std::mutex locale2DisplayNameMutex;
-    static const std::string EXT_PARAM_KEY;
+    static std::shared_mutex is24HourLocaleMapMutex;
+    static const std::string STANDARD_EXT_PARAM_KEY;
+    static const std::string CUST_EXT_PARAM_KEY;
     static const std::string NUMBER_SYSTEM_KEY;
     static const std::string TEMPERATURE_UNIT_KEY;
     static const std::string WEEK_DAY_KEY;
+    static const std::string CASE_FIRST_KEY;
+    static const std::string COLLATION_KEY;
+    static const std::string NUNBER_PATTERN_KEY;
+    static const std::string DEFAULT_NUMBERING_SYSTEM_NAME;
 
     static const std::unordered_set<std::string>& GetSupportedLocales();
     static const std::unordered_set<std::string>& GetSupportedLocalesV15();
@@ -208,17 +305,29 @@ private:
     static bool Is24HourLocale(const std::string& systemLocale);
     static bool HasDesignator(const std::string& inFormat, const char designator);
     static void QueryUpgradeLocale();
+    static std::string GetUnicodeWrappedFilePathInner(const std::string &path, const char delimiter,
+        const std::string& localeTag, std::string &invalidField);
+    static I18nErrorCode GetSystemNumberingSystemsFromLanguage(const std::string& language,
+        std::unordered_map<std::string, std::string>& systemNumberingSystems);
 
 #ifdef SUPPORT_GRAPHICS
     /**
-     * @brief Provided for updating i18n configuration include language and hour24.
+     * @brief Provided for updating i18n configuration include locale and language.
      *
-     * @param key Indicats configuration key.
-     * @param value Indicates configuration value.
-     * @param userId Indicats update user id.
-     * @param isSwitchUser Indicates whether user switch.
+     * @param locale Indicates update locale.
+     * @param language Indicates update language.
+     * @param userId Indicates update user id.
      */
-    static void UpdateConfiguration(const char *key, const std::string &value, int32_t userId);
+    static void UpdateConfigurationLocaleAndLanguage(const std::string& locale, const std::string& language,
+        int32_t userId);
+
+    /**
+     * @brief Provided for updating i18n configuration include is24Hour.
+     *
+     * @param is24Hour Indicates update is24Hour.
+     * @param userId Indicates update user id.
+     */
+    static void UpdateConfiguration24Hour(const std::string& is24Hour, int32_t userId);
 
     /**
      * @brief Provided for public i18n event include locale-change event and time-change event.
@@ -232,7 +341,7 @@ private:
     /**
      * @brief Change language part of system locale to languageTag.
      *
-     * @param languageTag Indicats language tag use to update locale.
+     * @param languageTag Indicates language tag use to update locale.
      * @return std::string Return locale tag.
      */
     static std::string UpdateLanguageOfLocale(const std::string &languageTag);
@@ -252,7 +361,7 @@ private:
     /**
      * @brief Create a locale tag from region tag. Use icu to fill in missing parts.
      *
-     * @param regionTag Indicats region tag used to create locale.
+     * @param regionTag Indicates region tag used to create locale.
      * @return std::string Return locale tag.
      */
     static std::string CreateLocaleFromRegion(const std::string &regionTag);
@@ -264,12 +373,25 @@ private:
      * @return std::string Return locale Tag.
      */
     static std::string UpdateRegionOfLocale(const std::string &regionTag);
-    static std::string ModifyExtParam(const std::string& locale, const std::string& key, const std::string& value);;
-    static std::unordered_map<std::string, std::string> ParseExtParam(const std::string& param);
-    static std::string GenerateExtParam(const std::unordered_map<std::string, std::string>& paramMap);
+    static std::string GetBestMatchedLocaleOfCollation(const std::string& requestLocale);
+    static std::string GetBestMatchedLocaleOfNumberingSystem(const std::string& requestLocale);
+    static I18nErrorCode GetSystemNumberPatternsFromLocale(
+        std::unordered_map<std::string, std::string>& systemNumberPatterns, const std::string& locale);
+    static std::string NumberPatternToHex(const std::string& groupingSymbol, const std::string& decimalSymbol);
+    static std::pair<std::string, std::string> HexToNumberPattern(const std::string& hex);
+    static std::unordered_map<std::string, std::unordered_map<std::string, std::string>> ParseAllExtParam(
+        std::string locale);
+    static std::unordered_map<std::string, std::string> ParseExtParam(const std::string& extParam,
+        const std::string& extParamKey);
+    static std::string GenerateAllExtParam(
+        const std::unordered_map<std::string, std::unordered_map<std::string, std::string>>& extParamMap);
+    static std::string GenerateExtParam(const std::unordered_map<std::string, std::string>& extParamMap,
+        const std::string& extParamKey);
+    static std::vector<std::pair<size_t, std::string>> GetExtParamPositions(const std::string& locale);
     static void ExtendWhiteLanguages();
     static void ExtendLanguageWithScript(const std::string &languageStr);
     static __attribute__((destructor)) void CleanupXmlResources();
+    static std::string GetPseudoDisplayLanguage(const std::string &language);
     static std::unordered_set<std::string> supportedLocales;
     static std::unordered_set<std::string> supportedLocalesV15;
     static std::unordered_set<std::string> supportedRegions;
@@ -290,6 +412,7 @@ private:
     static std::unordered_map<std::string, WeekDay> nameToWeekDay;
     static std::map<std::string, std::string> locale2DisplayName;
     static std::map<std::string, std::string> region2DisplayName;
+    static std::unordered_map<std::string, bool> is24HourLocaleMap;
     static std::unordered_map<std::string, std::vector<std::string>> dialectLanguages;
     static std::unordered_map<std::string, std::string> resourceIdMap;
     static std::string currentDialectLocale;

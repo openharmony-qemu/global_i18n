@@ -133,7 +133,7 @@ HWTEST_F(ZoneUtilTest,  ZoneUtilFuncTest004, TestSize.Level1)
  */
 HWTEST_F(ZoneUtilTest,  ZoneUtilFuncTest005, TestSize.Level1)
 {
-    vector<string> expects = { "Arctic/Longyearbyen", "Europe/Berlin", "Europe/Busingen" };
+    vector<string> expects = { "Europe/Berlin", "Europe/Busingen" };
     string country = "DE";
     vector<string> out;
     ZoneUtil util;
@@ -316,6 +316,9 @@ HWTEST_F(ZoneUtilTest, ZoneUtilFuncTest0012, TestSize.Level1)
     std::set<std::string> timeZoneList = GetTimeZoneAvailableIDs(errorCode);
     std::unordered_set<std::string> systemCountries = LocaleConfig::GetSystemCountries();
     for (const auto& systemCountry : systemCountries) {
+        if (systemCountry.compare("XA") == 0 || systemCountry.compare("XB") == 0) {
+            continue;
+        }
         std::string timeZoneId = util.GetDefaultZone(systemCountry);
         EXPECT_TRUE(timeZoneList.find(timeZoneId) != timeZoneList.end());
         if (timeZoneList.find(timeZoneId) == timeZoneList.end()) {

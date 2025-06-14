@@ -16,6 +16,7 @@
 
 #include <string>
 #include <unordered_map>
+
 #include "i18n_hilog.h"
 
 namespace OHOS {
@@ -27,6 +28,7 @@ static const std::unordered_map<int32_t, std::string> ErrorCodeToMsg {
     {I18N_NOT_SYSTEM_APP,
         "Permission verification failed. A non-system application calls a system API."},
     {I18N_NOT_VALID, "Invalid parameter"},
+    {I18N_NOT_VALID_NEW, "Invalid parameter"},
     {I18N_NOT_FOUND, "Parameter error"},
     {I18N_OPTION_NOT_VALID, "Invalid option name"}
 };
@@ -50,7 +52,7 @@ void ErrorUtil::NapiThrow(napi_env env, int32_t errCode, const std::string& valu
 
     if (errCode == I18N_NO_PERMISSION || errCode == I18N_NOT_SYSTEM_APP) {
         allErrMsg = errMsg;
-    } else if (errCode == I18N_NOT_VALID) {
+    } else if (errCode == I18N_NOT_VALID || errCode == I18N_NOT_VALID_NEW) {
         allErrMsg = errMsg + ", the " + valueName + " must be " + valueContent + ".";
     } else if (valueContent.length() == 0) {
         allErrMsg = errMsg + ", the " + valueName + " cannot be empty.";
@@ -76,6 +78,29 @@ void ErrorUtil::NapiNotFoundError(napi_env env, int32_t errCode, const std::stri
     bool throwError)
 {
     NapiThrow(env, errCode, valueName, "", throwError);
+}
+
+void ErrorUtil::NapiThrowUndefined(napi_env env, const std::string& value)
+{
+    napi_value code = nullptr;
+    napi_status status = napi_create_string_latin1(env, "undefined", NAPI_AUTO_LENGTH, &code);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("ErrorUtil::NapiThrowUndefined: create string undefined failed");
+        return;
+    }
+    napi_value message = nullptr;
+    status = napi_create_string_latin1(env, value.c_str(), NAPI_AUTO_LENGTH, &message);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("ErrorUtil::NapiThrowUndefined: create string %{public}s failed", value.c_str());
+        return;
+    }
+    napi_value error = nullptr;
+    status = napi_create_error(env, code, message, &error);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("ErrorUtil::NapiThrowUndefined: create error failed");
+        return;
+    }
+    napi_throw(env, error);
 }
 } // namespace I18n
 } // namespace Global

@@ -172,10 +172,51 @@ I18nErrorCode MultiUsers::SaveIs24Hour(const std::string& localId, const std::st
     return I18nErrorCode::SUCCESS;
 }
 
+std::string MultiUsers::GetLanguageFromUserId(int32_t userId)
+{
+    std::string localId = std::to_string(userId);
+    std::string locale = ReadMultiUsersParameter(MULTI_USERS_LOCALE_KEY, localId);
+    std::string language = ReadMultiUsersParameter(MULTI_USERS_LANGUAGE_KEY, localId);
+    if (locale.empty() || language.empty()) {
+        HILOG_ERROR_I18N("MultiUsers::GetLanguageFromUserId: Get language from userId %{public}d failed, "
+            "locale %{public}s, language %{public}s.", userId, locale.c_str(), language.c_str());
+        return LocaleConfig::GetEffectiveLanguage();
+    }
+    return LocaleConfig::ComputeEffectiveLanguage(locale, language);
+}
+
+std::string MultiUsers::GetSystemLanguageFromUserId(int32_t userId)
+{
+    if (userId == -1) {
+        return LocaleConfig::GetSystemLanguage();
+    }
+    std::string localId = std::to_string(userId);
+    std::string language = ReadMultiUsersParameter(MULTI_USERS_LANGUAGE_KEY, localId);
+    if (language.empty()) {
+        HILOG_ERROR_I18N("MultiUsers::GetSystemLanguageFromUserId: Get language failed.");
+        return LocaleConfig::GetSystemLanguage();
+    }
+    return language;
+}
+
+std::string MultiUsers::GetSystemLocaleFromUserId(int32_t userId)
+{
+    if (userId == -1) {
+        return LocaleConfig::GetEffectiveLocale();
+    }
+    std::string localId = std::to_string(userId);
+    std::string locale = ReadMultiUsersParameter(MULTI_USERS_LOCALE_KEY, localId);
+    if (locale.empty()) {
+        HILOG_ERROR_I18N("MultiUsers::GetSystemLocaleFromUserId: Get locale failed.");
+        return LocaleConfig::GetEffectiveLocale();
+    }
+    return locale;
+}
+
 I18nErrorCode MultiUsers::SaveGlobalParam(const std::string& localId)
 {
     std::string language = LocaleConfig::GetSystemLanguage();
-    std::string locale = LocaleConfig::GetSystemLocale();
+    std::string locale = LocaleConfig::GetEffectiveLocale();
     std::string is24Hour = ReadSystemParameter(LocaleConfig::HOUR_KEY.c_str(), CONFIG_LEN);
     if (is24Hour.empty()) {
         HILOG_ERROR_I18N("SaveIs24Hour: Get is24Hour failed");
@@ -225,7 +266,8 @@ I18nErrorCode MultiUsers::LoadGlobalParam(const std::string& localId)
         HILOG_ERROR_I18N("LoadGlobalParam: convert userId failed");
         return I18nErrorCode::FAILED;
     }
-    UpdateConfiguration(newLocale, newIs24Hour, userId);
+    std::string effectiveLanguage = LocaleConfig::ComputeEffectiveLanguage(newLocale, newLanguage);
+    UpdateConfiguration(newLocale, effectiveLanguage, newIs24Hour, userId);
     return PublishCommonEvent(userId);
 #endif
     return I18nErrorCode::SUCCESS;
@@ -364,11 +406,12 @@ I18nErrorCode MultiUsers::SetParamFromPreferences(const std::string& paramKey, c
 }
 
 #ifdef SUPPORT_GRAPHICS
-void MultiUsers::UpdateConfiguration(const std::string& locale, const std::string& is24Hour,
-    int32_t userId)
+void MultiUsers::UpdateConfiguration(const std::string& locale, const std::string& language,
+    const std::string& is24Hour, int32_t userId)
 {
     AppExecFwk::Configuration configuration;
-    configuration.AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE, locale);
+    configuration.AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_LOCALE, locale);
+    configuration.AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE, language);
     configuration.AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_HOUR, is24Hour);
     auto appMgrClient = std::make_unique<AppExecFwk::AppMgrClient>();
 

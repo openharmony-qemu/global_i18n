@@ -41,6 +41,19 @@ public:
     ErrCode RemovePreferredLanguage(int32_t index, int32_t& code) override;
     ErrCode SetTemperatureType(int32_t type, int32_t& code) override;
     ErrCode SetFirstDayOfWeek(int32_t type, int32_t& code) override;
+    ErrCode GetSystemCollations(std::unordered_map<std::string, std::string>& systemCollations,
+        int32_t& code) override;
+    ErrCode GetUsingCollation(std::string& usingCollation, int32_t& code) override;
+    ErrCode SetSystemCollation(const std::string& identifier, int32_t& code) override;
+    ErrCode GetSystemNumberingSystems(std::unordered_map<std::string, std::string>& systemNumberingSystems,
+        int32_t& code) override;
+    ErrCode GetUsingNumberingSystem(std::string& usingNumberingSystem, int32_t& code) override;
+    ErrCode SetSystemNumberingSystem(const std::string& identifier, int32_t& code) override;
+    ErrCode GetSystemNumberPatterns(std::unordered_map<std::string, std::string>& systemNumberPatterns,
+        int32_t& code) override;
+    ErrCode GetUsingNumberPattern(std::string& usingNumberPattern, int32_t& code) override;
+    ErrCode SetSystemNumberPattern(const std::string& pattern, int32_t& code) override;
+    ErrCode GetLanguageFromUserId(int32_t userId, std::string& language) override;
 
 protected:
     /**
@@ -74,6 +87,8 @@ private:
     void FinishTask(int32_t pid);
     int32_t GetCallingUserId();
     I18nErrorCode CheckPermission();
+    I18nErrorCode CheckSystemPermission();
+    I18nErrorCode CheckUpdatePermission();
     // i18n service unload event handler.
     std::shared_ptr<AppExecFwk::EventHandler> handler = nullptr;
     std::unique_ptr<I18nServiceEvent> i18nServiceEvent = nullptr;

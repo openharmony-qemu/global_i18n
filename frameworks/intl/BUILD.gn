@@ -17,9 +17,6 @@ import("//build/ohos.gni")
 
 group("build_module") {
   deps = [
-    ":hmos_cust_libphonenumber_mount",
-    ":hmos_cust_taboo_mount",
-    ":hmos_cust_timezone_mount",
     ":intl_util",
     ":num_timezone_cfg",
     ":preferred_language",
@@ -80,6 +77,7 @@ config("intl_util_config") {
     "//base/global/i18n/frameworks/intl/entity_recognition/phone_number_recognition/include",
     "//base/global/i18n/frameworks/intl/include",
     "//base/global/i18n/frameworks/intl/parameter_upgrade/include",
+    "//base/global/i18n/frameworks/intl/timezone/include",
     "//base/global/i18n/interfaces/native/inner_api/i18n/include",
   ]
 }
@@ -122,15 +120,18 @@ ohos_shared_library("intl_util") {
       "src/character.cpp",
       "src/collator.cpp",
       "src/date_time_format.cpp",
+      "src/displaynames.cpp",
       "src/holiday_manager.cpp",
       "src/i18n_break_iterator.cpp",
       "src/i18n_calendar.cpp",
       "src/i18n_normalizer.cpp",
       "src/i18n_timezone.cpp",
       "src/index_util.cpp",
+      "src/intl_locale.cpp",
       "src/locale_compare.cpp",
       "src/locale_config.cpp",
       "src/locale_data.cpp",
+      "src/locale_helper.cpp",
       "src/locale_info.cpp",
       "src/locale_matcher.cpp",
       "src/locale_util.cpp",
@@ -147,6 +148,8 @@ ohos_shared_library("intl_util") {
       "src/taboo.cpp",
       "src/taboo_utils.cpp",
       "src/utils.cpp",
+      "timezone/src/zone_offset_transition.cpp",
+      "timezone/src/zone_rules.cpp",
     ]
     version_script = "libintl_util.map"
     deps = [
@@ -381,49 +384,6 @@ ohos_prebuilt_etc("dialect_languages_xml") {
 ohos_prebuilt_etc("num_timezone_cfg") {
   source = "//base/global/i18n/frameworks/intl/etc/location/num_timezone.cfg"
   module_install_dir = "usr/ohos_locale_config/"
-  part_name = "i18n"
-  subsystem_name = "global"
-}
-
-ohos_executable("hmos_cust_libphonenumber_mount") {
-  sources = [ "./parameter_upgrade/mount/hmos_libphonenumber_mount.cpp" ]
-  include_dirs = [ "./include" ]
-  deps = [ ":intl_util" ]
-  external_deps = [
-    "hilog:libhilog",
-    "openssl:libcrypto_shared",
-    "openssl:libssl_shared",
-  ]
-  install_images = [ "system" ]
-  part_name = "i18n"
-  subsystem_name = "global"
-}
-
-ohos_executable("hmos_cust_taboo_mount") {
-  sources = [ "./parameter_upgrade/mount/hmos_taboo_mount.cpp" ]
-  include_dirs = [ "./include" ]
-  deps = [ ":intl_util" ]
-  external_deps = [
-    "hilog:libhilog",
-    "openssl:libcrypto_shared",
-    "openssl:libssl_shared",
-  ]
-  install_images = [ "system" ]
-  part_name = "i18n"
-  subsystem_name = "global"
-}
-
-ohos_executable("hmos_cust_timezone_mount") {
-  sources = [ "./parameter_upgrade/mount/hmos_timezone_mount.cpp" ]
-  include_dirs = [ "./include" ]
-  deps = [ ":intl_util" ]
-  external_deps = [
-    "hilog:libhilog",
-    "init:libbegetutil",
-    "openssl:libcrypto_shared",
-    "openssl:libssl_shared",
-  ]
-  install_images = [ "system" ]
   part_name = "i18n"
   subsystem_name = "global"
 }

@@ -20,6 +20,7 @@
 #include <set>
 #include <unordered_map>
 #include <vector>
+#include "unicode/formattedvalue.h"
 #include "unicode/numberformatter.h"
 #include "unicode/locid.h"
 #include "unicode/numfmt.h"
@@ -36,6 +37,7 @@
 #include "unicode/ulocdata.h"
 #include "number_utils.h"
 #include "number_utypes.h"
+#include "i18n_types.h"
 #include "locale_info.h"
 #include "measure_data.h"
 #include "relative_time_format.h"
@@ -44,16 +46,26 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
+struct FormatPartParam {
+    int previousLimit;
+    bool lastFieldGroup;
+    int groupLeapLength;
+    double number;
+    std::string napiType;
+};
+
 class NumberFormat {
 public:
     NumberFormat(const std::vector<std::string> &localeTag, std::map<std::string, std::string> &configs);
     virtual ~NumberFormat();
     std::string Format(double number);
+    std::string FormatBigInt(const std::string &number);
     bool IsRelativeTimeFormat(double number);
     icu::number::FormattedNumber FormatToFormattedNumber(double number);
     icu::FormattedRelativeDateTime FormatToFormattedRelativeDateTime(double number);
     std::string FormatRange(double start, double end);
-    void GetResolvedOptions(std::map<std::string, std::string> &map);
+    std::string FormatJsRange(double first, double second);
+    void GetResolvedOptions(std::map<std::string, std::string> &map, bool setDefault = false);
     std::string GetCurrency() const;
     std::string GetCurrencySign() const;
     std::string GetStyle() const;
@@ -65,6 +77,16 @@ public:
     std::string GetMinimumSignificantDigits() const;
     std::string GetMaximumSignificantDigits() const;
     std::string GetLocaleMatcher() const;
+    void FormatToParts(std::vector<std::vector<std::string>> &result);
+    void FormatToParts(double number, std::vector<std::vector<std::string>> &result);
+    void FormatBigIntToParts(std::string &number, std::vector<std::vector<std::string>> &result);
+    void FormatRangeToParts(const double &first, const double &second,
+        std::vector<std::vector<std::string>> &result);
+    static std::vector<std::string> SupportedLocalesOf(const std::vector<std::string> &requestLocales,
+        const std::map<std::string, std::string> &configs, I18nErrorCode &status);
+    static std::string GetIcuDefaultLocale();
+    std::string CheckNumberFormatOptions(std::map<std::string, std::string> &map, int32_t &code);
+    static std::string CheckParamLocales(std::vector<std::string> &localeArray);
 
 private:
     icu::Locale locale;
@@ -91,6 +113,9 @@ private:
     std::string unitMeasSys;
     std::string roundingPriorityStr;
     std::string roundingModeStr;
+    std::string groupingSymbol;
+    std::string decimalSymbol;
+    std::string effectiveLocale;
     size_t roundingIncrement = 1;
     bool createSuccess = false;
     bool isSetFraction = false;
@@ -104,7 +129,7 @@ private:
     UNumberUnitWidth unitDisplay = UNumberUnitWidth::UNUM_UNIT_WIDTH_SHORT;
     UNumberUnitWidth currencyDisplay = UNumberUnitWidth::UNUM_UNIT_WIDTH_SHORT;
     UNumberSignDisplay signDisplay = UNumberSignDisplay::UNUM_SIGN_AUTO;
-    static const int MAX_UNIT_NUM = 500;
+    static const int MAX_UNIT_NUM = 502;
     static const int DEFAULT_FRACTION_DIGITS = 3;
     static const int DEFAULT_MAX_SIGNIFICANT_DIGITS = 21;
     static const char *DEVICE_TYPE_NAME;
@@ -128,15 +153,25 @@ private:
     static std::unordered_map<std::string, UNumberFormatRoundingMode> roundingModeStyle;
     static std::vector<size_t> roundingIncrementList;
     static std::map<std::string, std::string> RelativeTimeFormatConfigs;
+    static std::unordered_map<UNumberFormatFields, std::string> numberFormatFieldMap;
+    static std::unordered_map<std::string, int> defaultCurrencyFractionMap;
     static bool ReadISO4217Datas();
+    static std::set<std::string> GetNumberAvailableLocales();
     std::string GetCurrencyFromConfig(const std::string& currency);
     void CreateRelativeTimeFormat(const std::string& locale);
     void ParseConfigs(std::map<std::string, std::string> &configs);
     void ParseDigitsConfigs(std::map<std::string, std::string> &configs);
     void ParseRoundingConfigs(std::map<std::string, std::string> &configs);
+    void GetDigitsResolvedOptions(std::map<std::string, std::string> &map, bool setDefault);
+    void GetDigitsResolvedOptionsExt(std::map<std::string, std::string> &map, bool setDefault);
+    void GetMinimumFractionDigitsOption(std::map<std::string, std::string> &map);
+    void GetMaximumFractionDigitsOption(std::map<std::string, std::string> &map);
+    int GetCurrencyFractionDigits(std::map<std::string, std::string> &map);
+    void ParseNumberPattern(const std::string& localeTag);
     void GetDigitsResolvedOptions(std::map<std::string, std::string> &map);
     void InitProperties(icu::number::UnlocalizedNumberFormatter &formatter);
     void InitUnitProperties(icu::number::UnlocalizedNumberFormatter &formatter);
+    void InitNumberPattern(icu::number::UnlocalizedNumberFormatter &formatter);
     void InitCurrencyProperties(icu::number::UnlocalizedNumberFormatter &formatter);
     void InitPercentStyleProperties(icu::number::UnlocalizedNumberFormatter &formatter);
     void InitUseGroupingProperties(icu::number::UnlocalizedNumberFormatter &formatter);
@@ -153,6 +188,27 @@ private:
     int32_t GetMaximumSignificantDigitsIntValue();
     int32_t GetMaximumFractionDigitsValue();
     int32_t GetMinimumFractionDigitsValue();
+    void RelativeDateTimeFormatToParts(double number, std::string &finalUnit,
+        std::vector<std::vector<std::string>> &result);
+    bool IsRelativeTimeFormat(double number, std::string &unitForConvert);
+    void AddFormatParts(std::string typeString, std::vector<std::vector<std::string>> &result,
+        icu::UnicodeString &formatResult, int32_t start, int32_t end);
+    std::string GetSubString(icu::UnicodeString &formatResult, int32_t start, int32_t end);
+    std::string GetNumberFieldType(const std::string &napiType, const int32_t &fieldId, const double &number);
+    icu::number::FormattedNumber FormatDecimalToFormattedNumber(const std::string &number);
+    void FormattedNumberParts(icu::number::FormattedNumber &formattedNumber,
+        std::vector<std::vector<std::string>> &result, const std::string &napiType, const double &number);
+    void FindAllFormatParts(icu::FormattedValue &formattedNumber, std::vector<std::vector<std::string>> &result,
+        double number, const std::string &napiType, icu::UnicodeString &formatResult);
+    void FindAllFormatParts(icu::FormattedValue &formattedNumber, std::vector<std::vector<std::string>> &result,
+        const double &first, const double &second, icu::UnicodeString &formatResult);
+    void SetEveryFormatPartItem(icu::ConstrainedFieldPosition &cfpo, icu::UnicodeString &formatResult,
+        std::vector<std::vector<std::string>> &result, FormatPartParam &param);
+    void CheckNumberFormatOptionsExt(std::map<std::string, std::string> &map, int32_t &code,
+        const std::string &optionName, int min, int max);
+    void FormatableRangeToParts(const double &first, const double &second,
+        std::vector<std::vector<std::string>> &result);
+    double GetBigIntFieldType(const std::string &bigintStr);
 };
 } // namespace I18n
 } // namespace Global

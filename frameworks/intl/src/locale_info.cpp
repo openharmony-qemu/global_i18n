@@ -55,16 +55,18 @@ void LocaleInfo::ResetFinalLocaleStatus()
     configs = {};
 }
 
-void LocaleInfo::InitLocaleInfo(const std::string &localeTag, std::map<std::string, std::string> &configMap)
+void LocaleInfo::InitLocaleInfo(const std::string &localeTag, const std::map<std::string, std::string> &configMap)
 {
     UErrorCode status = U_ZERO_ERROR;
     configs = configMap;
     if (!localeTag.empty()) {
-        ComputeFinalLocaleTag(localeTag);
+        std::string curLocale = LocaleConfig::RemoveCustExtParam(localeTag);
+        ComputeFinalLocaleTag(curLocale);
         locale = icu::Locale::forLanguageTag(icu::StringPiece(finalLocaleTag), status);
     }
     if (localeTag.empty() || U_FAILURE(status)) {
-        std::string defaultLocaleTag = LocaleConfig::GetSystemLocale();
+        std::string defaultLocaleTag = LocaleConfig::GetEffectiveLocale();
+        defaultLocaleTag = LocaleConfig::RemoveCustExtParam(defaultLocaleTag);
         ResetFinalLocaleStatus();
         ComputeFinalLocaleTag(defaultLocaleTag);
         status = U_ZERO_ERROR;
@@ -86,7 +88,7 @@ LocaleInfo::LocaleInfo(const std::string &localeTag)
     InitLocaleInfo(localeTag, configMap);
 }
 
-LocaleInfo::LocaleInfo(const std::string &localeTag, std::map<std::string, std::string> &configMap)
+LocaleInfo::LocaleInfo(const std::string &localeTag, const std::map<std::string, std::string> &configMap)
 {
     InitLocaleInfo(localeTag, configMap);
 }

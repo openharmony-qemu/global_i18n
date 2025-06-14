@@ -57,6 +57,7 @@
                 "bundle_framework",
                 "common_event_service",
                 "config_policy",
+                "cJSON",
                 "c_utils",
                 "eventhandler",
                 "hilog",
@@ -74,7 +75,9 @@
                 "protobuf",
                 "resource_management",
                 "safwk",
-                "samgr"
+                "samgr",
+                "selinux_adapter",
+                "runtime_core"
             ],
             "third_party": []
         },
@@ -82,12 +85,14 @@
             "sub_component": [
                 "//base/global/i18n/frameworks/zone:build_module",
                 "//base/global/i18n/frameworks/intl:build_module",
+                "//base/global/i18n/interfaces/js/innerkits/intl:build_module",
                 "//base/global/i18n/interfaces/js/kits:build_module",
                 "//base/global/i18n/interfaces/cj:build_module",
                 "//base/global/i18n/frameworks/intl:geocoding_depends",
                 "//base/global/i18n/ta:binary_files",
                 "//base/global/i18n/sa_profile:i18n_service_ability_profile",
-                "//base/global/i18n/services:i18n_service_ability"
+                "//base/global/i18n/services:i18n_service_ability",
+                "//base/global/i18n/interfaces/ets/ani:ani_package_i18n"
             ],
             "inner_kits": [
                 {
@@ -118,6 +123,24 @@
                             "preferred_language.h"
                         ],
                         "header_base": "//base/global/i18n/interfaces/native/inner_api/preferred_language/include"
+                    }
+                },
+                {
+                    "name": "//base/global/i18n/services:i18n_sa_client",
+                    "header": {
+                        "header_files": [
+                            "i18n_service_ability_client.h"
+                        ],
+                        "header_base": "//base/global/i18n/services/include"
+                    }
+                },
+                {
+                    "name": "//base/global/i18n/interfaces/js/innerkits/intl:intl_register",
+                    "header": {
+                        "header_files": [
+                            "replace_intl_module.h"
+                        ],
+                        "header_base": "//base/global/i18n/interfaces/js/innerkits/intl/include"
                     }
                 },
                 {

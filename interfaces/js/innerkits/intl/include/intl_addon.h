@@ -20,12 +20,11 @@
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
-#include "locale_info.h"
-#include "date_time_format.h"
-#include "number_format.h"
-#include "relative_time_format.h"
+
 #include "collator.h"
+#include "date_time_format.h"
 #include "plural_rules.h"
+#include "relative_time_format.h"
 
 namespace OHOS {
 namespace Global {
@@ -34,9 +33,12 @@ void GetDateOptionValues(napi_env env, napi_value options, std::map<std::string,
 void GetCollatorOptionValue(napi_env env, napi_value options, std::map<std::string, std::string> &map);
 void GetPluralRulesOptionValues(napi_env env, napi_value options, std::map<std::string, std::string> &map);
 void GetRelativeTimeOptionValues(napi_env env, napi_value options, std::map<std::string, std::string> &map);
+bool GetStringParameter(napi_env env, napi_value value, std::vector<char> &buf);
 
 class IntlAddon {
 public:
+    static napi_value Init(napi_env env, napi_value exports);
+
     static napi_value InitDateTimeFormat(napi_env env, napi_value exports);
     static napi_value InitCollator(napi_env env, napi_value exports);
     static napi_value InitRelativeTimeFormat(napi_env env, napi_value exports);
@@ -86,4 +88,7 @@ private:
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
+
+extern "C" bool RegisterIntl(napi_env env);
+extern "C" bool BindingIntlModules(napi_env env, napi_value &intlModule);
 #endif

@@ -28,7 +28,8 @@ IndexUtil::IndexUtil(const std::string &localeTag)
 {
     UErrorCode status = U_ZERO_ERROR;
     if (localeTag.empty()) {
-        std::string sysLocale = LocaleConfig::GetSystemLocale();
+        std::string sysLocale = LocaleConfig::GetEffectiveLocale();
+        sysLocale = LocaleConfig::RemoveCustExtParam(sysLocale);
         if (sysLocale.empty()) {
             HILOG_ERROR_I18N("IndexUtil::IndexUtil: get system locale failed.");
             return;
@@ -36,7 +37,8 @@ IndexUtil::IndexUtil(const std::string &localeTag)
         icu::Locale locale(sysLocale.c_str());
         index = std::make_unique<icu::AlphabeticIndex>(locale, status);
     } else {
-        icu::Locale locale(localeTag.c_str());
+        std::string curLocale = LocaleConfig::RemoveCustExtParam(localeTag);
+        icu::Locale locale(curLocale.c_str());
         index = std::make_unique<icu::AlphabeticIndex>(locale, status);
     }
     if (U_SUCCESS(status) && index != nullptr) {

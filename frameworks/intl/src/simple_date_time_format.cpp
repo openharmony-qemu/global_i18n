@@ -30,40 +30,60 @@ bool SimpleDateTimeFormat::icuInitialized = SimpleDateTimeFormat::Init();
 SimpleDateTimeFormat::SimpleDateTimeFormat(const std::string& skeletonOrPattern, std::shared_ptr<LocaleInfo> localeInfo,
     bool isBestPattern, I18nErrorCode& errCode)
 {
+    std::string locale;
+    if (localeInfo == nullptr) {
+        locale = LocaleConfig::GetEffectiveLocale();
+    } else {
+        locale = localeInfo->ToString();
+    }
+    InitSimpleDateTimeFormat(skeletonOrPattern, locale, isBestPattern, errCode);
+}
+
+SimpleDateTimeFormat::SimpleDateTimeFormat(const std::string& skeletonOrPattern, std::shared_ptr<IntlLocale> intlLocale,
+    bool isBestPattern, I18nErrorCode& errCode)
+{
+     std::string locale;
+    if (intlLocale == nullptr) {
+        locale = LocaleConfig::GetEffectiveLocale();
+    } else {
+        std::string errMessage;
+        locale = intlLocale->ToString(errMessage);
+    }
+    InitSimpleDateTimeFormat(skeletonOrPattern, locale, isBestPattern, errCode);
+}
+
+void SimpleDateTimeFormat::InitSimpleDateTimeFormat(const std::string& skeletonOrPattern, const std::string& locale,
+    bool isBestPattern, I18nErrorCode& errCode)
+{
     if (skeletonOrPattern.empty()) {
-        HILOG_ERROR_I18N("SimpleDateTimeFormat: skeleton or pattern is empty.");
+        HILOG_ERROR_I18N("SimpleDateTimeFormat::InitSimpleDateTimeFormat: skeleton or pattern is empty.");
         errCode = isBestPattern ? I18nErrorCode::INVALID_DATE_TIME_FORMAT_PATTERN :
             I18nErrorCode::INVALID_DATE_TIME_FORMAT_SKELETON;
         return;
     }
 
-    std::string locale;
-    if (localeInfo == nullptr) {
-        locale = LocaleConfig::GetSystemLocale();
-    } else {
-        locale = localeInfo->GetBaseName();
-    }
     if (locale.empty() || !LocaleConfig::IsValidTag(locale)) {
-        HILOG_ERROR_I18N("SimpleDateTimeFormat: locale %{public}s is invalid.", locale.c_str());
+        HILOG_ERROR_I18N("SimpleDateTimeFormat::InitSimpleDateTimeFormat: locale %{public}s is invalid.",
+            locale.c_str());
         errCode = I18nErrorCode::INVALID_LOCALE_TAG;
         return;
     }
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale icuLocale = icu::Locale::forLanguageTag(icu::StringPiece(locale), status);
     if (U_FAILURE(status)) {
-        HILOG_ERROR_I18N("SimpleDateTimeFormat: create icu::Locale failed.");
+        HILOG_ERROR_I18N("SimpleDateTimeFormat::InitSimpleDateTimeFormat: create icu::Locale failed.");
         errCode = I18nErrorCode::FAILED;
         return;
     }
 
     errCode = isBestPattern ? ParsePattern(skeletonOrPattern) : ParseSkeleton(skeletonOrPattern, icuLocale);
     if (errCode != I18nErrorCode::SUCCESS) {
-        HILOG_ERROR_I18N("SimpleDateTimeFormat: Parse pattern or skeleton failed.");
+        HILOG_ERROR_I18N("SimpleDateTimeFormat::InitSimpleDateTimeFormat: Parse pattern or skeleton failed.");
         return;
     }
     errCode = InitFormatters(icuLocale, isBestPattern);
     if (errCode != I18nErrorCode::SUCCESS) {
-        HILOG_ERROR_I18N("SimpleDateTimeFormat: Init formatters failed.");
+        HILOG_ERROR_I18N("SimpleDateTimeFormat::InitSimpleDateTimeFormat: Init formatters failed.");
         return;
     }
     initSuccess = true;

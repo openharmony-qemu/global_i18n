@@ -62,47 +62,46 @@ RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTag
     UErrorCode status = U_ZERO_ERROR;
     ParseConfigs(configs);
     for (size_t i = 0; i < localeTags.size(); i++) {
-        std::string curLocale = localeTags[i];
+        std::string curLocale = LocaleConfig::RemoveCustExtParam(localeTags[i]);
         locale = icu::Locale::forLanguageTag(icu::StringPiece(curLocale), status);
         if (U_FAILURE(status)) {
             status = U_ZERO_ERROR;
             continue;
         }
-        if (LocaleInfo::allValidLocales.count(locale.getLanguage()) > 0) {
-            localeInfo = std::make_unique<LocaleInfo>(curLocale, configs);
-            if (localeInfo == nullptr || !localeInfo->InitSuccess()) {
-                continue;
-            }
-            locale = localeInfo->GetLocale();
-            localeBaseName = localeInfo->GetBaseName();
-            relativeTimeFormat = std::make_unique<icu::RelativeDateTimeFormatter>(locale, nullptr, style,
-                UDISPCTX_CAPITALIZATION_NONE, status);
-            if (!U_SUCCESS(status) || !relativeTimeFormat) {
-                status = U_ZERO_ERROR;
-                continue;
-            }
-            createSuccess = true;
-            break;
+        localeBaseName = locale.getBaseName();
+        std::replace(localeBaseName.begin(), localeBaseName.end(), '_', '-');
+        relativeTimeFormat = std::make_unique<icu::RelativeDateTimeFormatter>(locale, nullptr, style,
+            UDISPCTX_CAPITALIZATION_NONE, status);
+        if (!U_SUCCESS(status) || !relativeTimeFormat) {
+            status = U_ZERO_ERROR;
+            continue;
         }
+        createSuccess = true;
+        std::string value = LocaleConfig::QueryExtParam(curLocale, "nu", "-u-");
+        if (!value.empty()) {
+            numberingSystem  = value;
+        }
+        break;
     }
     if (!createSuccess) {
-        localeInfo = std::make_unique<LocaleInfo>(LocaleConfig::GetSystemLocale(), configs);
-        if (localeInfo != nullptr && localeInfo->InitSuccess()) {
-            locale = localeInfo->GetLocale();
-            localeBaseName = localeInfo->GetBaseName();
-            relativeTimeFormat = std::make_unique<icu::RelativeDateTimeFormatter>(locale, nullptr, style,
-                UDISPCTX_CAPITALIZATION_NONE, status);
-            if (U_SUCCESS(status) && relativeTimeFormat) {
-                createSuccess = true;
+        std::string systemLocale = LocaleConfig::GetEffectiveLocale();
+        std::string curLocale = LocaleConfig::RemoveCustExtParam(systemLocale);
+        locale = icu::Locale::forLanguageTag(icu::StringPiece(curLocale), status);
+        if (U_FAILURE(status)) {
+            status = U_ZERO_ERROR;
+            return;
+        }
+        localeBaseName = locale.getBaseName();
+        std::replace(localeBaseName.begin(), localeBaseName.end(), '_', '-');
+        relativeTimeFormat = std::make_unique<icu::RelativeDateTimeFormatter>(locale, nullptr, style,
+            UDISPCTX_CAPITALIZATION_NONE, status);
+        if (U_SUCCESS(status) && relativeTimeFormat) {
+            createSuccess = true;
+            std::string value = LocaleConfig::QueryExtParam(curLocale, "nu", "-u-");
+            if (!value.empty()) {
+                numberingSystem  = value;
             }
         }
-    }
-    if (localeInfo == nullptr) {
-        return;
-    }
-    numberingSystem = localeInfo->GetNumberingSystem();
-    if (numberingSystem.empty()) {
-        numberingSystem = "latn";
     }
 }
 

@@ -32,6 +32,9 @@ public:
     static I18nErrorCode SaveLanguage(const std::string& localId, const std::string& language);
     static I18nErrorCode SaveLocale(const std::string& localId, const std::string& locale);
     static I18nErrorCode SaveIs24Hour(const std::string& localId, const std::string& is24Hour);
+    static std::string GetLanguageFromUserId(int32_t userId);
+    static std::string GetSystemLanguageFromUserId(int32_t userId);
+    static std::string GetSystemLocaleFromUserId(int32_t userId);
 
 private:
     static I18nErrorCode SaveGlobalParam(const std::string& localId);
@@ -47,7 +50,8 @@ private:
     static I18nErrorCode SetParamFromPreferences(const std::string& paramKey, const std::string& paramValue);
 
 #ifdef SUPPORT_GRAPHICS
-    static void UpdateConfiguration(const std::string& locale, const std::string& is24Hour, int32_t userId);
+    static void UpdateConfiguration(const std::string& locale, const std::string& language,
+        const std::string& is24Hour, int32_t userId);
     static I18nErrorCode PublishCommonEvent(int32_t userId);
 #endif
 

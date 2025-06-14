@@ -28,26 +28,46 @@ bool SimpleNumberFormat::icuInitialized = SimpleNumberFormat::Init();
 SimpleNumberFormat::SimpleNumberFormat(const std::string& skeleton, std::shared_ptr<LocaleInfo> localeInfo,
     I18nErrorCode& errCode)
 {
+    std::string locale;
+    if (localeInfo == nullptr) {
+        locale = LocaleConfig::GetEffectiveLocale();
+    } else {
+        locale = localeInfo->ToString();
+    }
+    SimpleNumberFormat::InitSimpleNumberFormat(skeleton, locale, errCode);
+}
+
+SimpleNumberFormat::SimpleNumberFormat(const std::string& skeleton, std::shared_ptr<IntlLocale> intlLocale,
+    I18nErrorCode& errCode)
+{
+    std::string locale;
+    if (intlLocale == nullptr) {
+        locale = LocaleConfig::GetEffectiveLocale();
+    } else {
+        std::string errMessage;
+        locale = intlLocale->ToString(errMessage);
+    }
+    SimpleNumberFormat::InitSimpleNumberFormat(skeleton, locale, errCode);
+}
+
+void SimpleNumberFormat::InitSimpleNumberFormat(const std::string& skeleton, const std::string& locale,
+    I18nErrorCode& errCode)
+{
     if (skeleton.empty()) {
-        HILOG_ERROR_I18N("SimpleNumberFormat: Skeleton is empty.");
+        HILOG_ERROR_I18N("SimpleNumberFormat::InitSimpleNumberFormat: Skeleton is empty.");
         errCode = I18nErrorCode::INVALID_NUMBER_FORMAT_SKELETON;
         return;
     }
-    std::string locale;
-    if (localeInfo == nullptr) {
-        locale = LocaleConfig::GetSystemLocale();
-    } else {
-        locale = localeInfo->GetBaseName();
-    }
+
     if (locale.empty() || !LocaleConfig::IsValidTag(locale)) {
-        HILOG_ERROR_I18N("SimpleNumberFormat: Locale %{public}s is invalid.", locale.c_str());
+        HILOG_ERROR_I18N("SimpleNumberFormat::InitSimpleNumberFormat: Locale %{public}s is invalid.", locale.c_str());
         errCode = I18nErrorCode::INVALID_LOCALE_TAG;
         return;
     }
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale icuLocale = icu::Locale::forLanguageTag(icu::StringPiece(locale), status);
     if (U_FAILURE(status)) {
-        HILOG_ERROR_I18N("SimpleNumberFormat: Create icu::Locale failed.");
+        HILOG_ERROR_I18N("SimpleNumberFormat::InitSimpleNumberFormat: Create icu::Locale failed.");
         errCode = I18nErrorCode::FAILED;
         return;
     }
@@ -55,9 +75,10 @@ SimpleNumberFormat::SimpleNumberFormat(const std::string& skeleton, std::shared_
     icu::number::UnlocalizedNumberFormatter unlocalizedNumberFormat =
         icu::number::NumberFormatter::forSkeleton(skeleton.c_str(), status);
     if (U_FAILURE(status)) {
-        HILOG_ERROR_I18N("SimpleNumberFormat: Create UnlocalizedNumberFormatter failed.");
+        HILOG_ERROR_I18N("SimpleNumberFormat::InitSimpleNumberFormat: Create UnlocalizedNumberFormatter failed.");
         if (status == U_NUMBER_SKELETON_SYNTAX_ERROR) {
-            HILOG_ERROR_I18N("SimpleNumberFormat: Invalid skeleton %{public}s.", skeleton.c_str());
+            HILOG_ERROR_I18N("SimpleNumberFormat::InitSimpleNumberFormat: Invalid skeleton %{public}s.",
+                skeleton.c_str());
             errCode = I18nErrorCode::INVALID_NUMBER_FORMAT_SKELETON;
             return;
         }

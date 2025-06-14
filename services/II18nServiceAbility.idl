@@ -23,4 +23,14 @@ interface OHOS.Global.I18n.II18nServiceAbility {
     void RemovePreferredLanguage([in] int index, [out] int code);
     void SetTemperatureType([in] int type, [out] int code);
     void SetFirstDayOfWeek([in] int type, [out] int code);
+    void GetSystemCollations([inout] Map<String, String> systemCollations, [out] int code);
+    void GetUsingCollation([inout] String usingCollation, [out] int code);
+    void SetSystemCollation([in] String identifier, [out] int code);
+    void GetSystemNumberingSystems([inout] Map<String, String> systemNumberingSystems, [out] int code);
+    void GetUsingNumberingSystem([inout] String usingNumberingSystem, [out] int code);
+    void SetSystemNumberingSystem([in] String identifier, [out] int code);
+    void GetSystemNumberPatterns([inout] Map<String, String> systemNumberPatterns, [out] int code);
+    void GetUsingNumberPattern([inout] String usingNumberPattern, [out] int code);
+    void SetSystemNumberPattern([in] String pattern, [out] int code);
+    void GetLanguageFromUserId([in] int userId, [out] String language);
 };
