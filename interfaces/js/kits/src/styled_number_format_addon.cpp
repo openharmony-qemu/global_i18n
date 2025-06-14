@@ -316,7 +316,7 @@ void StyledNumberFormatAddon::SetNamedProperty(napi_env env, napi_value &option,
 {
     napi_status status = napi_set_named_property(env, option, name.c_str(), property);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("CreateStyleoption: set property %{public}s failed", name.c_str());
+        HILOG_ERROR_I18N("SetNamedProperty: set property %{public}s failed", name.c_str());
     }
 }
 
@@ -327,7 +327,7 @@ void StyledNumberFormatAddon::GetNumberFmtOrSimpleNumberFmt(napi_env env, napi_v
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_status status = napi_typeof(env, arg, &valueType);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("StyledNumberFormatAddon::constructor Failed to get type.");
+        HILOG_ERROR_I18N("GetNumberFmtOrSimpleNumberFmt Failed to get type.");
         return;
     } else if (valueType != napi_valuetype::napi_object) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "intl.NumberFormat or SimpleNumberFormat", "", true);
@@ -380,25 +380,25 @@ bool StyledNumberFormatAddon::IsIntlNumberFormatInstance(napi_env env, napi_valu
     napi_value global = nullptr;
     napi_status status = napi_get_global(env, &global);
     if (status != napi_ok || global == nullptr) {
-        HILOG_ERROR_I18N("RegisterIntl: get global obj failed");
+        HILOG_ERROR_I18N("IsIntlNumberFormatInstance: get global obj failed");
         return false;
     }
     napi_value intlModule;
     status = napi_get_named_property(env, global, "Intl", &intlModule);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("Get Milliseconds property failed");
+        HILOG_ERROR_I18N("StyledNumberFormatAddon::IsIntlNumberFormatInstance Get Intl module failed");
         return false;
     }
     napi_value numFmtConstructor = nullptr;
     status = napi_get_named_property(env, intlModule, "NumberFormat", &numFmtConstructor);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("StyledNumberFormatAddon::IsNumberFormatInstance: get NumberFormat  constructor failed");
+        HILOG_ERROR_I18N("StyledNumberFormatAddon::IsIntlNumberFormatInstance: get NumberFormat  constructor failed");
         return false;
     }
     bool isInstance = true;
     status = napi_instanceof(env, arg, numFmtConstructor, &isInstance);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("StyledNumberFormatAddon::IsNumberFormatInstance Failed to get instance of argv 0.");
+        HILOG_ERROR_I18N("StyledNumberFormatAddon::IsIntlNumberFormatInstance napi_instanceof failed");
         return false;
     }
     return isInstance;
