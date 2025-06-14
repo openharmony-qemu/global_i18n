@@ -129,7 +129,7 @@ private:
     UNumberUnitWidth unitDisplay = UNumberUnitWidth::UNUM_UNIT_WIDTH_SHORT;
     UNumberUnitWidth currencyDisplay = UNumberUnitWidth::UNUM_UNIT_WIDTH_SHORT;
     UNumberSignDisplay signDisplay = UNumberSignDisplay::UNUM_SIGN_AUTO;
-    static const int MAX_UNIT_NUM = 500;
+    static const int MAX_UNIT_NUM = 502;
     static const int DEFAULT_FRACTION_DIGITS = 3;
     static const int DEFAULT_MAX_SIGNIFICANT_DIGITS = 21;
     static const char *DEVICE_TYPE_NAME;
