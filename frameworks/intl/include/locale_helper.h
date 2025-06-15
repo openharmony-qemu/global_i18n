@@ -50,8 +50,12 @@ public:
     static bool IsStructurallyValidLanguageTag(const std::string& tag);
     static bool DealwithLanguageTag(const std::vector<std::string> &containers, size_t &address);
     static bool IsAlpha(const std::string &str, size_t min, size_t max);
+    static bool IsNormativeCalendar(const std::string &value);
+    static bool IsNormativeNumberingSystem(const std::string &value);
+    static double TruncateDouble(double number);
 
 private:
+    static bool IsWellAlphaNumList(const std::string &value);
     static const std::unordered_map<std::string, std::unordered_set<std::string>> KEY_TO_OPTION_NAME;
 };
 } // namespace I18n
