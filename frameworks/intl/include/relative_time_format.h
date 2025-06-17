@@ -39,6 +39,7 @@
 #include "unicode/ureldatefmt.h"
 #include "number_utils.h"
 #include "number_utypes.h"
+#include "i18n_types.h"
 #include "locale_info.h"
 #include "measure_data.h"
 
@@ -53,6 +54,8 @@ public:
     icu::FormattedRelativeDateTime FormatToFormattedValue(double number, const std::string &unit);
     void FormatToParts(double number, const std::string &unit, std::vector<std::vector<std::string>> &timeVector);
     void GetResolvedOptions(std::map<std::string, std::string> &map);
+    static std::vector<std::string> SupportedLocalesOf(const std::vector<std::string> &requestLocales,
+        const std::map<std::string, std::string> &configs, I18nErrorCode &status);
 
 private:
     icu::Locale locale;

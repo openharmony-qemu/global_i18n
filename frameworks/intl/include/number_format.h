@@ -156,7 +156,6 @@ private:
     static std::unordered_map<UNumberFormatFields, std::string> numberFormatFieldMap;
     static std::unordered_map<std::string, int> defaultCurrencyFractionMap;
     static bool ReadISO4217Datas();
-    static std::set<std::string> GetNumberAvailableLocales();
     std::string GetCurrencyFromConfig(const std::string& currency);
     void CreateRelativeTimeFormat(const std::string& locale);
     void ParseConfigs(std::map<std::string, std::string> &configs);

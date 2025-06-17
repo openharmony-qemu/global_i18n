@@ -1072,38 +1072,10 @@ void NumberFormat::GetResolvedOptions(std::map<std::string, std::string> &map, b
     GetDigitsResolvedOptionsExt(map, setDefault);
 }
 
-std::set<std::string> NumberFormat::GetNumberAvailableLocales()
-{
-    std::set<std::string> result;
-    int32_t count = 0;
-    const icu::Locale* locales = icu::NumberFormat::getAvailableLocales(count);
-    if (count < 1 || locales == nullptr) {
-        HILOG_ERROR_I18N("NumberFormat::GetNumberAvailableLocales: Get available locales failed.");
-        return result;
-    }
-    for (int i = 0; i < count; i++) {
-        const char* name = locales[i].getName();
-        if (name != nullptr) {
-            result.insert(name);
-        }
-    }
-    return result;
-}
-
 std::vector<std::string> NumberFormat::SupportedLocalesOf(const std::vector<std::string> &requestLocales,
     const std::map<std::string, std::string> &configs, I18nErrorCode &status)
 {
-    std::vector<std::string> undefined = {};
-    auto requestedLocales = LocaleHelper::CanonicalizeLocaleList(requestLocales, status);
-    if (status != I18nErrorCode::SUCCESS) {
-        return undefined;
-    }
-    std::string localeMatcher = LocaleHelper::ParseOption(configs, "localeMatcher", "best fit", true, status);
-    if (status != I18nErrorCode::SUCCESS) {
-        return undefined;
-    }
-    std::set<std::string> availableLocales = GetNumberAvailableLocales();
-    return LocaleHelper::LookupSupportedLocales(availableLocales, requestedLocales);
+    return LocaleHelper::SupportedLocalesOf(requestLocales, configs, status);
 }
 
 void NumberFormat::GetDigitsResolvedOptions(std::map<std::string, std::string> &map, bool setDefault)

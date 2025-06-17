@@ -350,6 +350,9 @@ std::vector<std::string> JSUtils::GetLocaleArray(napi_env env, napi_value value,
         HILOG_ERROR_I18N("JSUtils::GetLocaleVector: Get type of value failed.");
         return result;
     }
+    if (valueType == napi_valuetype::napi_undefined) {
+        return result;
+    }
     if (valueType == napi_valuetype::napi_string) {
         std::string locale = JSUtils::GetString(env, value, code);
         if (code != 0) {
@@ -533,6 +536,32 @@ napi_value JSUtils::GetNapiPropertyFormObject(napi_env env, napi_value object, c
     }
     errCode = 0;
     return propertyValue;
+}
+
+bool JSUtils::GetStringParameter(napi_env env, napi_value value, std::vector<char> &buf)
+{
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    napi_status status = napi_typeof(env, value, &valueType);
+    if (status != napi_ok) {
+        return false;
+    }
+    if (valueType != napi_valuetype::napi_string) {
+        HILOG_ERROR_I18N("GetStringParameter: Parameter type does not match");
+        return false;
+    }
+    size_t len = 0;
+    status = napi_get_value_string_utf8(env, value, nullptr, 0, &len);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("GetStringParameter: Get first length failed");
+        return false;
+    }
+    buf.resize(len + 1);
+    status = napi_get_value_string_utf8(env, value, buf.data(), len + 1, &len);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("GetStringParameter: Get first failed");
+        return false;
+    }
+    return true;
 }
 } // namespace I18n
 } // namespace Global

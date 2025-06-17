@@ -14,6 +14,7 @@
  */
 #include "i18n_hilog.h"
 #include "locale_config.h"
+#include "locale_helper.h"
 #include "ohos/init_data.h"
 #include "utils.h"
 #include "parameter.h"
@@ -119,6 +120,9 @@ void RelativeTimeFormat::ParseConfigs(std::map<std::string, std::string> &config
     }
     if (configs.count("numeric") > 0) {
         numeric = configs["numeric"];
+    }
+    if (configs.count("numberingSystem") > 0) {
+        numberingSystem = configs["numberingSystem"];
     }
 }
 
@@ -236,6 +240,13 @@ void RelativeTimeFormat::GetResolvedOptions(std::map<std::string, std::string> &
     if (!numberingSystem.empty()) {
         map.insert(std::make_pair("numberingSystem", numberingSystem));
     }
+}
+
+std::vector<std::string> RelativeTimeFormat::SupportedLocalesOf(
+    const std::vector<std::string> &requestLocales,
+    const std::map<std::string, std::string> &configs, I18nErrorCode &status)
+{
+    return LocaleHelper::SupportedLocalesOf(requestLocales, configs, status);
 }
 
 void RelativeTimeFormat::SetDefaultStyle()
