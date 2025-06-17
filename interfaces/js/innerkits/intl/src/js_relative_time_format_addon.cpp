@@ -242,7 +242,7 @@ napi_value JSRelativeTimeFormatAddon::FormatToParts(napi_env env, napi_callback_
         return nullptr;
     }
     if (argc < argsCount) {
-        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::FormatToParts: parameter count less then required.");        
+        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::FormatToParts: parameter count less then required.");
         return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
@@ -259,7 +259,7 @@ napi_value JSRelativeTimeFormatAddon::FormatToParts(napi_env env, napi_callback_
     int32_t code = 0;
     std::string unit = JSUtils::GetString(env, argv[argsCount - 1], code);
     if (code != 0) {
-        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::FormatToParts: Get second parameter failed");        
+        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::FormatToParts: Get second parameter failed");
         return nullptr;
     }
     return GetFormatToPartsInner(env, argv[0], unit, thisVar);
