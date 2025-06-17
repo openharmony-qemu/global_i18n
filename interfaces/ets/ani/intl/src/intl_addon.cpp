@@ -137,7 +137,7 @@ ani_object IntlAddon::DateTimeFormat_ResolvedOptions(ani_env *env, ani_object ob
 
     std::vector<std::string> keys = {
         "locale", "dateStyle", "timeStyle", "hourCycle", "timeZone", "numberingSystem",
-        "weekday", "era", "year", "month", "day", "hour", "second",
+        "weekday", "era", "year", "month", "day", "hour", "minute", "second",
         "timeZoneName", "dayPeriod", "localeMatcher", "formatMatcher"
     };
 
