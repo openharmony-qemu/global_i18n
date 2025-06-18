@@ -17,6 +17,7 @@
 
 #include <string>
 #include <map>
+#include <mutex>
 #include <set>
 #include <unordered_set>
 #include <vector>
@@ -53,10 +54,16 @@ public:
     static bool IsNormativeCalendar(const std::string &value);
     static bool IsNormativeNumberingSystem(const std::string &value);
     static double TruncateDouble(double number);
+    static std::string DefaultLocale();
+    static std::string LookupMatcher(const std::set<std::string>& availableLocales,
+                                     const std::vector<std::string>& requestedLocales);
 
 private:
     static bool IsWellAlphaNumList(const std::string &value);
+
     static const std::unordered_map<std::string, std::unordered_set<std::string>> KEY_TO_OPTION_NAME;
+    static std::string defaultLocale;
+    static std::mutex defaultLocaleMutex;
 };
 } // namespace I18n
 } // namespace Global

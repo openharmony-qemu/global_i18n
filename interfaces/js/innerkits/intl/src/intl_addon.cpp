@@ -25,6 +25,7 @@
 #include "i18n_hilog.h"
 #include "intl_locale_addon.h"
 #include "intl_date_time_format_addon.h"
+#include "intl_plural_rules_addon.h"
 #include "js_number_format_addon.h"
 #include "js_utils.h"
 #include "locale_info_addon.h"
@@ -1120,7 +1121,7 @@ bool SetBuildInIntl(napi_env &env, napi_value &global, napi_value &intlModule)
     }
 
     const std::vector<std::string> buildinClasses = {"DurationFormat", "ListFormat",
-        "PluralRules", "RelativeTimeFormat", "Segmenter", "getCanonicalLocales", "supportedValuesOf"};
+        "RelativeTimeFormat", "Segmenter", "getCanonicalLocales", "supportedValuesOf"};
 
     for (std::string buildinClass : buildinClasses) {
         if (!SetBuildInIntlModule(env, intlModule, buildinIntlModule, buildinClass)) {
@@ -1159,6 +1160,12 @@ bool BindingIntlModules(napi_env env, napi_value &intlModule)
     intlModule = OHOS::Global::I18n::IntlDateTimeFormatAddon::InitIntlDateTimeFormat(env, intlModule);
     if (intlModule == nullptr) {
         HILOG_ERROR_I18N("RegisterIntl: init Intl DateTimeFormat Module failed");
+        return false;
+    }
+
+    intlModule = OHOS::Global::I18n::IntlPluralRulesAddon::InitIntlPluralRules(env, intlModule);
+    if (intlModule == nullptr) {
+        HILOG_ERROR_I18N("RegisterIntl: init Intl PluralRules Module failed");
         return false;
     }
     return true;

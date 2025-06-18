@@ -16,6 +16,8 @@
 #ifndef OHOS_GLOBAL_I18N_I18N_TYPES_H
 #define OHOS_GLOBAL_I18N_I18N_TYPES_H
 
+#include <string>
+
 namespace OHOS {
 namespace Global {
 namespace I18n {
@@ -78,7 +80,18 @@ enum class LocaleType {
     INTL_LOCALE = 1,
     LOCALE_INFO = 2,
 };
-}
-}
-}
+
+enum class ErrorType {
+    NO_ERROR,
+    TYEP_ERROR,
+    RANGE_ERROR
+};
+
+struct ErrorMessage {
+    ErrorType type = ErrorType::NO_ERROR;
+    std::string message = "";
+};
+} // namespace I18n
+} // namespace Global
+} // namespace OHOS
 #endif

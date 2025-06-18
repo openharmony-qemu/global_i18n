@@ -22,6 +22,8 @@
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 
+#include "i18n_hilog.h"
+
 namespace OHOS {
 namespace Global {
 namespace I18n {
@@ -29,10 +31,6 @@ class JSUtils {
 public:
     static napi_value DefaultConstructor(napi_env env, napi_callback_info info);
     static napi_value CreateEmptyString(napi_env env);
-    static void GetOptionValue(napi_env env, napi_value options, const std::string &optionName,
-        std::map<std::string, std::string> &map);
-    static void GetBoolOptionValue(napi_env env, napi_value options, const std::string &optionName,
-        std::map<std::string, std::string> &map);
 
     static void GetNumberOptionValues(napi_env env, napi_value options, std::map<std::string, std::string> &map);
     static int64_t GetIntegerOptionValue(napi_env env, napi_value options, const std::string &optionName,
@@ -44,6 +42,11 @@ public:
         std::map<std::string, std::string> &options, const std::string &option);
     static void SetIntegerOptionProperties(napi_env env, napi_value &result,
         std::map<std::string, std::string> &options, const std::string &option);
+    static void SetNamedStringProperties(napi_env env, napi_value &result, const std::string &key,
+        const std::string &value);
+    static void SetNamedIntegerProperties(napi_env env, napi_value &result, const std::string &key, int64_t value);
+    static void SetNamedVectorProperties(napi_env env, napi_value &result, const std::string &key,
+        const std::vector<std::string> &value);
     static std::string GetString(napi_env env, napi_value value, int32_t& code);
     static std::string GetBigIntStr(napi_env env, napi_value value, int32_t& code);
     static std::vector<std::string> GetStringArray(napi_env env, napi_value value, int32_t& code);
@@ -58,6 +61,122 @@ public:
         napi_valuetype type, std::string& value);
     static napi_value GetNapiPropertyFormObject(napi_env env, napi_value object, const std::string& property,
         int32_t& errCode);
+
+    // std::map and std::unordered_map
+    template<typename T>
+    static void GetOptionValue(napi_env env, napi_value options, const std::string &optionName, T &map)
+    {
+        napi_value optionValue = nullptr;
+        napi_valuetype type = napi_undefined;
+        napi_status status = napi_typeof(env, options, &type);
+        if (status != napi_ok && type != napi_object) {
+            HILOG_ERROR_I18N("Get option failed, option is not an object");
+            return;
+        }
+        bool hasProperty = false;
+        status = napi_has_named_property(env, options, optionName.c_str(), &hasProperty);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("GetOptionValue: Has not named property:%{public}s", optionName.c_str());
+            return;
+        }
+        if (!hasProperty) {
+            return;
+        }
+        status = napi_get_named_property(env, options, optionName.c_str(), &optionValue);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("GetOptionValue: Get named property for %{public}s failed.", optionName.c_str());
+            return;
+        }
+        size_t len = 0;
+        status = napi_get_value_string_utf8(env, optionValue, nullptr, 0, &len);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("GetOptionValue: get string length failed");
+            return;
+        }
+
+        std::vector<char> optionBuf(len + 1);
+        status = napi_get_value_string_utf8(env, optionValue, optionBuf.data(), len + 1, &len);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("GetOptionValue: get string value failed");
+            return;
+        }
+        auto ret = map.insert(make_pair(optionName, optionBuf.data()));
+        if (!ret.second) {
+            HILOG_ERROR_I18N("GetOptionValue: map insert failed");
+        }
+    }
+
+    template<typename T>
+    static void GetBoolOptionValue(napi_env env, napi_value options, const std::string &optionName, T &map)
+    {
+        napi_value optionValue = nullptr;
+        napi_valuetype type = napi_undefined;
+        napi_status status = napi_typeof(env, options, &type);
+        if (status != napi_ok && type != napi_object) {
+            HILOG_ERROR_I18N("GetBoolOptionValue: Set option failed, option is not an object");
+            return;
+        }
+        bool hasProperty = false;
+        status = napi_has_named_property(env, options, optionName.c_str(), &hasProperty);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("GetBoolOptionValue: Has not named property.");
+            return;
+        }
+        if (!hasProperty) {
+            return;
+        }
+        status = napi_get_named_property(env, options, optionName.c_str(), &optionValue);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("GetBoolOptionValue: Get named property for %{public}s failed.", optionName.c_str());
+            return;
+        }
+        bool boolValue = false;
+        status = napi_get_value_bool(env, optionValue, &boolValue);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("GetBoolOptionValue: Get bool value failed.");
+            return;
+        }
+        std::string value = boolValue ? "true" : "false";
+        auto ret = map.insert(make_pair(optionName, value));
+        if (!ret.second) {
+            HILOG_ERROR_I18N("GetBoolOptionValue: map insert failed");
+        }
+    }
+
+    template<typename T>
+    static void GetDoubleOptionValue(napi_env env, napi_value options, const std::string &optionName, T &map)
+    {
+        napi_value optionValue = nullptr;
+        napi_valuetype type = napi_undefined;
+        napi_status status = napi_typeof(env, options, &type);
+        if (status != napi_ok && type != napi_object) {
+            HILOG_ERROR_I18N("GetDoubleOptionValue: Get option failed, option is not an object.");
+            return;
+        }
+        bool hasProperty = false;
+        status = napi_has_named_property(env, options, optionName.c_str(), &hasProperty);
+        if (status != napi_ok || !hasProperty) {
+            HILOG_INFO_I18N("GetDoubleOptionValue: No named %{public}s param.", optionName.c_str());
+            return;
+        }
+        status = napi_get_named_property(env, options, optionName.c_str(), &optionValue);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("GetDoubleOptionValue: get named %{public}s param failed.", optionName.c_str());
+            return;
+        }
+        double option;
+        status = napi_get_value_double(env, optionValue, &option);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("GetDoubleOptionValue: param %{public}s get double value failed.", optionName.c_str());
+            return;
+        }
+        try {
+            map.insert(make_pair(optionName, std::to_string(option)));
+        } catch (const std::bad_alloc& except) {
+            HILOG_ERROR_I18N("GetDoubleOptionValue: double to string failed.");
+            return;
+        }
+    }
 };
 } // namespace I18n
 } // namespace Global
