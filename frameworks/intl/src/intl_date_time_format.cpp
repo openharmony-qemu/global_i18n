@@ -209,7 +209,7 @@ IcuPatternDesc::IcuPatternDesc(std::string property, const std::vector<std::pair
 
 Pattern::Pattern(const std::string& twoDigitPattern, const std::string& numericPattern)
 {
-    static IcuPatternDesc hourPatternDesc(IntlDateTimeFormat::HOUR_TAG,
+    IcuPatternDesc hourPatternDesc(IntlDateTimeFormat::HOUR_TAG,
         { { twoDigitPattern, "2-digit" }, { numericPattern, "numeric" } }, { "2-digit", "numeric" });
     std::vector<IcuPatternDesc> items = Pattern::GetIcuPatternDescs();
     std::vector<IcuPatternDesc> result;
