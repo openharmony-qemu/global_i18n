@@ -25,6 +25,7 @@ namespace Global {
 namespace I18n {
 const char* RelativeTimeFormat::DEVICE_TYPE_NAME = "const.product.devicetype";
 
+
 std::unordered_map<std::string, UDateRelativeDateTimeFormatterStyle> RelativeTimeFormat::relativeFormatStyle = {
     { "long", UDAT_STYLE_LONG },
     { "short", UDAT_STYLE_SHORT },
@@ -59,11 +60,14 @@ std::unordered_map<std::string, URelativeDateTimeUnit> RelativeTimeFormat::relat
 RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTags,
     std::map<std::string, std::string> &configs, bool flag)
 {
+        HILOG_ERROR_I18N("zdd---a-00");
     std::vector<std::string> resolvedLocales(localeTags);
     if (configs.find("localeMatcher") != configs.end()) {
+                HILOG_ERROR_I18N("zdd---a-aa-00");
         I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
         resolvedLocales = LocaleHelper::SupportedLocalesOf(resolvedLocales, configs, errorCode);
         if (errorCode != I18nErrorCode::SUCCESS) {
+            HILOG_ERROR_I18N("zdd---a-bb-00");
             HILOG_ERROR_I18N("RelativeTimeFormat: Get Supported Locales failed");
         }
     }
@@ -73,6 +77,7 @@ RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTag
 RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTags,
     std::map<std::string, std::string> &configs)
 {
+        HILOG_ERROR_I18N("zdd---c-00");
     SetDefaultStyle();
     UErrorCode status = U_ZERO_ERROR;
     ParseConfigs(configs);
@@ -83,12 +88,14 @@ RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTag
             status = U_ZERO_ERROR;
             continue;
         }
+        HILOG_ERROR_I18N("zdd---c-%{public}d", i);
         localeBaseName = locale.getBaseName();
         std::replace(localeBaseName.begin(), localeBaseName.end(), '_', '-');
         relativeTimeFormat = std::make_unique<icu::RelativeDateTimeFormatter>(locale, nullptr, style,
             UDISPCTX_CAPITALIZATION_NONE, status);
         if (!U_SUCCESS(status) || !relativeTimeFormat) {
             status = U_ZERO_ERROR;
+           HILOG_ERROR_I18N("zdd---c-aa-%{public}s", curLocale.c_str());
             continue;
         }
         createSuccess = true;
@@ -96,21 +103,27 @@ RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTag
         if (!value.empty()) {
             numberingSystem  = value;
         }
+           HILOG_ERROR_I18N("zdd---c-bb-%{public}d,createSuccess:%{public}d", i, createSuccess);
         break;
     }
+    HILOG_ERROR_I18N("zdd---c-b0b-createSuccess:%{public}d", createSuccess);
     if (!createSuccess) {
+           HILOG_ERROR_I18N("zdd---c-cc-");
         std::string systemLocale = LocaleConfig::GetEffectiveLocale();
         std::string curLocale = LocaleConfig::RemoveCustExtParam(systemLocale);
         locale = icu::Locale::forLanguageTag(icu::StringPiece(curLocale), status);
         if (U_FAILURE(status)) {
+           HILOG_ERROR_I18N("zdd---c-dd-%{public}s", curLocale.c_str());
             status = U_ZERO_ERROR;
             return;
         }
+           HILOG_ERROR_I18N("zdd---c-ee-%{public}s", curLocale.c_str());
         localeBaseName = locale.getBaseName();
         std::replace(localeBaseName.begin(), localeBaseName.end(), '_', '-');
         relativeTimeFormat = std::make_unique<icu::RelativeDateTimeFormatter>(locale, nullptr, style,
             UDISPCTX_CAPITALIZATION_NONE, status);
         if (U_SUCCESS(status) && relativeTimeFormat) {
+           HILOG_ERROR_I18N("zdd---c-ff-%{public}s", localeBaseName.c_str());
             createSuccess = true;
             std::string value = LocaleConfig::QueryExtParam(curLocale, "nu", "-u-");
             if (!value.empty()) {
@@ -118,6 +131,8 @@ RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTag
             }
         }
     }
+    HILOG_ERROR_I18N("zdd---c-b1b-createSuccess:%{public}d", createSuccess);
+        HILOG_ERROR_I18N("zdd---c-b1b-this:%{public}p", this);
 }
 
 RelativeTimeFormat::~RelativeTimeFormat()
@@ -164,7 +179,8 @@ std::string RelativeTimeFormat::CheckParamLocales(std::vector<std::string> &loca
 
 std::string RelativeTimeFormat::Format(double number, const std::string &unit)
 {
-    HILOG_ERROR_I18N("zdd---Format0,unit:%{public}s", unit.c_str());
+        HILOG_ERROR_I18N("zdd---c-Format-this:%{public}p", this);
+    HILOG_ERROR_I18N("zdd---Format0,unit:%{public}s,%{public}s", unit.c_str(), styleString.c_str());
     icu::FormattedRelativeDateTime formattedTime = FormatToFormattedValue(number, unit);
     UErrorCode status = U_ZERO_ERROR;
     std::string result;
@@ -249,20 +265,25 @@ void RelativeTimeFormat::FormatToParts(double number, const std::string &unit,
 icu::FormattedRelativeDateTime RelativeTimeFormat::FormatToFormattedValue(double number, const std::string &unit)
 {
     if (!createSuccess || relativeTimeFormat == nullptr || !relativeUnits.count(unit)) {
+        HILOG_ERROR_I18N("zdd---11111,%{public}d,%{public}d, ",createSuccess , (relativeTimeFormat == nullptr));
         return {};
     }
+        HILOG_ERROR_I18N("zdd---2222,%{public}s", unit.c_str());
     UErrorCode status = U_ZERO_ERROR;
     icu::FormattedRelativeDateTime fmtRelativeTime;
     if (numeric.compare("always") == 0) {
+        HILOG_ERROR_I18N("zdd---333");
         fmtRelativeTime = relativeTimeFormat->formatNumericToValue(number, relativeUnits[unit], status);
     } else {
+        HILOG_ERROR_I18N("zdd---4444");
         fmtRelativeTime = relativeTimeFormat->formatToValue(number, relativeUnits[unit], status);
     }
 
     if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("zdd---5555");
         return {};
     }
-
+        HILOG_ERROR_I18N("zdd---6666");
     return fmtRelativeTime;
 }
 
