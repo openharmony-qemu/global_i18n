@@ -57,6 +57,20 @@ std::unordered_map<std::string, URelativeDateTimeUnit> RelativeTimeFormat::relat
 };
 
 RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTags,
+    std::map<std::string, std::string> &configs, bool flag)
+{
+    std::vector<std::string> resolvedLocales(localeTags);
+    if (configs.find("localeMatcher") != configs.end()) {
+        I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
+        resolvedLocales = LocaleHelper::SupportedLocalesOf(resolvedLocales, configs, errorCode);
+        if (errorCode != I18nErrorCode::SUCCESS) {
+            HILOG_ERROR_I18N("RelativeTimeFormat: Get Supported Locales failed");
+        }
+    }
+    RelativeTimeFormat(resolvedLocales, configs);
+}
+
+RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTags,
     std::map<std::string, std::string> &configs)
 {
     SetDefaultStyle();

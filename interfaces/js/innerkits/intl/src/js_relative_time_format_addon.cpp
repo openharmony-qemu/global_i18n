@@ -105,14 +105,7 @@ napi_value JSRelativeTimeFormatAddon::ReltiveTimeFormatConstructor(napi_env env,
     if (argc > 1) {
         GetRelativeTimeOptionValues(env, argv[1], map);
     }
-    if (map.find("localeMatcher") != map.end()) {
-        I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
-        localeTags = LocaleHelper::SupportedLocalesOf(localeTags, map, errorCode);
-        if (errorCode != I18nErrorCode::SUCCESS) {
-            HILOG_ERROR_I18N("ReltiveTimeFormatConstructor: Get Supported Locales failed");
-            return nullptr;
-        }
-    }
+
     JSRelativeTimeFormatAddon* obj = new (std::nothrow) JSRelativeTimeFormatAddon();
     if (obj == nullptr) {
         HILOG_ERROR_I18N("RelativeTimeFormatConstructor: Create JSRelativeTimeFormatAddon failed");
@@ -197,7 +190,7 @@ void JSRelativeTimeFormatAddon::ThrowRangeError(napi_env env, const std::string 
 bool JSRelativeTimeFormatAddon::InitRelativeTimeFormatContext(napi_env env, napi_callback_info info,
     std::vector<std::string> localeTags, std::map<std::string, std::string> &map)
 {
-    relativetimefmt_ = std::make_unique<RelativeTimeFormat>(localeTags, map);
+    relativetimefmt_ = std::make_unique<RelativeTimeFormat>(localeTags, map, true);
     return relativetimefmt_ != nullptr;
 }
 

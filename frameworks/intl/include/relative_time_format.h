@@ -49,6 +49,8 @@ namespace I18n {
 class RelativeTimeFormat {
 public:
     RelativeTimeFormat(const std::vector<std::string> &localeTag, std::map<std::string, std::string> &configs);
+    RelativeTimeFormat(const std::vector<std::string> &locales,
+        std::map<std::string, std::string> &configs, bool flag);
     virtual ~RelativeTimeFormat();
     std::string Format(double number, const std::string &unit);
     icu::FormattedRelativeDateTime FormatToFormattedValue(double number, const std::string &unit);
