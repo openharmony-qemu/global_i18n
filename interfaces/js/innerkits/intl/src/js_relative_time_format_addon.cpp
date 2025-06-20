@@ -26,6 +26,12 @@ namespace Global {
 namespace I18n {
 static thread_local napi_ref g_JsRelativeTimeFormatConstructor = nullptr;
 
+std::unordered_map<std::string, std::vector<std::string>> JSRelativeTimeFormatAddon::optionAvaliableMap {
+    {"localeMatcher", {"lookup", "best fit"}}, 
+    {"numeric", {"always", "auto"}},
+    {"style", {"long", "short", "narrow"}},
+};
+
 JSRelativeTimeFormatAddon::JSRelativeTimeFormatAddon()
 {
 }
@@ -87,7 +93,9 @@ napi_value JSRelativeTimeFormatAddon::ReltiveTimeFormatConstructor(napi_env env,
     napi_value new_target;
     status = napi_get_new_target(env, info, &new_target);
     if (status == napi_pending_exception || new_target == nullptr) {
-        return CreateRelativeTimeFormatWithoutNew(env, argc, argv);
+        HILOG_ERROR_I18N("ReltiveTimeFormatConstructor: Intl.RelativeTimeFormat requires 'new'");
+        napi_throw_type_error(env, nullptr, "Constructor Intl.RelativeTimeFormat requires 'new'");
+        return nullptr;
     }
     std::vector<std::string> localeTags;
     if (argc > 0) {
@@ -129,9 +137,40 @@ void JSRelativeTimeFormatAddon::GetRelativeTimeOptionValues(napi_env env,
     napi_value options, std::map<std::string, std::string> &map)
 {
     JSUtils::GetOptionValue(env, options, "localeMatcher", map);
+    CheckOptionValue(env, map, "localeMatcher");
     JSUtils::GetOptionValue(env, options, "numeric", map);
+    CheckOptionValue(env, map, "numeric");
     JSUtils::GetOptionValue(env, options, "style", map);
-    JSUtils::GetOptionValue(env, options, "numberingSystem", map);
+    CheckOptionValue(env, map, "style");
+}
+
+void JSRelativeTimeFormatAddon::CheckOptionValue(napi_env env, std::map<std::string, std::string> &map,
+    const std::string &optionName)
+{
+    if (optionAvaliableMap.find(optionName) == optionAvaliableMap.end()) {
+        return;
+    }
+    if (map.find(optionName) != map.end()) {
+        std::string optionValue = map[optionName];
+        std::vector<std::string> aviliableValues = optionAvaliableMap[optionName];
+        auto it = std::find(aviliableValues.begin(), aviliableValues.end(), optionValue);
+        if (it == aviliableValues.end()) {
+            ThrowRangeError(env, optionName, optionValue);
+        }
+    } 
+}
+
+void JSRelativeTimeFormatAddon::ThrowRangeError(napi_env env, const std::string &property,
+    const std::string &value)
+{
+    std::string msg = "Value " + value + " out of range for property " + property;
+    napi_value error = nullptr;
+    napi_value errorCode = JSUtils::CreateString(env, "500");
+    napi_value errorMsg = JSUtils::CreateString(env, msg);
+    napi_status status = napi_create_range_error(env, errorCode, errorMsg, &error);
+    if (status != napi_ok || error == nullptr) {
+        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::ThrowRangeError: throw range error failed");
+    }
 }
 
 bool JSRelativeTimeFormatAddon::InitRelativeTimeFormatContext(napi_env env, napi_callback_info info,
@@ -139,34 +178,6 @@ bool JSRelativeTimeFormatAddon::InitRelativeTimeFormatContext(napi_env env, napi
 {
     relativetimefmt_ = std::make_unique<RelativeTimeFormat>(localeTags, map);
     return relativetimefmt_ != nullptr;
-}
-
-napi_value JSRelativeTimeFormatAddon::CreateRelativeTimeFormatWithoutNew(napi_env env, size_t argc,
-    napi_value *argv)
-{
-    napi_value exception;
-    napi_status status = napi_get_and_clear_last_exception(env, &exception);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("CreateRelativeTimeFormatWithoutNew: napi_get_and_clear_last_exception failed");
-        return nullptr;
-    }
-    if (g_JsRelativeTimeFormatConstructor == nullptr) {
-        HILOG_ERROR_I18N("CreateRelativeTimeFormatWithoutNew: g_JsRelativeTimeFormatConstructor is nullptr");
-        return nullptr;
-    }
-    napi_value constructor = nullptr;
-    status = napi_get_reference_value(env, g_JsRelativeTimeFormatConstructor, &constructor);
-    if (status != napi_ok || constructor == nullptr) {
-        HILOG_ERROR_I18N("CreateRelativeTimeFormatWithoutNew: napi_get_reference_value failed");
-        return nullptr;
-    }
-    napi_value instance = nullptr;
-    status = napi_new_instance(env, constructor, argc, argv, &instance);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("CreateRelativeTimeFormatWithoutNew: napi_new_instance failed");
-        return nullptr;
-    }
-    return instance;
 }
 
 napi_value JSRelativeTimeFormatAddon::Format(napi_env env, napi_callback_info info)
@@ -178,6 +189,17 @@ napi_value JSRelativeTimeFormatAddon::Format(napi_env env, napi_callback_info in
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::Format: Get parameter info failed");
+        return nullptr;
+    }
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::Format: Get param type failed.");
+        return nullptr;
+    }
+    if (valueType != napi_valuetype::napi_number) {
+        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::Format: parameter type invalid");
+        ErrorUtil::NapiThrowUndefined(env, "parameter type invalid");
         return nullptr;
     }
     double number;
@@ -309,6 +331,7 @@ napi_value JSRelativeTimeFormatAddon::SupportedLocalesOf(napi_env env, napi_call
     std::map<std::string, std::string> map = {};
     if (argc > 1) {
         JSUtils::GetOptionValue(env, argv[1], "localeMatcher", map);
+        CheckOptionValue(env, map, "localeMatcher");
     }
     I18nErrorCode i18nStatus = I18nErrorCode::SUCCESS;
     std::vector<std::string> resultLocales = RelativeTimeFormat::SupportedLocalesOf(localeTags, map, i18nStatus);

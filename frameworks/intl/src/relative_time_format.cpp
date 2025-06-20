@@ -121,8 +121,8 @@ void RelativeTimeFormat::ParseConfigs(std::map<std::string, std::string> &config
     if (configs.count("numeric") > 0) {
         numeric = configs["numeric"];
     }
-    if (configs.count("numberingSystem") > 0) {
-        numberingSystem = configs["numberingSystem"];
+    if (configs.count("localeMatcher") > 0) {
+        localeMatcher = configs["localeMatcher"];
     }
 }
 

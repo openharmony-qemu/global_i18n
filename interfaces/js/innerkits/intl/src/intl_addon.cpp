@@ -1109,7 +1109,7 @@ struct IntlInitFunction {
     IntlInitFunc func;
     const char* moduleName;
 };
-IntlInitFunction initFunctionArray[] = {
+IntlInitFunction g_intlInitFunctionArray[] = {
     {&OHOS::Global::I18n::CollatorAddon::InitCollator, "Collator"},
     {&OHOS::Global::I18n::DisplayNamesAddon::InitDisplayNames, "DisplayNames"},
     {&OHOS::Global::I18n::IntlLocaleAddon::InitIntlLocale, "Locale"},
@@ -1120,12 +1120,12 @@ IntlInitFunction initFunctionArray[] = {
 
 bool BindingIntlModules(napi_env env, napi_value &intlModule)
 {
-    for (auto initFunc : initFunctionArray) {
+    for (auto initFunc : g_intlInitFunctionArray) {
         intlModule = (initFunc.func)(env, intlModule);
         if (intlModule == nullptr) {
             HILOG_ERROR_I18N("RegisterIntl: init Intl %{public}s Module failed", initFunc.moduleName);
             return false;
-        }       
+        }
     }
     return true;
 }
