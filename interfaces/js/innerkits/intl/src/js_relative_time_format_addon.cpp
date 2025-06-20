@@ -30,6 +30,8 @@ std::unordered_map<std::string, std::vector<std::string>> JSRelativeTimeFormatAd
     {"localeMatcher", {"lookup", "best fit"}}, 
     {"numeric", {"always", "auto"}},
     {"style", {"long", "short", "narrow"}},
+    {"unit", {"year", "years", "quarter", "quarters", "month", "months", "week", "weeks",
+            "day", "days", "hour", "hours", "minute", "minutes", "second", "seconds"}},
 };
 
 JSRelativeTimeFormatAddon::JSRelativeTimeFormatAddon()
@@ -90,9 +92,9 @@ napi_value JSRelativeTimeFormatAddon::ReltiveTimeFormatConstructor(napi_env env,
         HILOG_ERROR_I18N("ReltiveTimeFormatConstructor: Get parameter info failed");
         return nullptr;
     }
-    napi_value new_target;
-    status = napi_get_new_target(env, info, &new_target);
-    if (status == napi_pending_exception || new_target == nullptr) {
+    napi_value newTarget;
+    status = napi_get_new_target(env, info, &newTarget);
+    if (status != napi_ok  || newTarget == nullptr) {
         HILOG_ERROR_I18N("ReltiveTimeFormatConstructor: Intl.RelativeTimeFormat requires 'new'");
         napi_throw_type_error(env, nullptr, "Constructor Intl.RelativeTimeFormat requires 'new'");
         return nullptr;
@@ -102,7 +104,7 @@ napi_value JSRelativeTimeFormatAddon::ReltiveTimeFormatConstructor(napi_env env,
         int32_t code = 0;
         std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argv[0], code);
         if (code != 0) {
-            return nullptr;
+            HILOG_ERROR_I18N("ReltiveTimeFormatConstructor: input locale is empty");
         }
         localeTags.assign(localeArray.begin(), localeArray.end());
     } else {
@@ -152,12 +154,18 @@ void JSRelativeTimeFormatAddon::CheckOptionValue(napi_env env, std::map<std::str
     }
     if (map.find(optionName) != map.end()) {
         std::string optionValue = map[optionName];
-        std::vector<std::string> aviliableValues = optionAvaliableMap[optionName];
-        auto it = std::find(aviliableValues.begin(), aviliableValues.end(), optionValue);
-        if (it == aviliableValues.end()) {
-            ThrowRangeError(env, optionName, optionValue);
-        }
+        CheckOptionValue(env, optionValue, optionName);
     } 
+}
+
+void JSRelativeTimeFormatAddon::CheckOptionValue(napi_env env, const std::string &optionValue,
+    const std::string &optionName)
+{
+    std::vector<std::string> aviliableValues = optionAvaliableMap[optionName];
+    auto it = std::find(aviliableValues.begin(), aviliableValues.end(), optionValue);
+    if (it == aviliableValues.end()) {
+        ThrowRangeError(env, optionName, optionValue);
+    }
 }
 
 void JSRelativeTimeFormatAddon::ThrowRangeError(napi_env env, const std::string &property,
@@ -212,6 +220,7 @@ napi_value JSRelativeTimeFormatAddon::Format(napi_env env, napi_callback_info in
     if (!JSUtils::GetStringParameter(env, argv[1], unit)) {
         return nullptr;
     }
+    CheckOptionValue(env, unit.data(), "unit");
     JSRelativeTimeFormatAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->relativetimefmt_) {
@@ -325,7 +334,6 @@ napi_value JSRelativeTimeFormatAddon::SupportedLocalesOf(napi_env env, napi_call
     std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argv[0], code);
     if (code != 0) {
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::SupportedLocalesOf: Get locale array failed");
-        return nullptr;
     }
     localeTags.assign(localeArray.begin(), localeArray.end());
     std::map<std::string, std::string> map = {};

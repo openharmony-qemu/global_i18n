@@ -48,6 +48,7 @@ private:
     static void GetRelativeTimeOptionValues(napi_env env, napi_value options, std::map<std::string, std::string> &map);
     static void ThrowRangeError(napi_env env, const std::string &property, const std::string &value);
     static void CheckOptionValue(napi_env env, std::map<std::string, std::string> &map, const std::string &optionName);
+    static void CheckOptionValue(napi_env env, const std::string &optionValue, const std::string &optionName);
     static std::unordered_map<std::string, std::vector<std::string>> optionAvaliableMap;
 
     bool InitRelativeTimeFormatContext(napi_env env, napi_callback_info info,
