@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 #include "js_utils.h"
-#include "i18n_hilog.h"
 #include "utils.h"
 
 namespace OHOS {
@@ -33,86 +32,6 @@ napi_value JSUtils::CreateEmptyString(napi_env env)
         HILOG_ERROR_I18N("JSUtils: create string js variable failed.");
     }
     return result;
-}
-
-void JSUtils::GetOptionValue(napi_env env, napi_value options, const std::string &optionName,
-    std::map<std::string, std::string> &map)
-{
-    napi_value optionValue = nullptr;
-    napi_valuetype type = napi_undefined;
-    napi_status status = napi_typeof(env, options, &type);
-    if (status != napi_ok && type != napi_object) {
-        HILOG_ERROR_I18N("Get option failed, option is not an object");
-        return;
-    }
-    bool hasProperty = false;
-    status = napi_has_named_property(env, options, optionName.c_str(), &hasProperty);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("GetOptionValue: Has not named property:%{public}s", optionName.c_str());
-        return;
-    }
-    if (!hasProperty) {
-        return;
-    }
-    status = napi_get_named_property(env, options, optionName.c_str(), &optionValue);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("GetOptionValue: Get named property for %{public}s failed.", optionName.c_str());
-        return;
-    }
-    size_t len = 0;
-    status = napi_get_value_string_utf8(env, optionValue, nullptr, 0, &len);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("GetOptionValue: get string length failed");
-        return;
-    }
-
-    std::vector<char> optionBuf(len + 1);
-    status = napi_get_value_string_utf8(env, optionValue, optionBuf.data(), len + 1, &len);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("GetOptionValue: get string value failed");
-        return;
-    }
-    auto ret = map.insert(make_pair(optionName, optionBuf.data()));
-    if (!ret.second) {
-        HILOG_ERROR_I18N("GetOptionValue: map insert failed");
-    }
-}
-
-void JSUtils::GetBoolOptionValue(napi_env env, napi_value options, const std::string &optionName,
-    std::map<std::string, std::string> &map)
-{
-    napi_value optionValue = nullptr;
-    napi_valuetype type = napi_undefined;
-    napi_status status = napi_typeof(env, options, &type);
-    if (status != napi_ok && type != napi_object) {
-        HILOG_ERROR_I18N("GetBoolOptionValue: Set option failed, option is not an object");
-        return;
-    }
-    bool hasProperty = false;
-    status = napi_has_named_property(env, options, optionName.c_str(), &hasProperty);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("GetBoolOptionValue: Has not named property.");
-        return;
-    }
-    if (!hasProperty) {
-        return;
-    }
-    status = napi_get_named_property(env, options, optionName.c_str(), &optionValue);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("GetBoolOptionValue: Get named property for %{public}s failed.", optionName.c_str());
-        return;
-    }
-    bool boolValue = false;
-    status = napi_get_value_bool(env, optionValue, &boolValue);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("GetBoolOptionValue: Get bool value failed.");
-        return;
-    }
-    std::string value = boolValue ? "true" : "false";
-    auto ret = map.insert(make_pair(optionName, value));
-    if (!ret.second) {
-        HILOG_ERROR_I18N("GetBoolOptionValue: map insert failed");
-    }
 }
 
 void JSUtils::GetNumberOptionValues(napi_env env, napi_value options, std::map<std::string, std::string> &map)
@@ -260,6 +179,55 @@ void JSUtils::SetIntegerOptionProperties(napi_env env, napi_value &result, std::
         HILOG_ERROR_I18N("JSUtils::SetIntegerOptionProperties: Set property failed.");
         return;
     }
+}
+
+void JSUtils::SetNamedStringProperties(napi_env env, napi_value &result, const std::string &key,
+    const std::string &value)
+{
+    napi_value jsValue = nullptr;
+    napi_status status = napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &jsValue);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("JSUtils::SetNamedStringProperties: string to js failed.");
+        return;
+    }
+    status = napi_set_named_property(env, result, key.c_str(), jsValue);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("JSUtils::SetNamedStringProperties: Set property failed.");
+        return;
+    }
+    return;
+}
+
+void JSUtils::SetNamedIntegerProperties(napi_env env, napi_value &result, const std::string &key, int64_t value)
+{
+    napi_value jsValue = nullptr;
+    napi_status status = napi_create_int64(env, value, &jsValue);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("JSUtils::SetNamedIntegerProperties: int64_t to js failed.");
+        return;
+    }
+    status = napi_set_named_property(env, result, key.c_str(), jsValue);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("JSUtils::SetNamedIntegerProperties: Set property failed.");
+        return;
+    }
+    return;
+}
+
+void JSUtils::SetNamedVectorProperties(napi_env env, napi_value &result, const std::string &key,
+    const std::vector<std::string> &value)
+{
+    napi_value jsValue = CreateArray(env, value);
+    if (!jsValue) {
+        HILOG_ERROR_I18N("JSUtils::SetNamedVectorProperties: craete array failed.");
+        return;
+    }
+    napi_status status = napi_set_named_property(env, result, key.c_str(), jsValue);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("JSUtils::SetNamedVectorProperties: Set property failed.");
+        return;
+    }
+    return;
 }
 
 std::string JSUtils::GetString(napi_env env, napi_value value, int32_t& code)

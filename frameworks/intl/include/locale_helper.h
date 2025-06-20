@@ -17,6 +17,7 @@
 
 #include <string>
 #include <map>
+#include <mutex>
 #include <set>
 #include <unordered_set>
 #include <vector>
@@ -56,10 +57,16 @@ public:
     static std::set<std::string> GetAvailableLocales();
     static std::vector<std::string> SupportedLocalesOf(const std::vector<std::string> &requestLocales,
         const std::map<std::string, std::string> &configs, I18nErrorCode &status);
+    static std::string DefaultLocale();
+    static std::string LookupMatcher(const std::set<std::string>& availableLocales,
+                                     const std::vector<std::string>& requestedLocales);
 
 private:
     static bool IsWellAlphaNumList(const std::string &value);
+
     static const std::unordered_map<std::string, std::unordered_set<std::string>> KEY_TO_OPTION_NAME;
+    static std::string defaultLocale;
+    static std::mutex defaultLocaleMutex;
 };
 } // namespace I18n
 } // namespace Global
