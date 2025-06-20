@@ -111,7 +111,6 @@ napi_value JSNumberFormatAddon::NumberFormatConstructor(napi_env env, napi_callb
         return nullptr;
     }
     if (!obj->InitNumberFormatContext(env, info, localeTags, map)) {
-        delete obj;
         HILOG_ERROR_I18N("Init NumberFormat failed");
         return nullptr;
     }

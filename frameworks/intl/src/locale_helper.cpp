@@ -111,6 +111,9 @@ bool IsExtensionSingleton(const std::string &value)
 }
 }
 
+std::string LocaleHelper::defaultLocale = "";
+std::mutex LocaleHelper::defaultLocaleMutex;
+
 const std::unordered_map<std::string, std::unordered_set<std::string>> LocaleHelper::KEY_TO_OPTION_NAME = {
     { "localeMatcher", { "best fit", "lookup" } },
     { "style", { "narrow", "short", "long" }},
@@ -215,7 +218,7 @@ std::vector<std::string> LocaleHelper::CanonicalizeLocaleList(const std::vector<
 {
     std::vector<std::string> resultLocales;
     for (const std::string& locale : locales) {
-        if (!LocaleHelper::IsStructurallyValidLanguageTag(locale) || locale.empty()) {
+        if (locale.empty() || !LocaleHelper::IsStructurallyValidLanguageTag(locale)) {
             status = I18nErrorCode::INVALID_LOCALE_TAG;
             return {};
         }
@@ -230,12 +233,12 @@ std::vector<std::string> LocaleHelper::CanonicalizeLocaleList(const std::vector<
         formalLocale = icu::LocaleBuilder().setLocale(formalLocale).build(icuStatus);
         // Canonicalize the locale ID of this object according to CLDR.
         formalLocale.canonicalize(icuStatus);
-        if ((U_FAILURE(icuStatus) != 0) || (formalLocale.isBogus() != 0)) {
+        if ((U_FAILURE(icuStatus)) || (formalLocale.isBogus())) {
             status = I18nErrorCode::INVALID_LOCALE_TAG;
             return {};
         }
         std::string languageTag = formalLocale.toLanguageTag<std::string>(icuStatus);
-        if (U_FAILURE(icuStatus) != 0) {
+        if (U_FAILURE(icuStatus)) {
             status = I18nErrorCode::INVALID_LOCALE_TAG;
             return {};
         }
@@ -419,6 +422,42 @@ double LocaleHelper::TruncateDouble(double number)
     }
     double ret = Geq(number, 0) ? std::floor(number) : std::ceil(number);
     return ret;
+}
+
+std::string LocaleHelper::DefaultLocale()
+{
+    if (!defaultLocale.empty()) {
+        return defaultLocale;
+    }
+    std::lock_guard<std::mutex> defaultLocaleLock(defaultLocaleMutex);
+    if (!defaultLocale.empty()) {
+        return defaultLocale;
+    }
+    icu::Locale icuDefaultLocale;
+    if (strcmp(icuDefaultLocale.getName(), "en_US_POSIX") == 0 || strcmp(icuDefaultLocale.getName(), "c") == 0) {
+        defaultLocale = "en-US";
+    } else if (icuDefaultLocale.isBogus()) {
+        defaultLocale = "und";
+    } else {
+        UErrorCode icuStatus = U_ZERO_ERROR;
+        defaultLocale = icuDefaultLocale.toLanguageTag<std::string>(icuStatus);
+        if (U_FAILURE(icuStatus)) {
+            HILOG_ERROR_I18N("LocaleHelper::DefaultLocale: toLanguageTag failed.");
+        }
+    }
+    return defaultLocale;
+}
+
+std::string LocaleHelper::LookupMatcher(const std::set<std::string>& availableLocales,
+                                        const std::vector<std::string>& requestedLocales)
+{
+    for (const std::string& locale : requestedLocales) {
+        std::string availableLocale = BestAvailableLocale(availableLocales, locale);
+        if (!availableLocale.empty()) {
+            return availableLocale;
+        }
+    }
+    return "";
 }
 } // namespace I18n
 } // namespace Global

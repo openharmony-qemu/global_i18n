@@ -127,6 +127,23 @@ int32_t ConvertString2Int(const string &numberStr, int32_t& status)
     }
 }
 
+int32_t ConvertString2Double(const string &numberStr, int32_t& status)
+{
+    try {
+        return std::stod(numberStr);
+    } catch (const std::invalid_argument &except) {
+        status = -1;
+        return -1;
+    } catch (const std::out_of_range &except) {
+        status = -1;
+        return -1;
+    } catch (...) {
+        status = -1;
+        HILOG_ERROR_I18N("ConvertString2Double: unknow error. numberStr: %{public}s.", numberStr.c_str());
+        return -1;
+    }
+}
+
 bool IsValidLocaleTag(icu::Locale &locale)
 {
     static std::unordered_set<std::string> allValidLocalesLanguageTag;
