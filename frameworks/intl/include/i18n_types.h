@@ -83,7 +83,7 @@ enum class LocaleType {
 
 enum class ErrorType {
     NO_ERROR,
-    TYEP_ERROR,
+    TYPE_ERROR,
     RANGE_ERROR
 };
 

@@ -177,7 +177,11 @@ void HolidayManager::ParseFileLine(const std::string &line, HolidayInfoItem *hol
         return;
     }
     std::string tag = match[1].str();
-    std::string value = line.substr(line.find_last_of(":") + 1, line.length());
+    size_t valuePos = line.find_last_of(":");
+    if (valuePos == std::string::npos || valuePos + 1 >= line.length()) {
+        return;
+    }
+    std::string value = line.substr(valuePos + 1, line.length());
     if (tag.compare(ITEM_DTSTART_TAG) == 0) {
         std::string startDate = value.size() >= 8 ? value.substr(0, 8) : ""; // 8 is date formarted string length
         if (startDate.size() == 8) {
@@ -212,8 +216,14 @@ std::string& HolidayManager::Trim(std::string &str)
     if (str.empty()) {
         return str;
     }
-    str.erase(0, str.find_first_not_of(" \t"));
-    str.erase(str.find_last_not_of("\r\n\t") + 1);
+    size_t endPos = str.find_first_not_of(" \t");
+    if (endPos != std::string::npos) {
+        str.erase(0, endPos);
+    }
+    size_t startPos = str.find_last_not_of("\r\n\t");
+    if (startPos != std::string::npos && startPos + 1 < str.length()) {
+        str.erase(startPos + 1);
+    }
     return str;
 }
 } // namespace I18n

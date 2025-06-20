@@ -69,7 +69,7 @@ public:
         napi_value optionValue = nullptr;
         napi_valuetype type = napi_undefined;
         napi_status status = napi_typeof(env, options, &type);
-        if (status != napi_ok && type != napi_object) {
+        if (status != napi_ok || type != napi_object) {
             HILOG_ERROR_I18N("Get option failed, option is not an object");
             return;
         }
@@ -112,7 +112,7 @@ public:
         napi_value optionValue = nullptr;
         napi_valuetype type = napi_undefined;
         napi_status status = napi_typeof(env, options, &type);
-        if (status != napi_ok && type != napi_object) {
+        if (status != napi_ok || type != napi_object) {
             HILOG_ERROR_I18N("GetBoolOptionValue: Set option failed, option is not an object");
             return;
         }
@@ -149,7 +149,7 @@ public:
         napi_value optionValue = nullptr;
         napi_valuetype type = napi_undefined;
         napi_status status = napi_typeof(env, options, &type);
-        if (status != napi_ok && type != napi_object) {
+        if (status != napi_ok || type != napi_object) {
             HILOG_ERROR_I18N("GetDoubleOptionValue: Get option failed, option is not an object.");
             return;
         }

@@ -43,6 +43,7 @@ ohos_shared_library("i18n") {
     "//base/global/i18n/interfaces/native/inner_api/i18n/include",
     "//base/global/i18n/services/include",
   ]
+  use_exceptions = true
   cflags_cc = [ "-frtti" ]
   remove_configs = [ "//build/config/compiler:no_rtti" ]
   sources = [
