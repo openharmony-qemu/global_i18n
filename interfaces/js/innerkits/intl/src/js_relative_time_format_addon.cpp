@@ -27,11 +27,11 @@ namespace I18n {
 static thread_local napi_ref g_JsRelativeTimeFormatConstructor = nullptr;
 
 std::unordered_map<std::string, std::vector<std::string>> JSRelativeTimeFormatAddon::optionAvaliableMap {
-    { "localeMatcher", {"lookup", "best fit"} }, 
-    { "numeric", {"always", "auto"} },
-    { "style", {"long", "short", "narrow"} },
-    { "unit", {"year", "years", "quarter", "quarters", "month", "months", "week", "weeks",
-            "day", "days", "hour", "hours", "minute", "minutes", "second", "seconds"} },
+    {"localeMatcher", {"lookup", "best fit"}},
+    {"numeric", {"always", "auto"}},
+    {"style", {"long", "short", "narrow"}},
+    {"unit", {"year", "years", "quarter", "quarters", "month", "months", "week", "weeks",
+            "day", "days", "hour", "hours", "minute", "minutes", "second", "seconds"}},
 };
 
 JSRelativeTimeFormatAddon::JSRelativeTimeFormatAddon()
@@ -134,7 +134,7 @@ void JSRelativeTimeFormatAddon::GetParameterLocales(napi_env env,
         return;
     }
     int32_t code = 0;
-     std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argValue, code);
+    std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argValue, code);
     if (code != 0) {
         HILOG_ERROR_I18N("ReltiveTimeFormatConstructor: input locale is empty");
     }
