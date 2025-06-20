@@ -2424,7 +2424,6 @@ std::string LocaleConfig::GenerateExtParam(const std::unordered_map<std::string,
         std::string key = item.first;
         std::string value = item.second;
         if (value.empty()) {
-            HILOG_INFO_I18N("LocaleConfig::GenerateExtParam: erase key (%{public}s) ", key.c_str());
             continue;
         }
         extParam += "-" + key + "-" + value;
