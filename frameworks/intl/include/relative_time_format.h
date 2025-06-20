@@ -58,6 +58,7 @@ public:
     void GetResolvedOptions(std::map<std::string, std::string> &map);
     static std::vector<std::string> SupportedLocalesOf(const std::vector<std::string> &requestLocales,
         const std::map<std::string, std::string> &configs, I18nErrorCode &status);
+    static std::string CheckParamLocales(std::vector<std::string> &localeArray);
 
 private:
     icu::Locale locale;

@@ -140,8 +140,31 @@ void RelativeTimeFormat::ParseConfigs(std::map<std::string, std::string> &config
     }
 }
 
+std::string RelativeTimeFormat::CheckParamLocales(std::vector<std::string> &localeArray)
+{
+    for (auto iter = localeArray.begin(); iter != localeArray.end(); ++iter) {
+        std::string localeId = *iter;
+        if (localeId.empty()) {
+            HILOG_ERROR_I18N("RelativeTimeFormat::CheckParamLocales: locale is empty");
+            return "invalid locale";
+        }
+        UErrorCode status = U_ZERO_ERROR;
+        icu::Locale locale = icu::Locale::forLanguageTag(icu::StringPiece(localeId), status);
+        if (U_FAILURE(status)) {
+            HILOG_ERROR_I18N("RelativeTimeFormat::CheckParamLocales: locale %{public}s invalid", localeId.c_str());
+            return "invalid locale";
+        }
+        if (LocaleInfo::allValidLocales.count(locale.getLanguage()) < 1) {
+            HILOG_ERROR_I18N("RelativeTimeFormat::CheckParamLocales: invalid locale: %{public}s ", localeId.c_str());
+            return "invalid locale";
+        }
+    }
+    return "";
+}
+
 std::string RelativeTimeFormat::Format(double number, const std::string &unit)
 {
+    HILOG_ERROR_I18N("zdd---Format0,unit:%{public}s", unit.c_str());
     icu::FormattedRelativeDateTime formattedTime = FormatToFormattedValue(number, unit);
     UErrorCode status = U_ZERO_ERROR;
     std::string result;
@@ -149,6 +172,7 @@ std::string RelativeTimeFormat::Format(double number, const std::string &unit)
     if (U_SUCCESS(status)) {
         formatResult.toUTF8String(result);
     }
+    HILOG_ERROR_I18N("zdd---Format:%{public}s", result.c_str());
     return PseudoLocalizationProcessor(result);
 }
 

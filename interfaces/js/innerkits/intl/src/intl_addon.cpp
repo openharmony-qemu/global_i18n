@@ -1095,7 +1095,7 @@ bool SetBuildInIntl(napi_env &env, napi_value &global, napi_value &intlModule)
     }
 
     const std::vector<std::string> buildinClasses = {"DurationFormat", "ListFormat",
-        "RelativeTimeFormat", "Segmenter", "getCanonicalLocales", "supportedValuesOf"};
+        "Segmenter", "getCanonicalLocales", "supportedValuesOf"};
 
     for (std::string buildinClass : buildinClasses) {
         if (!SetBuildInIntlModule(env, intlModule, buildinIntlModule, buildinClass)) {
@@ -1117,6 +1117,7 @@ IntlInitFunction g_intlInitFunctionArray[] = {
     {&OHOS::Global::I18n::JSNumberFormatAddon::InitJsNumberFormat, "NumberFormat"},
     {&OHOS::Global::I18n::JSRelativeTimeFormatAddon::InitJsRelativeTimeFormat, "RelativeTimeFormat"},
     {&OHOS::Global::I18n::IntlDateTimeFormatAddon::InitIntlDateTimeFormat, "DateTimeFormat"},
+    {&OHOS::Global::I18n::IntlPluralRulesAddon::InitIntlPluralRules, "PluralRules"}
 };
 
 bool BindingIntlModules(napi_env env, napi_value &intlModule)
@@ -1127,12 +1128,6 @@ bool BindingIntlModules(napi_env env, napi_value &intlModule)
             HILOG_ERROR_I18N("RegisterIntl: init Intl %{public}s Module failed", initFunc.moduleName);
             return false;
         }
-    }
-
-    intlModule = OHOS::Global::I18n::IntlPluralRulesAddon::InitIntlPluralRules(env, intlModule);
-    if (intlModule == nullptr) {
-        HILOG_ERROR_I18N("RegisterIntl: init Intl PluralRules Module failed");
-        return false;
     }
     return true;
 }
