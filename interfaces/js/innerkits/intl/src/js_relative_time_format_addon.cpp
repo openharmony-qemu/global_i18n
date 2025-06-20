@@ -100,18 +100,25 @@ napi_value JSRelativeTimeFormatAddon::ReltiveTimeFormatConstructor(napi_env env,
         return nullptr;
     }
     std::vector<std::string> localeTags;
-    GetParameterLocales(env, localeTags, argc, argv[0]);
+    GetParameterLocales(env, localeTags, argc, argv);
     std::map<std::string, std::string> map = {};
     if (argc > 1) {
         GetRelativeTimeOptionValues(env, argv[1], map);
+    }
+    if (map.find("localeMatcher") != map.end()) {
+        I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
+        localeTags = LocaleHelper::SupportedLocalesOf(localeTags, map, errorCode);
+        if (errorCode != I18nErrorCode::SUCCESS) {
+            HILOG_ERROR_I18N("ReltiveTimeFormatConstructor: Get Supported Locales failed");
+            return nullptr;
+        }
     }
     JSRelativeTimeFormatAddon* obj = new (std::nothrow) JSRelativeTimeFormatAddon();
     if (obj == nullptr) {
         HILOG_ERROR_I18N("RelativeTimeFormatConstructor: Create JSRelativeTimeFormatAddon failed");
         return nullptr;
     }
-    status =
-        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj), JSRelativeTimeFormatAddon::Destructor,
+    status = napi_wrap(env, thisVar, reinterpret_cast<void *>(obj), JSRelativeTimeFormatAddon::Destructor,
         nullptr, nullptr);
     if (status != napi_ok) {
         delete obj;
@@ -127,14 +134,14 @@ napi_value JSRelativeTimeFormatAddon::ReltiveTimeFormatConstructor(napi_env env,
 }
 
 void JSRelativeTimeFormatAddon::GetParameterLocales(napi_env env,
-    std::vector<std::string> &localeTags, const size_t &argc, napi_value argValue)
+    std::vector<std::string> &localeTags, const size_t &argc, napi_value* argv)
 {
     if (argc < 1) {
         localeTags.push_back("en-US");
         return;
     }
     int32_t code = 0;
-    std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argValue, code);
+    std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argv[0], code);
     if (code != 0) {
         HILOG_ERROR_I18N("ReltiveTimeFormatConstructor: input locale is empty");
     }
