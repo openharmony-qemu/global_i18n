@@ -1907,6 +1907,35 @@ HWTEST_F(I18nTest, I18nFuncTest073, TestSize.Level1)
     std::string result = LocaleConfig::GetUnicodeWrappedFilePath(path, delimiter, intlLocale, errorCode);
     EXPECT_EQ(result, "\u200f\u200edata\u200e\u200f>\u200elog\u200e\u200f>\u200efaultlog\u200e");
 }
+
+/**
+ * @tc.name: I18nFuncTest074
+ * @tc.desc: Test I18n calendar
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest074, TestSize.Level1)
+{
+    std::string systemLanguage = LocaleConfig::GetSystemLanguage();
+    std::string systemLocale = LocaleConfig::GetSystemLocale();
+    LocaleConfig::SetFirstDayOfWeek(WeekDay::THU);
+
+    I18nCalendar defaultCalendar("zh-Hans-CN", CalendarType::CHINESE);
+    int32_t firstDayOfWeek = defaultCalendar.GetFirstDayOfWeek();
+    EXPECT_EQ(firstDayOfWeek, 5);
+    defaultCalendar.SetFirstDayOfWeek(6);
+    firstDayOfWeek = defaultCalendar.GetFirstDayOfWeek();
+    EXPECT_EQ(firstDayOfWeek, 6);
+
+    I18nCalendar satCalendar("zh-Hans-CN-u-fw-sat", CalendarType::CHINESE);
+    firstDayOfWeek = satCalendar.GetFirstDayOfWeek();
+    EXPECT_EQ(firstDayOfWeek, 7);
+    satCalendar.SetFirstDayOfWeek(3);
+    firstDayOfWeek = satCalendar.GetFirstDayOfWeek();
+    EXPECT_EQ(firstDayOfWeek, 3);
+
+    LocaleConfig::SetSystemLanguage(systemLanguage);
+    LocaleConfig::SetSystemLocale(systemLocale);
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

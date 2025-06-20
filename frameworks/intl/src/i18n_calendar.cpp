@@ -22,6 +22,7 @@
 #include "indiancal.h"
 #include "islamcal.h"
 #include "japancal.h"
+#include "locale_config.h"
 #include "unicode/locdspnm.h"
 #include "persncal.h"
 #include "string"
@@ -39,6 +40,16 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
+static std::unordered_map<WeekDay, UCalendarDaysOfWeek> WEEK_DAY_TO_ICU {
+    { WeekDay::MON, UCalendarDaysOfWeek::UCAL_MONDAY },
+    { WeekDay::TUE, UCalendarDaysOfWeek::UCAL_TUESDAY },
+    { WeekDay::WED, UCalendarDaysOfWeek::UCAL_WEDNESDAY },
+    { WeekDay::THU, UCalendarDaysOfWeek::UCAL_THURSDAY },
+    { WeekDay::FRI, UCalendarDaysOfWeek::UCAL_FRIDAY },
+    { WeekDay::SAT, UCalendarDaysOfWeek::UCAL_SATURDAY },
+    { WeekDay::SUN, UCalendarDaysOfWeek::UCAL_SUNDAY }
+};
+
 I18nCalendar::I18nCalendar(std::string localeTag)
 {
     UErrorCode status = U_ZERO_ERROR;
@@ -60,6 +71,7 @@ I18nCalendar::I18nCalendar(std::string localeTag)
         }
         calendar_ = nullptr;
     }
+    InitFirstDayOfWeek(localeTag);
 }
 
 I18nCalendar::I18nCalendar(std::string localeTag, CalendarType type)
@@ -77,6 +89,7 @@ I18nCalendar::I18nCalendar(std::string localeTag, CalendarType type)
         return;
     }
     InitCalendar(tempLocale, type);
+    InitFirstDayOfWeek(localeTag);
 }
 
 void I18nCalendar::InitCalendar(const icu::Locale &locale, CalendarType type)
@@ -339,6 +352,24 @@ int32_t I18nCalendar::CompareDays(UDate date)
 icu::Calendar* I18nCalendar::GetIcuCalendar() const
 {
     return this->calendar_;
+}
+
+void I18nCalendar::InitFirstDayOfWeek(const std::string& localeTag)
+{
+    std::string param = LocaleConfig::QueryExtParam(localeTag, "fw", "-u-");
+    if (!param.empty()) {
+        return;
+    }
+    WeekDay weekDay = LocaleConfig::GetFirstDayOfWeek();
+    auto iter = WEEK_DAY_TO_ICU.find(weekDay);
+    if (iter == WEEK_DAY_TO_ICU.end()) {
+        return;
+    }
+    icu::Calendar* icuCalendar = GetIcuCalendar();
+    if (icuCalendar == nullptr) {
+        return;
+    }
+    icuCalendar->setFirstDayOfWeek(iter->second);
 }
 } // namespace I18n
 } // namespace Global
