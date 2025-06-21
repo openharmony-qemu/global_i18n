@@ -60,7 +60,7 @@ napi_value JSRelativeTimeFormatAddon::InitJsRelativeTimeFormat(napi_env env, nap
     };
     napi_value constructor = nullptr;
     napi_status status = napi_define_class(env, "RelativeTimeFormat", NAPI_AUTO_LENGTH,
-        ReltiveTimeFormatConstructor, nullptr,
+        RelativeTimeFormatConstructor, nullptr,
         sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("InitJsRelativeTimeFormat: Define class failed when init JsRelativeTimeFormat");
@@ -74,7 +74,7 @@ napi_value JSRelativeTimeFormatAddon::InitJsRelativeTimeFormat(napi_env env, nap
     return exports;
 }
 
-napi_value JSRelativeTimeFormatAddon::ReltiveTimeFormatConstructor(napi_env env, napi_callback_info info)
+napi_value JSRelativeTimeFormatAddon::RelativeTimeFormatConstructor(napi_env env, napi_callback_info info)
 {
     size_t argc = 2;
     napi_value argv[2] = { nullptr };
@@ -82,13 +82,13 @@ napi_value JSRelativeTimeFormatAddon::ReltiveTimeFormatConstructor(napi_env env,
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("ReltiveTimeFormatConstructor: Get parameter info failed");
+        HILOG_ERROR_I18N("RelativeTimeFormatConstructor: Get parameter info failed");
         return nullptr;
     }
     napi_value newTarget;
     status = napi_get_new_target(env, info, &newTarget);
     if (status != napi_ok  || newTarget == nullptr) {
-        HILOG_ERROR_I18N("ReltiveTimeFormatConstructor: Intl.RelativeTimeFormat requires new");
+        HILOG_ERROR_I18N("RelativeTimeFormatConstructor: Intl.RelativeTimeFormat requires new");
         napi_throw_type_error(env, nullptr, "newTarget is undefined");
         return nullptr;
     }
@@ -130,7 +130,7 @@ bool JSRelativeTimeFormatAddon::GetParameterLocales(napi_env env,
     int32_t code = 0;
     std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argv[0], code);
     if (code != 0) {
-        HILOG_ERROR_I18N("ReltiveTimeFormatConstructor: input locale is empty");
+        HILOG_ERROR_I18N("GetParameterLocales: input locale is empty");
     }
     std::string checkResult = LocaleHelper::CheckParamLocales(localeArray);
     if (!checkResult.empty()) {
@@ -169,22 +169,25 @@ void JSRelativeTimeFormatAddon::CheckOptionValue(napi_env env, const std::string
 {
     std::vector<std::string> aviliableValues = optionAvaliableMap[optionName];
     auto it = std::find(aviliableValues.begin(), aviliableValues.end(), optionValue);
-    if (it == aviliableValues.end()) {
-        ThrowRangeError(env, optionName, optionValue);
+    if (it != aviliableValues.end()) {
+        return;
+    }
+    if (!ThrowRangeError(env, optionName, optionValue)) {
+        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::CheckOptionValue:"
+            "throw error for %{public}s failed", optionName.c_str());
     }
 }
 
-void JSRelativeTimeFormatAddon::ThrowRangeError(napi_env env, const std::string &property,
+bool JSRelativeTimeFormatAddon::ThrowRangeError(napi_env env, const std::string &property,
     const std::string &value)
 {
-    std::string msg = "Value out of range for locale options property";
-    napi_value error = nullptr;
-    napi_value errorCode = JSUtils::CreateString(env, "500");
-    napi_value errorMsg = JSUtils::CreateString(env, msg);
-    napi_status status = napi_create_range_error(env, errorCode, errorMsg, &error);
-    if (status != napi_ok || error == nullptr) {
+    const char* msg = "Value out of range for locale options property";
+    napi_status status = napi_throw_range_error(env, nullptr, msg);
+    if (status != napi_ok) {
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::ThrowRangeError: throw range error failed");
+        return false;
     }
+    return true;
 }
 
 bool JSRelativeTimeFormatAddon::InitRelativeTimeFormatContext(napi_env env, napi_callback_info info,
@@ -204,6 +207,10 @@ napi_value JSRelativeTimeFormatAddon::Format(napi_env env, napi_callback_info in
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::Format: Get parameter info failed");
         return nullptr;
     }
+    if (argc < 2) { // 2 is required parameter count
+        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::Format: parameter less then required");
+        return nullptr;  
+    }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     status = napi_typeof(env, argv[0], &valueType);
     if (status != napi_ok) {
@@ -221,18 +228,19 @@ napi_value JSRelativeTimeFormatAddon::Format(napi_env env, napi_callback_info in
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::Format: Get number failed");
         return nullptr;
     }
-    std::vector<char> unit;
-    if (!JSUtils::GetStringParameter(env, argv[1], unit)) {
+    int32_t code = 0;
+    std::string unit = JSUtils::GetString(env, argv[1], code);
+    if (code != 0) {
         return nullptr;
     }
-    CheckOptionValue(env, unit.data(), "unit");
+    CheckOptionValue(env, unit, "unit");
     JSRelativeTimeFormatAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->relativetimefmt_) {
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::Format: Get RelativeTimeFormat object failed");
         return nullptr;
     }
-    std::string value = obj->relativetimefmt_->Format(number, unit.data());
+    std::string value = obj->relativetimefmt_->Format(number, unit);
     return JSUtils::CreateString(env, value);
 }
 
@@ -318,7 +326,7 @@ napi_value JSRelativeTimeFormatAddon::GetFormatToPartsInner(napi_env env, napi_v
         return nullptr;
     }
     obj->relativetimefmt_->FormatToParts(number, unit, relativeTimeParts);
-    return SetNumberFormatParts(env, status, relativeTimeParts);
+    return SetNumberFormatParts(env, relativeTimeParts);
 }
 
 napi_value JSRelativeTimeFormatAddon::SupportedLocalesOf(napi_env env, napi_callback_info info)
@@ -356,32 +364,34 @@ napi_value JSRelativeTimeFormatAddon::SupportedLocalesOf(napi_env env, napi_call
     return JSUtils::CreateArray(env, resultLocales);
 }
 
-napi_value JSRelativeTimeFormatAddon::SetNumberFormatParts(napi_env env, napi_status &status,
+napi_value JSRelativeTimeFormatAddon::SetNumberFormatParts(napi_env env,
     const std::vector<std::vector<std::string>> &numberParts)
 {
     napi_value result = nullptr;
-    status = napi_create_array_with_length(env, numberParts.size(), &result);
+    napi_status status = napi_create_array_with_length(env, numberParts.size(), &result);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("SetNumberFormatParts: Failed to create array");
         return nullptr;
     }
     for (size_t i = 0; i < numberParts.size(); i++) {
-        napi_value value = nullptr;
-        status = napi_create_string_utf8(env, numberParts[i][1].c_str(), NAPI_AUTO_LENGTH, &value);
-        if (status != napi_ok) {
+        if (numberParts[i].size() < 2) { // 2 is minimum vector's size
+            HILOG_ERROR_I18N("SetNumberFormatParts: numberParts's item in %{public}zu lack key&value pair", i);
+            return nullptr;
+        }
+        napi_value value = JSUtils::CreateString(env, numberParts[i][1].c_str());
+        if (value == nullptr) {
             HILOG_ERROR_I18N("Failed to create string item numberParts[i][1].");
             return nullptr;
         }
-        napi_value type = nullptr;
-        status = napi_create_string_utf8(env, numberParts[i][0].c_str(), NAPI_AUTO_LENGTH, &type);
-        if (status != napi_ok) {
+        napi_value type = JSUtils::CreateString(env, numberParts[i][0].c_str());
+        if (type == nullptr) {
             HILOG_ERROR_I18N("Failed to create string item numberParts[i][0].");
             return nullptr;
         }
         napi_value unit = nullptr;
         if (numberParts[i].size() > 2) { // 2 is vector's size which not contains unit
-            status = napi_create_string_utf8(env, numberParts[i][2].c_str(), NAPI_AUTO_LENGTH, &unit);
-            if (status != napi_ok) {
+            unit = JSUtils::CreateString(env, numberParts[i][2].c_str());
+            if (unit == nullptr) {
                 HILOG_ERROR_I18N("Failed to create string item numberParts[i][2].");
                 return nullptr;
             }

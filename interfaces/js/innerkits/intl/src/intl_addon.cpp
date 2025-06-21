@@ -1105,29 +1105,45 @@ bool SetBuildInIntl(napi_env &env, napi_value &global, napi_value &intlModule)
     return true;
 }
 
-using IntlInitFunc = napi_value (*)(napi_env, napi_value);
-struct IntlInitFunction {
-    IntlInitFunc func;
-    const char* moduleName;
-};
-IntlInitFunction g_intlInitFunctionArray[] = {
-    {&OHOS::Global::I18n::CollatorAddon::InitCollator, "Collator"},
-    {&OHOS::Global::I18n::DisplayNamesAddon::InitDisplayNames, "DisplayNames"},
-    {&OHOS::Global::I18n::IntlLocaleAddon::InitIntlLocale, "Locale"},
-    {&OHOS::Global::I18n::JSNumberFormatAddon::InitJsNumberFormat, "NumberFormat"},
-    {&OHOS::Global::I18n::JSRelativeTimeFormatAddon::InitJsRelativeTimeFormat, "RelativeTimeFormat"},
-    {&OHOS::Global::I18n::IntlDateTimeFormatAddon::InitIntlDateTimeFormat, "DateTimeFormat"},
-    {&OHOS::Global::I18n::IntlPluralRulesAddon::InitIntlPluralRules, "PluralRules"}
-};
-
 bool BindingIntlModules(napi_env env, napi_value &intlModule)
 {
-    for (auto initFunc : g_intlInitFunctionArray) {
-        intlModule = (initFunc.func)(env, intlModule);
-        if (intlModule == nullptr) {
-            HILOG_ERROR_I18N("RegisterIntl: init Intl %{public}s Module failed", initFunc.moduleName);
-            return false;
-        }
+    intlModule = OHOS::Global::I18n::CollatorAddon::InitCollator(env, intlModule);
+    if (intlModule == nullptr) {
+        HILOG_ERROR_I18N("RegisterIntl: init Intl Collator Module failed");
+        return false;
+    }
+
+    intlModule = OHOS::Global::I18n::DisplayNamesAddon::InitDisplayNames(env, intlModule);
+    if (intlModule == nullptr) {
+        HILOG_ERROR_I18N("RegisterIntl: init Intl DisplayNames Module failed");
+        return false;
+    }
+
+    intlModule = OHOS::Global::I18n::IntlLocaleAddon::InitIntlLocale(env, intlModule);
+    if (intlModule == nullptr) {
+        HILOG_ERROR_I18N("RegisterIntl: init Intl Locale Module failed");
+        return false;
+    }
+
+    intlModule = OHOS::Global::I18n::JSNumberFormatAddon::InitJsNumberFormat(env, intlModule);
+    if (intlModule == nullptr) {
+        HILOG_ERROR_I18N("RegisterIntl: init Intl NumberFormat Module failed");
+        return false;
+    }
+    intlModule = OHOS::Global::I18n::IntlDateTimeFormatAddon::InitIntlDateTimeFormat(env, intlModule);
+    if (intlModule == nullptr) {
+        HILOG_ERROR_I18N("RegisterIntl: init Intl DateTimeFormat Module failed");
+        return false;
+    }
+    intlModule = OHOS::Global::I18n::IntlPluralRulesAddon::InitIntlPluralRules(env, intlModule);
+    if (intlModule == nullptr) {
+        HILOG_ERROR_I18N("RegisterIntl: init Intl PluralRules Module failed");
+        return false;
+    }
+    intlModule = OHOS::Global::I18n::JSRelativeTimeFormatAddon::InitJsRelativeTimeFormat(env, intlModule);
+    if (intlModule == nullptr) {
+        HILOG_ERROR_I18N("RegisterIntl: init Intl RelativeTimeFormat Module failed");
+        return false;
     }
     return true;
 }
