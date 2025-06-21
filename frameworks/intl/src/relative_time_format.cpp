@@ -89,7 +89,8 @@ RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTag
 }
 
 RelativeTimeFormat::~RelativeTimeFormat()
-{}
+{
+}
 
 void RelativeTimeFormat::SetRelativeTimeFormat(const std::vector<std::string> &localeTags,
     std::map<std::string, std::string> &configs)
