@@ -86,7 +86,6 @@ public:
         const std::map<std::string, std::string> &configs, I18nErrorCode &status);
     static std::string GetIcuDefaultLocale();
     std::string CheckNumberFormatOptions(std::map<std::string, std::string> &map, int32_t &code);
-    static std::string CheckParamLocales(std::vector<std::string> &localeArray);
 
 private:
     icu::Locale locale;
@@ -156,7 +155,6 @@ private:
     static std::unordered_map<UNumberFormatFields, std::string> numberFormatFieldMap;
     static std::unordered_map<std::string, int> defaultCurrencyFractionMap;
     static bool ReadISO4217Datas();
-    static std::set<std::string> GetNumberAvailableLocales();
     std::string GetCurrencyFromConfig(const std::string& currency);
     void CreateRelativeTimeFormat(const std::string& locale);
     void ParseConfigs(std::map<std::string, std::string> &configs);

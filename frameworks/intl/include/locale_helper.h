@@ -54,6 +54,10 @@ public:
     static bool IsNormativeCalendar(const std::string &value);
     static bool IsNormativeNumberingSystem(const std::string &value);
     static double TruncateDouble(double number);
+    static std::set<std::string> GetAvailableLocales();
+    static std::vector<std::string> SupportedLocalesOf(const std::vector<std::string> &requestLocales,
+        const std::map<std::string, std::string> &configs, I18nErrorCode &status);
+    static std::string CheckParamLocales(std::vector<std::string> &localeArray);
     static std::string DefaultLocale();
     static std::string LookupMatcher(const std::set<std::string>& availableLocales,
                                      const std::vector<std::string>& requestedLocales);

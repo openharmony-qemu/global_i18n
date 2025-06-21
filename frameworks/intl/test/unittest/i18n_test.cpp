@@ -1699,6 +1699,7 @@ HWTEST_F(I18nTest, I18nFuncTest067, TestSize.Level1)
     EXPECT_EQ(code, 0);
     EXPECT_EQ(LocaleConfig::GetSimplifiedLanguage("cr-Cans-CA", code), "cr");
     EXPECT_EQ(code, 0);
+    LocaleConfig::SetSystemLanguage("zh-Hans");
 }
 
 /**

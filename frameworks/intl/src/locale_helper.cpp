@@ -16,6 +16,7 @@
 #include <sstream>
 #include "unicode/localebuilder.h"
 #include "i18n_hilog.h"
+#include "locale_info.h"
 #include "utils.h"
 
 namespace OHOS {
@@ -422,6 +423,62 @@ double LocaleHelper::TruncateDouble(double number)
     }
     double ret = Geq(number, 0) ? std::floor(number) : std::ceil(number);
     return ret;
+}
+
+std::set<std::string> LocaleHelper::GetAvailableLocales()
+{
+    std::set<std::string> result;
+    int32_t count = 0;
+    const icu::Locale* locales = icu::Locale::getAvailableLocales(count);
+    if (count < 1 || locales == nullptr) {
+        HILOG_ERROR_I18N("LocaleHelper::GetAvailableLocales: Get available locales failed.");
+        return result;
+    }
+    for (int i = 0; i < count; i++) {
+        const char* name = locales[i].getName();
+        if (name != nullptr) {
+            result.insert(name);
+        }
+    }
+    return result;
+}
+
+std::vector<std::string> LocaleHelper::SupportedLocalesOf(const std::vector<std::string> &requestLocales,
+    const std::map<std::string, std::string> &configs, I18nErrorCode &status)
+{
+    std::vector<std::string> undefined = {};
+    auto requestedLocales = CanonicalizeLocaleList(requestLocales, status);
+    if (status != I18nErrorCode::SUCCESS) {
+        return undefined;
+    }
+    std::string localeMatcher = ParseOption(configs, "localeMatcher", "best fit", true, status);
+    if (status != I18nErrorCode::SUCCESS) {
+        return undefined;
+    }
+    std::set<std::string> availableLocales = GetAvailableLocales();
+    return LookupSupportedLocales(availableLocales, requestedLocales);
+}
+
+std::string LocaleHelper::CheckParamLocales(std::vector<std::string> &localeArray)
+{
+    for (auto iter = localeArray.begin(); iter != localeArray.end(); ++iter) {
+        std::string localeId = *iter;
+        if (localeId.empty()) {
+            HILOG_ERROR_I18N("LocaleHelper::CheckParamLocales: locale is empty");
+            return "invalid locale";
+        }
+        UErrorCode status = U_ZERO_ERROR;
+        icu::Locale locale = icu::Locale::forLanguageTag(icu::StringPiece(localeId), status);
+        if (U_FAILURE(status)) {
+            HILOG_ERROR_I18N("LocaleHelper::CheckParamLocales: locale %{public}s invalid", localeId.c_str());
+            return "invalid locale";
+        }
+        if (LocaleInfo::allValidLocales.count(locale.getLanguage()) < 1) {
+            HILOG_ERROR_I18N("LocaleHelper::CheckParamLocales: invalid locale: %{public}s ", localeId.c_str());
+            return "invalid locale";
+        }
+    }
+    return "";
 }
 
 std::string LocaleHelper::DefaultLocale()

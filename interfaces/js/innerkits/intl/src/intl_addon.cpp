@@ -27,6 +27,7 @@
 #include "intl_date_time_format_addon.h"
 #include "intl_plural_rules_addon.h"
 #include "js_number_format_addon.h"
+#include "js_relative_time_format_addon.h"
 #include "js_utils.h"
 #include "locale_info_addon.h"
 #include "number_format_addon.h"
@@ -633,33 +634,6 @@ bool IntlAddon::InitCollatorContext(napi_env env, napi_callback_info info, std::
     return collator_ != nullptr;
 }
 
-bool GetStringParameter(napi_env env, napi_value value, std::vector<char> &buf)
-{
-    napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_status status = napi_typeof(env, value, &valueType);
-    if (status != napi_ok) {
-        return false;
-    }
-    if (valueType != napi_valuetype::napi_string) {
-        HILOG_ERROR_I18N("Parameter type does not match");
-        return false;
-    }
-    size_t len = 0;
-    status = napi_get_value_string_utf8(env, value, nullptr, 0, &len);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("Get first length failed");
-        return false;
-    }
-    buf.resize(len + 1);
-    status = napi_get_value_string_utf8(env, value, buf.data(), len + 1, &len);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("Get first failed");
-        return false;
-    }
-
-    return true;
-}
-
 napi_value IntlAddon::FormatRelativeTime(napi_env env, napi_callback_info info)
 {
     size_t argc = 2;
@@ -677,7 +651,7 @@ napi_value IntlAddon::FormatRelativeTime(napi_env env, napi_callback_info info)
         return nullptr;
     }
     std::vector<char> unit;
-    if (!GetStringParameter(env, argv[1], unit)) {
+    if (!JSUtils::GetStringParameter(env, argv[1], unit)) {
         return nullptr;
     }
     IntlAddon *obj = nullptr;
@@ -760,7 +734,7 @@ napi_value IntlAddon::FormatToParts(napi_env env, napi_callback_info info)
         return nullptr;
     }
     std::vector<char> unit;
-    if (!GetStringParameter(env, argv[1], unit)) {
+    if (!JSUtils::GetStringParameter(env, argv[1], unit)) {
         return nullptr;
     }
     IntlAddon *obj = nullptr;
@@ -792,12 +766,12 @@ napi_value IntlAddon::CompareString(napi_env env, napi_callback_info info)
         return nullptr;
     }
     std::vector<char> first;
-    if (!GetStringParameter(env, argv[0], first)) {
+    if (!JSUtils::GetStringParameter(env, argv[0], first)) {
         return nullptr;
     }
 
     std::vector<char> second;
-    if (!GetStringParameter(env, argv[1], second)) {
+    if (!JSUtils::GetStringParameter(env, argv[1], second)) {
         return nullptr;
     }
 
@@ -1121,7 +1095,7 @@ bool SetBuildInIntl(napi_env &env, napi_value &global, napi_value &intlModule)
     }
 
     const std::vector<std::string> buildinClasses = {"DurationFormat", "ListFormat",
-        "RelativeTimeFormat", "Segmenter", "getCanonicalLocales", "supportedValuesOf"};
+        "Segmenter", "getCanonicalLocales", "supportedValuesOf"};
 
     for (std::string buildinClass : buildinClasses) {
         if (!SetBuildInIntlModule(env, intlModule, buildinIntlModule, buildinClass)) {
@@ -1131,42 +1105,29 @@ bool SetBuildInIntl(napi_env &env, napi_value &global, napi_value &intlModule)
     return true;
 }
 
+using IntlInitFunc = napi_value (*)(napi_env, napi_value);
+struct IntlInitFunction {
+    IntlInitFunc func;
+    const char* moduleName;
+};
+IntlInitFunction g_intlInitFunctionArray[] = {
+    {&OHOS::Global::I18n::CollatorAddon::InitCollator, "Collator"},
+    {&OHOS::Global::I18n::DisplayNamesAddon::InitDisplayNames, "DisplayNames"},
+    {&OHOS::Global::I18n::IntlLocaleAddon::InitIntlLocale, "Locale"},
+    {&OHOS::Global::I18n::JSNumberFormatAddon::InitJsNumberFormat, "NumberFormat"},
+    {&OHOS::Global::I18n::JSRelativeTimeFormatAddon::InitJsRelativeTimeFormat, "RelativeTimeFormat"},
+    {&OHOS::Global::I18n::IntlDateTimeFormatAddon::InitIntlDateTimeFormat, "DateTimeFormat"},
+    {&OHOS::Global::I18n::IntlPluralRulesAddon::InitIntlPluralRules, "PluralRules"}
+};
+
 bool BindingIntlModules(napi_env env, napi_value &intlModule)
 {
-    intlModule = OHOS::Global::I18n::CollatorAddon::InitCollator(env, intlModule);
-    if (intlModule == nullptr) {
-        HILOG_ERROR_I18N("RegisterIntl: init Intl Collator Module failed");
-        return false;
-    }
-
-    intlModule = OHOS::Global::I18n::DisplayNamesAddon::InitDisplayNames(env, intlModule);
-    if (intlModule == nullptr) {
-        HILOG_ERROR_I18N("RegisterIntl: init Intl DisplayNames Module failed");
-        return false;
-    }
-
-    intlModule = OHOS::Global::I18n::IntlLocaleAddon::InitIntlLocale(env, intlModule);
-    if (intlModule == nullptr) {
-        HILOG_ERROR_I18N("RegisterIntl: init Intl Locale Module failed");
-        return false;
-    }
-
-    intlModule = OHOS::Global::I18n::JSNumberFormatAddon::InitJsNumberFormat(env, intlModule);
-    if (intlModule == nullptr) {
-        HILOG_ERROR_I18N("RegisterIntl: init Intl NumberFormat Module failed");
-        return false;
-    }
-
-    intlModule = OHOS::Global::I18n::IntlDateTimeFormatAddon::InitIntlDateTimeFormat(env, intlModule);
-    if (intlModule == nullptr) {
-        HILOG_ERROR_I18N("RegisterIntl: init Intl DateTimeFormat Module failed");
-        return false;
-    }
-
-    intlModule = OHOS::Global::I18n::IntlPluralRulesAddon::InitIntlPluralRules(env, intlModule);
-    if (intlModule == nullptr) {
-        HILOG_ERROR_I18N("RegisterIntl: init Intl PluralRules Module failed");
-        return false;
+    for (auto initFunc : g_intlInitFunctionArray) {
+        intlModule = (initFunc.func)(env, intlModule);
+        if (intlModule == nullptr) {
+            HILOG_ERROR_I18N("RegisterIntl: init Intl %{public}s Module failed", initFunc.moduleName);
+            return false;
+        }
     }
     return true;
 }

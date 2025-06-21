@@ -39,6 +39,7 @@
 #include "unicode/ureldatefmt.h"
 #include "number_utils.h"
 #include "number_utypes.h"
+#include "i18n_types.h"
 #include "locale_info.h"
 #include "measure_data.h"
 
@@ -48,11 +49,15 @@ namespace I18n {
 class RelativeTimeFormat {
 public:
     RelativeTimeFormat(const std::vector<std::string> &localeTag, std::map<std::string, std::string> &configs);
+    RelativeTimeFormat(const std::vector<std::string> &locales,
+        std::map<std::string, std::string> &configs, bool flag);
     virtual ~RelativeTimeFormat();
     std::string Format(double number, const std::string &unit);
     icu::FormattedRelativeDateTime FormatToFormattedValue(double number, const std::string &unit);
     void FormatToParts(double number, const std::string &unit, std::vector<std::vector<std::string>> &timeVector);
     void GetResolvedOptions(std::map<std::string, std::string> &map);
+    static std::vector<std::string> SupportedLocalesOf(const std::vector<std::string> &requestLocales,
+        const std::map<std::string, std::string> &configs, I18nErrorCode &status);
 
 private:
     icu::Locale locale;
@@ -60,14 +65,17 @@ private:
     std::string styleString = "long";
     std::string numeric = "always";
     std::string numberingSystem = "latn";
+    std::string localeMatcher = "best fit";
     std::unique_ptr<icu::RelativeDateTimeFormatter> relativeTimeFormat;
     UDateRelativeDateTimeFormatterStyle style = UDAT_STYLE_LONG;
     bool createSuccess = false;
+    bool intlAddon = false;
     static const char *DEVICE_TYPE_NAME;
     static constexpr int CONFIG_LEN = 128;
     static std::unordered_map<std::string, URelativeDateTimeUnit> relativeUnits;
     static std::unordered_map<std::string, UDateRelativeDateTimeFormatterStyle> relativeFormatStyle;
     static std::unordered_map<std::string, std::string> defaultFormatStyle;
+    static std::unordered_map<std::string, std::string> pluralUnitMap;
     void InsertInfo(std::vector<std::vector<std::string>> &timeVector, const std::string &unit, bool isInteger,
         const std::string &value);
     void ProcessIntegerField(const std::map<size_t, size_t> &indexMap,
@@ -75,6 +83,8 @@ private:
         const std::string &result);
     void ParseConfigs(std::map<std::string, std::string> &configs);
     void SetDefaultStyle();
+    void SetRelativeTimeFormat(const std::vector<std::string> &localeTags,
+        std::map<std::string, std::string> &configs);
 };
 } // namespace I18n
 } // namespace Global

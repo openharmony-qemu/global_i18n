@@ -14,6 +14,7 @@
  */
 #include "i18n_hilog.h"
 #include "locale_config.h"
+#include "locale_helper.h"
 #include "ohos/init_data.h"
 #include "utils.h"
 #include "parameter.h"
@@ -55,7 +56,43 @@ std::unordered_map<std::string, URelativeDateTimeUnit> RelativeTimeFormat::relat
     { "years", UDAT_REL_UNIT_YEAR },
 };
 
+std::unordered_map<std::string, std::string> RelativeTimeFormat::pluralUnitMap = {
+    { "seconds", "second" },
+    { "minutes", "minute" },
+    { "hours", "hour" },
+    { "days", "day" },
+    { "weeks", "week" },
+    { "months", "month" },
+    { "quarters", "quarter" },
+    { "years", "year" },
+};
+
 RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTags,
+    std::map<std::string, std::string> &configs, bool flag)
+{
+    intlAddon = flag;
+    std::vector<std::string> resolvedLocales(localeTags);
+    if (configs.find("localeMatcher") != configs.end()) {
+        I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
+        resolvedLocales = LocaleHelper::SupportedLocalesOf(resolvedLocales, configs, errorCode);
+        if (errorCode != I18nErrorCode::SUCCESS) {
+            HILOG_ERROR_I18N("RelativeTimeFormat: Get Supported Locales failed");
+        }
+    }
+    SetRelativeTimeFormat(resolvedLocales, configs);
+}
+
+RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTags,
+    std::map<std::string, std::string> &configs)
+{
+    SetRelativeTimeFormat(localeTags, configs);
+}
+
+RelativeTimeFormat::~RelativeTimeFormat()
+{
+}
+
+void RelativeTimeFormat::SetRelativeTimeFormat(const std::vector<std::string> &localeTags,
     std::map<std::string, std::string> &configs)
 {
     SetDefaultStyle();
@@ -72,7 +109,7 @@ RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTag
         std::replace(localeBaseName.begin(), localeBaseName.end(), '_', '-');
         relativeTimeFormat = std::make_unique<icu::RelativeDateTimeFormatter>(locale, nullptr, style,
             UDISPCTX_CAPITALIZATION_NONE, status);
-        if (!U_SUCCESS(status) || !relativeTimeFormat) {
+        if (U_FAILURE(status) || !relativeTimeFormat) {
             status = U_ZERO_ERROR;
             continue;
         }
@@ -105,10 +142,6 @@ RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTag
     }
 }
 
-RelativeTimeFormat::~RelativeTimeFormat()
-{
-}
-
 void RelativeTimeFormat::ParseConfigs(std::map<std::string, std::string> &configs)
 {
     if (configs.count("style") > 0) {
@@ -119,6 +152,9 @@ void RelativeTimeFormat::ParseConfigs(std::map<std::string, std::string> &config
     }
     if (configs.count("numeric") > 0) {
         numeric = configs["numeric"];
+    }
+    if (configs.count("localeMatcher") > 0) {
+        localeMatcher = configs["localeMatcher"];
     }
 }
 
@@ -138,10 +174,14 @@ void RelativeTimeFormat::InsertInfo(std::vector<std::vector<std::string>> &timeV
     const std::string &unit, bool isInteger, const std::string &value)
 {
     std::vector<std::string> info;
+    std::string singularUnit(unit);
+    if (intlAddon && pluralUnitMap.find(unit) != pluralUnitMap.end()) {
+        singularUnit = pluralUnitMap[unit];
+    }
     if (isInteger) {
         info.push_back("integer");
         info.push_back(value);
-        info.push_back(unit);
+        info.push_back(singularUnit);
     } else {
         info.push_back("literal");
         info.push_back(value);
@@ -220,7 +260,6 @@ icu::FormattedRelativeDateTime RelativeTimeFormat::FormatToFormattedValue(double
     if (U_FAILURE(status)) {
         return {};
     }
-
     return fmtRelativeTime;
 }
 
@@ -236,6 +275,13 @@ void RelativeTimeFormat::GetResolvedOptions(std::map<std::string, std::string> &
     if (!numberingSystem.empty()) {
         map.insert(std::make_pair("numberingSystem", numberingSystem));
     }
+}
+
+std::vector<std::string> RelativeTimeFormat::SupportedLocalesOf(
+    const std::vector<std::string> &requestLocales,
+    const std::map<std::string, std::string> &configs, I18nErrorCode &status)
+{
+    return LocaleHelper::SupportedLocalesOf(requestLocales, configs, status);
 }
 
 void RelativeTimeFormat::SetDefaultStyle()

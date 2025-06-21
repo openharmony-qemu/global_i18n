@@ -1072,38 +1072,10 @@ void NumberFormat::GetResolvedOptions(std::map<std::string, std::string> &map, b
     GetDigitsResolvedOptionsExt(map, setDefault);
 }
 
-std::set<std::string> NumberFormat::GetNumberAvailableLocales()
-{
-    std::set<std::string> result;
-    int32_t count = 0;
-    const icu::Locale* locales = icu::NumberFormat::getAvailableLocales(count);
-    if (count < 1 || locales == nullptr) {
-        HILOG_ERROR_I18N("NumberFormat::GetNumberAvailableLocales: Get available locales failed.");
-        return result;
-    }
-    for (int i = 0; i < count; i++) {
-        const char* name = locales[i].getName();
-        if (name != nullptr) {
-            result.insert(name);
-        }
-    }
-    return result;
-}
-
 std::vector<std::string> NumberFormat::SupportedLocalesOf(const std::vector<std::string> &requestLocales,
     const std::map<std::string, std::string> &configs, I18nErrorCode &status)
 {
-    std::vector<std::string> undefined = {};
-    auto requestedLocales = LocaleHelper::CanonicalizeLocaleList(requestLocales, status);
-    if (status != I18nErrorCode::SUCCESS) {
-        return undefined;
-    }
-    std::string localeMatcher = LocaleHelper::ParseOption(configs, "localeMatcher", "best fit", true, status);
-    if (status != I18nErrorCode::SUCCESS) {
-        return undefined;
-    }
-    std::set<std::string> availableLocales = GetNumberAvailableLocales();
-    return LocaleHelper::LookupSupportedLocales(availableLocales, requestedLocales);
+    return LocaleHelper::SupportedLocalesOf(requestLocales, configs, status);
 }
 
 void NumberFormat::GetDigitsResolvedOptions(std::map<std::string, std::string> &map, bool setDefault)
@@ -1380,28 +1352,6 @@ std::string NumberFormat::GetCurrencyFromConfig(const std::string& currency)
 std::string NumberFormat::GetIcuDefaultLocale()
 {
     return "en-US";
-}
-
-std::string NumberFormat::CheckParamLocales(std::vector<std::string> &localeArray)
-{
-    for (auto iter = localeArray.begin(); iter != localeArray.end(); ++iter) {
-        std::string localeId = *iter;
-        if (localeId.empty()) {
-            HILOG_ERROR_I18N("NumberFormat::CheckParamLocales: locale is empty");
-            return "invalid locale";
-        }
-        UErrorCode status = U_ZERO_ERROR;
-        icu::Locale locale = icu::Locale::forLanguageTag(icu::StringPiece(localeId), status);
-        if (U_FAILURE(status)) {
-            HILOG_ERROR_I18N("NumberFormat::CheckParamLocales: locale %{public}s invalid", localeId.c_str());
-            return "invalid locale";
-        }
-        if (LocaleInfo::allValidLocales.count(locale.getLanguage()) < 1) {
-            HILOG_ERROR_I18N("NumberFormat::CheckParamLocales: invalid locale: %{public}s ", localeId.c_str());
-            return "invalid locale";
-        }
-    }
-    return "";
 }
 
 std::string NumberFormat::CheckNumberFormatOptions(std::map<std::string, std::string> &map, int32_t &code)
