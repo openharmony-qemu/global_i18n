@@ -16,6 +16,7 @@
 #include <sstream>
 #include "unicode/localebuilder.h"
 #include "i18n_hilog.h"
+#include "locale_info.h"
 #include "utils.h"
 
 namespace OHOS {
@@ -456,6 +457,28 @@ std::vector<std::string> LocaleHelper::SupportedLocalesOf(const std::vector<std:
     }
     std::set<std::string> availableLocales = GetAvailableLocales();
     return LookupSupportedLocales(availableLocales, requestedLocales);
+}
+
+std::string LocaleHelper::CheckParamLocales(std::vector<std::string> &localeArray)
+{
+    for (auto iter = localeArray.begin(); iter != localeArray.end(); ++iter) {
+        std::string localeId = *iter;
+        if (localeId.empty()) {
+            HILOG_ERROR_I18N("LocaleHelper::CheckParamLocales: locale is empty");
+            return "invalid locale";
+        }
+        UErrorCode status = U_ZERO_ERROR;
+        icu::Locale locale = icu::Locale::forLanguageTag(icu::StringPiece(localeId), status);
+        if (U_FAILURE(status)) {
+            HILOG_ERROR_I18N("LocaleHelper::CheckParamLocales: locale %{public}s invalid", localeId.c_str());
+            return "invalid locale";
+        }
+        if (LocaleInfo::allValidLocales.count(locale.getLanguage()) < 1) {
+            HILOG_ERROR_I18N("LocaleHelper::CheckParamLocales: invalid locale: %{public}s ", localeId.c_str());
+            return "invalid locale";
+        }
+    }
+    return "";
 }
 
 std::string LocaleHelper::DefaultLocale()

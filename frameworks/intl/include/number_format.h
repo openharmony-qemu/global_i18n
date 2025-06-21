@@ -86,7 +86,6 @@ public:
         const std::map<std::string, std::string> &configs, I18nErrorCode &status);
     static std::string GetIcuDefaultLocale();
     std::string CheckNumberFormatOptions(std::map<std::string, std::string> &map, int32_t &code);
-    static std::string CheckParamLocales(std::vector<std::string> &localeArray);
 
 private:
     icu::Locale locale;

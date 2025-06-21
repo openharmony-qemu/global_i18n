@@ -131,7 +131,7 @@ bool JSNumberFormatAddon::HandleArguments(napi_env env, napi_value argVal, size_
         HILOG_ERROR_I18N("JSNumberFormatAddon::HandleArguments: Get locale array failed.");
         return false;
     }
-    std::string checkResult = NumberFormat::CheckParamLocales(localeArray);
+    std::string checkResult = LocaleHelper::CheckParamLocales(localeArray);
     if (!checkResult.empty()) {
         ErrorUtil::NapiThrowUndefined(env, checkResult);
         return false;

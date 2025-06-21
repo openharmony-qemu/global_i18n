@@ -1354,28 +1354,6 @@ std::string NumberFormat::GetIcuDefaultLocale()
     return "en-US";
 }
 
-std::string NumberFormat::CheckParamLocales(std::vector<std::string> &localeArray)
-{
-    for (auto iter = localeArray.begin(); iter != localeArray.end(); ++iter) {
-        std::string localeId = *iter;
-        if (localeId.empty()) {
-            HILOG_ERROR_I18N("NumberFormat::CheckParamLocales: locale is empty");
-            return "invalid locale";
-        }
-        UErrorCode status = U_ZERO_ERROR;
-        icu::Locale locale = icu::Locale::forLanguageTag(icu::StringPiece(localeId), status);
-        if (U_FAILURE(status)) {
-            HILOG_ERROR_I18N("NumberFormat::CheckParamLocales: locale %{public}s invalid", localeId.c_str());
-            return "invalid locale";
-        }
-        if (LocaleInfo::allValidLocales.count(locale.getLanguage()) < 1) {
-            HILOG_ERROR_I18N("NumberFormat::CheckParamLocales: invalid locale: %{public}s ", localeId.c_str());
-            return "invalid locale";
-        }
-    }
-    return "";
-}
-
 std::string NumberFormat::CheckNumberFormatOptions(std::map<std::string, std::string> &map, int32_t &code)
 {
     if (map.find("style") != map.end()) {

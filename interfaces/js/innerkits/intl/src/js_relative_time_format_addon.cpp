@@ -132,7 +132,7 @@ bool JSRelativeTimeFormatAddon::GetParameterLocales(napi_env env,
     if (code != 0) {
         HILOG_ERROR_I18N("ReltiveTimeFormatConstructor: input locale is empty");
     }
-    std::string checkResult = RelativeTimeFormat::CheckParamLocales(localeArray);
+    std::string checkResult = LocaleHelper::CheckParamLocales(localeArray);
     if (!checkResult.empty()) {
         ErrorUtil::NapiThrowUndefined(env, checkResult);
         return false;
