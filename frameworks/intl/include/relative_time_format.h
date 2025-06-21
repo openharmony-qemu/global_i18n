@@ -70,11 +70,13 @@ private:
     std::unique_ptr<icu::RelativeDateTimeFormatter> relativeTimeFormat;
     UDateRelativeDateTimeFormatterStyle style = UDAT_STYLE_LONG;
     bool createSuccess = false;
+    bool intlAddon = false;
     static const char *DEVICE_TYPE_NAME;
     static constexpr int CONFIG_LEN = 128;
     static std::unordered_map<std::string, URelativeDateTimeUnit> relativeUnits;
     static std::unordered_map<std::string, UDateRelativeDateTimeFormatterStyle> relativeFormatStyle;
     static std::unordered_map<std::string, std::string> defaultFormatStyle;
+    static std::unordered_map<std::string, std::string> pluralUnitMap;
     void InsertInfo(std::vector<std::vector<std::string>> &timeVector, const std::string &unit, bool isInteger,
         const std::string &value);
     void ProcessIntegerField(const std::map<size_t, size_t> &indexMap,
@@ -82,6 +84,8 @@ private:
         const std::string &result);
     void ParseConfigs(std::map<std::string, std::string> &configs);
     void SetDefaultStyle();
+    void SetRelativeTimeFormat(const std::vector<std::string> &localeTags,
+        std::map<std::string, std::string> &configs);
 };
 } // namespace I18n
 } // namespace Global

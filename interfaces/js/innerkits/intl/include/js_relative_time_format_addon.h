@@ -49,13 +49,13 @@ private:
     static void ThrowRangeError(napi_env env, const std::string &property, const std::string &value);
     static void CheckOptionValue(napi_env env, std::map<std::string, std::string> &map, const std::string &optionName);
     static void CheckOptionValue(napi_env env, const std::string &optionValue, const std::string &optionName);
-    static std::unordered_map<std::string, std::vector<std::string>> optionAvaliableMap;
 
     bool GetParameterLocales(napi_env env, std::vector<std::string> &localeTags,
         const size_t &argc, napi_value* argv);
     bool InitRelativeTimeFormatContext(napi_env env, napi_callback_info info,
         std::vector<std::string> localeTags, std::map<std::string, std::string> &map);
 
+    static std::unordered_map<std::string, std::vector<std::string>> optionAvaliableMap;
     std::shared_ptr<RelativeTimeFormat> relativetimefmt_ = nullptr;
 };
 } // namespace I18n

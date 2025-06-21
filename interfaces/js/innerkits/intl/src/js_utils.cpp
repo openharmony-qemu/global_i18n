@@ -385,6 +385,9 @@ napi_value JSUtils::CreateArrayItem(napi_env env, std::unordered_map<std::string
             continue;
         }
         napi_value value = propertys[key];
+        if (value == nullptr) {
+            continue;
+        }
         status = napi_set_named_property(env, object, key.c_str(), value);
         if (status != napi_ok) {
             code = 1;
