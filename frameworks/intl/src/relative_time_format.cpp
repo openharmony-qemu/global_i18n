@@ -64,7 +64,7 @@ std::unordered_map<std::string, std::string> RelativeTimeFormat::pluralUnitMap =
     { "weeks", "week" },
     { "months", "month" },
     { "quarters", "quarter" },
-    { "years", "year" },  
+    { "years", "year" },
 };
 
 RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTags,

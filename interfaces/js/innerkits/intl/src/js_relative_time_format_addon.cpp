@@ -99,7 +99,7 @@ napi_value JSRelativeTimeFormatAddon::ReltiveTimeFormatConstructor(napi_env env,
     }
     std::vector<std::string> localeTags;
     if (!obj->GetParameterLocales(env, localeTags, argc, argv)) {
-        delete obj;       
+        delete obj;
         return nullptr;
     }
     std::map<std::string, std::string> map = {};
