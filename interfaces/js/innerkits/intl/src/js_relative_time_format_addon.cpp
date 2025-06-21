@@ -17,6 +17,7 @@
 #include <cmath>
 #include "error_util.h"
 #include "i18n_hilog.h"
+#include "i18n_types.h"
 #include "js_utils.h"
 #include "locale_helper.h"
 #include "utils.h"
@@ -137,6 +138,12 @@ bool JSRelativeTimeFormatAddon::GetParameterLocales(napi_env env,
         ErrorUtil::NapiThrowUndefined(env, checkResult);
         return false;
     }
+    ErrorMessage errorMsg;
+    localeArray = RelativeTimeFormat::CanonicalizeLocales(localeArray, errorMsg);
+    if (errorMsg.type != ErrorType::NO_ERROR) {
+        napi_throw_range_error(env, nullptr, errorMsg.message.c_str());
+        return false;
+    }
     localeTags.assign(localeArray.begin(), localeArray.end());
     return true;
 }
@@ -209,7 +216,7 @@ napi_value JSRelativeTimeFormatAddon::Format(napi_env env, napi_callback_info in
     }
     if (argc < 2) { // 2 is required parameter count
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::Format: parameter less then required");
-        return nullptr;  
+        return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     status = napi_typeof(env, argv[0], &valueType);

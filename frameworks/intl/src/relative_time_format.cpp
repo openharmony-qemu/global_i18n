@@ -82,6 +82,21 @@ RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTag
     SetRelativeTimeFormat(resolvedLocales, configs);
 }
 
+std::vector<std::string> RelativeTimeFormat::CanonicalizeLocales(
+    const std::vector<std::string>& localeTags, ErrorMessage& errorMsg)
+{
+    I18nErrorCode status = I18nErrorCode::SUCCESS;
+    std::vector<std::string> resolvedLocales =
+        LocaleHelper::CanonicalizeLocaleList(localeTags, status);
+    if (status != I18nErrorCode::SUCCESS) {
+        errorMsg.type = ErrorType::RANGE_ERROR;
+        errorMsg.message = "invalid locale";
+        HILOG_ERROR_I18N("RelativeTimeFormat::CanonicalizeLocales CanonicalizeLocaleList failed.");
+        return {};
+    }
+    return resolvedLocales;
+}
+
 RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTags,
     std::map<std::string, std::string> &configs)
 {
