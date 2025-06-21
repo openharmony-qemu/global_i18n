@@ -182,7 +182,6 @@ std::string RelativeTimeFormat::CheckParamLocales(std::vector<std::string> &loca
 
 std::string RelativeTimeFormat::Format(double number, const std::string &unit)
 {
-
     icu::FormattedRelativeDateTime formattedTime = FormatToFormattedValue(number, unit);
     UErrorCode status = U_ZERO_ERROR;
     std::string result;

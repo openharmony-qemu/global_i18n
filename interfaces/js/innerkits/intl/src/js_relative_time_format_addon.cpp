@@ -191,7 +191,6 @@ bool JSRelativeTimeFormatAddon::InitRelativeTimeFormatContext(napi_env env, napi
     std::vector<std::string> localeTags, std::map<std::string, std::string> &map)
 {
     relativetimefmt_ = std::make_shared<RelativeTimeFormat>(localeTags, map, true);
-        HILOG_ERROR_I18N("zdd---c-b2b-this:%{public}p", relativetimefmt_.get());
     return relativetimefmt_ != nullptr;
 }
 
@@ -234,7 +233,6 @@ napi_value JSRelativeTimeFormatAddon::Format(napi_env env, napi_callback_info in
         return nullptr;
     }
     std::string value = obj->relativetimefmt_->Format(number, unit.data());
-    HILOG_ERROR_I18N("zdd--%{public}s,%{public}s", value.c_str(), std::to_string(number).c_str());
     return JSUtils::CreateString(env, value);
 }
 
@@ -381,7 +379,7 @@ napi_value JSRelativeTimeFormatAddon::SetNumberFormatParts(napi_env env, napi_st
             return nullptr;
         }
         napi_value unit = nullptr;
-        if (numberParts[i].size() > 2) { // 2 is vector size
+        if (numberParts[i].size() > 2) { // 2 is vector's size which not contains unit
             status = napi_create_string_utf8(env, numberParts[i][2].c_str(), NAPI_AUTO_LENGTH, &unit);
             if (status != napi_ok) {
                 HILOG_ERROR_I18N("Failed to create string item numberParts[i][2].");
