@@ -85,6 +85,12 @@ RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTag
 std::vector<std::string> RelativeTimeFormat::CanonicalizeLocales(
     const std::vector<std::string>& localeTags, ErrorMessage& errorMsg)
 {
+    if (localeTags.size() == 0) {
+        return {"en-US"};
+    }
+    if (localeTags.size() == 1 && localeTags[0] == "default") {
+        return {"en-US"};
+    }
     I18nErrorCode status = I18nErrorCode::SUCCESS;
     std::vector<std::string> resolvedLocales =
         LocaleHelper::CanonicalizeLocaleList(localeTags, status);

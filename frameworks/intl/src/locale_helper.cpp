@@ -459,13 +459,16 @@ std::vector<std::string> LocaleHelper::SupportedLocalesOf(const std::vector<std:
     return LookupSupportedLocales(availableLocales, requestedLocales);
 }
 
-std::string LocaleHelper::CheckParamLocales(std::vector<std::string> &localeArray)
+std::string LocaleHelper::CheckParamLocales(const std::vector<std::string> &localeArray)
 {
     for (auto iter = localeArray.begin(); iter != localeArray.end(); ++iter) {
         std::string localeId = *iter;
         if (localeId.empty()) {
             HILOG_ERROR_I18N("LocaleHelper::CheckParamLocales: locale is empty");
             return "invalid locale";
+        }
+        if (localeId.compare("default") == 0) {
+            continue;
         }
         UErrorCode status = U_ZERO_ERROR;
         icu::Locale locale = icu::Locale::forLanguageTag(icu::StringPiece(localeId), status);
