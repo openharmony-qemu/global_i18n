@@ -63,6 +63,7 @@ ohos_shared_library("intl_napi") {
     "src/locale_info_addon.cpp",
     "src/number_format_addon.cpp",
   ]
+  use_exceptions = true
   version_script = "libintl_napi.map"
   deps = [ "//base/global/i18n/frameworks/intl:intl_util" ]
   external_deps = [

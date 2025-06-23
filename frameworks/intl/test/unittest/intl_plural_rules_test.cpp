@@ -39,7 +39,7 @@ HWTEST_F(IntlPluralRulesTest, IntlPluralRulesFuncTest001, TestSize.Level1)
         { "type", "cardinal"},
         { "minimumIntegerDigits", "1"},
         { "minimumSignificantDigits", "1"},
-        { "maximumSignificantDigits`", "21"}
+        { "maximumSignificantDigits", "21"}
     };
     ErrorMessage errorMessage;
     IntlPluralRules intlPulral(localeTags, options, errorMessage);
