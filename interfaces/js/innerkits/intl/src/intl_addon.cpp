@@ -634,6 +634,33 @@ bool IntlAddon::InitCollatorContext(napi_env env, napi_callback_info info, std::
     return collator_ != nullptr;
 }
 
+bool GetStringParameter(napi_env env, napi_value value, std::vector<char> &buf)
+{
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    napi_status status = napi_typeof(env, value, &valueType);
+    if (status != napi_ok) {
+        return false;
+    }
+    if (valueType != napi_valuetype::napi_string) {
+        HILOG_ERROR_I18N("Parameter type does not match");
+        return false;
+    }
+    size_t len = 0;
+    status = napi_get_value_string_utf8(env, value, nullptr, 0, &len);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("Get first length failed");
+        return false;
+    }
+    buf.resize(len + 1);
+    status = napi_get_value_string_utf8(env, value, buf.data(), len + 1, &len);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("Get first failed");
+        return false;
+    }
+
+    return true;
+}
+
 napi_value IntlAddon::FormatRelativeTime(napi_env env, napi_callback_info info)
 {
     size_t argc = 2;
@@ -651,7 +678,7 @@ napi_value IntlAddon::FormatRelativeTime(napi_env env, napi_callback_info info)
         return nullptr;
     }
     std::vector<char> unit;
-    if (!JSUtils::GetStringParameter(env, argv[1], unit)) {
+    if (!GetStringParameter(env, argv[1], unit)) {
         return nullptr;
     }
     IntlAddon *obj = nullptr;
@@ -734,7 +761,7 @@ napi_value IntlAddon::FormatToParts(napi_env env, napi_callback_info info)
         return nullptr;
     }
     std::vector<char> unit;
-    if (!JSUtils::GetStringParameter(env, argv[1], unit)) {
+    if (!GetStringParameter(env, argv[1], unit)) {
         return nullptr;
     }
     IntlAddon *obj = nullptr;
@@ -766,12 +793,12 @@ napi_value IntlAddon::CompareString(napi_env env, napi_callback_info info)
         return nullptr;
     }
     std::vector<char> first;
-    if (!JSUtils::GetStringParameter(env, argv[0], first)) {
+    if (!GetStringParameter(env, argv[0], first)) {
         return nullptr;
     }
 
     std::vector<char> second;
-    if (!JSUtils::GetStringParameter(env, argv[1], second)) {
+    if (!GetStringParameter(env, argv[1], second)) {
         return nullptr;
     }
 

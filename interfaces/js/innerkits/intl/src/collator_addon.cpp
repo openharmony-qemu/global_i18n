@@ -214,12 +214,12 @@ napi_value CollatorAddon::CompareString(napi_env env, napi_callback_info info)
         return nullptr;
     }
     std::vector<char> first;
-    if (!JSUtils::GetStringParameter(env, argv[0], first)) {
+    if (!GetStringParameter(env, argv[0], first)) {
         return nullptr;
     }
 
     std::vector<char> second;
-    if (!JSUtils::GetStringParameter(env, argv[1], second)) {
+    if (!GetStringParameter(env, argv[1], second)) {
         return nullptr;
     }
 

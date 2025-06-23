@@ -61,7 +61,6 @@ public:
         napi_valuetype type, std::string& value);
     static napi_value GetNapiPropertyFormObject(napi_env env, napi_value object, const std::string& property,
         int32_t& errCode);
-    static bool GetStringParameter(napi_env env, napi_value value, std::vector<char> &buf);
 
     // std::map and std::unordered_map
     template<typename T>

@@ -131,7 +131,8 @@ bool JSRelativeTimeFormatAddon::GetParameterLocales(napi_env env,
     int32_t code = 0;
     std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argv[0], code);
     if (code != 0) {
-        HILOG_ERROR_I18N("GetParameterLocales: input locale is empty");
+        HILOG_ERROR_I18N("GetParameterLocales: Get input locales failed");
+        return false;
     }
     std::string checkResult = LocaleHelper::CheckParamLocales(localeArray);
     if (!checkResult.empty()) {
@@ -174,6 +175,9 @@ void JSRelativeTimeFormatAddon::CheckOptionValue(napi_env env, std::map<std::str
 void JSRelativeTimeFormatAddon::CheckOptionValue(napi_env env, const std::string &optionValue,
     const std::string &optionName)
 {
+    if (optionAvaliableMap.find(optionName) == optionAvaliableMap.end()) {
+        return;
+    }
     std::vector<std::string> aviliableValues = optionAvaliableMap[optionName];
     auto it = std::find(aviliableValues.begin(), aviliableValues.end(), optionValue);
     if (it != aviliableValues.end()) {
@@ -182,6 +186,7 @@ void JSRelativeTimeFormatAddon::CheckOptionValue(napi_env env, const std::string
     if (!ThrowRangeError(env, optionName, optionValue)) {
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::CheckOptionValue:"
             "throw error for %{public}s failed", optionName.c_str());
+        return;
     }
 }
 
@@ -354,6 +359,7 @@ napi_value JSRelativeTimeFormatAddon::SupportedLocalesOf(napi_env env, napi_call
     std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argv[0], code);
     if (code != 0) {
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::SupportedLocalesOf: Get locale array failed");
+        return nullptr;
     }
     localeTags.assign(localeArray.begin(), localeArray.end());
     std::map<std::string, std::string> map = {};
