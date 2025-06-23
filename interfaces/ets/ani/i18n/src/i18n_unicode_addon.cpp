@@ -17,7 +17,7 @@
 
 #include "character.h"
 #include "i18n_hilog.h"
-#include "variable_convertor.h"
+#include "variable_converter.h"
 
 using namespace OHOS;
 using namespace Global;
@@ -25,48 +25,48 @@ using namespace I18n;
 
 ani_boolean I18nUnicodeAddon::IsDigitAddon(ani_env *env, [[maybe_unused]] ani_object object, ani_string ch)
 {
-    return IsDigit(VariableConvertor::AniStrToString(env, ch));
+    return IsDigit(VariableConverter::AniStrToString(env, ch));
 }
 
 ani_boolean I18nUnicodeAddon::IsSpaceCharAddon(ani_env *env, [[maybe_unused]] ani_object object, ani_string ch)
 {
-    return IsSpaceChar(VariableConvertor::AniStrToString(env, ch));
+    return IsSpaceChar(VariableConverter::AniStrToString(env, ch));
 }
 
 ani_boolean I18nUnicodeAddon::IsWhitespaceAddon(ani_env *env, [[maybe_unused]] ani_object object, ani_string ch)
 {
-    return IsWhiteSpace(VariableConvertor::AniStrToString(env, ch));
+    return IsWhiteSpace(VariableConverter::AniStrToString(env, ch));
 }
 
 ani_boolean I18nUnicodeAddon::IsRTLAddon(ani_env *env, [[maybe_unused]] ani_object object, ani_string ch)
 {
-    return IsRTLCharacter(VariableConvertor::AniStrToString(env, ch));
+    return IsRTLCharacter(VariableConverter::AniStrToString(env, ch));
 }
 
 ani_boolean I18nUnicodeAddon::IsIdeographAddon(ani_env *env, [[maybe_unused]] ani_object object, ani_string ch)
 {
-    return IsIdeoGraphic(VariableConvertor::AniStrToString(env, ch));
+    return IsIdeoGraphic(VariableConverter::AniStrToString(env, ch));
 }
 
 ani_boolean I18nUnicodeAddon::IsLetterAddon(ani_env *env, [[maybe_unused]] ani_object object, ani_string ch)
 {
-    return IsLetter(VariableConvertor::AniStrToString(env, ch));
+    return IsLetter(VariableConverter::AniStrToString(env, ch));
 }
 
 ani_boolean I18nUnicodeAddon::IsLowerCaseAddon(ani_env *env, [[maybe_unused]] ani_object object, ani_string ch)
 {
-    return IsLowerCase(VariableConvertor::AniStrToString(env, ch));
+    return IsLowerCase(VariableConverter::AniStrToString(env, ch));
 }
 
 ani_boolean I18nUnicodeAddon::IsUpperCaseAddon(ani_env *env, [[maybe_unused]] ani_object object, ani_string ch)
 {
-    return IsUpperCase(VariableConvertor::AniStrToString(env, ch));
+    return IsUpperCase(VariableConverter::AniStrToString(env, ch));
 }
 
 ani_string I18nUnicodeAddon::GetTypeAddon(ani_env *env, [[maybe_unused]] ani_object object, ani_string ch)
 {
-    std::string type = GetType(VariableConvertor::AniStrToString(env, ch));
-    return VariableConvertor::StringToAniStr(env, type);
+    std::string type = GetType(VariableConverter::AniStrToString(env, ch));
+    return VariableConverter::StringToAniStr(env, type);
 }
 
 ani_status I18nUnicodeAddon::BindContextUnicode(ani_env *env)

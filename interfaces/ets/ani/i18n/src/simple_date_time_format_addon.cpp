@@ -18,7 +18,7 @@
 #include "error_util.h"
 #include "i18n_hilog.h"
 #include "locale_info_addon.h"
-#include "variable_convertor.h"
+#include "variable_converter.h"
 
 using namespace OHOS;
 using namespace Global;
@@ -54,13 +54,13 @@ ani_object I18nSimpleDateTimeFormatAddon::GetSimpleDateTimeFormatByPattern(ani_e
 
     std::unique_ptr<I18nSimpleDateTimeFormatAddon> obj = std::make_unique<I18nSimpleDateTimeFormatAddon>();
     if (obj == nullptr) {
-        HILOG_ERROR_I18N("SimpleDateTimeFormatConstructor: Cerate I18nSimpleDateTimeFormatAddon failed.");
+        HILOG_ERROR_I18N("SimpleDateTimeFormatConstructor: Create I18nSimpleDateTimeFormatAddon failed.");
         return nullptr;
     }
 
     I18nErrorCode errCode = I18nErrorCode::SUCCESS;
     obj->simpleDateTimeFormat_ = std::make_unique<SimpleDateTimeFormat>(
-        VariableConvertor::AniStrToString(env, pattern), localeInfo, true, errCode);
+        VariableConverter::AniStrToString(env, pattern), localeInfo, true, errCode);
     if (errCode == I18nErrorCode::INVALID_DATE_TIME_FORMAT_SKELETON) {
         ErrorUtil::AniThrow(env, I18N_NOT_VALID, "skeleton", "a valid date time format skeleton");
         return nullptr;
@@ -73,7 +73,7 @@ ani_object I18nSimpleDateTimeFormatAddon::GetSimpleDateTimeFormatByPattern(ani_e
     }
 
     static const char *className = "L@ohos/i18n/i18n/SimpleDateTimeFormat;";
-    ani_object simpleDateTimeFormatObject = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object simpleDateTimeFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return simpleDateTimeFormatObject;
 }
@@ -104,7 +104,7 @@ ani_object I18nSimpleDateTimeFormatAddon::GetSimpleDateTimeFormatBySkeleton(ani_
 
     I18nErrorCode errCode = I18nErrorCode::SUCCESS;
     obj->simpleDateTimeFormat_ = std::make_unique<SimpleDateTimeFormat>(
-        VariableConvertor::AniStrToString(env, skeleton), localeInfo, false, errCode);
+        VariableConverter::AniStrToString(env, skeleton), localeInfo, false, errCode);
     if (errCode == I18nErrorCode::INVALID_DATE_TIME_FORMAT_SKELETON) {
         ErrorUtil::AniThrow(env, I18N_NOT_VALID, "skeleton", "a valid date time format skeleton");
         return nullptr;
@@ -117,7 +117,7 @@ ani_object I18nSimpleDateTimeFormatAddon::GetSimpleDateTimeFormatBySkeleton(ani_
     }
 
     static const char *className = "L@ohos/i18n/i18n/SimpleDateTimeFormat;";
-    ani_object simpleDateTimeFormatObject = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object simpleDateTimeFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return simpleDateTimeFormatObject;
 }
@@ -153,7 +153,7 @@ ani_string I18nSimpleDateTimeFormatAddon::Format(ani_env *env, ani_object object
     if (formatResult.empty()) {
         HILOG_ERROR_I18N("SimpleDateTimeFormatConstructor: format result is empty.");
     }
-    return VariableConvertor::StringToAniStr(env, formatResult);
+    return VariableConverter::StringToAniStr(env, formatResult);
 }
 
 ani_status I18nSimpleDateTimeFormatAddon::BindContextSimpleDateTimeFormat(ani_env *env)

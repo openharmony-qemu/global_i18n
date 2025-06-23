@@ -16,7 +16,7 @@
 #ifndef I18N_UNICODE_ADDON_H
 #define I18N_UNICODE_ADDON_H
 
-#include <ani.h>
+#include "ani.h"
 
 namespace OHOS {
 namespace Global {

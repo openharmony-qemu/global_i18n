@@ -18,7 +18,7 @@
 #include "error_util.h"
 #include "i18n_hilog.h"
 #include "locale_config.h"
-#include "variable_convertor.h"
+#include "variable_converter.h"
 
 using namespace OHOS;
 using namespace Global;
@@ -40,7 +40,7 @@ ani_object I18nSysLocaleMgrAddon::Create(ani_env *env, [[maybe_unused]] ani_obje
     obj->systemLocaleManager_ = std::make_unique<SystemLocaleManager>();
 
     static const char *className = "L@ohos/i18n/i18n/SystemLocaleManager;";
-    ani_object sysLocaleMgrObject = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object sysLocaleMgrObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return sysLocaleMgrObject;
 }
@@ -66,12 +66,12 @@ static ani_object CreateLocaleItem(ani_env *env, LocaleItem localeItem)
         return nullptr;
     }
 
-    VariableConvertor::SetStringMember(env, ret, "id", localeItem.id);
-    VariableConvertor::SetStringMember(env, ret, "displayName", localeItem.displayName);
-    VariableConvertor::SetStringMember(env, ret, "localName", localeItem.localName);
+    VariableConverter::SetStringMember(env, ret, "id", localeItem.id);
+    VariableConverter::SetStringMember(env, ret, "displayName", localeItem.displayName);
+    VariableConverter::SetStringMember(env, ret, "localName", localeItem.localName);
 
     static const char *enumName = "L@ohos/i18n/i18n/SuggestionType;";
-    if (ANI_OK != env->Object_SetPropertyByName_Ref(ret, "suggestionType", VariableConvertor::GetEnumItemByIndex(env,
+    if (ANI_OK != env->Object_SetPropertyByName_Ref(ret, "suggestionType", VariableConverter::GetEnumItemByIndex(env,
         enumName, static_cast<int>(localeItem.suggestionType)))) {
         HILOG_ERROR_I18N("Set property 'suggestionType' failed");
     }
@@ -118,7 +118,7 @@ ani_object I18nSysLocaleMgrAddon::GetLanguageInfoArray(ani_env *env, ani_object 
     ani_object languages, ani_object options)
 {
     std::vector<std::string> languageList;
-    if (!VariableConvertor::ParseStringArray(env, languages, languageList)) {
+    if (!VariableConverter::ParseStringArray(env, languages, languageList)) {
         return nullptr;
     }
 
@@ -136,13 +136,13 @@ ani_object I18nSysLocaleMgrAddon::GetLanguageInfoArray(ani_env *env, ani_object 
         localeTag = LocaleConfig::GetSystemLocale();
     } else {
         std::string className = "L@ohos/i18n/i18n/SortOptionsInner;";
-        if (!VariableConvertor::GetStringMember(env, options, "locale", localeTag)) {
+        if (!VariableConverter::GetStringMember(env, options, "locale", localeTag)) {
             localeTag = LocaleConfig::GetSystemLocale();
         }
-        if (!VariableConvertor::GetBooleanMember(env, options, "isUseLocalName", isUseLocalName)) {
+        if (!VariableConverter::GetBooleanMember(env, options, "isUseLocalName", isUseLocalName)) {
             isUseLocalName = true;
         }
-        if (!VariableConvertor::GetBooleanMember(env, options, "isSuggestedFirst", isSuggestedFirst)) {
+        if (!VariableConverter::GetBooleanMember(env, options, "isSuggestedFirst", isSuggestedFirst)) {
             isSuggestedFirst = true;
         }
     }
@@ -171,7 +171,7 @@ ani_object I18nSysLocaleMgrAddon::GetRegionInfoArray(ani_env *env, ani_object ob
     ani_object regions, ani_object options)
 {
     std::vector<std::string> countryList;
-    if (!VariableConvertor::ParseStringArray(env, regions, countryList)) {
+    if (!VariableConverter::ParseStringArray(env, regions, countryList)) {
         return nullptr;
     }
 
@@ -189,13 +189,13 @@ ani_object I18nSysLocaleMgrAddon::GetRegionInfoArray(ani_env *env, ani_object ob
         localeTag = LocaleConfig::GetSystemLocale();
     } else {
         std::string className = "L@ohos/i18n/i18n/SortOptionsInner;";
-        if (!VariableConvertor::GetStringMember(env, options, "locale", localeTag)) {
+        if (!VariableConverter::GetStringMember(env, options, "locale", localeTag)) {
             localeTag = LocaleConfig::GetSystemLocale();
         }
-        if (!VariableConvertor::GetBooleanMember(env, options, "isUseLocalName", isUseLocalName)) {
+        if (!VariableConverter::GetBooleanMember(env, options, "isUseLocalName", isUseLocalName)) {
             isUseLocalName = false;
         }
-        if (!VariableConvertor::GetBooleanMember(env, options, "isSuggestedFirst", isSuggestedFirst)) {
+        if (!VariableConverter::GetBooleanMember(env, options, "isSuggestedFirst", isSuggestedFirst)) {
             isSuggestedFirst = true;
         }
     }
@@ -241,11 +241,11 @@ static ani_object CreateTimeZoneCityItem(ani_env *env, TimeZoneCityItem item)
         return nullptr;
     }
 
-    VariableConvertor::SetStringMember(env, ret, "zoneId", item.zoneId);
-    VariableConvertor::SetStringMember(env, ret, "cityId", item.cityId);
-    VariableConvertor::SetStringMember(env, ret, "cityDisplayName", item.cityDisplayName);
-    VariableConvertor::SetStringMember(env, ret, "zoneDisplayName", item.zoneDisplayName);
-    VariableConvertor::SetNumberMember(env, ret, "rawOffset", item.rawOffset);
+    VariableConverter::SetStringMember(env, ret, "zoneId", item.zoneId);
+    VariableConverter::SetStringMember(env, ret, "cityId", item.cityId);
+    VariableConverter::SetStringMember(env, ret, "cityDisplayName", item.cityDisplayName);
+    VariableConverter::SetStringMember(env, ret, "zoneDisplayName", item.zoneDisplayName);
+    VariableConverter::SetNumberMember(env, ret, "rawOffset", item.rawOffset);
 
     if (ANI_OK != env->Object_SetPropertyByName_Double(ret, "offset", item.offset)) {
         HILOG_ERROR_I18N("Set property 'offset' failed");

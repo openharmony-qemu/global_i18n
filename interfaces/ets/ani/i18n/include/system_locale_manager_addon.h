@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_GLOBAL_I18N_SYSTEM_LOCAEL_MANAGER_H
-#define OHOS_GLOBAL_I18N_SYSTEM_LOCAEL_MANAGER_H
+#ifndef OHOS_GLOBAL_I18N_SYSTEM_LOCALE_MANAGER_H
+#define OHOS_GLOBAL_I18N_SYSTEM_LOCALE_MANAGER_H
 
-#include <ani.h>
+#include "ani.h"
 #include "system_locale_manager.h"
 
 namespace OHOS {
