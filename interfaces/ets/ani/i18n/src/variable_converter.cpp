@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "variable_convertor.h"
+#include "variable_converter.h"
 
 #include "entity_recognizer_addon.h"
 #include "holiday_manager_addon.h"
@@ -34,7 +34,7 @@ using namespace OHOS;
 using namespace Global;
 using namespace I18n;
 
-std::string VariableConvertor::AniStrToString(ani_env *env, ani_ref aniStr)
+std::string VariableConverter::AniStrToString(ani_env *env, ani_ref aniStr)
 {
     ani_string ani_str = static_cast<ani_string>(aniStr);
     ani_size strSize;
@@ -53,7 +53,7 @@ std::string VariableConvertor::AniStrToString(ani_env *env, ani_ref aniStr)
     return std::string(buffer.data(), bytes_written);
 }
 
-ani_string VariableConvertor::StringToAniStr(ani_env *env, const std::string &str)
+ani_string VariableConverter::StringToAniStr(ani_env *env, const std::string &str)
 {
     ani_string ret;
     if (ANI_OK != env->String_NewUTF8(str.c_str(), str.size(), &ret)) {
@@ -63,7 +63,7 @@ ani_string VariableConvertor::StringToAniStr(ani_env *env, const std::string &st
     return ret;
 }
 
-void VariableConvertor::SetBooleanMember(ani_env *env, ani_object obj,
+void VariableConverter::SetBooleanMember(ani_env *env, ani_object obj,
     const std::string &name, const std::string &value)
 {
     if (value.empty()) {
@@ -96,7 +96,7 @@ void VariableConvertor::SetBooleanMember(ani_env *env, ani_object obj,
     }
 }
 
-bool VariableConvertor::GetBooleanMember(ani_env *env, ani_object options, const std::string &name, bool& value)
+bool VariableConverter::GetBooleanMember(ani_env *env, ani_object options, const std::string &name, bool& value)
 {
     ani_ref ref;
     if (ANI_OK != env->Object_GetPropertyByName_Ref(options, name.c_str(), &ref)) {
@@ -122,7 +122,7 @@ bool VariableConvertor::GetBooleanMember(ani_env *env, ani_object options, const
     return true;
 }
 
-void VariableConvertor::SetNumberMember(ani_env *env, ani_object obj, const std::string &name, const ani_int value)
+void VariableConverter::SetNumberMember(ani_env *env, ani_object obj, const std::string &name, const ani_int value)
 {
     static const char *className = "Lstd/core/Int;";
     ani_class cls;
@@ -149,7 +149,7 @@ void VariableConvertor::SetNumberMember(ani_env *env, ani_object obj, const std:
     }
 }
 
-void VariableConvertor::SetNumberMember(ani_env *env, ani_object obj, const std::string &name, const std::string &value)
+void VariableConverter::SetNumberMember(ani_env *env, ani_object obj, const std::string &name, const std::string &value)
 {
     if (value.empty()) {
         return;
@@ -186,7 +186,7 @@ void VariableConvertor::SetNumberMember(ani_env *env, ani_object obj, const std:
     }
 }
 
-bool VariableConvertor::GetNumberMember(ani_env *env, ani_object options, const std::string &name, int& value)
+bool VariableConverter::GetNumberMember(ani_env *env, ani_object options, const std::string &name, int& value)
 {
     ani_ref ref;
     if (ANI_OK != env->Object_GetPropertyByName_Ref(options, name.c_str(), &ref)) {
@@ -212,19 +212,19 @@ bool VariableConvertor::GetNumberMember(ani_env *env, ani_object options, const 
     return true;
 }
 
-void VariableConvertor::SetStringMember(ani_env *env, ani_object obj, const std::string &name, const std::string &value)
+void VariableConverter::SetStringMember(ani_env *env, ani_object obj, const std::string &name, const std::string &value)
 {
     if (value.empty()) {
         return;
     }
 
-    if (ANI_OK != env->Object_SetPropertyByName_Ref(obj, name.c_str(), VariableConvertor::StringToAniStr(env, value))) {
+    if (ANI_OK != env->Object_SetPropertyByName_Ref(obj, name.c_str(), VariableConverter::StringToAniStr(env, value))) {
         HILOG_ERROR_I18N("Set property '%{public}s' failed", name.c_str());
         return;
     }
 }
 
-bool VariableConvertor::GetStringMember(ani_env *env, ani_object options, const std::string &name, std::string &value)
+bool VariableConverter::GetStringMember(ani_env *env, ani_object options, const std::string &name, std::string &value)
 {
     ani_ref ref;
     if (ANI_OK != env->Object_GetPropertyByName_Ref(options, name.c_str(), &ref)) {
@@ -241,11 +241,11 @@ bool VariableConvertor::GetStringMember(ani_env *env, ani_object options, const 
         return false;
     }
 
-    value = VariableConvertor::AniStrToString(env, ref);
+    value = VariableConverter::AniStrToString(env, ref);
     return true;
 }
 
-ani_object VariableConvertor::CreateArray(ani_env *env, const std::vector<std::string> strs)
+ani_object VariableConverter::CreateArray(ani_env *env, const std::vector<std::string> &strs)
 {
     static const char *className = "Lescompat/Array;";
     ani_class cls;
@@ -273,7 +273,7 @@ ani_object VariableConvertor::CreateArray(ani_env *env, const std::vector<std::s
     }
 
     for (size_t i = 0; i < strs.size(); ++i) {
-        if (ANI_OK != env->Object_CallMethod_Void(ret, set, i, VariableConvertor::StringToAniStr(env, strs[i]))) {
+        if (ANI_OK != env->Object_CallMethod_Void(ret, set, i, VariableConverter::StringToAniStr(env, strs[i]))) {
             HILOG_ERROR_I18N("Call method '$_set' failed");
             return ret;
         }
@@ -281,7 +281,7 @@ ani_object VariableConvertor::CreateArray(ani_env *env, const std::vector<std::s
     return ret;
 }
 
-bool VariableConvertor::ParseStringArray(ani_env *env, ani_object obj, std::vector<std::string> &strs)
+bool VariableConverter::ParseStringArray(ani_env *env, ani_object obj, std::vector<std::string> &strs)
 {
     static const char *className = "Lescompat/Array;";
     ani_class cls;
@@ -314,12 +314,12 @@ bool VariableConvertor::ParseStringArray(ani_env *env, ani_object obj, std::vect
             HILOG_ERROR_I18N("Call method '$_get' failed");
             return false;
         }
-        strs.push_back(VariableConvertor::AniStrToString(env, static_cast<ani_string>(value)));
+        strs.push_back(VariableConverter::AniStrToString(env, static_cast<ani_string>(value)));
     }
     return true;
 }
 
-ani_enum_item VariableConvertor::GetEnumItemByIndex(ani_env* env, const char* enumClassName, const int index)
+ani_enum_item VariableConverter::GetEnumItemByIndex(ani_env* env, const char* enumClassName, const int index)
 {
     ani_enum aniEnum;
     if (ANI_OK != env->FindEnum(enumClassName, &aniEnum)) {
@@ -335,7 +335,7 @@ ani_enum_item VariableConvertor::GetEnumItemByIndex(ani_env* env, const char* en
     return enumItem;
 }
 
-ani_double VariableConvertor::GetDateValue(ani_env *env, ani_object date, const std::string &method)
+ani_double VariableConverter::GetDateValue(ani_env *env, ani_object date, const std::string &method)
 {
     static const char* className = "Lescompat/Date;";
     ani_class cls;
@@ -358,7 +358,7 @@ ani_double VariableConvertor::GetDateValue(ani_env *env, ani_object date, const 
     return ret;
 }
 
-std::vector<std::string> VariableConvertor::GetLocaleTags(ani_env *env, ani_object locale)
+std::vector<std::string> VariableConverter::GetLocaleTags(ani_env *env, ani_object locale)
 {
     std::vector<std::string> localeTags;
     ani_class stringClass;
@@ -413,7 +413,7 @@ std::vector<std::string> VariableConvertor::GetLocaleTags(ani_env *env, ani_obje
 }
 
 template<typename T>
-ani_object VariableConvertor::CreateAniObject(ani_env* env, const char* className, T* ptr)
+ani_object VariableConverter::CreateAniObject(ani_env* env, const char* className, T* ptr)
 {
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
@@ -435,29 +435,29 @@ ani_object VariableConvertor::CreateAniObject(ani_env* env, const char* classNam
     return obj;
 }
 
-template ani_object VariableConvertor::CreateAniObject<I18nBreakIteratorAddon>(
+template ani_object VariableConverter::CreateAniObject<I18nBreakIteratorAddon>(
     ani_env*, const char*, I18nBreakIteratorAddon*);
-template ani_object VariableConvertor::CreateAniObject<I18nCalendarAddon>(ani_env*, const char*, I18nCalendarAddon*);
-template ani_object VariableConvertor::CreateAniObject<I18nEntityRecognizerAddon>(
+template ani_object VariableConverter::CreateAniObject<I18nCalendarAddon>(ani_env*, const char*, I18nCalendarAddon*);
+template ani_object VariableConverter::CreateAniObject<I18nEntityRecognizerAddon>(
     ani_env*, const char*, I18nEntityRecognizerAddon*);
-template ani_object VariableConvertor::CreateAniObject<I18nHolidayManagerAddon>(
+template ani_object VariableConverter::CreateAniObject<I18nHolidayManagerAddon>(
     ani_env*, const char*, I18nHolidayManagerAddon*);
-template ani_object VariableConvertor::CreateAniObject<I18nIndexUtilAddon>(ani_env*, const char*, I18nIndexUtilAddon*);
-template ani_object VariableConvertor::CreateAniObject<I18nNormalizerAddon>(
+template ani_object VariableConverter::CreateAniObject<I18nIndexUtilAddon>(ani_env*, const char*, I18nIndexUtilAddon*);
+template ani_object VariableConverter::CreateAniObject<I18nNormalizerAddon>(
     ani_env*, const char*, I18nNormalizerAddon*);
-template ani_object VariableConvertor::CreateAniObject<I18nPhoneNumberFormatAddon>(
+template ani_object VariableConverter::CreateAniObject<I18nPhoneNumberFormatAddon>(
     ani_env*, const char*, I18nPhoneNumberFormatAddon*);
-template ani_object VariableConvertor::CreateAniObject<I18nSimpleDateTimeFormatAddon>(
+template ani_object VariableConverter::CreateAniObject<I18nSimpleDateTimeFormatAddon>(
     ani_env*, const char*, I18nSimpleDateTimeFormatAddon*);
-template ani_object VariableConvertor::CreateAniObject<I18nSimpleNumberFormatAddon>(
+template ani_object VariableConverter::CreateAniObject<I18nSimpleNumberFormatAddon>(
     ani_env*, const char*, I18nSimpleNumberFormatAddon*);
-template ani_object VariableConvertor::CreateAniObject<I18nStyledNumberFormatAddon>(
+template ani_object VariableConverter::CreateAniObject<I18nStyledNumberFormatAddon>(
     ani_env*, const char*, I18nStyledNumberFormatAddon*);
-template ani_object VariableConvertor::CreateAniObject<I18nSysLocaleMgrAddon>(
+template ani_object VariableConverter::CreateAniObject<I18nSysLocaleMgrAddon>(
     ani_env*, const char*, I18nSysLocaleMgrAddon*);
-template ani_object VariableConvertor::CreateAniObject<I18nTimeZoneAddon>(ani_env*, const char*, I18nTimeZoneAddon*);
-template ani_object VariableConvertor::CreateAniObject<I18nTransliteratorAddon>(
+template ani_object VariableConverter::CreateAniObject<I18nTimeZoneAddon>(ani_env*, const char*, I18nTimeZoneAddon*);
+template ani_object VariableConverter::CreateAniObject<I18nTransliteratorAddon>(
     ani_env*, const char*, I18nTransliteratorAddon*);
-template ani_object VariableConvertor::CreateAniObject<IntlAddon>(ani_env*, const char*, IntlAddon*);
-template ani_object VariableConvertor::CreateAniObject<LocaleInfoAddon>(ani_env*, const char*, LocaleInfoAddon*);
-template ani_object VariableConvertor::CreateAniObject<NumberFormatAddon>(ani_env*, const char*, NumberFormatAddon*);
+template ani_object VariableConverter::CreateAniObject<IntlAddon>(ani_env*, const char*, IntlAddon*);
+template ani_object VariableConverter::CreateAniObject<LocaleInfoAddon>(ani_env*, const char*, LocaleInfoAddon*);
+template ani_object VariableConverter::CreateAniObject<NumberFormatAddon>(ani_env*, const char*, NumberFormatAddon*);

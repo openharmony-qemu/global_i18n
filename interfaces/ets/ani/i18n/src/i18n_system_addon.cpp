@@ -22,7 +22,7 @@
 #include "locale_info.h"
 #include "preferred_language.h"
 #include "utils.h"
-#include "variable_convertor.h"
+#include "variable_converter.h"
 
 using namespace OHOS;
 using namespace Global;
@@ -37,8 +37,8 @@ static const int OFFSET_OF_ENUM = 1;
 ani_string I18nSystemAddon::GetDisplayCountry(ani_env *env, [[maybe_unused]] ani_object object,
     ani_string country, ani_string locale, ani_object sentenceCase)
 {
-    std::string countryBuf = VariableConvertor::AniStrToString(env, country);
-    std::string displayLocaleBuf = VariableConvertor::AniStrToString(env, locale);
+    std::string countryBuf = VariableConverter::AniStrToString(env, country);
+    std::string displayLocaleBuf = VariableConverter::AniStrToString(env, locale);
     LocaleInfo localeInfo(countryBuf);
     if (!LocaleConfig::IsValidRegion(countryBuf) && localeInfo.GetRegion() == "") {
         ErrorUtil::AniThrow(env, I18N_NOT_VALID, "country", "a valid region");
@@ -64,13 +64,13 @@ ani_string I18nSystemAddon::GetDisplayCountry(ani_env *env, [[maybe_unused]] ani
     }
 
     std::string str = LocaleConfig::GetDisplayRegion(countryBuf, displayLocaleBuf, sentenceCaseBool);
-    return VariableConvertor::StringToAniStr(env, str);
+    return VariableConverter::StringToAniStr(env, str);
 }
 
 ani_string I18nSystemAddon::GetDisplayLanguage(ani_env *env, [[maybe_unused]] ani_object object,
     ani_string language, ani_string locale, ani_object sentenceCase)
 {
-    std::string displayLocaleBuf = VariableConvertor::AniStrToString(env, locale);
+    std::string displayLocaleBuf = VariableConverter::AniStrToString(env, locale);
     if (!LocaleConfig::IsValidTag(displayLocaleBuf)) {
         ErrorUtil::AniThrow(env, I18N_NOT_VALID, "locale", "a valid locale");
         return nullptr;
@@ -91,24 +91,24 @@ ani_string I18nSystemAddon::GetDisplayLanguage(ani_env *env, [[maybe_unused]] an
         sentenceCaseBool = value;
     }
 
-    std::string str = LocaleConfig::GetDisplayLanguage(VariableConvertor::AniStrToString(env, language),
+    std::string str = LocaleConfig::GetDisplayLanguage(VariableConverter::AniStrToString(env, language),
         displayLocaleBuf, sentenceCaseBool);
-    return VariableConvertor::StringToAniStr(env, str);
+    return VariableConverter::StringToAniStr(env, str);
 }
 
 ani_object I18nSystemAddon::GetSystemLanguages(ani_env *env, [[maybe_unused]] ani_object object)
 {
     std::unordered_set<std::string> systemLanguages = LocaleConfig::GetSystemLanguages();
     std::vector<std::string> vector(systemLanguages.begin(), systemLanguages.end());
-    return VariableConvertor::CreateArray(env, vector);
+    return VariableConverter::CreateArray(env, vector);
 }
 
 ani_object I18nSystemAddon::GetSystemCountries(ani_env *env, [[maybe_unused]] ani_object object, ani_string language)
 {
     std::unordered_set<std::string> systemCountries =
-        LocaleConfig::GetSystemCountries(VariableConvertor::AniStrToString(env, language));
+        LocaleConfig::GetSystemCountries(VariableConverter::AniStrToString(env, language));
     std::vector<std::string> vector(systemCountries.begin(), systemCountries.end());
-    return VariableConvertor::CreateArray(env, vector);
+    return VariableConverter::CreateArray(env, vector);
 }
 
 ani_boolean I18nSystemAddon::IsSuggested(ani_env *env, [[maybe_unused]] ani_object object,
@@ -121,10 +121,10 @@ ani_boolean I18nSystemAddon::IsSuggested(ani_env *env, [[maybe_unused]] ani_obje
         return false;
     }
     if (!isUndefined) {
-        isSuggested = LocaleConfig::IsSuggested(VariableConvertor::AniStrToString(env, language),
-            VariableConvertor::AniStrToString(env, region));
+        isSuggested = LocaleConfig::IsSuggested(VariableConverter::AniStrToString(env, language),
+            VariableConverter::AniStrToString(env, region));
     } else {
-        isSuggested = LocaleConfig::IsSuggested(VariableConvertor::AniStrToString(env, language));
+        isSuggested = LocaleConfig::IsSuggested(VariableConverter::AniStrToString(env, language));
     }
     return isSuggested;
 }
@@ -132,12 +132,12 @@ ani_boolean I18nSystemAddon::IsSuggested(ani_env *env, [[maybe_unused]] ani_obje
 ani_string I18nSystemAddon::GetSystemLanguage(ani_env *env, [[maybe_unused]] ani_object object)
 {
     std::string str = LocaleConfig::GetSystemLanguage();
-    return VariableConvertor::StringToAniStr(env, str);
+    return VariableConverter::StringToAniStr(env, str);
 }
 
 void I18nSystemAddon::SetSystemLanguage(ani_env *env, [[maybe_unused]] ani_object object, ani_string language)
 {
-    I18nErrorCode err = I18nServiceAbilityClient::SetSystemLanguage(VariableConvertor::AniStrToString(env, language));
+    I18nErrorCode err = I18nServiceAbilityClient::SetSystemLanguage(VariableConverter::AniStrToString(env, language));
     HILOG_INFO_I18N("I18nSystemAddon::SetSystemLanguageImpl with code %{public}d", static_cast<int32_t>(err));
     bool success = err == I18nErrorCode::SUCCESS;
     if (!success) {
@@ -148,12 +148,12 @@ void I18nSystemAddon::SetSystemLanguage(ani_env *env, [[maybe_unused]] ani_objec
 ani_string I18nSystemAddon::GetSystemRegion(ani_env *env, [[maybe_unused]] ani_object object)
 {
     std::string str = LocaleConfig::GetSystemRegion();
-    return VariableConvertor::StringToAniStr(env, str);
+    return VariableConverter::StringToAniStr(env, str);
 }
 
 void I18nSystemAddon::SetSystemRegion(ani_env *env, [[maybe_unused]] ani_object object, ani_string region)
 {
-    I18nErrorCode err = I18nServiceAbilityClient::SetSystemRegion(VariableConvertor::AniStrToString(env, region));
+    I18nErrorCode err = I18nServiceAbilityClient::SetSystemRegion(VariableConverter::AniStrToString(env, region));
     HILOG_INFO_I18N("I18nSystemAddon::SetSystemRegionImpl with code %{public}d", static_cast<int32_t>(err));
     bool success = err == I18nErrorCode::SUCCESS;
     if (!success) {
@@ -164,12 +164,12 @@ void I18nSystemAddon::SetSystemRegion(ani_env *env, [[maybe_unused]] ani_object 
 ani_string I18nSystemAddon::GetSystemLocale(ani_env *env, [[maybe_unused]] ani_object object)
 {
     std::string str = LocaleConfig::GetSystemLocale();
-    return VariableConvertor::StringToAniStr(env, str);
+    return VariableConverter::StringToAniStr(env, str);
 }
 
 void I18nSystemAddon::SetSystemLocale(ani_env *env, [[maybe_unused]] ani_object object, ani_string locale)
 {
-    I18nErrorCode err = I18nServiceAbilityClient::SetSystemLocale(VariableConvertor::AniStrToString(env, locale));
+    I18nErrorCode err = I18nServiceAbilityClient::SetSystemLocale(VariableConverter::AniStrToString(env, locale));
     bool success = err == I18nErrorCode::SUCCESS;
     if (!success) {
         ErrorUtil::AniThrow(env, I18N_NO_PERMISSION, "", "");
@@ -211,7 +211,7 @@ void I18nSystemAddon::AddPreferredLanguage(ani_env *env, [[maybe_unused]] ani_ob
         index = static_cast<int>(value);
     }
     I18nErrorCode err = I18nServiceAbilityClient::AddPreferredLanguage(
-        VariableConvertor::AniStrToString(env, language), index);
+        VariableConverter::AniStrToString(env, language), index);
     HILOG_INFO_I18N("I18nSystemAddon::AddPreferredLanguageImpl with code %{public}d", static_cast<int32_t>(err));
     if (err == I18nErrorCode::NO_PERMISSION) {
         ErrorUtil::AniThrow(env, I18N_NO_PERMISSION, "", "");
@@ -240,18 +240,18 @@ void I18nSystemAddon::RemovePreferredLanguage([[maybe_unused]] ani_env *env, [[m
 ani_object I18nSystemAddon::GetPreferredLanguageList(ani_env *env, [[maybe_unused]] ani_object object)
 {
     std::vector<std::string> languageList = PreferredLanguage::GetPreferredLanguageList();
-    return VariableConvertor::CreateArray(env, languageList);
+    return VariableConverter::CreateArray(env, languageList);
 }
 
 ani_string I18nSystemAddon::GetFirstPreferredLanguage(ani_env *env, [[maybe_unused]] ani_object object)
 {
     std::string language = PreferredLanguage::GetFirstPreferredLanguage();
-    return VariableConvertor::StringToAniStr(env, language);
+    return VariableConverter::StringToAniStr(env, language);
 }
 
 void I18nSystemAddon::SetAppPreferredLanguage(ani_env *env, [[maybe_unused]] ani_object object, ani_string language)
 {
-    std::string localeTag = VariableConvertor::AniStrToString(env, language);
+    std::string localeTag = VariableConverter::AniStrToString(env, language);
     UErrorCode icuStatus = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeTag, icuStatus);
     if (U_FAILURE(icuStatus) || !(IsValidLocaleTag(locale) || localeTag.compare("default") == 0)) {
@@ -276,7 +276,7 @@ ani_string I18nSystemAddon::GetAppPreferredLanguage(ani_env *env, [[maybe_unused
 #else
     std::string language = PreferredLanguage::GetFirstPreferredLanguage();
 #endif
-    return VariableConvertor::StringToAniStr(env, language);
+    return VariableConverter::StringToAniStr(env, language);
 }
 
 void I18nSystemAddon::SetUsingLocalDigit([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
@@ -310,14 +310,14 @@ ani_string I18nSystemAddon::GetSimplifiedLanguage([[maybe_unused]] ani_env *env,
     } else {
         int code = 0;
         simplifiedLanguage = LocaleConfig::GetSimplifiedLanguage(
-            VariableConvertor::AniStrToString(env, language), code);
+            VariableConverter::AniStrToString(env, language), code);
         if (code != 0) {
             HILOG_ERROR_I18N("GetSimplifiedLanguage: language is not valid");
             ErrorUtil::AniThrow(env, I18N_NOT_VALID, "language", "a valid language");
             return nullptr;
         }
     }
-    return VariableConvertor::StringToAniStr(env, simplifiedLanguage);
+    return VariableConverter::StringToAniStr(env, simplifiedLanguage);
 }
 
 void I18nSystemAddon::SetTemperatureType([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
@@ -355,7 +355,7 @@ ani_enum_item I18nSystemAddon::GetTemperatureType([[maybe_unused]] ani_env *env,
     TemperatureType type = LocaleConfig::GetTemperatureType();
     int32_t index = static_cast<int32_t>(type) - OFFSET_OF_ENUM;
     static const char *enumName = "L@ohos/i18n/i18n/TemperatureType;";
-    return VariableConvertor::GetEnumItemByIndex(env, enumName, index);
+    return VariableConverter::GetEnumItemByIndex(env, enumName, index);
 }
 
 ani_string I18nSystemAddon::GetTemperatureName([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
@@ -374,7 +374,7 @@ ani_string I18nSystemAddon::GetTemperatureName([[maybe_unused]] ani_env *env, [[
         ErrorUtil::AniThrow(env, I18N_NOT_VALID, NAME_OF_TEMPERATURE, TYPE_OF_TEMPERATURE);
         return nullptr;
     }
-    return VariableConvertor::StringToAniStr(env, temperatureName);
+    return VariableConverter::StringToAniStr(env, temperatureName);
 }
 
 void I18nSystemAddon::SetFirstDayOfWeek([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
@@ -411,7 +411,7 @@ ani_enum_item I18nSystemAddon::GetFirstDayOfWeek([[maybe_unused]] ani_env *env, 
     WeekDay type = LocaleConfig::GetFirstDayOfWeek();
     int32_t index = static_cast<int32_t>(type) - OFFSET_OF_ENUM;
     static const char *enumName = "L@ohos/i18n/i18n/WeekDay;";
-    return VariableConvertor::GetEnumItemByIndex(env, enumName, index);
+    return VariableConverter::GetEnumItemByIndex(env, enumName, index);
 }
 
 ani_status I18nSystemAddon::BindContextSystem(ani_env *env)

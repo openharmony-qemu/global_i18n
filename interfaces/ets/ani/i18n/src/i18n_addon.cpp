@@ -32,7 +32,7 @@
 #include "simple_number_format_addon.h"
 #include "styled_number_format_addon.h"
 #include "system_locale_manager_addon.h"
-#include "variable_convertor.h"
+#include "variable_converter.h"
 
 using namespace OHOS;
 using namespace Global;
@@ -62,16 +62,16 @@ ani_object I18nPhoneNumberFormatAddon::Create(ani_env *env, [[maybe_unused]] ani
         return nullptr;
     }
     if (!isUndefined) {
-        VariableConvertor::GetStringMember(env, options, "type", typeStr);
+        VariableConverter::GetStringMember(env, options, "type", typeStr);
     }
     optionsStr.insert(std::make_pair("type", typeStr));
 
     std::unique_ptr<I18nPhoneNumberFormatAddon> obj = std::make_unique<I18nPhoneNumberFormatAddon>();
     obj->phonenumberfmt_ = PhoneNumberFormat::CreateInstance(
-        VariableConvertor::AniStrToString(env, country), optionsStr);
+        VariableConverter::AniStrToString(env, country), optionsStr);
 
     static const char *className = "L@ohos/i18n/i18n/PhoneNumberFormat;";
-    ani_object phoneNumberFormatObject = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object phoneNumberFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return phoneNumberFormatObject;
 }
@@ -83,7 +83,7 @@ ani_boolean I18nPhoneNumberFormatAddon::IsValidNumber(ani_env *env, ani_object o
         HILOG_ERROR_I18N("IsValidPhoneNumber: GetPhoneNumberFormat object failed");
         return false;
     }
-    return obj->phonenumberfmt_->isValidPhoneNumber(VariableConvertor::AniStrToString(env, number));
+    return obj->phonenumberfmt_->isValidPhoneNumber(VariableConverter::AniStrToString(env, number));
 }
 
 ani_string I18nPhoneNumberFormatAddon::Format(ani_env *env, ani_object object, ani_string number)
@@ -94,8 +94,8 @@ ani_string I18nPhoneNumberFormatAddon::Format(ani_env *env, ani_object object, a
         return nullptr;
     }
 
-    std::string formattedPhoneNumber = obj->phonenumberfmt_->format(VariableConvertor::AniStrToString(env, number));
-    return VariableConvertor::StringToAniStr(env, formattedPhoneNumber);
+    std::string formattedPhoneNumber = obj->phonenumberfmt_->format(VariableConverter::AniStrToString(env, number));
+    return VariableConverter::StringToAniStr(env, formattedPhoneNumber);
 }
 
 ani_string I18nPhoneNumberFormatAddon::GetLocationName(ani_env *env, ani_object object,
@@ -107,9 +107,9 @@ ani_string I18nPhoneNumberFormatAddon::GetLocationName(ani_env *env, ani_object 
         return nullptr;
     }
 
-    std::string resStr = obj->phonenumberfmt_->getLocationName(VariableConvertor::AniStrToString(env, number),
-        VariableConvertor::AniStrToString(env, locale));
-    return VariableConvertor::StringToAniStr(env, resStr);
+    std::string resStr = obj->phonenumberfmt_->getLocationName(VariableConverter::AniStrToString(env, number),
+        VariableConverter::AniStrToString(env, locale));
+    return VariableConverter::StringToAniStr(env, resStr);
 }
 
 I18nBreakIteratorAddon* I18nBreakIteratorAddon::UnwrapAddon(ani_env *env, ani_object object)
@@ -125,10 +125,10 @@ I18nBreakIteratorAddon* I18nBreakIteratorAddon::UnwrapAddon(ani_env *env, ani_ob
 ani_object I18nBreakIteratorAddon::GetLineInstance(ani_env *env, ani_string locale)
 {
     std::unique_ptr<I18nBreakIteratorAddon> obj = std::make_unique<I18nBreakIteratorAddon>();
-    obj->brkiter_ = std::make_unique<I18nBreakIterator>(VariableConvertor::AniStrToString(env, locale));
+    obj->brkiter_ = std::make_unique<I18nBreakIterator>(VariableConverter::AniStrToString(env, locale));
 
     static const char* className = "L@ohos/i18n/i18n/BreakIterator;";
-    ani_object breakIteratorObject = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object breakIteratorObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return breakIteratorObject;
 }
@@ -205,7 +205,7 @@ void I18nBreakIteratorAddon::SetLineBreakText(ani_env *env, ani_object object, a
         HILOG_ERROR_I18N("SetText: Get BreakIterator object failed");
         return;
     }
-    obj->brkiter_->SetText(VariableConvertor::AniStrToString(env, text).c_str());
+    obj->brkiter_->SetText(VariableConverter::AniStrToString(env, text).c_str());
 }
 
 ani_double I18nBreakIteratorAddon::Following(ani_env *env, ani_object object, ani_double offset)
@@ -228,7 +228,7 @@ ani_string I18nBreakIteratorAddon::GetLineBreakText(ani_env *env, ani_object obj
 
     std::string temp;
     obj->brkiter_->GetText(temp);
-    return VariableConvertor::StringToAniStr(env, temp);
+    return VariableConverter::StringToAniStr(env, temp);
 }
 
 ani_boolean I18nBreakIteratorAddon::IsBoundary(ani_env *env, ani_object object, ani_double offset)
@@ -260,14 +260,14 @@ ani_object I18nIndexUtilAddon::GetInstance(ani_env *env, ani_string string)
         return nullptr;
     }
     if (!isUndefined) {
-        localeTag = VariableConvertor::AniStrToString(env, string);
+        localeTag = VariableConverter::AniStrToString(env, string);
     }
 
     std::unique_ptr<I18nIndexUtilAddon> obj = std::make_unique<I18nIndexUtilAddon>();
     obj->indexUtil_ = std::make_unique<IndexUtil>(localeTag);
 
     static const char* className = "L@ohos/i18n/i18n/IndexUtil;";
-    ani_object indexUtilObject = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object indexUtilObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return indexUtilObject;
 }
@@ -280,7 +280,7 @@ ani_object I18nIndexUtilAddon::GetIndexList(ani_env *env, ani_object object)
         return nullptr;
     }
     std::vector<std::string> indexList = obj->indexUtil_->GetIndexList();
-    return VariableConvertor::CreateArray(env, indexList);
+    return VariableConverter::CreateArray(env, indexList);
 }
 
 void I18nIndexUtilAddon::AddLocale(ani_env *env, ani_object object, ani_string locale)
@@ -290,7 +290,7 @@ void I18nIndexUtilAddon::AddLocale(ani_env *env, ani_object object, ani_string l
         HILOG_ERROR_I18N("AddLocale: Get IndexUtil object failed");
         return;
     }
-    obj->indexUtil_->AddLocale(VariableConvertor::AniStrToString(env, locale));
+    obj->indexUtil_->AddLocale(VariableConverter::AniStrToString(env, locale));
 }
 
 ani_object I18nIndexUtilAddon::GetIndex(ani_env *env, ani_object object, ani_string text)
@@ -301,8 +301,8 @@ ani_object I18nIndexUtilAddon::GetIndex(ani_env *env, ani_object object, ani_str
         return nullptr;
     }
 
-    std::string index = obj->indexUtil_->GetIndex(VariableConvertor::AniStrToString(env, text));
-    return VariableConvertor::StringToAniStr(env, index);
+    std::string index = obj->indexUtil_->GetIndex(VariableConverter::AniStrToString(env, text));
+    return VariableConverter::StringToAniStr(env, index);
 }
 
 I18nTransliteratorAddon* I18nTransliteratorAddon::UnwrapAddon(ani_env *env, ani_object object)
@@ -341,14 +341,14 @@ ani_object I18nTransliteratorAddon::GetAvailableIDs(ani_env *env, [[maybe_unused
         ++i;
     }
     delete strenum;
-    return VariableConvertor::CreateArray(env, availableIDs);
+    return VariableConverter::CreateArray(env, availableIDs);
 }
 
 ani_object I18nTransliteratorAddon::GetInstance(ani_env *env, [[maybe_unused]] ani_object object, ani_string id)
 {
     std::unique_ptr<I18nTransliteratorAddon> obj = std::make_unique<I18nTransliteratorAddon>();
     UErrorCode status = U_ZERO_ERROR;
-    icu::UnicodeString unistr = icu::UnicodeString::fromUTF8(VariableConvertor::AniStrToString(env, id));
+    icu::UnicodeString unistr = icu::UnicodeString::fromUTF8(VariableConverter::AniStrToString(env, id));
     icu::Transliterator *trans = icu::Transliterator::createInstance(unistr, UTransDirection::UTRANS_FORWARD, status);
     if (U_FAILURE(status) || (trans == nullptr)) {
         return nullptr;
@@ -356,7 +356,7 @@ ani_object I18nTransliteratorAddon::GetInstance(ani_env *env, [[maybe_unused]] a
 
     obj->transliterator_ = std::unique_ptr<icu::Transliterator>(trans);
     static const char* className = "L@ohos/i18n/i18n/Transliterator;";
-    ani_object transliteratorObject = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object transliteratorObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return transliteratorObject;
 }
@@ -369,23 +369,23 @@ ani_string I18nTransliteratorAddon::Transform(ani_env *env, ani_object object, a
         return nullptr;
     }
 
-    icu::UnicodeString unistr = icu::UnicodeString::fromUTF8(VariableConvertor::AniStrToString(env, text));
+    icu::UnicodeString unistr = icu::UnicodeString::fromUTF8(VariableConverter::AniStrToString(env, text));
     obj->transliterator_->transliterate(unistr);
 
     std::string temp;
     unistr.toUTF8String(temp);
-    return VariableConvertor::StringToAniStr(env, temp);
+    return VariableConverter::StringToAniStr(env, temp);
 }
 
 static bool GetUnitInfo(ani_env *env, ani_object obj, std::string &unit, std::string &system)
 {
     std::string value;
-    if (!VariableConvertor::GetStringMember(env, obj, "unit", value)) {
+    if (!VariableConverter::GetStringMember(env, obj, "unit", value)) {
         return false;
     }
     unit = value;
 
-    if (!VariableConvertor::GetStringMember(env, obj, "measureSystem", value)) {
+    if (!VariableConverter::GetStringMember(env, obj, "measureSystem", value)) {
         return false;
     }
     system = value;
@@ -419,20 +419,20 @@ ani_string I18nAddon::UnitConvert(ani_env *env, [[maybe_unused]] ani_object obje
         return nullptr;
     }
     if (!isUndefined) {
-        map.insert(std::make_pair("unitDisplay", VariableConvertor::AniStrToString(env, style)));
+        map.insert(std::make_pair("unitDisplay", VariableConverter::AniStrToString(env, style)));
     }
 
     std::vector<std::string> localeTags;
-    localeTags.push_back(VariableConvertor::AniStrToString(env, locale));
+    localeTags.push_back(VariableConverter::AniStrToString(env, locale));
     std::unique_ptr<NumberFormat> numberFmt = std::make_unique<NumberFormat>(localeTags, map);
     std::string str = numberFmt->Format(value);
-    return VariableConvertor::StringToAniStr(env, str);
+    return VariableConverter::StringToAniStr(env, str);
 }
 
 ani_string I18nAddon::GetDateOrder(ani_env *env, [[maybe_unused]] ani_object object, ani_string locale)
 {
-    std::string value = DateTimeSequence::GetDateOrder(VariableConvertor::AniStrToString(env, locale));
-    return VariableConvertor::StringToAniStr(env, value);
+    std::string value = DateTimeSequence::GetDateOrder(VariableConverter::AniStrToString(env, locale));
+    return VariableConverter::StringToAniStr(env, value);
 }
 
 ani_string I18nAddon::GetTimePeriodName(ani_env *env, [[maybe_unused]] ani_object object,
@@ -445,7 +445,7 @@ ani_string I18nAddon::GetTimePeriodName(ani_env *env, [[maybe_unused]] ani_objec
         return nullptr;
     }
     if (!isUndefined) {
-        localeTag = VariableConvertor::AniStrToString(env, locale);
+        localeTag = VariableConverter::AniStrToString(env, locale);
     } else {
         localeTag = LocaleConfig::GetSystemLocale();
     }
@@ -476,12 +476,12 @@ ani_string I18nAddon::GetTimePeriodName(ani_env *env, [[maybe_unused]] ani_objec
     name.toUTF8String(result);
     delete formatter;
     delete calendar;
-    return VariableConvertor::StringToAniStr(env, result);
+    return VariableConverter::StringToAniStr(env, result);
 }
 
 static LocaleInfo* ProcessJsParamLocale(ani_env *env, ani_string locale)
 {
-    std::string localeTag = VariableConvertor::AniStrToString(env, locale);
+    std::string localeTag = VariableConverter::AniStrToString(env, locale);
     UErrorCode icuStatus = U_ZERO_ERROR;
     icu::Locale icuLocale = icu::Locale::forLanguageTag(localeTag, icuStatus);
     if (U_FAILURE(icuStatus) || !IsValidLocaleTag(icuLocale)) {
@@ -495,7 +495,7 @@ static bool ProcessJsParamLocaleList(ani_env *env, ani_object localeList, std::v
     LocaleInfo *requestLocale)
 {
     std::vector<std::string> localeTagList;
-    if (!VariableConvertor::ParseStringArray(env, localeList, localeTagList)) {
+    if (!VariableConverter::ParseStringArray(env, localeList, localeTagList)) {
         HILOG_ERROR_I18N("ProcessJsParamLocaleList: Failed to obtain the parameter.");
         return false;
     }
@@ -555,19 +555,19 @@ ani_string I18nAddon::GetBestMatchLocale(ani_env *env, [[maybe_unused]] ani_obje
         bestMatchLocaleTag = bestMatch->ToString();
     }
     ReleaseParam(requestLocale, candidateLocales);
-    return VariableConvertor::StringToAniStr(env, bestMatchLocaleTag);
+    return VariableConverter::StringToAniStr(env, bestMatchLocaleTag);
 }
 
 ani_string I18nAddon::GetThreeLetterLanguage(ani_env *env, [[maybe_unused]] ani_object object, ani_string locale)
 {
-    std::string language = GetISO3Language(VariableConvertor::AniStrToString(env, locale));
-    return VariableConvertor::StringToAniStr(env, language);
+    std::string language = GetISO3Language(VariableConverter::AniStrToString(env, locale));
+    return VariableConverter::StringToAniStr(env, language);
 }
 
 ani_string I18nAddon::GetThreeLetterRegion(ani_env *env, [[maybe_unused]] ani_object object, ani_string locale)
 {
-    std::string country = GetISO3Country(VariableConvertor::AniStrToString(env, locale));
-    return VariableConvertor::StringToAniStr(env, country);
+    std::string country = GetISO3Country(VariableConverter::AniStrToString(env, locale));
+    return VariableConverter::StringToAniStr(env, country);
 }
 
 ani_string I18nAddon::GetUnicodeWrappedFilePath(ani_env *env, [[maybe_unused]] ani_object object,
@@ -580,7 +580,7 @@ ani_string I18nAddon::GetUnicodeWrappedFilePath(ani_env *env, [[maybe_unused]] a
         return nullptr;
     }
     if (!isUndefined) {
-        std::string result = VariableConvertor::AniStrToString(env, delimiter);
+        std::string result = VariableConverter::AniStrToString(env, delimiter);
         if (result.length() != 1) {
             ErrorUtil::AniThrow(env, I18N_NOT_VALID, "delimiter", "a valid delimiter");
             delimiterChar = '\0';
@@ -605,18 +605,18 @@ ani_string I18nAddon::GetUnicodeWrappedFilePath(ani_env *env, [[maybe_unused]] a
 
     std::string errorCode;
     std::shared_ptr<LocaleInfo> localeInfoPtr = obj == nullptr ? nullptr : obj->GetLocaleInfo();
-    std::string result = LocaleConfig::GetUnicodeWrappedFilePath(VariableConvertor::AniStrToString(env, path),
+    std::string result = LocaleConfig::GetUnicodeWrappedFilePath(VariableConverter::AniStrToString(env, path),
         delimiterChar, localeInfoPtr, errorCode);
     if (!errorCode.empty()) {
         ErrorUtil::AniThrow(env, I18N_NOT_VALID, errorCode, "valid");
         return nullptr;
     }
-    return VariableConvertor::StringToAniStr(env, result);
+    return VariableConverter::StringToAniStr(env, result);
 }
 
 ani_boolean I18nAddon::IsRTL(ani_env *env, ani_string locale)
 {
-    return LocaleConfig::IsRTL(VariableConvertor::AniStrToString(env, locale));
+    return LocaleConfig::IsRTL(VariableConverter::AniStrToString(env, locale));
 }
 
 ani_status I18nPhoneNumberFormatAddon::BindContextPhoneNumberFormat(ani_env *env)
@@ -751,7 +751,7 @@ ani_status I18nAddon::BindContextI18NUtil(ani_env *env)
     return ANI_OK;
 }
 
-ani_status I18nAddon::BindContextNameSpace(ani_env *env)
+ani_status I18nAddon::BindContextNamespace(ani_env *env)
 {
     static const char* nameSpaceName = "L@ohos/i18n/i18n;";
     ani_namespace ns;
@@ -823,7 +823,7 @@ ani_status BindContext(ani_env *env)
         return status;
     }
 
-    status = I18nAddon::BindContextNameSpace(env);
+    status = I18nAddon::BindContextNamespace(env);
     if (status != ANI_OK) {
         return status;
     }

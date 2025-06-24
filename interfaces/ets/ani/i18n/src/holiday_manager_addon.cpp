@@ -17,7 +17,7 @@
 
 #include "error_util.h"
 #include "i18n_hilog.h"
-#include "variable_convertor.h"
+#include "variable_converter.h"
 
 using namespace OHOS;
 using namespace Global;
@@ -41,10 +41,10 @@ I18nHolidayManagerAddon* I18nHolidayManagerAddon::UnwrapAddon(ani_env *env, ani_
 ani_object I18nHolidayManagerAddon::Create(ani_env *env, [[maybe_unused]] ani_object object, ani_string icsPath)
 {
     std::unique_ptr<I18nHolidayManagerAddon> obj = std::make_unique<I18nHolidayManagerAddon>();
-    obj->holidayManager_ = std::make_unique<HolidayManager>(VariableConvertor::AniStrToString(env, icsPath).c_str());
+    obj->holidayManager_ = std::make_unique<HolidayManager>(VariableConverter::AniStrToString(env, icsPath).c_str());
 
     static const char *className = "L@ohos/i18n/i18n/HolidayManager;";
-    ani_object holidayManagerObject = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object holidayManagerObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return holidayManagerObject;
 }
@@ -67,9 +67,9 @@ ani_boolean I18nHolidayManagerAddon::IsHoliday(ani_env *env, ani_object object, 
         res = obj->holidayManager_->IsHoliday();
     } else {
         std::vector<int> list;
-        list.push_back(VariableConvertor::GetDateValue(env, date, "getFullYear"));
-        list.push_back(VariableConvertor::GetDateValue(env, date, "getMonth") + MONTH_INCREASE_ONE);
-        list.push_back(VariableConvertor::GetDateValue(env, date, "getDate"));
+        list.push_back(VariableConverter::GetDateValue(env, date, "getFullYear"));
+        list.push_back(VariableConverter::GetDateValue(env, date, "getMonth") + MONTH_INCREASE_ONE);
+        list.push_back(VariableConverter::GetDateValue(env, date, "getDate"));
         if (list.size() == SIZE_OF_LIST) {
             res = obj->holidayManager_->IsHoliday(list.at(INDEX_ONE_OF_LIST),
                 list.at(INDEX_TWO_OF_LIST), list.at(INDEX_THREE_OF_LIST));
@@ -99,8 +99,8 @@ static ani_object CreateHolidayLocalName(ani_env *env, HolidayLocalName localNam
         return nullptr;
     }
 
-    VariableConvertor::SetStringMember(env, ret, "language", localName.language);
-    VariableConvertor::SetStringMember(env, ret, "name", localName.name);
+    VariableConverter::SetStringMember(env, ret, "language", localName.language);
+    VariableConverter::SetStringMember(env, ret, "name", localName.name);
     return ret;
 }
 
@@ -161,7 +161,7 @@ static ani_object CreateHolidayInfoItem(ani_env *env, HolidayInfoItem item)
         return nullptr;
     }
 
-    VariableConvertor::SetStringMember(env, ret, "baseName", item.baseName);
+    VariableConverter::SetStringMember(env, ret, "baseName", item.baseName);
 
     if (ANI_OK != env->Object_SetPropertyByName_Double(ret, "year", item.year)) {
         HILOG_ERROR_I18N("Set property 'year' failed");

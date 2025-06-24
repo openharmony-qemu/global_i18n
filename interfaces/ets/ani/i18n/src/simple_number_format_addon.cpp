@@ -18,7 +18,7 @@
 #include "error_util.h"
 #include "i18n_hilog.h"
 #include "locale_info_addon.h"
-#include "variable_convertor.h"
+#include "variable_converter.h"
 
 using namespace OHOS;
 using namespace Global;
@@ -60,7 +60,7 @@ ani_object I18nSimpleNumberFormatAddon::GetSimpleNumberFormatBySkeleton(ani_env 
 
     I18nErrorCode errCode = I18nErrorCode::SUCCESS;
     obj->simpleNumberFormat_ = std::make_shared<SimpleNumberFormat>(
-        VariableConvertor::AniStrToString(env, skeleton), localeInfo, errCode);
+        VariableConverter::AniStrToString(env, skeleton), localeInfo, errCode);
     if (errCode == I18nErrorCode::INVALID_NUMBER_FORMAT_SKELETON) {
         ErrorUtil::AniThrow(env, I18N_NOT_VALID, "skeleton", "a valid number format skeleton");
         return nullptr;
@@ -70,7 +70,7 @@ ani_object I18nSimpleNumberFormatAddon::GetSimpleNumberFormatBySkeleton(ani_env 
     }
 
     static const char *className = "L@ohos/i18n/i18n/SimpleNumberFormat;";
-    ani_object simpleNumberFormatObject = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object simpleNumberFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return simpleNumberFormatObject;
 }
@@ -87,7 +87,7 @@ ani_string I18nSimpleNumberFormatAddon::Format(ani_env *env, ani_object object, 
     if (formatResult.empty()) {
         HILOG_ERROR_I18N("SimpleNumberFormatAddon::Format: Format result is empty.");
     }
-    return VariableConvertor::StringToAniStr(env, formatResult);
+    return VariableConverter::StringToAniStr(env, formatResult);
 }
 
 ani_status I18nSimpleNumberFormatAddon::BindContextSimpleNumberFormat(ani_env *env)

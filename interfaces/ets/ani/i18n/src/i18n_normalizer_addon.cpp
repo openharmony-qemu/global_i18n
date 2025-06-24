@@ -17,7 +17,7 @@
  
 #include "error_util.h"
 #include "i18n_hilog.h"
-#include "variable_convertor.h"
+#include "variable_converter.h"
 
 using namespace OHOS;
 using namespace Global;
@@ -55,7 +55,7 @@ ani_object I18nNormalizerAddon::GetInstance(ani_env *env, [[maybe_unused]] ani_o
     }
 
     static const char* className = "L@ohos/i18n/i18n/Normalizer;";
-    ani_object normalizerObject = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object normalizerObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return normalizerObject;
 }
@@ -68,14 +68,14 @@ ani_string I18nNormalizerAddon::Normalize(ani_env *env, ani_object object, ani_s
         return nullptr;
     }
 
-    std::string textStr = VariableConvertor::AniStrToString(env, text);
+    std::string textStr = VariableConverter::AniStrToString(env, text);
     I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
     std::string normalizedText = obj->normalizer_->Normalize(textStr.c_str(), static_cast<int32_t>(textStr.length()),
         errorCode);
     if (errorCode != I18nErrorCode::SUCCESS) {
         return nullptr;
     }
-    return VariableConvertor::StringToAniStr(env, normalizedText);
+    return VariableConverter::StringToAniStr(env, normalizedText);
 }
 
 ani_status I18nNormalizerAddon::BindContextNormalizer(ani_env *env)

@@ -16,7 +16,7 @@
 #ifndef I18N_TIMEZONE_ADDON_H
 #define I18N_TIMEZONE_ADDON_H
 
-#include <ani.h>
+#include "ani.h"
 #include "i18n_timezone.h"
 
 namespace OHOS {

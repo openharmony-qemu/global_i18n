@@ -16,7 +16,7 @@
 #include "i18n_timezone_addon.h"
 
 #include "i18n_hilog.h"
-#include "variable_convertor.h"
+#include "variable_converter.h"
 
 using namespace OHOS;
 using namespace Global;
@@ -42,12 +42,12 @@ ani_object I18nTimeZoneAddon::GetTimeZone(ani_env *env, ani_string zoneID)
     }
     std::string zoneIDStr = "";
     if (!isUndefined) {
-        zoneIDStr = VariableConvertor::AniStrToString(env, zoneID);
+        zoneIDStr = VariableConverter::AniStrToString(env, zoneID);
     }
     obj->timezone_ = I18nTimeZone::CreateInstance(zoneIDStr, true);
 
     static const char* className = "L@ohos/i18n/i18n/TimeZone;";
-    ani_object timeZoneObject = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object timeZoneObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return timeZoneObject;
 }
@@ -61,7 +61,7 @@ ani_string I18nTimeZoneAddon::GetID(ani_env *env, ani_object object)
     }
 
     std::string result = obj->timezone_->GetID();
-    return VariableConvertor::StringToAniStr(env, result);
+    return VariableConverter::StringToAniStr(env, result);
 }
 
 ani_string I18nTimeZoneAddon::GetDisplayName(ani_env *env, ani_object object, ani_string locale, ani_object isDST)
@@ -98,15 +98,15 @@ ani_string I18nTimeZoneAddon::GetDisplayName(ani_env *env, ani_object object, an
 
     std::string result;
     if (localeFlag && DSTFlag) {
-        result = obj->timezone_->GetDisplayName(VariableConvertor::AniStrToString(env, locale), isDSTBool);
+        result = obj->timezone_->GetDisplayName(VariableConverter::AniStrToString(env, locale), isDSTBool);
     }
     if (localeFlag && !DSTFlag) {
-        result = obj->timezone_->GetDisplayName(VariableConvertor::AniStrToString(env, locale));
+        result = obj->timezone_->GetDisplayName(VariableConverter::AniStrToString(env, locale));
     }
     if (!localeFlag && !DSTFlag) {
         result = obj->timezone_->GetDisplayName();
     }
-    return VariableConvertor::StringToAniStr(env, result);
+    return VariableConverter::StringToAniStr(env, result);
 }
 
 ani_double I18nTimeZoneAddon::GetRawOffset(ani_env *env, ani_object object)
@@ -156,33 +156,33 @@ ani_object I18nTimeZoneAddon::GetAvailableIDs(ani_env *env, [[maybe_unused]] ani
     }
 
     std::vector<std::string> vector(timezoneIDs.begin(), timezoneIDs.end());
-    return VariableConvertor::CreateArray(env, vector);
+    return VariableConverter::CreateArray(env, vector);
 }
 
 ani_object I18nTimeZoneAddon::GetAvailableZoneCityIDs(ani_env *env, [[maybe_unused]] ani_object object)
 {
     std::unordered_set<std::string> cityIDs = I18nTimeZone::GetAvailableZoneCityIDs();
     std::vector<std::string> vector(cityIDs.begin(), cityIDs.end());
-    return VariableConvertor::CreateArray(env, vector);
+    return VariableConverter::CreateArray(env, vector);
 }
 
 ani_object I18nTimeZoneAddon::GetCityDisplayName(ani_env *env, [[maybe_unused]] ani_object object,
     ani_string cityID, ani_string locale)
 {
-    std::string cityIDStr = VariableConvertor::AniStrToString(env, cityID);
-    std::string localeStr = VariableConvertor::AniStrToString(env, locale);
+    std::string cityIDStr = VariableConverter::AniStrToString(env, cityID);
+    std::string localeStr = VariableConverter::AniStrToString(env, locale);
     std::string name = I18nTimeZone::GetCityDisplayName(cityIDStr, localeStr);
-    return VariableConvertor::StringToAniStr(env, name);
+    return VariableConverter::StringToAniStr(env, name);
 }
 
 ani_object I18nTimeZoneAddon::GetTimezoneFromCity(ani_env *env, [[maybe_unused]] ani_object object, ani_string cityID)
 {
-    std::string cityIDStr = VariableConvertor::AniStrToString(env, cityID);
+    std::string cityIDStr = VariableConverter::AniStrToString(env, cityID);
     std::unique_ptr<I18nTimeZoneAddon> obj = std::make_unique<I18nTimeZoneAddon>();
     obj->timezone_ = I18nTimeZone::CreateInstance(cityIDStr, false);
 
     static const char* className = "L@ohos/i18n/i18n/TimeZone;";
-    ani_object timeZone_object = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object timeZone_object = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return timeZone_object;
 }
@@ -217,7 +217,7 @@ ani_object I18nTimeZoneAddon::GetTimezonesByLocation(ani_env *env, [[maybe_unuse
     }
 
     for (size_t i = 0; i < tempList.size(); ++i) {
-        ani_object timezone = GetTimezoneFromCity(env, object, VariableConvertor::StringToAniStr(env, tempList[i]));
+        ani_object timezone = GetTimezoneFromCity(env, object, VariableConverter::StringToAniStr(env, tempList[i]));
         if (ANI_OK != env->Object_CallMethod_Void(ret, set, i, timezone)) {
             HILOG_ERROR_I18N("Call method '$_set' failed");
             return nullptr;
