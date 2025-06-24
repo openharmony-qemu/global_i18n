@@ -142,7 +142,7 @@ static ani_object CreateStyleOption(ani_env *env, StyledNumberFormat::NumberPart
         return nullptr;
     }
 
-    static const char *className = "Larkui/component/styledString/StyleOptionsInner;";
+    static const char *className = "L@ohos/i18n/i18n/StyleOptionsInner;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -207,6 +207,7 @@ static ani_object CreateStyleOptions(ani_env *env,
         return nullptr;
     }
 
+    unsigned int index = 0;
     for (size_t i = 0; i < numberParts.size(); ++i) {
         auto iter = styledNumberFormatOptions.find(numberParts[i].part_name);
         if (iter == styledNumberFormatOptions.end()) {
@@ -215,46 +216,34 @@ static ani_object CreateStyleOptions(ani_env *env,
 
         ani_ref textStyleRef = iter->second;
         ani_object option = CreateStyleOption(env, numberParts[i], textStyleRef);
-        if (ANI_OK != env->Object_CallMethod_Void(ret, set, i, option)) {
+        if (ANI_OK != env->Object_CallMethod_Void(ret, set, index, option)) {
             HILOG_ERROR_I18N("Call method '$_set' failed");
             return nullptr;
         }
+        index += 1;
     }
     return ret;
 }
 
-ani_object I18nStyledNumberFormatAddon::Format(ani_env *env, ani_object object, ani_double value)
+ani_string I18nStyledNumberFormatAddon::GetFormattedNumber(ani_env *env, ani_object object, ani_double value)
 {
     I18nStyledNumberFormatAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->styledNumberFormat_  == nullptr) {
         HILOG_ERROR_I18N("Format: Get StyledNumberFormat object failed");
         return nullptr;
     }
+    return VariableConvertor::StringToAniStr(env, obj->styledNumberFormat_->Format(value));
+}
 
-    std::string formattedNumber = obj->styledNumberFormat_->Format(value);
+ani_object I18nStyledNumberFormatAddon::GetStyle(ani_env *env, ani_object object, ani_double value)
+{
+    I18nStyledNumberFormatAddon* obj = UnwrapAddon(env, object);
+    if (obj == nullptr || obj->styledNumberFormat_  == nullptr) {
+        HILOG_ERROR_I18N("Format: Get StyledNumberFormat object failed");
+        return nullptr;
+    }
     std::vector<StyledNumberFormat::NumberPart> numberParts = obj->styledNumberFormat_->ParseToParts(value);
-    
-    static const char *className = "Larkui/component/styledString/StyledString;";
-    ani_class cls;
-    if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
-        return nullptr;
-    }
-
-    ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "Lstd/core/Object;Lescompat/Array;:V", &ctor)) {
-        HILOG_ERROR_I18N("Find method '<ctor>' failed");
-        return nullptr;
-    }
-
-    ani_object styleOption = CreateStyleOptions(env, numberParts, obj->styledNumberFormatOptions_);
-    ani_object styleString;
-    if (ANI_OK != env->Object_New(cls, ctor, &styleString,
-        VariableConvertor::StringToAniStr(env, formattedNumber), styleOption)) {
-        HILOG_ERROR_I18N("New object '%{public}s' failed", className);
-        return nullptr;
-    }
-    return styleString;
+    return CreateStyleOptions(env, numberParts, obj->styledNumberFormatOptions_);
 }
 
 ani_status I18nStyledNumberFormatAddon::BindContextStyledNumberFormat(ani_env *env)
@@ -268,7 +257,9 @@ ani_status I18nStyledNumberFormatAddon::BindContextStyledNumberFormat(ani_env *e
 
     std::array methods = {
         ani_native_function { "create", nullptr, reinterpret_cast<void *>(I18nStyledNumberFormatAddon::Create) },
-        ani_native_function { "format", nullptr, reinterpret_cast<void *>(I18nStyledNumberFormatAddon::Format) },
+        ani_native_function { "getFormattedNumber", nullptr,
+            reinterpret_cast<void *>(I18nStyledNumberFormatAddon::GetFormattedNumber) },
+        ani_native_function { "getStyle", nullptr, reinterpret_cast<void *>(I18nStyledNumberFormatAddon::GetStyle) },
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
