@@ -595,6 +595,9 @@ std::string DateTimeFormat::FormatRange(int64_t fromMilliseconds, int64_t toMill
 
 void DateTimeFormat::GetResolvedOptions(std::map<std::string, std::string> &map)
 {
+    if (!createSuccess || localeInfo == nullptr || dateFormat == nullptr) {
+        return;
+    }
     map.insert(std::make_pair("locale", localeTag));
     if (!(localeInfo->GetCalendar()).empty()) {
         map.insert(std::make_pair("calendar", localeInfo->GetCalendar()));
