@@ -16,7 +16,7 @@
 #ifndef OHOS_GLOBAL_I18N_SIMPLE_NUMBER_FORMAT_ADDON_H
 #define OHOS_GLOBAL_I18N_SIMPLE_NUMBER_FORMAT_ADDON_H
 
-#include <ani.h>
+#include "ani.h"
 #include "simple_number_format.h"
 
 namespace OHOS {

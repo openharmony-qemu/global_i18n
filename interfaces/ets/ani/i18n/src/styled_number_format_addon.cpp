@@ -17,7 +17,7 @@
 
 #include "error_util.h"
 #include "i18n_hilog.h"
-#include "variable_convertor.h"
+#include "variable_converter.h"
 
 using namespace OHOS;
 using namespace Global;
@@ -129,7 +129,7 @@ ani_object I18nStyledNumberFormatAddon::Create(ani_env *env, [[maybe_unused]] an
     }
 
     static const char *className = "L@ohos/i18n/i18n/StyledNumberFormat;";
-    ani_object styledNumberFormatObject = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object styledNumberFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return styledNumberFormatObject;
 }
@@ -161,12 +161,12 @@ static ani_object CreateStyleOption(ani_env *env, StyledNumberFormat::NumberPart
         return nullptr;
     }
 
-    VariableConvertor::SetNumberMember(env, styleOptions, "start", numberPart.start);
-    VariableConvertor::SetNumberMember(env, styleOptions, "length", numberPart.length);
+    VariableConverter::SetNumberMember(env, styleOptions, "start", numberPart.start);
+    VariableConverter::SetNumberMember(env, styleOptions, "length", numberPart.length);
 
     static const char *enumName = "Larkui/component/styledString/StyledStringKey;";
     if (ANI_OK != env->Object_SetPropertyByName_Ref(styleOptions, "styledKey",
-        VariableConvertor::GetEnumItemByIndex(env, enumName, 0))) {
+        VariableConverter::GetEnumItemByIndex(env, enumName, 0))) {
         HILOG_ERROR_I18N("Set property 'styledKey' failed");
         return styleOptions;
     }
@@ -207,6 +207,7 @@ static ani_object CreateStyleOptions(ani_env *env,
         return nullptr;
     }
 
+    unsigned int index = 0;
     for (size_t i = 0; i < numberParts.size(); ++i) {
         auto iter = styledNumberFormatOptions.find(numberParts[i].part_name);
         if (iter == styledNumberFormatOptions.end()) {
@@ -215,10 +216,11 @@ static ani_object CreateStyleOptions(ani_env *env,
 
         ani_ref textStyleRef = iter->second;
         ani_object option = CreateStyleOption(env, numberParts[i], textStyleRef);
-        if (ANI_OK != env->Object_CallMethod_Void(ret, set, i, option)) {
+        if (ANI_OK != env->Object_CallMethod_Void(ret, set, index, option)) {
             HILOG_ERROR_I18N("Call method '$_set' failed");
             return nullptr;
         }
+        index += 1;
     }
     return ret;
 }
@@ -226,7 +228,7 @@ static ani_object CreateStyleOptions(ani_env *env,
 ani_object I18nStyledNumberFormatAddon::Format(ani_env *env, ani_object object, ani_double value)
 {
     I18nStyledNumberFormatAddon* obj = UnwrapAddon(env, object);
-    if (obj == nullptr || obj->styledNumberFormat_  == nullptr) {
+    if (obj == nullptr || obj->styledNumberFormat_ == nullptr) {
         HILOG_ERROR_I18N("Format: Get StyledNumberFormat object failed");
         return nullptr;
     }
@@ -250,7 +252,7 @@ ani_object I18nStyledNumberFormatAddon::Format(ani_env *env, ani_object object, 
     ani_object styleOption = CreateStyleOptions(env, numberParts, obj->styledNumberFormatOptions_);
     ani_object styleString;
     if (ANI_OK != env->Object_New(cls, ctor, &styleString,
-        VariableConvertor::StringToAniStr(env, formattedNumber), styleOption)) {
+        VariableConverter::StringToAniStr(env, formattedNumber), styleOption)) {
         HILOG_ERROR_I18N("New object '%{public}s' failed", className);
         return nullptr;
     }

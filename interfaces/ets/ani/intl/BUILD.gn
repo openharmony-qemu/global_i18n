@@ -20,7 +20,7 @@ ohos_shared_library("intl_ani") {
     "../i18n/include",
   ]
   sources = [
-    "../i18n/src/variable_convertor.cpp",
+    "../i18n/src/variable_converter.cpp",
     "./src/intl_addon.cpp",
     "./src/locale_info_addon.cpp",
     "./src/number_format_addon.cpp",
