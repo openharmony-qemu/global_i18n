@@ -2605,6 +2605,30 @@ std::string LocaleConfig::GetSystemLocaleInstanceTag()
     std::string defaultValue = languageToDefaultCollationValue[language];
     return ModifyExtParam(effectiveLocale, key, defaultValue, STANDARD_EXT_PARAM_KEY);
 }
+
+icu::Locale LocaleConfig::GetIcuLocale(const std::string& localeTag)
+{
+    if (!LocaleConfig::IsValidTag(localeTag)) {
+        return LocaleConfig::GetSystemIcuLocale();
+    }
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(localeTag, status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("LocaleConfig::GetIcuLocale: Create icu locale failed.");
+        return LocaleConfig::GetSystemIcuLocale();
+    }
+    return locale;
+}
+
+icu::Locale LocaleConfig::GetSystemIcuLocale()
+{
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(LocaleConfig::GetEffectiveLanguage(), status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("LocaleConfig::GetSystemIcuLocale: Create icu locale failed.");
+    }
+    return locale;
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
