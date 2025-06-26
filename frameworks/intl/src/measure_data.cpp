@@ -33,7 +33,7 @@ const int REGION_OFFSET = 7;
 const int BASE_VALUE_SIZE = 2;
 const int FACTOR_SIZE = 2;
 const int CHAR_OFFSET = 48;
-const int MAX_UNIT_NUM = 502;
+const int MAX_UNIT_NUM = 500;
 const size_t REGION_SIZE = 2;
 
 const std::unordered_map<std::string, std::vector<std::string>> USAGE_001 {
