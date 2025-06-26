@@ -109,7 +109,7 @@ void I18nCalendar::InitCalendar(const icu::Locale &locale, CalendarType type)
             break;
         }
         case ETHIOPIC: {
-            calendar_ = new icu::IslamicCalendar(locale, status, icu::IslamicCalendar::ECalculationType::CIVIL);
+            calendar_ = new icu::EthiopicCalendar(locale, status);
             break;
         }
         case HEBREW: {
@@ -121,7 +121,7 @@ void I18nCalendar::InitCalendar(const icu::Locale &locale, CalendarType type)
             break;
         }
         case ISLAMIC_CIVIL: {
-            calendar_ = new icu::IslamicCivilCalendar(locale, status);
+            calendar_ = new icu::IslamicCalendar(locale, status, icu::IslamicCalendar::ECalculationType::CIVIL);
             break;
         }
         default: {
