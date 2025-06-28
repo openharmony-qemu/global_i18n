@@ -192,13 +192,7 @@ namespace intl {
         numberingSystem: string;
     }
 
-    export interface RelativeTimeFormatPart {
-        type: string;
-        value: string;
-        unit?: string;
-    }
-
-    export class RelativeTimeFormatPartInner implements RelativeTimeFormatPart {
+    class RelativeTimeFormatPart {
         type: string;
         value: string;
         unit?: string;

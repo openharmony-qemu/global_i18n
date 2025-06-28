@@ -230,7 +230,7 @@ ani_string IntlAddon::RelativeTimeFormat_Format(ani_env *env, ani_object object,
 static void FillInArrayElement(ani_env *env, ani_class arrayCls, ani_object &result,
     const std::vector<std::vector<std::string>> &timeVector)
 {
-    static const char *className = "L@ohos/intl/intl/RelativeTimeFormatPartInner;";
+    static const char *className = "L@ohos/intl/intl/RelativeTimeFormatPart;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
