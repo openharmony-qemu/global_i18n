@@ -765,16 +765,16 @@ void I18nTimeZone::AddNumTimezoneCategoryMap(std::string &curIndex, std::string 
         return;
     }
     switch (curIndex[0]) {
-        case '0':
+        case 'west_north':
             categoryNum2TimezoneWN.insert(std::make_pair(num, tzId));
             break;
-        case '1':
+        case 'east_north':
             categoryNum2TimezoneEN.insert(std::make_pair(num, tzId));
             break;
-        case '2':
+        case 'west_south':
             categoryNum2TimezoneWS.insert(std::make_pair(num, tzId));
             break;
-        case '3':
+        case 'east_south':
             categoryNum2TimezoneES.insert(std::make_pair(num, tzId));
             break;
         default:
