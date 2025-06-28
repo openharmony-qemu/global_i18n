@@ -27,7 +27,6 @@ namespace Global {
 namespace I18n {
 class IntlAddon {
 public:
-public:
     static ani_string DateTimeFormat_Format(ani_env *env, ani_object object, ani_object date);
     static ani_string DateTimeFormat_FormatRange(ani_env *env, ani_object object,
         ani_object startDate, ani_object endDate);

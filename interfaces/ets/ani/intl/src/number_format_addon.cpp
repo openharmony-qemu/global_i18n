@@ -17,7 +17,7 @@
 
 #include "i18n_hilog.h"
 #include "utils.h"
-#include "variable_convertor.h"
+#include "variable_converter.h"
 
 using namespace OHOS;
 using namespace Global;
@@ -42,7 +42,7 @@ ani_string NumberFormatAddon::NumberFormat_Format(ani_env *env, ani_object objec
     }
 
     std::string str = obj->numberfmt_->Format(number);
-    return VariableConvertor::StringToAniStr(env, str);
+    return VariableConverter::StringToAniStr(env, str);
 }
 
 ani_string NumberFormatAddon::NumberFormat_FormatRange(ani_env *env, ani_object object,
@@ -55,7 +55,7 @@ ani_string NumberFormatAddon::NumberFormat_FormatRange(ani_env *env, ani_object 
     }
 
     std::string str = obj->numberfmt_->FormatRange(startRange, endRange);
-    return VariableConvertor::StringToAniStr(env, str);
+    return VariableConverter::StringToAniStr(env, str);
 }
 
 ani_object NumberFormatAddon::NumberFormat_ResolvedOptions(ani_env *env, ani_object object)
@@ -99,13 +99,13 @@ ani_object NumberFormatAddon::NumberFormat_ResolvedOptions(ani_env *env, ani_obj
             if (key == "minimumIntegerDigits" || key == "minimumFractionDigits" ||
                 key == "maximumFractionDigits" || key == "minimumSignificantDigits" ||
                 key == "maximumSignificantDigits" || key == "roundingIncrement") {
-                VariableConvertor::SetNumberMember(env, numberOptions, key, options[key]);
+                VariableConverter::SetNumberMember(env, numberOptions, key, options[key]);
             } else {
-                VariableConvertor::SetStringMember(env, numberOptions, key, options[key]);
+                VariableConverter::SetStringMember(env, numberOptions, key, options[key]);
             }
         }
     }
-    VariableConvertor::SetBooleanMember(env, numberOptions, "useGrouping", options["useGrouping"]);
+    VariableConverter::SetBooleanMember(env, numberOptions, "useGrouping", options["useGrouping"]);
     return numberOptions;
 }
 
@@ -117,7 +117,7 @@ ani_object NumberFormatAddon::NumberFormat_Create(ani_env *env, [[maybe_unused]]
     obj->numberfmt_ = std::make_unique<NumberFormat>(localeTags, map);
 
     static const char *className = "L@ohos/intl/intl/NumberFormat;";
-    ani_object numberFormatObject = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object numberFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return numberFormatObject;
 }
@@ -137,7 +137,7 @@ static std::map<std::string, std::string> GetNumberFormatOptions(ani_env *env, a
         };
         for (const auto& key : stringKeys) {
             std::string value;
-            if (VariableConvertor::GetStringMember(env, options, key, value)) {
+            if (VariableConverter::GetStringMember(env, options, key, value)) {
                 map.insert(std::make_pair(key, value));
             }
         }
@@ -147,13 +147,13 @@ static std::map<std::string, std::string> GetNumberFormatOptions(ani_env *env, a
             {"minimumSignificantDigits", 0}, {"maximumSignificantDigits", 0}, {"roundingIncrement", 0}
         };
         for (auto& [key, value] : intKeys) {
-            if (VariableConvertor::GetNumberMember(env, options, key, value)) {
+            if (VariableConverter::GetNumberMember(env, options, key, value)) {
                 map.insert(std::make_pair(key, std::to_string(value)));
             }
         }
 
         bool useGrouping;
-        if (VariableConvertor::GetBooleanMember(env, options, "useGrouping", useGrouping)) {
+        if (VariableConverter::GetBooleanMember(env, options, "useGrouping", useGrouping)) {
             map.insert(std::make_pair("useGrouping", useGrouping ? "true" : "false"));
         }
     }
@@ -163,14 +163,14 @@ static std::map<std::string, std::string> GetNumberFormatOptions(ani_env *env, a
 ani_object NumberFormatAddon::NumberFormat_CreateWithParam(ani_env *env, [[maybe_unused]] ani_object object,
     ani_object locale, ani_object options)
 {
-    std::vector<std::string> localeTags = VariableConvertor::GetLocaleTags(env, locale);
+    std::vector<std::string> localeTags = VariableConverter::GetLocaleTags(env, locale);
     std::map<std::string, std::string> map = GetNumberFormatOptions(env, options);
 
     std::unique_ptr<NumberFormatAddon> obj = std::make_unique<NumberFormatAddon>();
     obj->numberfmt_ = std::make_unique<NumberFormat>(localeTags, map);
 
     static const char *className = "L@ohos/intl/intl/NumberFormat;";
-    ani_object numberFormatObject = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object numberFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return numberFormatObject;
 }

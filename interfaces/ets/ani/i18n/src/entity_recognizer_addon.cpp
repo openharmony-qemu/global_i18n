@@ -18,7 +18,7 @@
 #include "error_util.h"
 #include "i18n_hilog.h"
 #include "locale_config.h"
-#include "variable_convertor.h"
+#include "variable_converter.h"
 
 using namespace OHOS;
 using namespace Global;
@@ -48,7 +48,7 @@ ani_object I18nEntityRecognizerAddon::Create(ani_env *env, [[maybe_unused]] ani_
     if (isUndefined) {
         localeStr = LocaleConfig::GetSystemLocale();
     } else {
-        localeStr = VariableConvertor::AniStrToString(env, locale);
+        localeStr = VariableConverter::AniStrToString(env, locale);
     }
 
     UErrorCode localeStatus = U_ZERO_ERROR;
@@ -64,7 +64,7 @@ ani_object I18nEntityRecognizerAddon::Create(ani_env *env, [[maybe_unused]] ani_
     obj->entityRecognizer_ = std::make_unique<EntityRecognizer>(icuLocale);
 
     static const char *className = "L@ohos/i18n/i18n/EntityRecognizer;";
-    ani_object entityRecognizerObject = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object entityRecognizerObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return entityRecognizerObject;
 }
@@ -90,7 +90,7 @@ static ani_object CreateEntityInfoItem(ani_env *env, const int begin, const int 
         return nullptr;
     }
 
-    VariableConvertor::SetStringMember(env, ret, "type", type);
+    VariableConverter::SetStringMember(env, ret, "type", type);
     if (ANI_OK != env->Object_SetPropertyByName_Double(ret, "begin", begin)) {
         HILOG_ERROR_I18N("Set property 'begin' failed");
     }
@@ -115,6 +115,13 @@ static ani_object GetEntityInfoItem(ani_env *env, std::vector<std::vector<int>>&
         return nullptr;
     }
 
+    if (entityInfo.size() <= INDEX_TWO_OF_VECTOR ||
+        entityInfo[INDEX_ONE_OF_VECTOR].size() <= INDEX_ONE_OF_VECTOR ||
+        entityInfo[INDEX_TWO_OF_VECTOR].size() <= INDEX_ONE_OF_VECTOR) {
+        HILOG_ERROR_I18N("Invalid entityInfo structure, potential out of bounds access");
+        return nullptr;
+    }
+
     ani_object ret;
     if (ANI_OK != env->Object_New(cls, ctor, &ret, (entityInfo[INDEX_ONE_OF_VECTOR][INDEX_ONE_OF_VECTOR] +
             entityInfo[INDEX_TWO_OF_VECTOR][INDEX_ONE_OF_VECTOR]))) {
@@ -131,7 +138,7 @@ static ani_object GetEntityInfoItem(ani_env *env, std::vector<std::vector<int>>&
     std::vector<std::string> types = {"phone_number", "date"};
     int index = 0;
     for (size_t t = 0; t < types.size(); ++t) {
-        for (size_t i = 0; i < entityInfo[t][INDEX_ONE_OF_VECTOR]; ++i) {
+        for (int i = 0; i < entityInfo[t][INDEX_ONE_OF_VECTOR]; ++i) {
             int begin = entityInfo[t][2 * i + 1];
             int end = entityInfo[t][2 * i + 2];
             std::string type = types[t];
@@ -153,7 +160,7 @@ ani_object I18nEntityRecognizerAddon::FindEntityInfo(ani_env *env, ani_object ob
         return nullptr;
     }
 
-    std::string message = VariableConvertor::AniStrToString(env, text);
+    std::string message = VariableConverter::AniStrToString(env, text);
     std::vector<std::vector<int>> entityInfo = obj->entityRecognizer_->FindEntityInfo(message);
     return GetEntityInfoItem(env, entityInfo);
 }

@@ -17,7 +17,7 @@
 
 #include "error_util.h"
 #include "i18n_hilog.h"
-#include "variable_convertor.h"
+#include "variable_converter.h"
 
 using namespace OHOS;
 using namespace Global;
@@ -129,7 +129,7 @@ ani_object I18nStyledNumberFormatAddon::Create(ani_env *env, [[maybe_unused]] an
     }
 
     static const char *className = "L@ohos/i18n/i18n/StyledNumberFormat;";
-    ani_object styledNumberFormatObject = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object styledNumberFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return styledNumberFormatObject;
 }
@@ -161,12 +161,12 @@ static ani_object CreateStyleOption(ani_env *env, StyledNumberFormat::NumberPart
         return nullptr;
     }
 
-    VariableConvertor::SetNumberMember(env, styleOptions, "start", numberPart.start);
-    VariableConvertor::SetNumberMember(env, styleOptions, "length", numberPart.length);
+    VariableConverter::SetNumberMember(env, styleOptions, "start", numberPart.start);
+    VariableConverter::SetNumberMember(env, styleOptions, "length", numberPart.length);
 
     static const char *enumName = "Larkui/component/styledString/StyledStringKey;";
     if (ANI_OK != env->Object_SetPropertyByName_Ref(styleOptions, "styledKey",
-        VariableConvertor::GetEnumItemByIndex(env, enumName, 0))) {
+        VariableConverter::GetEnumItemByIndex(env, enumName, 0))) {
         HILOG_ERROR_I18N("Set property 'styledKey' failed");
         return styleOptions;
     }
@@ -232,7 +232,7 @@ ani_string I18nStyledNumberFormatAddon::GetFormattedNumber(ani_env *env, ani_obj
         HILOG_ERROR_I18N("Format: Get StyledNumberFormat object failed");
         return nullptr;
     }
-    return VariableConvertor::StringToAniStr(env, obj->styledNumberFormat_->Format(value));
+    return VariableConverter::StringToAniStr(env, obj->styledNumberFormat_->Format(value));
 }
 
 ani_object I18nStyledNumberFormatAddon::GetStyle(ani_env *env, ani_object object, ani_double value)

@@ -16,7 +16,7 @@
 #include "locale_info_addon.h"
 
 #include "i18n_hilog.h"
-#include "variable_convertor.h"
+#include "variable_converter.h"
 
 using namespace OHOS;
 using namespace Global;
@@ -47,7 +47,7 @@ T LocaleInfoAddon::GetLocaleProperty(ani_env *env, ani_object object,
 ani_string LocaleInfoAddon::Locale_ToString(ani_env *env, ani_object object)
 {
     std::string value = GetLocaleProperty(env, object, "toString", &LocaleInfo::ToString);
-    return VariableConvertor::StringToAniStr(env, value);
+    return VariableConverter::StringToAniStr(env, value);
 }
 
 ani_object LocaleInfoAddon::Locale_Maximize(ani_env *env, ani_object object)
@@ -59,7 +59,7 @@ ani_object LocaleInfoAddon::Locale_Maximize(ani_env *env, ani_object object)
     }
 
     std::string localeTag = obj->locale_->Maximize();
-    return Locale_CreateWithParam(env, nullptr, VariableConvertor::StringToAniStr(env, localeTag), nullptr);
+    return Locale_CreateWithParam(env, nullptr, VariableConverter::StringToAniStr(env, localeTag), nullptr);
 }
 
 ani_object LocaleInfoAddon::Locale_Minimize(ani_env *env, ani_object object)
@@ -71,61 +71,61 @@ ani_object LocaleInfoAddon::Locale_Minimize(ani_env *env, ani_object object)
     }
 
     std::string localeTag = obj->locale_->Minimize();
-    return Locale_CreateWithParam(env, nullptr, VariableConvertor::StringToAniStr(env, localeTag), nullptr);
+    return Locale_CreateWithParam(env, nullptr, VariableConverter::StringToAniStr(env, localeTag), nullptr);
 }
 
 ani_string LocaleInfoAddon::Locale_GetLanguage(ani_env *env, ani_object object)
 {
     std::string value = GetLocaleProperty(env, object, "getLanguage", &LocaleInfo::GetLanguage);
-    return VariableConvertor::StringToAniStr(env, value);
+    return VariableConverter::StringToAniStr(env, value);
 }
 
 ani_string LocaleInfoAddon::Locale_GetScript(ani_env *env, ani_object object)
 {
     std::string value = GetLocaleProperty(env, object, "getScript", &LocaleInfo::GetScript);
-    return VariableConvertor::StringToAniStr(env, value);
+    return VariableConverter::StringToAniStr(env, value);
 }
 
 ani_string LocaleInfoAddon::Locale_GetRegion(ani_env *env, ani_object object)
 {
     std::string value = GetLocaleProperty(env, object, "getRegion", &LocaleInfo::GetRegion);
-    return VariableConvertor::StringToAniStr(env, value);
+    return VariableConverter::StringToAniStr(env, value);
 }
 
 ani_string LocaleInfoAddon::Locale_GetBaseName(ani_env *env, ani_object object)
 {
     std::string value = GetLocaleProperty(env, object, "getBaseName", &LocaleInfo::GetBaseName);
-    return VariableConvertor::StringToAniStr(env, value);
+    return VariableConverter::StringToAniStr(env, value);
 }
 
 ani_string LocaleInfoAddon::Locale_GetCaseFirst(ani_env *env, ani_object object)
 {
     std::string value = GetLocaleProperty(env, object, "getCaseFirst", &LocaleInfo::GetCaseFirst);
-    return VariableConvertor::StringToAniStr(env, value);
+    return VariableConverter::StringToAniStr(env, value);
 }
 
 ani_string LocaleInfoAddon::Locale_GetCalendar(ani_env *env, ani_object object)
 {
     std::string value = GetLocaleProperty(env, object, "getCalendar", &LocaleInfo::GetCalendar);
-    return VariableConvertor::StringToAniStr(env, value);
+    return VariableConverter::StringToAniStr(env, value);
 }
 
 ani_string LocaleInfoAddon::Locale_GetCollation(ani_env *env, ani_object object)
 {
     std::string value = GetLocaleProperty(env, object, "getCollation", &LocaleInfo::GetCollation);
-    return VariableConvertor::StringToAniStr(env, value);
+    return VariableConverter::StringToAniStr(env, value);
 }
 
 ani_string LocaleInfoAddon::Locale_GetHourCycle(ani_env *env, ani_object object)
 {
     std::string value = GetLocaleProperty(env, object, "getHourCycle", &LocaleInfo::GetHourCycle);
-    return VariableConvertor::StringToAniStr(env, value);
+    return VariableConverter::StringToAniStr(env, value);
 }
 
 ani_string LocaleInfoAddon::Locale_GetNumberingSystem(ani_env *env, ani_object object)
 {
     std::string value = GetLocaleProperty(env, object, "getNumberingSystem", &LocaleInfo::GetNumberingSystem);
-    return VariableConvertor::StringToAniStr(env, value);
+    return VariableConverter::StringToAniStr(env, value);
 }
 
 ani_boolean LocaleInfoAddon::Locale_GetNumeric(ani_env *env, ani_object object)
@@ -145,7 +145,7 @@ ani_object LocaleInfoAddon::Locale_Create(ani_env *env, [[maybe_unused]] ani_obj
     obj->locale_ = std::make_unique<LocaleInfo>("", map);
 
     static const char *className = "L@ohos/intl/intl/Locale;";
-    ani_object localeObject = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object localeObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return localeObject;
 }
@@ -166,21 +166,21 @@ ani_object LocaleInfoAddon::Locale_CreateWithParam(ani_env *env, [[maybe_unused]
 
         for (const auto& key : keys) {
             std::string value;
-            if (VariableConvertor::GetStringMember(env, options, key, value)) {
+            if (VariableConverter::GetStringMember(env, options, key, value)) {
                 map.insert(std::make_pair(key, value));
             }
         }
 
         bool numeric;
-        if (VariableConvertor::GetBooleanMember(env, options, "numeric", numeric)) {
+        if (VariableConverter::GetBooleanMember(env, options, "numeric", numeric)) {
             map.insert(std::make_pair("numeric", numeric ? "true" : "false"));
         }
     }
 
     std::unique_ptr<LocaleInfoAddon> obj = std::make_unique<LocaleInfoAddon>();
-    obj->locale_ = std::make_unique<LocaleInfo>(VariableConvertor::AniStrToString(env, locale), map);
+    obj->locale_ = std::make_unique<LocaleInfo>(VariableConverter::AniStrToString(env, locale), map);
     static const char *className = "L@ohos/intl/intl/Locale;";
-    ani_object localeObject = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object localeObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return localeObject;
 }

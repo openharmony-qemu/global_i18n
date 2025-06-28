@@ -19,7 +19,7 @@
 #include <unordered_set>
 #include "error_util.h"
 #include "i18n_hilog.h"
-#include "variable_convertor.h"
+#include "variable_converter.h"
 
 using namespace OHOS;
 using namespace Global;
@@ -35,7 +35,7 @@ static std::unordered_map<std::string, UCalendarDateFields> g_fieldsMap {
     { "day_of_year", UCAL_DAY_OF_YEAR },
     { "day_of_week", UCAL_DAY_OF_WEEK },
     { "day_of_week_in_month", UCAL_DAY_OF_WEEK_IN_MONTH },
-    { "ap_pm", UCAL_AM_PM },
+    { "am_pm", UCAL_AM_PM },
     { "hour", UCAL_HOUR },
     { "hour_of_day", UCAL_HOUR_OF_DAY },
     { "minute", UCAL_MINUTE },
@@ -92,15 +92,15 @@ ani_object I18nCalendarAddon::GetCalendar(ani_env *env, ani_string locale, ani_s
     }
     CalendarType calendartype = CalendarType::UNDEFINED;
     if (!isUndefined) {
-        std::string typeStr = VariableConvertor::AniStrToString(env, type);
+        std::string typeStr = VariableConverter::AniStrToString(env, type);
         if (g_typeMap.find(typeStr) != g_typeMap.end()) {
             calendartype = g_typeMap[typeStr];
         }
     }
 
-    obj->calendar_ = std::make_unique<I18nCalendar>(VariableConvertor::AniStrToString(env, locale), calendartype);
+    obj->calendar_ = std::make_unique<I18nCalendar>(VariableConverter::AniStrToString(env, locale), calendartype);
     static const char* className = "L@ohos/i18n/i18n/Calendar;";
-    ani_object calendarObject = VariableConvertor::CreateAniObject(env, className, obj.get());
+    ani_object calendarObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return calendarObject;
 }
@@ -112,7 +112,7 @@ void I18nCalendarAddon::SetTimeByDate(ani_env *env, ani_object object, ani_objec
         HILOG_ERROR_I18N("SetTime: Get calendar object failed");
         return;
     }
-    obj->calendar_->SetTime(VariableConvertor::GetDateValue(env, date, "valueOf"));
+    obj->calendar_->SetTime(VariableConverter::GetDateValue(env, date, "valueOf"));
 }
 
 void I18nCalendarAddon::SetTime(ani_env *env, ani_object object, ani_double time)
@@ -183,7 +183,7 @@ void I18nCalendarAddon::SetTimeZone(ani_env *env, ani_object object, ani_string 
         HILOG_ERROR_I18N("SetTimeZone: Get calendar object failed");
         return;
     }
-    obj->calendar_->SetTimeZone(VariableConvertor::AniStrToString(env, timezone));
+    obj->calendar_->SetTimeZone(VariableConverter::AniStrToString(env, timezone));
 }
 
 ani_string I18nCalendarAddon::GetTimeZone(ani_env *env, ani_object object)
@@ -195,7 +195,7 @@ ani_string I18nCalendarAddon::GetTimeZone(ani_env *env, ani_object object)
     }
 
     std::string str = obj->calendar_->GetTimeZone();
-    return VariableConvertor::StringToAniStr(env, str);
+    return VariableConverter::StringToAniStr(env, str);
 }
 
 ani_double I18nCalendarAddon::GetFirstDayOfWeek(ani_env *env, ani_object object)
@@ -240,7 +240,7 @@ void I18nCalendarAddon::SetMinimalDaysInFirstWeek(ani_env *env, ani_object objec
 
 ani_double I18nCalendarAddon::Get(ani_env *env, ani_object object, ani_string field)
 {
-    std::string str = VariableConvertor::AniStrToString(env, field);
+    std::string str = VariableConverter::AniStrToString(env, field);
     if (g_fieldsMap.find(str) == g_fieldsMap.end()) {
         HILOG_ERROR_I18N("Invalid field");
         return -1;
@@ -262,9 +262,9 @@ ani_string I18nCalendarAddon::GetDisplayName(ani_env *env, ani_object object, an
         return nullptr;
     }
 
-    std::string localeTag = VariableConvertor::AniStrToString(env, locale);
+    std::string localeTag = VariableConverter::AniStrToString(env, locale);
     std::string name = obj->calendar_->GetDisplayName(localeTag);
-    return VariableConvertor::StringToAniStr(env, name);
+    return VariableConverter::StringToAniStr(env, name);
 }
 
 ani_boolean I18nCalendarAddon::IsWeekend(ani_env *env, ani_object object, ani_object date)
@@ -285,16 +285,16 @@ ani_boolean I18nCalendarAddon::IsWeekend(ani_env *env, ani_object object, ani_ob
         isWeekEnd = obj->calendar_->IsWeekend();
     } else {
         UErrorCode error = U_ZERO_ERROR;
-        isWeekEnd = obj->calendar_->IsWeekend(VariableConvertor::GetDateValue(env, date, "valueOf"), error);
+        isWeekEnd = obj->calendar_->IsWeekend(VariableConverter::GetDateValue(env, date, "valueOf"), error);
     }
     return isWeekEnd;
 }
 
 void I18nCalendarAddon::Add(ani_env *env, ani_object object, ani_string field, ani_double amount)
 {
-    std::string str = VariableConvertor::AniStrToString(env, field);
+    std::string str = VariableConverter::AniStrToString(env, field);
     if (g_fieldsInFunctionAdd.find(str) == g_fieldsInFunctionAdd.end()) {
-        HILOG_ERROR_I18N("Parameter rangs do not match");
+        HILOG_ERROR_I18N("Parameter range do not match");
         ErrorUtil::AniThrow(env, I18N_NOT_VALID, "field", "a valid field");
         return;
     }
@@ -330,7 +330,7 @@ ani_double I18nCalendarAddon::CompareDays(ani_env *env, ani_object object, ani_o
         HILOG_ERROR_I18N("CompareDays: Get calendar object failed");
         return 0;
     }
-    return obj->calendar_->CompareDays(VariableConvertor::GetDateValue(env, date, "valueOf"));
+    return obj->calendar_->CompareDays(VariableConverter::GetDateValue(env, date, "valueOf"));
 }
 
 ani_status I18nCalendarAddon::BindContextCalendar(ani_env *env)

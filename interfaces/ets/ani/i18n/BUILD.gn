@@ -37,7 +37,7 @@ ohos_shared_library("i18n_ani") {
     "./src/simple_number_format_addon.cpp",
     "./src/styled_number_format_addon.cpp",
     "./src/system_locale_manager_addon.cpp",
-    "./src/variable_convertor.cpp",
+    "./src/variable_converter.cpp",
   ]
   deps = [
     "../../../../frameworks/intl:intl_util",
