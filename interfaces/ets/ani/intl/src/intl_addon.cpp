@@ -581,11 +581,9 @@ ani_status IntlAddon::BindContext_DateTimeFormat(ani_env *env)
     std::array methods = {
         ani_native_function {"create", ":L@ohos/intl/intl/DateTimeFormat;",
             reinterpret_cast<void *>(DateTimeFormat_Create) },
-        ani_native_function {
-            "create",
-            "X{C{escompat.Array}C{std.core.String}}C{@ohos.intl.DateTimeOptions}:C{@ohos.intl.DateTimeFormat}",
-            reinterpret_cast<void *>(DateTimeFormat_CreateWithParam)
-        },
+        ani_native_function {"create",
+            "Lstd/core/Object;L@ohos/intl/intl/DateTimeOptions;:L@ohos/intl/intl/DateTimeFormat;",
+            reinterpret_cast<void *>(DateTimeFormat_CreateWithParam) },
         ani_native_function {"format", nullptr, reinterpret_cast<void *>(DateTimeFormat_Format) },
         ani_native_function {"formatRange", nullptr, reinterpret_cast<void *>(DateTimeFormat_FormatRange) },
         ani_native_function {"resolvedOptions", nullptr, reinterpret_cast<void *>(DateTimeFormat_ResolvedOptions) },
@@ -609,11 +607,9 @@ ani_status IntlAddon::BindContext_Collator(ani_env *env)
 
     std::array methods = {
         ani_native_function {"create", ":L@ohos/intl/intl/Collator;", reinterpret_cast<void *>(Collator_Create) },
-        ani_native_function {
-            "create",
-            "X{C{std.core.String}C{escompat.Array}}C{@ohos.intl.CollatorOptions}:C{@ohos.intl.Collator}",
-            reinterpret_cast<void *>(Collator_CreateWithParam)
-        },
+        ani_native_function {"create",
+            "Lstd/core/Object;L@ohos/intl/intl/CollatorOptions;:L@ohos/intl/intl/Collator;",
+            reinterpret_cast<void *>(Collator_CreateWithParam) },
         ani_native_function {"compare", nullptr, reinterpret_cast<void *>(Collator_Compare) },
         ani_native_function {"resolvedOptions", nullptr, reinterpret_cast<void *>(Collator_ResolvedOptions) },
     };
@@ -636,11 +632,9 @@ ani_status IntlAddon::BindContext_PluralRules(ani_env *env)
 
     std::array methods = {
         ani_native_function {"create", ":L@ohos/intl/intl/PluralRules;", reinterpret_cast<void *>(PluralRules_Create) },
-        ani_native_function {
-            "create",
-            "X{C{escompat.Array}C{std.core.String}}C{@ohos.intl.PluralRulesOptions}:C{@ohos.intl.PluralRules}",
-            reinterpret_cast<void *>(PluralRules_CreateWithParam)
-        },
+        ani_native_function {"create",
+            "Lstd/core/Object;L@ohos/intl/intl/PluralRulesOptions;:L@ohos/intl/intl/PluralRules;",
+            reinterpret_cast<void *>(PluralRules_CreateWithParam) },
         ani_native_function {"select", nullptr, reinterpret_cast<void *>(PluralRules_Select) },
     };
 
@@ -663,12 +657,9 @@ ani_status IntlAddon::BindContext_RelativeTimeFormat(ani_env *env)
     std::array methods = {
         ani_native_function {"create", ":L@ohos/intl/intl/RelativeTimeFormat;",
             reinterpret_cast<void *>(RelativeTimeFormat_Create) },
-        ani_native_function {
-            "create",
-            "X{C{escompat.Array}C{std.core.String}}C{@ohos.intl.RelativeTimeFormatInputOptions}:"
-            "C{@ohos.intl.RelativeTimeFormat}",
-            reinterpret_cast<void *>(RelativeTimeFormat_CreateWithParam)
-        },
+        ani_native_function {"create",
+            "Lstd/core/Object;L@ohos/intl/intl/RelativeTimeFormatInputOptions;:L@ohos/intl/intl/RelativeTimeFormat;",
+            reinterpret_cast<void *>(RelativeTimeFormat_CreateWithParam) },
         ani_native_function {"format", nullptr, reinterpret_cast<void *>(RelativeTimeFormat_Format) },
         ani_native_function {"formatToParts", nullptr, reinterpret_cast<void *>(RelativeTimeFormat_FormatToParts) },
         ani_native_function {"resolvedOptions", nullptr, reinterpret_cast<void *>(RelativeTimeFormat_ResolvedOptions) },
