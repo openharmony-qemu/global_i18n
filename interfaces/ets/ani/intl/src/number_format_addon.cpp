@@ -187,9 +187,12 @@ ani_status NumberFormatAddon::BindContext_NumberFormat(ani_env *env)
     std::array methods = {
         ani_native_function {"create", ":L@ohos/intl/intl/NumberFormat;",
             reinterpret_cast<void *>(NumberFormat_Create) },
-        ani_native_function {"create",
-            "Lstd/core/Object;L@ohos/intl/intl/NumberOptions;:L@ohos/intl/intl/NumberFormat;",
-            reinterpret_cast<void *>(NumberFormat_CreateWithParam) },
+        ani_native_function {
+            "create",
+            "X{C{escompat.Array}C{std.core.String}}C{@ohos.intl.intl.NumberOptions}:"
+            "C{@ohos.intl.intl.NumberFormat}",
+            reinterpret_cast<void *>(NumberFormat_CreateWithParam)
+        },
         ani_native_function {"format", nullptr, reinterpret_cast<void *>(NumberFormat_Format) },
         ani_native_function {"formatRange", nullptr, reinterpret_cast<void *>(NumberFormat_FormatRange) },
         ani_native_function {"resolvedOptions", nullptr, reinterpret_cast<void *>(NumberFormat_ResolvedOptions) },
