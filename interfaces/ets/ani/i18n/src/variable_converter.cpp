@@ -291,7 +291,7 @@ bool VariableConverter::ParseStringArray(ani_env *env, ani_object obj, std::vect
     }
 
     ani_method getLengthMethod;
-    if (ANI_OK != env->Class_FindGetter(cls, "length", &getLengthMethod)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<get>length", nullptr, &getLengthMethod)) {
         HILOG_ERROR_I18N("Find getter 'length' failed");
         return false;
     }
@@ -384,7 +384,7 @@ std::vector<std::string> VariableConverter::GetLocaleTags(ani_env *env, ani_obje
     }
 
     ani_method getLengthMethod;
-    if (ANI_OK != env->Class_FindGetter(cls, "length", &getLengthMethod)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<get>length", nullptr, &getLengthMethod)) {
         HILOG_ERROR_I18N("Find getter 'length' failed");
         return localeTags;
     }
