@@ -17,11 +17,8 @@
 
 #include <unordered_map>
 #include <string>
-
-namespace icu {
-class Locale;
-class LocaleBuilder;
-}
+#include "unicode/locid.h"
+#include "unicode/localebuilder.h"
 
 namespace OHOS {
 namespace Global {

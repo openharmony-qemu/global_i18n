@@ -18,8 +18,6 @@
 #include "i18n_hilog.h"
 #include "locale_helper.h"
 #include "ohos/init_data.h"
-#include "unicode/locid.h"
-#include "unicode/localebuilder.h"
 
 namespace OHOS {
 namespace Global {

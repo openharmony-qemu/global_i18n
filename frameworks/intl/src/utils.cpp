@@ -443,12 +443,18 @@ std::string StrToHex(const std::string& text, size_t num)
         bitset<8> bs(i);
         binary += bs.to_string();
     }
-    std::stringstream ss;
+    unsigned long long vlaue;
     // 2 means binary.
-    ss << std::hex << std::setw(num) << std::setfill('0') << std::stoi(binary, nullptr, 2);
-    std::string hex;
-    ss >> hex;
-    return hex;
+    auto res = std::from_chars(binary.data(), binary.data() + binary.size(), vlaue, 2);
+    if (res.ec == std::errc()) {
+        std::stringstream stream;
+        stream << std::hex << std::setw(num) << std::setfill('0') << vlaue;
+        std::string hex;
+        stream >> hex;
+        return hex;
+    }
+    HILOG_ERROR_I18N("StrToHex: convert %{public}s to number error", binary.c_str());
+    return "";
 }
 
 std::string HexToStr(const std::string& hex)
