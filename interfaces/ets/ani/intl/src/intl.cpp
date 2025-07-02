@@ -521,7 +521,7 @@ static std::vector<std::string> GetLocaleTags(ani_env *env, ani_object locale)
         env->Object_CallMethod_Double(locale, getLengthMethod, &length);
         for (int i = 0; i < length; i++) {
             ani_method get;
-            env->Class_FindMethod(cls, "$_get", nullptr, &get);
+            env->Class_FindMethod(cls, "$_get", "I:Lstd/core/Object;", &get);
             ani_ref value;
             env->Object_CallMethod_Ref(locale, get, &value, i);
             localeTags.push_back(AniStrToString(env, value));
