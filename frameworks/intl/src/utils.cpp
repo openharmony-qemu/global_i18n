@@ -105,11 +105,11 @@ std::string ReadSystemParameter(const char *paramKey, const int paramLength)
     return "";
 }
 
-int32_t ConvertString2Int(const string &numberStr, int32_t& status)
+int32_t ConvertString2Int(const string &numberStr, int32_t& status, int base)
 {
     if (!numberStr.empty() && std::all_of(numberStr.begin(), numberStr.end(), ::isdigit)) {
         try {
-            return std::stoi(numberStr);
+            return std::stoi(numberStr, nullptr, base);
         } catch (const std::invalid_argument &except) {
             status = -1;
             return -1;
@@ -443,18 +443,18 @@ std::string StrToHex(const std::string& text, size_t num)
         bitset<8> bs(i);
         binary += bs.to_string();
     }
-    unsigned long long vlaue;
+    int32_t status = 0;
     // 2 means binary.
-    auto res = std::from_chars(binary.data(), binary.data() + binary.size(), vlaue, 2);
-    if (res.ec == std::errc()) {
-        std::stringstream stream;
-        stream << std::hex << std::setw(num) << std::setfill('0') << vlaue;
-        std::string hex;
-        stream >> hex;
-        return hex;
+    int32_t convertNum = ConvertString2Int(binary, status, 2);
+    if (status != 0) {
+        HILOG_ERROR_I18N("StrToHex: convert %{public}s to number error", binary.c_str());
+        return "";
     }
-    HILOG_ERROR_I18N("StrToHex: convert %{public}s to number error", binary.c_str());
-    return "";
+    std::stringstream ss;
+    ss << std::hex << std::setw(num) << std::setfill('0') << convertNum;
+    std::string hex;
+    ss >> hex;
+    return hex;
 }
 
 std::string HexToStr(const std::string& hex)
