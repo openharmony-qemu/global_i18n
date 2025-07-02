@@ -219,6 +219,12 @@ const std::unordered_map<std::string, std::vector<double>> CONVERT_FACTORS {
     { "barrel-US", { GAL_TO_M3 * 42, 0 } },
     { "hour", { 3600, 0 } },
     { "second", { 1, 0 } },
+    { "byte", { 1, 0 } },
+    { "kilobyte", { pow(10, 3), 0 } },
+    { "megabyte", { pow(10, 6), 0 } },
+    { "gigabyte", { pow(10, 9), 0 } },
+    { "terabyte", { pow(10, 12), 0 } },
+    { "petabyte", { pow(10, 15), 0 } },
 };
 
 const std::unordered_map<std::string, std::string> CONVERT_TO_UNIT {
@@ -271,6 +277,12 @@ const std::unordered_map<std::string, std::string> CONVERT_TO_UNIT {
     { "barrel-UK", "cubic-meter" },
     { "hour", "second" },
     { "second", "second" },
+    { "byte", "byte" },
+    { "kilobyte", "byte" },
+    { "megabyte", "byte" },
+    { "gigabyte", "byte" },
+    { "terabyte", "byte" },
+    { "petabyte", "byte" },
 };
 
 const std::unordered_map<std::string, double> PREFIX_VALUE {

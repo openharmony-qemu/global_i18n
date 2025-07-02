@@ -409,6 +409,63 @@ ErrCode I18nServiceAbility::SetSystemNumberPattern(const std::string& pattern, i
     return ERR_OK;
 }
 
+ErrCode I18nServiceAbility::GetSystemMeasurements(std::unordered_map<std::string, std::string>& systemMeasurements,
+    int32_t& code)
+{
+    int pid = getpid();
+    StartTask(pid);
+    I18nErrorCode errCode = CheckSystemPermission();
+    if (errCode != I18nErrorCode::SUCCESS) {
+        HILOG_ERROR_I18N("I18nServiceAbility::GetSystemMeasurements: Check system permission failed.");
+        code = static_cast<int32_t>(errCode);
+        FinishTask(pid);
+        return ERR_OK;
+    }
+    errCode = LocaleConfig::GetSystemMeasurements(systemMeasurements);
+    code = static_cast<int32_t>(errCode);
+    FinishTask(pid);
+    return ERR_OK;
+}
+
+ErrCode I18nServiceAbility::GetUsingMeasurement(std::string& identifier, int32_t& code)
+{
+    int pid = getpid();
+    StartTask(pid);
+    I18nErrorCode errCode = CheckSystemPermission();
+    if (errCode != I18nErrorCode::SUCCESS) {
+        HILOG_ERROR_I18N("I18nServiceAbility::GetUsingMeasurement: Check system permission failed.");
+        code = static_cast<int32_t>(errCode);
+        FinishTask(pid);
+        return ERR_OK;
+    }
+    errCode = LocaleConfig::GetUsingMeasurement(identifier);
+    code = static_cast<int32_t>(errCode);
+    FinishTask(pid);
+    return ERR_OK;
+}
+
+ErrCode I18nServiceAbility::SetSystemMeasurement(const std::string& identifier, int32_t& code)
+{
+    int pid = getpid();
+    StartTask(pid);
+    I18nErrorCode errCode = CheckPermission();
+    if (errCode != I18nErrorCode::SUCCESS) {
+        HILOG_ERROR_I18N("I18nServiceAbility::SetSystemMeasurement: Check permission failed.");
+        code = static_cast<int32_t>(errCode);
+        FinishTask(pid);
+        return ERR_OK;
+    }
+#ifdef SUPPORT_MULTI_USER
+    int32_t userId = GetCallingUserId();
+    errCode = LocaleConfig::SetSystemMeasurement(identifier, userId);
+#else
+    errCode = LocaleConfig::SetSystemMeasurement(identifier);
+#endif
+    code = static_cast<int32_t>(errCode);
+    FinishTask(pid);
+    return ERR_OK;
+}
+
 ErrCode I18nServiceAbility::GetLanguageFromUserId(int32_t userId, std::string& language)
 {
     int pid = getpid();

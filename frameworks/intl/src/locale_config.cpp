@@ -46,6 +46,7 @@
 #include "unicode/locid.h"
 #include <unicode/numsys.h>
 #include "unicode/smpdtfmt.h"
+#include "unicode/ulocdata.h"
 #include "unicode/unistr.h"
 #include "unicode/ustring.h"
 #include "unicode/utypes.h"
@@ -102,6 +103,7 @@ const std::string LocaleConfig::WEEK_DAY_KEY = "fw";
 const std::string LocaleConfig::CASE_FIRST_KEY = "kf";
 const std::string LocaleConfig::COLLATION_KEY = "co";
 const std::string LocaleConfig::NUNBER_PATTERN_KEY = "np";
+const std::string LocaleConfig::MEASUREMENT_KEY = "ms";
 const std::string LocaleConfig::TIMEZONE_KEY = "persist.time.timezone";
 const std::string LocaleConfig::DEFAULT_TIMEZONE = "GMT";
 const std::string LocaleConfig::DEFAULT_NUMBERING_SYSTEM_NAME = "latn";
@@ -392,6 +394,12 @@ static std::unordered_map<std::string, std::string> NumberPatternToDescription {
     { "0000002e", "12345.67" },
     { "002e002c", "12.345,67" },
     { "0000002c", "12345,67" }
+};
+
+static std::unordered_map<UMeasurementSystem, std::string> UMEASUREMENT_SYSTEM_TO_VALUE {
+    { UMeasurementSystem::UMS_UK, "uksystem"},
+    { UMeasurementSystem::UMS_SI, "metric"},
+    { UMeasurementSystem::UMS_US, "ussystem"}
 };
 
 string Adjust(const string &origin)
@@ -1865,7 +1873,7 @@ I18nErrorCode LocaleConfig::SetSystemCollation(const std::string& identifier, in
     auto it = languageToCollationValues.find(language);
     if (it == languageToCollationValues.end()) {
         HILOG_ERROR_I18N("LocaleConfig::SetSystemCollation: Invalid language %{public}s.", language.c_str());
-        return I18nErrorCode::FAILED;
+        return I18nErrorCode::INVALID_PARAM;
     }
 
     std::unordered_set<std::string> collationValues = it->second;
@@ -2046,6 +2054,79 @@ I18nErrorCode LocaleConfig::SetSystemNumberPattern(const std::string& pattern, i
     }
 
     return SetSystemLocale(ModifyExtParam(systemLocale, NUNBER_PATTERN_KEY, pattern, CUST_EXT_PARAM_KEY), userId);
+}
+
+I18nErrorCode LocaleConfig::GetSystemMeasurements(std::unordered_map<std::string, std::string>& systemMeasurements)
+{
+    systemMeasurements.clear();
+    std::string language = LocaleConfig::GetEffectiveLanguage();
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale locale = icu::Locale::forLanguageTag(icu::StringPiece(language), status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("LocaleConfig::GetSystemMeasurements: Create icu::Locale failed, language is %{public}s.",
+            language.c_str());
+        return I18nErrorCode::FAILED;
+    }
+    icu::LocaleDisplayNames* localeDisplayNames = icu::LocaleDisplayNames::createInstance(locale);
+    if (localeDisplayNames == nullptr) {
+        HILOG_ERROR_I18N("LocaleConfig::GetSystemMeasurements: Create icu::LocaleDisplayNames failed, language "
+            "is %{public}s.", language.c_str());
+        return I18nErrorCode::FAILED;
+    }
+    for (const auto& measurement : UMEASUREMENT_SYSTEM_TO_VALUE) {
+        icu::UnicodeString displayName;
+        localeDisplayNames->keyValueDisplayName(MEASUREMENT_KEY.c_str(), measurement.second.c_str(), displayName);
+        std::string value;
+        displayName.toUTF8String(value);
+        systemMeasurements.insert(std::make_pair(measurement.second, value));
+    }
+    delete localeDisplayNames;
+    return I18nErrorCode::SUCCESS;
+}
+
+I18nErrorCode LocaleConfig::GetUsingMeasurement(std::string& identifier)
+{
+    identifier.clear();
+    std::string locale = LocaleConfig::GetEffectiveLocale();
+    std::string extParam = LocaleConfig::QueryExtParam(locale, MEASUREMENT_KEY, STANDARD_EXT_PARAM_KEY);
+    if (!extParam.empty() && LocaleConfig::IsValidMeasurement(extParam)) {
+        identifier = extParam;
+        return I18nErrorCode::SUCCESS;
+    }
+    UErrorCode status = U_ZERO_ERROR;
+    UMeasurementSystem measurementSystem = ulocdata_getMeasurementSystem(locale.c_str(), &status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("LocaleConfig::GetUsingMeasurement: Get measurementSystem failed, locale is %{public}s.",
+            locale.c_str());
+        return I18nErrorCode::FAILED;
+    }
+    auto iter = UMEASUREMENT_SYSTEM_TO_VALUE.find(measurementSystem);
+    if (iter == UMEASUREMENT_SYSTEM_TO_VALUE.end()) {
+        HILOG_ERROR_I18N("LocaleConfig::GetUsingMeasurement: Invalid measurementSystem.");
+        return I18nErrorCode::FAILED;
+    }
+    identifier = iter->second;
+    return I18nErrorCode::SUCCESS;
+}
+
+I18nErrorCode LocaleConfig::SetSystemMeasurement(const std::string& identifier, int32_t userId)
+{
+    if (!LocaleConfig::IsValidMeasurement(identifier)) {
+        HILOG_ERROR_I18N("LocaleConfig::SetSystemMeasurement: Invalid identifier %{public}s.", identifier.c_str());
+        return I18nErrorCode::INVALID_PARAM;
+    }
+    std::string systemLocale = MultiUsers::GetSystemLocaleFromUserId(userId);
+    return SetSystemLocale(ModifyExtParam(systemLocale, MEASUREMENT_KEY, identifier, STANDARD_EXT_PARAM_KEY), userId);
+}
+
+bool LocaleConfig::IsValidMeasurement(const std::string& measurement)
+{
+    for (const auto& item : UMEASUREMENT_SYSTEM_TO_VALUE) {
+        if (item.second == measurement) {
+            return true;
+        }
+    }
+    return false;
 }
 
 std::string LocaleConfig::NumberPatternToHex(const std::string& groupingSymbol, const std::string& decimalSymbol)

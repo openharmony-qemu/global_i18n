@@ -674,6 +674,35 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0066, TestSize.Level1)
     std::string result2 = numFmt2->FormatRange(543.245, 543.245);
     EXPECT_EQ(result2, "~543.245");
 }
+
+/**
+ * @tc.name: NumberFormatFuncTest0067
+ * @tc.desc: Test Intl NumberFormat.FormatRange
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0067, TestSize.Level1)
+{
+    std::string systemLanguage = LocaleConfig::GetSystemLanguage();
+    std::string systemLocale = LocaleConfig::GetSystemLocale();
+    LocaleConfig::SetSystemLanguage("zh-Hans");
+    LocaleConfig::SetSystemLocale("zh-Hans-CN-u-ms-ussystem-mu-celsius");
+
+    std::vector<std::string> locales { "en-Latn-US-u-mu-kelvin" };
+    map<string, string> options = {
+        { "style", "unit" },
+        { "unit", "kelvin" },
+        { "unitUsage", "temperature" }
+    };
+    std::unique_ptr<NumberFormat> numberFormat = std::make_unique<NumberFormat>(locales, options);
+    ASSERT_TRUE(numberFormat != nullptr);
+    std::string result = numberFormat->Format(100);
+    EXPECT_EQ(result, "-173.15°C");
+    result = numberFormat->FormatRange(100, 200);
+    EXPECT_EQ(result, "-173.15 – -73.15°C");
+
+    LocaleConfig::SetSystemLanguage(systemLanguage);
+    LocaleConfig::SetSystemLocale(systemLocale);
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

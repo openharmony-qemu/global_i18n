@@ -66,10 +66,10 @@ std::unordered_map<std::string, UNumberSignDisplay> NumberFormat::signAccounting
     { "exceptZero", UNumberSignDisplay::UNUM_SIGN_ACCOUNTING_EXCEPT_ZERO }
 };
 
-std::unordered_map<UMeasurementSystem, std::string> NumberFormat::measurementSystem = {
-    { UMeasurementSystem::UMS_SI, "SI" },
-    { UMeasurementSystem::UMS_US, "US" },
-    { UMeasurementSystem::UMS_UK, "UK" },
+std::unordered_map<std::string, std::string> NumberFormat::measurementSystem = {
+    { "metric", "SI" },
+    { "ussystem", "US" },
+    { "uksystem", "UK" },
 };
 
 std::unordered_map<std::string, UNumberUnitWidth> NumberFormat::defaultUnitStyle = {
@@ -171,6 +171,17 @@ std::unordered_map<std::string, int> NumberFormat::defaultCurrencyFractionMap = 
     { "XPF", 0 },
 };
 
+static std::unordered_set<std::string> UNIT_USAGE_FILE = {
+    "size-file-byte",
+    "size-shortfile-byte"
+};
+
+static std::unordered_set<std::string> UNIT_USAGE_TEMPERATURE = {
+    "temperature",
+    "temperature-person",
+    "temperature-weather"
+};
+
 NumberFormat::NumberFormat(const std::vector<std::string> &localeTags, std::map<std::string, std::string> &configs)
 {
     SetDefaultStyle();
@@ -229,12 +240,10 @@ NumberFormat::~NumberFormat()
 
 void NumberFormat::InitNumberFormat()
 {
-    icu::number::UnlocalizedNumberFormatter formatter = icu::number::NumberFormatter::with();
-    InitProperties(formatter);
-    numberFormat = formatter.locale(locale);
-    numberRangeFormat = icu::number::NumberRangeFormatter::with()
-        .numberFormatterBoth(formatter)
-        .locale(locale);
+    icu::number::UnlocalizedNumberFormatter tempFormatter = icu::number::NumberFormatter::with();
+    InitProperties(tempFormatter);
+    styleFormatter = tempFormatter;
+    numberFormat = tempFormatter.locale(locale);
 }
 
 void NumberFormat::CreateRelativeTimeFormat(const std::string& locale)
@@ -344,15 +353,13 @@ void NumberFormat::InitUnitProperties(icu::number::UnlocalizedNumberFormatter &f
             unitType = curUnit.getType();
         }
     }
-    UErrorCode status = U_ZERO_ERROR;
-    UMeasurementSystem measSys = ulocdata_getMeasurementSystem(localeBaseName.c_str(), &status);
-    if (U_FAILURE(status)) {
-        HILOG_ERROR_I18N("NumberFormat::InitUnitProperties: Get measurement system failed.");
-        return;
-    }
-    bool isValidMeaSys = measurementSystem.find(measSys) != measurementSystem.end();
-    if (measSys >= 0 && isValidMeaSys) {
-        unitMeasSys = measurementSystem[measSys];
+    std::string usingMeasurement;
+    I18nErrorCode errCode = LocaleConfig::GetUsingMeasurement(usingMeasurement);
+    if (errCode == I18nErrorCode::SUCCESS) {
+        auto iter = measurementSystem.find(usingMeasurement);
+        if (iter != measurementSystem.end()) {
+            unitMeasSys = iter->second;
+        }
     }
     formatter = formatter.unitWidth(unitDisplay);
     formatter = formatter.precision(icu::number::Precision::maxFraction(DEFAULT_FRACTION_DIGITS));
@@ -610,6 +617,7 @@ void NumberFormat::SetUnit(std::string &preferredUnit)
     for (icu::MeasureUnit curUnit : unitArray) {
         if (!strcmp(curUnit.getSubtype(), preferredUnit.c_str())) {
             numberFormat = numberFormat.unit(curUnit);
+            styleFormatter = styleFormatter.unit(curUnit);
         }
     }
 }
@@ -890,45 +898,10 @@ icu::number::FormattedNumber NumberFormat::FormatToFormattedNumber(double number
     if (!createSuccess) {
         return {};
     }
-    double finalNumber = number;
-    std::string finalUnit = unit;
-    if ((unitUsage.compare("size-file-byte") == 0 || unitUsage.compare("size-shortfile-byte") == 0) &&
-        ConvertByte(finalNumber, finalUnit)) {
-        SetUnit(finalUnit);
-        SetPrecisionWithByte(finalNumber, finalUnit);
-    } else if (!unitUsage.empty()) {
-        std::vector<std::string> preferredUnits;
-        if (unitUsage.compare("default") == 0) {
-            GetDefaultPreferredUnit(localeInfo->GetRegion(), unitType, preferredUnits);
-        } else {
-            GetPreferredUnit(localeInfo->GetRegion(), unitUsage, preferredUnits);
-        }
-        std::map<double, std::string> preferredValuesOverOne;
-        std::map<double, std::string> preferredValuesUnderOne;
-        double num = number;
-        for (size_t i = 0; i < preferredUnits.size(); i++) {
-            int status = Convert(num, unit, unitMeasSys, preferredUnits[i], unitMeasSys);
-            if (!status) {
-                continue;
-            }
-            if (num >= 1) {
-                preferredValuesOverOne.insert(std::make_pair(num, preferredUnits[i]));
-            } else {
-                preferredValuesUnderOne.insert(std::make_pair(num, preferredUnits[i]));
-            }
-        }
-        std::string preferredUnit;
-        if (preferredValuesOverOne.size() > 0) {
-            finalNumber = preferredValuesOverOne.begin()->first;
-            preferredUnit = preferredValuesOverOne.begin()->second;
-        } else if (preferredValuesUnderOne.size() > 0) {
-            finalNumber = preferredValuesUnderOne.rbegin()->first;
-            preferredUnit = preferredValuesUnderOne.rbegin()->second;
-        }
-        SetUnit(preferredUnit);
-    }
+    double temp = 0;
+    NumberFormat::DealWithUnitUsage(false, number, temp);
     UErrorCode icuStatus = U_ZERO_ERROR;
-    icu::number::FormattedNumber formattedNumber = numberFormat.formatDouble(finalNumber, icuStatus);
+    icu::number::FormattedNumber formattedNumber = numberFormat.formatDouble(number, icuStatus);
     if (U_FAILURE(icuStatus)) {
         return {};
     }
@@ -960,9 +933,12 @@ std::string NumberFormat::FormatRange(double start, double end)
         HILOG_ERROR_I18N("FormatRange: parameter:end less then parameter:start");
         return PseudoLocalizationProcessor("");
     }
+    NumberFormat::DealWithUnitUsage(true, start, end);
+    icu::number::LocalizedNumberRangeFormatter tempNumberRangeFormat = icu::number::NumberRangeFormatter::with()
+        .numberFormatterBoth(styleFormatter)
+        .locale(locale);
     UErrorCode status = U_ZERO_ERROR;
-    icu::number::FormattedNumberRange numberRange =
-        numberRangeFormat.formatFormattableRange(start, end, status);
+    icu::number::FormattedNumberRange numberRange = tempNumberRangeFormat.formatFormattableRange(start, end, status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("FormatRange: formatFormattableRange failed.");
         return PseudoLocalizationProcessor("");
@@ -983,14 +959,17 @@ std::string NumberFormat::FormatJsRange(double first, double second)
         HILOG_ERROR_I18N("FormatRange: init numberRangeFormat failed.");
         return PseudoLocalizationProcessor("");
     }
+    icu::number::LocalizedNumberRangeFormatter tempNumberRangeFormat = icu::number::NumberRangeFormatter::with()
+        .numberFormatterBoth(styleFormatter)
+        .locale(locale);
     UErrorCode status = U_ZERO_ERROR;
-    icu::number::FormattedNumberRange formatedNumberRange =
-        numberRangeFormat.formatFormattableRange(first, second, status);
+    icu::number::FormattedNumberRange numberRange =
+        tempNumberRangeFormat.formatFormattableRange(first, second, status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("FormatRange: formatFormattableRange failed.");
         return PseudoLocalizationProcessor("");
     }
-    icu::UnicodeString unicodeStr = formatedNumberRange.toString(status);
+    icu::UnicodeString unicodeStr = numberRange.toString(status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("FormatRange: icu::UnicodeString.toString() failed.");
         return PseudoLocalizationProcessor("");
@@ -1006,16 +985,19 @@ void NumberFormat::FormatRangeToParts(const double &first, const double &second,
     FormatableRangeToParts(first, second, result);
 }
 
-void NumberFormat::FormatableRangeToParts(const double &first, const double &second,
+void NumberFormat::FormatableRangeToParts(double first, double second,
     std::vector<std::vector<std::string>> &result)
 {
     if (!createSuccess) {
         HILOG_ERROR_I18N("NumberFormat::FormatableRangeToParts: init numberRangeFormat failed.");
         return;
     }
+    icu::number::LocalizedNumberRangeFormatter tempNumberRangeFormat = icu::number::NumberRangeFormatter::with()
+        .numberFormatterBoth(styleFormatter)
+        .locale(locale);
     UErrorCode status = U_ZERO_ERROR;
     icu::number::FormattedNumberRange numberRange =
-        numberRangeFormat.formatFormattableRange(first, second, status);
+        tempNumberRangeFormat.formatFormattableRange(first, second, status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("NumberFormat::FormatableRangeToParts: formatFormattableRange failed.");
         return;
@@ -1214,6 +1196,8 @@ void NumberFormat::SetPrecisionWithByte(double number, const std::string& finalU
     }
     if (FractionDigits != -1) {
         numberFormat = numberFormat.precision(icu::number::Precision::minMaxFraction(FractionDigits, FractionDigits));
+        styleFormatter =
+            styleFormatter.precision(icu::number::Precision::minMaxFraction(FractionDigits, FractionDigits));
     }
 }
 
@@ -1420,6 +1404,83 @@ void NumberFormat::CheckNumberFormatOptionsExt(std::map<std::string, std::string
             code = -1;
         }
     }
+}
+
+void NumberFormat::DealWithUnitUsage(bool isFormatRange, double& firstNumber, double& secondNumber)
+{
+    if (!createSuccess) {
+        HILOG_ERROR_I18N("NumberFormat::DealWithUnitUsage: init numberRangeFormat failed.");
+        return;
+    }
+    if (unitUsage.empty()) {
+        return;
+    }
+    double finalNumber = firstNumber;
+    std::string finalUnit = unit;
+    if (!NumberFormat::DealWithUnitConvert(finalNumber, finalUnit)) {
+        HILOG_ERROR_I18N("NumberFormat::DealWithUnitUsage: Deal with unit convert failed.");
+        return;
+    }
+    if (isFormatRange) {
+        if (!Convert(secondNumber, unit, unitMeasSys, finalUnit, unitMeasSys)) {
+            HILOG_ERROR_I18N("NumberFormat::DealWithUnitUsage: Convert secondNumber failed.");
+            return;
+        }
+    }
+    firstNumber = finalNumber;
+    SetUnit(finalUnit);
+}
+
+bool NumberFormat::DealWithUnitConvert(double& finalNumber, std::string& finalUnit)
+{
+    if (UNIT_USAGE_FILE.find(unitUsage) != UNIT_USAGE_FILE.end()) {
+        if (!ConvertByte(finalNumber, finalUnit)) {
+            HILOG_ERROR_I18N("NumberFormat::DealWithUnitConvert: Convert byte failed.");
+            return false;
+        }
+        SetPrecisionWithByte(finalNumber, finalUnit);
+    } else if (UNIT_USAGE_TEMPERATURE.find(unitUsage) != UNIT_USAGE_TEMPERATURE.end()) {
+        std::string preferredTemperature = LocaleConfig::GetTemperatureName(LocaleConfig::GetTemperatureType());
+        if (preferredTemperature.empty() ||
+            Convert(finalNumber, unit, unitMeasSys, preferredTemperature, unitMeasSys) == 0) {
+            return false;
+        }
+        finalUnit = preferredTemperature;
+    } else {
+        if (localeInfo == nullptr) {
+            HILOG_ERROR_I18N("NumberFormat::DealWithUnitConvert: localeInfo is nullptr.");
+            return false;
+        }
+        std::vector<std::string> preferredUnits;
+        if (unitUsage == "default") {
+            GetDefaultPreferredUnit(localeInfo->GetRegion(), unitType, preferredUnits);
+        } else {
+            GetPreferredUnit(localeInfo->GetRegion(), unitUsage, preferredUnits);
+        }
+        std::map<double, std::string> preferredValuesOverOne;
+        std::map<double, std::string> preferredValuesUnderOne;
+        double num = finalNumber;
+        for (size_t i = 0; i < preferredUnits.size(); i++) {
+            if (!Convert(num, unit, unitMeasSys, preferredUnits[i], unitMeasSys)) {
+                HILOG_ERROR_I18N("NumberFormat::DealWithUnitConvert: Convert %{public}s failed.", unit.c_str());
+                continue;
+            }
+            if (num >= 1) {
+                preferredValuesOverOne.insert(std::make_pair(num, preferredUnits[i]));
+            } else {
+                preferredValuesUnderOne.insert(std::make_pair(num, preferredUnits[i]));
+            }
+        }
+        if (preferredValuesOverOne.empty() && preferredValuesUnderOne.empty()) {
+            return false;
+        }
+        if (preferredValuesOverOne.size() > 0) {
+            std::tie(finalNumber, finalUnit) = *preferredValuesOverOne.begin();
+        } else if (preferredValuesUnderOne.size() > 0) {
+            std::tie(finalNumber, finalUnit) = *preferredValuesUnderOne.begin();
+        }
+    }
+    return true;
 }
 } // namespace I18n
 } // namespace Global

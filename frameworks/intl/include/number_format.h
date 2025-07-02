@@ -121,7 +121,7 @@ private:
     std::unique_ptr<LocaleInfo> localeInfo = nullptr;
     std::unique_ptr<RelativeTimeFormat> relativeTimeFormat = nullptr;
     icu::number::LocalizedNumberFormatter numberFormat;
-    icu::number::LocalizedNumberRangeFormatter numberRangeFormat;
+    icu::number::UnlocalizedNumberFormatter styleFormatter;
     icu::number::Notation notation = icu::number::Notation::simple();
     UNumberRoundingPriority roundingPriority = UNumberRoundingPriority::UNUM_ROUNDING_PRIORITY_STRICT;
     UNumberFormatRoundingMode roundingMode = UNumberFormatRoundingMode::UNUM_ROUND_HALFUP;
@@ -145,7 +145,7 @@ private:
     static std::unordered_map<std::string, UNumberUnitWidth> currencyStyle;
     static std::unordered_map<std::string, UNumberSignDisplay> signAutoStyle;
     static std::unordered_map<std::string, UNumberSignDisplay> signAccountingStyle;
-    static std::unordered_map<UMeasurementSystem, std::string> measurementSystem;
+    static std::unordered_map<std::string, std::string> measurementSystem;
     static std::unordered_map<std::string, UNumberUnitWidth> defaultUnitStyle;
     static std::unordered_map<std::string, UNumberUnitWidth> defaultCurrencyStyle;
     static std::unordered_map<std::string, UNumberRoundingPriority> roundingPriorityStyle;
@@ -204,9 +204,11 @@ private:
         std::vector<std::vector<std::string>> &result, FormatPartParam &param);
     void CheckNumberFormatOptionsExt(std::map<std::string, std::string> &map, int32_t &code,
         const std::string &optionName, int min, int max);
-    void FormatableRangeToParts(const double &first, const double &second,
+    void FormatableRangeToParts(double first, double second,
         std::vector<std::vector<std::string>> &result);
     double GetBigIntFieldType(const std::string &bigintStr);
+    void DealWithUnitUsage(bool isFormatRange, double& firstNumber, double& secondNumber);
+    bool DealWithUnitConvert(double& finalNumber, std::string& finalUnit);
 };
 } // namespace I18n
 } // namespace Global

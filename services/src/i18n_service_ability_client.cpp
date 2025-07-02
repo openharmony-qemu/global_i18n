@@ -364,6 +364,61 @@ I18nErrorCode I18nServiceAbilityClient::SetSystemNumberPattern(const std::string
     return static_cast<I18nErrorCode>(code);
 }
 
+I18nErrorCode I18nServiceAbilityClient::GetSystemMeasurements(
+    std::unordered_map<std::string, std::string>& systemMeasurements)
+{
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetSystemMeasurements: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->GetSystemMeasurements(systemMeasurements, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetSystemMeasurements: Get system measurements failed, "
+            "errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
+}
+
+I18nErrorCode I18nServiceAbilityClient::GetUsingMeasurement(std::string& identifier)
+{
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetUsingMeasurement: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->GetUsingMeasurement(identifier, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetUsingMeasurement: Get using measurement failed, "
+            "errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
+}
+
+I18nErrorCode I18nServiceAbilityClient::SetSystemMeasurement(const std::string& identifier)
+{
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetSystemMeasurement: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->SetSystemMeasurement(identifier, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetSystemMeasurement: Set system measurement failed, "
+            "errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
+}
+
 std::string I18nServiceAbilityClient::GetLanguageFromUserId(int32_t userId)
 {
     I18nErrorCode err = I18nErrorCode::SUCCESS;
