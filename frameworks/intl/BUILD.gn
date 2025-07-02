@@ -17,9 +17,6 @@ import("//build/ohos.gni")
 
 group("build_module") {
   deps = [
-    ":hmos_cust_libphonenumber_mount",
-    ":hmos_cust_taboo_mount",
-    ":hmos_cust_timezone_mount",
     ":intl_util",
     ":preferred_language",
     "./parameter_upgrade:libphonenumber_version_txt",
@@ -375,49 +372,6 @@ ohos_prebuilt_etc("region_supported_locales_xml") {
 ohos_prebuilt_etc("dialect_languages_xml") {
   source = "//base/global/i18n/frameworks/intl/etc/dialect_languages.xml"
   module_install_dir = "usr/ohos_locale_config/"
-  part_name = "i18n"
-  subsystem_name = "global"
-}
-
-ohos_executable("hmos_cust_libphonenumber_mount") {
-  sources = [ "./parameter_upgrade/mount/hmos_libphonenumber_mount.cpp" ]
-  include_dirs = [ "./include" ]
-  deps = [ ":intl_util" ]
-  external_deps = [
-    "hilog:libhilog",
-    "openssl:libcrypto_shared",
-    "openssl:libssl_shared",
-  ]
-  install_images = [ "system" ]
-  part_name = "i18n"
-  subsystem_name = "global"
-}
-
-ohos_executable("hmos_cust_taboo_mount") {
-  sources = [ "./parameter_upgrade/mount/hmos_taboo_mount.cpp" ]
-  include_dirs = [ "./include" ]
-  deps = [ ":intl_util" ]
-  external_deps = [
-    "hilog:libhilog",
-    "openssl:libcrypto_shared",
-    "openssl:libssl_shared",
-  ]
-  install_images = [ "system" ]
-  part_name = "i18n"
-  subsystem_name = "global"
-}
-
-ohos_executable("hmos_cust_timezone_mount") {
-  sources = [ "./parameter_upgrade/mount/hmos_timezone_mount.cpp" ]
-  include_dirs = [ "./include" ]
-  deps = [ ":intl_util" ]
-  external_deps = [
-    "hilog:libhilog",
-    "init:libbegetutil",
-    "openssl:libcrypto_shared",
-    "openssl:libssl_shared",
-  ]
-  install_images = [ "system" ]
   part_name = "i18n"
   subsystem_name = "global"
 }
