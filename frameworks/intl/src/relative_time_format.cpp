@@ -71,13 +71,12 @@ RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTag
     std::map<std::string, std::string> &configs, bool flag)
 {
     intlAddon = flag;
-    std::vector<std::string> resolvedLocales(localeTags);
-    if (configs.find("localeMatcher") != configs.end()) {
-        I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
-        resolvedLocales = LocaleHelper::SupportedLocalesOf(resolvedLocales, configs, errorCode);
-        if (errorCode != I18nErrorCode::SUCCESS) {
-            HILOG_ERROR_I18N("RelativeTimeFormat: Get Supported Locales failed");
-        }
+    I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
+    std::vector<std::string> resolvedLocales =
+        LocaleHelper::SupportedLocalesOf(localeTags, configs, errorCode);
+    if (errorCode != I18nErrorCode::SUCCESS) {
+        HILOG_ERROR_I18N("RelativeTimeFormat: Get Supported Locales failed");
+        return;
     }
     SetRelativeTimeFormat(resolvedLocales, configs);
 }

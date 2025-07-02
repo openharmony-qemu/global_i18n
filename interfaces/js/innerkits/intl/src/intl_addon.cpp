@@ -657,7 +657,6 @@ bool GetStringParameter(napi_env env, napi_value value, std::vector<char> &buf)
         HILOG_ERROR_I18N("Get first failed");
         return false;
     }
-
     return true;
 }
 
