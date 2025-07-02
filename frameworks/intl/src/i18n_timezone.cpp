@@ -726,11 +726,16 @@ bool I18nTimeZone::ReadNumTimezoneConfigFile(const char* configPath)
         std::string line(buffer);
         line.resize(line.find_last_not_of("\r\n") + 1);
         line = trim(line);
-        if (line.find("::") != std::string::npos) {
-            curIndex = line.substr(0, 1);
+        std::size_t found = line.find("::");
+        if (found != std::string::npos) {
+            curIndex = line.substr(0, found);
             continue;
         }
         size_t start = line.find_first_of(",");
+        if (start == std::string::npos) {
+            HILOG_ERROR_I18N("I18nTimeZone::ReadNumTimezoneConfigFile: %{public}s invalid format", line.c_str());            
+            continue;
+        }
         std::string numStr = line.substr(0, start);
         std::string tzId = line.substr(start + 1);
         tzId = trim(tzId);
@@ -764,21 +769,14 @@ void I18nTimeZone::AddNumTimezoneCategoryMap(std::string &curIndex, std::string 
         HILOG_ERROR_I18N("I18nTimeZone::AddNumTimezoneCategoryMap numStr:%{public}s is not digit.", numStr.c_str());
         return;
     }
-    switch (curIndex[0]) {
-        case 'west_north':
-            categoryNum2TimezoneWN.insert(std::make_pair(num, tzId));
-            break;
-        case 'east_north':
-            categoryNum2TimezoneEN.insert(std::make_pair(num, tzId));
-            break;
-        case 'west_south':
-            categoryNum2TimezoneWS.insert(std::make_pair(num, tzId));
-            break;
-        case 'east_south':
-            categoryNum2TimezoneES.insert(std::make_pair(num, tzId));
-            break;
-        default:
-            break;
+    if (curIndex == "west_north") {
+        categoryNum2TimezoneWN.insert(std::make_pair(num, tzId));
+    } else if (curIndex == "east_north") {
+        categoryNum2TimezoneEN.insert(std::make_pair(num, tzId));
+    } else if (curIndex == "west_south") {
+        categoryNum2TimezoneWS.insert(std::make_pair(num, tzId));
+    } else if (curIndex == "east_south") {
+        categoryNum2TimezoneES.insert(std::make_pair(num, tzId));
     }
 }
 
