@@ -19,7 +19,6 @@
 #include "utils.h"
 #include "parameter.h"
 #include "relative_time_format.h"
-#include "intl_locale.h"
 #include "unicode/numsys.h"
 
 namespace OHOS {
