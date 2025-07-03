@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@
 #include <mutex>
 #include <vector>
 #include <set>
+#include <shared_mutex>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -159,6 +160,7 @@ private:
     static std::mutex dialectLocaleMutex;
     static std::mutex region2DisplayNameMutex;
     static std::mutex locale2DisplayNameMutex;
+    static std::shared_mutex is24HourLocaleMapMutex;
 
     static const std::unordered_set<std::string>& GetSupportedLocales();
     static const std::unordered_set<std::string>& GetSupportedLocalesV15();
@@ -286,6 +288,7 @@ private:
     static std::unordered_map<std::string, std::string> localDigitMap;
     static std::map<std::string, std::string> locale2DisplayName;
     static std::map<std::string, std::string> region2DisplayName;
+    static std::unordered_map<std::string, bool> is24HourLocaleMap;
     static std::unordered_map<std::string, std::vector<std::string>> dialectLanguages;
     static std::unordered_map<std::string, std::string> resourceIdMap;
     static std::string currentDialectLocale;
