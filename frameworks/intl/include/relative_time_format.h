@@ -84,9 +84,10 @@ private:
         std::vector<std::vector<std::string>> &timeVector, size_t &startIndex, const std::string &unit,
         const std::string &result);
     void ParseConfigs(std::map<std::string, std::string> &configs);
+    std::string GetSingularUnit(const std::string &unit);
     void SetDefaultStyle();
     void SetRelativeTimeFormat(const std::vector<std::string> &localeTags,
-        std::map<std::string, std::string> &configs);
+        std::map<std::string, std::string> &configs, bool flag);
 };
 } // namespace I18n
 } // namespace Global

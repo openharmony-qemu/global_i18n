@@ -19,6 +19,7 @@
 #include "utils.h"
 #include "parameter.h"
 #include "relative_time_format.h"
+#include "intl_locale.h"
 
 namespace OHOS {
 namespace Global {
@@ -78,7 +79,7 @@ RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTag
         HILOG_ERROR_I18N("RelativeTimeFormat: Get Supported Locales failed");
         return;
     }
-    SetRelativeTimeFormat(resolvedLocales, configs);
+    SetRelativeTimeFormat(resolvedLocales, configs, flag);
 }
 
 std::vector<std::string> RelativeTimeFormat::CanonicalizeLocales(
@@ -105,7 +106,7 @@ std::vector<std::string> RelativeTimeFormat::CanonicalizeLocales(
 RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTags,
     std::map<std::string, std::string> &configs)
 {
-    SetRelativeTimeFormat(localeTags, configs);
+    SetRelativeTimeFormat(localeTags, configs, false);
 }
 
 RelativeTimeFormat::~RelativeTimeFormat()
@@ -113,7 +114,7 @@ RelativeTimeFormat::~RelativeTimeFormat()
 }
 
 void RelativeTimeFormat::SetRelativeTimeFormat(const std::vector<std::string> &localeTags,
-    std::map<std::string, std::string> &configs)
+    std::map<std::string, std::string> &configs, bool flag)
 {
     SetDefaultStyle();
     UErrorCode status = U_ZERO_ERROR;
@@ -125,7 +126,7 @@ void RelativeTimeFormat::SetRelativeTimeFormat(const std::vector<std::string> &l
             status = U_ZERO_ERROR;
             continue;
         }
-        localeBaseName = locale.getBaseName();
+        localeBaseName = flag ? localeTags[i] : locale.getBaseName();
         std::replace(localeBaseName.begin(), localeBaseName.end(), '_', '-');
         relativeTimeFormat = std::make_unique<icu::RelativeDateTimeFormatter>(locale, nullptr, style,
             UDISPCTX_CAPITALIZATION_NONE, status);
@@ -190,14 +191,20 @@ std::string RelativeTimeFormat::Format(double number, const std::string &unit)
     return PseudoLocalizationProcessor(result);
 }
 
-void RelativeTimeFormat::InsertInfo(std::vector<std::vector<std::string>> &timeVector,
-    const std::string &unit, bool isInteger, const std::string &value)
+std::string RelativeTimeFormat::GetSingularUnit(const std::string &unit)
 {
-    std::vector<std::string> info;
     std::string singularUnit(unit);
     if (intlAddon && pluralUnitMap.find(unit) != pluralUnitMap.end()) {
         singularUnit = pluralUnitMap[unit];
     }
+    return singularUnit;
+}
+
+void RelativeTimeFormat::InsertInfo(std::vector<std::vector<std::string>> &timeVector,
+    const std::string &unit, bool isInteger, const std::string &value)
+{
+    std::vector<std::string> info;
+    std::string singularUnit = GetSingularUnit(unit);
     if (isInteger) {
         info.push_back("integer");
         info.push_back(value);
@@ -214,11 +221,22 @@ void RelativeTimeFormat::ProcessIntegerField(const std::map<size_t, size_t> &ind
     const std::string &result)
 {
     for (auto iter = indexMap.begin(); iter != indexMap.end(); iter++) {
-        if (iter->first > startIndex) {
-            InsertInfo(timeVector, unit, true, result.substr(startIndex, iter->first - startIndex));
-            InsertInfo(timeVector, unit, true, result.substr(iter->first, iter->second - iter->first));
-            startIndex = iter->second;
+        if (iter->first <= startIndex) {
+            continue;
         }
+        InsertInfo(timeVector, unit, true, result.substr(startIndex, iter->first - startIndex));
+        if (intlAddon) {
+            std::vector<std::string> info;
+            std::string singularUnit = GetSingularUnit(unit);
+            std::string value = result.substr(iter->first, iter->second - iter->first);
+            info.push_back("group");
+            info.push_back(value);
+            info.push_back(singularUnit);
+            timeVector.push_back(info);
+        } else {
+            InsertInfo(timeVector, unit, true, result.substr(iter->first, iter->second - iter->first));
+        }
+        startIndex = iter->second;
     }
 }
 
@@ -294,6 +312,15 @@ void RelativeTimeFormat::GetResolvedOptions(std::map<std::string, std::string> &
     }
     if (!numberingSystem.empty()) {
         map.insert(std::make_pair("numberingSystem", numberingSystem));
+    } else if (intlAddon) {
+        const std::unordered_map<std::string, std::string> configs = {};
+        std::string errMsg;
+        IntlLocale intlLocale(localeBaseName, configs, errMsg);
+        if (!errMsg.empty()) {
+            HILOG_ERROR_I18N("RelativeTimeFormat::GetResolvedOptions: %{public}s", errMsg.c_str());           
+            return;
+        }
+        map.insert(std::make_pair("numberingSystem", intlLocale.GetNumberingSystem()));
     }
 }
 
