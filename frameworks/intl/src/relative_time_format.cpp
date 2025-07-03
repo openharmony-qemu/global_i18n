@@ -20,6 +20,7 @@
 #include "parameter.h"
 #include "relative_time_format.h"
 #include "intl_locale.h"
+#include "unicode/numsys.h"
 
 namespace OHOS {
 namespace Global {
@@ -313,15 +314,31 @@ void RelativeTimeFormat::GetResolvedOptions(std::map<std::string, std::string> &
     if (!numberingSystem.empty()) {
         map.insert(std::make_pair("numberingSystem", numberingSystem));
     } else if (intlAddon) {
-        const std::unordered_map<std::string, std::string> configs = {};
-        std::string errMsg;
-        IntlLocale intlLocale(localeBaseName, configs, errMsg);
-        if (!errMsg.empty()) {
-            HILOG_ERROR_I18N("RelativeTimeFormat::GetResolvedOptions: %{public}s", errMsg.c_str());           
-            return;
-        }
-        map.insert(std::make_pair("numberingSystem", intlLocale.GetNumberingSystem()));
+        map.insert(std::make_pair("numberingSystem", GetNumberSystemFromLocale()));
     }
+}
+
+std::string RelativeTimeFormat::GetNumberSystemFromLocale()
+{
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale inLocale = icu::Locale::forLanguageTag(localeBaseName.data(), status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("GetNumberSystemFromLocale: Create locale for %{public}s failed", localeBaseName.c_str());
+        return "";
+    }
+    std::unique_ptr<icu::NumberingSystem> numSystem =
+        std::unique_ptr<icu::NumberingSystem>(icu::NumberingSystem::createInstance(inLocale, status));
+    if (U_FAILURE(status) || numSystem == nullptr) {
+        HILOG_ERROR_I18N("GetNumberSystemFromLocale: Create icu::NumberingSystem failed");
+        return "";
+    }
+    const char* name = numSystem->getName();
+    if (name == nullptr) {
+        HILOG_ERROR_I18N("GetNumberSystemFromLocale: icu::NumberingSystem name is nullptr");
+        return "";
+    }
+    std::string numberSystem(name);
+    return numberSystem;
 }
 
 std::vector<std::string> RelativeTimeFormat::SupportedLocalesOf(

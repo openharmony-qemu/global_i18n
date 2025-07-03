@@ -85,6 +85,7 @@ private:
         const std::string &result);
     void ParseConfigs(std::map<std::string, std::string> &configs);
     std::string GetSingularUnit(const std::string &unit);
+    std::string GetNumberSystemFromLocale();
     void SetDefaultStyle();
     void SetRelativeTimeFormat(const std::vector<std::string> &localeTags,
         std::map<std::string, std::string> &configs, bool flag);
