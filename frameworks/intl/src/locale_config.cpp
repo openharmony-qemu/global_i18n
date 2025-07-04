@@ -615,11 +615,6 @@ void LocaleConfig::Split(const string &src, const string &sep, std::unordered_se
 std::unordered_set<std::string> LocaleConfig::GetSystemLanguages()
 {
     std::unordered_set<std::string> result(whiteLanguages);
-    std::string developerMode = ReadSystemParameter(DEVELOPER_MODE_KEY, CONFIG_LEN);
-    if (developerMode.compare("true") == 0) {
-        result.insert("en-XA");
-        result.insert("ar-XB");
-    }
     std::unordered_set<string> blockedLanguages = GetBlockedLanguages();
     Expunge(result, blockedLanguages);
     return result;
