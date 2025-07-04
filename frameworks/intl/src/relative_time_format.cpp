@@ -137,8 +137,8 @@ void RelativeTimeFormat::SetRelativeTimeFormat(const std::vector<std::string> &l
         createSuccess = true;
         std::string value = LocaleConfig::QueryExtParam(curLocale, "nu", "-u-");
         if (!value.empty()) {
-            numberingSystem  = value;
-            intlNumberingSystem  = value;
+            numberingSystem = value;
+            intlNumberingSystem = value;
         }
         break;
     }
@@ -158,8 +158,8 @@ void RelativeTimeFormat::SetRelativeTimeFormat(const std::vector<std::string> &l
             createSuccess = true;
             std::string value = LocaleConfig::QueryExtParam(curLocale, "nu", "-u-");
             if (!value.empty()) {
-                numberingSystem  = value;
-                intlNumberingSystem  = value;
+                numberingSystem = value;
+                intlNumberingSystem = value;
             }
         }
     }
