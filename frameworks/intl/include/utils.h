@@ -34,7 +34,7 @@ void Split(const std::string& src, const std::string& sep, std::unordered_set<st
 void Merge(const std::vector<std::string>& src, const std::string& sep, std::string& dest);
 std::string ReadSystemParameter(const char *paramKey, const int paramLength);
 int32_t ConvertString2Int(const std::string &numberStr, int32_t& status, int base = 10);
-int32_t ConvertString2Double(const std::string &numberStr, int32_t& status);
+double ConvertString2Double(const std::string &numberStr, int32_t& status);
 bool IsValidLocaleTag(icu::Locale &locale);
 void GetAllValidLocalesTag(std::unordered_set<std::string>& allValidLocalesLanguageTag);
 std::string GetAbsoluteFilePath(const std::string &filePath);
