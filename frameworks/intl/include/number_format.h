@@ -152,7 +152,6 @@ private:
     static std::unordered_map<std::string, UNumberFormatRoundingMode> roundingModeStyle;
     static std::vector<size_t> roundingIncrementList;
     static std::map<std::string, std::string> RelativeTimeFormatConfigs;
-    static std::unordered_map<UNumberFormatFields, std::string> numberFormatFieldMap;
     static std::unordered_map<std::string, int> defaultCurrencyFractionMap;
     static bool ReadISO4217Datas();
     std::string GetCurrencyFromConfig(const std::string& currency);
@@ -192,7 +191,6 @@ private:
     void AddFormatParts(std::string typeString, std::vector<std::vector<std::string>> &result,
         icu::UnicodeString &formatResult, int32_t start, int32_t end);
     std::string GetSubString(icu::UnicodeString &formatResult, int32_t start, int32_t end);
-    std::string GetNumberFieldType(const std::string &napiType, const int32_t &fieldId, const double &number);
     icu::number::FormattedNumber FormatDecimalToFormattedNumber(const std::string &number);
     void FormattedNumberParts(icu::number::FormattedNumber &formattedNumber,
         std::vector<std::vector<std::string>> &result, const std::string &napiType, const double &number);

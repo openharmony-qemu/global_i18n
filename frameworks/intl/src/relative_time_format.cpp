@@ -19,7 +19,7 @@
 #include "utils.h"
 #include "parameter.h"
 #include "relative_time_format.h"
-#include "unicode/numsys.h"
+#include "format_utils.h"
 
 namespace OHOS {
 namespace Global {
@@ -250,6 +250,10 @@ void RelativeTimeFormat::FormatToParts(double number, const std::string &unit,
     if (U_SUCCESS(status)) {
         fmtRelativeTimeStr.toUTF8String(result);
     }
+    if (intlAddon) {
+        IntlFormatToParts(fmtRelativeTime, result, timeVector, number, unit);
+        return;
+    }
     icu::ConstrainedFieldPosition constrainedPos;
     constrainedPos.constrainCategory(UFIELD_CATEGORY_NUMBER);
     size_t prevIndex = 0;
@@ -280,6 +284,65 @@ void RelativeTimeFormat::FormatToParts(double number, const std::string &unit,
     if (prevIndex < length) {
         InsertInfo(timeVector, unit, false, result.substr(prevIndex, length - prevIndex));
     }
+}
+
+void RelativeTimeFormat::IntlFormatToParts(icu::FormattedValue &fmtRelativeTime, const std::string& result,
+    std::vector<std::vector<std::string>> &timeVector, double number, const std::string &unit)
+{
+    UErrorCode status = U_ZERO_ERROR;
+    icu::ConstrainedFieldPosition constrainedPos;
+    constrainedPos.constrainCategory(UFIELD_CATEGORY_NUMBER);
+    int32_t prevIndex = 0;
+    size_t length = result.length();
+    std::map<int32_t, int32_t> indexMap;
+    while (fmtRelativeTime.nextPosition(constrainedPos, status)) {
+        if (U_FAILURE(status)) {
+            HILOG_ERROR_I18N("RelativeTimeFormat::FormatToParts: Get next position failed.");
+            return;
+        }
+        int32_t fieldId = constrainedPos.getField();
+        int32_t startIndex = constrainedPos.getStart();
+        int32_t limit = constrainedPos.getLimit();
+        if (constrainedPos.getField() == UNUM_GROUPING_SEPARATOR_FIELD) {
+            indexMap.insert(std::make_pair(startIndex, limit));
+            continue;
+        }
+        if (startIndex > prevIndex) {
+            std::string val = result.substr(prevIndex, startIndex - prevIndex);
+            timeVector.push_back(FormatPart("literal", val, ""));
+        }
+        for (auto iter = indexMap.begin(); iter != indexMap.end(); iter++) {
+            if (iter->first > startIndex) {
+                std::string typeString = FormatUtils::GetNumberFieldType("number", fieldId, number);
+                std::string valStr = result.substr(startIndex, iter->first - startIndex);
+                timeVector.push_back(FormatPart(typeString, valStr, unit));
+                std::string value = result.substr(iter->first, iter->second - iter->first);
+                timeVector.push_back(FormatPart("group", value, unit));
+                startIndex = iter->second;
+            }
+        }
+        std::string typeString = FormatUtils::GetNumberFieldType("number", fieldId, number);
+        std::string value = result.substr(startIndex, limit - startIndex);
+        timeVector.push_back(FormatPart(typeString, value, unit));
+        prevIndex = limit;
+    }
+    if (length > prevIndex) {
+        std::string value = result.substr(prevIndex, length - prevIndex);
+        timeVector.push_back(FormatPart("literal", value, ""));
+    }
+}
+
+std::vector<std::string> RelativeTimeFormat::FormatPart(const std::string type,
+    const std::string& value, const std::string& unit)
+{
+    std::vector<std::string> info;
+    info.push_back(type);
+    info.push_back(value);
+    if (!unit.empty()) {
+        std::string singularUnit = GetSingularUnit(unit);
+        info.push_back(singularUnit);
+    }
+    return info;
 }
 
 icu::FormattedRelativeDateTime RelativeTimeFormat::FormatToFormattedValue(double number, const std::string &unit)
