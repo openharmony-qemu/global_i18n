@@ -67,6 +67,7 @@ private:
     std::string styleString = "long";
     std::string numeric = "always";
     std::string numberingSystem = "latn";
+    std::string intlNumberingSystem = "";
     std::string localeMatcher = "best fit";
     std::unique_ptr<icu::RelativeDateTimeFormatter> relativeTimeFormat;
     UDateRelativeDateTimeFormatterStyle style = UDAT_STYLE_LONG;

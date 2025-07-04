@@ -221,22 +221,11 @@ void RelativeTimeFormat::ProcessIntegerField(const std::map<size_t, size_t> &ind
     const std::string &result)
 {
     for (auto iter = indexMap.begin(); iter != indexMap.end(); iter++) {
-        if (iter->first <= startIndex) {
-            continue;
-        }
-        InsertInfo(timeVector, unit, true, result.substr(startIndex, iter->first - startIndex));
-        if (intlAddon) {
-            std::vector<std::string> info;
-            std::string singularUnit = GetSingularUnit(unit);
-            std::string value = result.substr(iter->first, iter->second - iter->first);
-            info.push_back("group");
-            info.push_back(value);
-            info.push_back(singularUnit);
-            timeVector.push_back(info);
-        } else {
+        if (iter->first > startIndex) {
+            InsertInfo(timeVector, unit, true, result.substr(startIndex, iter->first - startIndex));
             InsertInfo(timeVector, unit, true, result.substr(iter->first, iter->second - iter->first));
+            startIndex = iter->second;
         }
-        startIndex = iter->second;
     }
 }
 
@@ -373,10 +362,11 @@ void RelativeTimeFormat::GetResolvedOptions(std::map<std::string, std::string> &
     if (!numeric.empty()) {
         map.insert(std::make_pair("numeric", numeric));
     }
-    if (!numberingSystem.empty()) {
+    if (intlAddon) {
+        std::string numSystem = intlNumberingSystem.empty() ? GetNumberSystemFromLocale() : intlNumberingSystem;
+        map.insert(std::make_pair("numberingSystem", numSystem));
+    } else if (!numberingSystem.empty()) {
         map.insert(std::make_pair("numberingSystem", numberingSystem));
-    } else if (intlAddon) {
-        map.insert(std::make_pair("numberingSystem", GetNumberSystemFromLocale()));
     }
 }
 
@@ -388,6 +378,7 @@ std::string RelativeTimeFormat::GetNumberSystemFromLocale()
         HILOG_ERROR_I18N("GetNumberSystemFromLocale: Create locale for %{public}s failed", localeBaseName.c_str());
         return "";
     }
+
     std::unique_ptr<icu::NumberingSystem> numSystem =
         std::unique_ptr<icu::NumberingSystem>(icu::NumberingSystem::createInstance(inLocale, status));
     if (U_FAILURE(status) || numSystem == nullptr) {
