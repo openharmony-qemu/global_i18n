@@ -118,22 +118,14 @@ std::map<std::string, std::string> NumberFormat::RelativeTimeFormatConfigs = {
 std::unordered_map<std::string, int> NumberFormat::defaultCurrencyFractionMap = {
     { "BHD", 3 },
     { "XOF", 0 },
-    { "XOF", 0 },
     { "BIF", 0 },
-    { "XAF", 0 },
-    { "XAF", 0 },
     { "XAF", 0 },
     { "CLP", 0 },
     { "CLF", 4 },
     { "KMF", 0 },
-    { "XAF", 0 },
-    { "XOF", 0 },
     { "DJF", 0 },
-    { "XAF", 0 },
     { "XPF", 0 },
-    { "XAF", 0 },
     { "GNF", 0 },
-    { "XOF", 0 },
     { "ISK", 0 },
     { "IQD", 3 },
     { "JPY", 0 },
@@ -141,21 +133,15 @@ std::unordered_map<std::string, int> NumberFormat::defaultCurrencyFractionMap = 
     { "KRW", 0 },
     { "KWD", 3 },
     { "LYD", 3 },
-    { "XOF", 0 },
-    { "XPF", 0 },
-    { "XOF", 0 },
     { "OMR", 3 },
     { "PYG", 0 },
     { "RWF", 0 },
-    { "XOF", 0 },
-    { "XOF", 0 },
     { "TND", 3 },
     { "UGX", 0 },
     { "UYI", 0 },
     { "UYW", 4 },
     { "VUV", 0 },
     { "VND", 0 },
-    { "XPF", 0 },
 };
 
 NumberFormat::NumberFormat(const std::vector<std::string> &localeTags, std::map<std::string, std::string> &configs)
@@ -1351,7 +1337,7 @@ std::string NumberFormat::CheckNumberFormatOptions(std::map<std::string, std::st
         {"minimumSignificantDigits", 1, 21}, // 21 is maximum of minimumSignificantDigits
         {"maximumSignificantDigits", 1, 21}, // 21 is maximum of maximumSignificantDigits
     };
-    for (auto iter = vect.begin(); iter < vect.end(); ++iter) {
+    for (auto iter = vect.begin(); iter != vect.end(); ++iter) {
         std::string optionName = std::get<0>(*iter);
         int min = std::get<1>(*iter); // 1 is item index
         int max = std::get<2>(*iter); // 2 is item index

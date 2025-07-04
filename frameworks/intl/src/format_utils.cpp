@@ -40,14 +40,12 @@ std::string FormatUtils::GetNumberFieldType(const std::string &napiType,
         return numberFormatFieldMap[formatField];
     }
     bool isBigint = napiType.compare("bigint") == 0;
-    double tempNumber = 0;
     switch (formatField) {
         case UNUM_INTEGER_FIELD:
-            tempNumber = isBigint ? tempNumber : number;
-            if (isBigint || std::isfinite(tempNumber)) {
+            if (isBigint || std::isfinite(number)) {
                 return "integer";
             }
-            if (std::isnan(tempNumber)) {
+            if (std::isnan(number)) {
                 return "nan";
             }
             return "infinity";

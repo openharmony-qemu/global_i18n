@@ -138,6 +138,7 @@ void RelativeTimeFormat::SetRelativeTimeFormat(const std::vector<std::string> &l
         std::string value = LocaleConfig::QueryExtParam(curLocale, "nu", "-u-");
         if (!value.empty()) {
             numberingSystem  = value;
+            intlNumberingSystem  = value;
         }
         break;
     }
@@ -158,6 +159,7 @@ void RelativeTimeFormat::SetRelativeTimeFormat(const std::vector<std::string> &l
             std::string value = LocaleConfig::QueryExtParam(curLocale, "nu", "-u-");
             if (!value.empty()) {
                 numberingSystem  = value;
+                intlNumberingSystem  = value;
             }
         }
     }
@@ -316,7 +318,7 @@ void RelativeTimeFormat::IntlFormatToParts(icu::FormattedValue &fmtRelativeTime,
         prevIndex = limit;
     }
     if (length > prevIndex) {
-        std::string value = result.substr(prevIndex, length - prevIndex);
+        std::string value = result.substr(prevIndex, length - static_cast<size_t>(prevIndex));
         timeVector.push_back(FormatPart("literal", value, ""));
     }
 }
@@ -378,7 +380,6 @@ std::string RelativeTimeFormat::GetNumberSystemFromLocale()
         HILOG_ERROR_I18N("GetNumberSystemFromLocale: Create locale for %{public}s failed", localeBaseName.c_str());
         return "";
     }
-
     std::unique_ptr<icu::NumberingSystem> numSystem =
         std::unique_ptr<icu::NumberingSystem>(icu::NumberingSystem::createInstance(inLocale, status));
     if (U_FAILURE(status) || numSystem == nullptr) {
