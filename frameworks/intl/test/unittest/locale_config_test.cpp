@@ -581,7 +581,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest025, TestSize.Level1)
     LocaleConfig::SetSystemLanguage("zh-Hans");
     LocaleConfig::SetSystemRegion("HK");
     I18nErrorCode errCode = LocaleConfig::SetSystemCollation("upper");
-    EXPECT_EQ(errCode, I18nErrorCode::FAILED);
+    EXPECT_EQ(errCode, I18nErrorCode::INVALID_PARAM);
     std::string systemLocaleInstanceTag = LocaleConfig::GetSystemLocaleInstanceTag();
     EXPECT_EQ(systemLocaleInstanceTag, "zh-Hans-HK");
 
@@ -694,6 +694,43 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest028, TestSize.Level1)
     EXPECT_EQ(extParam, "002c002e");
     std::string numberingSystemDigit = LocaleConfig::GetNumberingSystemDigit("latn");
     EXPECT_EQ(numberingSystemDigit, "0123456789");
+}
+
+/**
+ * @tc.name: LocaleConfigFuncTest029
+ * @tc.desc: Test LocaleConfig
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest029, TestSize.Level1)
+{
+    std::string systemLanguage = LocaleConfig::GetSystemLanguage();
+    std::string systemLocale = LocaleConfig::GetSystemLocale();
+
+    LocaleConfig::SetSystemLanguage("zh-Hans");
+    LocaleConfig::SetSystemLocale("zh-Hans-CN");
+    std::unordered_map<std::string, std::string> systemMeasurements;
+    I18nErrorCode errCode = LocaleConfig::GetSystemMeasurements(systemMeasurements);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    EXPECT_TRUE(systemMeasurements.find("uksystem") != systemMeasurements.end());
+    EXPECT_TRUE(systemMeasurements.find("ussystem") != systemMeasurements.end());
+    EXPECT_TRUE(systemMeasurements.find("metric") != systemMeasurements.end());
+
+    std::string usingMeasurement;
+    errCode = LocaleConfig::GetUsingMeasurement(usingMeasurement);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    EXPECT_EQ(usingMeasurement, "metric");
+
+    errCode = LocaleConfig::SetSystemMeasurement("uksystem");
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    errCode = LocaleConfig::GetUsingMeasurement(usingMeasurement);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    EXPECT_EQ(usingMeasurement, "uksystem");
+ 
+    errCode = LocaleConfig::SetSystemMeasurement("Invalid");
+    EXPECT_EQ(errCode, I18nErrorCode::INVALID_PARAM);
+
+    LocaleConfig::SetSystemLanguage(systemLanguage);
+    LocaleConfig::SetSystemLocale(systemLocale);
 }
 } // namespace I18n
 } // namespace Global

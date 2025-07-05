@@ -178,6 +178,30 @@ public:
      */
     static I18nErrorCode SetSystemNumberPattern(const std::string& pattern);
 
+    /**
+     * @brief Gets measurements supported by system locale.
+     *
+     * @param systemMeasurements a map will containing identifier and name of measurements supported by system locale.
+     * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
+     */
+    static I18nErrorCode GetSystemMeasurements(std::unordered_map<std::string, std::string>& systemMeasurements);
+
+    /**
+     * @brief Gets measurement currently used by system locale.
+     *
+     * @param usingMeasurement The identifier of measurement system using by system locale.
+     * @return I18nErrorCode Return SUCCESS indicates that the getting was successful.
+     */
+    static I18nErrorCode GetUsingMeasurement(std::string& identifier);
+
+    /**
+     * @brief Sets the measurement system used by the system locale.
+     *
+     * @param identifier Identifier of the measurement system.
+     * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
+     */
+    static I18nErrorCode SetSystemMeasurement(const std::string& identifier);
+
     static std::string GetLanguageFromUserId(int32_t userId);
 
 private:

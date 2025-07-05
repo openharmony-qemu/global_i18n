@@ -32,5 +32,8 @@ interface OHOS.Global.I18n.II18nServiceAbility {
     void GetSystemNumberPatterns([inout] Map<String, String> systemNumberPatterns, [out] int code);
     void GetUsingNumberPattern([inout] String usingNumberPattern, [out] int code);
     void SetSystemNumberPattern([in] String pattern, [out] int code);
+    void GetSystemMeasurements([inout] Map<String, String> systemMeasurements, [out] int code);
+    void GetUsingMeasurement([inout] String identifier, [out] int code);
+    void SetSystemMeasurement([in] String identifier, [out] int code);
     void GetLanguageFromUserId([in] int userId, [out] String language);
 };

@@ -172,6 +172,31 @@ public:
      */
     static I18nErrorCode SetSystemNumberPattern(const std::string& pattern, int32_t userId = -1);
 
+    /**
+     * @brief Gets measurements supported by system locale.
+     *
+     * @param systemMeasurements a map will containing identifier and name of measurements supported by system locale.
+     * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
+     */
+    static I18nErrorCode GetSystemMeasurements(std::unordered_map<std::string, std::string>& systemMeasurements);
+
+    /**
+     * @brief Gets measurement currently used by system locale.
+     *
+     * @param usingMeasurement The identifier of measurement system using by system locale.
+     * @return I18nErrorCode Return SUCCESS indicates that the getting was successful.
+     */
+    static I18nErrorCode GetUsingMeasurement(std::string& identifier);
+
+    /**
+     * @brief Sets the measurement system used by the system locale.
+     *
+     * @param identifier Identifier of the measurement system.
+     * @param userId Indicates update user id.
+     * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
+     */
+    static I18nErrorCode SetSystemMeasurement(const std::string& identifier, int32_t userId = -1);
+
     static TemperatureType GetTemperatureType();
     static std::string GetTemperatureName(const TemperatureType& type);
     static WeekDay GetFirstDayOfWeek();
@@ -279,6 +304,7 @@ private:
     static const std::string CASE_FIRST_KEY;
     static const std::string COLLATION_KEY;
     static const std::string NUNBER_PATTERN_KEY;
+    static const std::string MEASUREMENT_KEY;
     static const std::string DEFAULT_NUMBERING_SYSTEM_NAME;
 
     static const std::unordered_set<std::string>& GetSupportedLocales();
@@ -380,6 +406,7 @@ private:
         std::unordered_map<std::string, std::string>& systemNumberPatterns, const std::string& locale);
     static std::string NumberPatternToHex(const std::string& groupingSymbol, const std::string& decimalSymbol);
     static std::pair<std::string, std::string> HexToNumberPattern(const std::string& hex);
+    static bool IsValidMeasurement(const std::string& measurement);
     static std::unordered_map<std::string, std::unordered_map<std::string, std::string>> ParseAllExtParam(
         std::string locale);
     static std::unordered_map<std::string, std::string> ParseExtParam(const std::string& extParam,

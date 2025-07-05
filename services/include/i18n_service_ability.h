@@ -53,6 +53,10 @@ public:
         int32_t& code) override;
     ErrCode GetUsingNumberPattern(std::string& usingNumberPattern, int32_t& code) override;
     ErrCode SetSystemNumberPattern(const std::string& pattern, int32_t& code) override;
+    ErrCode GetSystemMeasurements(std::unordered_map<std::string, std::string>& systemMeasurements,
+        int32_t& code) override;
+    ErrCode GetUsingMeasurement(std::string& identifier, int32_t& code) override;
+    ErrCode SetSystemMeasurement(const std::string& identifier, int32_t& code) override;
     ErrCode GetLanguageFromUserId(int32_t userId, std::string& language) override;
 
 protected:

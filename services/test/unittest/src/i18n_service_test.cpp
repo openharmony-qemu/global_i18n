@@ -575,6 +575,34 @@ HWTEST_F(I18nServiceTest, I18nServiceFuncTest033, TestSize.Level1)
     EXPECT_EQ(err, I18nErrorCode::SUCCESS);
     EXPECT_EQ(usingNumberPattern, "002e002c");
 }
+
+/**
+ * @tc.name: I18nServiceFuncTest034
+ * @tc.desc: Test I18nServiceAbilityClient set and get measurement
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nServiceTest, I18nServiceFuncTest034, TestSize.Level1)
+{
+    InitTestEnvironment();
+    AddNativeTokenTypeAndPermissions();
+    I18nErrorCode err = I18nServiceAbilityClient::SetSystemLanguage("zh-Hans");
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    err = I18nServiceAbilityClient::SetSystemLocale("zh-Hans-CN");
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+
+    std::unordered_map<std::string, std::string> systemMeasurements;
+    err = I18nServiceAbilityClient::GetSystemMeasurements(systemMeasurements);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    EXPECT_TRUE(systemMeasurements.find("uksystem") != systemMeasurements.end());
+    EXPECT_TRUE(systemMeasurements.find("metric") != systemMeasurements.end());
+    EXPECT_TRUE(systemMeasurements.find("ussystem") != systemMeasurements.end());
+    err = I18nServiceAbilityClient::SetSystemMeasurement("ussystem");
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    std::string usingMeasurement;
+    err = I18nServiceAbilityClient::GetUsingMeasurement(usingMeasurement);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    EXPECT_EQ(usingMeasurement, "ussystem");
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
