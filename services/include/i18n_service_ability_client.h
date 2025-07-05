@@ -202,6 +202,31 @@ public:
      */
     static I18nErrorCode SetSystemMeasurement(const std::string& identifier);
 
+    /**
+     * @brief Gets numerical date patterns and examples supported by system locale.
+     *
+     * @param numericalDatePatterns a map containing the date patterns and examples.
+     * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
+     */
+    static I18nErrorCode GetSystemNumericalDatePatterns(
+        std::unordered_map<std::string, std::string>& numericalDatePatterns);
+
+    /**
+     * @brief Gets numerical date pattern currently used by system locale.
+     *
+     * @param identifier Identifier of numerical date pattern used by system locale
+     * @return I18nErrorCode Return SUCCESS indicates that the getting was successful.
+     */
+    static I18nErrorCode GetUsingNumericalDatePattern(std::string& identifier);
+
+    /**
+     * @brief Sets the numerical date pattern used by the system locale.
+     *
+     * @param identifier Identifier of the numerical date pattern.
+     * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
+     */
+    static I18nErrorCode SetSystemNumericalDatePattern(const std::string& identifier);
+
     static std::string GetLanguageFromUserId(int32_t userId);
 
 private:

@@ -19,6 +19,7 @@
 #include <vector>
 #include <climits>
 #include <set>
+#include <unordered_map>
 #include "locale_info.h"
 #include "unicode/datefmt.h"
 #include "unicode/dtptngen.h"
@@ -57,6 +58,12 @@ public:
     std::string GetSecond() const;
     static std::unique_ptr<DateTimeFormat> CreateInstance(const std::vector<std::string> &localeTags,
                                                           std::map<std::string, std::string> &configs);
+    static icu::UnicodeString GetPatternFromLocale(const std::string& localeTag);
+    static std::unordered_map<std::string, std::string> GetPatternsFromLocale(const std::string& localeTag);
+    static icu::UnicodeString GetYMDPatternFromNumber(const std::string& number);
+    static std::string GetNumberFromPattern(const icu::UnicodeString& pattern);
+    static std::string GetDateSampleFromPattern(const icu::UnicodeString& pattern, const std::string& localeTag);
+    static bool IsValidPatternNumber(const std::string& number);
 
 private:
     std::string localeTag;
@@ -144,12 +151,19 @@ private:
         std::string shortChar, std::string narrowChar);
     void InitDateFormatWithoutConfigs(UErrorCode &status);
     void InitDateFormat(UErrorCode &status);
-    void InitDateFormatWithDateTimeStyle(UErrorCode &status);
+    void InitDateFormatWithDateTimeStyle(bool& initSuccess, UErrorCode &status);
     void GetAdditionalResolvedOptions(std::map<std::string, std::string> &map);
     void FixPatternPartOne();
     void FixPatternPartTwo();
     void RemoveAmPmChar();
     bool CheckInitSuccess();
+    bool InitPatternByDateStyle();
+    bool InitPatternByNumeric();
+    void ReplacePattern(const icu::UnicodeString& tempPattern, const icu::UnicodeString& replacePattern);
+    bool InitFormatter();
+    static icu::UnicodeString GetBestPattern(const icu::UnicodeString& skeleton, const icu::Locale& icuLocale);
+    static icu::UnicodeString GetBestPattern(icu::DateFormat::EStyle dateStyle, icu::DateFormat::EStyle timeStyle,
+        const icu::Locale& icuLocale);
 };
 } // namespace I18n
 } // namespace Global

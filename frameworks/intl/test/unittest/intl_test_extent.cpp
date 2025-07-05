@@ -753,8 +753,8 @@ HWTEST_F(IntlTest, IntlFuncTest0066, TestSize.Level1)
         EXPECT_EQ(dateRes, "12 Jan 1970");
         EXPECT_EQ(timeRes, "06:20:54");
     } else {
-        EXPECT_EQ(defaultRes, "12/01/1970");
-        EXPECT_EQ(dateRes, "12/01/1970");
+        EXPECT_EQ(defaultRes, "1970/1/12");
+        EXPECT_EQ(dateRes, "1970/1/12");
         EXPECT_EQ(timeRes, "06:20");
     }
 }

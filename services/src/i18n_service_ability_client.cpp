@@ -419,6 +419,61 @@ I18nErrorCode I18nServiceAbilityClient::SetSystemMeasurement(const std::string& 
     return static_cast<I18nErrorCode>(code);
 }
 
+I18nErrorCode I18nServiceAbilityClient::GetSystemNumericalDatePatterns(
+    std::unordered_map<std::string, std::string>& numericalDatePatterns)
+{
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetSystemNumericalDatePatterns: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->GetSystemNumericalDatePatterns(numericalDatePatterns, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetSystemNumericalDatePatterns: Get system numerical date pattern "
+            "failed, errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
+}
+
+I18nErrorCode I18nServiceAbilityClient::GetUsingNumericalDatePattern(std::string& identifier)
+{
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetUsingNumericalDatePattern: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->GetUsingNumericalDatePattern(identifier, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetUsingNumericalDatePattern: Get using numerical date pattern "
+            "failed, errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
+}
+
+I18nErrorCode I18nServiceAbilityClient::SetSystemNumericalDatePattern(const std::string& identifier)
+{
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetSystemNumericalDatePattern: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->SetSystemNumericalDatePattern(identifier, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetSystemNumericalDatePattern: Set system numerical date pattern "
+            "failed, errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
+}
+
 std::string I18nServiceAbilityClient::GetLanguageFromUserId(int32_t userId)
 {
     I18nErrorCode err = I18nErrorCode::SUCCESS;

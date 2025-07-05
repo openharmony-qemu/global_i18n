@@ -121,6 +121,7 @@ private:
     std::unique_ptr<LocaleInfo> localeInfo = nullptr;
     std::unique_ptr<RelativeTimeFormat> relativeTimeFormat = nullptr;
     icu::number::LocalizedNumberFormatter numberFormat;
+    icu::number::LocalizedNumberRangeFormatter numberRangeFormat;
     icu::number::UnlocalizedNumberFormatter styleFormatter;
     icu::number::Notation notation = icu::number::Notation::simple();
     UNumberRoundingPriority roundingPriority = UNumberRoundingPriority::UNUM_ROUNDING_PRIORITY_STRICT;
