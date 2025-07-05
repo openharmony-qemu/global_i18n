@@ -236,11 +236,13 @@ void RelativeTimeFormat::FormatToParts(double number, const std::string &unit,
 {
     icu::FormattedRelativeDateTime fmtRelativeTime = FormatToFormattedValue(number, unit);
     UErrorCode status = U_ZERO_ERROR;
-    std::string result;
     icu::UnicodeString fmtRelativeTimeStr = fmtRelativeTime.toString(status);
-    if (U_SUCCESS(status)) {
-        fmtRelativeTimeStr.toUTF8String(result);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("RelativeTimeFormat::FormatToParts: Get formated string failed.");
+        return;
     }
+    std::string result;
+    fmtRelativeTimeStr.toUTF8String(result);
     if (intlAddon) {
         IntlFormatToParts(fmtRelativeTime, result, timeVector, number, unit);
         return;
