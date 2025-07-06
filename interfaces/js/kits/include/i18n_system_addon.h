@@ -103,6 +103,9 @@ private:
     static napi_value GetSystemMeasurements(napi_env env, napi_callback_info info);
     static napi_value GetUsingMeasurement(napi_env env, napi_callback_info info);
     static napi_value SetSystemMeasurement(napi_env env, napi_callback_info info);
+    static napi_value GetSystemNumericalDatePatterns(napi_env env, napi_callback_info info);
+    static napi_value GetUsingNumericalDatePattern(napi_env env, napi_callback_info info);
+    static napi_value SetSystemNumericalDatePattern(napi_env env, napi_callback_info info);
     static const std::string NAME_OF_TEMPERATURE;
     static const std::string TYPE_OF_TEMPERATURE;
     static const std::string NAME_OF_WEEKDAY;

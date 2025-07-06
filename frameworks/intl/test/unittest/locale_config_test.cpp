@@ -732,6 +732,52 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest029, TestSize.Level1)
     LocaleConfig::SetSystemLanguage(systemLanguage);
     LocaleConfig::SetSystemLocale(systemLocale);
 }
+
+/**
+ * @tc.name: LocaleConfigFuncTest030
+ * @tc.desc: Test LocaleConfig
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest030, TestSize.Level1)
+{
+    std::string systemLanguage = LocaleConfig::GetSystemLanguage();
+    std::string systemLocale = LocaleConfig::GetSystemLocale();
+
+    LocaleConfig::SetSystemLanguage("zh-Hans");
+    LocaleConfig::SetSystemLocale("zh-Hans-CN");
+    std::unordered_map<std::string, std::string> numericalDatePatterns;
+    I18nErrorCode errCode = LocaleConfig::GetSystemNumericalDatePatterns(numericalDatePatterns);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    EXPECT_TRUE(numericalDatePatterns.find("dd/MM/y") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("dd/M/yy") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("y-MM-dd") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("dd/M/y") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("dd/MM/yy") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("dd.MM.yy") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("yy/MM/dd") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("dd.MM.y") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("d\u200f/M\u200f/y") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("dd-MM-y") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("y/M/dd") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("dd-M-y") != numericalDatePatterns.end());
+
+    std::string identifier;
+    errCode = LocaleConfig::GetUsingNumericalDatePattern(identifier);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    EXPECT_EQ(identifier, "y/M/dd");
+
+    errCode = LocaleConfig::SetSystemNumericalDatePattern("dd/MM/yy");
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    errCode = LocaleConfig::GetUsingNumericalDatePattern(identifier);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    EXPECT_EQ(identifier, "dd/MM/yy");
+ 
+    errCode = LocaleConfig::SetSystemNumericalDatePattern("Invalid");
+    EXPECT_EQ(errCode, I18nErrorCode::INVALID_PARAM);
+
+    LocaleConfig::SetSystemLanguage(systemLanguage);
+    LocaleConfig::SetSystemLocale(systemLocale);
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

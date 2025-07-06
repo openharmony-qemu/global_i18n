@@ -197,6 +197,32 @@ public:
      */
     static I18nErrorCode SetSystemMeasurement(const std::string& identifier, int32_t userId = -1);
 
+    /**
+     * @brief Gets numerical date patterns and examples supported by system locale.
+     *
+     * @param numericalDatePatterns a map containing the date patterns and examples.
+     * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
+     */
+    static I18nErrorCode GetSystemNumericalDatePatterns(
+        std::unordered_map<std::string, std::string>& numericalDatePatterns);
+
+    /**
+     * @brief Gets numerical date pattern currently used by system locale.
+     *
+     * @param identifier Identifier of numerical date pattern used by system locale
+     * @return I18nErrorCode Return SUCCESS indicates that the getting was successful.
+     */
+    static I18nErrorCode GetUsingNumericalDatePattern(std::string& identifier);
+
+    /**
+     * @brief Sets the numerical date pattern used by the system locale.
+     *
+     * @param identifier Identifier of the numerical date pattern.
+     * @param userId Indicates update user id.
+     * @return I18nErrorCode Return SUCCESS indicates that the setting was successful.
+     */
+    static I18nErrorCode SetSystemNumericalDatePattern(const std::string& identifier, int32_t userId = -1);
+
     static TemperatureType GetTemperatureType();
     static std::string GetTemperatureName(const TemperatureType& type);
     static WeekDay GetFirstDayOfWeek();
@@ -243,6 +269,7 @@ public:
     static std::string QueryExtParam(const std::string& locale, const std::string& key,
         const std::string& extParamKey);
     static std::string GetNumberingSystemDigit(const std::string& NumberingSystem);
+    static std::string GetPatternNumberFromLocale(const std::string& locale);
     static icu::Locale GetIcuLocale(const std::string& localeTag);
     static const std::string HOUR_EVENT_DATA;
     static const std::string LANGUAGE_KEY;
@@ -305,6 +332,7 @@ private:
     static const std::string COLLATION_KEY;
     static const std::string NUNBER_PATTERN_KEY;
     static const std::string MEASUREMENT_KEY;
+    static const std::string NUMERIC_DATE_KEY;
     static const std::string DEFAULT_NUMBERING_SYSTEM_NAME;
 
     static const std::unordered_set<std::string>& GetSupportedLocales();

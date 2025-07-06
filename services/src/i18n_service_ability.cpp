@@ -466,6 +466,63 @@ ErrCode I18nServiceAbility::SetSystemMeasurement(const std::string& identifier, 
     return ERR_OK;
 }
 
+ErrCode I18nServiceAbility::GetSystemNumericalDatePatterns(
+    std::unordered_map<std::string, std::string>& numericalDatePatterns, int32_t& code)
+{
+    int pid = getpid();
+    StartTask(pid);
+    I18nErrorCode errCode = CheckSystemPermission();
+    if (errCode != I18nErrorCode::SUCCESS) {
+        HILOG_ERROR_I18N("I18nServiceAbility::GetSystemNumericalDatePatterns: Check system permission failed.");
+        code = static_cast<int32_t>(errCode);
+        FinishTask(pid);
+        return ERR_OK;
+    }
+    errCode = LocaleConfig::GetSystemNumericalDatePatterns(numericalDatePatterns);
+    code = static_cast<int32_t>(errCode);
+    FinishTask(pid);
+    return ERR_OK;
+}
+
+ErrCode I18nServiceAbility::GetUsingNumericalDatePattern(std::string& identifier, int32_t& code)
+{
+    int pid = getpid();
+    StartTask(pid);
+    I18nErrorCode errCode = CheckSystemPermission();
+    if (errCode != I18nErrorCode::SUCCESS) {
+        HILOG_ERROR_I18N("I18nServiceAbility::GetUsingNumericalDatePattern: Check system permission failed.");
+        code = static_cast<int32_t>(errCode);
+        FinishTask(pid);
+        return ERR_OK;
+    }
+    errCode = LocaleConfig::GetUsingNumericalDatePattern(identifier);
+    code = static_cast<int32_t>(errCode);
+    FinishTask(pid);
+    return ERR_OK;
+}
+
+ErrCode I18nServiceAbility::SetSystemNumericalDatePattern(const std::string& identifier, int32_t& code)
+{
+    int pid = getpid();
+    StartTask(pid);
+    I18nErrorCode errCode = CheckPermission();
+    if (errCode != I18nErrorCode::SUCCESS) {
+        HILOG_ERROR_I18N("I18nServiceAbility::SetSystemNumericalDatePattern: Check permission failed.");
+        code = static_cast<int32_t>(errCode);
+        FinishTask(pid);
+        return ERR_OK;
+    }
+#ifdef SUPPORT_MULTI_USER
+    int32_t userId = GetCallingUserId();
+    errCode = LocaleConfig::SetSystemNumericalDatePattern(identifier, userId);
+#else
+    errCode = LocaleConfig::SetSystemNumericalDatePattern(identifier);
+#endif
+    code = static_cast<int32_t>(errCode);
+    FinishTask(pid);
+    return ERR_OK;
+}
+
 ErrCode I18nServiceAbility::GetLanguageFromUserId(int32_t userId, std::string& language)
 {
     int pid = getpid();

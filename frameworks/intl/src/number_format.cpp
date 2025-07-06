@@ -244,6 +244,9 @@ void NumberFormat::InitNumberFormat()
     InitProperties(tempFormatter);
     styleFormatter = tempFormatter;
     numberFormat = tempFormatter.locale(locale);
+    numberRangeFormat = icu::number::NumberRangeFormatter::with()
+        .numberFormatterBoth(tempFormatter)
+        .locale(locale);
 }
 
 void NumberFormat::CreateRelativeTimeFormat(const std::string& locale)

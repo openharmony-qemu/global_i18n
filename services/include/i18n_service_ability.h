@@ -57,6 +57,10 @@ public:
         int32_t& code) override;
     ErrCode GetUsingMeasurement(std::string& identifier, int32_t& code) override;
     ErrCode SetSystemMeasurement(const std::string& identifier, int32_t& code) override;
+    ErrCode GetSystemNumericalDatePatterns(std::unordered_map<std::string, std::string>& numericalDatePatterns,
+        int32_t& code) override;
+    ErrCode GetUsingNumericalDatePattern(std::string& identifier, int32_t& code) override;
+    ErrCode SetSystemNumericalDatePattern(const std::string& identifier, int32_t& code) override;
     ErrCode GetLanguageFromUserId(int32_t userId, std::string& language) override;
 
 protected:

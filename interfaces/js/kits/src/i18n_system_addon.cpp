@@ -90,6 +90,9 @@ napi_value I18nSystemAddon::InitI18nSystem(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getSystemMeasurements", GetSystemMeasurements),
         DECLARE_NAPI_STATIC_FUNCTION("getUsingMeasurement", GetUsingMeasurement),
         DECLARE_NAPI_STATIC_FUNCTION("setSystemMeasurement", SetSystemMeasurement),
+        DECLARE_NAPI_STATIC_FUNCTION("getSystemNumericalDatePatterns", GetSystemNumericalDatePatterns),
+        DECLARE_NAPI_STATIC_FUNCTION("getUsingNumericalDatePattern", GetUsingNumericalDatePattern),
+        DECLARE_NAPI_STATIC_FUNCTION("setSystemNumericalDatePattern", SetSystemNumericalDatePattern),
     };
     napi_value constructor = nullptr;
     napi_status status = napi_define_class(env, "System", NAPI_AUTO_LENGTH, JSUtils::DefaultConstructor, nullptr,
@@ -1440,6 +1443,80 @@ napi_value I18nSystemAddon::SetSystemMeasurement(napi_env env, napi_callback_inf
             break;
         default:
             HILOG_ERROR_I18N("I18nSystemAddon::SetSystemMeasurement: Set system measurement failed.");
+    }
+    return nullptr;
+}
+
+napi_value I18nSystemAddon::GetSystemNumericalDatePatterns(napi_env env, napi_callback_info info)
+{
+    std::unordered_map<std::string, std::string> numericalDatePatterns;
+    I18nErrorCode err = I18nServiceAbilityClient::GetSystemNumericalDatePatterns(numericalDatePatterns);
+    if (err == I18nErrorCode::NOT_SYSTEM_APP) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_SYSTEM_APP, "", "", true);
+        return nullptr;
+    }
+    return VariableConvertor::CreateMap(env, numericalDatePatterns);
+}
+
+napi_value I18nSystemAddon::GetUsingNumericalDatePattern(napi_env env, napi_callback_info info)
+{
+    std::string identifier;
+    I18nErrorCode err = I18nServiceAbilityClient::GetUsingNumericalDatePattern(identifier);
+    if (err == I18nErrorCode::NOT_SYSTEM_APP) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_SYSTEM_APP, "", "", true);
+        return nullptr;
+    }
+    return VariableConvertor::CreateString(env, identifier);
+}
+
+napi_value I18nSystemAddon::SetSystemNumericalDatePattern(napi_env env, napi_callback_info info)
+{
+    size_t argc = 1;
+    napi_value argv[1] = { nullptr };
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("I18nSystemAddon::SetSystemNumericalDatePattern: Get cb info failed.");
+        return nullptr;
+    } else if (argc < 1) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "identifier", "", true);
+        return nullptr;
+    }
+
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("I18nSystemAddon::SetSystemNumericalDatePattern: Failed to get type of argv[0].");
+        return nullptr;
+    } else if (valueType != napi_valuetype::napi_string) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "identifier", "string", true);
+        return nullptr;
+    }
+
+    int32_t code = 0;
+    std::string identifier = VariableConvertor::GetString(env, argv[0], code);
+    if (code != 0) {
+        HILOG_ERROR_I18N("I18nSystemAddon::SetSystemNumericalDatePattern: Get string from argv[0] failed.");
+        return nullptr;
+    }
+
+    I18nErrorCode err = I18nServiceAbilityClient::SetSystemNumericalDatePattern(identifier);
+    if (err == I18nErrorCode::SUCCESS) {
+        return nullptr;
+    }
+    switch (err) {
+        case I18nErrorCode::NOT_SYSTEM_APP:
+            ErrorUtil::NapiThrow(env, I18N_NOT_SYSTEM_APP, "", "", true);
+            break;
+        case I18nErrorCode::NO_PERMISSION:
+            ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, "", "", true);
+            break;
+        case I18nErrorCode::INVALID_PARAM:
+            ErrorUtil::NapiThrow(env, I18N_NOT_VALID_NEW, "identifier", "in a numerical date pattern supported by "
+                "the system", true);
+            break;
+        default:
+            HILOG_ERROR_I18N(
+                "I18nSystemAddon::SetSystemNumericalDatePattern: Set system numerical date pattern failed.");
     }
     return nullptr;
 }
