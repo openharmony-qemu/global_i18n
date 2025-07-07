@@ -50,6 +50,16 @@ static std::unordered_map<WeekDay, UCalendarDaysOfWeek> WEEK_DAY_TO_ICU {
     { WeekDay::SUN, UCalendarDaysOfWeek::UCAL_SUNDAY }
 };
 
+static std::unordered_map<std::string, UCalendarDaysOfWeek> WEEK_DAY_STR_TO_ICU {
+    { "mon", UCalendarDaysOfWeek::UCAL_MONDAY },
+    { "tue", UCalendarDaysOfWeek::UCAL_TUESDAY },
+    { "wed", UCalendarDaysOfWeek::UCAL_WEDNESDAY },
+    { "thu", UCalendarDaysOfWeek::UCAL_THURSDAY },
+    { "fri", UCalendarDaysOfWeek::UCAL_FRIDAY },
+    { "sat", UCalendarDaysOfWeek::UCAL_SATURDAY },
+    { "sun", UCalendarDaysOfWeek::UCAL_SUNDAY }
+};
+
 I18nCalendar::I18nCalendar(std::string localeTag)
 {
     UErrorCode status = U_ZERO_ERROR;
@@ -356,17 +366,20 @@ icu::Calendar* I18nCalendar::GetIcuCalendar() const
 
 void I18nCalendar::InitFirstDayOfWeek(const std::string& localeTag)
 {
+    icu::Calendar* icuCalendar = GetIcuCalendar();
+    if (icuCalendar == nullptr) {
+        return;
+    }
     std::string param = LocaleConfig::QueryExtParam(localeTag, "fw", "-u-");
     if (!param.empty()) {
+        if (WEEK_DAY_STR_TO_ICU.find(param) != WEEK_DAY_STR_TO_ICU.end()) {
+            icuCalendar->setFirstDayOfWeek(WEEK_DAY_STR_TO_ICU[param]);
+        }
         return;
     }
     WeekDay weekDay = LocaleConfig::GetFirstDayOfWeek();
     auto iter = WEEK_DAY_TO_ICU.find(weekDay);
     if (iter == WEEK_DAY_TO_ICU.end()) {
-        return;
-    }
-    icu::Calendar* icuCalendar = GetIcuCalendar();
-    if (icuCalendar == nullptr) {
         return;
     }
     icuCalendar->setFirstDayOfWeek(iter->second);
