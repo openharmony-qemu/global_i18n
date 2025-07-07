@@ -2037,8 +2037,13 @@ I18nErrorCode LocaleConfig::GetUsingNumberPattern(std::string& usingNumberPatter
 I18nErrorCode LocaleConfig::SetSystemNumberPattern(const std::string& pattern, int32_t userId)
 {
     std::string systemLocale = MultiUsers::GetSystemLocaleFromUserId(userId);
+    std::vector<std::pair<size_t, std::string>> positions = GetExtParamPositions(systemLocale);
+    std::string localeWithoutExtParam = systemLocale;
+    if (positions[0].first != std::string::npos) {
+        localeWithoutExtParam = systemLocale.substr(0, positions[0].first);
+    }
     std::unordered_map<std::string, std::string> systemNumberPatterns;
-    I18nErrorCode errCode = GetSystemNumberPatternsFromLocale(systemNumberPatterns, systemLocale);
+    I18nErrorCode errCode = GetSystemNumberPatternsFromLocale(systemNumberPatterns, localeWithoutExtParam);
     if (errCode != I18nErrorCode::SUCCESS) {
         HILOG_ERROR_I18N("LocaleConfig::SetSystemNumberPattern: Get system number patterns failed.");
         return I18nErrorCode::FAILED;
@@ -2373,7 +2378,7 @@ std::string LocaleConfig::UpdateLanguageOfLocale(const std::string &languageTag)
     systemLocaleTag = LocaleConfig::ModifyExtParam(systemLocaleTag, COLLATION_KEY, "", STANDARD_EXT_PARAM_KEY);
     systemLocaleTag = LocaleConfig::ModifyExtParam(systemLocaleTag, NUMBER_SYSTEM_KEY, "", STANDARD_EXT_PARAM_KEY);
     std::string numberPattern = LocaleConfig::QueryExtParam(systemLocaleTag, NUNBER_PATTERN_KEY, CUST_EXT_PARAM_KEY);
-    if (NumberPatternToDescription.find(numberPattern) != NumberPatternToDescription.end()) {
+    if (NumberPatternToDescription.find(numberPattern) == NumberPatternToDescription.end()) {
         systemLocaleTag = LocaleConfig::ModifyExtParam(systemLocaleTag, NUNBER_PATTERN_KEY, "", CUST_EXT_PARAM_KEY);
     }
     std::vector<std::pair<size_t, std::string>> positions = GetExtParamPositions(systemLocaleTag);
@@ -2435,7 +2440,7 @@ std::string LocaleConfig::UpdateRegionOfLocale(const std::string &regionTag)
     }
     ret += extParam;
     std::string numberPattern = LocaleConfig::QueryExtParam(ret, NUNBER_PATTERN_KEY, CUST_EXT_PARAM_KEY);
-    if (NumberPatternToDescription.find(numberPattern) != NumberPatternToDescription.end()) {
+    if (NumberPatternToDescription.find(numberPattern) == NumberPatternToDescription.end()) {
         ret = LocaleConfig::ModifyExtParam(ret, NUNBER_PATTERN_KEY, "", CUST_EXT_PARAM_KEY);
     }
     return ret;
