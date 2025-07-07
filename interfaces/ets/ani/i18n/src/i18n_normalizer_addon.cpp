@@ -87,15 +87,20 @@ ani_status I18nNormalizerAddon::BindContextNormalizer(ani_env *env)
         return (ani_status)ANI_ERROR;
     }
 
-    std::array methods = {
+    std::array staticMethods = {
         ani_native_function { "getInstance", nullptr, reinterpret_cast<void *>(I18nNormalizerAddon::GetInstance) },
+    };
+    if (ANI_OK != env->Class_BindStaticNativeMethods(cls, staticMethods.data(), staticMethods.size())) {
+        HILOG_ERROR_I18N("Cannot bind static native methods to '%{public}s'", className);
+        return (ani_status)ANI_ERROR;
+    }
+
+    std::array methods = {
         ani_native_function { "normalize", nullptr, reinterpret_cast<void *>(I18nNormalizerAddon::Normalize) },
     };
-
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
         HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
         return (ani_status)ANI_ERROR;
-    };
-
+    }
     return ANI_OK;
 }

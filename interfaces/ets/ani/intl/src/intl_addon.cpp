@@ -579,6 +579,16 @@ ani_status IntlAddon::BindContext_DateTimeFormat(ani_env *env)
     }
 
     std::array methods = {
+        ani_native_function {"format", nullptr, reinterpret_cast<void *>(DateTimeFormat_Format) },
+        ani_native_function {"formatRange", nullptr, reinterpret_cast<void *>(DateTimeFormat_FormatRange) },
+        ani_native_function {"resolvedOptions", nullptr, reinterpret_cast<void *>(DateTimeFormat_ResolvedOptions) },
+    };
+    if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
+        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+        return (ani_status)ANI_ERROR;
+    }
+
+    std::array staticMethods = {
         ani_native_function {"create", ":C{@ohos.intl.intl.DateTimeFormat}",
             reinterpret_cast<void *>(DateTimeFormat_Create) },
         ani_native_function {
@@ -587,15 +597,11 @@ ani_status IntlAddon::BindContext_DateTimeFormat(ani_env *env)
             "C{@ohos.intl.intl.DateTimeFormat}",
             reinterpret_cast<void *>(DateTimeFormat_CreateWithParam)
         },
-        ani_native_function {"format", nullptr, reinterpret_cast<void *>(DateTimeFormat_Format) },
-        ani_native_function {"formatRange", nullptr, reinterpret_cast<void *>(DateTimeFormat_FormatRange) },
-        ani_native_function {"resolvedOptions", nullptr, reinterpret_cast<void *>(DateTimeFormat_ResolvedOptions) },
     };
-
-    if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+    if (ANI_OK != env->Class_BindStaticNativeMethods(cls, staticMethods.data(), staticMethods.size())) {
+        HILOG_ERROR_I18N("Cannot bind static native methods to '%{public}s'", className);
         return (ani_status)ANI_ERROR;
-    };
+    }
     return ANI_OK;
 }
 
@@ -609,20 +615,26 @@ ani_status IntlAddon::BindContext_Collator(ani_env *env)
     }
 
     std::array methods = {
+        ani_native_function {"compare", nullptr, reinterpret_cast<void *>(Collator_Compare) },
+        ani_native_function {"resolvedOptions", nullptr, reinterpret_cast<void *>(Collator_ResolvedOptions) },
+    };
+    if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
+        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+        return (ani_status)ANI_ERROR;
+    }
+
+    std::array staticMethods = {
         ani_native_function {"create", ":C{@ohos.intl.intl.Collator}", reinterpret_cast<void *>(Collator_Create) },
         ani_native_function {
             "create",
             "X{C{std.core.String}C{escompat.Array}}C{@ohos.intl.intl.CollatorOptions}:C{@ohos.intl.intl.Collator}",
             reinterpret_cast<void *>(Collator_CreateWithParam)
         },
-        ani_native_function {"compare", nullptr, reinterpret_cast<void *>(Collator_Compare) },
-        ani_native_function {"resolvedOptions", nullptr, reinterpret_cast<void *>(Collator_ResolvedOptions) },
     };
-
-    if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+    if (ANI_OK != env->Class_BindStaticNativeMethods(cls, staticMethods.data(), staticMethods.size())) {
+        HILOG_ERROR_I18N("Cannot bind static native methods to '%{public}s'", className);
         return (ani_status)ANI_ERROR;
-    };
+    }
     return ANI_OK;
 }
 
@@ -636,6 +648,14 @@ ani_status IntlAddon::BindContext_PluralRules(ani_env *env)
     }
 
     std::array methods = {
+        ani_native_function {"select", nullptr, reinterpret_cast<void *>(PluralRules_Select) },
+    };
+    if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
+        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+        return (ani_status)ANI_ERROR;
+    }
+
+    std::array staticMethods = {
         ani_native_function {"create",
             ":C{@ohos.intl.intl.PluralRules}",
             reinterpret_cast<void *>(PluralRules_Create) },
@@ -645,13 +665,11 @@ ani_status IntlAddon::BindContext_PluralRules(ani_env *env)
             "C{@ohos.intl.intl.PluralRules}",
             reinterpret_cast<void *>(PluralRules_CreateWithParam)
         },
-        ani_native_function {"select", nullptr, reinterpret_cast<void *>(PluralRules_Select) },
     };
-
-    if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+    if (ANI_OK != env->Class_BindStaticNativeMethods(cls, staticMethods.data(), staticMethods.size())) {
+        HILOG_ERROR_I18N("Cannot bind static native methods to '%{public}s'", className);
         return (ani_status)ANI_ERROR;
-    };
+    }
     return ANI_OK;
 }
 
@@ -665,6 +683,16 @@ ani_status IntlAddon::BindContext_RelativeTimeFormat(ani_env *env)
     }
 
     std::array methods = {
+        ani_native_function {"format", nullptr, reinterpret_cast<void *>(RelativeTimeFormat_Format) },
+        ani_native_function {"formatToParts", nullptr, reinterpret_cast<void *>(RelativeTimeFormat_FormatToParts) },
+        ani_native_function {"resolvedOptions", nullptr, reinterpret_cast<void *>(RelativeTimeFormat_ResolvedOptions) },
+    };
+    if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
+        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+        return (ani_status)ANI_ERROR;
+    }
+
+    std::array staticMethods = {
         ani_native_function {"create", ":C{@ohos.intl.intl.RelativeTimeFormat}",
             reinterpret_cast<void *>(RelativeTimeFormat_Create) },
         ani_native_function {
@@ -673,15 +701,11 @@ ani_status IntlAddon::BindContext_RelativeTimeFormat(ani_env *env)
             "C{@ohos.intl.intl.RelativeTimeFormat}",
             reinterpret_cast<void *>(RelativeTimeFormat_CreateWithParam)
         },
-        ani_native_function {"format", nullptr, reinterpret_cast<void *>(RelativeTimeFormat_Format) },
-        ani_native_function {"formatToParts", nullptr, reinterpret_cast<void *>(RelativeTimeFormat_FormatToParts) },
-        ani_native_function {"resolvedOptions", nullptr, reinterpret_cast<void *>(RelativeTimeFormat_ResolvedOptions) },
     };
-
-    if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+    if (ANI_OK != env->Class_BindStaticNativeMethods(cls, staticMethods.data(), staticMethods.size())) {
+        HILOG_ERROR_I18N("Cannot bind static native methods to '%{public}s'", className);
         return (ani_status)ANI_ERROR;
-    };
+    }
     return ANI_OK;
 }
 

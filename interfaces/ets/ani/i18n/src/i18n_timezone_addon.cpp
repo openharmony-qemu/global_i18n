@@ -240,6 +240,13 @@ ani_status I18nTimeZoneAddon::BindContextTimeZone(ani_env *env)
         ani_native_function { "getDisplayName", nullptr, reinterpret_cast<void *>(I18nTimeZoneAddon::GetDisplayName) },
         ani_native_function { "getRawOffset", nullptr, reinterpret_cast<void *>(I18nTimeZoneAddon::GetRawOffset) },
         ani_native_function { "getOffset", nullptr, reinterpret_cast<void *>(I18nTimeZoneAddon::GetOffset) },
+    };
+    if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
+        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+        return (ani_status)ANI_ERROR;
+    }
+
+    std::array staticMethods = {
         ani_native_function { "getAvailableIDs", nullptr,
             reinterpret_cast<void *>(I18nTimeZoneAddon::GetAvailableIDs) },
         ani_native_function { "getAvailableZoneCityIDs", nullptr,
@@ -251,11 +258,10 @@ ani_status I18nTimeZoneAddon::BindContextTimeZone(ani_env *env)
         ani_native_function { "getTimezonesByLocation", nullptr,
             reinterpret_cast<void *>(I18nTimeZoneAddon::GetTimezonesByLocation) },
     };
-
-    if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+    if (ANI_OK != env->Class_BindStaticNativeMethods(cls, staticMethods.data(), staticMethods.size())) {
+        HILOG_ERROR_I18N("Cannot bind static native methods to '%{public}s'", className);
         return (ani_status)ANI_ERROR;
-    };
+    }
 
     return ANI_OK;
 }

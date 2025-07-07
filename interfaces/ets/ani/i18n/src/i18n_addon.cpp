@@ -627,20 +627,25 @@ ani_status I18nPhoneNumberFormatAddon::BindContextPhoneNumberFormat(ani_env *env
         return (ani_status)ANI_ERROR;
     }
 
-    std::array methods = {
+    std::array staticMethods = {
         ani_native_function { "create", nullptr, reinterpret_cast<void *>(I18nPhoneNumberFormatAddon::Create) },
+    };
+    if (ANI_OK != env->Class_BindStaticNativeMethods(cls, staticMethods.data(), staticMethods.size())) {
+        HILOG_ERROR_I18N("Cannot bind static native methods to '%{public}s'", className);
+        return (ani_status)ANI_ERROR;
+    }
+
+    std::array methods = {
         ani_native_function { "isValidNumber", nullptr,
             reinterpret_cast<void *>(I18nPhoneNumberFormatAddon::IsValidNumber) },
         ani_native_function { "format", nullptr, reinterpret_cast<void *>(I18nPhoneNumberFormatAddon::Format) },
         ani_native_function { "getLocationName", nullptr,
             reinterpret_cast<void *>(I18nPhoneNumberFormatAddon::GetLocationName) },
     };
-
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
         HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
         return (ani_status)ANI_ERROR;
-    };
-
+    }
     return ANI_OK;
 }
 
@@ -707,18 +712,23 @@ ani_status I18nTransliteratorAddon::BindContextTransliterator(ani_env *env)
         return (ani_status)ANI_ERROR;
     }
 
-    std::array methods = {
+    std::array staticMethods = {
         ani_native_function { "getAvailableIDs", nullptr,
             reinterpret_cast<void *>(I18nTransliteratorAddon::GetAvailableIDs) },
         ani_native_function { "getInstance", nullptr, reinterpret_cast<void *>(I18nTransliteratorAddon::GetInstance) },
+    };
+    if (ANI_OK != env->Class_BindStaticNativeMethods(cls, staticMethods.data(), staticMethods.size())) {
+        HILOG_ERROR_I18N("Cannot bind static native methods to '%{public}s'", className);
+        return (ani_status)ANI_ERROR;
+    }
+
+    std::array methods = {
         ani_native_function { "transform", nullptr, reinterpret_cast<void *>(I18nTransliteratorAddon::Transform) },
     };
-
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
         HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
         return (ani_status)ANI_ERROR;
-    };
-
+    }
     return ANI_OK;
 }
 
@@ -740,8 +750,8 @@ ani_status I18nAddon::BindContextI18NUtil(ani_env *env)
         ani_native_function { "getThreeLetterRegion", nullptr, reinterpret_cast<void *>(GetThreeLetterRegion) },
     };
 
-    if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+    if (ANI_OK != env->Class_BindStaticNativeMethods(cls, methods.data(), methods.size())) {
+        HILOG_ERROR_I18N("Cannot bind static native methods to '%{public}s'", className);
         return (ani_status)ANI_ERROR;
     };
 

@@ -194,10 +194,17 @@ ani_status LocaleInfoAddon::BindContext_Locale(ani_env *env)
         return (ani_status)ANI_ERROR;
     }
 
-    std::array methods = {
+    std::array staticMethods = {
         ani_native_function {"create", ":C{@ohos.intl.intl.Locale}", reinterpret_cast<void *>(Locale_Create) },
         ani_native_function {"create", "C{std.core.String}C{@ohos.intl.intl.LocaleOptions}:C{@ohos.intl.intl.Locale}",
             reinterpret_cast<void *>(Locale_CreateWithParam) },
+    };
+    if (ANI_OK != env->Class_BindStaticNativeMethods(cls, staticMethods.data(), staticMethods.size())) {
+        HILOG_ERROR_I18N("Cannot bind static native methods to '%{public}s'", className);
+        return (ani_status)ANI_ERROR;
+    }
+
+    std::array methods = {
         ani_native_function {"toString", nullptr, reinterpret_cast<void *>(Locale_ToString) },
         ani_native_function {"maximize", nullptr, reinterpret_cast<void *>(Locale_Maximize) },
         ani_native_function {"minimize", nullptr, reinterpret_cast<void *>(Locale_Minimize) },
@@ -212,10 +219,9 @@ ani_status LocaleInfoAddon::BindContext_Locale(ani_env *env)
         ani_native_function {"getNumberingSystem", nullptr, reinterpret_cast<void *>(Locale_GetNumberingSystem) },
         ani_native_function {"getNumeric", nullptr, reinterpret_cast<void *>(Locale_GetNumeric) },
     };
-
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
         HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
         return (ani_status)ANI_ERROR;
-    };
+    }
     return ANI_OK;
 }
