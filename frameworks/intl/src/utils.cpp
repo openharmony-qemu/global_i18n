@@ -127,7 +127,7 @@ int32_t ConvertString2Int(const string &numberStr, int32_t& status, int base)
     }
 }
 
-int32_t ConvertString2Double(const string &numberStr, int32_t& status)
+double ConvertString2Double(const string &numberStr, int32_t& status)
 {
     try {
         return std::stod(numberStr);
