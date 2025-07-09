@@ -733,7 +733,7 @@ bool I18nTimeZone::ReadNumTimezoneConfigFile(const char* configPath)
         }
         size_t start = line.find_first_of(",");
         if (start == std::string::npos) {
-            HILOG_ERROR_I18N("I18nTimeZone::ReadNumTimezoneConfigFile: %{public}s invalid format", line.c_str());            
+            HILOG_ERROR_I18N("I18nTimeZone::ReadNumTimezoneConfigFile: %{public}s invalid format", line.c_str());
             continue;
         }
         std::string numStr = line.substr(0, start);
