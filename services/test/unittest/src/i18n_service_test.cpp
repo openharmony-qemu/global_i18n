@@ -603,6 +603,43 @@ HWTEST_F(I18nServiceTest, I18nServiceFuncTest034, TestSize.Level1)
     EXPECT_EQ(err, I18nErrorCode::SUCCESS);
     EXPECT_EQ(usingMeasurement, "ussystem");
 }
+
+/**
+ * @tc.name: I18nServiceFuncTest035
+ * @tc.desc: Test I18nServiceAbilityClient set and get numerical date patterns
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nServiceTest, I18nServiceFuncTest035, TestSize.Level1)
+{
+    InitTestEnvironment();
+    AddNativeTokenTypeAndPermissions();
+    I18nErrorCode err = I18nServiceAbilityClient::SetSystemLanguage("zh-Hans");
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    err = I18nServiceAbilityClient::SetSystemLocale("zh-Hans-CN");
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    std::unordered_map<std::string, std::string> numericalDatePatterns;
+    err = I18nServiceAbilityClient::GetSystemNumericalDatePatterns(numericalDatePatterns);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    EXPECT_TRUE(numericalDatePatterns.find("dd/MM/y") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("dd/M/yy") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("y-MM-dd") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("dd/M/y") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("dd/MM/yy") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("dd.MM.yy") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("yy/MM/dd") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("dd.MM.y") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("dd\u200f/M\u200f/y") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("dd-MM-y") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("y/M/dd") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("dd-M-y") != numericalDatePatterns.end());
+
+    err = I18nServiceAbilityClient::SetSystemNumericalDatePattern("dd-M-y");
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+
+    std::string identifier;
+    err = I18nServiceAbilityClient::GetUsingNumericalDatePattern(identifier);
+    EXPECT_EQ(identifier, "dd-M-y");
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
