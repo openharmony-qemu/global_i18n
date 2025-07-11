@@ -473,6 +473,8 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest021, TestSize.Level1)
     flag = LocaleConfig::IsValidTag(fakeTag);
     EXPECT_TRUE(!flag);
     EXPECT_FALSE(LocaleConfig::IsValidTag(""));
+    icu::Locale locale = LocaleConfig::GetIcuLocale(tag);
+    EXPECT_EQ(locale.getLanguage(), language);
 }
 
 /**
@@ -756,7 +758,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest030, TestSize.Level1)
     EXPECT_TRUE(numericalDatePatterns.find("dd.MM.yy") != numericalDatePatterns.end());
     EXPECT_TRUE(numericalDatePatterns.find("yy/MM/dd") != numericalDatePatterns.end());
     EXPECT_TRUE(numericalDatePatterns.find("dd.MM.y") != numericalDatePatterns.end());
-    EXPECT_TRUE(numericalDatePatterns.find("d\u200f/M\u200f/y") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("dd\u200f/M\u200f/y") != numericalDatePatterns.end());
     EXPECT_TRUE(numericalDatePatterns.find("dd-MM-y") != numericalDatePatterns.end());
     EXPECT_TRUE(numericalDatePatterns.find("y/M/dd") != numericalDatePatterns.end());
     EXPECT_TRUE(numericalDatePatterns.find("dd-M-y") != numericalDatePatterns.end());

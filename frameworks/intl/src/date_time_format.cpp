@@ -84,7 +84,7 @@ std::unordered_map<std::string, std::vector<icu::UnicodeString>> EXT_PARAM_TO_PA
     { "0006", { "dd.MM.yy", "MM.yy", "dd.MM" } },
     { "0007", { "yy/MM/dd", "yy/MM", "MM/dd" } },
     { "0008", { "dd.MM.y", "MM.y", "dd.MM" } },
-    { "0009", { "d\u200f/M\u200f/y", "M\u200f/y", "dd\u200f/M" } },
+    { "0009", { "dd\u200f/M\u200f/y", "M\u200f/y", "dd\u200f/M" } },
     { "0010", { "dd-MM-y", "MM-y", "dd-MM" } },
     { "0011", { "y/M/dd", "y/M", "M/dd" } },
     { "0012", { "dd-M-y", "M-y", "dd-M" } },
