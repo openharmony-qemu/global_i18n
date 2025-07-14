@@ -16,6 +16,7 @@
 #include "locale_config_test.h"
 #include <gtest/gtest.h>
 #include "locale_config.h"
+#include "locale_config_ext.h"
 #include "unicode/locid.h"
 #include "parameter.h"
 
@@ -473,7 +474,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest021, TestSize.Level1)
     flag = LocaleConfig::IsValidTag(fakeTag);
     EXPECT_TRUE(!flag);
     EXPECT_FALSE(LocaleConfig::IsValidTag(""));
-    icu::Locale locale = LocaleConfig::GetIcuLocale(tag);
+    icu::Locale locale = LocaleConfigExt::GetIcuLocale(tag);
     EXPECT_EQ(locale.getLanguage(), language);
 }
 
