@@ -18,6 +18,10 @@
 #include <unordered_map>
 #include <string>
 
+namespace icu {
+class Locale;
+class LocaleBuilder;
+}
 
 namespace OHOS {
 namespace Global {
