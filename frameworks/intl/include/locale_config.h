@@ -270,7 +270,6 @@ public:
         const std::string& extParamKey);
     static std::string GetNumberingSystemDigit(const std::string& NumberingSystem);
     static std::string GetPatternNumberFromLocale(const std::string& locale);
-    static icu::Locale GetIcuLocale(const std::string& localeTag);
     static const std::string HOUR_EVENT_DATA;
     static const std::string LANGUAGE_KEY;
     static const std::string LOCALE_KEY;
@@ -446,7 +445,6 @@ private:
     static std::vector<std::pair<size_t, std::string>> GetExtParamPositions(const std::string& locale);
     static void ExtendWhiteLanguages();
     static void ExtendLanguageWithScript(const std::string &languageStr);
-    static icu::Locale GetSystemIcuLocale();
     static __attribute__((destructor)) void CleanupXmlResources();
     static std::string GetPseudoDisplayLanguage(const std::string &language);
     static std::unordered_set<std::string> supportedLocales;
