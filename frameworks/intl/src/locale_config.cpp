@@ -59,6 +59,7 @@
 #include "locale_matcher.h"
 #include "multi_users.h"
 #include "utils.h"
+#include "intl_locale.h"
 
 namespace OHOS {
 namespace Global {

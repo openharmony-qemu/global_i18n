@@ -24,13 +24,13 @@
 #include <unordered_map>
 #include <unordered_set>
 #include "i18n_types.h"
-#include "intl_locale.h"
 #include "taboo_utils.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
 class LocaleInfo;
+class IntlLocale;
 
 class LocaleConfig {
 public:

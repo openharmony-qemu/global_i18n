@@ -18,8 +18,6 @@
 #include "i18n_hilog.h"
 #include "locale_helper.h"
 #include "ohos/init_data.h"
-#include "unicode/locid.h"
-#include "unicode/localebuilder.h"
 
 namespace OHOS {
 namespace Global {
@@ -218,13 +216,12 @@ bool IntlLocale::SetConfigsExtParam(const std::unordered_map<std::string, std::s
     }
 
     UErrorCode status = U_ZERO_ERROR;
-    icu::Locale tempLocale = builder->build(status);
+    icuLocale = builder->build(status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("IntlLocale::IntlLocale: Build icuLocale failed.");
         return false;
     }
-    icuLocale = std::unique_ptr<icu::Locale>(&tempLocale);
-    icuLocale->canonicalize(status);
+    icuLocale.canonicalize(status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("IntlLocale::IntlLocale: icuLocale canonicalize failed.");
         return false;
@@ -253,7 +250,7 @@ std::string IntlLocale::GetLanguage()
     if (!initSuccess) {
         return "";
     }
-    return icuLocale->getLanguage();
+    return icuLocale.getLanguage();
 }
 
 std::string IntlLocale::GetScript()
@@ -261,7 +258,7 @@ std::string IntlLocale::GetScript()
     if (!initSuccess) {
         return "";
     }
-    return icuLocale->getScript();
+    return icuLocale.getScript();
 }
 
 std::string IntlLocale::GetRegion()
@@ -269,7 +266,7 @@ std::string IntlLocale::GetRegion()
     if (!initSuccess) {
         return "";
     }
-    return icuLocale->getCountry();
+    return icuLocale.getCountry();
 }
 
 std::string IntlLocale::GetBaseName()
@@ -277,7 +274,7 @@ std::string IntlLocale::GetBaseName()
     if (!initSuccess) {
         return "";
     }
-    std::string result = icuLocale->getBaseName();
+    std::string result = icuLocale.getBaseName();
     std::replace(result.begin(), result.end(), '_', '-');
     return result;
 }
@@ -288,7 +285,7 @@ std::string IntlLocale::GetCalendar()
         return "";
     }
     UErrorCode status = U_ZERO_ERROR;
-    std::string calendar = icuLocale->getUnicodeKeywordValue<std::string>(calendarExtTag, status);
+    std::string calendar = icuLocale.getUnicodeKeywordValue<std::string>(calendarExtTag, status);
     if (U_FAILURE(status)) {
         return "";
     }
@@ -301,7 +298,7 @@ std::string IntlLocale::GetCollation()
         return "";
     }
     UErrorCode status = U_ZERO_ERROR;
-    std::string collation = icuLocale->getUnicodeKeywordValue<std::string>(collationExtTag, status);
+    std::string collation = icuLocale.getUnicodeKeywordValue<std::string>(collationExtTag, status);
     if (U_FAILURE(status)) {
         return "";
     }
@@ -314,7 +311,7 @@ std::string IntlLocale::GetHourCycle()
         return "";
     }
     UErrorCode status = U_ZERO_ERROR;
-    std::string hourCycle = icuLocale->getUnicodeKeywordValue<std::string>(hourCycleExtTag, status);
+    std::string hourCycle = icuLocale.getUnicodeKeywordValue<std::string>(hourCycleExtTag, status);
     if (U_FAILURE(status)) {
         return "";
     }
@@ -327,7 +324,7 @@ std::string IntlLocale::GetNumberingSystem()
         return "";
     }
     UErrorCode status = U_ZERO_ERROR;
-    std::string numberingSystem = icuLocale->getUnicodeKeywordValue<std::string>(numberingSystemExtTag, status);
+    std::string numberingSystem = icuLocale.getUnicodeKeywordValue<std::string>(numberingSystemExtTag, status);
     if (U_FAILURE(status)) {
         return "";
     }
@@ -340,7 +337,7 @@ std::string IntlLocale::GetNumeric()
         return "";
     }
     UErrorCode status = U_ZERO_ERROR;
-    std::string numeric = icuLocale->getUnicodeKeywordValue<std::string>(numericExtTag, status);
+    std::string numeric = icuLocale.getUnicodeKeywordValue<std::string>(numericExtTag, status);
     if (U_FAILURE(status)) {
         return "";
     }
@@ -366,7 +363,7 @@ std::string IntlLocale::ToString(std::string& errMessage)
         return "";
     }
     UErrorCode status = U_ZERO_ERROR;
-    std::string result = icuLocale->toLanguageTag<std::string>(status);
+    std::string result = icuLocale.toLanguageTag<std::string>(status);
     if (U_FAILURE(status)) {
         errMessage = INVALID_LOCALE_ERROR_MESSAGE;
         HILOG_ERROR_I18N("IntlLocale::ToString: Get languageTag from icuLocale failed.");
@@ -381,24 +378,17 @@ std::string IntlLocale::Maximize()
         return "";
     }
     UErrorCode status = U_ZERO_ERROR;
-    icu::Locale* curLocale = icuLocale->clone();
-    if (curLocale == nullptr) {
-        HILOG_ERROR_I18N("IntlLocale::Maximize: Clone locale failed");
-        return "";
-    }
-    curLocale->addLikelySubtags(status);
+    icu::Locale curLocale = icuLocale;
+    curLocale.addLikelySubtags(status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("IntlLocale::Maximize: Add likely subtags failed.");
-        delete curLocale;
         return "";
     }
-    std::string result = curLocale->toLanguageTag<std::string>(status);
+    std::string result = curLocale.toLanguageTag<std::string>(status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("IntlLocale::Maximize: Get languageTag from curLocale failed.");
-        delete curLocale;
         return "";
     }
-    delete curLocale;
     return result;
 }
 
@@ -408,24 +398,17 @@ std::string IntlLocale::Minimize()
         return "";
     }
     UErrorCode status = U_ZERO_ERROR;
-    icu::Locale* curLocale = icuLocale->clone();
-    if (curLocale == nullptr) {
-        HILOG_ERROR_I18N("IntlLocale::Minimize: Clone locale failed");
-        return "";
-    }
-    curLocale->minimizeSubtags(status);
+    icu::Locale curLocale = icuLocale;
+    curLocale.minimizeSubtags(status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("IntlLocale::Minimize: Minimize subtags failed.");
-        delete curLocale;
         return "";
     }
-    std::string result = curLocale->toLanguageTag<std::string>(status);
+    std::string result = curLocale.toLanguageTag<std::string>(status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("IntlLocale::Minimize: Get languageTag from curLocale failed.");
-        delete curLocale;
         return "";
     }
-    delete curLocale;
     return result;
 }
 

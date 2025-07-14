@@ -17,18 +17,12 @@
 
 #include <unordered_map>
 #include <string>
-
-namespace icu {
-class Locale;
-class LocaleBuilder;
-}
+#include "unicode/locid.h"
+#include "unicode/localebuilder.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-using icu::Locale;
-using namespace icu;
-
 class IntlLocale {
 public:
     IntlLocale(const std::string &localeTag, const std::unordered_map<std::string, std::string>& configs,
@@ -63,14 +57,14 @@ public:
 private:
     bool CheckLocaleParam(const std::string& localeTag, const std::unordered_map<std::string, std::string>& configs);
     bool SetLocaleParam(const std::string& localeTag, const std::unordered_map<std::string, std::string>& configs,
-        LocaleBuilder* builder);
+        icu::LocaleBuilder* builder);
     bool CheckConfigsExtParam(const std::unordered_map<std::string, std::string>& configs);
-    bool SetConfigsExtParam(const std::unordered_map<std::string, std::string>& configs, LocaleBuilder* builder);
+    bool SetConfigsExtParam(const std::unordered_map<std::string, std::string>& configs, icu::LocaleBuilder* builder);
     bool SetExtParam(const std::unordered_map<std::string, std::string>& configs, const std::string paramTag,
-        const std::string paramExtTag, LocaleBuilder* builder);
+        const std::string paramExtTag, icu::LocaleBuilder* builder);
 
     bool initSuccess = false;
-    std::unique_ptr<icu::Locale> icuLocale = nullptr;
+    icu::Locale icuLocale;
 
     static bool icuInitialized;
     static bool Init();
