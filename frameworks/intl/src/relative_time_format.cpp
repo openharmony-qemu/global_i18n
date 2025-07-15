@@ -319,13 +319,13 @@ void RelativeTimeFormat::IntlFormatToParts(icu::FormattedValue &fmtRelativeTime,
         timeVector.push_back(FormatPart(typeString, value, unit));
         prevIndex = limit;
     }
-    if (length > prevIndex) {
+    if (length > static_cast<size_t>(prevIndex)) {
         std::string value = result.substr(prevIndex, length - static_cast<size_t>(prevIndex));
         timeVector.push_back(FormatPart("literal", value, ""));
     }
 }
 
-std::vector<std::string> RelativeTimeFormat::FormatPart(const std::string type,
+std::vector<std::string> RelativeTimeFormat::FormatPart(const std::string& type,
     const std::string& value, const std::string& unit)
 {
     std::vector<std::string> info;

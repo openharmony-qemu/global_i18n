@@ -92,8 +92,8 @@ private:
         std::map<std::string, std::string> &configs, bool flag);
     void IntlFormatToParts(icu::FormattedValue &fmtRelativeTime, const std::string& result,
         std::vector<std::vector<std::string>> &timeVector, double number, const std::string &unit);
-    std::vector<std::string> FormatPart(const std::string type,
-    const std::string& value, const std::string& unit);
+    std::vector<std::string> FormatPart(const std::string& type, const std::string& value,
+        const std::string& unit);
 };
 } // namespace I18n
 } // namespace Global
