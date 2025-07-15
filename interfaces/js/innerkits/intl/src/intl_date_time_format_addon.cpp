@@ -504,7 +504,7 @@ napi_value IntlDateTimeFormatAddon::CreateFormatPart(napi_env env,
         }
         status = napi_set_element(env, result, index, object);
         if (status != napi_ok) {
-            HILOG_ERROR_I18N("IntlDateTimeFormatAddon::CreateFormatPart: Set element failed, index is %{public}d.",
+            HILOG_ERROR_I18N("IntlDateTimeFormatAddon::CreateFormatPart: Set element failed, index is %{public}zu.",
                 index);
             return nullptr;
         }
