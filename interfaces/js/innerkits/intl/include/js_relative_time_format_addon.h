@@ -46,7 +46,7 @@ private:
     static napi_value SetNumberFormatParts(napi_env env,
         const std::vector<std::vector<std::string>> &numberParts);
     static void GetRelativeTimeOptionValues(napi_env env, napi_value options, std::map<std::string, std::string> &map);
-    static bool ThrowRangeError(napi_env env, const std::string &property, const std::string &value);
+    static bool ThrowRangeError(napi_env env);
     static void CheckOptionValue(napi_env env, std::map<std::string, std::string> &map, const std::string &optionName);
     static void CheckOptionValue(napi_env env, const std::string &optionValue, const std::string &optionName);
 

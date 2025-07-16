@@ -183,15 +183,14 @@ void JSRelativeTimeFormatAddon::CheckOptionValue(napi_env env, const std::string
     if (it != aviliableValues.end()) {
         return;
     }
-    if (!ThrowRangeError(env, optionName, optionValue)) {
+    if (!ThrowRangeError(env)) {
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::CheckOptionValue:"
             "throw error for %{public}s failed", optionName.c_str());
         return;
     }
 }
 
-bool JSRelativeTimeFormatAddon::ThrowRangeError(napi_env env, const std::string &property,
-    const std::string &value)
+bool JSRelativeTimeFormatAddon::ThrowRangeError(napi_env env)
 {
     const char* msg = "Value out of range for locale options property";
     napi_status status = napi_throw_range_error(env, nullptr, msg);
