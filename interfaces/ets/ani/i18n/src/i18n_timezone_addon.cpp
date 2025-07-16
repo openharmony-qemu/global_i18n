@@ -109,7 +109,7 @@ ani_string I18nTimeZoneAddon::GetDisplayName(ani_env *env, ani_object object, an
     return VariableConverter::StringToAniStr(env, result);
 }
 
-ani_double I18nTimeZoneAddon::GetRawOffset(ani_env *env, ani_object object)
+ani_int I18nTimeZoneAddon::GetRawOffset(ani_env *env, ani_object object)
 {
     I18nTimeZoneAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->timezone_ == nullptr) {
@@ -119,7 +119,7 @@ ani_double I18nTimeZoneAddon::GetRawOffset(ani_env *env, ani_object object)
     return obj->timezone_->GetRawOffset();
 }
 
-ani_double I18nTimeZoneAddon::GetOffset(ani_env *env, ani_object object, ani_object date)
+ani_int I18nTimeZoneAddon::GetOffset(ani_env *env, ani_object object, ani_object date)
 {
     I18nTimeZoneAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->timezone_ == nullptr) {

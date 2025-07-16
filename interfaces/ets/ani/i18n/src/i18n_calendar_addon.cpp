@@ -125,8 +125,8 @@ void I18nCalendarAddon::SetTime(ani_env *env, ani_object object, ani_double time
     obj->calendar_->SetTime(time);
 }
 
-void I18nCalendarAddon::Set(ani_env *env, ani_object object, ani_double year, ani_double month,
-    ani_double date, ani_object hour, ani_object minute, ani_object second)
+void I18nCalendarAddon::Set(ani_env *env, ani_object object, ani_int year, ani_int month,
+    ani_int date, ani_object hour, ani_object minute, ani_object second)
 {
     I18nCalendarAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->calendar_ == nullptr) {
@@ -141,9 +141,9 @@ void I18nCalendarAddon::Set(ani_env *env, ani_object object, ani_double year, an
         return;
     }
     if (!isUndefined) {
-        ani_double hourValue;
-        if (ANI_OK != env->Object_CallMethodByName_Double(hour, "unboxed", ":D", &hourValue)) {
-            HILOG_ERROR_I18N("Unboxed Double failed");
+        ani_int hourValue;
+        if (ANI_OK != env->Object_CallMethodByName_Int(hour, "unboxed", ":I", &hourValue)) {
+            HILOG_ERROR_I18N("Unboxed Int failed");
             return;
         }
         obj->calendar_->Set(UCalendarDateFields::UCAL_HOUR_OF_DAY, hourValue);
@@ -154,9 +154,9 @@ void I18nCalendarAddon::Set(ani_env *env, ani_object object, ani_double year, an
         return;
     }
     if (!isUndefined) {
-        ani_double minuteValue;
-        if (ANI_OK != env->Object_CallMethodByName_Double(minute, "unboxed", ":D", &minuteValue)) {
-            HILOG_ERROR_I18N("Unboxed Double failed");
+        ani_int minuteValue;
+        if (ANI_OK != env->Object_CallMethodByName_Int(minute, "unboxed", ":I", &minuteValue)) {
+            HILOG_ERROR_I18N("Unboxed Int failed");
             return;
         }
         obj->calendar_->Set(UCalendarDateFields::UCAL_MINUTE, minuteValue);
@@ -167,9 +167,9 @@ void I18nCalendarAddon::Set(ani_env *env, ani_object object, ani_double year, an
         return;
     }
     if (!isUndefined) {
-        ani_double secondValue;
-        if (ANI_OK != env->Object_CallMethodByName_Double(second, "unboxed", ":D", &secondValue)) {
-            HILOG_ERROR_I18N("Unboxed Double failed");
+        ani_int secondValue;
+        if (ANI_OK != env->Object_CallMethodByName_Int(second, "unboxed", ":I", &secondValue)) {
+            HILOG_ERROR_I18N("Unboxed Int failed");
             return;
         }
         obj->calendar_->Set(UCalendarDateFields::UCAL_SECOND, secondValue);
@@ -198,7 +198,7 @@ ani_string I18nCalendarAddon::GetTimeZone(ani_env *env, ani_object object)
     return VariableConverter::StringToAniStr(env, str);
 }
 
-ani_double I18nCalendarAddon::GetFirstDayOfWeek(ani_env *env, ani_object object)
+ani_int I18nCalendarAddon::GetFirstDayOfWeek(ani_env *env, ani_object object)
 {
     I18nCalendarAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->calendar_ == nullptr) {
@@ -208,7 +208,7 @@ ani_double I18nCalendarAddon::GetFirstDayOfWeek(ani_env *env, ani_object object)
     return obj->calendar_->GetFirstDayOfWeek();
 }
 
-void I18nCalendarAddon::SetFirstDayOfWeek(ani_env *env, ani_object object, ani_double value)
+void I18nCalendarAddon::SetFirstDayOfWeek(ani_env *env, ani_object object, ani_int value)
 {
     I18nCalendarAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->calendar_ == nullptr) {
@@ -218,7 +218,7 @@ void I18nCalendarAddon::SetFirstDayOfWeek(ani_env *env, ani_object object, ani_d
     obj->calendar_->SetFirstDayOfWeek(value);
 }
 
-ani_double I18nCalendarAddon::GetMinimalDaysInFirstWeek(ani_env *env, ani_object object)
+ani_int I18nCalendarAddon::GetMinimalDaysInFirstWeek(ani_env *env, ani_object object)
 {
     I18nCalendarAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->calendar_ == nullptr) {
@@ -228,7 +228,7 @@ ani_double I18nCalendarAddon::GetMinimalDaysInFirstWeek(ani_env *env, ani_object
     return obj->calendar_->GetMinimalDaysInFirstWeek();
 }
 
-void I18nCalendarAddon::SetMinimalDaysInFirstWeek(ani_env *env, ani_object object, ani_double value)
+void I18nCalendarAddon::SetMinimalDaysInFirstWeek(ani_env *env, ani_object object, ani_int value)
 {
     I18nCalendarAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->calendar_ == nullptr) {
@@ -238,7 +238,7 @@ void I18nCalendarAddon::SetMinimalDaysInFirstWeek(ani_env *env, ani_object objec
     obj->calendar_->SetMinimalDaysInFirstWeek(value);
 }
 
-ani_double I18nCalendarAddon::Get(ani_env *env, ani_object object, ani_string field)
+ani_int I18nCalendarAddon::Get(ani_env *env, ani_object object, ani_string field)
 {
     std::string str = VariableConverter::AniStrToString(env, field);
     if (g_fieldsMap.find(str) == g_fieldsMap.end()) {
@@ -290,7 +290,7 @@ ani_boolean I18nCalendarAddon::IsWeekend(ani_env *env, ani_object object, ani_ob
     return isWeekEnd;
 }
 
-void I18nCalendarAddon::Add(ani_env *env, ani_object object, ani_string field, ani_double amount)
+void I18nCalendarAddon::Add(ani_env *env, ani_object object, ani_string field, ani_int amount)
 {
     std::string str = VariableConverter::AniStrToString(env, field);
     if (g_fieldsInFunctionAdd.find(str) == g_fieldsInFunctionAdd.end()) {
@@ -307,7 +307,7 @@ void I18nCalendarAddon::Add(ani_env *env, ani_object object, ani_string field, a
     obj->calendar_->Add(g_fieldsMap[str], amount);
 }
 
-ani_double I18nCalendarAddon::GetTimeInMillis(ani_env *env, ani_object object)
+ani_long I18nCalendarAddon::GetTimeInMillis(ani_env *env, ani_object object)
 {
     bool flag = true;
     I18nCalendarAddon* obj = UnwrapAddon(env, object);
@@ -323,7 +323,7 @@ ani_double I18nCalendarAddon::GetTimeInMillis(ani_env *env, ani_object object)
     return temp;
 }
 
-ani_double I18nCalendarAddon::CompareDays(ani_env *env, ani_object object, ani_object date)
+ani_int I18nCalendarAddon::CompareDays(ani_env *env, ani_object object, ani_object date)
 {
     I18nCalendarAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->calendar_ == nullptr) {

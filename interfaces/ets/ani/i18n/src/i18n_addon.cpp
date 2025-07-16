@@ -133,7 +133,7 @@ ani_object I18nBreakIteratorAddon::GetLineInstance(ani_env *env, ani_string loca
     return breakIteratorObject;
 }
 
-ani_double I18nBreakIteratorAddon::Current(ani_env *env, ani_object object)
+ani_int I18nBreakIteratorAddon::Current(ani_env *env, ani_object object)
 {
     I18nBreakIteratorAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->brkiter_ == nullptr) {
@@ -143,7 +143,7 @@ ani_double I18nBreakIteratorAddon::Current(ani_env *env, ani_object object)
     return obj->brkiter_->Current();
 }
 
-ani_double I18nBreakIteratorAddon::First(ani_env *env, ani_object object)
+ani_int I18nBreakIteratorAddon::First(ani_env *env, ani_object object)
 {
     I18nBreakIteratorAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->brkiter_ == nullptr) {
@@ -153,7 +153,7 @@ ani_double I18nBreakIteratorAddon::First(ani_env *env, ani_object object)
     return obj->brkiter_->First();
 }
 
-ani_double I18nBreakIteratorAddon::Last(ani_env *env, ani_object object)
+ani_int I18nBreakIteratorAddon::Last(ani_env *env, ani_object object)
 {
     I18nBreakIteratorAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->brkiter_ == nullptr) {
@@ -163,7 +163,7 @@ ani_double I18nBreakIteratorAddon::Last(ani_env *env, ani_object object)
     return obj->brkiter_->Last();
 }
 
-ani_double I18nBreakIteratorAddon::Next(ani_env *env, ani_object object, ani_object index)
+ani_int I18nBreakIteratorAddon::Next(ani_env *env, ani_object object, ani_object index)
 {
     I18nBreakIteratorAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->brkiter_ == nullptr) {
@@ -171,24 +171,22 @@ ani_double I18nBreakIteratorAddon::Next(ani_env *env, ani_object object, ani_obj
         return -1;
     }
 
-    int value = 1;
+    ani_int value = 1;
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(index, &isUndefined)) {
         HILOG_ERROR_I18N("Reference IsUndefined failed");
         return -1;
     }
     if (!isUndefined) {
-        ani_double temp;
-        if (ANI_OK != env->Object_CallMethodByName_Double(index, "unboxed", ":D", &temp)) {
-            HILOG_ERROR_I18N("Unbox Double failed");
+        if (ANI_OK != env->Object_CallMethodByName_Int(index, "unboxed", ":I", &value)) {
+            HILOG_ERROR_I18N("Unbox Int failed");
             return -1;
         }
-        value = static_cast<int>(temp);
     }
     return obj->brkiter_->Next(value);
 }
 
-ani_double I18nBreakIteratorAddon::Previous(ani_env *env, ani_object object)
+ani_int I18nBreakIteratorAddon::Previous(ani_env *env, ani_object object)
 {
     I18nBreakIteratorAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->brkiter_ == nullptr) {
@@ -208,7 +206,7 @@ void I18nBreakIteratorAddon::SetLineBreakText(ani_env *env, ani_object object, a
     obj->brkiter_->SetText(VariableConverter::AniStrToString(env, text).c_str());
 }
 
-ani_double I18nBreakIteratorAddon::Following(ani_env *env, ani_object object, ani_double offset)
+ani_int I18nBreakIteratorAddon::Following(ani_env *env, ani_object object, ani_int offset)
 {
     I18nBreakIteratorAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->brkiter_ == nullptr) {
@@ -231,7 +229,7 @@ ani_string I18nBreakIteratorAddon::GetLineBreakText(ani_env *env, ani_object obj
     return VariableConverter::StringToAniStr(env, temp);
 }
 
-ani_boolean I18nBreakIteratorAddon::IsBoundary(ani_env *env, ani_object object, ani_double offset)
+ani_boolean I18nBreakIteratorAddon::IsBoundary(ani_env *env, ani_object object, ani_int offset)
 {
     I18nBreakIteratorAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->brkiter_ == nullptr) {
@@ -436,7 +434,7 @@ ani_string I18nAddon::GetDateOrder(ani_env *env, [[maybe_unused]] ani_object obj
 }
 
 ani_string I18nAddon::GetTimePeriodName(ani_env *env, [[maybe_unused]] ani_object object,
-    ani_double hour, ani_string locale)
+    ani_int hour, ani_string locale)
 {
     std::string localeTag;
     ani_boolean isUndefined;

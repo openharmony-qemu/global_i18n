@@ -151,7 +151,7 @@ ani_object IntlAddon::DateTimeFormat_ResolvedOptions(ani_env *env, ani_object ob
 }
 
 
-ani_double IntlAddon::Collator_Compare(ani_env *env, ani_object object, ani_string first, ani_string second)
+ani_int IntlAddon::Collator_Compare(ani_env *env, ani_object object, ani_string first, ani_string second)
 {
     IntlAddon *obj = UnwrapAddon(env, object, "nativeCollator");
     if (obj == nullptr || obj->collator_ == nullptr) {
@@ -161,7 +161,7 @@ ani_double IntlAddon::Collator_Compare(ani_env *env, ani_object object, ani_stri
 
     CompareResult compareResult = obj->collator_->Compare(
         VariableConverter::AniStrToString(env, first), VariableConverter::AniStrToString(env, second));
-    return static_cast<double>(compareResult);
+    return static_cast<int32_t>(compareResult);
 }
 ani_object IntlAddon::Collator_ResolvedOptions(ani_env *env, ani_object object)
 {
