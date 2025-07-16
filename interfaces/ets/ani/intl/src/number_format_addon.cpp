@@ -33,7 +33,7 @@ NumberFormatAddon* NumberFormatAddon::UnwrapAddon(ani_env *env, ani_object objec
     return reinterpret_cast<NumberFormatAddon*>(ptr);
 }
 
-ani_string NumberFormatAddon::NumberFormat_Format(ani_env *env, ani_object object, ani_double number)
+ani_string NumberFormatAddon::NumberFormat_Format(ani_env *env, ani_object object, ani_double num)
 {
     NumberFormatAddon *obj = UnwrapAddon(env, object, "nativeNumberFormat");
     if (obj == nullptr || obj->numberfmt_ == nullptr) {
@@ -41,7 +41,7 @@ ani_string NumberFormatAddon::NumberFormat_Format(ani_env *env, ani_object objec
         return nullptr;
     }
 
-    std::string str = obj->numberfmt_->Format(number);
+    std::string str = obj->numberfmt_->Format(num);
     return VariableConverter::StringToAniStr(env, str);
 }
 

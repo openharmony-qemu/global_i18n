@@ -206,9 +206,9 @@ namespace i18n {
         }
 
         native static create(country: string, options?: PhoneNumberFormatOptions): PhoneNumberFormat;
-        native isValidNumber(number: string): boolean;
-        native format(number: string): string;
-        native getLocationName(number: string, locale: string): string;
+        native isValidNumber(phoneNumber: string): boolean;
+        native format(phoneNumber: string): string;
+        native getLocationName(phoneNumber: string, locale: string): string;
     }
 
     export class Calendar {
