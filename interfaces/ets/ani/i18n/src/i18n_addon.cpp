@@ -817,6 +817,11 @@ ani_status BindContext(ani_env *env)
         return status;
     }
 
+    status = I18nStyledNumberFormatAddon::BindContextStyledNumberFormat(env);
+    if (status != ANI_OK) {
+        return status;
+    }
+
     status = I18nAddon::BindContextNamespace(env);
     if (status != ANI_OK) {
         return status;
