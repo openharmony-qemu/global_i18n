@@ -29,9 +29,9 @@ class I18nPhoneNumberFormatAddon {
 public:
     static I18nPhoneNumberFormatAddon* UnwrapAddon(ani_env *env, ani_object object);
     static ani_object Create(ani_env *env, [[maybe_unused]] ani_object object, ani_string country, ani_object options);
-    static ani_boolean IsValidNumber(ani_env *env, ani_object object, ani_string number);
-    static ani_string Format(ani_env *env, ani_object object, ani_string number);
-    static ani_string GetLocationName(ani_env *env, ani_object object, ani_string number, ani_string locale);
+    static ani_boolean IsValidNumber(ani_env *env, ani_object object, ani_string phoneNumber);
+    static ani_string Format(ani_env *env, ani_object object, ani_string phoneNumber);
+    static ani_string GetLocationName(ani_env *env, ani_object object, ani_string phoneNumber, ani_string locale);
     static ani_status BindContextPhoneNumberFormat(ani_env *env);
 private:
     std::unique_ptr<PhoneNumberFormat> phonenumberfmt_ = nullptr;

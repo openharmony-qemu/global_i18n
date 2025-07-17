@@ -350,7 +350,7 @@ namespace intl {
 
         native static create(): NumberFormat;
         native static create(locale: string | Array<string>, options?: NumberOptions): NumberFormat;
-        native format(number: double): string;
+        native format(num: double): string;
         native formatRange(startRange: double, endRange: double): string;
         native resolvedOptions(): NumberOptions;
     }

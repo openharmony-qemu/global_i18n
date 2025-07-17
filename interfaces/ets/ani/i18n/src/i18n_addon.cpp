@@ -76,17 +76,17 @@ ani_object I18nPhoneNumberFormatAddon::Create(ani_env *env, [[maybe_unused]] ani
     return phoneNumberFormatObject;
 }
 
-ani_boolean I18nPhoneNumberFormatAddon::IsValidNumber(ani_env *env, ani_object object, ani_string number)
+ani_boolean I18nPhoneNumberFormatAddon::IsValidNumber(ani_env *env, ani_object object, ani_string phoneNumber)
 {
     auto obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->phonenumberfmt_ == nullptr) {
         HILOG_ERROR_I18N("IsValidPhoneNumber: GetPhoneNumberFormat object failed");
         return false;
     }
-    return obj->phonenumberfmt_->isValidPhoneNumber(VariableConverter::AniStrToString(env, number));
+    return obj->phonenumberfmt_->isValidPhoneNumber(VariableConverter::AniStrToString(env, phoneNumber));
 }
 
-ani_string I18nPhoneNumberFormatAddon::Format(ani_env *env, ani_object object, ani_string number)
+ani_string I18nPhoneNumberFormatAddon::Format(ani_env *env, ani_object object, ani_string phoneNumber)
 {
     auto obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->phonenumberfmt_ == nullptr) {
@@ -94,12 +94,13 @@ ani_string I18nPhoneNumberFormatAddon::Format(ani_env *env, ani_object object, a
         return nullptr;
     }
 
-    std::string formattedPhoneNumber = obj->phonenumberfmt_->format(VariableConverter::AniStrToString(env, number));
+    std::string formattedPhoneNumber =
+        obj->phonenumberfmt_->format(VariableConverter::AniStrToString(env, phoneNumber));
     return VariableConverter::StringToAniStr(env, formattedPhoneNumber);
 }
 
 ani_string I18nPhoneNumberFormatAddon::GetLocationName(ani_env *env, ani_object object,
-    ani_string number, ani_string locale)
+    ani_string phoneNumber, ani_string locale)
 {
     auto obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->phonenumberfmt_ == nullptr) {
@@ -107,7 +108,7 @@ ani_string I18nPhoneNumberFormatAddon::GetLocationName(ani_env *env, ani_object 
         return nullptr;
     }
 
-    std::string resStr = obj->phonenumberfmt_->getLocationName(VariableConverter::AniStrToString(env, number),
+    std::string resStr = obj->phonenumberfmt_->getLocationName(VariableConverter::AniStrToString(env, phoneNumber),
         VariableConverter::AniStrToString(env, locale));
     return VariableConverter::StringToAniStr(env, resStr);
 }
@@ -830,7 +831,7 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
         HILOG_ERROR_I18N("Unsupported ANI_VERSION_1");
         return (ani_status)ANI_ERROR;
     }
-    
+
     auto status = I18nSystemAddon::BindContextSystem(env);
     if (status != ANI_OK) {
         return status;
