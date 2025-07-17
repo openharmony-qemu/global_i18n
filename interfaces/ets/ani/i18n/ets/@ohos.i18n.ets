@@ -14,6 +14,7 @@
  */
 
 import intl from '@ohos.intl';
+import { TextStyle, StyledString, StyleOptions, StyledStringKey } from 'arkui.component.styledString';
 
 namespace i18n {
     export enum WeekDay {
@@ -143,6 +144,27 @@ namespace i18n {
         begin: number;
         end: number;
         type: string;
+    }
+
+    export interface StyledNumberFormatOptions {
+        integer?: TextStyle;
+        decimal?: TextStyle;
+        fraction?: TextStyle;
+        unit?: TextStyle;
+    }
+
+    export class StyledNumberFormatOptionsInner implements StyledNumberFormatOptions {
+        integer?: TextStyle;
+        decimal?: TextStyle;
+        fraction?: TextStyle;
+        unit?: TextStyle;
+    }
+
+    class StyleOptionsInner {
+        start?: number;
+        length?: number;
+        styledKey: StyledStringKey;
+        styledValue: TextStyle;
     }
 
     export class System {
@@ -430,6 +452,49 @@ namespace i18n {
         }
 
         native format(value: number): string;
+    }
+
+    export class StyledNumberFormat {
+        static { loadLibrary("i18n_ani.z"); }
+
+        private nativeStyledNumberFormat: long = 0;
+
+        constructor(context: long) {
+            if (this.nativeStyledNumberFormat == 0) {
+                this.nativeStyledNumberFormat = context;
+            }
+        }
+
+        constructor(numberFormat: intl.NumberFormat | SimpleNumberFormat, options?: StyledNumberFormatOptions) {
+            this.nativeStyledNumberFormat = StyledNumberFormat.create(numberFormat, options).nativeStyledNumberFormat;
+        }
+
+        native static create(numberFormat: intl.NumberFormat | SimpleNumberFormat,
+            options?: StyledNumberFormatOptions): StyledNumberFormat;
+        native getFormattedNumber(value: number): string;
+        native getStyle(value: number): Array<StyleOptionsInner>;
+        format(value: number): StyledString {
+            let str = this.getFormattedNumber(value);
+            let style = this.getStyle(value);
+            let option: Array<StyleOptions> = new Array<StyleOptions>();
+            for (let i = 0; i < style.length; i++) {
+                let textStyle: TextStyle = {
+                    fontColor: style[i].styledValue.fontColor,
+                    fontFamily: style[i].styledValue.fontFamily,
+                    fontSize: style[i].styledValue.fontSize,
+                    fontWeight: style[i].styledValue.fontWeight,
+                    fontStyle: style[i].styledValue.fontStyle
+                };
+                let styleOption: StyleOptions = {
+                    start: style[i].start,
+                    length: style[i].length,
+                    styledKey: style[i].styledKey,
+                    styledValue: textStyle
+                };
+                option.push(styleOption);
+            }
+            return new StyledString(str, option);
+        }
     }
 
     loadLibrary("i18n_ani.z");
