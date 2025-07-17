@@ -203,12 +203,12 @@ bool VariableConverter::GetNumberMember(ani_env *env, ani_object options, const 
         return false;
     }
 
-    ani_double valueDouble;
-    if (ANI_OK != env->Object_CallMethodByName_Double(static_cast<ani_object>(ref), "unboxed", ":D", &valueDouble)) {
+    ani_int valueInt;
+    if (ANI_OK != env->Object_CallMethodByName_Int(static_cast<ani_object>(ref), "unboxed", ":I", &valueInt)) {
         HILOG_ERROR_I18N("Unboxed Double failed");
         return false;
     }
-    value = static_cast<int>(valueDouble);
+    value = valueInt;
     return true;
 }
 
