@@ -615,12 +615,16 @@ bool IntlDateTimeFormat::InitIcuTimeZone(const std::unordered_map<std::string, s
 
     if (timeZone.empty()) {
         icuTimeZone = icu::TimeZone::createDefault();
+        if (icuTimeZone == nullptr) {
+            HILOG_ERROR_I18N("IntlDateTimeFormat::InitIcuTimeZone: Create default time zone.");
+            return false;
+        }
     } else {
         icuTimeZone = icu::TimeZone::createTimeZone(timeZone.c_str());
-    }
-    if (icuTimeZone == nullptr || !IsValidTimeZoneName(*icuTimeZone)) {
-        errMessage = "invalid timeZone";
-        return false;
+        if (icuTimeZone == nullptr || !IsValidTimeZoneName(*icuTimeZone)) {
+            errMessage = "invalid timeZone";
+            return false;
+        }
     }
     return true;
 }
