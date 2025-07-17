@@ -14,6 +14,7 @@
  */
 
 #include "locale_config.h"
+#include "locale_config_ext.h"
 
 #include <algorithm>
 #include <regex>
@@ -59,6 +60,7 @@
 #include "locale_matcher.h"
 #include "multi_users.h"
 #include "utils.h"
+#include "intl_locale.h"
 
 namespace OHOS {
 namespace Global {
@@ -2775,26 +2777,26 @@ std::string LocaleConfig::GetSystemLocaleInstanceTag()
     return ModifyExtParam(effectiveLocale, key, defaultValue, STANDARD_EXT_PARAM_KEY);
 }
 
-icu::Locale LocaleConfig::GetIcuLocale(const std::string& localeTag)
+icu::Locale LocaleConfigExt::GetIcuLocale(const std::string& localeTag)
 {
     if (!LocaleConfig::IsValidTag(localeTag)) {
-        return LocaleConfig::GetSystemIcuLocale();
+        return LocaleConfigExt::GetSystemIcuLocale();
     }
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeTag, status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("LocaleConfig::GetIcuLocale: Create icu locale failed.");
-        return LocaleConfig::GetSystemIcuLocale();
+        return LocaleConfigExt::GetSystemIcuLocale();
     }
     return locale;
 }
 
-icu::Locale LocaleConfig::GetSystemIcuLocale()
+icu::Locale LocaleConfigExt::GetSystemIcuLocale()
 {
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(LocaleConfig::GetEffectiveLanguage(), status);
     if (U_FAILURE(status)) {
-        HILOG_ERROR_I18N("LocaleConfig::GetSystemIcuLocale: Create icu locale failed.");
+        HILOG_ERROR_I18N("LocaleConfigExt::GetSystemIcuLocale: Create icu locale failed.");
     }
     return locale;
 }
