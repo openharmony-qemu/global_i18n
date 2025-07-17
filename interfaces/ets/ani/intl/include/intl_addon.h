@@ -31,7 +31,7 @@ public:
     static ani_string DateTimeFormat_FormatRange(ani_env *env, ani_object object,
         ani_object startDate, ani_object endDate);
     static ani_object DateTimeFormat_ResolvedOptions(ani_env *env, ani_object object);
-    static ani_double Collator_Compare(ani_env *env, ani_object object, ani_string first, ani_string second);
+    static ani_int Collator_Compare(ani_env *env, ani_object object, ani_string first, ani_string second);
     static ani_object Collator_ResolvedOptions(ani_env *env, ani_object object);
     static ani_string PluralRules_Select(ani_env *env, ani_object object, ani_double number);
     static ani_string RelativeTimeFormat_Format(ani_env *env, ani_object object, ani_double value, ani_string unit);

@@ -93,33 +93,33 @@ namespace i18n {
         zoneId: string;
         cityId: string;
         cityDisplayName: string;
-        offset: number;
+        offset: int;
         zoneDisplayName: string;
-        rawOffset?: number;
+        rawOffset?: int;
     }
 
     export class TimeZoneCityItemInner implements TimeZoneCityItem {
         zoneId: string;
         cityId: string;
         cityDisplayName: string;
-        offset: number;
+        offset: int;
         zoneDisplayName: string;
-        rawOffset?: number;
+        rawOffset?: int;
     }
 
     export interface HolidayInfoItem {
         baseName: string;
-        year: number;
-        month: number;
-        day: number;
+        year: int;
+        month: int;
+        day: int;
         localNames?: Array<HolidayLocalName>;
     }
 
     export class HolidayInfoItemInner implements HolidayInfoItem {
         baseName: string;
-        year: number;
-        month: number;
-        day: number;
+        year: int;
+        month: int;
+        day: int;
         localNames?: Array<HolidayLocalName>;
     }
 
@@ -134,14 +134,14 @@ namespace i18n {
     }
 
     export interface EntityInfoItem {
-        begin: number;
-        end: number;
+        begin: int;
+        end: int;
         type: string;
     }
 
     export class EntityInfoItemInner implements EntityInfoItem {
-        begin: number;
-        end: number;
+        begin: int;
+        end: int;
         type: string;
     }
 
@@ -161,8 +161,8 @@ namespace i18n {
         native static setSystemLocale(locale: string): void;
         native static is24HourClock(): boolean;
         native static set24HourClock(option: boolean): void;
-        native static addPreferredLanguage(language: string, index?: number): void;
-        native static removePreferredLanguage(index: number): void;
+        native static addPreferredLanguage(language: string, index?: int): void;
+        native static removePreferredLanguage(index: int): void;
         native static getPreferredLanguageList(): Array<string>;
         native static getFirstPreferredLanguage(): string;
         native static setAppPreferredLanguage(language: string): void;
@@ -181,9 +181,9 @@ namespace i18n {
         static { loadLibrary("i18n_ani.z"); }
 
         native static unitConvert(fromUnit: UnitInfo, toUnit: UnitInfo,
-            value: number, locale: string, style?: string): string;
+            value: double, locale: string, style?: string): string;
         native static getDateOrder(locale: string): string;
-        native static getTimePeriodName(hour: number, locale?: string): string;
+        native static getTimePeriodName(hour: int, locale?: string): string;
         native static getBestMatchLocale(locale: string, localeList: string[]): string;
         native static getThreeLetterLanguage(locale: string): string;
         native static getThreeLetterRegion(locale: string): string;
@@ -223,20 +223,20 @@ namespace i18n {
         }
 
         native setTime(date: Date): void;
-        native setTime(time: number): void;
-        native set(year: number, month: number, date: number, hour?: number, minute?: number, second?: number): void;
+        native setTime(time: double): void;
+        native set(year: int, month: int, date: int, hour?: int, minute?: int, second?: int): void;
         native setTimeZone(timezone: string): void;
         native getTimeZone(): string;
-        native getFirstDayOfWeek(): number;
-        native setFirstDayOfWeek(value: number): void;
-        native getMinimalDaysInFirstWeek(): number;
-        native setMinimalDaysInFirstWeek(value: number): void;
+        native getFirstDayOfWeek(): int;
+        native setFirstDayOfWeek(value: int): void;
+        native getMinimalDaysInFirstWeek(): int;
+        native setMinimalDaysInFirstWeek(value: int): void;
         native get(field: string): number;
         native getDisplayName(locale: string): string;
         native isWeekend(date?: Date): boolean;
-        native add(field: string, amount: number): void;
-        native getTimeInMillis(): number;
-        native compareDays(date: Date): number;
+        native add(field: string, amount: int): void;
+        native getTimeInMillis(): long;
+        native compareDays(date: Date): int;
     }
 
     export class BreakIterator {
@@ -250,15 +250,15 @@ namespace i18n {
             }
         }
 
-        native current(): number;
-        native first(): number;
-        native last(): number;
-        native next(index?: number): number;
-        native previous(): number;
+        native current(): int;
+        native first(): int;
+        native last(): int;
+        native next(index?: int): int;
+        native previous(): int;
         native setLineBreakText(text: string): void;
-        native following(offset: number): number;
+        native following(offset: int): int;
         native getLineBreakText(): string;
-        native isBoundary(offset: number): boolean;
+        native isBoundary(offset: int): boolean;
     }
 
     export class IndexUtil {
@@ -304,13 +304,13 @@ namespace i18n {
 
         native getID(): string;
         native getDisplayName(locale?: string, isDST?: boolean): string;
-        native getRawOffset(): number;
-        native getOffset(date?: number): number;
+        native getRawOffset(): int;
+        native getOffset(date?: double): int;
         native static getAvailableIDs(): Array<string>;
         native static getAvailableZoneCityIDs(): Array<string>;
         native static getCityDisplayName(cityID: string, locale: string): string;
         native static getTimezoneFromCity(cityID: string): TimeZone;
-        native static getTimezonesByLocation(longitude: number, latitude: number): Array<TimeZone>;
+        native static getTimezonesByLocation(longitude: double, latitude: double): Array<TimeZone>;
     }
 
     export class Transliterator {
@@ -382,7 +382,7 @@ namespace i18n {
 
         native static create(icsPath: String): HolidayManager;
         native isHoliday(date?: Date): boolean;
-        native getHolidayInfoItemArray(year?: number): Array<HolidayInfoItem>;
+        native getHolidayInfoItemArray(year?: int): Array<HolidayInfoItem>;
     }
 
     export class EntityRecognizer {
@@ -429,7 +429,7 @@ namespace i18n {
             }
         }
 
-        native format(value: number): string;
+        native format(value: double): string;
     }
 
     loadLibrary("i18n_ani.z");

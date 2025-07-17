@@ -91,13 +91,13 @@ namespace intl {
         style?: string
         numberingSystem?: string
         useGrouping?: boolean;
-        minimumIntegerDigits?: number;
-        minimumFractionDigits?: number;
-        maximumFractionDigits?: number;
-        minimumSignificantDigits?: number;
-        maximumSignificantDigits?: number;
+        minimumIntegerDigits?: int;
+        minimumFractionDigits?: int;
+        maximumFractionDigits?: int;
+        minimumSignificantDigits?: int;
+        maximumSignificantDigits?: int;
         roundingPriority?: string
-        roundingIncrement?: number;
+        roundingIncrement?: int;
         roundingMode?: string
     }
 
@@ -116,13 +116,13 @@ namespace intl {
         style?: string;
         numberingSystem?: string;
         useGrouping?: boolean;
-        minimumIntegerDigits?: number;
-        minimumFractionDigits?: number;
-        maximumFractionDigits?: number;
-        minimumSignificantDigits?: number;
-        maximumSignificantDigits?: number;
+        minimumIntegerDigits?: int;
+        minimumFractionDigits?: int;
+        maximumFractionDigits?: int;
+        minimumSignificantDigits?: int;
+        maximumSignificantDigits?: int;
         roundingPriority?: string;
-        roundingIncrement?: number;
+        roundingIncrement?: int;
         roundingMode?: string;
     }
 
@@ -149,21 +149,21 @@ namespace intl {
     export interface PluralRulesOptions {
         localeMatcher?: string;
         type?: string;
-        minimumIntegerDigits?: number;
-        minimumFractionDigits?: number;
-        maximumFractionDigits?: number;
-        minimumSignificantDigits?: number;
-        maximumSignificantDigits?: number;
+        minimumIntegerDigits?: int;
+        minimumFractionDigits?: int;
+        maximumFractionDigits?: int;
+        minimumSignificantDigits?: int;
+        maximumSignificantDigits?: int;
     }
 
     export class PluralRulesOptionsInner implements PluralRulesOptions {
         localeMatcher?: string;
         type?: string;
-        minimumIntegerDigits?: number;
-        minimumFractionDigits?: number;
-        maximumFractionDigits?: number;
-        minimumSignificantDigits?: number;
-        maximumSignificantDigits?: number;
+        minimumIntegerDigits?: int;
+        minimumFractionDigits?: int;
+        maximumFractionDigits?: int;
+        minimumSignificantDigits?: int;
+        maximumSignificantDigits?: int;
     }
 
     export interface RelativeTimeFormatInputOptions {
@@ -350,8 +350,8 @@ namespace intl {
 
         native static create(): NumberFormat;
         native static create(locale: string | Array<string>, options?: NumberOptions): NumberFormat;
-        native format(num: number): string;
-        native formatRange(startRange: number, endRange: number): string;
+        native format(num: double): string;
+        native formatRange(startRange: double, endRange: double): string;
         native resolvedOptions(): NumberOptions;
     }
 
@@ -376,7 +376,7 @@ namespace intl {
 
         native static create(): Collator;
         native static create(locale: string | Array<string>, options?: CollatorOptions): Collator;
-        native compare(first: string, second: string): number;
+        native compare(first: string, second: string): int;
         native resolvedOptions(): CollatorOptions;
     }
 
@@ -401,7 +401,7 @@ namespace intl {
 
         native static create(): PluralRules;
         native static create(locale: string | Array<string>, options?: PluralRulesOptions): PluralRules;
-        native select(n: number): string;
+        native select(n: double): string;
     }
 
     export class RelativeTimeFormat {
@@ -426,8 +426,8 @@ namespace intl {
         native static create(): RelativeTimeFormat;
         native static create(locale: string | Array<string>,
             options?: RelativeTimeFormatInputOptions): RelativeTimeFormat;
-        native format(value: number, unit: string): string;
-        native formatToParts(value: number, unit: string): Array<RelativeTimeFormatPart>;
+        native format(value: double, unit: string): string;
+        native formatToParts(value: double, unit: string): Array<RelativeTimeFormatPart>;
         native resolvedOptions(): RelativeTimeFormatResolvedOptions;
     }
 }

@@ -196,19 +196,17 @@ void I18nSystemAddon::Set24HourClock([[maybe_unused]] ani_env *env, [[maybe_unus
 void I18nSystemAddon::AddPreferredLanguage(ani_env *env, [[maybe_unused]] ani_object object,
     ani_string language, ani_object number)
 {
-    int index = 1000000;
+    ani_int index = 1000000;
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(number, &isUndefined)) {
         HILOG_ERROR_I18N("Reference IsUndefined failed");
         return;
     }
     if (!isUndefined) {
-        ani_double value;
-        if (ANI_OK != env->Object_CallMethodByName_Double(number, "unboxed", ":D", &value)) {
-            HILOG_ERROR_I18N("Unboxed Double failed");
+        if (ANI_OK != env->Object_CallMethodByName_Int(number, "unboxed", ":I", &index)) {
+            HILOG_ERROR_I18N("Unboxed Int failed");
             return;
         }
-        index = static_cast<int>(value);
     }
     I18nErrorCode err = I18nServiceAbilityClient::AddPreferredLanguage(
         VariableConverter::AniStrToString(env, language), index);
@@ -222,7 +220,7 @@ void I18nSystemAddon::AddPreferredLanguage(ani_env *env, [[maybe_unused]] ani_ob
 }
 
 void I18nSystemAddon::RemovePreferredLanguage([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
-    ani_double index)
+    ani_int index)
 {
     int len = static_cast<int>(PreferredLanguage::GetPreferredLanguageList().size());
     if ((index < 0 || index > len - 1)) {
