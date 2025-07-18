@@ -71,7 +71,7 @@ ani_string I18nUnicodeAddon::GetTypeAddon(ani_env *env, [[maybe_unused]] ani_obj
 
 ani_status I18nUnicodeAddon::BindContextUnicode(ani_env *env)
 {
-    static const char *className = "L@ohos/i18n/i18n/Unicode;";
+    static const char *className = "@ohos.i18n.i18n.Unicode";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);

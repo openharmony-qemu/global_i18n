@@ -72,7 +72,7 @@ ani_object I18nSimpleDateTimeFormatAddon::GetSimpleDateTimeFormatByPattern(ani_e
         return nullptr;
     }
 
-    static const char *className = "L@ohos/i18n/i18n/SimpleDateTimeFormat;";
+    static const char *className = "@ohos.i18n.i18n.SimpleDateTimeFormat";
     ani_object simpleDateTimeFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return simpleDateTimeFormatObject;
@@ -116,7 +116,7 @@ ani_object I18nSimpleDateTimeFormatAddon::GetSimpleDateTimeFormatBySkeleton(ani_
         return nullptr;
     }
 
-    static const char *className = "L@ohos/i18n/i18n/SimpleDateTimeFormat;";
+    static const char *className = "@ohos.i18n.i18n.SimpleDateTimeFormat";
     ani_object simpleDateTimeFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return simpleDateTimeFormatObject;
@@ -158,7 +158,7 @@ ani_string I18nSimpleDateTimeFormatAddon::Format(ani_env *env, ani_object object
 
 ani_status I18nSimpleDateTimeFormatAddon::BindContextSimpleDateTimeFormat(ani_env *env)
 {
-    static const char *className = "L@ohos/i18n/i18n/SimpleDateTimeFormat;";
+    static const char *className = "@ohos.i18n.i18n.SimpleDateTimeFormat";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);

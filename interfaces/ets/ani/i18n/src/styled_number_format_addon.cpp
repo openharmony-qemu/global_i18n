@@ -37,7 +37,7 @@ static void GetNumberFmtOrSimpleNumberFmt(ani_env *env, ani_object numberFormat,
     NumberFormatAddon **numberFormatAddon, I18nSimpleNumberFormatAddon **simpleNumberFormatAddon)
 {
     ani_class simpleNumberFormatClass;
-    if (ANI_OK != env->FindClass("L@ohos/i18n/i18n/SimpleNumberFormat;", &simpleNumberFormatClass)) {
+    if (ANI_OK != env->FindClass("@ohos.i18n.i18n.SimpleNumberFormat", &simpleNumberFormatClass)) {
         HILOG_ERROR_I18N("Find class 'L@ohos/i18n/i18n/SimpleNumberFormat;' failed");
         return;
     }
@@ -128,7 +128,7 @@ ani_object I18nStyledNumberFormatAddon::Create(ani_env *env, [[maybe_unused]] an
         return nullptr;
     }
 
-    static const char *className = "L@ohos/i18n/i18n/StyledNumberFormat;";
+    static const char *className = "@ohos.i18n.i18n.StyledNumberFormat";
     ani_object styledNumberFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return styledNumberFormatObject;
@@ -142,7 +142,7 @@ static ani_object CreateStyleOption(ani_env *env, StyledNumberFormat::NumberPart
         return nullptr;
     }
 
-    static const char *className = "L@ohos/i18n/i18n/StyleOptionsInner;";
+    static const char *className = "@ohos.i18n.i18n.StyleOptionsInner";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -164,7 +164,7 @@ static ani_object CreateStyleOption(ani_env *env, StyledNumberFormat::NumberPart
     VariableConverter::SetNumberMember(env, styleOptions, "start", numberPart.start);
     VariableConverter::SetNumberMember(env, styleOptions, "length", numberPart.length);
 
-    static const char *enumName = "Larkui/component/styledString/StyledStringKey;";
+    static const char *enumName = "arkui.component.styledString.StyledStringKey";
     if (ANI_OK != env->Object_SetPropertyByName_Ref(styleOptions, "styledKey",
         VariableConverter::GetEnumItemByIndex(env, enumName, 0))) {
         HILOG_ERROR_I18N("Set property 'styledKey' failed");
@@ -182,7 +182,7 @@ static ani_object CreateStyleOptions(ani_env *env,
     const std::vector<StyledNumberFormat::NumberPart> &numberParts,
     const std::unordered_map<std::string, ani_ref> &styledNumberFormatOptions)
 {
-    static const char *className = "Lescompat/Array;";
+    static const char *className = "escompat.Array";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -190,7 +190,7 @@ static ani_object CreateStyleOptions(ani_env *env,
     }
 
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "I:V", &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "i:", &ctor)) {
         HILOG_ERROR_I18N("Find method '<ctor>' failed");
         return nullptr;
     }
@@ -202,7 +202,7 @@ static ani_object CreateStyleOptions(ani_env *env,
     }
 
     ani_method set;
-    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "ILstd/core/Object;:V", &set)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "iC{std.core.Object}:", &set)) {
         HILOG_ERROR_I18N("Find method '$_set' failed");
         return nullptr;
     }
@@ -248,7 +248,7 @@ ani_object I18nStyledNumberFormatAddon::GetStyle(ani_env *env, ani_object object
 
 ani_status I18nStyledNumberFormatAddon::BindContextStyledNumberFormat(ani_env *env)
 {
-    static const char *className = "L@ohos/i18n/i18n/StyledNumberFormat;";
+    static const char *className = "@ohos.i18n.i18n.StyledNumberFormat";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);

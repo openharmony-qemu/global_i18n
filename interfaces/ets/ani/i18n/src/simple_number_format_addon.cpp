@@ -69,7 +69,7 @@ ani_object I18nSimpleNumberFormatAddon::GetSimpleNumberFormatBySkeleton(ani_env 
         return nullptr;
     }
 
-    static const char *className = "L@ohos/i18n/i18n/SimpleNumberFormat;";
+    static const char *className = "@ohos.i18n.i18n.SimpleNumberFormat";
     ani_object simpleNumberFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return simpleNumberFormatObject;
@@ -92,7 +92,7 @@ ani_string I18nSimpleNumberFormatAddon::Format(ani_env *env, ani_object object, 
 
 ani_status I18nSimpleNumberFormatAddon::BindContextSimpleNumberFormat(ani_env *env)
 {
-    static const char *className = "L@ohos/i18n/i18n/SimpleNumberFormat;";
+    static const char *className = "@ohos.i18n.i18n.SimpleNumberFormat";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);

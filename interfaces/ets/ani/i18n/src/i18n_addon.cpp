@@ -70,7 +70,7 @@ ani_object I18nPhoneNumberFormatAddon::Create(ani_env *env, [[maybe_unused]] ani
     obj->phonenumberfmt_ = PhoneNumberFormat::CreateInstance(
         VariableConverter::AniStrToString(env, country), optionsStr);
 
-    static const char *className = "L@ohos/i18n/i18n/PhoneNumberFormat;";
+    static const char *className = "@ohos.i18n.i18n.PhoneNumberFormat";
     ani_object phoneNumberFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return phoneNumberFormatObject;
@@ -128,7 +128,7 @@ ani_object I18nBreakIteratorAddon::GetLineInstance(ani_env *env, ani_string loca
     std::unique_ptr<I18nBreakIteratorAddon> obj = std::make_unique<I18nBreakIteratorAddon>();
     obj->brkiter_ = std::make_unique<I18nBreakIterator>(VariableConverter::AniStrToString(env, locale));
 
-    static const char* className = "L@ohos/i18n/i18n/BreakIterator;";
+    static const char* className = "@ohos.i18n.i18n.BreakIterator";
     ani_object breakIteratorObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return breakIteratorObject;
@@ -179,7 +179,7 @@ ani_int I18nBreakIteratorAddon::Next(ani_env *env, ani_object object, ani_object
         return -1;
     }
     if (!isUndefined) {
-        if (ANI_OK != env->Object_CallMethodByName_Int(index, "unboxed", ":I", &value)) {
+        if (ANI_OK != env->Object_CallMethodByName_Int(index, "unboxed", ":i", &value)) {
             HILOG_ERROR_I18N("Unbox Int failed");
             return -1;
         }
@@ -265,7 +265,7 @@ ani_object I18nIndexUtilAddon::GetInstance(ani_env *env, ani_string string)
     std::unique_ptr<I18nIndexUtilAddon> obj = std::make_unique<I18nIndexUtilAddon>();
     obj->indexUtil_ = std::make_unique<IndexUtil>(localeTag);
 
-    static const char* className = "L@ohos/i18n/i18n/IndexUtil;";
+    static const char* className = "@ohos.i18n.i18n.IndexUtil";
     ani_object indexUtilObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return indexUtilObject;
@@ -354,7 +354,7 @@ ani_object I18nTransliteratorAddon::GetInstance(ani_env *env, [[maybe_unused]] a
     }
 
     obj->transliterator_ = std::unique_ptr<icu::Transliterator>(trans);
-    static const char* className = "L@ohos/i18n/i18n/Transliterator;";
+    static const char* className = "@ohos.i18n.i18n.Transliterator}";
     ani_object transliteratorObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return transliteratorObject;
@@ -620,7 +620,7 @@ ani_boolean I18nAddon::IsRTL(ani_env *env, ani_string locale)
 
 ani_status I18nPhoneNumberFormatAddon::BindContextPhoneNumberFormat(ani_env *env)
 {
-    static const char *className = "L@ohos/i18n/i18n/PhoneNumberFormat;";
+    static const char *className = "@ohos.i18n.i18n.PhoneNumberFormat";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -646,7 +646,7 @@ ani_status I18nPhoneNumberFormatAddon::BindContextPhoneNumberFormat(ani_env *env
 
 ani_status I18nBreakIteratorAddon::BindContextBreakIterator(ani_env *env)
 {
-    static const char *className = "L@ohos/i18n/i18n/BreakIterator;";
+    static const char *className = "@ohos.i18n.i18n.BreakIterator";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -677,7 +677,7 @@ ani_status I18nBreakIteratorAddon::BindContextBreakIterator(ani_env *env)
 
 ani_status I18nIndexUtilAddon::BindContextIndexUtil(ani_env *env)
 {
-    static const char *className = "L@ohos/i18n/i18n/IndexUtil;";
+    static const char *className = "@ohos.i18n.i18n.IndexUtil";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -700,7 +700,7 @@ ani_status I18nIndexUtilAddon::BindContextIndexUtil(ani_env *env)
 
 ani_status I18nTransliteratorAddon::BindContextTransliterator(ani_env *env)
 {
-    static const char *className = "L@ohos/i18n/i18n/Transliterator;";
+    static const char *className = "@ohos.i18n.i18n.Transliterator";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -724,7 +724,7 @@ ani_status I18nTransliteratorAddon::BindContextTransliterator(ani_env *env)
 
 ani_status I18nAddon::BindContextI18NUtil(ani_env *env)
 {
-    static const char *className = "L@ohos/i18n/i18n/I18NUtil;";
+    static const char *className = "@ohos.i18n.i18n.I18NUtil";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -750,7 +750,7 @@ ani_status I18nAddon::BindContextI18NUtil(ani_env *env)
 
 ani_status I18nAddon::BindContextNamespace(ani_env *env)
 {
-    static const char* nameSpaceName = "L@ohos/i18n/i18n;";
+    static const char* nameSpaceName = "@ohos.i18n.i18n";
     ani_namespace ns;
     if (ANI_OK != env->FindNamespace(nameSpaceName, &ns)) {
         HILOG_ERROR_I18N("Find namespace '%{public}s' failed", nameSpaceName);

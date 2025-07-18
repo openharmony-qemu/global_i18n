@@ -56,7 +56,7 @@ ani_string I18nSystemAddon::GetDisplayCountry(ani_env *env, [[maybe_unused]] ani
     }
     if (!isUndefined) {
         ani_boolean value;
-        if (ANI_OK != env->Object_CallMethodByName_Boolean(sentenceCase, "unboxed", ":Z", &value)) {
+        if (ANI_OK != env->Object_CallMethodByName_Boolean(sentenceCase, "unboxed", ":z", &value)) {
             HILOG_ERROR_I18N("Unboxed Boolean failed");
             return nullptr;
         }
@@ -84,7 +84,7 @@ ani_string I18nSystemAddon::GetDisplayLanguage(ani_env *env, [[maybe_unused]] an
     }
     if (!isUndefined) {
         ani_boolean value;
-        if (ANI_OK != env->Object_CallMethodByName_Boolean(sentenceCase, "unboxed", ":Z", &value)) {
+        if (ANI_OK != env->Object_CallMethodByName_Boolean(sentenceCase, "unboxed", ":z", &value)) {
             HILOG_ERROR_I18N("Unboxed Boolean failed");
             return nullptr;
         }
@@ -203,7 +203,7 @@ void I18nSystemAddon::AddPreferredLanguage(ani_env *env, [[maybe_unused]] ani_ob
         return;
     }
     if (!isUndefined) {
-        if (ANI_OK != env->Object_CallMethodByName_Int(number, "unboxed", ":I", &index)) {
+        if (ANI_OK != env->Object_CallMethodByName_Int(number, "unboxed", ":i", &index)) {
             HILOG_ERROR_I18N("Unboxed Int failed");
             return;
         }
@@ -352,7 +352,7 @@ ani_enum_item I18nSystemAddon::GetTemperatureType([[maybe_unused]] ani_env *env,
 {
     TemperatureType type = LocaleConfig::GetTemperatureType();
     int32_t index = static_cast<int32_t>(type) - OFFSET_OF_ENUM;
-    static const char *enumName = "L@ohos/i18n/i18n/TemperatureType;";
+    static const char *enumName = "@ohos.i18n.i18n.TemperatureType";
     return VariableConverter::GetEnumItemByIndex(env, enumName, index);
 }
 
@@ -408,13 +408,13 @@ ani_enum_item I18nSystemAddon::GetFirstDayOfWeek([[maybe_unused]] ani_env *env, 
 {
     WeekDay type = LocaleConfig::GetFirstDayOfWeek();
     int32_t index = static_cast<int32_t>(type) - OFFSET_OF_ENUM;
-    static const char *enumName = "L@ohos/i18n/i18n/WeekDay;";
+    static const char *enumName = "@ohos.i18n.i18n.WeekDay";
     return VariableConverter::GetEnumItemByIndex(env, enumName, index);
 }
 
 ani_status I18nSystemAddon::BindContextSystem(ani_env *env)
 {
-    static const char *className = "L@ohos/i18n/i18n/System;";
+    static const char *className = "@ohos.i18n.i18n.System";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
