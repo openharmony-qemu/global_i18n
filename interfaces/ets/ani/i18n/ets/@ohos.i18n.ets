@@ -197,6 +197,12 @@ namespace i18n {
         native static getTemperatureName(type: TemperatureType): string;
         native static setFirstDayOfWeek(type: WeekDay): void;
         native static getFirstDayOfWeek(): WeekDay;
+
+        public static getSystemLocaleInstance(): Intl.Locale {
+            let systemLocaleStr = System.getSystemLocale();
+            let systemLocale = new Intl.Locale(systemLocaleStr);
+            return systemLocale;
+        }
     }
 
     export class I18NUtil {
@@ -209,7 +215,6 @@ namespace i18n {
         native static getBestMatchLocale(locale: string, localeList: string[]): string;
         native static getThreeLetterLanguage(locale: string): string;
         native static getThreeLetterRegion(locale: string): string;
-        native static getUnicodeWrappedFilePath(path: string, delimiter?: string, locale?: intl.Locale): string;
     }
 
     export class PhoneNumberFormat {
@@ -503,9 +508,4 @@ namespace i18n {
     export native function getLineInstance(locale: string): BreakIterator;
     export native function getInstance(locale?: string): IndexUtil;
     export native function getTimeZone(zoneID?: string): TimeZone;
-    export native function getSimpleDateTimeFormatByPattern(pattern: string,
-        locale?: intl.Locale): SimpleDateTimeFormat;
-    export native function getSimpleDateTimeFormatBySkeleton(skeleton: string,
-        locale?: intl.Locale): SimpleDateTimeFormat;
-    export native function getSimpleNumberFormatBySkeleton(skeleton: string, locale?: intl.Locale): SimpleNumberFormat;
 }
