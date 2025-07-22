@@ -43,7 +43,7 @@ HolidayManager::HolidayManager(const char* path)
     }
     std::string absolutePath = GetAbsoluteFilePath(path);
     if (absolutePath.empty()) {
-        HILOG_ERROR_I18N("Failed: holiday file path: %{public}s invalid.", path);
+        HILOG_ERROR_I18N("Failed: holiday file path invalid.");
         return;
     }
     std::vector<HolidayInfoItem> items = ReadHolidayFile(absolutePath);
