@@ -18,7 +18,7 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-const std::unordered_map<UNumberFormatFields, std::string> FormatUtils::numberFormatFieldMap = {
+const std::unordered_map<UNumberFormatFields, std::string> FormatUtils::NUMBER_FORMAT_FIELD_MAP = {
     { UNUM_FRACTION_FIELD, "fraction" },
     { UNUM_DECIMAL_SEPARATOR_FIELD, "decimal" },
     { UNUM_GROUPING_SEPARATOR_FIELD, "group" },
@@ -36,8 +36,8 @@ std::string FormatUtils::GetNumberFieldType(const std::string &napiType,
     const int32_t fieldId, const double number)
 {
     UNumberFormatFields formatField = static_cast<UNumberFormatFields>(fieldId);
-    if (numberFormatFieldMap.find(formatField) != numberFormatFieldMap.end()) {
-        return numberFormatFieldMap.at(formatField);
+    if (NUMBER_FORMAT_FIELD_MAP.find(formatField) != NUMBER_FORMAT_FIELD_MAP.end()) {
+        return NUMBER_FORMAT_FIELD_MAP.at(formatField);
     }
     bool isBigint = napiType.compare("bigint") == 0;
     switch (formatField) {

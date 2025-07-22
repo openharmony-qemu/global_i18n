@@ -28,7 +28,7 @@ public:
         const int32_t fieldId, const double number);
 
 private:
-    static const std::unordered_map<UNumberFormatFields, std::string> numberFormatFieldMap;
+    static const std::unordered_map<UNumberFormatFields, std::string> NUMBER_FORMAT_FIELD_MAP;
 };
 } // namespace I18n
 } // namespace Global
