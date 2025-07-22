@@ -253,7 +253,7 @@ namespace i18n {
         native setFirstDayOfWeek(value: int): void;
         native getMinimalDaysInFirstWeek(): int;
         native setMinimalDaysInFirstWeek(value: int): void;
-        native get(field: string): number;
+        native get(field: string): int;
         native getDisplayName(locale: string): string;
         native isWeekend(date?: Date): boolean;
         native add(field: string, amount: int): void;
@@ -471,9 +471,9 @@ namespace i18n {
 
         native static create(numberFormat: intl.NumberFormat | SimpleNumberFormat,
             options?: StyledNumberFormatOptions): StyledNumberFormat;
-        native getFormattedNumber(value: number): string;
-        native getStyle(value: number): Array<StyleOptionsInner>;
-        format(value: number): StyledString {
+        native getFormattedNumber(value: double): string;
+        native getStyle(value: double): Array<StyleOptionsInner>;
+        format(value: double): StyledString {
             let str = this.getFormattedNumber(value);
             let style = this.getStyle(value);
             let option: Array<StyleOptions> = new Array<StyleOptions>();

@@ -91,10 +91,10 @@ static ani_object CreateEntityInfoItem(ani_env *env, const int begin, const int 
     }
 
     VariableConverter::SetStringMember(env, ret, "type", type);
-    if (ANI_OK != env->Object_SetPropertyByName_Double(ret, "begin", begin)) {
+    if (ANI_OK != env->Object_SetPropertyByName_Int(ret, "begin", begin)) {
         HILOG_ERROR_I18N("Set property 'begin' failed");
     }
-    if (ANI_OK != env->Object_SetPropertyByName_Double(ret, "end", end)) {
+    if (ANI_OK != env->Object_SetPropertyByName_Int(ret, "end", end)) {
         HILOG_ERROR_I18N("Set property 'end' failed");
     }
     return ret;
