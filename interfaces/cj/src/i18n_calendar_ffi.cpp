@@ -25,6 +25,9 @@
 
 namespace {
 using namespace OHOS::Global::I18n;
+constexpr int32_t HOUR_FLAG = 4;
+constexpr int32_t MINUTE_FLAG = 2;
+constexpr int32_t SECOND_FLAG = 1;
 std::unordered_map<std::string, UCalendarDateFields> g_fieldsMap {
     { "era", UCAL_ERA },
     { "year", UCAL_YEAR },
@@ -156,6 +159,24 @@ void FfiOHOSCalendarSetOfDay(int64_t id, int32_t hour, int32_t minute, int32_t s
     instance->Set(UCalendarDateFields::UCAL_HOUR_OF_DAY, hour);
     instance->Set(UCalendarDateFields::UCAL_MINUTE, minute);
     instance->Set(UCalendarDateFields::UCAL_SECOND, second);
+}
+
+void FfiOHOSCalendarSetTimeOfDay(int64_t id, int32_t hour, int32_t minute, int32_t second, int32_t flag)
+{
+    auto instance = FFIData::GetData<CCalendar>(id);
+    if (!instance) {
+        HILOG_ERROR_I18N("The CCalendar instance is nullptr");
+        return;
+    }
+    if (flag & HOUR_FLAG) {
+        instance->Set(UCalendarDateFields::UCAL_HOUR_OF_DAY, hour);
+    }
+    if (flag & MINUTE_FLAG) {
+        instance->Set(UCalendarDateFields::UCAL_MINUTE, minute);
+    }
+    if (flag & SECOND_FLAG) {
+        instance->Set(UCalendarDateFields::UCAL_SECOND, second);
+    }
 }
 
 void FfiOHOSCalendarSetTimeZone(int64_t id, const char* timeZone)
