@@ -18,7 +18,7 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-std::unordered_map<UNumberFormatFields, std::string> FormatUtils::numberFormatFieldMap = {
+const std::unordered_map<UNumberFormatFields, std::string> FormatUtils::numberFormatFieldMap = {
     { UNUM_FRACTION_FIELD, "fraction" },
     { UNUM_DECIMAL_SEPARATOR_FIELD, "decimal" },
     { UNUM_GROUPING_SEPARATOR_FIELD, "group" },
