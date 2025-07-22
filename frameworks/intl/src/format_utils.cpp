@@ -37,7 +37,7 @@ std::string FormatUtils::GetNumberFieldType(const std::string &napiType,
 {
     UNumberFormatFields formatField = static_cast<UNumberFormatFields>(fieldId);
     if (numberFormatFieldMap.find(formatField) != numberFormatFieldMap.end()) {
-        return numberFormatFieldMap[formatField];
+        return numberFormatFieldMap.at(formatField);
     }
     bool isBigint = napiType.compare("bigint") == 0;
     switch (formatField) {
