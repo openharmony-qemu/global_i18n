@@ -25,10 +25,10 @@ namespace I18n {
 class FormatUtils {
 public:
     static std::string GetNumberFieldType(const std::string &napiType,
-        const int32_t &fieldId, const double &number);
+        const int32_t fieldId, const double number);
 
 private:
-    static std::unordered_map<UNumberFormatFields, std::string> numberFormatFieldMap;
+    static const std::unordered_map<UNumberFormatFields, std::string> numberFormatFieldMap;
 };
 } // namespace I18n
 } // namespace Global

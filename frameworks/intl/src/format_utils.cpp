@@ -33,7 +33,7 @@ std::unordered_map<UNumberFormatFields, std::string> FormatUtils::numberFormatFi
 };
 
 std::string FormatUtils::GetNumberFieldType(const std::string &napiType,
-    const int32_t &fieldId, const double &number)
+    const int32_t fieldId, const double number)
 {
     UNumberFormatFields formatField = static_cast<UNumberFormatFields>(fieldId);
     if (numberFormatFieldMap.find(formatField) != numberFormatFieldMap.end()) {
