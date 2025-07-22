@@ -38,12 +38,12 @@ const char* HolidayManager::ITEM_RESOURCES_TAG = "RESOURCES";
 HolidayManager::HolidayManager(const char* path)
 {
     if (path == nullptr) {
-        HILOG_ERROR_I18N("Failed: parameter path is NULL.");
+        HILOG_ERROR_I18N("HolidayManager::HolidayManager: parameter path is NULL.");
         return;
     }
     std::string absolutePath = GetAbsoluteFilePath(path);
     if (absolutePath.empty()) {
-        HILOG_ERROR_I18N("Failed: holiday file path: %{public}s invalid.", path);
+        HILOG_ERROR_I18N("HolidayManager::HolidayManager: holiday file path invalid.");
         return;
     }
     std::vector<HolidayInfoItem> items = ReadHolidayFile(absolutePath);
@@ -52,7 +52,7 @@ HolidayManager::HolidayManager(const char* path)
         char strDate[10];
         size_t resCode = strftime(strDate, sizeof(strDate), "%Y%m%d", &tmObj);
         if (resCode == 0) {
-            HILOG_ERROR_I18N("Failed: strftime error:%{public}zu.", resCode);
+            HILOG_ERROR_I18N("HolidayManager::HolidayManager: strftime error:%{public}zu.", resCode);
             return;
         }
         std::string startDate(strDate);
