@@ -19,6 +19,7 @@
 #include "utils.h"
 #include "parameter.h"
 #include "relative_time_format.h"
+#include "format_utils.h"
 
 namespace OHOS {
 namespace Global {
@@ -71,21 +72,41 @@ RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTag
     std::map<std::string, std::string> &configs, bool flag)
 {
     intlAddon = flag;
-    std::vector<std::string> resolvedLocales(localeTags);
-    if (configs.find("localeMatcher") != configs.end()) {
-        I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
-        resolvedLocales = LocaleHelper::SupportedLocalesOf(resolvedLocales, configs, errorCode);
-        if (errorCode != I18nErrorCode::SUCCESS) {
-            HILOG_ERROR_I18N("RelativeTimeFormat: Get Supported Locales failed");
-        }
+    I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
+    std::vector<std::string> resolvedLocales =
+        LocaleHelper::SupportedLocalesOf(localeTags, configs, errorCode);
+    if (errorCode != I18nErrorCode::SUCCESS) {
+        HILOG_ERROR_I18N("RelativeTimeFormat: Get Supported Locales failed");
+        return;
     }
-    SetRelativeTimeFormat(resolvedLocales, configs);
+    SetRelativeTimeFormat(resolvedLocales, configs, flag);
+}
+
+std::vector<std::string> RelativeTimeFormat::CanonicalizeLocales(
+    const std::vector<std::string>& localeTags, ErrorMessage& errorMsg)
+{
+    if (localeTags.size() == 0) {
+        return {"en-US"};
+    }
+    if (localeTags.size() == 1 && localeTags[0] == "default") {
+        return {"en-US"};
+    }
+    I18nErrorCode status = I18nErrorCode::SUCCESS;
+    std::vector<std::string> resolvedLocales =
+        LocaleHelper::CanonicalizeLocaleList(localeTags, status);
+    if (status != I18nErrorCode::SUCCESS) {
+        errorMsg.type = ErrorType::RANGE_ERROR;
+        errorMsg.message = "invalid locale";
+        HILOG_ERROR_I18N("RelativeTimeFormat::CanonicalizeLocales CanonicalizeLocaleList failed.");
+        return {};
+    }
+    return resolvedLocales;
 }
 
 RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTags,
     std::map<std::string, std::string> &configs)
 {
-    SetRelativeTimeFormat(localeTags, configs);
+    SetRelativeTimeFormat(localeTags, configs, false);
 }
 
 RelativeTimeFormat::~RelativeTimeFormat()
@@ -93,7 +114,7 @@ RelativeTimeFormat::~RelativeTimeFormat()
 }
 
 void RelativeTimeFormat::SetRelativeTimeFormat(const std::vector<std::string> &localeTags,
-    std::map<std::string, std::string> &configs)
+    std::map<std::string, std::string> &configs, bool flag)
 {
     SetDefaultStyle();
     UErrorCode status = U_ZERO_ERROR;
@@ -105,7 +126,7 @@ void RelativeTimeFormat::SetRelativeTimeFormat(const std::vector<std::string> &l
             status = U_ZERO_ERROR;
             continue;
         }
-        localeBaseName = locale.getBaseName();
+        localeBaseName = flag ? localeTags[i] : locale.getBaseName();
         std::replace(localeBaseName.begin(), localeBaseName.end(), '_', '-');
         relativeTimeFormat = std::make_unique<icu::RelativeDateTimeFormatter>(locale, nullptr, style,
             UDISPCTX_CAPITALIZATION_NONE, status);
@@ -116,7 +137,8 @@ void RelativeTimeFormat::SetRelativeTimeFormat(const std::vector<std::string> &l
         createSuccess = true;
         std::string value = LocaleConfig::QueryExtParam(curLocale, "nu", "-u-");
         if (!value.empty()) {
-            numberingSystem  = value;
+            numberingSystem = value;
+            intlNumberingSystem = value;
         }
         break;
     }
@@ -136,7 +158,8 @@ void RelativeTimeFormat::SetRelativeTimeFormat(const std::vector<std::string> &l
             createSuccess = true;
             std::string value = LocaleConfig::QueryExtParam(curLocale, "nu", "-u-");
             if (!value.empty()) {
-                numberingSystem  = value;
+                numberingSystem = value;
+                intlNumberingSystem = value;
             }
         }
     }
@@ -170,14 +193,20 @@ std::string RelativeTimeFormat::Format(double number, const std::string &unit)
     return PseudoLocalizationProcessor(result);
 }
 
-void RelativeTimeFormat::InsertInfo(std::vector<std::vector<std::string>> &timeVector,
-    const std::string &unit, bool isInteger, const std::string &value)
+std::string RelativeTimeFormat::GetSingularUnit(const std::string &unit)
 {
-    std::vector<std::string> info;
     std::string singularUnit(unit);
     if (intlAddon && pluralUnitMap.find(unit) != pluralUnitMap.end()) {
         singularUnit = pluralUnitMap[unit];
     }
+    return singularUnit;
+}
+
+void RelativeTimeFormat::InsertInfo(std::vector<std::vector<std::string>> &timeVector,
+    const std::string &unit, bool isInteger, const std::string &value)
+{
+    std::vector<std::string> info;
+    std::string singularUnit = GetSingularUnit(unit);
     if (isInteger) {
         info.push_back("integer");
         info.push_back(value);
@@ -207,10 +236,16 @@ void RelativeTimeFormat::FormatToParts(double number, const std::string &unit,
 {
     icu::FormattedRelativeDateTime fmtRelativeTime = FormatToFormattedValue(number, unit);
     UErrorCode status = U_ZERO_ERROR;
-    std::string result;
     icu::UnicodeString fmtRelativeTimeStr = fmtRelativeTime.toString(status);
-    if (U_SUCCESS(status)) {
-        fmtRelativeTimeStr.toUTF8String(result);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("RelativeTimeFormat::FormatToParts: Get formated string failed.");
+        return;
+    }
+    std::string result;
+    fmtRelativeTimeStr.toUTF8String(result);
+    if (intlAddon) {
+        IntlFormatToParts(fmtRelativeTime, result, timeVector, number, unit);
+        return;
     }
     icu::ConstrainedFieldPosition constrainedPos;
     constrainedPos.constrainCategory(UFIELD_CATEGORY_NUMBER);
@@ -244,6 +279,65 @@ void RelativeTimeFormat::FormatToParts(double number, const std::string &unit,
     }
 }
 
+void RelativeTimeFormat::IntlFormatToParts(icu::FormattedValue &fmtRelativeTime, const std::string& result,
+    std::vector<std::vector<std::string>> &timeVector, double number, const std::string &unit)
+{
+    UErrorCode status = U_ZERO_ERROR;
+    icu::ConstrainedFieldPosition constrainedPos;
+    constrainedPos.constrainCategory(UFIELD_CATEGORY_NUMBER);
+    int32_t prevIndex = 0;
+    size_t length = result.length();
+    std::map<int32_t, int32_t> indexMap;
+    while (fmtRelativeTime.nextPosition(constrainedPos, status)) {
+        if (U_FAILURE(status)) {
+            HILOG_ERROR_I18N("RelativeTimeFormat::FormatToParts: Get next position failed.");
+            return;
+        }
+        int32_t fieldId = constrainedPos.getField();
+        int32_t startIndex = constrainedPos.getStart();
+        int32_t limit = constrainedPos.getLimit();
+        if (constrainedPos.getField() == UNUM_GROUPING_SEPARATOR_FIELD) {
+            indexMap.insert(std::make_pair(startIndex, limit));
+            continue;
+        }
+        if (startIndex > prevIndex) {
+            std::string val = result.substr(prevIndex, startIndex - prevIndex);
+            timeVector.push_back(FormatPart("literal", val, ""));
+        }
+        for (auto iter = indexMap.begin(); iter != indexMap.end(); iter++) {
+            if (iter->first > startIndex) {
+                std::string typeString = FormatUtils::GetNumberFieldType("number", fieldId, number);
+                std::string valStr = result.substr(startIndex, iter->first - startIndex);
+                timeVector.push_back(FormatPart(typeString, valStr, unit));
+                std::string value = result.substr(iter->first, iter->second - iter->first);
+                timeVector.push_back(FormatPart("group", value, unit));
+                startIndex = iter->second;
+            }
+        }
+        std::string typeString = FormatUtils::GetNumberFieldType("number", fieldId, number);
+        std::string value = result.substr(startIndex, limit - startIndex);
+        timeVector.push_back(FormatPart(typeString, value, unit));
+        prevIndex = limit;
+    }
+    if (length > static_cast<size_t>(prevIndex)) {
+        std::string value = result.substr(prevIndex, length - static_cast<size_t>(prevIndex));
+        timeVector.push_back(FormatPart("literal", value, ""));
+    }
+}
+
+std::vector<std::string> RelativeTimeFormat::FormatPart(const std::string& type,
+    const std::string& value, const std::string& unit)
+{
+    std::vector<std::string> info;
+    info.push_back(type);
+    info.push_back(value);
+    if (!unit.empty()) {
+        std::string singularUnit = GetSingularUnit(unit);
+        info.push_back(singularUnit);
+    }
+    return info;
+}
+
 icu::FormattedRelativeDateTime RelativeTimeFormat::FormatToFormattedValue(double number, const std::string &unit)
 {
     if (!createSuccess || relativeTimeFormat == nullptr || !relativeUnits.count(unit)) {
@@ -272,9 +366,35 @@ void RelativeTimeFormat::GetResolvedOptions(std::map<std::string, std::string> &
     if (!numeric.empty()) {
         map.insert(std::make_pair("numeric", numeric));
     }
-    if (!numberingSystem.empty()) {
+    if (intlAddon) {
+        std::string numSystem = intlNumberingSystem.empty() ? GetNumberSystemFromLocale() : intlNumberingSystem;
+        map.insert(std::make_pair("numberingSystem", numSystem));
+    } else if (!numberingSystem.empty()) {
         map.insert(std::make_pair("numberingSystem", numberingSystem));
     }
+}
+
+std::string RelativeTimeFormat::GetNumberSystemFromLocale()
+{
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale inLocale = icu::Locale::forLanguageTag(localeBaseName.data(), status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("GetNumberSystemFromLocale: Create locale for %{public}s failed", localeBaseName.c_str());
+        return "";
+    }
+    std::unique_ptr<icu::NumberingSystem> numSystem =
+        std::unique_ptr<icu::NumberingSystem>(icu::NumberingSystem::createInstance(inLocale, status));
+    if (U_FAILURE(status) || numSystem == nullptr) {
+        HILOG_ERROR_I18N("GetNumberSystemFromLocale: Create icu::NumberingSystem failed");
+        return "";
+    }
+    const char* name = numSystem->getName();
+    if (name == nullptr) {
+        HILOG_ERROR_I18N("GetNumberSystemFromLocale: icu::NumberingSystem name is nullptr");
+        return "";
+    }
+    std::string numberSystem(name);
+    return numberSystem;
 }
 
 std::vector<std::string> RelativeTimeFormat::SupportedLocalesOf(

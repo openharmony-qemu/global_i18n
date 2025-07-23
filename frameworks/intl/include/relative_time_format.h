@@ -58,6 +58,8 @@ public:
     void GetResolvedOptions(std::map<std::string, std::string> &map);
     static std::vector<std::string> SupportedLocalesOf(const std::vector<std::string> &requestLocales,
         const std::map<std::string, std::string> &configs, I18nErrorCode &status);
+    static std::vector<std::string> CanonicalizeLocales(
+        const std::vector<std::string>& localeTags, ErrorMessage& errorMsg);
 
 private:
     icu::Locale locale;
@@ -65,6 +67,7 @@ private:
     std::string styleString = "long";
     std::string numeric = "always";
     std::string numberingSystem = "latn";
+    std::string intlNumberingSystem = "";
     std::string localeMatcher = "best fit";
     std::unique_ptr<icu::RelativeDateTimeFormatter> relativeTimeFormat;
     UDateRelativeDateTimeFormatterStyle style = UDAT_STYLE_LONG;
@@ -82,9 +85,15 @@ private:
         std::vector<std::vector<std::string>> &timeVector, size_t &startIndex, const std::string &unit,
         const std::string &result);
     void ParseConfigs(std::map<std::string, std::string> &configs);
+    std::string GetSingularUnit(const std::string &unit);
+    std::string GetNumberSystemFromLocale();
     void SetDefaultStyle();
     void SetRelativeTimeFormat(const std::vector<std::string> &localeTags,
-        std::map<std::string, std::string> &configs);
+        std::map<std::string, std::string> &configs, bool flag);
+    void IntlFormatToParts(icu::FormattedValue &fmtRelativeTime, const std::string& result,
+        std::vector<std::vector<std::string>> &timeVector, double number, const std::string &unit);
+    std::vector<std::string> FormatPart(const std::string& type, const std::string& value,
+        const std::string& unit);
 };
 } // namespace I18n
 } // namespace Global

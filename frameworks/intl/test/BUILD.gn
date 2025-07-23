@@ -38,6 +38,7 @@ ohos_unittest("intl_test") {
     "unittest/number_format_test.cpp",
     "unittest/number_format_test_extend.cpp",
     "unittest/phone_number_format_test.cpp",
+    "unittest/relative_time_format_test.cpp",
     "unittest/timezone_location_test.cpp",
     "unittest/translit_test.cpp",
   ]
