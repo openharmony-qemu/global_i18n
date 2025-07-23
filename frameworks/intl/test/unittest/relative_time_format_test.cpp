@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 #include <sys/stat.h>
+#include <cmath>
 #include "i18n_types.h"
 #include "relative_time_format.h"
 #include "format_utils.h"
@@ -46,7 +47,7 @@ void RelativeTimeFormatTest::TearDown(void)
 
 /**
  * @tc.name: RelativeTimeFormatTest0001
- * @tc.desc: Test GetTimezoneIdByLocation
+ * @tc.desc: Test CanonicalizeLocales
  * @tc.type: FUNC
  */
 HWTEST_F(RelativeTimeFormatTest, RelativeTimeFormatTest0001, TestSize.Level1)
@@ -55,10 +56,35 @@ HWTEST_F(RelativeTimeFormatTest, RelativeTimeFormatTest0001, TestSize.Level1)
     const std::vector<std::string> localeTags = {"en"};
     std::vector<std::string> result = RelativeTimeFormat::CanonicalizeLocales(localeTags, errorMsg);
     EXPECT_EQ(localeTags.size(), 1);
+}
+
+/**
+ * @tc.name: RelativeTimeFormatTest0002
+ * @tc.desc: Test GetNumberFieldType
+ * @tc.type: FUNC
+ */
+HWTEST_F(RelativeTimeFormatTest, RelativeTimeFormatTest0002, TestSize.Level1)
+{
     const std::string napiType = "number";
     const int32_t fieldId = UNUM_FRACTION_FIELD;
     std::string type = FormatUtils::GetNumberFieldType(napiType, fieldId, 12.45);
     EXPECT_EQ(type, "fraction");
+    const int32_t fieldId2 = UNUM_INTEGER_FIELD;
+    std::string type2 = FormatUtils::GetNumberFieldType("bigint", fieldId2, 100000);
+    EXPECT_EQ(type2, "integer");
+    std::string type3 = FormatUtils::GetNumberFieldType("number", fieldId2, INFINITY);
+    EXPECT_EQ(type3, "infinity");
+    std::string type4 = FormatUtils::GetNumberFieldType("number", fieldId2, NAN);
+    EXPECT_EQ(type4, "nan");
+}
+
+/**
+ * @tc.name: RelativeTimeFormatTest0003
+ * @tc.desc: Test CheckParamLocales
+ * @tc.type: FUNC
+ */
+HWTEST_F(RelativeTimeFormatTest, RelativeTimeFormatTest0003, TestSize.Level1)
+{
     const std::vector<std::string> localeArray = {"@1"};
     std::string res = LocaleHelper::CheckParamLocales(localeArray);
     EXPECT_EQ(res, "invalid locale");

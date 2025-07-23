@@ -30,6 +30,8 @@ public:
 };
 
 int RelativeTimeFormatTest0001(void);
+int RelativeTimeFormatTest0002(void);
+int RelativeTimeFormatTest0003(void);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
