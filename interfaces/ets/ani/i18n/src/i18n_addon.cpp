@@ -738,8 +738,6 @@ ani_status I18nAddon::BindContextI18NUtil(ani_env *env)
         ani_native_function { "getBestMatchLocale", nullptr, reinterpret_cast<void *>(GetBestMatchLocale) },
         ani_native_function { "getThreeLetterLanguage", nullptr, reinterpret_cast<void *>(GetThreeLetterLanguage) },
         ani_native_function { "getThreeLetterRegion", nullptr, reinterpret_cast<void *>(GetThreeLetterRegion) },
-        ani_native_function { "getUnicodeWrappedFilePath", nullptr,
-            reinterpret_cast<void *>(GetUnicodeWrappedFilePath) },
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
@@ -765,12 +763,6 @@ ani_status I18nAddon::BindContextNamespace(ani_env *env)
             reinterpret_cast<void *>(I18nBreakIteratorAddon::GetLineInstance) },
         ani_native_function { "getInstance", nullptr, reinterpret_cast<void *>(I18nIndexUtilAddon::GetInstance) },
         ani_native_function { "getTimeZone", nullptr, reinterpret_cast<void *>(I18nTimeZoneAddon::GetTimeZone) },
-        ani_native_function { "getSimpleDateTimeFormatByPattern", nullptr,
-            reinterpret_cast<void *>(I18nSimpleDateTimeFormatAddon::GetSimpleDateTimeFormatByPattern) },
-        ani_native_function { "getSimpleDateTimeFormatBySkeleton", nullptr,
-            reinterpret_cast<void *>(I18nSimpleDateTimeFormatAddon::GetSimpleDateTimeFormatBySkeleton) },
-        ani_native_function { "getSimpleNumberFormatBySkeleton", nullptr,
-            reinterpret_cast<void *>(I18nSimpleNumberFormatAddon::GetSimpleNumberFormatBySkeleton) },
     };
     if (ANI_OK != env->Namespace_BindNativeFunctions(ns, methods.data(), methods.size())) {
         HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", nameSpaceName);
