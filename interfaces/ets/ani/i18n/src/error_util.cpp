@@ -87,7 +87,7 @@ ani_object ErrorUtil::CreateError(ani_env *env, ani_int code, const std::string 
         HILOG_ERROR_I18N("FindClass failed %{public}d", status);
         return nullptr;
     }
-    if ((status = env->Class_FindMethod(cls, "<ctor>", "DLescompat/Error;:V", &method)) != ANI_OK) {
+    if ((status = env->Class_FindMethod(cls, "<ctor>", "ILescompat/Error;:V", &method)) != ANI_OK) {
         HILOG_ERROR_I18N("Class_FindMethod failed %{public}d", status);
         return nullptr;
     }
