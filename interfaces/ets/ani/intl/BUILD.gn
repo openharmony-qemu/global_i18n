@@ -15,12 +15,23 @@ import("//build/config/components/ets_frontend/ets2abc_config.gni")
 import("//build/ohos.gni")
 
 ohos_shared_library("intl_ani") {
-  include_dirs = [ "./include" ]
-  sources = [ "./src/intl.cpp" ]
+  include_dirs = [
+    "./include",
+    "../i18n/include",
+  ]
+  sources = [
+    "../i18n/src/variable_converter.cpp",
+    "./src/intl_addon.cpp",
+    "./src/locale_info_addon.cpp",
+    "./src/number_format_addon.cpp",
+  ]
   deps = [ "../../../../frameworks/intl:intl_util" ]
   external_deps = [
     "hilog:libhilog",
     "icu:shared_icuuc",
+    "libphonenumber:phonenumber_standard",
+    "libpng:libpng",
+    "libxml2:libxml2",
     "runtime_core:ani",
   ]
   part_name = "i18n"
