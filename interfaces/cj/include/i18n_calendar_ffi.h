@@ -23,7 +23,8 @@
 extern "C" {
     FFI_EXPORT void FfiOHOSCalendarSetTime(int64_t id, double milliseconds);
     FFI_EXPORT void FfiOHOSCalendarSetOfDay(int64_t id, int32_t hour, int32_t minute, int32_t second);
-    FFI_EXPORT void FfiOHOSCalendarSetTimeOfDay(int64_t id, int32_t hour, int32_t minute, int32_t second, int32_t flag);
+    FFI_EXPORT void FfiOHOSCalendarSetTimeOfDay(int64_t id, int32_t hour, int32_t minute, int32_t second,
+        uint32_t flag);
     FFI_EXPORT void FfiOHOSCalendarSetDate(int64_t id, int32_t year, int32_t month, int32_t day);
     FFI_EXPORT void FfiOHOSCalendarSetTimeZone(int64_t id, const char* timeZone);
     FFI_EXPORT char* FfiOHOSCalendarGetTimeZone(int64_t id);
