@@ -57,6 +57,7 @@ ohos_shared_library("i18n_sa_client") {
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "ipc:ipc_single",
     "samgr:samgr_proxy",
   ]
   if (target_platform == "watch") {
