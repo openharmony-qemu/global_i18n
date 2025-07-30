@@ -47,7 +47,6 @@ ohos_shared_library("i18n_ani") {
     "hilog:libhilog",
     "icu:shared_icui18n",
     "icu:shared_icuuc",
-    "ipc:ipc_single",
     "libphonenumber:phonenumber_standard",
     "libpng:libpng",
     "libxml2:libxml2",
