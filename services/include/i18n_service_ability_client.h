@@ -17,12 +17,16 @@
 #define OHOS_GLOBAL_I18N_I18N_SERVICE_ABILITY_CLIENT_H
 
 #include <string>
-#include "ii18n_service_ability.h"
 #include "i18n_types.h"
 
 namespace OHOS {
+template <typename T>
+class sptr;
+
 namespace Global {
 namespace I18n {
+class II18nServiceAbility;
+
 /**
  * @brief I18nServiceAbilityClient is i18n service entry class, provides i18n service entry function,
  * such as SetSystemLanguage.

@@ -15,6 +15,7 @@
 
 #include "i18n_hilog.h"
 #include "i18n_service_ability_load_manager.h"
+#include "ii18n_service_ability.h"
 #include "iremote_object.h"
 #include "system_ability_definition.h"
 #include "i18n_service_ability_client.h"
