@@ -161,8 +161,8 @@ namespace i18n {
     }
 
     class StyleOptionsInner {
-        start?: number;
-        length?: number;
+        start?: int;
+        length?: int;
         styledKey: StyledStringKey;
         styledValue: TextStyle;
     }
