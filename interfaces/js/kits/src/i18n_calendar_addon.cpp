@@ -68,7 +68,7 @@ static std::unordered_map<std::string, CalendarType> g_typeMap {
     { "islamic_tbla", CalendarType::ISLAMIC_TBLA },
     { "islamic_umalqura", CalendarType::ISLAMIC_UMALQURA },
     { "japanese", CalendarType::JAPANESE },
-    { "persion", CalendarType::PERSIAN },
+    { "persian", CalendarType::PERSIAN },
 };
 
 I18nCalendarAddon::I18nCalendarAddon() {}
@@ -755,7 +755,7 @@ napi_value I18nCalendarAddon::CompareDays(napi_env env, napi_callback_info info)
         }
         return result;
     }
-    
+
     int32_t diff_date = obj->calendar_->CompareDays(milliseconds);
     status = napi_create_int32(env, diff_date, &result);
     if (status != napi_ok) {
