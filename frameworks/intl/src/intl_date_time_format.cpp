@@ -742,7 +742,6 @@ int32_t IntlDateTimeFormat::GetFractionalSecondDigit(const std::unordered_map<st
         }
     }
     if (result < MIN_VALUE_OF_FRACTIONAL_SECOND_DIGITS || result > MAX_VALUE_OF_FRACTIONAL_SECOND_DIGITS) {
-        HILOG_ERROR_I18N("IntlDateTimeFormat::GetFractionalSecondDigit: Invalid result %{public}d.", result);
         return 0;
     }
     return result;

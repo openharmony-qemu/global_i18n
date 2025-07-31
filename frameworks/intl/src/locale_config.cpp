@@ -477,7 +477,6 @@ std::string LocaleConfig::GetEffectiveLocale()
     if (!systemLocale.empty()) {
         return systemLocale;
     }
-    HILOG_ERROR_I18N("LocaleConfig::GetEffectiveLocale: Read system locale failed.");
     systemLocale = ReadSystemParameter(DEFAULT_LOCALE_KEY, CONFIG_LEN);
     if (systemLocale.empty()) {
         HILOG_ERROR_I18N("LocaleConfig::GetEffectiveLocale: Read default system locale failed.");
@@ -732,7 +731,6 @@ void LocaleConfig::ExtendWhiteLanguages()
         icu::Locale locale = icu::Locale::forLanguageTag((*iter).c_str(), status);
         locale.addLikelySubtags(status);
         if (U_FAILURE(status)) {
-            HILOG_ERROR_I18N("create Locale object for %{public}s failed.", (*iter).c_str());
             continue;
         }
         const char* baseName = locale.getBaseName();
