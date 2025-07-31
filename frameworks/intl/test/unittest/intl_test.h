@@ -24,6 +24,7 @@ public:
     static std::string originalLanguage;
     static std::string originalRegion;
     static std::string originalLocale;
+    static std::string deviceType;
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
     void SetUp();

@@ -133,7 +133,6 @@ private:
     static const int DEFAULT_FRACTION_DIGITS = 3;
     static const int DEFAULT_MAX_SIGNIFICANT_DIGITS = 21;
     static const char *DEVICE_TYPE_NAME;
-    static const int BUFFER_LEN = 10;
     static const int POW_BASE_NUMBER = 10;
     static const int CURRENCY_LEN = 3;
     static std::mutex numToCurrencyMutex;

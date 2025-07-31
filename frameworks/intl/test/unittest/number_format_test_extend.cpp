@@ -418,23 +418,19 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0060, TestSize.Level1)
     EXPECT_EQ(res, format->Format(12));
     delete format;
 
-    string locale = "en-CN";
-    string expects = "123K";
-    vector<string> locales;
-    locales.push_back(locale);
+    vector<string> locales = { "en-CN" };
     string style = "decimal";
     map<string, string> options = { { "style", style },
                                     { "notation", "compact" } };
     NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
     ASSERT_TRUE(numFmt != nullptr);
     string out = numFmt->Format(123456.789);
-    EXPECT_EQ(out, expects);
+    EXPECT_EQ(out, "123K");
     EXPECT_EQ(numFmt->GetStyle(), style);
     delete numFmt;
 
-    locale = "en-GB";
     locales.clear();
-    locales.push_back(locale);
+    locales.push_back("en-GB");
     options = { { "style", "unit" },
                 { "unit", "day" },
                 { "unitUsage", "elapsed-time-second"} };
@@ -446,10 +442,20 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0060, TestSize.Level1)
     std::string monthRes = numFormat->Format(-62.5);
 
     EXPECT_EQ(nowRes, "now");
-    EXPECT_EQ(secondRes, "3 seconds ago");
     EXPECT_EQ(dayRes, "yesterday");
-    EXPECT_EQ(monthRes, "2 months ago");
     delete numFormat;
+    if (NumberFormatTest::deviceType == "wearable" || NumberFormatTest::deviceType == "liteWearable" ||
+        NumberFormatTest::deviceType == "watch") {
+        EXPECT_EQ(secondRes, "3 sec ago");
+        EXPECT_EQ(monthRes, "2 mo ago");
+    } else if (NumberFormatTest::deviceType == "tablet" || NumberFormatTest::deviceType == "2in1" ||
+        NumberFormatTest::deviceType == "tv" || NumberFormatTest::deviceType == "pc") {
+        EXPECT_EQ(secondRes, "3 seconds ago");
+        EXPECT_EQ(monthRes, "2 months ago");
+    } else {
+        EXPECT_EQ(secondRes, "3 seconds ago");
+        EXPECT_EQ(monthRes, "2 months ago");
+    }
 }
 
 /**
@@ -459,15 +465,8 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0060, TestSize.Level1)
  */
 HWTEST_F(NumberFormatTest, NumberFormatFuncTest0061, TestSize.Level1)
 {
-    int bufferLen = 10;
-    char value[bufferLen];
     vector<string> locales;
     locales.push_back("en-GB");
-    int code = GetParameter("const.product.devicetype", "", value, bufferLen);
-    std::string deviceType;
-    if (code > 0) {
-        deviceType = value;
-    }
     map<string, string> unitOptions = {
         { "style", "unit" },
         { "unit", "hectare" }
@@ -482,10 +481,12 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0061, TestSize.Level1)
     NumberFormat *currencyFormatter = new NumberFormat(locales, currencyOptions);
     ASSERT_TRUE(currencyFormatter != nullptr);
     string currencyRes = currencyFormatter->Format(123);
-    if (deviceType == "wearable" || deviceType == "liteWearable" || deviceType == "watch") {
+    if (NumberFormatTest::deviceType == "wearable" || NumberFormatTest::deviceType == "liteWearable" ||
+        NumberFormatTest::deviceType == "watch") {
         EXPECT_EQ(currencyRes, "$123.00");
         EXPECT_EQ(unitRes, "123ha");
-    } else if (deviceType == "tablet" || deviceType == "2in1" || deviceType == "tv" || deviceType == "pc") {
+    } else if (NumberFormatTest::deviceType == "tablet" || NumberFormatTest::deviceType == "2in1" ||
+        NumberFormatTest::deviceType == "tv" || NumberFormatTest::deviceType == "pc") {
         EXPECT_EQ(currencyRes, "US$123.00");
         EXPECT_EQ(unitRes, "123 hectares");
     } else {
@@ -503,42 +504,54 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0061, TestSize.Level1)
  */
 HWTEST_F(NumberFormatTest, NumberFormatFuncTest0062, TestSize.Level1)
 {
-    std::string locale = "en-GB";
-    std::vector<std::string> locales;
-    locales.push_back(locale);
+    std::vector<std::string> locales = { "en-GB" };
     map<string, string> options = { { "style", "unit" },
                                     { "unit", "megabyte" },
                                     { "unitUsage", "size-file-byte"} };
-    NumberFormat *numFmt = new (std::nothrow) NumberFormat(locales, options);
+    std::unique_ptr<NumberFormat> numFmt = std::make_unique<NumberFormat>(locales, options);
     ASSERT_TRUE(numFmt != nullptr);
     std::string byteRes = numFmt->Format(0.00000812);
     std::string kbRes = numFmt->Format(0.125);
     std::string mbRes = numFmt->Format(3.5);
     std::string gbRes = numFmt->Format(23122);
 
-    EXPECT_EQ(byteRes, "8 byte");
-    EXPECT_EQ(kbRes, "125 kB");
-    EXPECT_EQ(mbRes, "3.50 MB");
-    EXPECT_EQ(gbRes, "23.12 GB");
-    delete numFmt;
+    options["unitUsage"] = "size-shortfile-byte";
+    std::unique_ptr<NumberFormat> numFormat = std::make_unique<NumberFormat>(locales, options);
+    std::string shortByteRes = numFormat->Format(0.00000812);
+    std::string shortKbRes = numFormat->Format(0.125);
+    std::string shortMbRes = numFormat->Format(3.5);
+    std::string shortGbRes = numFormat->Format(23122);
 
-    locales.clear();
-    locales.push_back(locale);
-    options = { { "style", "unit" },
-                { "unit", "megabyte" },
-                { "unitUsage", "size-shortfile-byte"} };
-    NumberFormat *numFormat = new (std::nothrow) NumberFormat(locales, options);
-    ASSERT_TRUE(numFormat != nullptr);
-    byteRes = numFormat->Format(0.00000812);
-    kbRes = numFormat->Format(0.125);
-    mbRes = numFormat->Format(3.5);
-    gbRes = numFormat->Format(23122);
-
-    EXPECT_EQ(byteRes, "8 byte");
-    EXPECT_EQ(kbRes, "125 kB");
-    EXPECT_EQ(mbRes, "3.5 MB");
-    EXPECT_EQ(gbRes, "23 GB");
-    delete numFormat;
+    if (NumberFormatTest::deviceType == "wearable" || NumberFormatTest::deviceType == "liteWearable" ||
+        NumberFormatTest::deviceType == "watch") {
+        EXPECT_EQ(byteRes, "8B");
+        EXPECT_EQ(kbRes, "125kB");
+        EXPECT_EQ(mbRes, "3.50MB");
+        EXPECT_EQ(gbRes, "23.12GB");
+        EXPECT_EQ(shortByteRes, "8B");
+        EXPECT_EQ(shortKbRes, "125kB");
+        EXPECT_EQ(shortMbRes, "3.5MB");
+        EXPECT_EQ(shortGbRes, "23GB");
+    } else if (NumberFormatTest::deviceType == "tablet" || NumberFormatTest::deviceType == "2in1" ||
+        NumberFormatTest::deviceType == "tv" || NumberFormatTest::deviceType == "pc") {
+        EXPECT_EQ(byteRes, "8 bytes");
+        EXPECT_EQ(kbRes, "125 kilobytes");
+        EXPECT_EQ(mbRes, "3.50 megabytes");
+        EXPECT_EQ(gbRes, "23.12 gigabytes");
+        EXPECT_EQ(shortByteRes, "8 bytes");
+        EXPECT_EQ(shortKbRes, "125 kilobytes");
+        EXPECT_EQ(shortMbRes, "3.5 megabytes");
+        EXPECT_EQ(shortGbRes, "23 gigabytes");
+    } else {
+        EXPECT_EQ(byteRes, "8 byte");
+        EXPECT_EQ(kbRes, "125 kB");
+        EXPECT_EQ(mbRes, "3.50 MB");
+        EXPECT_EQ(gbRes, "23.12 GB");
+        EXPECT_EQ(shortByteRes, "8 byte");
+        EXPECT_EQ(shortKbRes, "125 kB");
+        EXPECT_EQ(shortMbRes, "3.5 MB");
+        EXPECT_EQ(shortGbRes, "23 GB");
+    }
 }
 
 /**
@@ -696,9 +709,20 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0067, TestSize.Level1)
     std::unique_ptr<NumberFormat> numberFormat = std::make_unique<NumberFormat>(locales, options);
     ASSERT_TRUE(numberFormat != nullptr);
     std::string result = numberFormat->Format(100);
-    EXPECT_EQ(result, "-173.15°C");
-    result = numberFormat->FormatRange(100, 200);
-    EXPECT_EQ(result, "-173.15 – -73.15°C");
+    std::string resultOfRange = numberFormat->FormatRange(100, 200);
+
+    if (NumberFormatTest::deviceType == "wearable" || NumberFormatTest::deviceType == "liteWearable" ||
+        NumberFormatTest::deviceType == "watch") {
+        EXPECT_EQ(result, "-173.15°C");
+        EXPECT_EQ(resultOfRange, "-173.15 – -73.15°C");
+    } else if (NumberFormatTest::deviceType == "tablet" || NumberFormatTest::deviceType == "2in1" ||
+        NumberFormatTest::deviceType == "tv" || NumberFormatTest::deviceType == "pc") {
+        EXPECT_EQ(result, "-173.15 degrees Celsius");
+        EXPECT_EQ(resultOfRange, "-173.15 – -73.15 degrees Celsius");
+    } else {
+        EXPECT_EQ(result, "-173.15°C");
+        EXPECT_EQ(resultOfRange, "-173.15 – -73.15°C");
+    }
 
     LocaleConfig::SetSystemLanguage(systemLanguage);
     LocaleConfig::SetSystemLocale(systemLocale);

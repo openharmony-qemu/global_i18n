@@ -20,7 +20,7 @@
 #include "simple_number_format.h"
 #include "styled_number_format.h"
 #include "unicode/locid.h"
-#include "parameter.h"
+#include "utils.h"
 
 using namespace OHOS::Global::I18n;
 using testing::ext::TestSize;
@@ -32,6 +32,7 @@ namespace I18n {
 string NumberFormatTest::originalLanguage;
 string NumberFormatTest::originalRegion;
 string NumberFormatTest::originalLocale;
+string NumberFormatTest::deviceType;
 
 void NumberFormatTest::SetUpTestCase(void)
 {
@@ -41,6 +42,7 @@ void NumberFormatTest::SetUpTestCase(void)
     LocaleConfig::SetSystemLanguage("zh-Hans");
     LocaleConfig::SetSystemRegion("CN");
     LocaleConfig::SetSystemLocale("zh-Hans-CN");
+    NumberFormatTest::deviceType = ReadSystemParameter("const.product.devicetype", LocaleConfig::CONFIG_LEN);
 }
 
 void NumberFormatTest::TearDownTestCase(void)
@@ -1841,16 +1843,42 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0037, TestSize.Level1)
                                     { "unit", unit } };
     std::unique_ptr<NumberFormat> rangeFormatter = std::make_unique<NumberFormat>(locales, options);
     ASSERT_TRUE(rangeFormatter != nullptr);
-    EXPECT_EQ(rangeFormatter->FormatRange(1, 5), "1–5 m");
-    EXPECT_EQ(rangeFormatter->FormatRange(4.9999999, 5.0000001), "~5 m");
-    EXPECT_EQ(rangeFormatter->FormatRange(5, 5), "~5 m");
-    EXPECT_EQ(rangeFormatter->FormatRange(0, 3), "0–3 m");
-    EXPECT_EQ(rangeFormatter->FormatRange(0, 0), "~0 m");
-    EXPECT_EQ(rangeFormatter->FormatRange(3, 3000), "3–3,000 m");
-    EXPECT_EQ(rangeFormatter->FormatRange(3000, 5000), "3,000–5,000 m");
-    EXPECT_EQ(rangeFormatter->FormatRange(4999, 5001), "4,999–5,001 m");
-    EXPECT_EQ(rangeFormatter->FormatRange(5000, 5000), "~5,000 m");
-    EXPECT_EQ(rangeFormatter->FormatRange(5e3, 5e6), "5,000–5,000,000 m");
+    if (NumberFormatTest::deviceType == "wearable" || NumberFormatTest::deviceType == "liteWearable" ||
+        NumberFormatTest::deviceType == "watch") {
+        EXPECT_EQ(rangeFormatter->FormatRange(1, 5), "1–5m");
+        EXPECT_EQ(rangeFormatter->FormatRange(4.9999999, 5.0000001), "~5m");
+        EXPECT_EQ(rangeFormatter->FormatRange(5, 5), "~5m");
+        EXPECT_EQ(rangeFormatter->FormatRange(0, 3), "0–3m");
+        EXPECT_EQ(rangeFormatter->FormatRange(0, 0), "~0m");
+        EXPECT_EQ(rangeFormatter->FormatRange(3, 3000), "3–3,000m");
+        EXPECT_EQ(rangeFormatter->FormatRange(3000, 5000), "3,000–5,000m");
+        EXPECT_EQ(rangeFormatter->FormatRange(4999, 5001), "4,999–5,001m");
+        EXPECT_EQ(rangeFormatter->FormatRange(5000, 5000), "~5,000m");
+        EXPECT_EQ(rangeFormatter->FormatRange(5e3, 5e6), "5,000–5,000,000m");
+    } else if (NumberFormatTest::deviceType == "tablet" || NumberFormatTest::deviceType == "2in1" ||
+        NumberFormatTest::deviceType == "tv" || NumberFormatTest::deviceType == "pc") {
+        EXPECT_EQ(rangeFormatter->FormatRange(1, 5), "1–5 meters");
+        EXPECT_EQ(rangeFormatter->FormatRange(4.9999999, 5.0000001), "~5 meters");
+        EXPECT_EQ(rangeFormatter->FormatRange(5, 5), "~5 meters");
+        EXPECT_EQ(rangeFormatter->FormatRange(0, 3), "0–3 meters");
+        EXPECT_EQ(rangeFormatter->FormatRange(0, 0), "~0 meters");
+        EXPECT_EQ(rangeFormatter->FormatRange(3, 3000), "3–3,000 meters");
+        EXPECT_EQ(rangeFormatter->FormatRange(3000, 5000), "3,000–5,000 meters");
+        EXPECT_EQ(rangeFormatter->FormatRange(4999, 5001), "4,999–5,001 meters");
+        EXPECT_EQ(rangeFormatter->FormatRange(5000, 5000), "~5,000 meters");
+        EXPECT_EQ(rangeFormatter->FormatRange(5e3, 5e6), "5,000–5,000,000 meters");
+    } else {
+        EXPECT_EQ(rangeFormatter->FormatRange(1, 5), "1–5 m");
+        EXPECT_EQ(rangeFormatter->FormatRange(4.9999999, 5.0000001), "~5 m");
+        EXPECT_EQ(rangeFormatter->FormatRange(5, 5), "~5 m");
+        EXPECT_EQ(rangeFormatter->FormatRange(0, 3), "0–3 m");
+        EXPECT_EQ(rangeFormatter->FormatRange(0, 0), "~0 m");
+        EXPECT_EQ(rangeFormatter->FormatRange(3, 3000), "3–3,000 m");
+        EXPECT_EQ(rangeFormatter->FormatRange(3000, 5000), "3,000–5,000 m");
+        EXPECT_EQ(rangeFormatter->FormatRange(4999, 5001), "4,999–5,001 m");
+        EXPECT_EQ(rangeFormatter->FormatRange(5000, 5000), "~5,000 m");
+        EXPECT_EQ(rangeFormatter->FormatRange(5e3, 5e6), "5,000–5,000,000 m");
+    }
 }
 
 /**
@@ -1971,7 +1999,15 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0042, TestSize.Level1)
     std::shared_ptr<NumberFormat> numFmt = std::make_shared<NumberFormat>(locales, options);
     ASSERT_TRUE(numFmt != nullptr);
     StyledNumberFormat styledNumFmt(true, numFmt, nullptr);
-    EXPECT_EQ(styledNumFmt.Format(1234.5678), "20 hours ago");
+    if (NumberFormatTest::deviceType == "wearable" || NumberFormatTest::deviceType == "liteWearable" ||
+        NumberFormatTest::deviceType == "watch") {
+        EXPECT_EQ(styledNumFmt.Format(1234.5678), "20 hr. ago");
+    } else if (NumberFormatTest::deviceType == "tablet" || NumberFormatTest::deviceType == "2in1" ||
+        NumberFormatTest::deviceType == "tv" || NumberFormatTest::deviceType == "pc") {
+        EXPECT_EQ(styledNumFmt.Format(1234.5678), "20 hours ago");
+    } else {
+        EXPECT_EQ(styledNumFmt.Format(1234.5678), "20 hours ago");
+    }
     std::vector<StyledNumberFormat::NumberPart> out = styledNumFmt.ParseToParts(123456.789);
     EXPECT_EQ(out.size(), 2);
     EXPECT_EQ(out[0].part_name, "integer");
