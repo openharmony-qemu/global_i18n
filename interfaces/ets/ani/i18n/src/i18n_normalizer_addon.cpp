@@ -14,7 +14,7 @@
  */
 
 #include "i18n_normalizer_addon.h"
- 
+
 #include "error_util.h"
 #include "i18n_hilog.h"
 #include "variable_converter.h"
@@ -84,7 +84,7 @@ ani_status I18nNormalizerAddon::BindContextNormalizer(ani_env *env)
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
-        return (ani_status)ANI_ERROR;
+        return ANI_ERROR;
     }
 
     std::array methods = {
@@ -94,7 +94,7 @@ ani_status I18nNormalizerAddon::BindContextNormalizer(ani_env *env)
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
         HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
-        return (ani_status)ANI_ERROR;
+        return ANI_ERROR;
     };
 
     return ANI_OK;

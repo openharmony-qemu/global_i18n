@@ -625,7 +625,7 @@ ani_status I18nPhoneNumberFormatAddon::BindContextPhoneNumberFormat(ani_env *env
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
-        return (ani_status)ANI_ERROR;
+        return ANI_ERROR;
     }
 
     std::array methods = {
@@ -639,7 +639,7 @@ ani_status I18nPhoneNumberFormatAddon::BindContextPhoneNumberFormat(ani_env *env
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
         HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
-        return (ani_status)ANI_ERROR;
+        return ANI_ERROR;
     };
 
     return ANI_OK;
@@ -651,7 +651,7 @@ ani_status I18nBreakIteratorAddon::BindContextBreakIterator(ani_env *env)
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
-        return (ani_status)ANI_ERROR;
+        return ANI_ERROR;
     }
 
     std::array methods = {
@@ -670,7 +670,7 @@ ani_status I18nBreakIteratorAddon::BindContextBreakIterator(ani_env *env)
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
         HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
-        return (ani_status)ANI_ERROR;
+        return ANI_ERROR;
     };
 
     return ANI_OK;
@@ -682,7 +682,7 @@ ani_status I18nIndexUtilAddon::BindContextIndexUtil(ani_env *env)
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
-        return (ani_status)ANI_ERROR;
+        return ANI_ERROR;
     }
 
     std::array methods = {
@@ -693,7 +693,7 @@ ani_status I18nIndexUtilAddon::BindContextIndexUtil(ani_env *env)
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
         HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
-        return (ani_status)ANI_ERROR;
+        return ANI_ERROR;
     };
 
     return ANI_OK;
@@ -705,7 +705,7 @@ ani_status I18nTransliteratorAddon::BindContextTransliterator(ani_env *env)
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
-        return (ani_status)ANI_ERROR;
+        return ANI_ERROR;
     }
 
     std::array methods = {
@@ -717,7 +717,7 @@ ani_status I18nTransliteratorAddon::BindContextTransliterator(ani_env *env)
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
         HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
-        return (ani_status)ANI_ERROR;
+        return ANI_ERROR;
     };
 
     return ANI_OK;
@@ -729,7 +729,7 @@ ani_status I18nAddon::BindContextI18NUtil(ani_env *env)
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
-        return (ani_status)ANI_ERROR;
+        return ANI_ERROR;
     }
 
     std::array methods = {
@@ -743,7 +743,7 @@ ani_status I18nAddon::BindContextI18NUtil(ani_env *env)
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
         HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
-        return (ani_status)ANI_ERROR;
+        return ANI_ERROR;
     };
 
     return ANI_OK;
@@ -755,7 +755,7 @@ ani_status I18nAddon::BindContextNamespace(ani_env *env)
     ani_namespace ns;
     if (ANI_OK != env->FindNamespace(nameSpaceName, &ns)) {
         HILOG_ERROR_I18N("Find namespace '%{public}s' failed", nameSpaceName);
-        return (ani_status)ANI_ERROR;
+        return ANI_ERROR;
     }
     std::array methods = {
         ani_native_function { "getCalendar", nullptr, reinterpret_cast<void *>(I18nCalendarAddon::GetCalendar) },
@@ -767,7 +767,7 @@ ani_status I18nAddon::BindContextNamespace(ani_env *env)
     };
     if (ANI_OK != env->Namespace_BindNativeFunctions(ns, methods.data(), methods.size())) {
         HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", nameSpaceName);
-        return (ani_status)ANI_ERROR;
+        return ANI_ERROR;
     };
 
     return ANI_OK;
@@ -822,7 +822,7 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
     ani_env *env;
     if (ANI_OK != vm->GetEnv(ANI_VERSION_1, &env)) {
         HILOG_ERROR_I18N("Unsupported ANI_VERSION_1");
-        return (ani_status)ANI_ERROR;
+        return ANI_ERROR;
     }
 
     auto status = I18nSystemAddon::BindContextSystem(env);

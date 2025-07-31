@@ -98,7 +98,7 @@ ani_object I18nSimpleDateTimeFormatAddon::GetSimpleDateTimeFormatBySkeleton(ani_
 
     std::unique_ptr<I18nSimpleDateTimeFormatAddon> obj = std::make_unique<I18nSimpleDateTimeFormatAddon>();
     if (obj == nullptr) {
-        HILOG_ERROR_I18N("SimpleDateTimeFormatConstructor: Cerate I18nSimpleDateTimeFormatAddon failed.");
+        HILOG_ERROR_I18N("SimpleDateTimeFormatConstructor: Create I18nSimpleDateTimeFormatAddon failed.");
         return nullptr;
     }
 
@@ -162,7 +162,7 @@ ani_status I18nSimpleDateTimeFormatAddon::BindContextSimpleDateTimeFormat(ani_en
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
-        return (ani_status)ANI_ERROR;
+        return ANI_ERROR;
     }
 
     std::array methods = {
@@ -171,7 +171,7 @@ ani_status I18nSimpleDateTimeFormatAddon::BindContextSimpleDateTimeFormat(ani_en
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
         HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
-        return (ani_status)ANI_ERROR;
+        return ANI_ERROR;
     };
 
     return ANI_OK;

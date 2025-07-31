@@ -69,7 +69,7 @@ static std::unordered_map<std::string, CalendarType> g_typeMap {
     { "islamic_tbla", CalendarType::ISLAMIC_TBLA },
     { "islamic_umalqura", CalendarType::ISLAMIC_UMALQURA },
     { "japanese", CalendarType::JAPANESE },
-    { "persion", CalendarType::PERSIAN },
+    { "persian", CalendarType::PERSIAN },
 };
 
 I18nCalendarAddon* I18nCalendarAddon::UnwrapAddon(ani_env *env, ani_object object)
@@ -339,7 +339,7 @@ ani_status I18nCalendarAddon::BindContextCalendar(ani_env *env)
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
-        return (ani_status)ANI_ERROR;
+        return ANI_ERROR;
     }
 
     std::array methods = {
@@ -368,7 +368,7 @@ ani_status I18nCalendarAddon::BindContextCalendar(ani_env *env)
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
         HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
-        return (ani_status)ANI_ERROR;
+        return ANI_ERROR;
     };
 
     return ANI_OK;

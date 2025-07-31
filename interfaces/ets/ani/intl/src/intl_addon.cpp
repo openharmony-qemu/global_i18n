@@ -321,7 +321,7 @@ ani_status IntlAddon::BindContext_DateTimeFormat(ani_env *env)
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
-        return (ani_status)ANI_ERROR;
+        return ANI_ERROR;
     }
 
     std::array methods = {
@@ -337,7 +337,7 @@ ani_status IntlAddon::BindContext_DateTimeFormat(ani_env *env)
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
         HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
-        return (ani_status)ANI_ERROR;
+        return ANI_ERROR;
     };
     return ANI_OK;
 }
@@ -348,7 +348,7 @@ ani_status IntlAddon::BindContext_Collator(ani_env *env)
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
-        return (ani_status)ANI_ERROR;
+        return ANI_ERROR;
     }
 
     std::array methods = {
@@ -362,7 +362,7 @@ ani_status IntlAddon::BindContext_Collator(ani_env *env)
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
         HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
-        return (ani_status)ANI_ERROR;
+        return ANI_ERROR;
     };
     return ANI_OK;
 }
@@ -372,7 +372,7 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
     ani_env *env;
     if (ANI_OK != vm->GetEnv(ANI_VERSION_1, &env)) {
         HILOG_ERROR_I18N("Unsupported ANI_VERSION_1");
-        return (ani_status)ANI_ERROR;
+        return ANI_ERROR;
     }
 
     auto status = IntlAddon::BindContext_DateTimeFormat(env);

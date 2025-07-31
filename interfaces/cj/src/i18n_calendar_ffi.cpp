@@ -72,7 +72,7 @@ std::unordered_map<std::string, CalendarType> g_typeMap {
     { "islamic_tbla", CalendarType::ISLAMIC_TBLA },
     { "islamic_umalqura", CalendarType::ISLAMIC_UMALQURA },
     { "japanese", CalendarType::JAPANESE },
-    { "persion", CalendarType::PERSIAN },
+    { "persian", CalendarType::PERSIAN },
 };
 }
 
@@ -145,7 +145,7 @@ void FfiOHOSCalendarSetOfDay(int64_t id, int32_t hour, int32_t minute, int32_t s
         currentMinute = now->tm_min;
         currentSecond = now->tm_sec;
     }
-    
+
     if (hour == -1) {
         hour = currentHour;
     }
@@ -155,7 +155,7 @@ void FfiOHOSCalendarSetOfDay(int64_t id, int32_t hour, int32_t minute, int32_t s
     if (second == -1) {
         second = currentSecond;
     }
-    
+
     instance->Set(UCalendarDateFields::UCAL_HOUR_OF_DAY, hour);
     instance->Set(UCalendarDateFields::UCAL_MINUTE, minute);
     instance->Set(UCalendarDateFields::UCAL_SECOND, second);
