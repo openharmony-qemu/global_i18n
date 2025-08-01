@@ -1211,8 +1211,8 @@ bool NumberFormat::Init()
 
 void NumberFormat::SetDefaultStyle()
 {
-    char value[BUFFER_LEN];
-    int code = GetParameter(DEVICE_TYPE_NAME, "", value, BUFFER_LEN);
+    char value[LocaleConfig::CONFIG_LEN];
+    int code = GetParameter(DEVICE_TYPE_NAME, "", value, LocaleConfig::CONFIG_LEN);
     if (code > 0) {
         std::string deviceType = value;
         if (defaultUnitStyle.find(deviceType) != defaultUnitStyle.end()) {

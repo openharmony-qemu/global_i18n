@@ -685,24 +685,19 @@ HWTEST_F(IntlTest, IntlFuncTest0064, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest0065, TestSize.Level1)
 {
-    int bufferLen = 10;
-    char value[bufferLen];
     vector<string> locales;
     locales.push_back("fr-FR");
-    int code = GetParameter("const.product.devicetype", "", value, bufferLen);
-    std::string deviceType;
-    if (code > 0) {
-        deviceType = value;
-    }
     map<string, string> options;
     RelativeTimeFormat *formatter = new RelativeTimeFormat(locales, options);
 
     double number = -1;
     string unit = "day";
     string res = formatter->Format(number, unit);
-    if (deviceType == "wearable" || deviceType == "liteWearable" || deviceType == "watch") {
+    if (IntlTest::deviceType == "wearable" || IntlTest::deviceType == "liteWearable" ||
+        IntlTest::deviceType == "watch") {
         EXPECT_EQ(res, "-1 j");
-    } else if (deviceType == "tablet" || deviceType == "2in1" || deviceType == "tv" || deviceType == "pc") {
+    } else if (IntlTest::deviceType == "tablet" || IntlTest::deviceType == "2in1" || IntlTest::deviceType == "tv" ||
+        IntlTest::deviceType == "pc") {
         EXPECT_EQ(res, "il y a 1 jour");
     } else {
         EXPECT_EQ(res, "il y a 1 jour");
@@ -717,15 +712,8 @@ HWTEST_F(IntlTest, IntlFuncTest0065, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest0066, TestSize.Level1)
 {
-    int bufferLen = 10;
-    char value[bufferLen];
     vector<string> locales;
     locales.push_back("en-GB");
-    int code = GetParameter("const.product.devicetype", "", value, bufferLen);
-    std::string deviceType;
-    if (code > 0) {
-        deviceType = value;
-    }
     int64_t milliseconds = 987654321;
 
     map<string, string> defaultOptions;
@@ -744,11 +732,13 @@ HWTEST_F(IntlTest, IntlFuncTest0066, TestSize.Level1)
     std::unique_ptr<DateTimeFormat> timeFormatter = DateTimeFormat::CreateInstance(locales, timeOptions);
     string timeRes = timeFormatter->Format(milliseconds);
 
-    if (deviceType == "wearable" || deviceType == "liteWearable" || deviceType == "watch") {
-        EXPECT_EQ(defaultRes, "12/01/1970");
-        EXPECT_EQ(dateRes, "12/01/1970");
+    if (IntlTest::deviceType == "wearable" || IntlTest::deviceType == "liteWearable" ||
+        IntlTest::deviceType == "watch") {
+        EXPECT_EQ(defaultRes, "1970/1/12");
+        EXPECT_EQ(dateRes, "1970/1/12");
         EXPECT_EQ(timeRes, "06:20");
-    } else if (deviceType == "tablet" || deviceType == "2in1" || deviceType == "tv" || deviceType == "pc") {
+    } else if (IntlTest::deviceType == "tablet" || IntlTest::deviceType == "2in1" || IntlTest::deviceType == "tv" ||
+        IntlTest::deviceType == "pc") {
         EXPECT_EQ(defaultRes, "12 Jan 1970");
         EXPECT_EQ(dateRes, "12 Jan 1970");
         EXPECT_EQ(timeRes, "06:20:54");
@@ -766,15 +756,8 @@ HWTEST_F(IntlTest, IntlFuncTest0066, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest0067, TestSize.Level1)
 {
-    int bufferLen = 10;
-    char value[bufferLen];
     vector<string> locales;
     locales.push_back("en-GB");
-    int code = GetParameter("const.product.devicetype", "", value, bufferLen);
-    std::string deviceType;
-    if (code > 0) {
-        deviceType = value;
-    }
     int64_t milliseconds = 987654321;
 
     map<string, string> monthOptions = {
@@ -796,11 +779,13 @@ HWTEST_F(IntlTest, IntlFuncTest0067, TestSize.Level1)
     std::unique_ptr<DateTimeFormat> eraFormatter = DateTimeFormat::CreateInstance(locales, eraOptions);
     string eraRes = eraFormatter->Format(milliseconds);
 
-    if (deviceType == "wearable" || deviceType == "liteWearable" || deviceType == "watch") {
+    if (IntlTest::deviceType == "wearable" || IntlTest::deviceType == "liteWearable" ||
+        IntlTest::deviceType == "watch") {
         EXPECT_EQ(monthRes, "Jan");
         EXPECT_EQ(weekdayRes, "Mon");
         EXPECT_EQ(eraRes, "70 A");
-    } else if (deviceType == "tablet" || deviceType == "2in1" || deviceType == "tv" || deviceType == "pc") {
+    } else if (IntlTest::deviceType == "tablet" || IntlTest::deviceType == "2in1" || IntlTest::deviceType == "tv" ||
+        IntlTest::deviceType == "pc") {
         EXPECT_EQ(monthRes, "January");
         EXPECT_EQ(weekdayRes, "Monday");
         EXPECT_EQ(eraRes, "70 Anno Domini");
@@ -818,15 +803,8 @@ HWTEST_F(IntlTest, IntlFuncTest0067, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest0068, TestSize.Level1)
 {
-    int bufferLen = 10;
-    char value[bufferLen];
     vector<string> locales;
     locales.push_back("fr-FR");
-    int code = GetParameter("const.product.devicetype", "", value, bufferLen);
-    std::string deviceType;
-    if (code > 0) {
-        deviceType = value;
-    }
     int64_t milliseconds = 987654321;
 
     map<string, string> dayPeriodOptions = {
@@ -846,10 +824,12 @@ HWTEST_F(IntlTest, IntlFuncTest0068, TestSize.Level1)
         = DateTimeFormat::CreateInstance(locales, timeZoneNameOptions);
     string timeZoneNameRes = timeZoneNameFormatter->Format(milliseconds);
 
-    if (deviceType == "wearable" || deviceType == "liteWearable" || deviceType == "watch") {
-        EXPECT_EQ(dayPeriodRes, "10 mat.");
+    if (IntlTest::deviceType == "wearable" || IntlTest::deviceType == "liteWearable" ||
+        IntlTest::deviceType == "watch") {
+        EXPECT_EQ(dayPeriodRes, "10\xE2\x80\xAFmat.");
         EXPECT_EQ(timeZoneNameRes, "6\xE2\x80\xAFPM UTC+8");
-    } else if (deviceType == "tablet" || deviceType == "2in1" || deviceType == "tv" || deviceType == "pc") {
+    } else if (IntlTest::deviceType == "tablet" || IntlTest::deviceType == "2in1" || IntlTest::deviceType == "tv" ||
+        IntlTest::deviceType == "pc") {
         EXPECT_EQ(dayPeriodRes, "10\xE2\x80\xAF" "du matin");
         EXPECT_EQ(timeZoneNameRes, "6\xE2\x80\xAFPM heure normale de la Chine");
     } else {

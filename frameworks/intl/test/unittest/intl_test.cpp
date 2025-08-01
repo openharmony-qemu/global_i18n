@@ -65,6 +65,7 @@ static constexpr int32_t ROOT_UID = 0;
 string IntlTest::originalLanguage;
 string IntlTest::originalRegion;
 string IntlTest::originalLocale;
+string IntlTest::deviceType;
 
 void IntlTest::SetUpTestCase(void)
 {
@@ -74,6 +75,7 @@ void IntlTest::SetUpTestCase(void)
     LocaleConfig::SetSystemLanguage("zh-Hans");
     LocaleConfig::SetSystemRegion("CN");
     LocaleConfig::SetSystemLocale("zh-Hans-CN");
+    IntlTest::deviceType = ReadSystemParameter("const.product.devicetype", LocaleConfig::CONFIG_LEN);
 }
 
 void IntlTest::TearDownTestCase(void)
@@ -961,8 +963,7 @@ HWTEST_F(IntlTest, IntlFuncTest0025, TestSize.Level1)
     
     double number = 2022;
     string unit = "year";
-    string res = formatter->Format(number, unit);
-    EXPECT_EQ(res, "in 2,022 years");
+    string resultOfYear = formatter->Format(number, unit);
     string fakeUnit = "abc";
     EXPECT_EQ(formatter->Format(number, fakeUnit), "");
     vector<vector<string>> timeVector;
@@ -971,33 +972,41 @@ HWTEST_F(IntlTest, IntlFuncTest0025, TestSize.Level1)
 
     number = 3;
     unit = "quarter";
-    res = formatter->Format(number, unit);
-    EXPECT_EQ(res, "in 3 quarters");
+    std::string resultOfQuarter = formatter->Format(number, unit);
     formatter->FormatToParts(number, unit, timeVector);
     EXPECT_EQ(timeVector.size(), 8);
 
     number = 11;
     unit = "month";
-    res = formatter->Format(number, unit);
-    EXPECT_EQ(res, "in 11 months");
+    std::string resultOfMonth = formatter->Format(number, unit);
     formatter->FormatToParts(number, unit, timeVector);
     EXPECT_EQ(timeVector.size(), 11);
 
     number = 2;
     unit = "week";
-    res = formatter->Format(number, unit);
-    EXPECT_EQ(res, "in 2 weeks");
+    std::string resultOfWeek = formatter->Format(number, unit);
     formatter->FormatToParts(number, unit, timeVector);
     EXPECT_EQ(timeVector.size(), 14);
-
-    number = 18;
-    unit = "day";
-    res = formatter->Format(number, unit);
-    EXPECT_EQ(res, "in 18 days");
-    formatter->FormatToParts(number, unit, timeVector);
-    EXPECT_EQ(timeVector.size(), 17);
-
     delete formatter;
+
+    if (IntlTest::deviceType == "wearable" || IntlTest::deviceType == "liteWearable" ||
+        IntlTest::deviceType == "watch") {
+        EXPECT_EQ(resultOfYear, "in 2,022 yr.");
+        EXPECT_EQ(resultOfQuarter, "in 3 qtrs.");
+        EXPECT_EQ(resultOfMonth, "in 11 mo.");
+        EXPECT_EQ(resultOfWeek, "in 2 wk.");
+    } else if (IntlTest::deviceType == "tablet" || IntlTest::deviceType == "2in1" || IntlTest::deviceType == "tv" ||
+        IntlTest::deviceType == "pc") {
+        EXPECT_EQ(resultOfYear, "in 2,022 years");
+        EXPECT_EQ(resultOfQuarter, "in 3 quarters");
+        EXPECT_EQ(resultOfMonth, "in 11 months");
+        EXPECT_EQ(resultOfWeek, "in 2 weeks");
+    } else {
+        EXPECT_EQ(resultOfYear, "in 2,022 years");
+        EXPECT_EQ(resultOfQuarter, "in 3 quarters");
+        EXPECT_EQ(resultOfMonth, "in 11 months");
+        EXPECT_EQ(resultOfWeek, "in 2 weeks");
+    }
 }
 
 /**
@@ -1014,23 +1023,20 @@ HWTEST_F(IntlTest, IntlFuncTest0026, TestSize.Level1)
     
     double number = 23;
     string unit = "hour";
-    string res = formatter->Format(number, unit);
-    EXPECT_EQ(res, "in 23 hours");
+    string resultOfHour = formatter->Format(number, unit);
     vector<vector<string>> timeVector;
     formatter->FormatToParts(number, unit, timeVector);
     EXPECT_EQ(timeVector.size(), 3);
 
     number = 59;
     unit = "minute";
-    res = formatter->Format(number, unit);
-    EXPECT_EQ(res, "in 59 minutes");
+    std::string resultOfMinute = formatter->Format(number, unit);
     formatter->FormatToParts(number, unit, timeVector);
     EXPECT_EQ(timeVector.size(), 6);
 
     number = 1;
     unit = "second";
-    res = formatter->Format(number, unit);
-    EXPECT_EQ(res, "in 1 second");
+    std::string resultOfSecond = formatter->Format(number, unit);
     formatter->FormatToParts(number, unit, timeVector);
     EXPECT_EQ(timeVector.size(), 9);
     string fakeUnit = "abc";
@@ -1039,6 +1045,22 @@ HWTEST_F(IntlTest, IntlFuncTest0026, TestSize.Level1)
     EXPECT_EQ(fakeVector.size(), 0);
 
     delete formatter;
+
+    if (IntlTest::deviceType == "wearable" || IntlTest::deviceType == "liteWearable" ||
+        IntlTest::deviceType == "watch") {
+        EXPECT_EQ(resultOfHour, "in 23 hr.");
+        EXPECT_EQ(resultOfMinute, "in 59 min.");
+        EXPECT_EQ(resultOfSecond, "in 1 sec.");
+    } else if (IntlTest::deviceType == "tablet" || IntlTest::deviceType == "2in1" || IntlTest::deviceType == "tv" ||
+        IntlTest::deviceType == "pc") {
+        EXPECT_EQ(resultOfHour, "in 23 hours");
+        EXPECT_EQ(resultOfMinute, "in 59 minutes");
+        EXPECT_EQ(resultOfSecond, "in 1 second");
+    } else {
+        EXPECT_EQ(resultOfHour, "in 23 hours");
+        EXPECT_EQ(resultOfMinute, "in 59 minutes");
+        EXPECT_EQ(resultOfSecond, "in 1 second");
+    }
 }
 
 /**

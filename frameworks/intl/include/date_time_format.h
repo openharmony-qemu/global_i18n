@@ -120,7 +120,6 @@ private:
     static const int HALF_HOUR = 30;
     static const int HOURS_OF_A_DAY = 24;
     static bool icuInitialized;
-    static const int BUFFER_LEN = 10;
     static const char* DEVICE_TYPE_NAME;
     static bool Init();
     static std::map<std::string, icu::DateFormat::EStyle> dateTimeStyle;
