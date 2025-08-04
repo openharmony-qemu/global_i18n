@@ -46,7 +46,7 @@ ani_object I18nTimeZoneAddon::GetTimeZone(ani_env *env, ani_string zoneID)
     }
     obj->timezone_ = I18nTimeZone::CreateInstance(zoneIDStr, true);
 
-    static const char* className = "L@ohos/i18n/i18n/TimeZone;";
+    static const char* className = "@ohos.i18n.i18n.TimeZone";
     ani_object timeZoneObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return timeZoneObject;
@@ -90,7 +90,7 @@ ani_string I18nTimeZoneAddon::GetDisplayName(ani_env *env, ani_object object, an
     }
     if (!isUndefined) {
         DSTFlag = true;
-        if (ANI_OK != env->Object_CallMethodByName_Boolean(isDST, "unboxed", ":Z", &isDSTBool)) {
+        if (ANI_OK != env->Object_CallMethodByName_Boolean(isDST, "unboxed", ":z", &isDSTBool)) {
             HILOG_ERROR_I18N("Unbox Boolean failed");
             return nullptr;
         }
@@ -134,7 +134,7 @@ ani_int I18nTimeZoneAddon::GetOffset(ani_env *env, ani_object object, ani_object
         return -1;
     }
     if (!isUndefined) {
-        if (ANI_OK != env->Object_CallMethodByName_Double(date, "unboxed", ":D", &dateDouble)) {
+        if (ANI_OK != env->Object_CallMethodByName_Double(date, "unboxed", ":d", &dateDouble)) {
             HILOG_ERROR_I18N("Unbox Double failed");
             return -1;
         }
@@ -181,7 +181,7 @@ ani_object I18nTimeZoneAddon::GetTimezoneFromCity(ani_env *env, [[maybe_unused]]
     std::unique_ptr<I18nTimeZoneAddon> obj = std::make_unique<I18nTimeZoneAddon>();
     obj->timezone_ = I18nTimeZone::CreateInstance(cityIDStr, false);
 
-    static const char* className = "L@ohos/i18n/i18n/TimeZone;";
+    static const char* className = "@ohos.i18n.i18n.TimeZone";
     ani_object timeZone_object = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return timeZone_object;
@@ -191,7 +191,7 @@ ani_object I18nTimeZoneAddon::GetTimezonesByLocation(ani_env *env, [[maybe_unuse
     ani_double longitude, ani_double latitude)
 {
     std::vector<std::string> tempList = I18nTimeZone::GetTimezoneIdByLocation(longitude, latitude);
-    static const char *className = "Lescompat/Array;";
+    static const char *className = "escompat.Array";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -199,7 +199,7 @@ ani_object I18nTimeZoneAddon::GetTimezonesByLocation(ani_env *env, [[maybe_unuse
     }
 
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "I:V", &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "i:", &ctor)) {
         HILOG_ERROR_I18N("Find method '<ctor>' failed");
         return nullptr;
     }
@@ -211,7 +211,7 @@ ani_object I18nTimeZoneAddon::GetTimezonesByLocation(ani_env *env, [[maybe_unuse
     }
 
     ani_method set;
-    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "ILstd/core/Object;:V", &set)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "iC{std.core.Object}:", &set)) {
         HILOG_ERROR_I18N("Find method '$_set' failed");
         return nullptr;
     }
@@ -228,7 +228,7 @@ ani_object I18nTimeZoneAddon::GetTimezonesByLocation(ani_env *env, [[maybe_unuse
 
 ani_status I18nTimeZoneAddon::BindContextTimeZone(ani_env *env)
 {
-    static const char *className = "L@ohos/i18n/i18n/TimeZone;";
+    static const char *className = "@ohos.i18n.i18n.TimeZone";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);

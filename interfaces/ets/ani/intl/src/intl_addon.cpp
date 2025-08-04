@@ -39,7 +39,7 @@ static IntlAddon* UnwrapAddon(ani_env *env, ani_object object, const std::string
 
 ani_string IntlAddon::DateTimeFormat_Format(ani_env *env, ani_object object, ani_object date)
 {
-    static const char *className = "Lescompat/Date;";
+    static const char *className = "escompat.Date";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -71,7 +71,7 @@ ani_string IntlAddon::DateTimeFormat_Format(ani_env *env, ani_object object, ani
 ani_string IntlAddon::DateTimeFormat_FormatRange(ani_env *env, ani_object object,
     ani_object startDate, ani_object endDate)
 {
-    static const char *className = "Lescompat/Date;";
+    static const char *className = "escompat.Date;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -116,7 +116,7 @@ ani_object IntlAddon::DateTimeFormat_ResolvedOptions(ani_env *env, ani_object ob
     std::map<std::string, std::string> options = {};
     obj->datefmt_->GetResolvedOptions(options);
 
-    static const char *className = "L@ohos/intl/intl/DateTimeOptionsInner;";
+    static const char *className = "@ohos.intl.intl.DateTimeOptionsInner";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -173,7 +173,7 @@ ani_object IntlAddon::Collator_ResolvedOptions(ani_env *env, ani_object object)
     std::map<std::string, std::string> options = {};
     obj->collator_->ResolvedOptions(options);
 
-    static const char *className = "L@ohos/intl/intl/CollatorOptionsInner;";
+    static const char *className = "@ohos.intl.intl.CollatorOptionsInner";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -230,7 +230,7 @@ ani_string IntlAddon::RelativeTimeFormat_Format(ani_env *env, ani_object object,
 static void FillInArrayElement(ani_env *env, ani_class arrayCls, ani_object &result,
     const std::vector<std::vector<std::string>> &timeVector)
 {
-    static const char *className = "L@ohos/intl/intl/RelativeTimeFormatPart;";
+    static const char *className = "@ohos.intl.intl.RelativeTimeFormatPart";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -244,7 +244,7 @@ static void FillInArrayElement(ani_env *env, ani_class arrayCls, ani_object &res
     }
 
     ani_method set;
-    if (ANI_OK != env->Class_FindMethod(arrayCls, "$_set", "ILstd/core/Object;:V", &set)) {
+    if (ANI_OK != env->Class_FindMethod(arrayCls, "$_set", "iC{std.core.Object}:", &set)) {
         HILOG_ERROR_I18N("Find method '$_set' failed");
         return;
     }
@@ -287,7 +287,7 @@ ani_object IntlAddon::RelativeTimeFormat_FormatToParts(ani_env *env, ani_object 
     std::vector<std::vector<std::string>> timeVector;
     obj->relativetimefmt_->FormatToParts(value, VariableConverter::AniStrToString(env, unit), timeVector);
 
-    static const char *className = "Lescompat/Array;";
+    static const char *className = "escompat.Array";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -295,7 +295,7 @@ ani_object IntlAddon::RelativeTimeFormat_FormatToParts(ani_env *env, ani_object 
     }
 
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "I:V", &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "i:", &ctor)) {
         HILOG_ERROR_I18N("Find method '<ctor>' failed");
         return nullptr;
     }
@@ -320,7 +320,7 @@ ani_object IntlAddon::RelativeTimeFormat_ResolvedOptions(ani_env *env, ani_objec
     std::map<std::string, std::string> options = {};
     obj->relativetimefmt_->GetResolvedOptions(options);
 
-    static const char *className = "L@ohos/intl/intl/RelativeTimeFormatResolvedOptionsInner;";
+    static const char *className = "@ohos.intl.intl.RelativeTimeFormatResolvedOptionsInner";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -355,7 +355,7 @@ ani_object IntlAddon::DateTimeFormat_Create(ani_env *env, [[maybe_unused]] ani_o
     std::map<std::string, std::string> map = {};
 
     obj->datefmt_ = DateTimeFormat::CreateInstance(localeTags, map);
-    static const char *className = "L@ohos/intl/intl/DateTimeFormat;";
+    static const char *className = "@ohos.intl.intl.DateTimeFormat";
     ani_object dateTimeFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return dateTimeFormatObject;
@@ -399,7 +399,7 @@ ani_object IntlAddon::DateTimeFormat_CreateWithParam(ani_env *env, [[maybe_unuse
     std::unique_ptr<IntlAddon> obj = std::make_unique<IntlAddon>();
     obj->datefmt_ = DateTimeFormat::CreateInstance(localeTags, map);
 
-    static const char *className = "L@ohos/intl/intl/DateTimeFormat;";
+    static const char *className = "@ohos.intl.intl.DateTimeFormat";
     ani_object dateTimeFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return dateTimeFormatObject;
@@ -412,7 +412,7 @@ ani_object IntlAddon::Collator_Create(ani_env *env, [[maybe_unused]] ani_object 
     std::unique_ptr<IntlAddon> obj = std::make_unique<IntlAddon>();
     obj->collator_ = std::make_unique<Collator>(localeTags, map);
 
-    static const char *className = "L@ohos/intl/intl/Collator;";
+    static const char *className = "@ohos.intl.intl.Collator";
     ani_object collatorObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return collatorObject;
@@ -457,7 +457,7 @@ ani_object IntlAddon::Collator_CreateWithParam(ani_env *env, [[maybe_unused]] an
     std::unique_ptr<IntlAddon> obj = std::make_unique<IntlAddon>();
     obj->collator_ = std::make_unique<Collator>(localeTags, map);
 
-    static const char *className = "L@ohos/intl/intl/Collator;";
+    static const char *className = "@ohos.intl.intl.Collator";
     ani_object collatorObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return collatorObject;
@@ -470,7 +470,7 @@ ani_object IntlAddon::PluralRules_Create(ani_env *env, [[maybe_unused]] ani_obje
     std::unique_ptr<IntlAddon> obj = std::make_unique<IntlAddon>();
     obj->pluralrules_ = std::make_unique<PluralRules>(localeTags, map);
 
-    static const char *className = "L@ohos/intl/intl/PluralRules;";
+    static const char *className = "@ohos.intl.intl.PluralRules";
     ani_object pluralRulesObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return pluralRulesObject;
@@ -515,7 +515,7 @@ ani_object IntlAddon::PluralRules_CreateWithParam(ani_env *env, [[maybe_unused]]
     std::unique_ptr<IntlAddon> obj = std::make_unique<IntlAddon>();
     obj->pluralrules_ = std::make_unique<PluralRules>(localeTags, map);
 
-    static const char *className = "L@ohos/intl/intl/PluralRules;";
+    static const char *className = "@ohos.intl.intl.PluralRules";
     ani_object pluralRulesObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return pluralRulesObject;
@@ -528,7 +528,7 @@ ani_object IntlAddon::RelativeTimeFormat_Create(ani_env *env, [[maybe_unused]] a
     std::unique_ptr<IntlAddon> obj = std::make_unique<IntlAddon>();
     obj->relativetimefmt_ = std::make_unique<RelativeTimeFormat>(localeTags, map);
 
-    static const char *className = "L@ohos/intl/intl/RelativeTimeFormat;";
+    static const char *className = "@ohos.intl.intl.RelativeTimeFormat";
     ani_object relativeTimeFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return relativeTimeFormatObject;
@@ -563,7 +563,7 @@ ani_object IntlAddon::RelativeTimeFormat_CreateWithParam(ani_env *env, [[maybe_u
     std::unique_ptr<IntlAddon> obj = std::make_unique<IntlAddon>();
     obj->relativetimefmt_= std::make_unique<RelativeTimeFormat>(localeTags, map);
 
-    static const char *className = "L@ohos/intl/intl/RelativeTimeFormat;";
+    static const char *className = "@ohos.intl.intl.RelativeTimeFormat";
     ani_object relativeTimeFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return relativeTimeFormatObject;
@@ -571,7 +571,7 @@ ani_object IntlAddon::RelativeTimeFormat_CreateWithParam(ani_env *env, [[maybe_u
 
 ani_status IntlAddon::BindContext_DateTimeFormat(ani_env *env)
 {
-    static const char *className = "L@ohos/intl/intl/DateTimeFormat;";
+    static const char *className = "@ohos.intl.intl.DateTimeFormat";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -579,7 +579,7 @@ ani_status IntlAddon::BindContext_DateTimeFormat(ani_env *env)
     }
 
     std::array methods = {
-        ani_native_function {"create", ":L@ohos/intl/intl/DateTimeFormat;",
+        ani_native_function {"create", ":C{@ohos.intl.intl.DateTimeFormat}",
             reinterpret_cast<void *>(DateTimeFormat_Create) },
         ani_native_function {
             "create",
@@ -601,7 +601,7 @@ ani_status IntlAddon::BindContext_DateTimeFormat(ani_env *env)
 
 ani_status IntlAddon::BindContext_Collator(ani_env *env)
 {
-    static const char *className = "L@ohos/intl/intl/Collator;";
+    static const char *className = "@ohos.intl.intl.Collator";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -609,7 +609,7 @@ ani_status IntlAddon::BindContext_Collator(ani_env *env)
     }
 
     std::array methods = {
-        ani_native_function {"create", ":L@ohos/intl/intl/Collator;", reinterpret_cast<void *>(Collator_Create) },
+        ani_native_function {"create", ":C{@ohos.intl.intl.Collator}", reinterpret_cast<void *>(Collator_Create) },
         ani_native_function {
             "create",
             "X{C{std.core.String}C{escompat.Array}}C{@ohos.intl.intl.CollatorOptions}:C{@ohos.intl.intl.Collator}",
@@ -628,7 +628,7 @@ ani_status IntlAddon::BindContext_Collator(ani_env *env)
 
 ani_status IntlAddon::BindContext_PluralRules(ani_env *env)
 {
-    static const char *className = "L@ohos/intl/intl/PluralRules;";
+    static const char *className = "@ohos.intl.intl.PluralRules";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -636,7 +636,9 @@ ani_status IntlAddon::BindContext_PluralRules(ani_env *env)
     }
 
     std::array methods = {
-        ani_native_function {"create", ":L@ohos/intl/intl/PluralRules;", reinterpret_cast<void *>(PluralRules_Create) },
+        ani_native_function {"create",
+            ":C{@ohos.intl.intl.PluralRules}",
+            reinterpret_cast<void *>(PluralRules_Create) },
         ani_native_function {
             "create",
             "X{C{escompat.Array}C{std.core.String}}C{@ohos.intl.intl.PluralRulesOptions}:"
@@ -655,7 +657,7 @@ ani_status IntlAddon::BindContext_PluralRules(ani_env *env)
 
 ani_status IntlAddon::BindContext_RelativeTimeFormat(ani_env *env)
 {
-    static const char *className = "L@ohos/intl/intl/RelativeTimeFormat;";
+    static const char *className = "@ohos.intl.intl.RelativeTimeFormat";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -663,7 +665,7 @@ ani_status IntlAddon::BindContext_RelativeTimeFormat(ani_env *env)
     }
 
     std::array methods = {
-        ani_native_function {"create", ":L@ohos/intl/intl/RelativeTimeFormat;",
+        ani_native_function {"create", ":C{@ohos.intl.intl.RelativeTimeFormat}",
             reinterpret_cast<void *>(RelativeTimeFormat_Create) },
         ani_native_function {
             "create",

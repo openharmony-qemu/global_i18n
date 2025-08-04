@@ -144,7 +144,7 @@ ani_object LocaleInfoAddon::Locale_Create(ani_env *env, [[maybe_unused]] ani_obj
     std::unique_ptr<LocaleInfoAddon> obj = std::make_unique<LocaleInfoAddon>();
     obj->locale_ = std::make_unique<LocaleInfo>("", map);
 
-    static const char *className = "L@ohos/intl/intl/Locale;";
+    static const char *className = "@ohos.intl.intl.Locale";
     ani_object localeObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return localeObject;
@@ -179,7 +179,7 @@ ani_object LocaleInfoAddon::Locale_CreateWithParam(ani_env *env, [[maybe_unused]
 
     std::unique_ptr<LocaleInfoAddon> obj = std::make_unique<LocaleInfoAddon>();
     obj->locale_ = std::make_unique<LocaleInfo>(VariableConverter::AniStrToString(env, locale), map);
-    static const char *className = "L@ohos/intl/intl/Locale;";
+    static const char *className = "@ohos.intl.intl.Locale";
     ani_object localeObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return localeObject;
@@ -187,7 +187,7 @@ ani_object LocaleInfoAddon::Locale_CreateWithParam(ani_env *env, [[maybe_unused]
 
 ani_status LocaleInfoAddon::BindContext_Locale(ani_env *env)
 {
-    static const char *className = "L@ohos/intl/intl/Locale;";
+    static const char *className = "@ohos.intl.intl.Locale";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -195,8 +195,8 @@ ani_status LocaleInfoAddon::BindContext_Locale(ani_env *env)
     }
 
     std::array methods = {
-        ani_native_function {"create", ":L@ohos/intl/intl/Locale;", reinterpret_cast<void *>(Locale_Create) },
-        ani_native_function {"create", "Lstd/core/String;L@ohos/intl/intl/LocaleOptions;:L@ohos/intl/intl/Locale;",
+        ani_native_function {"create", ":C{@ohos.intl.intl.Locale}", reinterpret_cast<void *>(Locale_Create) },
+        ani_native_function {"create", "C{std.core.String}C{@ohos.intl.intl.LocaleOptions}:C{@ohos.intl.intl.Locale}",
             reinterpret_cast<void *>(Locale_CreateWithParam) },
         ani_native_function {"toString", nullptr, reinterpret_cast<void *>(Locale_ToString) },
         ani_native_function {"maximize", nullptr, reinterpret_cast<void *>(Locale_Maximize) },

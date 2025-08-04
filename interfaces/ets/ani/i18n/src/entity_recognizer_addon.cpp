@@ -63,7 +63,7 @@ ani_object I18nEntityRecognizerAddon::Create(ani_env *env, [[maybe_unused]] ani_
     std::unique_ptr<I18nEntityRecognizerAddon> obj = std::make_unique<I18nEntityRecognizerAddon>();
     obj->entityRecognizer_ = std::make_unique<EntityRecognizer>(icuLocale);
 
-    static const char *className = "L@ohos/i18n/i18n/EntityRecognizer;";
+    static const char *className = "@ohos.i18n.i18n.EntityRecognizer";
     ani_object entityRecognizerObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return entityRecognizerObject;
@@ -71,7 +71,7 @@ ani_object I18nEntityRecognizerAddon::Create(ani_env *env, [[maybe_unused]] ani_
 
 static ani_object CreateEntityInfoItem(ani_env *env, const int begin, const int end, const std::string &type)
 {
-    static const char *className = "L@ohos/i18n/i18n/EntityInfoItemInner;";
+    static const char *className = "@ohos.i18n.i18n.EntityInfoItemInner";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -102,7 +102,7 @@ static ani_object CreateEntityInfoItem(ani_env *env, const int begin, const int 
 
 static ani_object GetEntityInfoItem(ani_env *env, std::vector<std::vector<int>>& entityInfo)
 {
-    static const char *className = "Lescompat/Array;";
+    static const char *className = "escompat.Array";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -110,7 +110,7 @@ static ani_object GetEntityInfoItem(ani_env *env, std::vector<std::vector<int>>&
     }
 
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "I:V", &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "i:", &ctor)) {
         HILOG_ERROR_I18N("Find method '<ctor>' failed");
         return nullptr;
     }
@@ -130,7 +130,7 @@ static ani_object GetEntityInfoItem(ani_env *env, std::vector<std::vector<int>>&
     }
 
     ani_method set;
-    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "ILstd/core/Object;:V", &set)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "iC{std.core.Object}:", &set)) {
         HILOG_ERROR_I18N("Find method '$_set' failed");
         return ret;
     }
@@ -167,7 +167,7 @@ ani_object I18nEntityRecognizerAddon::FindEntityInfo(ani_env *env, ani_object ob
 
 ani_status I18nEntityRecognizerAddon::BindContextEntityRecognizer(ani_env *env)
 {
-    static const char *className = "L@ohos/i18n/i18n/EntityRecognizer;";
+    static const char *className = "@ohos.i18n.i18n.EntityRecognizer";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);

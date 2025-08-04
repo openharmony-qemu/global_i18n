@@ -53,13 +53,13 @@ ani_object ErrorUtil::WrapAniError(ani_env *env, const std::string &msg)
     }
 
     ani_class cls {};
-    if ((status = env->FindClass("Lescompat/Error;", &cls)) != ANI_OK) {
+    if ((status = env->FindClass("C{escompat.Error}", &cls)) != ANI_OK) {
         HILOG_ERROR_I18N("FindClass failed %{public}d", status);
         return nullptr;
     }
 
     ani_method method {};
-    if ((status = env->Class_FindMethod(cls, "<ctor>", "Lstd/core/String;Lescompat/ErrorOptions;:V", &method)) !=
+    if ((status = env->Class_FindMethod(cls, "<ctor>", "C{std.core.String}C{escompat.ErrorOptions}:", &method)) !=
         ANI_OK) {
         HILOG_ERROR_I18N("Class_FindMethod failed %{public}d", status);
         return nullptr;
@@ -83,11 +83,11 @@ ani_object ErrorUtil::CreateError(ani_env *env, ani_int code, const std::string 
         HILOG_ERROR_I18N("null env");
         return nullptr;
     }
-    if ((status = env->FindClass("L@ohos/base/BusinessError;", &cls)) != ANI_OK) {
+    if ((status = env->FindClass("@ohos.base.BusinessError", &cls)) != ANI_OK) {
         HILOG_ERROR_I18N("FindClass failed %{public}d", status);
         return nullptr;
     }
-    if ((status = env->Class_FindMethod(cls, "<ctor>", "ILescompat/Error;:V", &method)) != ANI_OK) {
+    if ((status = env->Class_FindMethod(cls, "<ctor>", "iC{escompat.Error}:", &method)) != ANI_OK) {
         HILOG_ERROR_I18N("Class_FindMethod failed %{public}d", status);
         return nullptr;
     }

@@ -39,7 +39,7 @@ ani_object I18nSysLocaleMgrAddon::Create(ani_env *env, [[maybe_unused]] ani_obje
     std::unique_ptr<I18nSysLocaleMgrAddon> obj = std::make_unique<I18nSysLocaleMgrAddon>();
     obj->systemLocaleManager_ = std::make_unique<SystemLocaleManager>();
 
-    static const char *className = "L@ohos/i18n/i18n/SystemLocaleManager;";
+    static const char *className = "@ohos.i18n.i18n.SystemLocaleManager";
     ani_object sysLocaleMgrObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return sysLocaleMgrObject;
@@ -47,7 +47,7 @@ ani_object I18nSysLocaleMgrAddon::Create(ani_env *env, [[maybe_unused]] ani_obje
 
 static ani_object CreateLocaleItem(ani_env *env, LocaleItem localeItem)
 {
-    static const char *className = "L@ohos/i18n/i18n/LocaleItemInner;";
+    static const char *className = "@ohos.i18n.i18n.LocaleItemInner";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -70,7 +70,7 @@ static ani_object CreateLocaleItem(ani_env *env, LocaleItem localeItem)
     VariableConverter::SetStringMember(env, ret, "displayName", localeItem.displayName);
     VariableConverter::SetStringMember(env, ret, "localName", localeItem.localName);
 
-    static const char *enumName = "L@ohos/i18n/i18n/SuggestionType;";
+    static const char *enumName = "@ohos.i18n.i18n.SuggestionType";
     if (ANI_OK != env->Object_SetPropertyByName_Ref(ret, "suggestionType", VariableConverter::GetEnumItemByIndex(env,
         enumName, static_cast<int>(localeItem.suggestionType)))) {
         HILOG_ERROR_I18N("Set property 'suggestionType' failed");
@@ -80,7 +80,7 @@ static ani_object CreateLocaleItem(ani_env *env, LocaleItem localeItem)
 
 static ani_object CreateLocaleItemArray(ani_env *env, std::vector<LocaleItem> LocaleItemList)
 {
-    static const char *className = "Lescompat/Array;";
+    static const char *className = "escompat.Array";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -88,7 +88,7 @@ static ani_object CreateLocaleItemArray(ani_env *env, std::vector<LocaleItem> Lo
     }
 
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "I:V", &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "i:", &ctor)) {
         HILOG_ERROR_I18N("Find method '<ctor>' failed");
         return nullptr;
     }
@@ -100,7 +100,7 @@ static ani_object CreateLocaleItemArray(ani_env *env, std::vector<LocaleItem> Lo
     }
 
     ani_method set;
-    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "ILstd/core/Object;:V", &set)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "iC{std.core.Object}:", &set)) {
         HILOG_ERROR_I18N("Find method '$_set' failed");
         return ret;
     }
@@ -135,7 +135,7 @@ ani_object I18nSysLocaleMgrAddon::GetLanguageInfoArray(ani_env *env, ani_object 
     if (isUndefined) {
         localeTag = LocaleConfig::GetSystemLocale();
     } else {
-        std::string className = "L@ohos/i18n/i18n/SortOptionsInner;";
+        std::string className = "@ohos.i18n.i18n.SortOptionsInner";
         if (!VariableConverter::GetStringMember(env, options, "locale", localeTag)) {
             localeTag = LocaleConfig::GetSystemLocale();
         }
@@ -188,7 +188,7 @@ ani_object I18nSysLocaleMgrAddon::GetRegionInfoArray(ani_env *env, ani_object ob
     if (isUndefined) {
         localeTag = LocaleConfig::GetSystemLocale();
     } else {
-        std::string className = "L@ohos/i18n/i18n/SortOptionsInner;";
+        std::string className = "@ohos.i18n.i18n.SortOptionsInner";
         if (!VariableConverter::GetStringMember(env, options, "locale", localeTag)) {
             localeTag = LocaleConfig::GetSystemLocale();
         }
@@ -222,7 +222,7 @@ ani_object I18nSysLocaleMgrAddon::GetRegionInfoArray(ani_env *env, ani_object ob
 
 static ani_object CreateTimeZoneCityItem(ani_env *env, TimeZoneCityItem item)
 {
-    static const char *className = "L@ohos/i18n/i18n/TimeZoneCityItemInner;";
+    static const char *className = "@ohos.i18n.i18n.TimeZoneCityItemInner";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -262,7 +262,7 @@ ani_object I18nSysLocaleMgrAddon::GetTimeZoneCityItemArray(ani_env *env, [[maybe
         return nullptr;
     }
 
-    static const char *className = "Lescompat/Array;";
+    static const char *className = "escompat.Array;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -270,7 +270,7 @@ ani_object I18nSysLocaleMgrAddon::GetTimeZoneCityItemArray(ani_env *env, [[maybe
     }
 
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "I:V", &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "i:", &ctor)) {
         HILOG_ERROR_I18N("Find method '<ctor>' failed");
         return nullptr;
     }
@@ -282,7 +282,7 @@ ani_object I18nSysLocaleMgrAddon::GetTimeZoneCityItemArray(ani_env *env, [[maybe
     }
 
     ani_method set;
-    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "ILstd/core/Object;:V", &set)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "iC{std.core.Object}:", &set)) {
         HILOG_ERROR_I18N("Find method '$_set' failed");
         return ret;
     }
@@ -298,7 +298,7 @@ ani_object I18nSysLocaleMgrAddon::GetTimeZoneCityItemArray(ani_env *env, [[maybe
 
 ani_status I18nSysLocaleMgrAddon::BindContextSysLocaleMgr(ani_env *env)
 {
-    static const char *className = "L@ohos/i18n/i18n/SystemLocaleManager;";
+    static const char *className = "@ohos.i18n.i18n.SystemLocaleManager";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);

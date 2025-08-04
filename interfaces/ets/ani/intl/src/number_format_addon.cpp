@@ -68,7 +68,7 @@ ani_object NumberFormatAddon::NumberFormat_ResolvedOptions(ani_env *env, ani_obj
     std::map<std::string, std::string> options = {};
     obj->numberfmt_->GetResolvedOptions(options);
 
-    static const char *className = "L@ohos/intl/intl/NumberOptionsInner;";
+    static const char *className = "@ohos.intl.intl.NumberOptionsInner";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -116,7 +116,7 @@ ani_object NumberFormatAddon::NumberFormat_Create(ani_env *env, [[maybe_unused]]
     std::unique_ptr<NumberFormatAddon> obj = std::make_unique<NumberFormatAddon>();
     obj->numberfmt_ = std::make_unique<NumberFormat>(localeTags, map);
 
-    static const char *className = "L@ohos/intl/intl/NumberFormat;";
+    static const char *className = "@ohos.intl.intl.NumberFormat";
     ani_object numberFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return numberFormatObject;
@@ -169,7 +169,7 @@ ani_object NumberFormatAddon::NumberFormat_CreateWithParam(ani_env *env, [[maybe
     std::unique_ptr<NumberFormatAddon> obj = std::make_unique<NumberFormatAddon>();
     obj->numberfmt_ = std::make_unique<NumberFormat>(localeTags, map);
 
-    static const char *className = "L@ohos/intl/intl/NumberFormat;";
+    static const char *className = "@ohos.intl.intl.NumberFormat";
     ani_object numberFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return numberFormatObject;
@@ -177,7 +177,7 @@ ani_object NumberFormatAddon::NumberFormat_CreateWithParam(ani_env *env, [[maybe
 
 ani_status NumberFormatAddon::BindContext_NumberFormat(ani_env *env)
 {
-    static const char *className = "L@ohos/intl/intl/NumberFormat;";
+    static const char *className = "@ohos.intl.intl.NumberFormat";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -185,7 +185,7 @@ ani_status NumberFormatAddon::BindContext_NumberFormat(ani_env *env)
     }
 
     std::array methods = {
-        ani_native_function {"create", ":L@ohos/intl/intl/NumberFormat;",
+        ani_native_function {"create", ":C{@ohos.intl.intl.NumberFormat}",
             reinterpret_cast<void *>(NumberFormat_Create) },
         ani_native_function {
             "create",
