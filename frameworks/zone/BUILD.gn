@@ -36,6 +36,7 @@ ohos_shared_library("zone_util") {
     "libphonenumber:phonenumber_standard",
     "libpng:libpng",
     "libxml2:libxml2",
+    "protobuf:protobuf_lite",
   ]
   subsystem_name = "global"
   part_name = "i18n"
