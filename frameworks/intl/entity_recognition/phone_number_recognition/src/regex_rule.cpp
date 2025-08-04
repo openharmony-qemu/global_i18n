@@ -351,6 +351,9 @@ std::vector<MatchedNumberInfo> RegexRule::HandleBlank(PhoneNumberMatch* possible
     // exclude phone number 2333333
     icu::UnicodeString negativeRegex = "(?<![-\\d])(23{6,7})(?![-\\d])";
     icu::RegexMatcher negativePattern(negativeRegex, 0, status);
+    if (U_FAILURE(status)) {
+        return matchedNumberInfoList;
+    }
     negativePattern.reset(number);
     if (matcher->find()) {
         // exclude phone number 5201314
@@ -383,6 +386,7 @@ std::vector<MatchedNumberInfo> RegexRule::HandleSlant(PhoneNumberMatch* possible
     }
     icu::RegexPattern* pattern = GetPattern();
     if (pattern == nullptr) {
+        HILOG_ERROR_I18N("RegexRule::HandleSlant: pattern is nullptr.");
         return matchedNumberInfoList;
     }
     UErrorCode status = U_ZERO_ERROR;

@@ -18,7 +18,6 @@
 #include "i18n_hilog.h"
 #include "i18n_timezone.h"
 #include "ohos/init_data.h"
-#include "phonenumbers/phonenumberutil.h"
 #include "unicode/strenum.h"
 #include "unicode/timezone.h"
 #include "utils.h"

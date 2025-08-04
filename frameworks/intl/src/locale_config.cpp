@@ -1646,7 +1646,11 @@ I18nErrorCode LocaleConfig::SetSystemLocale(const std::string &localeTag, int32_
 
 bool LocaleConfig::IsValid24HourClockValue(const std::string &tag)
 {
-    return (tag.compare("true") == 0 || tag.compare("false") == 0 || tag.compare("default") == 0);
+    if (tag.compare("true") == 0 || tag.compare("false") == 0 || tag.compare("default") == 0) {
+        return true;
+    }
+    HILOG_ERROR_I18N("IsValid24HourClockValue invalid 24 Hour clock tag: %{public}s", tag.c_str());
+    return false;
 }
 
 I18nErrorCode LocaleConfig::Set24HourClock(const std::string &option, int32_t userId)
@@ -1933,6 +1937,7 @@ I18nErrorCode LocaleConfig::GetUsingNumberingSystem(std::string& usingNumberingS
         return I18nErrorCode::FAILED;
     }
     usingNumberingSystem = numberingSystem->getName();
+    delete numberingSystem;
     if (usingNumberingSystem.empty()) {
         usingNumberingSystem = DEFAULT_NUMBERING_SYSTEM_NAME;
         HILOG_ERROR_I18N("LocaleConfig::GetUsingNumberingSystem: Get name failed.");
@@ -1977,6 +1982,7 @@ std::pair<std::string, std::string> LocaleConfig::GetNumberPatternFromLocale(con
     }
     icu::DecimalFormatSymbols* decimalFormatSymbols = new icu::DecimalFormatSymbols(locale, status);
     if (U_FAILURE(status) || decimalFormatSymbols == nullptr) {
+        delete decimalFormatSymbols;
         HILOG_ERROR_I18N("LocaleConfig::GetNumberPatternFromLocale: Create icu::DecimalFormatSymbols failed.");
         return numberPattern;
     }

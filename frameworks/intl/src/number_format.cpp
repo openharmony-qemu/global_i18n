@@ -644,10 +644,10 @@ void NumberFormat::FormatBigIntToParts(std::string &number, std::vector<std::vec
     FormattedNumberParts(formattedNumber, result, "bigint", numDouble);
 }
 
-double NumberFormat::GetBigIntFieldType(const std::string &bigintStr)
+double NumberFormat::GetBigIntFieldType(const std::string &bigIntStr)
 {
     double numDouble = 0;
-    if (!bigintStr.empty() && bigintStr.at(0) == '-') {
+    if (!bigIntStr.empty() && bigIntStr.at(0) == '-') {
         numDouble = -1.0; // -1 just means number is negative
     }
     return numDouble;
@@ -657,7 +657,7 @@ void NumberFormat::FormatToParts(double number, std::vector<std::vector<std::str
 {
     std::string finalUnit = unit;
     if (IsRelativeTimeFormat(number, finalUnit)) {
-        RelativeDateTimeFormatToParts(number, finalUnit, result);
+        RelativeDateTimeFormatToParts(number, unit, result);
         return;
     }
     icu::number::FormattedNumber formattedNumber = FormatToFormattedNumber(number);

@@ -90,14 +90,14 @@ const std::unordered_map<char16_t, std::string> HOUR_CYCLE_MAP = {
     { 'k', "h24" }
 };
 
-const std::unordered_map<UDateFormatHourCycle, std::string> UDateFormatHourCycleToString = {
+const std::unordered_map<UDateFormatHourCycle, std::string> UDATE_FORMAT_HOUR_CYCLE_TO_STRING = {
     { UDAT_HOUR_CYCLE_11, "h11" },
     { UDAT_HOUR_CYCLE_12, "h12" },
     { UDAT_HOUR_CYCLE_23, "h23" },
     { UDAT_HOUR_CYCLE_24, "h24" }
 };
 
-const std::unordered_map<int32_t, std::string> FieldIdToDateType = {
+const std::unordered_map<int32_t, std::string> FIELD_ID_TO_DATE_TYPE = {
     { UDAT_YEAR_FIELD, "year" },
     { UDAT_EXTENDED_YEAR_FIELD, "year" },
     { UDAT_YEAR_NAME_FIELD, "yearName" },
@@ -556,7 +556,7 @@ bool IntlDateTimeFormat::InitIntlDateTimeFormat(const std::unordered_map<std::st
         return false;
     }
     std::string effectiveHourCycle;
-    if (!IntlDateTimeFormat::InitHourCycle(configs, effectiveHourCycle)) {
+    if (!IntlDateTimeFormat::InitHourCycle(effectiveHourCycle)) {
         HILOG_ERROR_I18N("IntlDateTimeFormat::InitIntlDateTimeFormat: Init hour cycle failed.");
         return false;
     }
@@ -601,7 +601,7 @@ void IntlDateTimeFormat::InitIcuLocale()
             if (U_FAILURE(icuStatus)) {
                 HILOG_ERROR_I18N("IntlDateTimeFormat::InitIcuLocale: Set icuLocale calendar failed.");
             }
-        } 
+        }
     }
 }
 
@@ -644,8 +644,7 @@ bool IntlDateTimeFormat::InitDateTimePatternGenerator(std::string& errMessage)
     return true;
 }
 
-bool IntlDateTimeFormat::InitHourCycle(const std::unordered_map<std::string, std::string>& configs,
-    std::string& effectiveHourCycle)
+bool IntlDateTimeFormat::InitHourCycle(std::string& effectiveHourCycle)
 {
     if (icuDateTimePatternGenerator == nullptr) {
         HILOG_ERROR_I18N("IntlDateTimeFormat::InitHourCycle: icuDateTimePatternGenerator is nullptr.");
@@ -1034,8 +1033,8 @@ bool IntlDateTimeFormat::InitDateIntervalFormat()
 
 std::string IntlDateTimeFormat::ConvertUDateFormatHourCycleToString(UDateFormatHourCycle hc)
 {
-    auto iter = UDateFormatHourCycleToString.find(hc);
-    if (iter == UDateFormatHourCycleToString.end()) {
+    auto iter = UDATE_FORMAT_HOUR_CYCLE_TO_STRING.find(hc);
+    if (iter == UDATE_FORMAT_HOUR_CYCLE_TO_STRING.end()) {
         HILOG_ERROR_I18N("IntlDateTimeFormat::ConvertUDateFormatHourCycleToString: Invalid hourCycle.");
         return "";
     }
@@ -1044,8 +1043,8 @@ std::string IntlDateTimeFormat::ConvertUDateFormatHourCycleToString(UDateFormatH
 
 std::string IntlDateTimeFormat::ConvertFieldIdToDateType(int32_t fieldId)
 {
-    auto iter = FieldIdToDateType.find(fieldId);
-    if (iter == FieldIdToDateType.end()) {
+    auto iter = FIELD_ID_TO_DATE_TYPE.find(fieldId);
+    if (iter == FIELD_ID_TO_DATE_TYPE.end()) {
         return "literal";
     }
     return iter->second;

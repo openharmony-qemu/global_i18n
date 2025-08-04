@@ -146,6 +146,10 @@ std::string PreferredLanguage::GetFirstPreferredLanguage()
 std::shared_ptr<NativePreferences::Preferences> PreferredLanguage::GetI18nAppPreferences()
 {
     std::shared_ptr<AbilityRuntime::ApplicationContext> appContext = AbilityRuntime::ApplicationContext::GetInstance();
+    if (appContext == nullptr) {
+        HILOG_ERROR_I18N("PreferredLanguage::GetAppPreferredLanguage: Get app context failed.");
+        return nullptr;
+    }
     int defaultMode = appContext->GetArea();
     appContext->SwitchArea(0);
     std::string preferencesDirPath = appContext->GetPreferencesDir();

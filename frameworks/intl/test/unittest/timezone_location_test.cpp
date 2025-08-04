@@ -704,6 +704,7 @@ HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0001, TestSize.Level1)
         double latitude = std::get<1>(*iter);
         std::vector<std::string> expects = std::get<2>(*iter);
         vector<std::string> tz = I18nTimeZone::GetTimezoneIdByLocation(longitude, latitude);
+        EXPECT_EQ(tz.size(), expects.size());
         for (unsigned int i = 0; i < tz.size(); i++) {
             EXPECT_EQ(tz[i], expects[i]);
         }

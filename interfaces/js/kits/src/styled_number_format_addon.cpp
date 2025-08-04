@@ -113,29 +113,33 @@ napi_value StyledNumberFormatAddon::Format(napi_env env, napi_callback_info info
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("StyledNumberFormatAddon::Format: Get cb info failed.");
-        return VariableConvertor::CreateString(env, "");
+        return CreateStyledString(env, "", nullptr);
     } else if (argc < 1) {
         ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, "value", true);
-        return VariableConvertor::CreateString(env, "");
+        return CreateStyledString(env, "", nullptr);
     }
 
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     status = napi_typeof(env, argv[0], &valueType);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("StyledNumberFormatAddon::Format: Failed to get type of argv[0].");
-        return VariableConvertor::CreateString(env, "");
+        return CreateStyledString(env, "", nullptr);
     } else if (valueType != napi_valuetype::napi_number) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "value", "number", true);
-        return VariableConvertor::CreateString(env, "");
+        return CreateStyledString(env, "", nullptr);
     }
 
     double number = 0;
-    napi_get_value_double(env, argv[0], &number);
+    status = napi_get_value_double(env, argv[0], &number);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("Format: Get double from napi failed");
+        return CreateStyledString(env, "", nullptr);
+    }
     StyledNumberFormatAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->styledNumberFormat_) {
         HILOG_ERROR_I18N("Format: Get StyledNumberFormat object failed");
-        return VariableConvertor::CreateString(env, "");
+        return CreateStyledString(env, "", nullptr);
     }
 
     std::string formattedNumber = obj->styledNumberFormat_->Format(number);
@@ -152,7 +156,7 @@ bool StyledNumberFormatAddon::InitStyledNumberFormatContent(napi_env env, JSNumb
 {
     if (jsNumberFormatAddon) {
         styledNumberFormat_ =
-            std::make_unique<StyledNumberFormat>(true, jsNumberFormatAddon->CopyNumberFormat(), nullptr);
+            std::make_unique<StyledNumberFormat>(true, jsNumberFormatAddon->GetNumberFormat(), nullptr);
     } else if (numberFormatAddon) {
         styledNumberFormat_ =
             std::make_unique<StyledNumberFormat>(true, numberFormatAddon->CopyNumberFormat(), nullptr);
@@ -249,11 +253,10 @@ napi_value StyledNumberFormatAddon::CreateStyleOptions(napi_env env,
 
     unsigned int index = 0;
     for (size_t i = 0; i < numberParts.size(); ++i) {
-        auto iter = styledNumberFormatOptions.find(numberParts[i].part_name);
-        if (iter == styledNumberFormatOptions.end()) {
+        if (styledNumberFormatOptions.find(numberParts[i].part_name) == styledNumberFormatOptions.end()) {
             continue;
         }
-        napi_ref textStyleRef = iter->second;
+        napi_ref textStyleRef = styledNumberFormatOptions.at(numberParts[i].part_name);
         napi_value option = CreateStyleOption(env, numberParts[i], textStyleRef);
         status = napi_set_element(env, result, index, option);
         if (status != napi_ok) {

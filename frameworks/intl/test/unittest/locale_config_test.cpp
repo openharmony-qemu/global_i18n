@@ -778,6 +778,9 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest030, TestSize.Level1)
     errCode = LocaleConfig::SetSystemNumericalDatePattern("Invalid");
     EXPECT_EQ(errCode, I18nErrorCode::INVALID_PARAM);
 
+    std::string patternNumber = LocaleConfig::GetPatternNumberFromLocale("zh-Hans-CN");
+    EXPECT_EQ(patternNumber, "0011");
+
     LocaleConfig::SetSystemLanguage(systemLanguage);
     LocaleConfig::SetSystemLocale(systemLocale);
 }
