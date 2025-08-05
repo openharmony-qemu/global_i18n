@@ -36,8 +36,6 @@ ohos_unittest("i18n_service_test") {
     "common_event_service:cesfwk_innerkits",
     "googletest:gtest",
     "hilog:libhilog",
-    "ipc:ipc_core",
-    "selinux_adapter:librestorecon",
   ]
 
   deps = [

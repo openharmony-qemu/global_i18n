@@ -50,7 +50,6 @@ ohos_shared_library("cj_i18n_ffi") {
     "napi:cj_bind_ffi",
     "napi:cj_bind_native",
     "preferences:native_preferences",
-    "protobuf:protobuf_lite",
     "samgr:samgr_proxy",
   ]
 
