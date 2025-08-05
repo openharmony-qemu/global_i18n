@@ -473,6 +473,8 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest021, TestSize.Level1)
     flag = LocaleConfig::IsValidTag(fakeTag);
     EXPECT_TRUE(!flag);
     EXPECT_FALSE(LocaleConfig::IsValidTag(""));
+    icu::Locale locale = LocaleConfig::GetIcuLocale(tag);
+    EXPECT_EQ(locale.getLanguage(), language);
 }
 
 /**
@@ -667,7 +669,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest027, TestSize.Level1)
     errCode = LocaleConfig::GetUsingNumberPattern(usingNumberPattern);
     EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
     EXPECT_EQ(usingNumberPattern, "0000002c");
- 
+
     errCode = LocaleConfig::SetSystemNumberingSystem("002d002f");
     EXPECT_EQ(errCode, I18nErrorCode::INVALID_PARAM);
 

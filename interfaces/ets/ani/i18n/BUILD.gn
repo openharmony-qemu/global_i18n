@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//base/global/i18n/i18n.gni")
 import("//build/config/components/ets_frontend/ets2abc_config.gni")
 import("//build/ohos.gni")
 
@@ -54,6 +55,11 @@ ohos_shared_library("i18n_ani") {
     "libxml2:libxml2",
     "runtime_core:ani",
   ]
+
+  defines = []
+  if (i18n_support_app_preferred_language) {
+    defines += [ "SUPPORT_APP_PREFERRED_LANGUAGE" ]
+  }
   part_name = "i18n"
   subsystem_name = "global"
 }
