@@ -352,6 +352,8 @@ std::vector<MatchedNumberInfo> RegexRule::HandleBlank(PhoneNumberMatch* possible
     icu::UnicodeString negativeRegex = "(?<![-\\d])(23{6,7})(?![-\\d])";
     icu::RegexMatcher negativePattern(negativeRegex, 0, status);
     if (U_FAILURE(status)) {
+        delete matcher;
+        delete pattern;        
         return matchedNumberInfoList;
     }
     negativePattern.reset(number);

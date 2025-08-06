@@ -657,7 +657,7 @@ void NumberFormat::FormatToParts(double number, std::vector<std::vector<std::str
 {
     std::string finalUnit = unit;
     if (IsRelativeTimeFormat(number, finalUnit)) {
-        RelativeDateTimeFormatToParts(number, unit, result);
+        RelativeDateTimeFormatToParts(number, finalUnit, result);
         return;
     }
     icu::number::FormattedNumber formattedNumber = FormatToFormattedNumber(number);
