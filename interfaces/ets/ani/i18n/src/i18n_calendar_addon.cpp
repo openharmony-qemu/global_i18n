@@ -343,7 +343,7 @@ ani_status I18nCalendarAddon::BindContextCalendar(ani_env *env)
     }
 
     std::array methods = {
-        ani_native_function { "setTime", "escompat.Date:",
+        ani_native_function { "setTime", "C{escompat.Date}:",
             reinterpret_cast<void *>(I18nCalendarAddon::SetTimeByDate) },
         ani_native_function { "setTime", "d:", reinterpret_cast<void *>(I18nCalendarAddon::SetTime) },
         ani_native_function { "set", nullptr, reinterpret_cast<void *>(I18nCalendarAddon::Set) },

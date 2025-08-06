@@ -70,7 +70,7 @@ void VariableConverter::SetBooleanMember(ani_env *env, ani_object obj,
         return;
     }
 
-    static const char *className = "Lstd/core/Boolean;";
+    static const char *className = "std.core.Boolean";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -78,7 +78,7 @@ void VariableConverter::SetBooleanMember(ani_env *env, ani_object obj,
     }
 
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "Z:V", &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "z:", &ctor)) {
         HILOG_ERROR_I18N("Find method '<ctor>' failed");
         return;
     }
@@ -114,7 +114,7 @@ bool VariableConverter::GetBooleanMember(ani_env *env, ani_object options, const
     }
 
     ani_boolean ret;
-    if (ANI_OK != env->Object_CallMethodByName_Boolean(static_cast<ani_object>(ref), "unboxed", ":Z", &ret)) {
+    if (ANI_OK != env->Object_CallMethodByName_Boolean(static_cast<ani_object>(ref), "unboxed", ":z", &ret)) {
         HILOG_ERROR_I18N("Call method by name failed");
         return false;
     }
@@ -124,7 +124,7 @@ bool VariableConverter::GetBooleanMember(ani_env *env, ani_object options, const
 
 void VariableConverter::SetNumberMember(ani_env *env, ani_object obj, const std::string &name, const ani_int value)
 {
-    static const char *className = "Lstd/core/Int;";
+    static const char *className = "std.core.Int";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -132,7 +132,7 @@ void VariableConverter::SetNumberMember(ani_env *env, ani_object obj, const std:
     }
 
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "I:V", &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "i:", &ctor)) {
         HILOG_ERROR_I18N("Find method '<ctor>' failed");
         return;
     }
@@ -155,7 +155,7 @@ void VariableConverter::SetNumberMember(ani_env *env, ani_object obj, const std:
         return;
     }
 
-    static const char *className = "Lstd/core/Int;";
+    static const char *className = "std.core.Int";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -163,7 +163,7 @@ void VariableConverter::SetNumberMember(ani_env *env, ani_object obj, const std:
     }
 
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "I:V", &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "i:", &ctor)) {
         HILOG_ERROR_I18N("Find method '<ctor>' failed");
         return;
     }
@@ -204,7 +204,7 @@ bool VariableConverter::GetNumberMember(ani_env *env, ani_object options, const 
     }
 
     ani_int valueInt;
-    if (ANI_OK != env->Object_CallMethodByName_Int(static_cast<ani_object>(ref), "unboxed", ":I", &valueInt)) {
+    if (ANI_OK != env->Object_CallMethodByName_Int(static_cast<ani_object>(ref), "unboxed", ":i", &valueInt)) {
         HILOG_ERROR_I18N("Unboxed Double failed");
         return false;
     }
@@ -247,7 +247,7 @@ bool VariableConverter::GetStringMember(ani_env *env, ani_object options, const 
 
 ani_object VariableConverter::CreateArray(ani_env *env, const std::vector<std::string> &strs)
 {
-    static const char *className = "Lescompat/Array;";
+    static const char *className = "escompat.Array";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -255,7 +255,7 @@ ani_object VariableConverter::CreateArray(ani_env *env, const std::vector<std::s
     }
 
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "I:V", &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "i:", &ctor)) {
         HILOG_ERROR_I18N("Find method '<ctor>' failed");
         return nullptr;
     }
@@ -267,7 +267,7 @@ ani_object VariableConverter::CreateArray(ani_env *env, const std::vector<std::s
     }
 
     ani_method set;
-    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "ILstd/core/Object;:V", &set)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "iC{std.core.Object}:", &set)) {
         HILOG_ERROR_I18N("Find method '$_set' failed");
         return ret;
     }
@@ -283,7 +283,7 @@ ani_object VariableConverter::CreateArray(ani_env *env, const std::vector<std::s
 
 bool VariableConverter::ParseStringArray(ani_env *env, ani_object obj, std::vector<std::string> &strs)
 {
-    static const char *className = "Lescompat/Array;";
+    static const char *className = "escompat.Array";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -296,14 +296,14 @@ bool VariableConverter::ParseStringArray(ani_env *env, ani_object obj, std::vect
         return false;
     }
 
-    ani_double length;
-    if (ANI_OK != env->Object_CallMethod_Double(obj, getLengthMethod, &length)) {
+    ani_int length;
+    if (ANI_OK != env->Object_CallMethod_Int(obj, getLengthMethod, &length)) {
         HILOG_ERROR_I18N("Get 'length' failed");
         return false;
     }
 
     ani_method get;
-    if (ANI_OK != env->Class_FindMethod(cls, "$_get", "I:Lstd/core/Object;", &get)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "$_get", "i:C{std.core.Object}", &get)) {
         HILOG_ERROR_I18N("Find method '$_get' failed");
         return false;
     }
@@ -337,7 +337,7 @@ ani_enum_item VariableConverter::GetEnumItemByIndex(ani_env* env, const char* en
 
 ani_double VariableConverter::GetDateValue(ani_env *env, ani_object date, const std::string &method)
 {
-    static const char* className = "Lescompat/Date;";
+    static const char* className = "escompat.Date";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -362,8 +362,8 @@ std::vector<std::string> VariableConverter::GetLocaleTags(ani_env *env, ani_obje
 {
     std::vector<std::string> localeTags;
     ani_class stringClass;
-    if (ANI_OK != env->FindClass("Lstd/core/String;", &stringClass)) {
-        HILOG_ERROR_I18N("Find class 'Lstd/core/String' failed");
+    if (ANI_OK != env->FindClass("std.core.String", &stringClass)) {
+        HILOG_ERROR_I18N("Find class 'std.core.String' failed");
         return localeTags;
     }
 
@@ -376,7 +376,7 @@ std::vector<std::string> VariableConverter::GetLocaleTags(ani_env *env, ani_obje
         localeTags.push_back(AniStrToString(env, locale));
         return localeTags;
     }
-    static const char *className = "Lescompat/Array;";
+    static const char *className = "escompat.Array";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -389,14 +389,14 @@ std::vector<std::string> VariableConverter::GetLocaleTags(ani_env *env, ani_obje
         return localeTags;
     }
 
-    ani_double length;
-    if (ANI_OK != env->Object_CallMethod_Double(locale, getLengthMethod, &length)) {
+    ani_int length;
+    if (ANI_OK != env->Object_CallMethod_Int(locale, getLengthMethod, &length)) {
         HILOG_ERROR_I18N("Get 'length' failed");
         return localeTags;
     }
 
     ani_method get;
-    if (ANI_OK != env->Class_FindMethod(cls, "$_get", "I:Lstd/core/Object;", &get)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "$_get", "i:C{std.core.Object}", &get)) {
         HILOG_ERROR_I18N("Find method '$_get' failed");
         return localeTags;
     }
@@ -422,7 +422,7 @@ ani_object VariableConverter::CreateAniObject(ani_env* env, const char* classNam
     }
 
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "J:V", &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "l:", &ctor)) {
         HILOG_ERROR_I18N("Find method '<ctor>' failed");
         return nullptr;
     }

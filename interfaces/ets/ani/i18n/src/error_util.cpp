@@ -53,8 +53,8 @@ ani_object ErrorUtil::WrapAniError(ani_env *env, const std::string &msg)
     }
 
     ani_class cls {};
-    if ((status = env->FindClass("C{escompat.Error}", &cls)) != ANI_OK) {
-        HILOG_ERROR_I18N("FindClass failed %{public}d", status);
+    if ((status = env->FindClass("escompat.Error", &cls)) != ANI_OK) {
+        HILOG_ERROR_I18N("WrapAniError FindClass escompat.Error failed %{public}d", status);
         return nullptr;
     }
 

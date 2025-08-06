@@ -354,7 +354,7 @@ ani_object I18nTransliteratorAddon::GetInstance(ani_env *env, [[maybe_unused]] a
     }
 
     obj->transliterator_ = std::unique_ptr<icu::Transliterator>(trans);
-    static const char* className = "@ohos.i18n.i18n.Transliterator}";
+    static const char* className = "@ohos.i18n.i18n.Transliterator";
     ani_object transliteratorObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return transliteratorObject;
