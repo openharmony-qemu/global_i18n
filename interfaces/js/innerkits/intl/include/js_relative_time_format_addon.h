@@ -41,8 +41,9 @@ private:
     static napi_value GetNumberResolvedOptions(napi_env env, napi_callback_info info);
     static napi_value FormatToParts(napi_env env, napi_callback_info info);
     static napi_value SupportedLocalesOf(napi_env env, napi_callback_info info);
-    static napi_value GetFormatToPartsInner(napi_env env, napi_value param, const std::string &unit,
+    static napi_value GetFormatToPartsInner(napi_env env, double number, const std::string &unit,
         napi_value &thisVar);
+    static double GetFirstFormatParameter(napi_env env, napi_value param, napi_valuetype &valueType, int &errorCode);
     static napi_value SetNumberFormatParts(napi_env env,
         const std::vector<std::vector<std::string>> &numberParts);
     static void GetRelativeTimeOptionValues(napi_env env, napi_value options, std::map<std::string, std::string> &map);

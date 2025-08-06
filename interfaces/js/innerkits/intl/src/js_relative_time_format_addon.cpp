@@ -228,14 +228,14 @@ napi_value JSRelativeTimeFormatAddon::Format(napi_env env, napi_callback_info in
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::Format: Get param type failed.");
         return nullptr;
     }
-    if (valueType != napi_valuetype::napi_number) {
+    /**if (valueType != napi_valuetype::napi_number) {
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::Format: parameter type invalid");
         ErrorUtil::NapiThrowUndefined(env, "parameter type invalid");
         return nullptr;
-    }
-    double number;
-    status = napi_get_value_double(env, argv[0], &number);
-    if (status != napi_ok) {
+    }*/
+    int errorCode = 0;
+    double number = GetFirstFormatParameter(env, argv[0], valueType, errorCode);
+    if (errorCode != 0) {
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::Format: Get number failed");
         return nullptr;
     }
@@ -253,6 +253,22 @@ napi_value JSRelativeTimeFormatAddon::Format(napi_env env, napi_callback_info in
     }
     std::string value = obj->relativetimefmt_->Format(number, unit);
     return JSUtils::CreateString(env, value);
+}
+
+double JSRelativeTimeFormatAddon::GetFirstFormatParameter(napi_env env, napi_value param,
+    napi_valuetype &valueType, int &errorCode)
+{
+    if (valueType == napi_valuetype::napi_number) {
+        double number;
+        napi_status status = napi_get_value_double(env, param, &number);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::GetFirstFormatParameter: Get double value failed");
+            errorCode = -1;
+            return 0;
+        }
+        return number;
+    } 
+    return JSUtils::GetNumberValue(env, param, errorCode);
 }
 
 napi_value JSRelativeTimeFormatAddon::GetNumberResolvedOptions(napi_env env, napi_callback_info info)
@@ -306,9 +322,15 @@ napi_value JSRelativeTimeFormatAddon::FormatToParts(napi_env env, napi_callback_
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::FormatToParts: Get param type failed.");
         return nullptr;
     }
-    if (valueType != napi_valuetype::napi_number) {
+    /**if (valueType != napi_valuetype::napi_number) {
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::FormatToParts: parameter type invalid");
         ErrorUtil::NapiThrowUndefined(env, "parameter type invalid");
+        return nullptr;
+    }*/
+    int errorCode = 0;
+    double number = GetFirstFormatParameter(env, argv[0], valueType, errorCode);
+    if (errorCode != 0) {
+        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::FormatToParts: Get parameter number failed");
         return nullptr;
     }
     int32_t code = 0;
@@ -317,10 +339,10 @@ napi_value JSRelativeTimeFormatAddon::FormatToParts(napi_env env, napi_callback_
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::FormatToParts: Get second parameter failed");
         return nullptr;
     }
-    return GetFormatToPartsInner(env, argv[0], unit, thisVar);
+    return GetFormatToPartsInner(env, number, unit, thisVar);
 }
 
-napi_value JSRelativeTimeFormatAddon::GetFormatToPartsInner(napi_env env, napi_value param,
+napi_value JSRelativeTimeFormatAddon::GetFormatToPartsInner(napi_env env, double number,
     const std::string &unit, napi_value &thisVar)
 {
     JSRelativeTimeFormatAddon *obj = nullptr;
@@ -330,12 +352,6 @@ napi_value JSRelativeTimeFormatAddon::GetFormatToPartsInner(napi_env env, napi_v
         return nullptr;
     }
     std::vector<std::vector<std::string>> relativeTimeParts;
-    double number = 0;
-    status = napi_get_value_double(env, param, &number);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("GetFormatToPartsInner: Get double parameter value failed");
-        return nullptr;
-    }
     obj->relativetimefmt_->FormatToParts(number, unit, relativeTimeParts);
     return SetNumberFormatParts(env, relativeTimeParts);
 }
