@@ -49,6 +49,7 @@ private:
         napi_value &thisVar);
     static napi_value FormatWithDiffParamType(napi_env env, napi_value param, napi_valuetype &valueType,
         napi_value &thisVar);
+    static double GetNumberValue(napi_env env, napi_value param, int errorCode);
     static napi_value SetNumberFormatParts(napi_env env, napi_status &status,
         const std::vector<std::vector<std::string>> &numberParts);
     static napi_value CreateNumberFormatWithoutNew(napi_env env, size_t argc, napi_value *argv);

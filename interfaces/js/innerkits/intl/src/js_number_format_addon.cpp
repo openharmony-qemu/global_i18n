@@ -200,11 +200,6 @@ napi_value JSNumberFormatAddon::FormatNumber(napi_env env, napi_callback_info in
         HILOG_ERROR_I18N("JSNumberFormatAddon::FormatNumber: Get parameter type failed");
         return nullptr;
     }
-    if (valueType != napi_valuetype::napi_number && valueType != napi_valuetype::napi_bigint) {
-        HILOG_ERROR_I18N("JSNumberFormatAddon::FormatNumber: parameter type invalid");
-        ErrorUtil::NapiThrowUndefined(env, "parameter type invalid");
-        return nullptr;
-    }
     return FormatWithDiffParamType(env, argv[0], valueType, thisVar);
 }
 
@@ -372,11 +367,6 @@ napi_value JSNumberFormatAddon::FormatToParts(napi_env env, napi_callback_info i
         HILOG_ERROR_I18N("JSNumberFormatAddon::FormatToParts: Get param type failed.");
         return nullptr;
     }
-    if (valueType != napi_valuetype::napi_number && valueType != napi_valuetype::napi_bigint) {
-        HILOG_ERROR_I18N("JSNumberFormatAddon::FormatToParts: parameter type invalid");
-        ErrorUtil::NapiThrowUndefined(env, "parameter type invalid");
-        return nullptr;
-    }
     return GetFormatToPartsInner(env, argv[0], valueType, thisVar);
 }
 
@@ -406,8 +396,64 @@ napi_value JSNumberFormatAddon::FormatWithDiffParamType(napi_env env, napi_value
             return nullptr;
         }
         formatedValue = obj->numberfmt_->Format(number);
+    } else {
+        int errorCode = 0;
+        double paramValue = GetNumberValue(env, param, errorCode);
+        if (errorCode != 0) {
+            HILOG_ERROR_I18N("FormatWithDiffParamType: Get Number object value failed");
+            return nullptr;
+        }
+        formatedValue = obj->numberfmt_->Format(paramValue);
     }
     return JSUtils::CreateString(env, formatedValue);
+}
+
+double JSNumberFormatAddon::GetNumberValue(napi_env env, napi_value param, int errorCode)
+{
+    napi_value global = nullptr;
+    napi_status status = napi_get_global(env, &global);
+    if (status != napi_ok || global == nullptr) {
+        HILOG_ERROR_I18N("JSNumberFormatAddon::GetNumberValue: get global object failed");
+        errorCode = -1;
+        return 0;
+    }
+    napi_value numberConstructor;
+    status = napi_get_named_property(env, global, "Number", &numberConstructor);
+    if (status != napi_ok || numberConstructor == nullptr) {
+        HILOG_ERROR_I18N("JSNumberFormatAddon::GetNumberValue: Number constructor failed");
+        errorCode = -1;
+        return 0;
+    }
+    size_t argc = 1;
+    napi_value instance = nullptr;
+    status = napi_new_instance(env, numberConstructor, argc, param, &instance);
+    if (status != napi_ok || instance == nullptr) {
+        HILOG_ERROR_I18N("JSNumberFormatAddon::GetNumberValue: Create Number object failed");
+        errorCode = -1;
+        return 0;
+    }
+    napi_value valueOfFunc = nullptr;
+    status = napi_get_named_property(env, instance, "valueOf", &valueOfFunc);
+    if (status != napi_ok || valueOfFunc == nullptr) {
+        HILOG_ERROR_I18N("JSNumberFormatAddon::GetNumberValue: Get valueOf function failed");
+        errorCode = -1;
+        return 0;
+    }
+    napi_value retValue = nullptr;
+    status = napi_call_function(env, instance, valueOfFunc, 0, nullptr, &retValue);
+    if (status != napi_ok || retValue == nullptr) {
+        HILOG_ERROR_I18N("JSNumberFormatAddon::GetNumberValue: Call valueOf() function failed");
+        errorCode = -1;
+        return 0;
+    }
+    double number = 0;
+    status = napi_get_value_double(env, retValue, &number);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("JSNumberFormatAddon::GetNumberValue: Get valueOf() double value failed");
+        errorCode = -1;
+        return 0;
+    }    
+    return number;
 }
 
 napi_value JSNumberFormatAddon::GetFormatToPartsInner(napi_env env, napi_value param,
@@ -440,6 +486,14 @@ napi_value JSNumberFormatAddon::GetFormatToPartsInner(napi_env env, napi_value p
             return nullptr;
         }
         obj->numberfmt_->FormatToParts(number, numberParts);
+    } else {
+        int errorCode = 0;
+        double paramValue = GetNumberValue(env, param, errorCode);
+        if (errorCode != 0) {
+            HILOG_ERROR_I18N("GetFormatToPartsInner: Get Number object value failed");
+            return nullptr;
+        }
+        obj->numberfmt_->FormatToParts(paramValue, numberParts);
     }
     return SetNumberFormatParts(env, status, numberParts);
 }
