@@ -228,11 +228,6 @@ napi_value JSRelativeTimeFormatAddon::Format(napi_env env, napi_callback_info in
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::Format: Get param type failed.");
         return nullptr;
     }
-    /**if (valueType != napi_valuetype::napi_number) {
-        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::Format: parameter type invalid");
-        ErrorUtil::NapiThrowUndefined(env, "parameter type invalid");
-        return nullptr;
-    }*/
     int errorCode = 0;
     double number = GetFirstFormatParameter(env, argv[0], valueType, errorCode);
     if (errorCode != 0) {
@@ -267,7 +262,7 @@ double JSRelativeTimeFormatAddon::GetFirstFormatParameter(napi_env env, napi_val
             return 0;
         }
         return number;
-    } 
+    }
     return JSUtils::GetNumberValue(env, param, errorCode);
 }
 
@@ -322,11 +317,6 @@ napi_value JSRelativeTimeFormatAddon::FormatToParts(napi_env env, napi_callback_
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::FormatToParts: Get param type failed.");
         return nullptr;
     }
-    /**if (valueType != napi_valuetype::napi_number) {
-        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::FormatToParts: parameter type invalid");
-        ErrorUtil::NapiThrowUndefined(env, "parameter type invalid");
-        return nullptr;
-    }*/
     int errorCode = 0;
     double number = GetFirstFormatParameter(env, argv[0], valueType, errorCode);
     if (errorCode != 0) {

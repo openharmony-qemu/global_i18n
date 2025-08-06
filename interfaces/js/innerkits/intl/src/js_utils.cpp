@@ -514,14 +514,14 @@ double JSUtils::GetNumberValue(napi_env env, napi_value param, int &errorCode)
     napi_value global = nullptr;
     napi_status status = napi_get_global(env, &global);
     if (status != napi_ok || global == nullptr) {
-        HILOG_ERROR_I18N("JSNumberFormatAddon::GetNumberValue: get global object failed");
+        HILOG_ERROR_I18N("JSUtils::GetNumberValue: get global object failed");
         errorCode = -1;
         return 0;
     }
     napi_value numberConstructor;
     status = napi_get_named_property(env, global, "Number", &numberConstructor);
     if (status != napi_ok || numberConstructor == nullptr) {
-        HILOG_ERROR_I18N("JSNumberFormatAddon::GetNumberValue: Number constructor failed");
+        HILOG_ERROR_I18N("JSUtils::GetNumberValue: Number constructor failed");
         errorCode = -1;
         return 0;
     }
@@ -530,28 +530,28 @@ double JSUtils::GetNumberValue(napi_env env, napi_value param, int &errorCode)
     napi_value argv[1] = { param };
     status = napi_new_instance(env, numberConstructor, argc, argv, &instance);
     if (status != napi_ok || instance == nullptr) {
-        HILOG_ERROR_I18N("JSNumberFormatAddon::GetNumberValue: Create Number object failed");
+        HILOG_ERROR_I18N("JSUtils::GetNumberValue: Create Number object failed");
         errorCode = -1;
         return 0;
     }
     napi_value valueOfFunc = nullptr;
     status = napi_get_named_property(env, instance, "valueOf", &valueOfFunc);
     if (status != napi_ok || valueOfFunc == nullptr) {
-        HILOG_ERROR_I18N("JSNumberFormatAddon::GetNumberValue: Get valueOf function failed");
+        HILOG_ERROR_I18N("JSUtils::GetNumberValue: Get valueOf function failed");
         errorCode = -1;
         return 0;
     }
     napi_value retValue = nullptr;
     status = napi_call_function(env, instance, valueOfFunc, 0, nullptr, &retValue);
     if (status != napi_ok || retValue == nullptr) {
-        HILOG_ERROR_I18N("JSNumberFormatAddon::GetNumberValue: Call valueOf() function failed");
+        HILOG_ERROR_I18N("JSUtils::GetNumberValue: Call valueOf() function failed");
         errorCode = -1;
         return 0;
     }
     double number = 0;
     status = napi_get_value_double(env, retValue, &number);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("JSNumberFormatAddon::GetNumberValue: Get valueOf() double value failed");
+        HILOG_ERROR_I18N("JSUtils::GetNumberValue: Get valueOf() double value failed");
         errorCode = -1;
         return 0;
     }
