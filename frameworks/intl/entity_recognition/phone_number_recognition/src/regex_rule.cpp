@@ -353,7 +353,7 @@ std::vector<MatchedNumberInfo> RegexRule::HandleBlank(PhoneNumberMatch* possible
     icu::RegexMatcher negativePattern(negativeRegex, 0, status);
     if (U_FAILURE(status)) {
         delete matcher;
-        delete pattern;        
+        delete pattern;
         return matchedNumberInfoList;
     }
     negativePattern.reset(number);
