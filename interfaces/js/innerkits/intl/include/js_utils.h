@@ -61,7 +61,8 @@ public:
         napi_valuetype type, std::string& value);
     static napi_value GetNapiPropertyFormObject(napi_env env, napi_value object, const std::string& property,
         int32_t& errCode);
-    static double GetNumberValue(napi_env env, napi_value param, int &errorCode);
+    static double GetNumberValue(napi_env env, napi_value param, int32_t &errorCode);
+    static double GetDoubleFromNapiValue(napi_env env, napi_value param, napi_valuetype &valueType, int32_t &errorCode);
 
     // std::map and std::unordered_map
     template<typename T>

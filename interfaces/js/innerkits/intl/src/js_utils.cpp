@@ -509,7 +509,7 @@ napi_value JSUtils::GetNapiPropertyFormObject(napi_env env, napi_value object, c
     return propertyValue;
 }
 
-double JSUtils::GetNumberValue(napi_env env, napi_value param, int &errorCode)
+double JSUtils::GetNumberValue(napi_env env, napi_value param, int32_t &errorCode)
 {
     napi_value global = nullptr;
     napi_status status = napi_get_global(env, &global);
@@ -556,6 +556,22 @@ double JSUtils::GetNumberValue(napi_env env, napi_value param, int &errorCode)
         return 0;
     }
     return number;
+}
+
+double JSUtils::GetDoubleFromNapiValue(napi_env env, napi_value param, napi_valuetype &valueType,
+    int32_t &errorCode)
+{
+    if (valueType == napi_valuetype::napi_number) {
+        double number;
+        napi_status status = napi_get_value_double(env, param, &number);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("JSUtils::GetDoubleFromNapiValue: Get double value failed");
+            errorCode = -1;
+            return 0;
+        }
+        return number;
+    }
+    return GetNumberValue(env, param, errorCode);
 }
 } // namespace I18n
 } // namespace Global
