@@ -561,17 +561,17 @@ double JSUtils::GetNumberValue(napi_env env, napi_value param, int32_t &errorCod
 double JSUtils::GetDoubleFromNapiValue(napi_env env, napi_value param, napi_valuetype &valueType,
     int32_t &errorCode)
 {
-    if (valueType == napi_valuetype::napi_number) {
-        double number;
-        napi_status status = napi_get_value_double(env, param, &number);
-        if (status != napi_ok) {
-            HILOG_ERROR_I18N("JSUtils::GetDoubleFromNapiValue: Get double value failed");
-            errorCode = -1;
-            return 0;
-        }
-        return number;
+    if (valueType != napi_valuetype::napi_number) {
+        return GetNumberValue(env, param, errorCode);
     }
-    return GetNumberValue(env, param, errorCode);
+    double number;
+    napi_status status = napi_get_value_double(env, param, &number);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("JSUtils::GetDoubleFromNapiValue: Get double value failed");
+        errorCode = -1;
+        return 0;
+    }
+    return number;
 }
 } // namespace I18n
 } // namespace Global
