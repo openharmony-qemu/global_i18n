@@ -385,7 +385,7 @@ napi_value JSNumberFormatAddon::FormatWithDiffParamType(napi_env env, napi_value
         }
         formatedValue = obj->numberfmt_->Format(number);
     } else {
-        int errorCode = 0;
+        int32_t errorCode = 0;
         double paramValue = JSUtils::GetNumberValue(env, param, errorCode);
         if (errorCode != 0) {
             HILOG_ERROR_I18N("FormatWithDiffParamType: Get Number object value failed");
@@ -427,7 +427,7 @@ napi_value JSNumberFormatAddon::GetFormatToPartsInner(napi_env env, napi_value p
         }
         obj->numberfmt_->FormatToParts(number, numberParts);
     } else {
-        int errorCode = 0;
+        int32_t errorCode = 0;
         double paramValue = JSUtils::GetNumberValue(env, param, errorCode);
         if (errorCode != 0) {
             HILOG_ERROR_I18N("GetFormatToPartsInner: Get Number object value failed");
