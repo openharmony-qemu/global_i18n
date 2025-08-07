@@ -134,6 +134,7 @@ int IntlFuncTest00100(void);
 int IntlFuncTest00101(void);
 int IntlFuncTest00102(void);
 int IntlFuncTest00103(void);
+int IntlFuncTest00104(void);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

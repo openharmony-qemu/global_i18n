@@ -27,6 +27,10 @@ static const std::string NUMERIC_STR = "numeric";
 static const icu::UnicodeString YMD_SKELETON = "yyyyMd";
 static const icu::UnicodeString YM_SKELETON = "yyyyM";
 static const icu::UnicodeString MD_SKELETON = "Md";
+static const icu::UnicodeString D_SKELETON = "d";
+static const icu::UnicodeString DD_SKELETON = "dd";
+static const icu::UnicodeString LTR_SYMBOL = "\u200e";
+static const icu::UnicodeString RTL_SYMBOL = "\u200f";
 static const size_t YMD_INDEX = 0;
 static const size_t YM_INDEX = 1;
 static const size_t MD_INDEX = 2;
@@ -59,35 +63,31 @@ std::unordered_map<DateTimeFormat::DefaultStyle, DateFormat::EStyle> DateTimeFor
 };
 
 std::map<icu::UnicodeString, std::string> PATTERN_TO_EXT_PARAM = {
-    { "dd/MM/y", "0001" },
+    { "d/MM/y", "0001" },
     { "d/M/yy", "0002" },
-    { "y-MM-dd", "0003" },
-    { "GGGGG y-MM-dd", "0003" },
+    { "y-MM-d", "0003" },
     { "d/M/y", "0004" },
-    { "dd/MM/yy", "0005" },
-    { "dd.MM.yy", "0006" },
-    { "yy/MM/dd", "0007" },
-    { "dd.MM.y", "0008" },
-    { "d\u200f/M\u200f/y", "0009" },
-    { "dd-MM-y", "0010" },
-    { "y/M/d", "0011" },
-    { "GGGGG y/M/d", "0011" },
-    { "d-M-y", "0012" },
+    { "d/MM/yy", "0005" },
+    { "d.MM.yy", "0006" },
+    { "yy/MM/d", "0007" },
+    { "d.MM.y", "0008" },
+    { "d-MM-y", "0009" },
+    { "y/M/d", "0010" },
+    { "d-M-y", "0011" },
 };
 
 std::unordered_map<std::string, std::vector<icu::UnicodeString>> EXT_PARAM_TO_PATTERNS = {
-    { "0001", { "dd/MM/y", "MM/y", "dd/MM" } },
-    { "0002", { "dd/M/yy", "M/yy", "dd/M" } },
-    { "0003", { "y-MM-dd", "y-MM", "MM-dd" } },
-    { "0004", { "dd/M/y", "M/y", "dd/M" } },
-    { "0005", { "dd/MM/yy", "MM/yy", "dd/MM" } },
-    { "0006", { "dd.MM.yy", "MM.yy", "dd.MM" } },
-    { "0007", { "yy/MM/dd", "yy/MM", "MM/dd" } },
-    { "0008", { "dd.MM.y", "MM.y", "dd.MM" } },
-    { "0009", { "dd\u200f/M\u200f/y", "M\u200f/y", "dd\u200f/M" } },
-    { "0010", { "dd-MM-y", "MM-y", "dd-MM" } },
-    { "0011", { "y/M/dd", "y/M", "M/dd" } },
-    { "0012", { "dd-M-y", "M-y", "dd-M" } },
+    { "0001", { "d/MM/y", "MM/y", "d/MM" } },
+    { "0002", { "d/M/yy", "M/yy", "d/M" } },
+    { "0003", { "y-MM-d", "y-MM", "MM-d" } },
+    { "0004", { "d/M/y", "M/y", "d/M" } },
+    { "0005", { "d/MM/yy", "MM/yy", "d/MM" } },
+    { "0006", { "d.MM.yy", "MM.yy", "d.MM" } },
+    { "0007", { "yy/MM/d", "yy/MM", "MM/d" } },
+    { "0008", { "d.MM.y", "MM.y", "d.MM" } },
+    { "0009", { "d-MM-y", "MM-y", "d-MM" } },
+    { "0010", { "y/M/d", "y/M", "M/d" } },
+    { "0011", { "d-M-y", "M-y", "d-M" } },
 };
 
 DateTimeFormat::DateTimeFormat(const std::vector<std::string> &localeTags, std::map<std::string, std::string> &configs)
@@ -95,7 +95,6 @@ DateTimeFormat::DateTimeFormat(const std::vector<std::string> &localeTags, std::
     defaultStyle = GetDefaultStyle();
     ParseConfigsPartOne(configs);
     ParseConfigsPartTwo(configs);
-    std::string finalLocale;
     for (size_t i = 0; i < localeTags.size(); i++) {
         std::string curLocale = localeTags[i];
         UErrorCode status = U_ZERO_ERROR;
@@ -111,7 +110,8 @@ DateTimeFormat::DateTimeFormat(const std::vector<std::string> &localeTags, std::
     if (finalLocale.empty()) {
         finalLocale = LocaleConfig::GetEffectiveLocale();
     }
-    createSuccess = InitWithLocale(finalLocale, configs);
+    std::string localeWithoutCustExtParam = LocaleConfig::RemoveCustExtParam(finalLocale);
+    createSuccess = InitWithLocale(localeWithoutCustExtParam, configs);
     if (!createSuccess) {
         HILOG_ERROR_I18N("DateTimeFormat::DateTimeFormat: Init dateTimeFormat failed.");
     }
@@ -177,13 +177,14 @@ void DateTimeFormat::InitDateFormatWithoutConfigs(UErrorCode &status)
 {
     DateFormat::EStyle style = DefaultDTStyle[defaultStyle];
     if (style == DateFormat::EStyle::kShort) {
-        std::string effectiveLocale = LocaleConfig::GetEffectiveLocale();
-        std::string number = LocaleConfig::GetPatternNumberFromLocale(effectiveLocale);
+        std::string number = LocaleConfig::GetPatternNumberFromLocale(finalLocale);
         auto iter = EXT_PARAM_TO_PATTERNS.find(number);
         if (iter != EXT_PARAM_TO_PATTERNS.end()) {
             pattern = iter->second[YMD_INDEX];
+            icu::UnicodeString dayPattern = GetDayPatternFromLocale(finalLocale);
+            pattern.findAndReplace(D_SKELETON, dayPattern);
         } else {
-            pattern = DateTimeFormat::GetPatternFromLocale(LocaleConfig::GetSystemLocale());
+            pattern = DateTimeFormat::GetPatternFromLocale(finalLocale);
         }
         if (InitFormatter()) {
             return;
@@ -840,23 +841,15 @@ DateTimeFormat::DefaultStyle DateTimeFormat::GetDefaultStyle()
 bool DateTimeFormat::InitPatternByDateStyle()
 {
     icu::UnicodeString tempPattern = GetBestPattern(DateFormat::EStyle::kShort, DateFormat::EStyle::kNone, locale);
-    std::string effectiveLocale = LocaleConfig::GetEffectiveLocale();
-    std::string number = LocaleConfig::GetPatternNumberFromLocale(effectiveLocale);
+    std::string number = LocaleConfig::GetPatternNumberFromLocale(finalLocale);
     auto iter = EXT_PARAM_TO_PATTERNS.find(number);
     icu::UnicodeString replacePattern;
     if (iter != EXT_PARAM_TO_PATTERNS.end()) {
         replacePattern = iter->second[YMD_INDEX];
-    } else {
-        std::string tempLocale = LocaleConfig::GetSystemLocale();
-        UErrorCode status = U_ZERO_ERROR;
-        icu::Locale tempIcuLocale = icu::Locale::forLanguageTag(StringPiece(tempLocale), status);
-        if (U_FAILURE(status)) {
-            HILOG_ERROR_I18N("DateTimeFormat::InitPatternByDateStyle: Create icu locale failed.");
-            return false;
-        }
-        replacePattern = GetBestPattern(DateFormat::EStyle::kShort, DateFormat::EStyle::kNone, tempIcuLocale);
+        icu::UnicodeString dayPattern = GetDayPatternFromLocale(finalLocale);
+        replacePattern.findAndReplace(D_SKELETON, dayPattern);
+        ReplacePattern(tempPattern, replacePattern);
     }
-    ReplacePattern(tempPattern, replacePattern);
     return InitFormatter();
 }
 
@@ -877,24 +870,16 @@ bool DateTimeFormat::InitPatternByNumeric()
     if (tempSkeleton.isEmpty()) {
         return false;
     }
-    std::string effectiveLocale = LocaleConfig::GetEffectiveLocale();
-    std::string number = LocaleConfig::GetPatternNumberFromLocale(effectiveLocale);
+    std::string number = LocaleConfig::GetPatternNumberFromLocale(finalLocale);
     auto iter = EXT_PARAM_TO_PATTERNS.find(number);
     icu::UnicodeString replacePattern;
     icu::UnicodeString tempPattern = GetBestPattern(tempSkeleton, locale);
     if (iter != EXT_PARAM_TO_PATTERNS.end()) {
         replacePattern = iter->second[index];
-    } else {
-        std::string tempLocale = LocaleConfig::GetSystemLocale();
-        UErrorCode status = U_ZERO_ERROR;
-        icu::Locale tempIcuLocale = icu::Locale::forLanguageTag(StringPiece(tempLocale), status);
-        if (U_FAILURE(status)) {
-            HILOG_ERROR_I18N("DateTimeFormat::InitPatternByNumeric: Create icu locale failed.");
-            return false;
-        }
-        replacePattern = GetBestPattern(tempSkeleton, tempIcuLocale);
+        icu::UnicodeString dayPattern = GetDayPatternFromLocale(finalLocale);
+        replacePattern.findAndReplace(D_SKELETON, dayPattern);
+        ReplacePattern(tempPattern, replacePattern);
     }
-    ReplacePattern(tempPattern, replacePattern);
     return InitFormatter();
 }
 
@@ -923,13 +908,23 @@ std::unordered_map<std::string, std::string> DateTimeFormat::GetPatternsFromLoca
         result.insert(std::make_pair(tempPattern, item.first));
     }
 
-    icu::UnicodeString pattern = GetPatternFromLocale(localeTag);
-    auto iter = PATTERN_TO_EXT_PARAM.find(pattern);
-    if (iter == PATTERN_TO_EXT_PARAM.end()) {
-        std::string tempPattern;
-        pattern.toUTF8String(tempPattern);
-        result.insert(std::make_pair(tempPattern, ""));
+    icu::UnicodeString pattern = GetSingleDayPatternFromLocale(localeTag);
+    icu::UnicodeString patternWithoutSymbol = pattern;
+    patternWithoutSymbol.findAndReplace(LTR_SYMBOL, "");
+    if (patternWithoutSymbol.indexOf(RTL_SYMBOL) != -1) {
+        patternWithoutSymbol.findAndReplace(RTL_SYMBOL, "");
+        patternWithoutSymbol.reverse();
     }
+    std::string tempPatternWithoutSymbol;
+    patternWithoutSymbol.toUTF8String(tempPatternWithoutSymbol);
+    auto iter = result.find(tempPatternWithoutSymbol);
+    if (iter != result.end()) {
+        result.erase(iter);
+    }
+
+    std::string tempPattern;
+    pattern.toUTF8String(tempPattern);
+    result.insert(std::make_pair(tempPattern, ""));
     return result;
 }
 
@@ -965,33 +960,19 @@ icu::UnicodeString DateTimeFormat::GetYMDPatternFromNumber(const std::string& nu
     return patterns[YMD_INDEX];
 }
 
-std::string DateTimeFormat::GetNumberFromPattern(const icu::UnicodeString& pattern)
-{
-    auto iter = PATTERN_TO_EXT_PARAM.find(pattern);
-    if (iter == PATTERN_TO_EXT_PARAM.end()) {
-        HILOG_ERROR_I18N("DateTimeFormat::GetNumberFromPattern: Invalid pattern.");
-        return "";
-    }
-    return iter->second;
-}
-
 std::string DateTimeFormat::GetDateSampleFromPattern(const icu::UnicodeString& pattern, const std::string& localeTag)
 {
+    std::string localeWithoutCustExtParam = LocaleConfig::RemoveCustExtParam(localeTag);
     UErrorCode status = U_ZERO_ERROR;
-    icu::Locale locale = icu::Locale::forLanguageTag(StringPiece(localeTag), status);
+    icu::Locale icuLocale = icu::Locale::forLanguageTag(StringPiece(localeWithoutCustExtParam), status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("DateTimeFormat::GetDateSampleFromPattern: Create icu locale failed.");
         return "";
     }
     std::unique_ptr<icu::SimpleDateFormat> simpleDateFormat =
-        std::make_unique<icu::SimpleDateFormat>(pattern, locale, status);
+        std::make_unique<icu::SimpleDateFormat>(pattern, icuLocale, status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("DateTimeFormat::GetDateSampleFromPattern: Create simpleDateFormat failed.");
-        return "";
-    }
-    icu::Calendar* calendar = icu::Calendar::createInstance(locale, status);
-    if (U_FAILURE(status) || calendar == nullptr) {
-        HILOG_ERROR_I18N("DateTimeFormat::GetDateSampleFromPattern: Create calendar failed.");
         return "";
     }
     icu::UnicodeString formatResult;
@@ -1075,6 +1056,23 @@ bool DateTimeFormat::InitFormatter()
         return false;
     }
     return true;
+}
+
+icu::UnicodeString DateTimeFormat::GetDayPatternFromLocale(const std::string& localeTag)
+{
+    icu::UnicodeString pattern = DateTimeFormat::GetPatternFromLocale(localeTag);
+    int32_t index = pattern.indexOf(DD_SKELETON);
+    if (index == -1) {
+        return D_SKELETON;
+    }
+    return DD_SKELETON;
+}
+
+icu::UnicodeString DateTimeFormat::GetSingleDayPatternFromLocale(const std::string& localeTag)
+{
+    icu::UnicodeString pattern = GetPatternFromLocale(localeTag);
+    pattern.findAndReplace(DD_SKELETON, D_SKELETON);
+    return pattern;
 }
 } // namespace I18n
 } // namespace Global

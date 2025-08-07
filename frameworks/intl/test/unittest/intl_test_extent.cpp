@@ -734,8 +734,8 @@ HWTEST_F(IntlTest, IntlFuncTest0066, TestSize.Level1)
 
     if (IntlTest::deviceType == "wearable" || IntlTest::deviceType == "liteWearable" ||
         IntlTest::deviceType == "watch") {
-        EXPECT_EQ(defaultRes, "1970/1/12");
-        EXPECT_EQ(dateRes, "1970/1/12");
+        EXPECT_EQ(defaultRes, "12/01/1970");
+        EXPECT_EQ(dateRes, "12/01/1970");
         EXPECT_EQ(timeRes, "06:20");
     } else if (IntlTest::deviceType == "tablet" || IntlTest::deviceType == "2in1" || IntlTest::deviceType == "tv" ||
         IntlTest::deviceType == "pc") {
@@ -743,8 +743,8 @@ HWTEST_F(IntlTest, IntlFuncTest0066, TestSize.Level1)
         EXPECT_EQ(dateRes, "12 Jan 1970");
         EXPECT_EQ(timeRes, "06:20:54");
     } else {
-        EXPECT_EQ(defaultRes, "1970/1/12");
-        EXPECT_EQ(dateRes, "1970/1/12");
+        EXPECT_EQ(defaultRes, "12/01/1970");
+        EXPECT_EQ(dateRes, "12/01/1970");
         EXPECT_EQ(timeRes, "06:20");
     }
 }
@@ -2000,6 +2000,38 @@ HWTEST_F(IntlTest, IntlFuncTest00103, TestSize.Level1)
     ASSERT_TRUE(posibleNumber != nullptr);
     PhoneNumberMatch* pMatch = regexRule3->IsValid(posibleNumber.get(), message);
     EXPECT_TRUE(pMatch == nullptr);
+}
+
+/**
+ * @tc.name: IntlFuncTest00104
+ * @tc.desc: Test DateTimeFormat
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest00104, TestSize.Level1)
+{
+    icu::UnicodeString pattern = DateTimeFormat::GetPatternFromLocale("123");
+    EXPECT_EQ(pattern, "");;
+    pattern = DateTimeFormat::GetPatternFromLocale("zh-Hans-CN");
+    EXPECT_EQ(pattern, "y/M/d");
+
+    auto patterns = DateTimeFormat::GetPatternsFromLocale("zh-Hans-CN");
+    EXPECT_EQ(patterns.size(), 11);
+
+    pattern = DateTimeFormat::GetYMDPatternFromNumber("0001");
+    EXPECT_EQ(pattern, "d/MM/y");
+    pattern = DateTimeFormat::GetYMDPatternFromNumber("0013");
+    EXPECT_EQ(pattern, "");
+
+    std::string dateSample = DateTimeFormat::GetDateSampleFromPattern("d/MM/y", "zh-Hans-CN");
+    EXPECT_EQ(dateSample, "18/07/2025");
+
+    pattern = DateTimeFormat::GetSingleDayPatternFromLocale("zh-Hans-CN");
+    EXPECT_EQ(pattern, "y/M/d");
+
+    bool isValid = DateTimeFormat::IsValidPatternNumber("0001");
+    EXPECT_EQ(isValid, true);
+    isValid = DateTimeFormat::IsValidPatternNumber("0021");
+    EXPECT_EQ(isValid, false);
 }
 } // namespace I18n
 } // namespace Global

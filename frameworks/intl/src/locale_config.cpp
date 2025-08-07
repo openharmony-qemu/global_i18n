@@ -2137,14 +2137,7 @@ std::string LocaleConfig::GetPatternNumberFromLocale(const std::string& locale)
     if (DateTimeFormat::IsValidPatternNumber(number)) {
         return number;
     }
-
-    std::vector<std::pair<size_t, std::string>> positions = GetExtParamPositions(locale);
-    std::string localeWithoutExtParam = locale;
-    if (positions[0].first != std::string::npos) {
-        localeWithoutExtParam = locale.substr(0, positions[0].first);
-    }
-    icu::UnicodeString pattern = DateTimeFormat::GetPatternFromLocale(localeWithoutExtParam);
-    return DateTimeFormat::GetNumberFromPattern(pattern);
+    return "";
 }
 
 I18nErrorCode LocaleConfig::GetSystemNumericalDatePatterns(
@@ -2154,11 +2147,12 @@ I18nErrorCode LocaleConfig::GetSystemNumericalDatePatterns(
     std::string systemLocale = LocaleConfig::GetSystemLocale();
     std::unordered_map<std::string, std::string> supportNumbers =
         DateTimeFormat::GetPatternsFromLocale(systemLocale);
+    std::string effectiveLocale = LocaleConfig::GetEffectiveLocale();
     for (const auto& item : supportNumbers) {
         icu::UnicodeString pattern = item.first.c_str();
         std::string key;
         pattern.toUTF8String(key);
-        std::string value = DateTimeFormat::GetDateSampleFromPattern(pattern, systemLocale);
+        std::string value = DateTimeFormat::GetDateSampleFromPattern(pattern, effectiveLocale);
         if (value.empty()) {
             continue;
         }
@@ -2183,15 +2177,8 @@ I18nErrorCode LocaleConfig::GetUsingNumericalDatePattern(std::string& identifier
     if (positions[0].first != std::string::npos) {
         localeWithoutExtParam = effectiveLocale.substr(0, positions[0].first);
     }
-    icu::UnicodeString pattern = DateTimeFormat::GetPatternFromLocale(localeWithoutExtParam);
-    number = DateTimeFormat::GetNumberFromPattern(pattern);
-    if (!number.empty()) {
-        pattern = DateTimeFormat::GetYMDPatternFromNumber(number);
-    }
-    if (pattern.isEmpty()) {
-        HILOG_ERROR_I18N("LocaleConfig::GetUsingNumericalDatePattern: Get pattern failed.");
-        return I18nErrorCode::FAILED;
-    }
+
+    icu::UnicodeString pattern = DateTimeFormat::GetSingleDayPatternFromLocale(localeWithoutExtParam);
     pattern.toUTF8String(identifier);
     return I18nErrorCode::SUCCESS;
 }
@@ -2377,6 +2364,7 @@ std::string LocaleConfig::UpdateLanguageOfLocale(const std::string &languageTag)
     systemLocaleTag = LocaleConfig::ModifyExtParam(systemLocaleTag, CASE_FIRST_KEY, "", STANDARD_EXT_PARAM_KEY);
     systemLocaleTag = LocaleConfig::ModifyExtParam(systemLocaleTag, COLLATION_KEY, "", STANDARD_EXT_PARAM_KEY);
     systemLocaleTag = LocaleConfig::ModifyExtParam(systemLocaleTag, NUMBER_SYSTEM_KEY, "", STANDARD_EXT_PARAM_KEY);
+    systemLocaleTag = LocaleConfig::ModifyExtParam(systemLocaleTag, NUMERIC_DATE_KEY, "", CUST_EXT_PARAM_KEY);
     std::string numberPattern = LocaleConfig::QueryExtParam(systemLocaleTag, NUNBER_PATTERN_KEY, CUST_EXT_PARAM_KEY);
     if (NumberPatternToDescription.find(numberPattern) == NumberPatternToDescription.end()) {
         systemLocaleTag = LocaleConfig::ModifyExtParam(systemLocaleTag, NUNBER_PATTERN_KEY, "", CUST_EXT_PARAM_KEY);
@@ -2443,6 +2431,7 @@ std::string LocaleConfig::UpdateRegionOfLocale(const std::string &regionTag)
     if (NumberPatternToDescription.find(numberPattern) == NumberPatternToDescription.end()) {
         ret = LocaleConfig::ModifyExtParam(ret, NUNBER_PATTERN_KEY, "", CUST_EXT_PARAM_KEY);
     }
+    ret = LocaleConfig::ModifyExtParam(ret, NUMERIC_DATE_KEY, "", CUST_EXT_PARAM_KEY);
     return ret;
 }
 

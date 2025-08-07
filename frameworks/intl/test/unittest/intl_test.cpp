@@ -461,7 +461,7 @@ HWTEST_F(IntlTest, IntlFuncTest0012, TestSize.Level1)
     };
     vector<string> locales;
     locales.push_back(locale);
-    std::string expects = "5882/3/11";
+    std::string expects = "3/11/82";
     DateTimeFormat *dateFormat = new (std::nothrow) DateTimeFormat(locales, options);
     ASSERT_TRUE(dateFormat != nullptr);
     int64_t milliseconds = 123456789123456;
@@ -1495,11 +1495,11 @@ HWTEST_F(IntlTest, IntlFuncTest0036, TestSize.Level1)
 
     int64_t milliseconds = 123456789;
     string res = formatter->Format(milliseconds);
-    EXPECT_EQ(res, "1970/1/02");
+    EXPECT_EQ(res, "1/2/70");
     
     int64_t milliseconds2 = 987654321;
     res = formatter->FormatRange(milliseconds, milliseconds2);
-    EXPECT_EQ(res, "1/2/1970 \xE2\x80\x93 1/12/1970");
+    EXPECT_EQ(res, "1/2/70 \xE2\x80\x93 1/12/70");
     delete formatter;
 }
 
