@@ -25,9 +25,9 @@
 
 namespace {
 using namespace OHOS::Global::I18n;
-constexpr int32_t HOUR_FLAG = 4;
-constexpr int32_t MINUTE_FLAG = 2;
-constexpr int32_t SECOND_FLAG = 1;
+constexpr uint32_t HOUR_FLAG = 4;
+constexpr uint32_t MINUTE_FLAG = 2;
+constexpr uint32_t SECOND_FLAG = 1;
 std::unordered_map<std::string, UCalendarDateFields> g_fieldsMap {
     { "era", UCAL_ERA },
     { "year", UCAL_YEAR },
@@ -161,7 +161,7 @@ void FfiOHOSCalendarSetOfDay(int64_t id, int32_t hour, int32_t minute, int32_t s
     instance->Set(UCalendarDateFields::UCAL_SECOND, second);
 }
 
-void FfiOHOSCalendarSetTimeOfDay(int64_t id, int32_t hour, int32_t minute, int32_t second, int32_t flag)
+void FfiOHOSCalendarSetTimeOfDay(int64_t id, int32_t hour, int32_t minute, int32_t second, uint32_t flag)
 {
     auto instance = FFIData::GetData<CCalendar>(id);
     if (!instance) {

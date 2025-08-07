@@ -61,9 +61,9 @@ public:
     static icu::UnicodeString GetPatternFromLocale(const std::string& localeTag);
     static std::unordered_map<std::string, std::string> GetPatternsFromLocale(const std::string& localeTag);
     static icu::UnicodeString GetYMDPatternFromNumber(const std::string& number);
-    static std::string GetNumberFromPattern(const icu::UnicodeString& pattern);
     static std::string GetDateSampleFromPattern(const icu::UnicodeString& pattern, const std::string& localeTag);
     static bool IsValidPatternNumber(const std::string& number);
+    static icu::UnicodeString GetSingleDayPatternFromLocale(const std::string& localeTag);
 
 private:
     std::string localeTag;
@@ -85,6 +85,7 @@ private:
     std::string dayPeriod;
     std::string localeMatcher;
     std::string formatMatcher;
+    std::string finalLocale;
     std::unique_ptr<icu::DateFormat> dateFormat = nullptr;
     std::unique_ptr<icu::DateIntervalFormat> dateIntvFormat = nullptr;
     std::unique_ptr<icu::Calendar> calendar = nullptr;
@@ -163,6 +164,7 @@ private:
     static icu::UnicodeString GetBestPattern(const icu::UnicodeString& skeleton, const icu::Locale& icuLocale);
     static icu::UnicodeString GetBestPattern(icu::DateFormat::EStyle dateStyle, icu::DateFormat::EStyle timeStyle,
         const icu::Locale& icuLocale);
+    static icu::UnicodeString GetDayPatternFromLocale(const std::string& localeTag);
 };
 } // namespace I18n
 } // namespace Global
