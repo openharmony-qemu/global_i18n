@@ -751,32 +751,34 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest030, TestSize.Level1)
     std::unordered_map<std::string, std::string> numericalDatePatterns;
     I18nErrorCode errCode = LocaleConfig::GetSystemNumericalDatePatterns(numericalDatePatterns);
     EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
-    EXPECT_TRUE(numericalDatePatterns.find("dd/MM/y") != numericalDatePatterns.end());
-    EXPECT_TRUE(numericalDatePatterns.find("dd/M/yy") != numericalDatePatterns.end());
-    EXPECT_TRUE(numericalDatePatterns.find("y-MM-dd") != numericalDatePatterns.end());
-    EXPECT_TRUE(numericalDatePatterns.find("dd/M/y") != numericalDatePatterns.end());
-    EXPECT_TRUE(numericalDatePatterns.find("dd/MM/yy") != numericalDatePatterns.end());
-    EXPECT_TRUE(numericalDatePatterns.find("dd.MM.yy") != numericalDatePatterns.end());
-    EXPECT_TRUE(numericalDatePatterns.find("yy/MM/dd") != numericalDatePatterns.end());
-    EXPECT_TRUE(numericalDatePatterns.find("dd.MM.y") != numericalDatePatterns.end());
-    EXPECT_TRUE(numericalDatePatterns.find("dd\u200f/M\u200f/y") != numericalDatePatterns.end());
-    EXPECT_TRUE(numericalDatePatterns.find("dd-MM-y") != numericalDatePatterns.end());
-    EXPECT_TRUE(numericalDatePatterns.find("y/M/dd") != numericalDatePatterns.end());
-    EXPECT_TRUE(numericalDatePatterns.find("dd-M-y") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("d/MM/y") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("d/M/yy") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("y-MM-d") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("d/M/y") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("d/MM/yy") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("d.MM.yy") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("yy/MM/d") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("d.MM.y") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("d-MM-y") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("y/M/d") != numericalDatePatterns.end());
+    EXPECT_TRUE(numericalDatePatterns.find("d-M-y") != numericalDatePatterns.end());
 
     std::string identifier;
     errCode = LocaleConfig::GetUsingNumericalDatePattern(identifier);
     EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
-    EXPECT_EQ(identifier, "y/M/dd");
+    EXPECT_EQ(identifier, "y/M/d");
 
-    errCode = LocaleConfig::SetSystemNumericalDatePattern("dd/MM/yy");
+    errCode = LocaleConfig::SetSystemNumericalDatePattern("d/MM/yy");
     EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
     errCode = LocaleConfig::GetUsingNumericalDatePattern(identifier);
     EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
-    EXPECT_EQ(identifier, "dd/MM/yy");
+    EXPECT_EQ(identifier, "d/MM/yy");
  
     errCode = LocaleConfig::SetSystemNumericalDatePattern("Invalid");
     EXPECT_EQ(errCode, I18nErrorCode::INVALID_PARAM);
+
+    std::string patternNumber = LocaleConfig::GetPatternNumberFromLocale("zh-Hans-CN");
+    EXPECT_EQ(patternNumber, "");
 
     LocaleConfig::SetSystemLanguage(systemLanguage);
     LocaleConfig::SetSystemLocale(systemLocale);
