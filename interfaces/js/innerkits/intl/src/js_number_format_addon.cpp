@@ -463,9 +463,12 @@ napi_value JSNumberFormatAddon::SupportedLocalesOf(napi_env env, napi_callback_i
     }
     I18nErrorCode i18nStatus = I18nErrorCode::SUCCESS;
     std::vector<std::string> resultLocales = NumberFormat::SupportedLocalesOf(localeTags, map, i18nStatus);
-    if (i18nStatus != I18nErrorCode::SUCCESS) {
+    if (i18nStatus == I18nErrorCode::INVALID_LOCALE_TAG) {
         HILOG_ERROR_I18N("JSNumberFormatAddon::SupportedLocalesOf: SupportedLocalesOf status fail");
         ErrorUtil::NapiThrowUndefined(env, "invalid locale");
+        return nullptr;
+    } else if (i18nStatus != I18nErrorCode::SUCCESS) {
+        ErrorUtil::NapiThrowUndefined(env, "getStringOption failed");
         return nullptr;
     }
     return JSUtils::CreateArray(env, resultLocales);
