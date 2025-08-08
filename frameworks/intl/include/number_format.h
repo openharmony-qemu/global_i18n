@@ -57,7 +57,8 @@ struct FormatPartParam {
 class NumberFormat {
 public:
     NumberFormat(const std::vector<std::string> &localeTag, std::map<std::string, std::string> &configs);
-    NumberFormat(const std::vector<std::string> &localeTag, std::map<std::string, std::string> &configs, bool arkTsAddon);
+    NumberFormat(const std::vector<std::string> &localeTag,
+        std::map<std::string, std::string> &configs, bool fromArkTs);
     virtual ~NumberFormat();
     std::string Format(double number);
     std::string FormatBigInt(const std::string &number);
@@ -211,7 +212,8 @@ private:
     void DealWithUnitUsage(bool isFormatRange, double& firstNumber, double& secondNumber);
     bool DealWithUnitConvert(double& finalNumber, std::string& finalUnit);
     void ResolveLocaleTags(const std::vector<std::string> &localeTags, std::map<std::string, std::string> &configs);
-    void CreateNumberFormatWithDefaultLocale(const std::string &systemLocale, std::map<std::string, std::string> &configs);
+    void CreateNumberFormatWithDefaultLocale(const std::string &systemLocale,
+        std::map<std::string, std::string> &configs);
 };
 } // namespace I18n
 } // namespace Global

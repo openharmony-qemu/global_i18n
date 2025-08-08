@@ -162,15 +162,16 @@ NumberFormat::NumberFormat(const std::vector<std::string> &localeTags, std::map<
     CreateNumberFormatWithDefaultLocale(systemLocale, configs);
 }
 
-NumberFormat::NumberFormat(const std::vector<std::string> &localeTag, std::map<std::string, std::string> &configs,
-    bool fromArkTs)
+NumberFormat::NumberFormat(const std::vector<std::string> &localeTag,
+    std::map<std::string, std::string> &configs, bool fromArkTs)
 {
     ResolveLocaleTags(localeTag, configs);
     std::string defaultLocale = LocaleHelper::DefaultLocale();
     CreateNumberFormatWithDefaultLocale(defaultLocale, configs);
 }
 
-void NumberFormat::ResolveLocaleTags(const std::vector<std::string> &localeTags, std::map<std::string, std::string> &configs)
+void NumberFormat::ResolveLocaleTags(const std::vector<std::string> &localeTags,
+    std::map<std::string, std::string> &configs)
 {
     SetDefaultStyle();
     UErrorCode status = U_ZERO_ERROR;

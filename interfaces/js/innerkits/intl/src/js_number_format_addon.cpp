@@ -141,13 +141,14 @@ bool JSNumberFormatAddon::HandleArguments(napi_env env, napi_value argVal, size_
     return true;
 }
 
-bool JSNumberFormatAddon::InitNumberFormatContext(napi_env env, napi_callback_info info,
+bool JSNumberFormatAddon::InitNumberFormatContext(napi_env env,
     const std::vector<std::string> &localeTags, std::map<std::string, std::string> &map)
 {
     int32_t code = 0;
     std::string message = NumberFormat::CheckNumberFormatOptions(map, code);
     if (code != 0) {
         ErrorUtil::NapiThrowUndefined(env, message);
+        return false;
     }
     numberfmt_ = std::make_shared<NumberFormat>(localeTags, map, true);
     return numberfmt_ != nullptr;
@@ -451,11 +452,7 @@ napi_value JSNumberFormatAddon::SupportedLocalesOf(napi_env env, napi_callback_i
     if (argc > 0) {
         int32_t code = 0;
         std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argv[0], code);
-        if (localeArray.empty()) {
-            localeTags.push_back(NumberFormat::GetIcuDefaultLocale());
-        } else {
-            localeTags.assign(localeArray.begin(), localeArray.end());
-        }
+        localeTags.assign(localeArray.begin(), localeArray.end());
     }
     std::map<std::string, std::string> map = {};
     if (argc > 1) {

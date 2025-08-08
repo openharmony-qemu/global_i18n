@@ -467,22 +467,6 @@ std::string LocaleHelper::CheckParamLocales(const std::vector<std::string> &loca
         HILOG_ERROR_I18N("LocaleHelper::CheckParamLocales: CanonicalizeLocaleList failed");
         return "invalid locale";
     }
-    /**for (auto iter = localeArray.begin(); iter != localeArray.end(); ++iter) {
-        std::string localeId = *iter;
-        if (localeId.empty()) {
-            HILOG_ERROR_I18N("LocaleHelper::CheckParamLocales: locale is empty");
-            return "invalid locale";
-        }
-        if (localeId.compare("default") == 0) {
-            continue;
-        }
-        UErrorCode status = U_ZERO_ERROR;
-        icu::Locale locale = icu::Locale::forLanguageTag(icu::StringPiece(localeId), status);
-        if (U_FAILURE(status)) {
-            HILOG_ERROR_I18N("LocaleHelper::CheckParamLocales: locale %{public}s invalid", localeId.c_str());
-            return "invalid locale";
-        }
-    }*/
     return "";
 }
 
