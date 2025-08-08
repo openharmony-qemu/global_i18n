@@ -461,7 +461,13 @@ std::vector<std::string> LocaleHelper::SupportedLocalesOf(const std::vector<std:
 
 std::string LocaleHelper::CheckParamLocales(const std::vector<std::string> &localeArray)
 {
-    for (auto iter = localeArray.begin(); iter != localeArray.end(); ++iter) {
+    I18nErrorCode i18nStatus = I18nErrorCode::SUCCESS;
+    std::vector<std::string> requestedLocales = CanonicalizeLocaleList(localeArray, i18nStatus);
+    if (i18nStatus != I18nErrorCode::SUCCESS) {
+        HILOG_ERROR_I18N("LocaleHelper::CheckParamLocales: CanonicalizeLocaleList failed");
+        return "invalid locale";
+    }
+    /**for (auto iter = localeArray.begin(); iter != localeArray.end(); ++iter) {
         std::string localeId = *iter;
         if (localeId.empty()) {
             HILOG_ERROR_I18N("LocaleHelper::CheckParamLocales: locale is empty");
@@ -476,11 +482,7 @@ std::string LocaleHelper::CheckParamLocales(const std::vector<std::string> &loca
             HILOG_ERROR_I18N("LocaleHelper::CheckParamLocales: locale %{public}s invalid", localeId.c_str());
             return "invalid locale";
         }
-        if (LocaleInfo::allValidLocales.count(locale.getLanguage()) < 1) {
-            HILOG_ERROR_I18N("LocaleHelper::CheckParamLocales: invalid locale: %{public}s ", localeId.c_str());
-            return "invalid locale";
-        }
-    }
+    }*/
     return "";
 }
 

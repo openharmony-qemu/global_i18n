@@ -180,12 +180,11 @@ napi_value CollatorAddon::SupportedLocalesOf(napi_env env, napi_callback_info in
     if (argc > 0) {
         int32_t code = 0;
         std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argv[0], code);
-        if (code != 0) {
-            HILOG_ERROR_I18N("SupportedLocalesOf: JSUtils:GetLocaleArray failed.");
-            ErrorUtil::NapiThrowUndefined(env, "kValue is not String or Object");
-            return JSUtils::CreateArray(env, resultLocales);
+        if (localeArray.empty()) {
+            localeTags.push_back("en-US");
+        } else {
+            localeTags.assign(localeArray.begin(), localeArray.end());
         }
-        localeTags.assign(localeArray.begin(), localeArray.end());
     }
     std::map<std::string, std::string> map = {};
     if (argc > 1) {

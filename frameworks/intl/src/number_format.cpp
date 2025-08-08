@@ -157,6 +157,21 @@ static std::unordered_set<std::string> UNIT_USAGE_TEMPERATURE = {
 
 NumberFormat::NumberFormat(const std::vector<std::string> &localeTags, std::map<std::string, std::string> &configs)
 {
+    ResolveLocaleTags(localeTags, configs);
+    std::string systemLocale = LocaleConfig::GetEffectiveLocale();
+    CreateNumberFormatWithDefaultLocale(systemLocale, configs);
+}
+
+NumberFormat::NumberFormat(const std::vector<std::string> &localeTag, std::map<std::string, std::string> &configs,
+    bool fromArkTs)
+{
+    ResolveLocaleTags(localeTag, configs);
+    std::string defaultLocale = LocaleHelper::DefaultLocale();
+    CreateNumberFormatWithDefaultLocale(defaultLocale, configs);
+}
+
+void NumberFormat::ResolveLocaleTags(const std::vector<std::string> &localeTags, std::map<std::string, std::string> &configs)
+{
     SetDefaultStyle();
     UErrorCode status = U_ZERO_ERROR;
     std::unique_ptr<icu::LocaleBuilder> builder = nullptr;
@@ -187,8 +202,13 @@ NumberFormat::NumberFormat(const std::vector<std::string> &localeTags, std::map<
             break;
         }
     }
+}
+
+void NumberFormat::CreateNumberFormatWithDefaultLocale(const std::string &systemLocale,
+    std::map<std::string, std::string> &configs)
+{
     if (!createSuccess) {
-        std::string systemLocale = LocaleConfig::GetEffectiveLocale();
+        UErrorCode status = U_ZERO_ERROR;
         std::string curLocale = LocaleConfig::RemoveCustExtParam(systemLocale);
         localeInfo = std::make_unique<LocaleInfo>(curLocale, configs);
         CreateRelativeTimeFormat(systemLocale);

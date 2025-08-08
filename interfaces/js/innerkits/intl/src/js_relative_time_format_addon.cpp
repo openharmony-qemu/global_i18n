@@ -344,11 +344,11 @@ napi_value JSRelativeTimeFormatAddon::SupportedLocalesOf(napi_env env, napi_call
     }
     int32_t code = 0;
     std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argv[0], code);
-    if (code != 0) {
-        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::SupportedLocalesOf: Get locale array failed");
-        return nullptr;
+    if (localeArray.empty()) {
+        localeTags.push_back("en-US");
+    } else {
+        localeTags.assign(localeArray.begin(), localeArray.end());
     }
-    localeTags.assign(localeArray.begin(), localeArray.end());
     std::map<std::string, std::string> map = {};
     if (argc > 1) {
         JSUtils::GetOptionValue(env, argv[1], "localeMatcher", map);

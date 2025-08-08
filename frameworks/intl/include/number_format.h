@@ -57,6 +57,7 @@ struct FormatPartParam {
 class NumberFormat {
 public:
     NumberFormat(const std::vector<std::string> &localeTag, std::map<std::string, std::string> &configs);
+    NumberFormat(const std::vector<std::string> &localeTag, std::map<std::string, std::string> &configs, bool arkTsAddon);
     virtual ~NumberFormat();
     std::string Format(double number);
     std::string FormatBigInt(const std::string &number);
@@ -85,7 +86,7 @@ public:
     static std::vector<std::string> SupportedLocalesOf(const std::vector<std::string> &requestLocales,
         const std::map<std::string, std::string> &configs, I18nErrorCode &status);
     static std::string GetIcuDefaultLocale();
-    std::string CheckNumberFormatOptions(std::map<std::string, std::string> &map, int32_t &code);
+    static std::string CheckNumberFormatOptions(std::map<std::string, std::string> &map, int32_t &code);
 
 private:
     icu::Locale locale;
@@ -154,7 +155,11 @@ private:
     static std::map<std::string, std::string> RelativeTimeFormatConfigs;
     static std::unordered_map<std::string, int> defaultCurrencyFractionMap;
     static bool ReadISO4217Datas();
-    std::string GetCurrencyFromConfig(const std::string& currency);
+    static void CheckNumberFormatOptionsExt(std::map<std::string, std::string> &map, int32_t &code,
+        const std::string &optionName, int min, int max);
+    static std::string CheckFormatOptions(std::map<std::string, std::string> &map, int32_t &code);
+    static std::string GetCurrencyFromConfig(const std::string& currency);
+
     void CreateRelativeTimeFormat(const std::string& locale);
     void ParseConfigs(std::map<std::string, std::string> &configs);
     void ParseDigitsConfigs(std::map<std::string, std::string> &configs);
@@ -200,14 +205,13 @@ private:
         const double &first, const double &second, icu::UnicodeString &formatResult);
     void SetEveryFormatPartItem(icu::ConstrainedFieldPosition &cfpo, icu::UnicodeString &formatResult,
         std::vector<std::vector<std::string>> &result, FormatPartParam &param);
-    void CheckNumberFormatOptionsExt(std::map<std::string, std::string> &map, int32_t &code,
-        const std::string &optionName, int min, int max);
     void FormatableRangeToParts(double first, double second,
         std::vector<std::vector<std::string>> &result);
     double GetBigIntFieldType(const std::string &bigintStr);
     void DealWithUnitUsage(bool isFormatRange, double& firstNumber, double& secondNumber);
     bool DealWithUnitConvert(double& finalNumber, std::string& finalUnit);
-    std::string CheckFormatOptions(std::map<std::string, std::string> &map, int32_t &code);
+    void ResolveLocaleTags(const std::vector<std::string> &localeTags, std::map<std::string, std::string> &configs);
+    void CreateNumberFormatWithDefaultLocale(const std::string &systemLocale, std::map<std::string, std::string> &configs);
 };
 } // namespace I18n
 } // namespace Global
