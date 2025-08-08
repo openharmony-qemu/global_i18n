@@ -127,9 +127,10 @@ bool JSNumberFormatAddon::HandleArguments(napi_env env, napi_value argVal, size_
     }
     int32_t code = 0;
     std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argVal, code);
-    if (code != 0) {
-        HILOG_ERROR_I18N("JSNumberFormatAddon::HandleArguments: Get locale array failed.");
-        return false;
+    if (localeArray.empty()) {
+        std::string defaultLocale = NumberFormat::GetIcuDefaultLocale();
+        localeTags.push_back(defaultLocale);
+        return true;
     }
     std::string checkResult = LocaleHelper::CheckParamLocales(localeArray);
     if (!checkResult.empty()) {
@@ -200,11 +201,6 @@ napi_value JSNumberFormatAddon::FormatNumber(napi_env env, napi_callback_info in
         HILOG_ERROR_I18N("JSNumberFormatAddon::FormatNumber: Get parameter type failed");
         return nullptr;
     }
-    if (valueType != napi_valuetype::napi_number && valueType != napi_valuetype::napi_bigint) {
-        HILOG_ERROR_I18N("JSNumberFormatAddon::FormatNumber: parameter type invalid");
-        ErrorUtil::NapiThrowUndefined(env, "parameter type invalid");
-        return nullptr;
-    }
     return FormatWithDiffParamType(env, argv[0], valueType, thisVar);
 }
 
@@ -223,15 +219,14 @@ napi_value JSNumberFormatAddon::FormatRangeNumber(napi_env env, napi_callback_in
         HILOG_ERROR_I18N("FormatRangeNumber: Insufficient parameters");
         return JSUtils::CreateEmptyString(env);
     }
-    double start = 0;
-    status = napi_get_value_double(env, argv[0], &start);
-    if (status != napi_ok) {
+    int32_t errorCode = 0;
+    double start = GetFormatParam(env, argv[0], errorCode);
+    if (errorCode != 0) {
         HILOG_ERROR_I18N("FormatRangeNumber: Get first param value failed");
         return JSUtils::CreateEmptyString(env);
     }
-    double end = 0;
-    status = napi_get_value_double(env, argv[1], &end);
-    if (status != napi_ok) {
+    double end = GetFormatParam(env, argv[1], errorCode);
+    if (errorCode != 0) {
         HILOG_ERROR_I18N("FormatRangeNumber: Get second param value failed");
         return JSUtils::CreateEmptyString(env);
     }
@@ -267,14 +262,12 @@ napi_value JSNumberFormatAddon::FormatRangeToParts(napi_env env, napi_callback_i
         return JSUtils::CreateEmptyString(env);
     }
     int32_t code = 0;
-    double start = 0;
-    GetFormatParam(env, argv[0], code, start);
+    double start = GetFormatParam(env, argv[0], code);
     if (code != 0) {
         HILOG_ERROR_I18N("FormatRangeToParts: Get first param value failed");
         return JSUtils::CreateEmptyString(env);
     }
-    double end = 0;
-    GetFormatParam(env, argv[1], code, end);
+    double end = GetFormatParam(env, argv[1], code);
     if (code != 0) {
         HILOG_ERROR_I18N("FormatRangeToParts: Get second param value failed");
         return JSUtils::CreateEmptyString(env);
@@ -290,25 +283,16 @@ napi_value JSNumberFormatAddon::FormatRangeToParts(napi_env env, napi_callback_i
     return SetNumberFormatParts(env, status, result);
 }
 
-void JSNumberFormatAddon::GetFormatParam(napi_env env, napi_value param, int32_t &code, double &result)
+double JSNumberFormatAddon::GetFormatParam(napi_env env, napi_value param, int32_t &code)
 {
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_status status = napi_typeof(env, param, &valueType);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("JSNumberFormatAddon::GetFormatParam: Get parameter type failed");
         code = -1;
-        return;
+        return 0;
     }
-    if (valueType != napi_valuetype::napi_number) {
-        HILOG_ERROR_I18N("JSNumberFormatAddon::GetFormatParam: parameter type invalid");
-        ErrorUtil::NapiThrowUndefined(env, "parameter type invalid");
-    }
-    status = napi_get_value_double(env, param, &result);
-    if (status != napi_ok) {
-        code = -1;
-        HILOG_ERROR_I18N("JSNumberFormatAddon::GetFormatParam: Get double parameter value failed");
-        return;
-    }
+    return JSUtils::GetDoubleFromNapiValue(env, param, valueType, code);
 }
 
 napi_value JSNumberFormatAddon::GetNumberResolvedOptions(napi_env env, napi_callback_info info)
@@ -372,11 +356,6 @@ napi_value JSNumberFormatAddon::FormatToParts(napi_env env, napi_callback_info i
         HILOG_ERROR_I18N("JSNumberFormatAddon::FormatToParts: Get param type failed.");
         return nullptr;
     }
-    if (valueType != napi_valuetype::napi_number && valueType != napi_valuetype::napi_bigint) {
-        HILOG_ERROR_I18N("JSNumberFormatAddon::FormatToParts: parameter type invalid");
-        ErrorUtil::NapiThrowUndefined(env, "parameter type invalid");
-        return nullptr;
-    }
     return GetFormatToPartsInner(env, argv[0], valueType, thisVar);
 }
 
@@ -406,6 +385,14 @@ napi_value JSNumberFormatAddon::FormatWithDiffParamType(napi_env env, napi_value
             return nullptr;
         }
         formatedValue = obj->numberfmt_->Format(number);
+    } else {
+        int32_t errorCode = 0;
+        double paramValue = JSUtils::GetNumberValue(env, param, errorCode);
+        if (errorCode != 0) {
+            HILOG_ERROR_I18N("FormatWithDiffParamType: Get Number object value failed");
+            return nullptr;
+        }
+        formatedValue = obj->numberfmt_->Format(paramValue);
     }
     return JSUtils::CreateString(env, formatedValue);
 }
@@ -440,6 +427,14 @@ napi_value JSNumberFormatAddon::GetFormatToPartsInner(napi_env env, napi_value p
             return nullptr;
         }
         obj->numberfmt_->FormatToParts(number, numberParts);
+    } else {
+        int32_t errorCode = 0;
+        double paramValue = JSUtils::GetNumberValue(env, param, errorCode);
+        if (errorCode != 0) {
+            HILOG_ERROR_I18N("GetFormatToPartsInner: Get Number object value failed");
+            return nullptr;
+        }
+        obj->numberfmt_->FormatToParts(paramValue, numberParts);
     }
     return SetNumberFormatParts(env, status, numberParts);
 }
@@ -469,9 +464,12 @@ napi_value JSNumberFormatAddon::SupportedLocalesOf(napi_env env, napi_callback_i
     }
     I18nErrorCode i18nStatus = I18nErrorCode::SUCCESS;
     std::vector<std::string> resultLocales = NumberFormat::SupportedLocalesOf(localeTags, map, i18nStatus);
-    if (i18nStatus != I18nErrorCode::SUCCESS) {
+    if (i18nStatus == I18nErrorCode::INVALID_LOCALE_TAG) {
         HILOG_ERROR_I18N("JSNumberFormatAddon::SupportedLocalesOf: SupportedLocalesOf status fail");
         ErrorUtil::NapiThrowUndefined(env, "invalid locale");
+        return nullptr;
+    } else if (i18nStatus != I18nErrorCode::SUCCESS) {
+        ErrorUtil::NapiThrowUndefined(env, "getStringOption failed");
         return nullptr;
     }
     return JSUtils::CreateArray(env, resultLocales);

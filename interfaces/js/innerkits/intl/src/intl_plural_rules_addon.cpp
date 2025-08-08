@@ -141,14 +141,10 @@ napi_value IntlPluralRulesAddon::Select(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("IntlPluralRulesAddon::Select: Get parameter type failed.");
         return nullptr;
     }
-    if (valueType != napi_valuetype::napi_number) {
-        HILOG_ERROR_I18N("IntlPluralRulesAddon::Select: parameter type is not number.");
-        return nullptr;
-    }
-    double number = 0;
-    status = napi_get_value_double(env, argv[0], &number);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("IntlPluralRulesAddon::Select: JS to double failed.");
+    int32_t errorCode = 0;
+    double number = JSUtils::GetDoubleFromNapiValue(env, argv[0], valueType, errorCode);
+    if (errorCode != 0) {
+        HILOG_ERROR_I18N("IntlPluralRulesAddon::Select: Get number value failed.");
         return nullptr;
     }
 

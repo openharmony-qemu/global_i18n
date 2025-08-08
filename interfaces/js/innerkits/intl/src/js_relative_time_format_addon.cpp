@@ -130,9 +130,9 @@ bool JSRelativeTimeFormatAddon::GetParameterLocales(napi_env env,
     }
     int32_t code = 0;
     std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argv[0], code);
-    if (code != 0) {
-        HILOG_ERROR_I18N("GetParameterLocales: Get input locales failed");
-        return false;
+    if (localeArray.empty()) {
+        localeTags.push_back("en-US");
+        return true;
     }
     std::string checkResult = LocaleHelper::CheckParamLocales(localeArray);
     if (!checkResult.empty()) {
@@ -228,18 +228,12 @@ napi_value JSRelativeTimeFormatAddon::Format(napi_env env, napi_callback_info in
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::Format: Get param type failed.");
         return nullptr;
     }
-    if (valueType != napi_valuetype::napi_number) {
-        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::Format: parameter type invalid");
-        ErrorUtil::NapiThrowUndefined(env, "parameter type invalid");
-        return nullptr;
-    }
-    double number;
-    status = napi_get_value_double(env, argv[0], &number);
-    if (status != napi_ok) {
+    int32_t code = 0;
+    double number = JSUtils::GetDoubleFromNapiValue(env, argv[0], valueType, code);
+    if (code != 0) {
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::Format: Get number failed");
         return nullptr;
     }
-    int32_t code = 0;
     std::string unit = JSUtils::GetString(env, argv[1], code);
     if (code != 0) {
         return nullptr;
@@ -306,21 +300,21 @@ napi_value JSRelativeTimeFormatAddon::FormatToParts(napi_env env, napi_callback_
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::FormatToParts: Get param type failed.");
         return nullptr;
     }
-    if (valueType != napi_valuetype::napi_number) {
-        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::FormatToParts: parameter type invalid");
-        ErrorUtil::NapiThrowUndefined(env, "parameter type invalid");
+    int32_t code = 0;
+    double number = JSUtils::GetDoubleFromNapiValue(env, argv[0], valueType, code);
+    if (code != 0) {
+        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::FormatToParts: Get parameter number failed");
         return nullptr;
     }
-    int32_t code = 0;
     std::string unit = JSUtils::GetString(env, argv[argsCount - 1], code);
     if (code != 0) {
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::FormatToParts: Get second parameter failed");
         return nullptr;
     }
-    return GetFormatToPartsInner(env, argv[0], unit, thisVar);
+    return GetFormatToPartsInner(env, number, unit, thisVar);
 }
 
-napi_value JSRelativeTimeFormatAddon::GetFormatToPartsInner(napi_env env, napi_value param,
+napi_value JSRelativeTimeFormatAddon::GetFormatToPartsInner(napi_env env, double number,
     const std::string &unit, napi_value &thisVar)
 {
     JSRelativeTimeFormatAddon *obj = nullptr;
@@ -330,12 +324,6 @@ napi_value JSRelativeTimeFormatAddon::GetFormatToPartsInner(napi_env env, napi_v
         return nullptr;
     }
     std::vector<std::vector<std::string>> relativeTimeParts;
-    double number = 0;
-    status = napi_get_value_double(env, param, &number);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("GetFormatToPartsInner: Get double parameter value failed");
-        return nullptr;
-    }
     obj->relativetimefmt_->FormatToParts(number, unit, relativeTimeParts);
     return SetNumberFormatParts(env, relativeTimeParts);
 }
@@ -368,9 +356,12 @@ napi_value JSRelativeTimeFormatAddon::SupportedLocalesOf(napi_env env, napi_call
     }
     I18nErrorCode i18nStatus = I18nErrorCode::SUCCESS;
     std::vector<std::string> resultLocales = RelativeTimeFormat::SupportedLocalesOf(localeTags, map, i18nStatus);
-    if (i18nStatus != I18nErrorCode::SUCCESS) {
+    if (i18nStatus == I18nErrorCode::INVALID_LOCALE_TAG) {
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::SupportedLocalesOf: SupportedLocalesOf status fail");
         ErrorUtil::NapiThrowUndefined(env, "invalid locale");
+        return nullptr;
+    } else if (i18nStatus != I18nErrorCode::SUCCESS) {
+        ErrorUtil::NapiThrowUndefined(env, "getStringOption failed");
         return nullptr;
     }
     return JSUtils::CreateArray(env, resultLocales);

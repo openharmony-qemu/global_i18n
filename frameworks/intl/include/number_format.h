@@ -207,6 +207,7 @@ private:
     double GetBigIntFieldType(const std::string &bigintStr);
     void DealWithUnitUsage(bool isFormatRange, double& firstNumber, double& secondNumber);
     bool DealWithUnitConvert(double& finalNumber, std::string& finalUnit);
+    std::string CheckFormatOptions(std::map<std::string, std::string> &map, int32_t &code);
 };
 } // namespace I18n
 } // namespace Global

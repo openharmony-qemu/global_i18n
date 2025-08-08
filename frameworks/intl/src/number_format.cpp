@@ -1287,11 +1287,40 @@ std::string NumberFormat::GetIcuDefaultLocale()
 
 std::string NumberFormat::CheckNumberFormatOptions(std::map<std::string, std::string> &map, int32_t &code)
 {
+    std::string message = CheckFormatOptions(map, code);
+    if (!message.empty()) {
+        return message;
+    }
+    std::vector<std::tuple<std::string, int, int>> vect = {
+        {"minimumIntegerDigits", 1, 21}, // 21 is maximum of minimumIntegerDigits
+        {"minimumFractionDigits", 0, 20}, // 20 is maximum of minimumFractionDigits
+        {"maximumFractionDigits", 0, 21}, // 21 is maximum of maximumFractionDigits
+        {"minimumSignificantDigits", 1, 21}, // 21 is maximum of minimumSignificantDigits
+        {"maximumSignificantDigits", 1, 21}, // 21 is maximum of maximumSignificantDigits
+    };
+    for (auto iter = vect.begin(); iter != vect.end(); ++iter) {
+        std::string optionName = std::get<0>(*iter);
+        int min = std::get<1>(*iter); // 1 is item index
+        int max = std::get<2>(*iter); // 2 is item index
+        CheckNumberFormatOptionsExt(map, code, optionName, min, max);
+        if (code != 0) {
+            return "";
+        }
+    }
+    return "";
+}
+
+std::string NumberFormat::CheckFormatOptions(std::map<std::string, std::string> &map, int32_t &code)
+{
     if (map.find("style") != map.end()) {
         std::string style = map["style"];
         if (style.compare("currency") == 0 && map.find("currency") == map.end()) {
             code = -1;
             return "style is currency but currency is undefined";
+        }
+        if (style.compare("unit") == 0 && map.find("unit") == map.end()) {
+            code = -1;
+            return "style is unit but unit is undefined";
         }
     }
     if (map.find("currency") != map.end()) {
@@ -1315,22 +1344,6 @@ std::string NumberFormat::CheckNumberFormatOptions(std::map<std::string, std::st
         if (currencySign.compare("standard") != 0 && currencySign.compare("accounting") != 0) {
             code = -1;
             return "getStringOption failed";
-        }
-    }
-    std::vector<std::tuple<std::string, int, int>> vect = {
-        {"minimumIntegerDigits", 1, 21}, // 21 is maximum of minimumIntegerDigits
-        {"minimumFractionDigits", 0, 20}, // 20 is maximum of minimumFractionDigits
-        {"maximumFractionDigits", 0, 21}, // 21 is maximum of maximumFractionDigits
-        {"minimumSignificantDigits", 1, 21}, // 21 is maximum of minimumSignificantDigits
-        {"maximumSignificantDigits", 1, 21}, // 21 is maximum of maximumSignificantDigits
-    };
-    for (auto iter = vect.begin(); iter != vect.end(); ++iter) {
-        std::string optionName = std::get<0>(*iter);
-        int min = std::get<1>(*iter); // 1 is item index
-        int max = std::get<2>(*iter); // 2 is item index
-        CheckNumberFormatOptionsExt(map, code, optionName, min, max);
-        if (code != 0) {
-            return "";
         }
     }
     return "";
