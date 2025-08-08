@@ -537,7 +537,6 @@ double JSUtils::GetNumberValue(napi_env env, napi_value param, int32_t &errorCod
     napi_value valueOfFunc = nullptr;
     status = napi_get_named_property(env, instance, "valueOf", &valueOfFunc);
     if (status != napi_ok || valueOfFunc == nullptr) {
-        napi_delete_reference(env, instance);
         HILOG_ERROR_I18N("JSUtils::GetNumberValue: Get valueOf function failed");
         errorCode = -1;
         return 0;
@@ -545,12 +544,10 @@ double JSUtils::GetNumberValue(napi_env env, napi_value param, int32_t &errorCod
     napi_value retValue = nullptr;
     status = napi_call_function(env, instance, valueOfFunc, 0, nullptr, &retValue);
     if (status != napi_ok || retValue == nullptr) {
-        napi_delete_reference(env, instance);
         HILOG_ERROR_I18N("JSUtils::GetNumberValue: Call valueOf() function failed");
         errorCode = -1;
         return 0;
     }
-    napi_delete_reference(env, instance);
     double number = 0;
     status = napi_get_value_double(env, retValue, &number);
     if (status != napi_ok) {
