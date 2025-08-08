@@ -324,7 +324,7 @@ std::vector<MatchedNumberInfo> PositiveRule::HandlePossibleNumberWithPattern(Pho
     }
     icu::RegexPattern* pattern = GetPattern();
     if (pattern == nullptr) {
-        HILOG_ERROR_I18N("RegexPattern is nullptr.");
+        HILOG_ERROR_I18N("PositiveRule::HandlePossibleNumberWithPattern: RegexPattern is nullptr.");
         return matchedList;
     }
     UErrorCode status = U_ZERO_ERROR;

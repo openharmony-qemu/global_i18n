@@ -141,7 +141,7 @@ napi_value ZoneOffsetTransitionAddon::GetZoneOffsetTransObject(napi_env env, Zon
         HILOG_ERROR_I18N("ErrorUtil::NapiThrow: create int32 failed");
         return nullptr;
     }
-    argv[2] = offsetAfter;
+    argv[CONSTRUCTOR_ARGS_COUNT - 1] = offsetAfter;
     napi_value constructor = nullptr;
     status = napi_get_reference_value(env, g_zoneOffsetTransConstructor, &constructor);
     if (status != napi_ok || constructor == nullptr) {

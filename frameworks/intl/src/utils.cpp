@@ -182,15 +182,19 @@ void GetAllValidLocalesTag(std::unordered_set<std::string>& allValidLocalesLangu
 
 std::string GetAbsoluteFilePath(const std::string &filePath)
 {
+    if (filePath.empty()) {
+        HILOG_ERROR_I18N("utils::GetAbsoluteFilePath: input param filePath is empty");
+        return "";
+    }
     char* result = realpath(filePath.c_str(), nullptr);
     if (result == nullptr) {
-        HILOG_ERROR_I18N("utils: GetAbsoluteFilePath realpath error, error message: %{public}s.", strerror(errno));
+        HILOG_ERROR_I18N("utils::GetAbsoluteFilePath realpath error, error message: %{public}s.", strerror(errno));
         return "";
     }
     std::ifstream file(result);
     if (!file.good()) {
         free(result);
-        HILOG_ERROR_I18N("utils: file open is not good.");
+        HILOG_ERROR_I18N("utils::GetAbsoluteFilePath file open is not good.");
         return "";
     }
     std::string absolutePath(result);

@@ -63,7 +63,7 @@ napi_value CollatorAddon::InitCollator(napi_env env, napi_value exports)
 
     status = napi_create_reference(env, constructor, 1, &g_constructor);
     if (status != napi_ok || g_constructor == nullptr) {
-        HILOG_ERROR_I18N("tnapi_create_reference failed");
+        HILOG_ERROR_I18N("InitCollator: napi_create_reference failed");
         return nullptr;
     }
 
@@ -135,7 +135,7 @@ napi_value CollatorAddon::CreateCollatorWithoutNew(napi_env env, size_t argc, na
 
     napi_value instance = nullptr;
     status = napi_new_instance(env, constructor, argc, argv, &instance);
-    if (status != napi_ok) {
+    if (status != napi_ok || instance == nullptr) {
         HILOG_ERROR_I18N("CreateCollatorWithoutNew: napi_new_instance failed");
         return nullptr;
     }

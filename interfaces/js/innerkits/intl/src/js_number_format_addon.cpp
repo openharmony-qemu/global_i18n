@@ -516,7 +516,7 @@ napi_value JSNumberFormatAddon::SetNumberFormatParts(napi_env env, napi_status &
     return result;
 }
 
-std::shared_ptr<NumberFormat> JSNumberFormatAddon::CopyNumberFormat()
+std::shared_ptr<NumberFormat> JSNumberFormatAddon::GetNumberFormat()
 {
     return numberfmt_;
 }

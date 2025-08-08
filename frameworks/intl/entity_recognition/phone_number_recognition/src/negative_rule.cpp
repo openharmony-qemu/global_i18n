@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "i18n_hilog.h"
 #include "negative_rule.h"
 #include "i18n_hilog.h"
 
@@ -58,6 +59,7 @@ icu::UnicodeString NegativeRule::Handle(icu::UnicodeString& src)
     icu::UnicodeString ret = src;
     icu::RegexPattern* pattern = GetPattern();
     if (pattern == nullptr) {
+        HILOG_ERROR_I18N("NegativeRule::Handle: pattern is nullptr.");
         return ret;
     }
     UErrorCode status = U_ZERO_ERROR;

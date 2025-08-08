@@ -115,8 +115,7 @@ private:
     bool InitIntlDateTimeFormat(const std::unordered_map<std::string, std::string>& configs, std::string& errMessage);
     bool InitIcuTimeZone(const std::unordered_map<std::string, std::string>& configs, std::string& errMessage);
     bool InitDateTimePatternGenerator(std::string& errMessage);
-    bool InitHourCycle(const std::unordered_map<std::string, std::string>& configs,
-        std::string& effectiveHourCycle);
+    bool InitHourCycle(std::string& effectiveHourCycle);
     int32_t GetFractionalSecondDigit(const std::unordered_map<std::string, std::string>& configs);
     bool InitSkeleton(const std::unordered_map<std::string, std::string>& configs,
         const std::string& effectiveHourCycle, bool& isHourDefined, bool& isExistComponents, std::string& errMessage);

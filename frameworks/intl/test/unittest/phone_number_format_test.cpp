@@ -83,6 +83,7 @@ HWTEST_F(PhoneNumberFormatTest, PhoneNumberFormatTest0002, TestSize.Level1)
     map<string, string> options;
     std::unique_ptr<PhoneNumberFormat> phoneNumberFormat =
         std::make_unique<PhoneNumberFormat>("CN", options);
+    ASSERT_TRUE(phoneNumberFormat != nullptr);
     EXPECT_EQ(phoneNumberFormat->getLocationName("+886370123456", "zh"), "中国苗栗");
     EXPECT_EQ(phoneNumberFormat->getLocationName("+886491234567", "zh"), "中国南投");
     EXPECT_EQ(phoneNumberFormat->getLocationName("+886370123456", "en"), "Miaoli (China)");
