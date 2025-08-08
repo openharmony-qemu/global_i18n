@@ -127,9 +127,10 @@ bool JSNumberFormatAddon::HandleArguments(napi_env env, napi_value argVal, size_
     }
     int32_t code = 0;
     std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argVal, code);
-    if (code != 0) {
-        HILOG_ERROR_I18N("JSNumberFormatAddon::HandleArguments: Get locale array failed.");
-        return false;
+    if (localeArray.empty()) {
+        std::string defaultLocale = NumberFormat::GetIcuDefaultLocale();
+        localeTags.push_back(defaultLocale);
+        return true;
     }
     std::string checkResult = LocaleHelper::CheckParamLocales(localeArray);
     if (!checkResult.empty()) {

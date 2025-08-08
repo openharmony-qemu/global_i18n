@@ -130,9 +130,9 @@ bool JSRelativeTimeFormatAddon::GetParameterLocales(napi_env env,
     }
     int32_t code = 0;
     std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argv[0], code);
-    if (code != 0) {
-        HILOG_ERROR_I18N("GetParameterLocales: Get input locales failed");
-        return false;
+    if (localeArray.empty()) {
+        localeTags.push_back("en-US");
+        return true;
     }
     std::string checkResult = LocaleHelper::CheckParamLocales(localeArray);
     if (!checkResult.empty()) {
