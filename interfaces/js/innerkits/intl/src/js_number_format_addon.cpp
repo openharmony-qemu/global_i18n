@@ -110,7 +110,7 @@ napi_value JSNumberFormatAddon::NumberFormatConstructor(napi_env env, napi_callb
         HILOG_ERROR_I18N("NumberFormatConstructor: Wrap JSNumberFormatAddon failed");
         return nullptr;
     }
-    if (!obj->InitNumberFormatContext(env, info, localeTags, map)) {
+    if (!obj->InitNumberFormatContext(env, localeTags, map)) {
         HILOG_ERROR_I18N("Init NumberFormat failed");
         return nullptr;
     }
