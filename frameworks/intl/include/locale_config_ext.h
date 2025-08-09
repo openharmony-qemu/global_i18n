@@ -16,7 +16,10 @@
 #define OHOS_GLOBAL_I18N_LOCALE_CONFIG_EXT_H
 
 #include <string>
+#include "i18n_types.h"
 #include "unicode/locid.h"
+#include "unicode/calendar.h"
+#include "unicode/utypes.h"
 
 namespace OHOS {
 namespace Global {
@@ -24,9 +27,12 @@ namespace I18n {
 class LocaleConfigExt {
 public:
     static icu::Locale GetIcuLocale(const std::string& localeTag);
+    static std::unordered_map<icu::Calendar::EDaysOfWeek, WeekDay> GetDaysOfWeekMap();
 
 private:
     static icu::Locale GetSystemIcuLocale();
+
+    static std::unordered_map<icu::Calendar::EDaysOfWeek, WeekDay> eDaysOfWeekToWeekDay;
 };
 } // namespace I18n
 } // namespace Global

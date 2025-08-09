@@ -550,6 +550,12 @@ HWTEST_F(IntlTest, IntlFuncTest0061, TestSize.Level1)
     bool flag = LocaleConfig::IsSuggestedV15("zh-Hans");
     EXPECT_TRUE(flag);
     EXPECT_TRUE(LocaleConfig::IsSuggestedV15("zh-Hans", "SG"));
+    flag = LocaleConfig::IsSuggested("pt-Latn-PT");
+    EXPECT_FALSE(flag);
+    flag = LocaleConfig::IsSuggested("es-Latn-BR");
+    EXPECT_FALSE(flag);
+    flag = LocaleConfig::IsSuggested("es-Latn-419");
+    EXPECT_FALSE(flag);
 }
 
 /**
@@ -2010,7 +2016,7 @@ HWTEST_F(IntlTest, IntlFuncTest00103, TestSize.Level1)
 HWTEST_F(IntlTest, IntlFuncTest00104, TestSize.Level1)
 {
     icu::UnicodeString pattern = DateTimeFormat::GetPatternFromLocale("123");
-    EXPECT_EQ(pattern, "");;
+    EXPECT_EQ(pattern, "");
     pattern = DateTimeFormat::GetPatternFromLocale("zh-Hans-CN");
     EXPECT_EQ(pattern, "y/M/d");
 

@@ -108,7 +108,7 @@ bool VariableConvertor::GetBoolOptionValue(napi_env env, napi_value &options, co
     return true;
 }
 
-double VariableConvertor::GetDouble(napi_env &env, napi_value &value, int32_t &code)
+double VariableConvertor::GetDouble(napi_env env, napi_value value, int32_t &code)
 {
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_status status = napi_typeof(env, value, &valueType);
@@ -132,7 +132,7 @@ double VariableConvertor::GetDouble(napi_env &env, napi_value &value, int32_t &c
     return result;
 }
 
-int32_t VariableConvertor::GetInt(napi_env &env, napi_value &value, int32_t &code)
+int32_t VariableConvertor::GetInt(napi_env env, napi_value value, int32_t &code)
 {
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_status status = napi_typeof(env, value, &valueType);
@@ -156,8 +156,7 @@ int32_t VariableConvertor::GetInt(napi_env &env, napi_value &value, int32_t &cod
     return result;
 }
 
-
-std::string VariableConvertor::GetString(napi_env &env, napi_value &value, int32_t &code)
+std::string VariableConvertor::GetString(napi_env env, napi_value value, int32_t &code)
 {
     size_t len = 0;
     napi_status status = napi_get_value_string_utf8(env, value, nullptr, 0, &len);

@@ -670,7 +670,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest027, TestSize.Level1)
     errCode = LocaleConfig::GetUsingNumberPattern(usingNumberPattern);
     EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
     EXPECT_EQ(usingNumberPattern, "0000002c");
- 
+
     errCode = LocaleConfig::SetSystemNumberingSystem("002d002f");
     EXPECT_EQ(errCode, I18nErrorCode::INVALID_PARAM);
 
@@ -728,7 +728,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest029, TestSize.Level1)
     errCode = LocaleConfig::GetUsingMeasurement(usingMeasurement);
     EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
     EXPECT_EQ(usingMeasurement, "uksystem");
- 
+
     errCode = LocaleConfig::SetSystemMeasurement("Invalid");
     EXPECT_EQ(errCode, I18nErrorCode::INVALID_PARAM);
 
@@ -773,7 +773,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest030, TestSize.Level1)
     errCode = LocaleConfig::GetUsingNumericalDatePattern(identifier);
     EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
     EXPECT_EQ(identifier, "d/MM/yy");
- 
+
     errCode = LocaleConfig::SetSystemNumericalDatePattern("Invalid");
     EXPECT_EQ(errCode, I18nErrorCode::INVALID_PARAM);
 

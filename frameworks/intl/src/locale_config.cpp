@@ -12,14 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "locale_config.h"
 #include "locale_config_ext.h"
 
 #include <algorithm>
 #include <regex>
-#include <cctype>
-
 #include "accesstoken_kit.h"
 #ifdef SUPPORT_GRAPHICS
 #include "app_mgr_client.h"
@@ -30,36 +27,34 @@
 #include <common_event_publish_info.h>
 #include <common_event_support.h>
 #endif
+#include <cctype>
 #include "config_policy_utils.h"
+#include "i18n_hilog.h"
 #include "date_time_format.h"
 #include "ipc_skeleton.h"
 #include "libxml/parser.h"
-#include "ohos/init_data.h"
-#include "parameter.h"
-#include "securec.h"
-#include "string_ex.h"
-#include "tokenid_kit.h"
-#include "ucase.h"
-#include "ulocimp.h"
-#include "unicode/calendar.h"
+#include "locale_info.h"
+#include "locale_matcher.h"
+#include "multi_users.h"
 #include "unicode/dcfmtsym.h"
 #include "unicode/localebuilder.h"
 #include "unicode/locdspnm.h"
 #include "unicode/locid.h"
 #include <unicode/numsys.h>
 #include "unicode/smpdtfmt.h"
+#include "ohos/init_data.h"
+#include "parameter.h"
+#include "securec.h"
+#include "string_ex.h"
+#include "ucase.h"
+#include "ulocimp.h"
 #include "unicode/ulocdata.h"
 #include "unicode/unistr.h"
-#include "unicode/ustring.h"
-#include "unicode/utypes.h"
 #include "ureslocs.h"
+#include "unicode/ustring.h"
 #include "ustr_imp.h"
-
-#include "i18n_hilog.h"
-#include "locale_info.h"
-#include "locale_matcher.h"
-#include "multi_users.h"
 #include "utils.h"
+#include "tokenid_kit.h"
 #include "intl_locale.h"
 
 namespace OHOS {
@@ -241,6 +236,16 @@ std::unordered_map<std::string, WeekDay> LocaleConfig::nameToWeekDay {
     { "sun", WeekDay::SUN }
 };
 
+std::unordered_map<icu::Calendar::EDaysOfWeek, WeekDay> LocaleConfigExt::eDaysOfWeekToWeekDay {
+    { icu::Calendar::EDaysOfWeek::MONDAY, WeekDay::MON },
+    { icu::Calendar::EDaysOfWeek::TUESDAY, WeekDay::TUE },
+    { icu::Calendar::EDaysOfWeek::WEDNESDAY, WeekDay::WED },
+    { icu::Calendar::EDaysOfWeek::THURSDAY, WeekDay::THU },
+    { icu::Calendar::EDaysOfWeek::FRIDAY, WeekDay::FRI },
+    { icu::Calendar::EDaysOfWeek::SATURDAY, WeekDay::SAT },
+    { icu::Calendar::EDaysOfWeek::SUNDAY, WeekDay::SUN }
+};
+
 std::map<std::string, std::string> LocaleConfig::supportedDialectLocales;
 std::map<string, string> LocaleConfig::locale2DisplayName {};
 std::map<string, string> LocaleConfig::region2DisplayName {};
@@ -337,16 +342,6 @@ static unordered_map<string, string> g_languageMap = {
     { "pt-Latn-BR", "pt-BR" },
     { "pa-Guru", "pa-Guru" },
     { "mai-Deva", "mai-Deva" }
-};
-
-static std::unordered_map<icu::Calendar::EDaysOfWeek, WeekDay> eDaysOfWeekToWeekDay {
-    { icu::Calendar::EDaysOfWeek::MONDAY, WeekDay::MON },
-    { icu::Calendar::EDaysOfWeek::TUESDAY, WeekDay::TUE },
-    { icu::Calendar::EDaysOfWeek::WEDNESDAY, WeekDay::WED },
-    { icu::Calendar::EDaysOfWeek::THURSDAY, WeekDay::THU },
-    { icu::Calendar::EDaysOfWeek::FRIDAY, WeekDay::FRI },
-    { icu::Calendar::EDaysOfWeek::SATURDAY, WeekDay::SAT },
-    { icu::Calendar::EDaysOfWeek::SUNDAY, WeekDay::SUN }
 };
 
 static std::unordered_map<std::string, std::unordered_set<std::string>> languageToCollationValues {
@@ -1792,7 +1787,12 @@ WeekDay LocaleConfig::GetFirstDayOfWeek()
     }
     icu::Calendar::EDaysOfWeek firstDay = calendar->getFirstDayOfWeek();
     delete calendar;
-    return eDaysOfWeekToWeekDay[firstDay];
+    return LocaleConfigExt::GetDaysOfWeekMap()[firstDay];
+}
+
+std::unordered_map<icu::Calendar::EDaysOfWeek, WeekDay> LocaleConfigExt::GetDaysOfWeekMap()
+{
+    return eDaysOfWeekToWeekDay;
 }
 
 std::string LocaleConfig::GetBestMatchedLocaleOfCollation(const std::string& requestLocale)

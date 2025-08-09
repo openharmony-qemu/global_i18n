@@ -253,6 +253,7 @@ void NumberFormat::InitNumberPattern(icu::number::UnlocalizedNumberFormatter &fo
     }
     icu::DecimalFormatSymbols* decimalFormatSymbols = new icu::DecimalFormatSymbols(icuLocale, status);
     if (U_FAILURE(status) || decimalFormatSymbols == nullptr) {
+        delete decimalFormatSymbols;
         HILOG_ERROR_I18N("NumberFormat::InitNumberPattern: Create icu::DecimalFormatSymbols failed.");
         return;
     }
