@@ -157,14 +157,16 @@ static std::unordered_set<std::string> UNIT_USAGE_TEMPERATURE = {
 
 NumberFormat::NumberFormat(const std::vector<std::string> &localeTags, std::map<std::string, std::string> &configs)
 {
+    SetDefaultStyle();
     ResolveLocaleTags(localeTags, configs);
     std::string systemLocale = LocaleConfig::GetEffectiveLocale();
     CreateNumberFormatWithDefaultLocale(systemLocale, configs);
 }
 
 NumberFormat::NumberFormat(const std::vector<std::string> &localeTag,
-    std::map<std::string, std::string> &configs, bool fromArkTs)
+    std::map<std::string, std::string> &configs, bool flag)
 {
+    fromArkTs = flag;
     ResolveLocaleTags(localeTag, configs);
     std::string defaultLocale = LocaleHelper::DefaultLocale();
     CreateNumberFormatWithDefaultLocale(defaultLocale, configs);
@@ -173,7 +175,6 @@ NumberFormat::NumberFormat(const std::vector<std::string> &localeTag,
 void NumberFormat::ResolveLocaleTags(const std::vector<std::string> &localeTags,
     std::map<std::string, std::string> &configs)
 {
-    SetDefaultStyle();
     UErrorCode status = U_ZERO_ERROR;
     std::unique_ptr<icu::LocaleBuilder> builder = nullptr;
     builder = std::make_unique<icu::LocaleBuilder>();
@@ -344,11 +345,16 @@ void NumberFormat::InitUnitProperties(icu::number::UnlocalizedNumberFormatter &f
     if (styleString.empty() || styleString.compare("unit") != 0) {
         return;
     }
+    bool foundUnit = false;
     for (icu::MeasureUnit curUnit : unitArray) {
         if (!strcmp(curUnit.getSubtype(), unit.c_str())) {
             formatter = formatter.unit(curUnit);
+            foundUnit = true;
             unitType = curUnit.getType();
         }
+    }
+    if (!foundUnit && fromArkTs) {
+        SetPerUnit();
     }
     std::string usingMeasurement;
     I18nErrorCode errCode = LocaleConfig::GetUsingMeasurement(usingMeasurement);
@@ -360,6 +366,20 @@ void NumberFormat::InitUnitProperties(icu::number::UnlocalizedNumberFormatter &f
     }
     formatter = formatter.unitWidth(unitDisplay);
     formatter = formatter.precision(icu::number::Precision::maxFraction(DEFAULT_FRACTION_DIGITS));
+}
+
+void NumberFormat::SetPerUnit()
+{
+    icu::MeasureUnit icuUnit;
+    icu::MeasureUnit icuPerUnit;
+    IsWellFormedUnitIdentifier(icuUnit, icuPerUnit);
+    icu::MeasureUnit emptyUnit = icu::MeasureUnit();
+    if (icuUnit != emptyUnit) {
+        formatter = formatter.unit(icuUnit);
+    }
+    if (icuPerUnit != emptyUnit) {
+        formatter = formatter.perUnit(icuPerUnit);
+    }
 }
 
 void NumberFormat::InitDigitsProperties(icu::number::UnlocalizedNumberFormatter &formatter)
@@ -1461,6 +1481,47 @@ bool NumberFormat::DealWithUnitConvert(double& finalNumber, std::string& finalUn
             std::tie(finalNumber, finalUnit) = *preferredValuesUnderOne.begin();
         }
     }
+    return true;
+}
+
+bool NumberFormat::ToMeasureUnit(const std::string &sanctionedUnit,
+    icu::MeasureUnit &measureUnit)
+{
+    for (auto &unitItem : unitArray) {
+        if (std::strcmp(sanctionedUnit.c_str(), unitItem.getSubtype()) == 0) {
+            measureUnit = unitItem;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool NumberFormat::IsWellFormedUnitIdentifier(icu::MeasureUnit &icuUnit,
+    icu::MeasureUnit &icuPerUnit)
+{
+    icu::MeasureUnit result = icu::MeasureUnit();
+    icu::MeasureUnit emptyUnit = icu::MeasureUnit();
+    auto pos = unit.find("-per-");
+    if (ToMeasureUnit(unit, result) && pos == std::string::npos) {
+        icuPerUnit = emptyUnit;
+        return true;
+    }
+    size_t afterPos = pos + NumberFormat::PERUNIT_STRING;
+    if (pos == std::string::npos || unit.find("-per-", afterPos) != std::string::npos) {
+        return false;
+    }
+    std::string numerator = unit.substr(0, pos);
+    if (!ToMeasureUnit(numerator, result)) {
+        return false;
+    }
+    std::string denominator = unit.substr(pos + NumberFormat::PERUNIT_STRING);
+
+    icu::MeasureUnit perResult = icu::MeasureUnit();
+    if (!ToMeasureUnit(denominator, perResult)) {
+        return false;
+    }
+    icuUnit = result;
+    icuPerUnit = perResult;
     return true;
 }
 } // namespace I18n

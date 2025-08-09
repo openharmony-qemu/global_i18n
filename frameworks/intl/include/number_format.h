@@ -58,7 +58,7 @@ class NumberFormat {
 public:
     NumberFormat(const std::vector<std::string> &localeTag, std::map<std::string, std::string> &configs);
     NumberFormat(const std::vector<std::string> &localeTag,
-        std::map<std::string, std::string> &configs, bool fromArkTs);
+        std::map<std::string, std::string> &configs, bool flag);
     virtual ~NumberFormat();
     std::string Format(double number);
     std::string FormatBigInt(const std::string &number);
@@ -120,6 +120,7 @@ private:
     size_t roundingIncrement = 1;
     bool createSuccess = false;
     bool isSetFraction = false;
+    bool fromArkTs = false;
     std::unique_ptr<LocaleInfo> localeInfo = nullptr;
     std::unique_ptr<RelativeTimeFormat> relativeTimeFormat = nullptr;
     icu::number::LocalizedNumberFormatter numberFormat;
@@ -137,6 +138,7 @@ private:
     static const char *DEVICE_TYPE_NAME;
     static const int POW_BASE_NUMBER = 10;
     static const int CURRENCY_LEN = 3;
+    static constexpr uint32_t PERUNIT_STRING = 5;
     static std::mutex numToCurrencyMutex;
     static bool initISO4217;
     static std::unordered_map<std::string, std::string> numToCurrency;
@@ -214,6 +216,9 @@ private:
     void ResolveLocaleTags(const std::vector<std::string> &localeTags, std::map<std::string, std::string> &configs);
     void CreateNumberFormatWithDefaultLocale(const std::string &systemLocale,
         std::map<std::string, std::string> &configs);
+    bool IsWellFormedUnitIdentifier(icu::MeasureUnit &icuUnit, icu::MeasureUnit &icuPerUnit);
+    bool ToMeasureUnit(const std::string &sanctionedUnit, icu::MeasureUnit &measureUnit);
+    void SetPerUnit();
 };
 } // namespace I18n
 } // namespace Global
