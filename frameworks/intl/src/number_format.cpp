@@ -372,7 +372,10 @@ void NumberFormat::SetPerUnit(icu::number::UnlocalizedNumberFormatter &formatter
 {
     icu::MeasureUnit icuUnit;
     icu::MeasureUnit icuPerUnit;
-    IsWellFormedUnitIdentifier(icuUnit, icuPerUnit);
+    if (!IsWellFormedUnitIdentifier(icuUnit, icuPerUnit)) {
+        HILOG_ERROR_I18N("NumberFormat::SetPerUnit: Get unit failed");
+        return;
+    }
     icu::MeasureUnit emptyUnit = icu::MeasureUnit();
     if (icuUnit != emptyUnit) {
         formatter = formatter.unit(icuUnit);
@@ -1499,29 +1502,27 @@ bool NumberFormat::ToMeasureUnit(const std::string &sanctionedUnit,
 bool NumberFormat::IsWellFormedUnitIdentifier(icu::MeasureUnit &icuUnit,
     icu::MeasureUnit &icuPerUnit)
 {
-    icu::MeasureUnit result = icu::MeasureUnit();
     icu::MeasureUnit emptyUnit = icu::MeasureUnit();
     auto pos = unit.find("-per-");
-    if (ToMeasureUnit(unit, result) && pos == std::string::npos) {
+    if (ToMeasureUnit(unit, icuUnit) && pos == std::string::npos) {
         icuPerUnit = emptyUnit;
         return true;
     }
     size_t afterPos = pos + NumberFormat::PERUNIT_STRING;
     if (pos == std::string::npos || unit.find("-per-", afterPos) != std::string::npos) {
+        HILOG_ERROR_I18N("IsWellFormedUnitIdentifier: invalid unit: %{public}s", unit.c_str());
         return false;
     }
     std::string numerator = unit.substr(0, pos);
-    if (!ToMeasureUnit(numerator, result)) {
+    if (!ToMeasureUnit(numerator, icuUnit)) {
+        HILOG_ERROR_I18N("IsWellFormedUnitIdentifier: before unit: %{public}s invalid", numerator.c_str());
         return false;
     }
     std::string denominator = unit.substr(pos + NumberFormat::PERUNIT_STRING);
-
-    icu::MeasureUnit perResult = icu::MeasureUnit();
-    if (!ToMeasureUnit(denominator, perResult)) {
+    if (!ToMeasureUnit(denominator, icuPerUnit)) {
+        HILOG_ERROR_I18N("IsWellFormedUnitIdentifier: after unit: %{public}s invalid", denominator.c_str());
         return false;
     }
-    icuUnit = result;
-    icuPerUnit = perResult;
     return true;
 }
 } // namespace I18n
