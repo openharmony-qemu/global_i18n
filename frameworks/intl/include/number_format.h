@@ -218,7 +218,7 @@ private:
         std::map<std::string, std::string> &configs);
     bool IsWellFormedUnitIdentifier(icu::MeasureUnit &icuUnit, icu::MeasureUnit &icuPerUnit);
     bool ToMeasureUnit(const std::string &sanctionedUnit, icu::MeasureUnit &measureUnit);
-    void SetPerUnit();
+    void SetPerUnit(icu::number::UnlocalizedNumberFormatter &formatter);
 };
 } // namespace I18n
 } // namespace Global

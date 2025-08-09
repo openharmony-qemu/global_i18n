@@ -354,7 +354,7 @@ void NumberFormat::InitUnitProperties(icu::number::UnlocalizedNumberFormatter &f
         }
     }
     if (!foundUnit && fromArkTs) {
-        SetPerUnit();
+        SetPerUnit(formatter);
     }
     std::string usingMeasurement;
     I18nErrorCode errCode = LocaleConfig::GetUsingMeasurement(usingMeasurement);
@@ -368,7 +368,7 @@ void NumberFormat::InitUnitProperties(icu::number::UnlocalizedNumberFormatter &f
     formatter = formatter.precision(icu::number::Precision::maxFraction(DEFAULT_FRACTION_DIGITS));
 }
 
-void NumberFormat::SetPerUnit()
+void NumberFormat::SetPerUnit(icu::number::UnlocalizedNumberFormatter &formatter)
 {
     icu::MeasureUnit icuUnit;
     icu::MeasureUnit icuPerUnit;
