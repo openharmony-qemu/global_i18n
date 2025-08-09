@@ -1335,7 +1335,7 @@ std::string NumberFormat::CheckNumberFormatOptions(std::map<std::string, std::st
     std::vector<std::tuple<std::string, int, int>> vect = {
         {"minimumIntegerDigits", 1, 21}, // 21 is maximum of minimumIntegerDigits
         {"minimumFractionDigits", 0, 20}, // 20 is maximum of minimumFractionDigits
-        {"maximumFractionDigits", 0, 21}, // 21 is maximum of maximumFractionDigits
+        {"maximumFractionDigits", 0, 20}, // 20 is maximum of maximumFractionDigits
         {"minimumSignificantDigits", 1, 21}, // 21 is maximum of minimumSignificantDigits
         {"maximumSignificantDigits", 1, 21}, // 21 is maximum of maximumSignificantDigits
     };
