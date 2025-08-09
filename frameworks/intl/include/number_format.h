@@ -56,8 +56,8 @@ struct FormatPartParam {
 
 class NumberFormat {
 public:
-    NumberFormat(const std::vector<std::string> &localeTag, std::map<std::string, std::string> &configs);
-    NumberFormat(const std::vector<std::string> &localeTag,
+    NumberFormat(const std::vector<std::string> &localeTags, std::map<std::string, std::string> &configs);
+    NumberFormat(const std::vector<std::string> &localeTags,
         std::map<std::string, std::string> &configs, bool flag);
     virtual ~NumberFormat();
     std::string Format(double number);

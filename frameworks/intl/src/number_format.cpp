@@ -163,11 +163,11 @@ NumberFormat::NumberFormat(const std::vector<std::string> &localeTags, std::map<
     CreateNumberFormatWithDefaultLocale(systemLocale, configs);
 }
 
-NumberFormat::NumberFormat(const std::vector<std::string> &localeTag,
+NumberFormat::NumberFormat(const std::vector<std::string> &localeTags,
     std::map<std::string, std::string> &configs, bool flag)
 {
     fromArkTs = flag;
-    ResolveLocaleTags(localeTag, configs);
+    ResolveLocaleTags(localeTags, configs);
     std::string defaultLocale = LocaleHelper::DefaultLocale();
     CreateNumberFormatWithDefaultLocale(defaultLocale, configs);
 }
