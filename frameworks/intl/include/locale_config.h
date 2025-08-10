@@ -368,9 +368,9 @@ private:
     /**
      * @brief Provided for updating i18n configuration include locale and language.
      *
-     * @param locale Indicates update locale.
+     * @param locale Indicats update locale.
      * @param language Indicates update language.
-     * @param userId Indicates update user id.
+     * @param userId Indicats update user id.
      */
     static void UpdateConfigurationLocaleAndLanguage(const std::string& locale, const std::string& language,
         int32_t userId);
@@ -378,8 +378,8 @@ private:
     /**
      * @brief Provided for updating i18n configuration include is24Hour.
      *
-     * @param is24Hour Indicates update is24Hour.
-     * @param userId Indicates update user id.
+     * @param locale Indicats update is24Hour.
+     * @param userId Indicats update user id.
      */
     static void UpdateConfiguration24Hour(const std::string& is24Hour, int32_t userId);
 
@@ -395,7 +395,7 @@ private:
     /**
      * @brief Change language part of system locale to languageTag.
      *
-     * @param languageTag Indicates language tag use to update locale.
+     * @param languageTag Indicats language tag use to update locale.
      * @return std::string Return locale tag.
      */
     static std::string UpdateLanguageOfLocale(const std::string &languageTag);
@@ -415,7 +415,7 @@ private:
     /**
      * @brief Create a locale tag from region tag. Use icu to fill in missing parts.
      *
-     * @param regionTag Indicates region tag used to create locale.
+     * @param regionTag Indicats region tag used to create locale.
      * @return std::string Return locale tag.
      */
     static std::string CreateLocaleFromRegion(const std::string &regionTag);

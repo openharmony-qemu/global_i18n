@@ -1149,7 +1149,18 @@ std::tuple<uint32_t, uint32_t> I18nTimeZone::GetTzDataWidth(std::vector<std::str
         return std::make_tuple(0, 0);
     }
     png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    if (!png_ptr) {
+        CloseFile(fp);
+        HILOG_ERROR_I18N("I18nTimeZone::GetTzDataWidth: create read_struct failed.");
+        return std::make_tuple(0, 0);
+    }
     info_ptr = png_create_info_struct(png_ptr);
+    if (!info_ptr) {
+        png_destroy_read_struct(&png_ptr, &info_ptr, 0);
+        CloseFile(fp);
+        HILOG_ERROR_I18N("I18nTimeZone::GetTzDataWidth: create info_struct failed.");
+        return std::make_tuple(0, 0);
+    }
     rewind(fp);
     png_init_io(png_ptr, fp);
     png_read_info(png_ptr, info_ptr);

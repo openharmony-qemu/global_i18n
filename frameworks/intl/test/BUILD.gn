@@ -73,7 +73,6 @@ ohos_unittest("intl_test") {
     "libxml2:libxml2",
     "openssl:libssl_shared",
     "preferences:native_preferences",
-    "protobuf:protobuf_lite",
     "selinux_adapter:librestorecon",
   ]
   defines = []
