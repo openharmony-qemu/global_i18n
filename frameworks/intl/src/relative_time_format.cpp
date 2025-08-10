@@ -71,7 +71,7 @@ std::unordered_map<std::string, std::string> RelativeTimeFormat::pluralUnitMap =
 RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTags,
     std::map<std::string, std::string> &configs, bool fromArkTs)
 {
-    intlAddon = fromArkTs;
+    createFromArkTs = fromArkTs;
     I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
     std::vector<std::string> resolvedLocales =
         LocaleHelper::SupportedLocalesOf(localeTags, configs, errorCode);
@@ -203,7 +203,7 @@ std::string RelativeTimeFormat::Format(double number, const std::string &unit)
 std::string RelativeTimeFormat::GetSingularUnit(const std::string &unit)
 {
     std::string singularUnit(unit);
-    if (intlAddon && pluralUnitMap.find(unit) != pluralUnitMap.end()) {
+    if (createFromArkTs && pluralUnitMap.find(unit) != pluralUnitMap.end()) {
         singularUnit = pluralUnitMap[unit];
     }
     return singularUnit;
@@ -250,7 +250,7 @@ void RelativeTimeFormat::FormatToParts(double number, const std::string &unit,
     }
     std::string result;
     fmtRelativeTimeStr.toUTF8String(result);
-    if (intlAddon) {
+    if (createFromArkTs) {
         IntlFormatToParts(fmtRelativeTime, result, timeVector, number, unit);
         return;
     }
@@ -373,7 +373,7 @@ void RelativeTimeFormat::GetResolvedOptions(std::map<std::string, std::string> &
     if (!numeric.empty()) {
         map.insert(std::make_pair("numeric", numeric));
     }
-    if (intlAddon) {
+    if (createFromArkTs) {
         std::string numSystem = intlNumberingSystem.empty() ? GetNumberSystemFromLocale() : intlNumberingSystem;
         map.insert(std::make_pair("numberingSystem", numSystem));
     } else if (!numberingSystem.empty()) {

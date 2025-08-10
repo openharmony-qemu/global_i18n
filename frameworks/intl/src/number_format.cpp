@@ -195,7 +195,7 @@ void NumberFormat::ResolveLocaleTags(const std::vector<std::string> &localeTags,
             locale = localeInfo->GetLocale();
             localeBaseName = localeInfo->GetBaseName();
             icu::MeasureUnit::getAvailable(unitArray, MAX_UNIT_NUM, status);
-            if (!U_SUCCESS(status)) {
+            if (U_FAILURE(status)) {
                 status = U_ZERO_ERROR;
                 continue;
             }

@@ -72,7 +72,7 @@ private:
     std::unique_ptr<icu::RelativeDateTimeFormatter> relativeTimeFormat;
     UDateRelativeDateTimeFormatterStyle style = UDAT_STYLE_LONG;
     bool createSuccess = false;
-    bool intlAddon = false;
+    bool createFromArkTs = false;
     static const char *DEVICE_TYPE_NAME;
     static constexpr int CONFIG_LEN = 128;
     static std::unordered_map<std::string, URelativeDateTimeUnit> relativeUnits;

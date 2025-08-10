@@ -216,34 +216,34 @@ napi_value JSRelativeTimeFormatAddon::Format(napi_env env, napi_callback_info in
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::Format: Get parameter info failed");
-        return nullptr;
+        return JSUtils::CreateEmptyString(env);
     }
     if (argc < 2) { // 2 is required parameter count
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::Format: parameter less then required");
-        return nullptr;
+        return JSUtils::CreateEmptyString(env);
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     status = napi_typeof(env, argv[0], &valueType);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::Format: Get param type failed.");
-        return nullptr;
+        return JSUtils::CreateEmptyString(env);
     }
     int32_t code = 0;
     double number = JSUtils::GetDoubleFromNapiValue(env, argv[0], valueType, code);
     if (code != 0) {
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::Format: Get number failed");
-        return nullptr;
+        return JSUtils::CreateEmptyString(env);
     }
     std::string unit = JSUtils::GetString(env, argv[1], code);
     if (code != 0) {
-        return nullptr;
+        return JSUtils::CreateEmptyString(env);
     }
     CheckOptionValue(env, unit, "unit");
     JSRelativeTimeFormatAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->relativetimefmt_) {
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::Format: Get RelativeTimeFormat object failed");
-        return nullptr;
+        return JSUtils::CreateEmptyString(env);
     }
     std::string value = obj->relativetimefmt_->Format(number, unit);
     return JSUtils::CreateString(env, value);
@@ -256,19 +256,19 @@ napi_value JSRelativeTimeFormatAddon::GetNumberResolvedOptions(napi_env env, nap
     napi_status status = napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::GetNumberResolvedOptions: Get parameter info failed");
-        return nullptr;
+        return JSUtils::CreateEmptyObject(env);
     }
     JSRelativeTimeFormatAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->relativetimefmt_) {
         HILOG_ERROR_I18N("GetNumberResolvedOptions: Get RelativeTimeFormat object failed");
-        return nullptr;
+        return JSUtils::CreateEmptyObject(env);
     }
     napi_value result = nullptr;
     status = napi_create_object(env, &result);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::GetNumberResolvedOptions: napi_create_object failed");
-        return nullptr;
+        return JSUtils::CreateEmptyObject(env);
     }
     std::map<std::string, std::string> options = {};
     obj->relativetimefmt_->GetResolvedOptions(options);
@@ -288,28 +288,28 @@ napi_value JSRelativeTimeFormatAddon::FormatToParts(napi_env env, napi_callback_
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::FormatToParts: Get parameter info failed");
-        return nullptr;
+        return JSUtils::CreateEmptyArray(env);
     }
     if (argc < argsCount) {
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::FormatToParts: parameter count less then required.");
-        return nullptr;
+        return JSUtils::CreateEmptyArray(env);
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     status = napi_typeof(env, argv[0], &valueType);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::FormatToParts: Get param type failed.");
-        return nullptr;
+        return JSUtils::CreateEmptyArray(env);
     }
     int32_t code = 0;
     double number = JSUtils::GetDoubleFromNapiValue(env, argv[0], valueType, code);
     if (code != 0) {
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::FormatToParts: Get parameter number failed");
-        return nullptr;
+        return JSUtils::CreateEmptyArray(env);
     }
     std::string unit = JSUtils::GetString(env, argv[argsCount - 1], code);
     if (code != 0) {
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::FormatToParts: Get second parameter failed");
-        return nullptr;
+        return JSUtils::CreateEmptyArray(env);
     }
     return GetFormatToPartsInner(env, number, unit, thisVar);
 }
@@ -321,7 +321,7 @@ napi_value JSRelativeTimeFormatAddon::GetFormatToPartsInner(napi_env env, double
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->relativetimefmt_) {
         HILOG_ERROR_I18N("GetFormatToPartsInner: Get NumberFormat object failed");
-        return nullptr;
+        return JSUtils::CreateEmptyArray(env);
     }
     std::vector<std::vector<std::string>> relativeTimeParts;
     obj->relativetimefmt_->FormatToParts(number, unit, relativeTimeParts);
@@ -336,7 +336,7 @@ napi_value JSRelativeTimeFormatAddon::SupportedLocalesOf(napi_env env, napi_call
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::SupportedLocalesOf: Get parameter info failed");
-        return nullptr;
+        return JSUtils::CreateEmptyArray(env);
     }
     std::vector<std::string> localeTags;
     if (argc < 1) {
@@ -370,29 +370,29 @@ napi_value JSRelativeTimeFormatAddon::SetNumberFormatParts(napi_env env,
     napi_status status = napi_create_array_with_length(env, numberParts.size(), &result);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("SetNumberFormatParts: Failed to create array");
-        return nullptr;
+        return JSUtils::CreateEmptyArray(env);
     }
     for (size_t i = 0; i < numberParts.size(); i++) {
         if (numberParts[i].size() < 2) { // 2 is minimum vector's size
             HILOG_ERROR_I18N("SetNumberFormatParts: numberParts's item in %{public}zu lack key&value pair", i);
-            return nullptr;
+            return JSUtils::CreateEmptyArray(env);
         }
         napi_value value = JSUtils::CreateString(env, numberParts[i][1].c_str());
         if (value == nullptr) {
             HILOG_ERROR_I18N("Failed to create string item numberParts[i][1].");
-            return nullptr;
+            return JSUtils::CreateEmptyArray(env);
         }
         napi_value type = JSUtils::CreateString(env, numberParts[i][0].c_str());
         if (type == nullptr) {
             HILOG_ERROR_I18N("Failed to create string item numberParts[i][0].");
-            return nullptr;
+            return JSUtils::CreateEmptyArray(env);
         }
         napi_value unit = nullptr;
         if (numberParts[i].size() > 2) { // 2 is vector's size which not contains unit
             unit = JSUtils::CreateString(env, numberParts[i][2].c_str());
             if (unit == nullptr) {
                 HILOG_ERROR_I18N("Failed to create string item numberParts[i][2].");
-                return nullptr;
+                return JSUtils::CreateEmptyArray(env);
             }
         }
         std::unordered_map<std::string, napi_value> propertys {
@@ -404,12 +404,12 @@ napi_value JSRelativeTimeFormatAddon::SetNumberFormatParts(napi_env env,
         int32_t code = 0;
         napi_value formatInfo = JSUtils::CreateArrayItem(env, propertys, code, keyVect);
         if (code != 0) {
-            return nullptr;
+            return JSUtils::CreateEmptyArray(env);
         }
         status = napi_set_element(env, result, i, formatInfo);
         if (status != napi_ok) {
             HILOG_ERROR_I18N("Failed to set array item");
-            return nullptr;
+            return JSUtils::CreateEmptyArray(env);
         }
     }
     return result;
