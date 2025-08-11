@@ -747,7 +747,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0068, TestSize.Level1)
     EXPECT_EQ(resultMap.at("numberingSystem"), "arab");
     int32_t code = 0;
     map<std::string, std::string> optionsMap = {
-        { "currency", "###" },        
+        { "currency", "###" },
     };
     std::string message = NumberFormat::CheckNumberFormatOptions(optionsMap, code);
     EXPECT_EQ(message, "not a wellformed code");
