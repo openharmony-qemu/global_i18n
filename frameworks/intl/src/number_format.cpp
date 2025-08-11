@@ -158,6 +158,23 @@ static std::unordered_set<std::string> UNIT_USAGE_TEMPERATURE = {
 NumberFormat::NumberFormat(const std::vector<std::string> &localeTags, std::map<std::string, std::string> &configs)
 {
     SetDefaultStyle();
+    ResolveLocaleTags(localeTags, configs);
+    std::string systemLocale = LocaleConfig::GetEffectiveLocale();
+    CreateNumberFormatWithDefaultLocale(systemLocale, configs);
+}
+
+NumberFormat::NumberFormat(const std::vector<std::string> &localeTags,
+    std::map<std::string, std::string> &configs, bool flag)
+{
+    fromArkTs = flag;
+    ResolveLocaleTags(localeTags, configs);
+    std::string defaultLocale = LocaleHelper::DefaultLocale();
+    CreateNumberFormatWithDefaultLocale(defaultLocale, configs);
+}
+
+void NumberFormat::ResolveLocaleTags(const std::vector<std::string> &localeTags,
+    std::map<std::string, std::string> &configs)
+{
     UErrorCode status = U_ZERO_ERROR;
     std::unique_ptr<icu::LocaleBuilder> builder = nullptr;
     builder = std::make_unique<icu::LocaleBuilder>();
@@ -178,7 +195,7 @@ NumberFormat::NumberFormat(const std::vector<std::string> &localeTags, std::map<
             locale = localeInfo->GetLocale();
             localeBaseName = localeInfo->GetBaseName();
             icu::MeasureUnit::getAvailable(unitArray, MAX_UNIT_NUM, status);
-            if (!U_SUCCESS(status)) {
+            if (U_FAILURE(status)) {
                 status = U_ZERO_ERROR;
                 continue;
             }
@@ -187,8 +204,13 @@ NumberFormat::NumberFormat(const std::vector<std::string> &localeTags, std::map<
             break;
         }
     }
+}
+
+void NumberFormat::CreateNumberFormatWithDefaultLocale(const std::string &systemLocale,
+    std::map<std::string, std::string> &configs)
+{
     if (!createSuccess) {
-        std::string systemLocale = LocaleConfig::GetEffectiveLocale();
+        UErrorCode status = U_ZERO_ERROR;
         std::string curLocale = LocaleConfig::RemoveCustExtParam(systemLocale);
         localeInfo = std::make_unique<LocaleInfo>(curLocale, configs);
         CreateRelativeTimeFormat(systemLocale);
@@ -324,11 +346,16 @@ void NumberFormat::InitUnitProperties(icu::number::UnlocalizedNumberFormatter &f
     if (styleString.empty() || styleString.compare("unit") != 0) {
         return;
     }
+    bool foundUnit = false;
     for (icu::MeasureUnit curUnit : unitArray) {
         if (!strcmp(curUnit.getSubtype(), unit.c_str())) {
             formatter = formatter.unit(curUnit);
+            foundUnit = true;
             unitType = curUnit.getType();
         }
+    }
+    if (!foundUnit && fromArkTs) {
+        SetPerUnit(formatter);
     }
     std::string usingMeasurement;
     I18nErrorCode errCode = LocaleConfig::GetUsingMeasurement(usingMeasurement);
@@ -340,6 +367,23 @@ void NumberFormat::InitUnitProperties(icu::number::UnlocalizedNumberFormatter &f
     }
     formatter = formatter.unitWidth(unitDisplay);
     formatter = formatter.precision(icu::number::Precision::maxFraction(DEFAULT_FRACTION_DIGITS));
+}
+
+void NumberFormat::SetPerUnit(icu::number::UnlocalizedNumberFormatter &formatter)
+{
+    icu::MeasureUnit icuUnit;
+    icu::MeasureUnit icuPerUnit;
+    if (!IsWellFormedUnitIdentifier(icuUnit, icuPerUnit)) {
+        HILOG_ERROR_I18N("NumberFormat::SetPerUnit: Get unit failed");
+        return;
+    }
+    icu::MeasureUnit emptyUnit = icu::MeasureUnit();
+    if (icuUnit != emptyUnit) {
+        formatter = formatter.unit(icuUnit);
+    }
+    if (icuPerUnit != emptyUnit) {
+        formatter = formatter.perUnit(icuPerUnit);
+    }
 }
 
 void NumberFormat::InitDigitsProperties(icu::number::UnlocalizedNumberFormatter &formatter)
@@ -1295,7 +1339,7 @@ std::string NumberFormat::CheckNumberFormatOptions(std::map<std::string, std::st
     std::vector<std::tuple<std::string, int, int>> vect = {
         {"minimumIntegerDigits", 1, 21}, // 21 is maximum of minimumIntegerDigits
         {"minimumFractionDigits", 0, 20}, // 20 is maximum of minimumFractionDigits
-        {"maximumFractionDigits", 0, 21}, // 21 is maximum of maximumFractionDigits
+        {"maximumFractionDigits", 0, 20}, // 20 is maximum of maximumFractionDigits
         {"minimumSignificantDigits", 1, 21}, // 21 is maximum of minimumSignificantDigits
         {"maximumSignificantDigits", 1, 21}, // 21 is maximum of maximumSignificantDigits
     };
@@ -1440,6 +1484,45 @@ bool NumberFormat::DealWithUnitConvert(double& finalNumber, std::string& finalUn
         } else if (preferredValuesUnderOne.size() > 0) {
             std::tie(finalNumber, finalUnit) = *preferredValuesUnderOne.begin();
         }
+    }
+    return true;
+}
+
+bool NumberFormat::ToMeasureUnit(const std::string &sanctionedUnit,
+    icu::MeasureUnit &measureUnit)
+{
+    for (auto &unitItem : unitArray) {
+        if (std::strcmp(sanctionedUnit.c_str(), unitItem.getSubtype()) == 0) {
+            measureUnit = unitItem;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool NumberFormat::IsWellFormedUnitIdentifier(icu::MeasureUnit &icuUnit,
+    icu::MeasureUnit &icuPerUnit)
+{
+    icu::MeasureUnit emptyUnit = icu::MeasureUnit();
+    auto pos = unit.find("-per-");
+    if (ToMeasureUnit(unit, icuUnit) && pos == std::string::npos) {
+        icuPerUnit = emptyUnit;
+        return true;
+    }
+    size_t afterPos = pos + NumberFormat::PERUNIT_STRING;
+    if (pos == std::string::npos || unit.find("-per-", afterPos) != std::string::npos) {
+        HILOG_ERROR_I18N("IsWellFormedUnitIdentifier: invalid unit: %{public}s", unit.c_str());
+        return false;
+    }
+    std::string numerator = unit.substr(0, pos);
+    if (!ToMeasureUnit(numerator, icuUnit)) {
+        HILOG_ERROR_I18N("IsWellFormedUnitIdentifier: before unit: %{public}s invalid", numerator.c_str());
+        return false;
+    }
+    std::string denominator = unit.substr(pos + NumberFormat::PERUNIT_STRING);
+    if (!ToMeasureUnit(denominator, icuPerUnit)) {
+        HILOG_ERROR_I18N("IsWellFormedUnitIdentifier: after unit: %{public}s invalid", denominator.c_str());
+        return false;
     }
     return true;
 }

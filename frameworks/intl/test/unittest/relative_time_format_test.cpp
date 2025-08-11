@@ -47,7 +47,7 @@ void RelativeTimeFormatTest::TearDown(void)
 
 /**
  * @tc.name: RelativeTimeFormatTest0001
- * @tc.desc: Test CanonicalizeLocales
+ * @tc.desc: Test RelativeTimeFormat
  * @tc.type: FUNC
  */
 HWTEST_F(RelativeTimeFormatTest, RelativeTimeFormatTest0001, TestSize.Level1)
@@ -56,6 +56,13 @@ HWTEST_F(RelativeTimeFormatTest, RelativeTimeFormatTest0001, TestSize.Level1)
     const std::vector<std::string> localeTags = {"en"};
     std::vector<std::string> result = RelativeTimeFormat::CanonicalizeLocales(localeTags, errorMsg);
     EXPECT_EQ(localeTags.size(), 1);
+    std::vector<std::string> locales { "en" };
+    map<string, string> options = {
+        { "style", "narrow" }
+    };
+    std::unique_ptr<RelativeTimeFormat> relativeTimeFmt =
+        std::make_unique<RelativeTimeFormat>(locales, options, true);
+    EXPECT_TRUE(relativeTimeFmt != nullptr);
 }
 
 /**

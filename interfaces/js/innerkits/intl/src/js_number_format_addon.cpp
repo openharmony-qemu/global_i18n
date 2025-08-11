@@ -110,7 +110,7 @@ napi_value JSNumberFormatAddon::NumberFormatConstructor(napi_env env, napi_callb
         HILOG_ERROR_I18N("NumberFormatConstructor: Wrap JSNumberFormatAddon failed");
         return nullptr;
     }
-    if (!obj->InitNumberFormatContext(env, info, localeTags, map)) {
+    if (!obj->InitNumberFormatContext(env, localeTags, map)) {
         HILOG_ERROR_I18N("Init NumberFormat failed");
         return nullptr;
     }
@@ -141,17 +141,16 @@ bool JSNumberFormatAddon::HandleArguments(napi_env env, napi_value argVal, size_
     return true;
 }
 
-bool JSNumberFormatAddon::InitNumberFormatContext(napi_env env, napi_callback_info info,
+bool JSNumberFormatAddon::InitNumberFormatContext(napi_env env,
     const std::vector<std::string> &localeTags, std::map<std::string, std::string> &map)
 {
-    numberfmt_ = std::make_shared<NumberFormat>(localeTags, map);
-    if (numberfmt_ != nullptr) {
-        int32_t code = 0;
-        std::string message = numberfmt_->CheckNumberFormatOptions(map, code);
-        if (code != 0) {
-            ErrorUtil::NapiThrowUndefined(env, message);
-        }
+    int32_t code = 0;
+    std::string message = NumberFormat::CheckNumberFormatOptions(map, code);
+    if (code != 0) {
+        ErrorUtil::NapiThrowUndefined(env, message);
+        return false;
     }
+    numberfmt_ = std::make_shared<NumberFormat>(localeTags, map, true);
     return numberfmt_ != nullptr;
 }
 
@@ -188,7 +187,7 @@ napi_value JSNumberFormatAddon::FormatNumber(napi_env env, napi_callback_info in
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("JSNumberFormatAddon::FormatNumber: Get patameter info failed");
-        return nullptr;
+        return JSUtils::CreateEmptyString(env);
     }
     if (argc < 1) {
         HILOG_ERROR_I18N("JSNumberFormatAddon::FormatNumber: Param count less then required");
@@ -199,7 +198,7 @@ napi_value JSNumberFormatAddon::FormatNumber(napi_env env, napi_callback_info in
     status = napi_typeof(env, argv[0], &valueType);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("JSNumberFormatAddon::FormatNumber: Get parameter type failed");
-        return nullptr;
+        return JSUtils::CreateEmptyString(env);
     }
     return FormatWithDiffParamType(env, argv[0], valueType, thisVar);
 }
@@ -255,28 +254,28 @@ napi_value JSNumberFormatAddon::FormatRangeToParts(napi_env env, napi_callback_i
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("FormatRangeToParts: Get parameter info failed");
-        return JSUtils::CreateEmptyString(env);
+        return JSUtils::CreateEmptyArray(env);
     }
     if (argc != 2) { // 2 is parameter count
         HILOG_ERROR_I18N("FormatRangeToParts: Insufficient parameters");
-        return JSUtils::CreateEmptyString(env);
+        return JSUtils::CreateEmptyArray(env);
     }
     int32_t code = 0;
     double start = GetFormatParam(env, argv[0], code);
     if (code != 0) {
         HILOG_ERROR_I18N("FormatRangeToParts: Get first param value failed");
-        return JSUtils::CreateEmptyString(env);
+        return JSUtils::CreateEmptyArray(env);
     }
     double end = GetFormatParam(env, argv[1], code);
     if (code != 0) {
         HILOG_ERROR_I18N("FormatRangeToParts: Get second param value failed");
-        return JSUtils::CreateEmptyString(env);
+        return JSUtils::CreateEmptyArray(env);
     }
     JSNumberFormatAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->numberfmt_) {
         HILOG_ERROR_I18N("FormatRangeToParts: Get NumberFormat object failed");
-        return JSUtils::CreateEmptyString(env);
+        return JSUtils::CreateEmptyArray(env);
     }
     std::vector<std::vector<std::string>> result;
     obj->numberfmt_->FormatRangeToParts(start, end, result);
@@ -301,18 +300,18 @@ napi_value JSNumberFormatAddon::GetNumberResolvedOptions(napi_env env, napi_call
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
     if (status != napi_ok) {
-        return nullptr;
+        return JSUtils::CreateEmptyObject(env);
     }
     JSNumberFormatAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->numberfmt_) {
         HILOG_ERROR_I18N("GetNumberResolvedOptions: Get NumberFormat object failed");
-        return nullptr;
+        return JSUtils::CreateEmptyObject(env);
     }
     napi_value result = nullptr;
     status = napi_create_object(env, &result);
     if (status != napi_ok) {
-        return nullptr;
+        return JSUtils::CreateEmptyObject(env);
     }
     std::map<std::string, std::string> options = {};
     obj->numberfmt_->GetResolvedOptions(options, true);
@@ -345,7 +344,7 @@ napi_value JSNumberFormatAddon::FormatToParts(napi_env env, napi_callback_info i
     napi_value thisVar = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (status != napi_ok) {
-        return nullptr;
+        return JSUtils::CreateEmptyArray(env);
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     if (argc < 1) {
@@ -354,7 +353,7 @@ napi_value JSNumberFormatAddon::FormatToParts(napi_env env, napi_callback_info i
     status = napi_typeof(env, argv[0], &valueType);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("JSNumberFormatAddon::FormatToParts: Get param type failed.");
-        return nullptr;
+        return JSUtils::CreateEmptyArray(env);
     }
     return GetFormatToPartsInner(env, argv[0], valueType, thisVar);
 }
@@ -366,7 +365,7 @@ napi_value JSNumberFormatAddon::FormatWithDiffParamType(napi_env env, napi_value
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->numberfmt_) {
         HILOG_ERROR_I18N("FormatWithDiffParamType: Get NumberFormat object failed");
-        return nullptr;
+        return JSUtils::CreateEmptyString(env);
     }
     std::string formatedValue;
     if (valueType == napi_valuetype::napi_bigint) {
@@ -374,7 +373,7 @@ napi_value JSNumberFormatAddon::FormatWithDiffParamType(napi_env env, napi_value
         std::string bigintValue = JSUtils::GetBigIntStr(env, param, code);
         if (code != 0) {
             HILOG_ERROR_I18N("FormatWithDiffParamType: Get bigint parameter value failed");
-            return nullptr;
+            return JSUtils::CreateEmptyString(env);
         }
         formatedValue = obj->numberfmt_->FormatBigInt(bigintValue);
     } else if (valueType == napi_valuetype::napi_number) {
@@ -382,7 +381,7 @@ napi_value JSNumberFormatAddon::FormatWithDiffParamType(napi_env env, napi_value
         status = napi_get_value_double(env, param, &number);
         if (status != napi_ok) {
             HILOG_ERROR_I18N("FormatWithDiffParamType: Get double parameter value failed");
-            return nullptr;
+            return JSUtils::CreateEmptyString(env);
         }
         formatedValue = obj->numberfmt_->Format(number);
     } else {
@@ -390,7 +389,7 @@ napi_value JSNumberFormatAddon::FormatWithDiffParamType(napi_env env, napi_value
         double paramValue = JSUtils::GetNumberValue(env, param, errorCode);
         if (errorCode != 0) {
             HILOG_ERROR_I18N("FormatWithDiffParamType: Get Number object value failed");
-            return nullptr;
+            return JSUtils::CreateEmptyString(env);
         }
         formatedValue = obj->numberfmt_->Format(paramValue);
     }
@@ -404,7 +403,7 @@ napi_value JSNumberFormatAddon::GetFormatToPartsInner(napi_env env, napi_value p
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->numberfmt_) {
         HILOG_ERROR_I18N("GetFormatToPartsInner: Get NumberFormat object failed");
-        return nullptr;
+        return JSUtils::CreateEmptyArray(env);
     }
     std::vector<std::vector<std::string>> numberParts;
     if (param == nullptr) {
@@ -416,7 +415,7 @@ napi_value JSNumberFormatAddon::GetFormatToPartsInner(napi_env env, napi_value p
         std::string bigintValue = JSUtils::GetBigIntStr(env, param, code);
         if (code != 0) {
             HILOG_ERROR_I18N("GetFormatToPartsInner: Get bigint parameter value failed");
-            return nullptr;
+            return JSUtils::CreateEmptyArray(env);
         }
         obj->numberfmt_->FormatBigIntToParts(bigintValue, numberParts);
     } else if (valueType == napi_valuetype::napi_number) {
@@ -424,7 +423,7 @@ napi_value JSNumberFormatAddon::GetFormatToPartsInner(napi_env env, napi_value p
         status = napi_get_value_double(env, param, &number);
         if (status != napi_ok) {
             HILOG_ERROR_I18N("GetFormatToPartsInner: Get double parameter value failed");
-            return nullptr;
+            return JSUtils::CreateEmptyArray(env);
         }
         obj->numberfmt_->FormatToParts(number, numberParts);
     } else {
@@ -432,7 +431,7 @@ napi_value JSNumberFormatAddon::GetFormatToPartsInner(napi_env env, napi_value p
         double paramValue = JSUtils::GetNumberValue(env, param, errorCode);
         if (errorCode != 0) {
             HILOG_ERROR_I18N("GetFormatToPartsInner: Get Number object value failed");
-            return nullptr;
+            return JSUtils::CreateEmptyArray(env);
         }
         obj->numberfmt_->FormatToParts(paramValue, numberParts);
     }
@@ -447,15 +446,12 @@ napi_value JSNumberFormatAddon::SupportedLocalesOf(napi_env env, napi_callback_i
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("JSNumberFormatAddon::SupportedLocalesOf: Get parameter info failed");
-        return nullptr;
+        return JSUtils::CreateEmptyArray(env);
     }
     std::vector<std::string> localeTags;
     if (argc > 0) {
         int32_t code = 0;
         std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argv[0], code);
-        if (code != 0) {
-            return nullptr;
-        }
         localeTags.assign(localeArray.begin(), localeArray.end());
     }
     std::map<std::string, std::string> map = {};
@@ -481,21 +477,21 @@ napi_value JSNumberFormatAddon::SetNumberFormatParts(napi_env env, napi_status &
     napi_value result = nullptr;
     status = napi_create_array_with_length(env, numberParts.size(), &result);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("GetFormatToPartsInner: Failed to create array");
-        return nullptr;
+        HILOG_ERROR_I18N("SetNumberFormatParts: Failed to create array");
+        return JSUtils::CreateEmptyArray(env);
     }
     for (size_t i = 0; i < numberParts.size(); i++) {
         napi_value value = nullptr;
         status = napi_create_string_utf8(env, numberParts[i][1].c_str(), NAPI_AUTO_LENGTH, &value);
         if (status != napi_ok) {
             HILOG_ERROR_I18N("Failed to create string item numberParts[i][1].");
-            return nullptr;
+            return JSUtils::CreateEmptyArray(env);
         }
         napi_value type = nullptr;
         status = napi_create_string_utf8(env, numberParts[i][0].c_str(), NAPI_AUTO_LENGTH, &type);
         if (status != napi_ok) {
             HILOG_ERROR_I18N("Failed to create string item numberParts[i][0].");
-            return nullptr;
+            return JSUtils::CreateEmptyArray(env);
         }
         std::unordered_map<std::string, napi_value> propertys {
             { "type", type },
@@ -505,12 +501,12 @@ napi_value JSNumberFormatAddon::SetNumberFormatParts(napi_env env, napi_status &
         int32_t code = 0;
         napi_value formatInfo = JSUtils::CreateArrayItem(env, propertys, code, keyVect);
         if (code != 0) {
-            return nullptr;
+            return JSUtils::CreateEmptyArray(env);
         }
         status = napi_set_element(env, result, i, formatInfo);
         if (status != napi_ok) {
             HILOG_ERROR_I18N("Failed to set array item");
-            return nullptr;
+            return JSUtils::CreateEmptyArray(env);
         }
     }
     return result;

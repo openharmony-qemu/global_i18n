@@ -69,9 +69,9 @@ std::unordered_map<std::string, std::string> RelativeTimeFormat::pluralUnitMap =
 };
 
 RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTags,
-    std::map<std::string, std::string> &configs, bool flag)
+    std::map<std::string, std::string> &configs, bool fromArkTs)
 {
-    intlAddon = flag;
+    createFromArkTs = fromArkTs;
     I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
     std::vector<std::string> resolvedLocales =
         LocaleHelper::SupportedLocalesOf(localeTags, configs, errorCode);
@@ -79,7 +79,7 @@ RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTag
         HILOG_ERROR_I18N("RelativeTimeFormat: Get Supported Locales failed");
         return;
     }
-    SetRelativeTimeFormat(resolvedLocales, configs, flag);
+    SetRelativeTimeFormat(resolvedLocales, configs, fromArkTs);
 }
 
 std::vector<std::string> RelativeTimeFormat::CanonicalizeLocales(
@@ -106,6 +106,7 @@ std::vector<std::string> RelativeTimeFormat::CanonicalizeLocales(
 RelativeTimeFormat::RelativeTimeFormat(const std::vector<std::string> &localeTags,
     std::map<std::string, std::string> &configs)
 {
+    SetDefaultStyle();
     SetRelativeTimeFormat(localeTags, configs, false);
 }
 
@@ -114,9 +115,8 @@ RelativeTimeFormat::~RelativeTimeFormat()
 }
 
 void RelativeTimeFormat::SetRelativeTimeFormat(const std::vector<std::string> &localeTags,
-    std::map<std::string, std::string> &configs, bool flag)
+    std::map<std::string, std::string> &configs, bool fromArkTs)
 {
-    SetDefaultStyle();
     UErrorCode status = U_ZERO_ERROR;
     ParseConfigs(configs);
     for (size_t i = 0; i < localeTags.size(); i++) {
@@ -126,7 +126,7 @@ void RelativeTimeFormat::SetRelativeTimeFormat(const std::vector<std::string> &l
             status = U_ZERO_ERROR;
             continue;
         }
-        localeBaseName = flag ? localeTags[i] : locale.getBaseName();
+        localeBaseName = fromArkTs ? localeTags[i] : locale.getBaseName();
         std::replace(localeBaseName.begin(), localeBaseName.end(), '_', '-');
         relativeTimeFormat = std::make_unique<icu::RelativeDateTimeFormatter>(locale, nullptr, style,
             UDISPCTX_CAPITALIZATION_NONE, status);
@@ -142,8 +142,15 @@ void RelativeTimeFormat::SetRelativeTimeFormat(const std::vector<std::string> &l
         }
         break;
     }
+    CreateRelativeTimeFormatWithDefaultLocale(fromArkTs);
+}
+
+void RelativeTimeFormat::CreateRelativeTimeFormatWithDefaultLocale(bool fromArkTs)
+{
     if (!createSuccess) {
-        std::string systemLocale = LocaleConfig::GetEffectiveLocale();
+        UErrorCode status = U_ZERO_ERROR;
+        std::string systemLocale = fromArkTs ?
+            LocaleHelper::DefaultLocale() : LocaleConfig::GetEffectiveLocale();
         std::string curLocale = LocaleConfig::RemoveCustExtParam(systemLocale);
         locale = icu::Locale::forLanguageTag(icu::StringPiece(curLocale), status);
         if (U_FAILURE(status)) {
@@ -196,7 +203,7 @@ std::string RelativeTimeFormat::Format(double number, const std::string &unit)
 std::string RelativeTimeFormat::GetSingularUnit(const std::string &unit)
 {
     std::string singularUnit(unit);
-    if (intlAddon && pluralUnitMap.find(unit) != pluralUnitMap.end()) {
+    if (createFromArkTs && pluralUnitMap.find(unit) != pluralUnitMap.end()) {
         singularUnit = pluralUnitMap[unit];
     }
     return singularUnit;
@@ -243,7 +250,7 @@ void RelativeTimeFormat::FormatToParts(double number, const std::string &unit,
     }
     std::string result;
     fmtRelativeTimeStr.toUTF8String(result);
-    if (intlAddon) {
+    if (createFromArkTs) {
         IntlFormatToParts(fmtRelativeTime, result, timeVector, number, unit);
         return;
     }
@@ -366,7 +373,7 @@ void RelativeTimeFormat::GetResolvedOptions(std::map<std::string, std::string> &
     if (!numeric.empty()) {
         map.insert(std::make_pair("numeric", numeric));
     }
-    if (intlAddon) {
+    if (createFromArkTs) {
         std::string numSystem = intlNumberingSystem.empty() ? GetNumberSystemFromLocale() : intlNumberingSystem;
         map.insert(std::make_pair("numberingSystem", numSystem));
     } else if (!numberingSystem.empty()) {

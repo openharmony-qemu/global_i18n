@@ -175,24 +175,24 @@ napi_value DisplayNamesAddon::Of(napi_env env, napi_callback_info info)
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("DisplayNamesAddon::Of: napi get callback info failed.");
-        return JSUtils::CreateString(env, "");
+        return JSUtils::CreateEmptyString(env);
     }
     if (argc < 1) {
         HILOG_ERROR_I18N("DisplayNamesAddon::Of: missing code param.");
         ErrorUtil::NapiThrowUndefined(env, "code is undefined");
-        return JSUtils::CreateString(env, "");
+        return JSUtils::CreateEmptyString(env);
     }
     int32_t errorCode = 0;
     std::string code = JSUtils::GetString(env, argv[0], errorCode);
     if (errorCode != 0) {
-        return JSUtils::CreateString(env, "");
+        return JSUtils::CreateEmptyString(env);
     }
 
     DisplayNamesAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->displaynames_) {
         HILOG_ERROR_I18N("DisplayNamesAddon::Of: Get DisplayNames object failed");
-        return JSUtils::CreateString(env, "");
+        return JSUtils::CreateEmptyString(env);
     }
     std::string displayResult = obj->displaynames_->Display(code);
     I18nErrorCode i18nErrorCode = obj->displaynames_->GetError();
@@ -200,7 +200,7 @@ napi_value DisplayNamesAddon::Of(napi_env env, napi_callback_info info)
         std::string errorMessage = obj->displaynames_->GetErrorMessage();
         HILOG_ERROR_I18N("DisplayNamesAddon::Of: %{public}s.", errorMessage.c_str());
         ErrorUtil::NapiThrowUndefined(env, errorMessage);
-        return JSUtils::CreateString(env, "");
+        return JSUtils::CreateEmptyString(env);
     }
     return JSUtils::CreateString(env, displayResult);
 }
@@ -210,7 +210,7 @@ napi_value DisplayNamesAddon::ResolvedOptions(napi_env env, napi_callback_info i
     napi_value result = nullptr;
     napi_status status = napi_create_object(env, &result);
     if (status != napi_ok) {
-        return nullptr;
+        return JSUtils::CreateEmptyObject(env);
     }
 
     napi_value thisVar = nullptr;

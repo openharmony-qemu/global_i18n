@@ -29,9 +29,31 @@ napi_value JSUtils::CreateEmptyString(napi_env env)
     std::string emptyStr = "";
     napi_status status = napi_create_string_utf8(env, emptyStr.c_str(), NAPI_AUTO_LENGTH, &result);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("JSUtils: create string js variable failed.");
+        HILOG_ERROR_I18N("JSUtils: create empty string failed.");
     }
     return result;
+}
+
+napi_value JSUtils::CreateEmptyArray(napi_env env)
+{
+    napi_value result = nullptr;
+    napi_status status = napi_create_array(env, &result);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("JSUtils::CreateEmptyArray: Failed to create empty array");
+        return result;
+    }
+    return result;
+}
+
+napi_value JSUtils::CreateEmptyObject(napi_env env)
+{
+    napi_value object = nullptr;
+    napi_status status = napi_create_object(env, &object);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("JSUtils::CreateEmptyObject: Create empty object failed.");
+        return object;
+    }
+    return object;
 }
 
 void JSUtils::GetNumberOptionValues(napi_env env, napi_value options, std::map<std::string, std::string> &map)

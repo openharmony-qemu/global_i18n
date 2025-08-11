@@ -727,6 +727,39 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0067, TestSize.Level1)
     LocaleConfig::SetSystemLanguage(systemLanguage);
     LocaleConfig::SetSystemLocale(systemLocale);
 }
+
+/**
+ * @tc.name: NumberFormatFuncTest0068
+ * @tc.desc: Test Intl NumberFormat
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0068, TestSize.Level1)
+{
+    std::vector<std::string> locales { "ar" };
+    map<string, string> options = {
+        { "numeric", "auto" },
+        { "localeMatcher", "best fit" }
+    };
+    std::unique_ptr<NumberFormat> numberFormat = std::make_unique<NumberFormat>(locales, options, true);
+    ASSERT_TRUE(numberFormat != nullptr);
+    map<std::string, std::string> resultMap;
+    numberFormat->GetResolvedOptions(resultMap);
+    EXPECT_EQ(resultMap.at("numberingSystem"), "arab");
+    int32_t code = 0;
+    map<std::string, std::string> optionsMap = {
+        { "currency", "###" },
+    };
+    std::string message = NumberFormat::CheckNumberFormatOptions(optionsMap, code);
+    EXPECT_EQ(message, "not a wellformed code");
+    EXPECT_EQ(code, -1);
+    options = { { "style", "unit" } };
+    code = 0;
+    std::string msg = NumberFormat::CheckNumberFormatOptions(options, code);
+    EXPECT_EQ(msg, "style is unit but unit is undefined");
+    options = { { "style", "currency" } };
+    std::string checkCurrencyMsg = NumberFormat::CheckNumberFormatOptions(options, code);
+    EXPECT_EQ(checkCurrencyMsg, "style is currency but currency is undefined");
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

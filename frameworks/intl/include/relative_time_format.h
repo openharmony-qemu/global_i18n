@@ -50,7 +50,7 @@ class RelativeTimeFormat {
 public:
     RelativeTimeFormat(const std::vector<std::string> &localeTag, std::map<std::string, std::string> &configs);
     RelativeTimeFormat(const std::vector<std::string> &locales,
-        std::map<std::string, std::string> &configs, bool flag);
+        std::map<std::string, std::string> &configs, bool fromArkTs);
     virtual ~RelativeTimeFormat();
     std::string Format(double number, const std::string &unit);
     icu::FormattedRelativeDateTime FormatToFormattedValue(double number, const std::string &unit);
@@ -72,7 +72,7 @@ private:
     std::unique_ptr<icu::RelativeDateTimeFormatter> relativeTimeFormat;
     UDateRelativeDateTimeFormatterStyle style = UDAT_STYLE_LONG;
     bool createSuccess = false;
-    bool intlAddon = false;
+    bool createFromArkTs = false;
     static const char *DEVICE_TYPE_NAME;
     static constexpr int CONFIG_LEN = 128;
     static std::unordered_map<std::string, URelativeDateTimeUnit> relativeUnits;
@@ -89,11 +89,12 @@ private:
     std::string GetNumberSystemFromLocale();
     void SetDefaultStyle();
     void SetRelativeTimeFormat(const std::vector<std::string> &localeTags,
-        std::map<std::string, std::string> &configs, bool flag);
+        std::map<std::string, std::string> &configs, bool fromArkTs);
     void IntlFormatToParts(icu::FormattedValue &fmtRelativeTime, const std::string& result,
         std::vector<std::vector<std::string>> &timeVector, double number, const std::string &unit);
     std::vector<std::string> FormatPart(const std::string& type, const std::string& value,
         const std::string& unit);
+    void CreateRelativeTimeFormatWithDefaultLocale(bool fromArkTs);
 };
 } // namespace I18n
 } // namespace Global

@@ -31,6 +31,8 @@ class JSUtils {
 public:
     static napi_value DefaultConstructor(napi_env env, napi_callback_info info);
     static napi_value CreateEmptyString(napi_env env);
+    static napi_value CreateEmptyArray(napi_env env);
+    static napi_value CreateEmptyObject(napi_env env);
 
     static void GetNumberOptionValues(napi_env env, napi_value options, std::map<std::string, std::string> &map);
     static int64_t GetIntegerOptionValue(napi_env env, napi_value options, const std::string &optionName,

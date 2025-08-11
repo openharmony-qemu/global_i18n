@@ -56,7 +56,9 @@ struct FormatPartParam {
 
 class NumberFormat {
 public:
-    NumberFormat(const std::vector<std::string> &localeTag, std::map<std::string, std::string> &configs);
+    NumberFormat(const std::vector<std::string> &localeTags, std::map<std::string, std::string> &configs);
+    NumberFormat(const std::vector<std::string> &localeTags,
+        std::map<std::string, std::string> &configs, bool flag);
     virtual ~NumberFormat();
     std::string Format(double number);
     std::string FormatBigInt(const std::string &number);
@@ -85,7 +87,7 @@ public:
     static std::vector<std::string> SupportedLocalesOf(const std::vector<std::string> &requestLocales,
         const std::map<std::string, std::string> &configs, I18nErrorCode &status);
     static std::string GetIcuDefaultLocale();
-    std::string CheckNumberFormatOptions(std::map<std::string, std::string> &map, int32_t &code);
+    static std::string CheckNumberFormatOptions(std::map<std::string, std::string> &map, int32_t &code);
 
 private:
     icu::Locale locale;
@@ -118,6 +120,7 @@ private:
     size_t roundingIncrement = 1;
     bool createSuccess = false;
     bool isSetFraction = false;
+    bool fromArkTs = false;
     std::unique_ptr<LocaleInfo> localeInfo = nullptr;
     std::unique_ptr<RelativeTimeFormat> relativeTimeFormat = nullptr;
     icu::number::LocalizedNumberFormatter numberFormat;
@@ -135,6 +138,7 @@ private:
     static const char *DEVICE_TYPE_NAME;
     static const int POW_BASE_NUMBER = 10;
     static const int CURRENCY_LEN = 3;
+    static constexpr uint32_t PERUNIT_STRING = 5;
     static std::mutex numToCurrencyMutex;
     static bool initISO4217;
     static std::unordered_map<std::string, std::string> numToCurrency;
@@ -154,7 +158,11 @@ private:
     static std::map<std::string, std::string> RelativeTimeFormatConfigs;
     static std::unordered_map<std::string, int> defaultCurrencyFractionMap;
     static bool ReadISO4217Datas();
-    std::string GetCurrencyFromConfig(const std::string& currency);
+    static void CheckNumberFormatOptionsExt(std::map<std::string, std::string> &map, int32_t &code,
+        const std::string &optionName, int min, int max);
+    static std::string CheckFormatOptions(std::map<std::string, std::string> &map, int32_t &code);
+    static std::string GetCurrencyFromConfig(const std::string& currency);
+
     void CreateRelativeTimeFormat(const std::string& locale);
     void ParseConfigs(std::map<std::string, std::string> &configs);
     void ParseDigitsConfigs(std::map<std::string, std::string> &configs);
@@ -200,14 +208,17 @@ private:
         const double &first, const double &second, icu::UnicodeString &formatResult);
     void SetEveryFormatPartItem(icu::ConstrainedFieldPosition &cfpo, icu::UnicodeString &formatResult,
         std::vector<std::vector<std::string>> &result, FormatPartParam &param);
-    void CheckNumberFormatOptionsExt(std::map<std::string, std::string> &map, int32_t &code,
-        const std::string &optionName, int min, int max);
     void FormatableRangeToParts(double first, double second,
         std::vector<std::vector<std::string>> &result);
     double GetBigIntFieldType(const std::string &bigintStr);
     void DealWithUnitUsage(bool isFormatRange, double& firstNumber, double& secondNumber);
     bool DealWithUnitConvert(double& finalNumber, std::string& finalUnit);
-    std::string CheckFormatOptions(std::map<std::string, std::string> &map, int32_t &code);
+    void ResolveLocaleTags(const std::vector<std::string> &localeTags, std::map<std::string, std::string> &configs);
+    void CreateNumberFormatWithDefaultLocale(const std::string &systemLocale,
+        std::map<std::string, std::string> &configs);
+    bool IsWellFormedUnitIdentifier(icu::MeasureUnit &icuUnit, icu::MeasureUnit &icuPerUnit);
+    bool ToMeasureUnit(const std::string &sanctionedUnit, icu::MeasureUnit &measureUnit);
+    void SetPerUnit(icu::number::UnlocalizedNumberFormatter &formatter);
 };
 } // namespace I18n
 } // namespace Global

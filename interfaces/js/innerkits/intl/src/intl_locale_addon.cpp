@@ -433,12 +433,12 @@ napi_value IntlLocaleAddon::GetIntlLocaleAttribute(napi_env env, napi_callback_i
             status = napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &result);
             if (status != napi_ok || result == nullptr) {
                 HILOG_ERROR_I18N("IntlLocaleAddon::GetIntlLocaleAttribute: Create attribute string failed.");
-                return nullptr;
+                return JSUtils::CreateEmptyString(env);
             }
             break;
         }
         default:
-            return nullptr;
+            return JSUtils::CreateEmptyString(env);
     }
     return result;
 }

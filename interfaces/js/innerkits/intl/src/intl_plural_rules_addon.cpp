@@ -209,13 +209,13 @@ napi_value IntlPluralRulesAddon::ToString(napi_env env, napi_callback_info info)
     napi_status status = napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("IntlPluralRulesAddon::ToString: get cb info failed.");
-        return nullptr;
+        return JSUtils::CreateEmptyString(env);
     }
     IntlPluralRulesAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->intlPluralRules) {
         HILOG_ERROR_I18N("IntlPluralRulesAddon::ToString: Get IntlPluralRules object failed.");
-        return nullptr;
+        return JSUtils::CreateEmptyString(env);
     }
 
     return JSUtils::CreateString(env, "[object Intl.PluralRules]");
@@ -230,7 +230,7 @@ napi_value IntlPluralRulesAddon::SupportedLocalesOf(napi_env env, napi_callback_
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("IntlPluralRulesAddon::SupportedLocalesOf: napi get callback info failed.");
-        return nullptr;
+        return JSUtils::CreateEmptyArray(env);
     }
     std::vector<std::string> localeTags;
     if (argc > 0) {

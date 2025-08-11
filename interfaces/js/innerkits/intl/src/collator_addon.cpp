@@ -180,11 +180,6 @@ napi_value CollatorAddon::SupportedLocalesOf(napi_env env, napi_callback_info in
     if (argc > 0) {
         int32_t code = 0;
         std::vector<std::string> localeArray = JSUtils::GetLocaleArray(env, argv[0], code);
-        if (code != 0) {
-            HILOG_ERROR_I18N("SupportedLocalesOf: JSUtils:GetLocaleArray failed.");
-            ErrorUtil::NapiThrowUndefined(env, "kValue is not String or Object");
-            return JSUtils::CreateArray(env, resultLocales);
-        }
         localeTags.assign(localeArray.begin(), localeArray.end());
     }
     std::map<std::string, std::string> map = {};
@@ -247,18 +242,18 @@ napi_value CollatorAddon::GetCollatorResolvedOptions(napi_env env, napi_callback
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
     if (status != napi_ok) {
-        return nullptr;
+        return JSUtils::CreateEmptyObject(env);
     }
     CollatorAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->collator_) {
         HILOG_ERROR_I18N("GetCollatorResolvedOptions: Get Collator object failed");
-        return nullptr;
+        return JSUtils::CreateEmptyObject(env);
     }
     napi_value result = nullptr;
     status = napi_create_object(env, &result);
     if (status != napi_ok) {
-        return nullptr;
+        return JSUtils::CreateEmptyObject(env);
     }
     std::map<std::string, std::string> options = {};
     obj->collator_->ResolvedOptions(options);
