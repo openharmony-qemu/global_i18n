@@ -755,7 +755,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0068, TestSize.Level1)
     options = { { "style", "unit" } };
     code = 0;
     std::string msg = NumberFormat::CheckNumberFormatOptions(options, code);
-    EXPECT_EQ(message, "style is unit but unit is undefined");
+    EXPECT_EQ(msg, "style is unit but unit is undefined");
     options = { { "style", "currency" } };
     std::string checkCurrencyMsg = NumberFormat::CheckNumberFormatOptions(options, code);
     EXPECT_EQ(checkCurrencyMsg, "style is currency but currency is undefined");
