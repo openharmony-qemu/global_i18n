@@ -39,15 +39,12 @@ SimpleDateTimeFormat::SimpleDateTimeFormat(const std::string& skeletonOrPattern,
     InitSimpleDateTimeFormat(skeletonOrPattern, locale, isBestPattern, errCode);
 }
 
-SimpleDateTimeFormat::SimpleDateTimeFormat(const std::string& skeletonOrPattern, std::shared_ptr<IntlLocale> intlLocale,
+SimpleDateTimeFormat::SimpleDateTimeFormat(const std::string& skeletonOrPattern, const std::string& localeTag,
     bool isBestPattern, I18nErrorCode& errCode)
 {
-     std::string locale;
-    if (intlLocale == nullptr) {
+    std::string locale = localeTag;
+    if (locale.empty()) {
         locale = LocaleConfig::GetEffectiveLocale();
-    } else {
-        std::string errMessage;
-        locale = intlLocale->ToString(errMessage);
     }
     InitSimpleDateTimeFormat(skeletonOrPattern, locale, isBestPattern, errCode);
 }

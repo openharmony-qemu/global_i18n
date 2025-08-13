@@ -19,7 +19,6 @@
 #include <string>
 #include <vector>
 #include "i18n_types.h"
-#include "intl_locale.h"
 #include "locale_info.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
@@ -48,11 +47,14 @@ public:
     static napi_status SetEnumValue(napi_env env, napi_value enumObj, const std::string& enumName, int32_t enumVal);
     static LocaleType GetLocaleType(napi_env env, napi_value locale);
     static std::shared_ptr<LocaleInfo> ParseLocaleInfo(napi_env env, napi_value localeInfo);
-    static std::shared_ptr<IntlLocale> ParseIntlLocale(napi_env env, napi_value intlLocale);
-    static napi_value CreateIntlLocaleObject(napi_env env, const std::string& locale);
+    static std::string ParseBuiltinsLocale(napi_env env, napi_value intlLocale);
+    static napi_value CreateBuiltinsLocaleObject(napi_env env, const std::string& locale);
     static napi_value CreateMap(napi_env env, std::unordered_map<std::string, std::string>& ump);
 
 private:
+    static napi_value GetBuiltinsLocaleConstructor(napi_env env);
+    static bool IsBuiltinsLocale(napi_env env, napi_value locale);
+
     static const std::map<napi_valuetype, std::string> NAPI_TYPE_MAP;
 };
 } // namespace I18n

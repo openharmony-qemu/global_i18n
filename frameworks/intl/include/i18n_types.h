@@ -77,7 +77,7 @@ enum WeekDay {
 
 enum class LocaleType {
     INVALID = 0,
-    INTL_LOCALE = 1,
+    BUILTINS_LOCALE = 1,
     LOCALE_INFO = 2,
 };
 

@@ -17,7 +17,6 @@
 
 #include <vector>
 #include "i18n_types.h"
-#include "intl_locale.h"
 #include "locale_info.h"
 #include "unicode/locid.h"
 #include "unicode/smpdtfmt.h"
@@ -29,7 +28,7 @@ class SimpleDateTimeFormat {
 public:
     SimpleDateTimeFormat(const std::string& skeletonOrPattern, std::shared_ptr<LocaleInfo> localeInfo,
         bool isBestPattern, I18nErrorCode& errCode);
-    SimpleDateTimeFormat(const std::string& skeletonOrPattern, std::shared_ptr<IntlLocale> IntlLocale,
+    SimpleDateTimeFormat(const std::string& skeletonOrPattern, const std::string& localeTag,
         bool isBestPattern, I18nErrorCode& errCode);
     std::string Format(int64_t milliseconds);
 

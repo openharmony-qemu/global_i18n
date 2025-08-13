@@ -15,7 +15,6 @@
 
 #include "error_util.h"
 #include "i18n_hilog.h"
-#include "intl_locale_addon.h"
 #include "locale_info_addon.h"
 #include "variable_convertor.h"
 
@@ -286,9 +285,9 @@ LocaleType VariableConvertor::GetLocaleType(napi_env env, napi_value locale)
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "Locale", true);
         return LocaleType::INVALID;
     }
-    bool isIntlLocale = IntlLocaleAddon::IsIntlLocale(env, locale);
-    if (isIntlLocale) {
-        return LocaleType::INTL_LOCALE;
+    bool isBuiltinsLocale = VariableConvertor::IsBuiltinsLocale(env, locale);
+    if (isBuiltinsLocale) {
+        return LocaleType::BUILTINS_LOCALE;
     }
     bool isLocaleInfo = LocaleInfoAddon::IsLocaleInfo(env, locale);
     if (isLocaleInfo) {
@@ -315,32 +314,53 @@ std::shared_ptr<LocaleInfo> VariableConvertor::ParseLocaleInfo(napi_env env, nap
     return localeInfoAddon->GetLocaleInfo();
 }
 
-std::shared_ptr<IntlLocale> VariableConvertor::ParseIntlLocale(napi_env env, napi_value intlLocale)
+std::string VariableConvertor::ParseBuiltinsLocale(napi_env env, napi_value builtinsLocale)
 {
-    IntlLocaleAddon *IntlLocaleAddon = nullptr;
-    napi_status status = napi_unwrap(env, intlLocale, reinterpret_cast<void **>(&IntlLocaleAddon));
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("VariableConvertor::ParseIntlLocale: Failed to unwrap intlLocale.");
-        return nullptr;
-    } else if (!IntlLocaleAddon) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "Intl.Locale", true);
-        return nullptr;
-    } else if (!IntlLocaleAddon->GetIntlLocale()) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "locale", "a valid Intl.Locale", true);
-        return nullptr;
+    napi_value func = nullptr;
+    napi_status status = napi_get_named_property(env, builtinsLocale, "toString", &func);
+    if (status != napi_ok || func == nullptr) {
+        HILOG_ERROR_I18N("VariableConvertor::ParseBuiltinsLocale: Get function toString failed.");
+        return "";
     }
-    return IntlLocaleAddon->GetIntlLocale();
+    napi_value locale = nullptr;
+    status = napi_call_function(env, builtinsLocale, func, 0, nullptr, &locale);
+    if (status != napi_ok || locale == nullptr) {
+        HILOG_ERROR_I18N("VariableConvertor::ParseBuiltinsLocale: Call function failed.");
+        return "";
+    }
+    int32_t code = 0;
+    std::string localeTag = VariableConvertor::GetString(env, locale, code);
+    if (code != 0) {
+        HILOG_ERROR_I18N("VariableConvertor::ParseBuiltinsLocale: Get string failed.");
+        return "";
+    }
+    return localeTag;
 }
 
-napi_value VariableConvertor::CreateIntlLocaleObject(napi_env env, const std::string& locale)
+napi_value VariableConvertor::CreateBuiltinsLocaleObject(napi_env env, const std::string& locale)
 {
     napi_value param = nullptr;
     napi_status status = napi_create_string_utf8(env, locale.c_str(), NAPI_AUTO_LENGTH, &param);
     if (status != napi_ok || param == nullptr) {
-        HILOG_ERROR_I18N("VariableConvertor::CreateIntlLocaleObject: Create string failed.");
+        HILOG_ERROR_I18N("VariableConvertor::CreateBuiltinsLocaleObject: Create string failed.");
         return nullptr;
     }
-    return IntlLocaleAddon::CreateIntlLocaleObject(env, param);
+
+    napi_value localeConstructor = VariableConvertor::GetBuiltinsLocaleConstructor(env);
+    if (localeConstructor == nullptr) {
+        HILOG_ERROR_I18N("VariableConvertor::CreateBuiltinsLocaleObject: Get constructor failed.");
+        return nullptr;
+    }
+
+    size_t argc = 1;
+    napi_value argv[1] = { param };
+    napi_value builtinsLocale = nullptr;
+    status = napi_new_instance(env, localeConstructor, argc, argv, &builtinsLocale);
+    if (status != napi_ok || builtinsLocale == nullptr) {
+        HILOG_ERROR_I18N("VariableConvertor::CreateBuiltinsLocaleObject: Create locale failed.");
+        return nullptr;
+    }
+    return builtinsLocale;
 }
 
 napi_value VariableConvertor::CreateMap(napi_env env, std::unordered_map<std::string, std::string>& ump)
@@ -373,6 +393,48 @@ napi_value VariableConvertor::CreateMap(napi_env env, std::unordered_map<std::st
         }
     }
     return result;
+}
+
+napi_value VariableConvertor::GetBuiltinsLocaleConstructor(napi_env env)
+{
+    napi_value global = nullptr;
+    napi_status status = napi_get_global(env, &global);
+    if (status != napi_ok || global == nullptr) {
+        HILOG_ERROR_I18N("VariableConvertor::GetBuiltinsLocaleConstructor: Get global failed.");
+        return nullptr;
+    }
+
+    napi_value intl = nullptr;
+    status = napi_get_named_property(env, global, "Intl", &intl);
+    if (status != napi_ok || intl == nullptr) {
+        HILOG_ERROR_I18N("VariableConvertor::GetBuiltinsLocaleConstructor: Load intl failed.");
+        return nullptr;
+    }
+
+    napi_value localeConstructor = nullptr;
+    status = napi_get_named_property(env, intl, "Locale", &localeConstructor);
+    if (status != napi_ok || localeConstructor == nullptr) {
+        HILOG_ERROR_I18N("VariableConvertor::GetBuiltinsLocaleConstructor: Get locale constructor failed.");
+        return nullptr;
+    }
+    return localeConstructor;
+}
+
+bool VariableConvertor::IsBuiltinsLocale(napi_env env, napi_value locale)
+{
+    napi_value localeConstructor = VariableConvertor::GetBuiltinsLocaleConstructor(env);
+    if (localeConstructor == nullptr) {
+        HILOG_ERROR_I18N("VariableConvertor::IsBuiltinsLocale: Get constructor failed.");
+        return false;
+    }
+
+    bool isBuiltinsLocale = false;
+    napi_status status = napi_instanceof(env, locale, localeConstructor, &isBuiltinsLocale);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("VariableConvertor::IsBuiltinsLocale: Get instance of locale failed.");
+        return false;
+    }
+    return isBuiltinsLocale;
 }
 } // namespace I18n
 } // namespace Global

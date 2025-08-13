@@ -27,7 +27,6 @@ ohos_unittest("intl_test") {
     "unittest/convert_test.cpp",
     "unittest/i18n_test.cpp",
     "unittest/intl_date_time_format_test.cpp",
-    "unittest/intl_locale_test.cpp",
     "unittest/intl_plural_rules_test.cpp",
     "unittest/intl_test.cpp",
     "unittest/intl_test_extent.cpp",

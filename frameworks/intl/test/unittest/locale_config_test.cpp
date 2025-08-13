@@ -685,14 +685,16 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest027, TestSize.Level1)
  */
 HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest028, TestSize.Level1)
 {
-    std::string localeTag = "zh-Hans-CN-x-np-002c002e";
+    std::string localeTag = "zh-Hans-CN-u-nu-arab-x-np-002c002e";
     std::pair<std::string, std::string> numberPattern = LocaleConfig::GetNumberPatternFromLocale(localeTag);
     EXPECT_EQ(numberPattern.first, ",");
     EXPECT_EQ(numberPattern.second, ".");
     std::string removedLocale = LocaleConfig::RemoveCustExtParam(localeTag);
+    EXPECT_EQ(removedLocale, "zh-Hans-CN-u-nu-arab");
+    removedLocale = LocaleConfig::RemoveAllExtParam(localeTag);
     EXPECT_EQ(removedLocale, "zh-Hans-CN");
     std::string modifiedLocale = LocaleConfig::ModifyExtParam(localeTag, "np", "0000002c", "-x-");
-    EXPECT_EQ(modifiedLocale, "zh-Hans-CN-x-np-0000002c");
+    EXPECT_EQ(modifiedLocale, "zh-Hans-CN-u-nu-arab-x-np-0000002c");
     std::string extParam = LocaleConfig::QueryExtParam(localeTag, "np", "-x-");
     EXPECT_EQ(extParam, "002c002e");
     std::string numberingSystemDigit = LocaleConfig::GetNumberingSystemDigit("latn");

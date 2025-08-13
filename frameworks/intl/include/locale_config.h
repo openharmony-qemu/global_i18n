@@ -259,11 +259,12 @@ public:
     static std::string GetUnicodeWrappedFilePath(const std::string &path, const char delimiter,
         std::shared_ptr<LocaleInfo> localeInfo, std::string &invalidField);
     static std::string GetUnicodeWrappedFilePath(const std::string &path, const char delimiter,
-        std::shared_ptr<IntlLocale> intlLocale, std::string &invalidField);
+        const std::string& localeTag, std::string &invalidField);
     static std::string ComputeEffectiveLanguage(const std::string& localeTag, const std::string& language);
     static std::string GetSystemLocaleInstanceTag();
     static std::pair<std::string, std::string> GetNumberPatternFromLocale(const std::string& localeTag);
     static std::string RemoveCustExtParam(const std::string& locale);
+    static std::string RemoveAllExtParam(const std::string& locale);
     static std::string ModifyExtParam(const std::string& locale, const std::string& key, const std::string& value,
         const std::string& extParamKey);
     static std::string QueryExtParam(const std::string& locale, const std::string& key,
