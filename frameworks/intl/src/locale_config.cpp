@@ -55,7 +55,6 @@
 #include "ustr_imp.h"
 #include "utils.h"
 #include "tokenid_kit.h"
-#include "intl_locale.h"
 
 namespace OHOS {
 namespace Global {
@@ -2465,6 +2464,16 @@ std::string LocaleConfig::RemoveCustExtParam(const std::string& locale)
     return ModifyExtParam(tempLocale, NUMERIC_DATE_KEY, "", CUST_EXT_PARAM_KEY);
 }
 
+std::string LocaleConfig::RemoveAllExtParam(const std::string& locale)
+{
+    std::vector<std::pair<size_t, std::string>> positions = GetExtParamPositions(locale);
+    std::string localeWithoutExtParam = locale;
+    if (positions[0].first != std::string::npos) {
+        localeWithoutExtParam = locale.substr(0, positions[0].first);
+    }
+    return localeWithoutExtParam;
+}
+
 std::string LocaleConfig::QueryExtParam(const std::string& locale, const std::string& key,
     const std::string& extParamKey)
 {
@@ -2704,12 +2713,9 @@ std::string LocaleConfig::GetUnicodeWrappedFilePath(const std::string &path, con
 }
 
 std::string LocaleConfig::GetUnicodeWrappedFilePath(const std::string &path, const char delimiter,
-    std::shared_ptr<IntlLocale> intlLocale, std::string &invalidField)
+    const std::string& localeTag, std::string &invalidField)
 {
-    std::string locale;
-    if (intlLocale != nullptr) {
-        locale = intlLocale->GetBaseName();
-    }
+    std::string locale = LocaleConfig::RemoveAllExtParam(localeTag);
     return LocaleConfig::GetUnicodeWrappedFilePathInner(path, delimiter, locale, invalidField);
 }
 

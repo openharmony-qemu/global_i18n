@@ -16,7 +16,6 @@
 #define OHOS_GLOBAL_I18N_SIMPLE_NUMBER_FORMAT_H
 
 #include "i18n_types.h"
-#include "intl_locale.h"
 #include "locale_info.h"
 #include "unicode/numberformatter.h"
 
@@ -26,7 +25,7 @@ namespace I18n {
 class SimpleNumberFormat {
 public:
     SimpleNumberFormat(const std::string& skeleton, std::shared_ptr<LocaleInfo> localeInfo, I18nErrorCode& errCode);
-    SimpleNumberFormat(const std::string& skeleton, std::shared_ptr<IntlLocale> intlLocale, I18nErrorCode& errCode);
+    SimpleNumberFormat(const std::string& skeleton, const std::string& localeTag, I18nErrorCode& errCode);
     ~SimpleNumberFormat();
     std::string Format(double number);
     icu::number::FormattedNumber FormatToFormattedNumber(double number);

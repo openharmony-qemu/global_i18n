@@ -127,7 +127,6 @@ ohos_shared_library("intl_util") {
       "src/i18n_normalizer.cpp",
       "src/i18n_timezone.cpp",
       "src/index_util.cpp",
-      "src/intl_locale.cpp",
       "src/intl_date_time_format.cpp",
       "src/intl_plural_rules.cpp",
       "src/locale_compare.cpp",

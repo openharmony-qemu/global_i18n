@@ -1821,20 +1821,16 @@ HWTEST_F(I18nTest, I18nFuncTest071, TestSize.Level1)
 {
     I18nErrorCode err = I18nErrorCode::SUCCESS;
     std::string skeleton = "percent";
-    std::unordered_map<std::string, std::string> configs;
-    std::string errMessage;
-    std::shared_ptr<IntlLocale> intlLocale = std::make_shared<IntlLocale>("zh-Hans-CN", configs, errMessage);
-    ASSERT_TRUE(intlLocale != nullptr);
-    std::unique_ptr<SimpleNumberFormat> formatter = std::make_unique<SimpleNumberFormat>(skeleton, intlLocale, err);
+    std::string localeTag = "zh-Hans-CN";
+    std::unique_ptr<SimpleNumberFormat> formatter = std::make_unique<SimpleNumberFormat>(skeleton, localeTag, err);
     EXPECT_EQ(err, I18nErrorCode::SUCCESS);
     ASSERT_TRUE(formatter != nullptr);
     std::string result = formatter->Format(10);
     EXPECT_EQ(result, "10%");
 
     skeleton = "%";
-    std::shared_ptr<IntlLocale> nullIntlLocale = nullptr;
     std::unique_ptr<SimpleNumberFormat> formatterWithoutLocale =
-        std::make_unique<SimpleNumberFormat>(skeleton, nullIntlLocale, err);
+        std::make_unique<SimpleNumberFormat>(skeleton, "", err);
     EXPECT_EQ(err, I18nErrorCode::SUCCESS);
     ASSERT_TRUE(formatterWithoutLocale != nullptr);
     result = formatterWithoutLocale->Format(10);
@@ -1842,11 +1838,11 @@ HWTEST_F(I18nTest, I18nFuncTest071, TestSize.Level1)
 
     skeleton = "5%";
     std::unique_ptr<SimpleNumberFormat> formatterWithError =
-        std::make_unique<SimpleNumberFormat>(skeleton, nullIntlLocale, err);
+        std::make_unique<SimpleNumberFormat>(skeleton, "", err);
     EXPECT_EQ(err, I18nErrorCode::INVALID_NUMBER_FORMAT_SKELETON);
 
     std::unique_ptr<SimpleNumberFormat> formatterWithEmpty =
-        std::make_unique<SimpleNumberFormat>("", nullIntlLocale, err);
+        std::make_unique<SimpleNumberFormat>("", "", err);
     EXPECT_EQ(err, I18nErrorCode::INVALID_NUMBER_FORMAT_SKELETON);
 }
 
@@ -1858,14 +1854,10 @@ HWTEST_F(I18nTest, I18nFuncTest071, TestSize.Level1)
 HWTEST_F(I18nTest, I18nFuncTest072, TestSize.Level1)
 {
     I18nErrorCode err = I18nErrorCode::SUCCESS;
-    std::unordered_map<std::string, std::string> configs;
-    std::string errMessage;
-    std::shared_ptr<IntlLocale> intlLocale = std::make_shared<IntlLocale>("zh-Hans-CN", configs, errMessage);
-    ASSERT_TRUE(intlLocale != nullptr);
-
+    std::string localeTag = "zh-Hans-CN";
     std::string pattern = "yMd";
     std::unique_ptr<SimpleDateTimeFormat> patternFormatter =
-        std::make_unique<SimpleDateTimeFormat>(pattern, intlLocale, true, err);
+        std::make_unique<SimpleDateTimeFormat>(pattern, localeTag, true, err);
     EXPECT_EQ(err, I18nErrorCode::SUCCESS);
     ASSERT_TRUE(patternFormatter != nullptr);
 
@@ -1875,7 +1867,7 @@ HWTEST_F(I18nTest, I18nFuncTest072, TestSize.Level1)
 
     pattern = "'year('y')month('M')day('d')'";
     std::unique_ptr<SimpleDateTimeFormat> formatterWithContent =
-        std::make_unique<SimpleDateTimeFormat>(pattern, intlLocale, true, err);
+        std::make_unique<SimpleDateTimeFormat>(pattern, localeTag, true, err);
     EXPECT_EQ(err, I18nErrorCode::SUCCESS);
     ASSERT_TRUE(formatterWithContent != nullptr);
     result = formatterWithContent->Format(milliseconds);
@@ -1883,11 +1875,11 @@ HWTEST_F(I18nTest, I18nFuncTest072, TestSize.Level1)
 
     pattern = "y''Md";
     std::unique_ptr<SimpleDateTimeFormat> formatterInvalidPattern =
-        std::make_unique<SimpleDateTimeFormat>(pattern, intlLocale, true, err);
+        std::make_unique<SimpleDateTimeFormat>(pattern, localeTag, true, err);
     EXPECT_EQ(err, I18nErrorCode::INVALID_DATE_TIME_FORMAT_PATTERN);
 
     std::unique_ptr<SimpleDateTimeFormat> formatterWithEmptyPattern =
-        std::make_unique<SimpleDateTimeFormat>("", intlLocale, true, err);
+        std::make_unique<SimpleDateTimeFormat>("", localeTag, true, err);
     EXPECT_EQ(err, I18nErrorCode::INVALID_DATE_TIME_FORMAT_PATTERN);
 }
 
@@ -1898,14 +1890,11 @@ HWTEST_F(I18nTest, I18nFuncTest072, TestSize.Level1)
  */
 HWTEST_F(I18nTest, I18nFuncTest073, TestSize.Level1)
 {
-    std::unordered_map<std::string, std::string> configs;
-    std::string errMessage;
-    std::shared_ptr<IntlLocale> intlLocale = std::make_shared<IntlLocale>("ar", configs, errMessage);
-    ASSERT_TRUE(intlLocale != nullptr);
+    std::string localeTag = "ar";
     std::string path = "data>log>faultlog";
     char delimiter = '>';
     std::string errorCode;
-    std::string result = LocaleConfig::GetUnicodeWrappedFilePath(path, delimiter, intlLocale, errorCode);
+    std::string result = LocaleConfig::GetUnicodeWrappedFilePath(path, delimiter, localeTag, errorCode);
     EXPECT_EQ(result, "\u200f\u200edata\u200e\u200f>\u200elog\u200e\u200f>\u200efaultlog\u200e");
 }
 

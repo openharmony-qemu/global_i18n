@@ -272,9 +272,9 @@ std::unique_ptr<SimpleDateTimeFormat> SimpleDateTimeFormatAddon::InitSimpleDateT
         return std::make_unique<SimpleDateTimeFormat>(skeleton, localeInfo, isBestPattern, errCode);
     }
 
-    if (VariableConvertor::GetLocaleType(env, locale) == LocaleType::INTL_LOCALE) {
-        std::shared_ptr<IntlLocale> intllocale = VariableConvertor::ParseIntlLocale(env, locale);
-        return std::make_unique<SimpleDateTimeFormat>(skeleton, intllocale, isBestPattern, errCode);
+    if (VariableConvertor::GetLocaleType(env, locale) == LocaleType::BUILTINS_LOCALE) {
+        std::string localeTag = VariableConvertor::ParseBuiltinsLocale(env, locale);
+        return std::make_unique<SimpleDateTimeFormat>(skeleton, localeTag, isBestPattern, errCode);
     } else if (VariableConvertor::GetLocaleType(env, locale) == LocaleType::LOCALE_INFO) {
         std::shared_ptr<LocaleInfo> localeInfo = VariableConvertor::ParseLocaleInfo(env, locale);
         return std::make_unique<SimpleDateTimeFormat>(skeleton, localeInfo, isBestPattern, errCode);

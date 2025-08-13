@@ -37,15 +37,12 @@ SimpleNumberFormat::SimpleNumberFormat(const std::string& skeleton, std::shared_
     SimpleNumberFormat::InitSimpleNumberFormat(skeleton, locale, errCode);
 }
 
-SimpleNumberFormat::SimpleNumberFormat(const std::string& skeleton, std::shared_ptr<IntlLocale> intlLocale,
+SimpleNumberFormat::SimpleNumberFormat(const std::string& skeleton, const std::string& localeTag,
     I18nErrorCode& errCode)
 {
-    std::string locale;
-    if (intlLocale == nullptr) {
+    std::string locale = localeTag;
+    if (locale.empty()) {
         locale = LocaleConfig::GetEffectiveLocale();
-    } else {
-        std::string errMessage;
-        locale = intlLocale->ToString(errMessage);
     }
     SimpleNumberFormat::InitSimpleNumberFormat(skeleton, locale, errCode);
 }

@@ -1152,7 +1152,7 @@ napi_value I18nSystemAddon::GetSimplifiedLanguage(napi_env env, napi_callback_in
 napi_value I18nSystemAddon::GetSystemLocaleInstance(napi_env env, napi_callback_info info)
 {
     std::string locale = LocaleConfig::GetSystemLocaleInstanceTag();
-    return VariableConvertor::CreateIntlLocaleObject(env, locale);
+    return VariableConvertor::CreateBuiltinsLocaleObject(env, locale);
 }
 
 napi_value I18nSystemAddon::GetSystemCollations(napi_env env, napi_callback_info info)

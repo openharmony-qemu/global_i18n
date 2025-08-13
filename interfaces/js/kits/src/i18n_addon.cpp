@@ -821,9 +821,9 @@ std::string I18nAddon::GetUnicodeWrappedFilePathInner(napi_env env, napi_value l
         return LocaleConfig::GetUnicodeWrappedFilePath(path, delimiter, localeInfo, errorCode);
     }
 
-    if (VariableConvertor::GetLocaleType(env, locale) == LocaleType::INTL_LOCALE) {
-        std::shared_ptr<IntlLocale> intllocale = VariableConvertor::ParseIntlLocale(env, locale);
-        return LocaleConfig::GetUnicodeWrappedFilePath(path, delimiter, intllocale, errorCode);
+    if (VariableConvertor::GetLocaleType(env, locale) == LocaleType::BUILTINS_LOCALE) {
+        std::string localeTag = VariableConvertor::ParseBuiltinsLocale(env, locale);
+        return LocaleConfig::GetUnicodeWrappedFilePath(path, delimiter, localeTag, errorCode);
     } else if (VariableConvertor::GetLocaleType(env, locale) == LocaleType::LOCALE_INFO) {
         std::shared_ptr<LocaleInfo> localeInfo = VariableConvertor::ParseLocaleInfo(env, locale);
         return LocaleConfig::GetUnicodeWrappedFilePath(path, delimiter, localeInfo, errorCode);
