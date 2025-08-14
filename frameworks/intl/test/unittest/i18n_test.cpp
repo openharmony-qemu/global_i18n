@@ -1653,6 +1653,9 @@ HWTEST_F(I18nTest, I18nFuncTest066, TestSize.Level1)
     std::string typeName = LocaleConfig::GetTemperatureName(type);
     EXPECT_EQ(typeName, "kelvin");
 
+    type = LocaleConfig::GetTemperatureTypeFromLocale("zh-Hans-CN-u-mu-kelvin");
+    EXPECT_EQ(type, TemperatureType::KELVIN);
+
     WeekDay weekDayType = LocaleConfig::GetFirstDayOfWeek();
     EXPECT_EQ(weekDayType, WeekDay::SUN);
 
@@ -1911,7 +1914,7 @@ HWTEST_F(I18nTest, I18nFuncTest074, TestSize.Level1)
 
     I18nCalendar defaultCalendar("zh-Hans-CN", CalendarType::CHINESE);
     int32_t firstDayOfWeek = defaultCalendar.GetFirstDayOfWeek();
-    EXPECT_EQ(firstDayOfWeek, 5);
+    EXPECT_EQ(firstDayOfWeek, 1);
     defaultCalendar.SetFirstDayOfWeek(6);
     firstDayOfWeek = defaultCalendar.GetFirstDayOfWeek();
     EXPECT_EQ(firstDayOfWeek, 6);

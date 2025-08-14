@@ -698,9 +698,9 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0067, TestSize.Level1)
     std::string systemLanguage = LocaleConfig::GetSystemLanguage();
     std::string systemLocale = LocaleConfig::GetSystemLocale();
     LocaleConfig::SetSystemLanguage("zh-Hans");
-    LocaleConfig::SetSystemLocale("zh-Hans-CN-u-ms-ussystem-mu-celsius");
+    LocaleConfig::SetSystemLocale("zh-Hans-CN-u-ms-ussystem-mu-kelvin");
 
-    std::vector<std::string> locales { "en-Latn-US-u-mu-kelvin" };
+    std::vector<std::string> locales { "en-Latn-US-u-mu-celsius" };
     map<string, string> options = {
         { "style", "unit" },
         { "unit", "kelvin" },
@@ -759,6 +759,18 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0068, TestSize.Level1)
     options = { { "style", "currency" } };
     std::string checkCurrencyMsg = NumberFormat::CheckNumberFormatOptions(options, code);
     EXPECT_EQ(checkCurrencyMsg, "style is currency but currency is undefined");
+}
+
+/**
+ * @tc.name: NumberFormatFuncTest0069
+ * @tc.desc: Test Intl NumberFormat
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0069, TestSize.Level1)
+{
+    std::pair<std::string, std::string> numberPattern = { "", "," };
+    std::string sample = NumberFormat::GetNumberPatternSample("ar-CN-u-nu-latn", numberPattern);
+    EXPECT_EQ(sample, "12345,67");
 }
 } // namespace I18n
 } // namespace Global

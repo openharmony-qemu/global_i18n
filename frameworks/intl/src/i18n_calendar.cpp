@@ -371,18 +371,12 @@ void I18nCalendar::InitFirstDayOfWeek(const std::string& localeTag)
         return;
     }
     std::string param = LocaleConfig::QueryExtParam(localeTag, "fw", "-u-");
-    if (!param.empty()) {
-        if (WEEK_DAY_STR_TO_ICU.find(param) != WEEK_DAY_STR_TO_ICU.end()) {
-            icuCalendar->setFirstDayOfWeek(WEEK_DAY_STR_TO_ICU[param]);
-        }
+    if (param.empty()) {
         return;
     }
-    WeekDay weekDay = LocaleConfig::GetFirstDayOfWeek();
-    auto iter = WEEK_DAY_TO_ICU.find(weekDay);
-    if (iter == WEEK_DAY_TO_ICU.end()) {
-        return;
+    if (WEEK_DAY_STR_TO_ICU.find(param) != WEEK_DAY_STR_TO_ICU.end()) {
+        icuCalendar->setFirstDayOfWeek(WEEK_DAY_STR_TO_ICU[param]);
     }
-    icuCalendar->setFirstDayOfWeek(iter->second);
 }
 } // namespace I18n
 } // namespace Global
