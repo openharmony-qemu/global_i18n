@@ -296,8 +296,8 @@ bool VariableConverter::ParseStringArray(ani_env *env, ani_object obj, std::vect
         return false;
     }
 
-    ani_double length;
-    if (ANI_OK != env->Object_CallMethod_Double(obj, getLengthMethod, &length)) {
+    ani_int length;
+    if (ANI_OK != env->Object_CallMethod_Int(obj, getLengthMethod, &length)) {
         HILOG_ERROR_I18N("Get 'length' failed");
         return false;
     }
@@ -389,8 +389,8 @@ std::vector<std::string> VariableConverter::GetLocaleTags(ani_env *env, ani_obje
         return localeTags;
     }
 
-    ani_double length;
-    if (ANI_OK != env->Object_CallMethod_Double(locale, getLengthMethod, &length)) {
+    ani_int length;
+    if (ANI_OK != env->Object_CallMethod_Int(locale, getLengthMethod, &length)) {
         HILOG_ERROR_I18N("Get 'length' failed");
         return localeTags;
     }
