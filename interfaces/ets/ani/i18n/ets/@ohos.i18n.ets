@@ -153,18 +153,10 @@ namespace i18n {
         unit?: TextStyle;
     }
 
-    export class StyledNumberFormatOptionsInner implements StyledNumberFormatOptions {
-        integer?: TextStyle;
-        decimal?: TextStyle;
-        fraction?: TextStyle;
-        unit?: TextStyle;
-    }
-
-    class StyleOptionsInner {
-        start?: int;
-        length?: int;
-        styledKey: StyledStringKey;
-        styledValue: TextStyle;
+    class StyledPartInner {
+        start: int;
+        length: int;
+        type: string;
     }
 
     export class System {
@@ -463,6 +455,7 @@ namespace i18n {
         static { loadLibrary("i18n_ani.z"); }
 
         private nativeStyledNumberFormat: long = 0;
+        private styledOptions: StyledNumberFormatOptions = {};
 
         constructor(context: long) {
             if (this.nativeStyledNumberFormat == 0) {
@@ -471,32 +464,56 @@ namespace i18n {
         }
 
         constructor(numberFormat: intl.NumberFormat | SimpleNumberFormat, options?: StyledNumberFormatOptions) {
-            this.nativeStyledNumberFormat = StyledNumberFormat.create(numberFormat, options).nativeStyledNumberFormat;
+            this.nativeStyledNumberFormat = StyledNumberFormat.create(numberFormat).nativeStyledNumberFormat;
+            if (options != undefined) {
+                this.styledOptions = options;
+            }
         }
 
-        native static create(numberFormat: intl.NumberFormat | SimpleNumberFormat,
-            options?: StyledNumberFormatOptions): StyledNumberFormat;
+        native static create(numberFormat: intl.NumberFormat | SimpleNumberFormat): StyledNumberFormat;
         native getFormattedNumber(value: double): string;
-        native getStyle(value: double): Array<StyleOptionsInner>;
+        native getStyle(value: double): Array<StyledPartInner>;
         format(value: double): StyledString {
             let str = this.getFormattedNumber(value);
             let style = this.getStyle(value);
             let option: Array<StyleOptions> = new Array<StyleOptions>();
             for (let i = 0; i < style.length; i++) {
-                let textStyle: TextStyle = {
-                    fontColor: style[i].styledValue.fontColor,
-                    fontFamily: style[i].styledValue.fontFamily,
-                    fontSize: style[i].styledValue.fontSize,
-                    fontWeight: style[i].styledValue.fontWeight,
-                    fontStyle: style[i].styledValue.fontStyle
-                };
-                let styleOption: StyleOptions = {
-                    start: style[i].start,
-                    length: style[i].length,
-                    styledKey: style[i].styledKey,
-                    styledValue: textStyle
-                };
-                option.push(styleOption);
+                if (style[i].type == 'integer' && this.styledOptions.integer != undefined) {
+                    let styleOption: StyleOptions = {
+                        start: style[i].start,
+                        length: style[i].length,
+                        styledKey: StyledStringKey.FONT,
+                        styledValue: this.styledOptions.integer as TextStyle
+                    };
+                    option.push(styleOption);
+                }
+                if (style[i].type == 'decimal' && this.styledOptions.decimal != undefined) {
+                    let styleOption: StyleOptions = {
+                        start: style[i].start,
+                        length: style[i].length,
+                        styledKey: StyledStringKey.FONT,
+                        styledValue: this.styledOptions.decimal as TextStyle
+                    };
+                    option.push(styleOption);
+                }
+                if (style[i].type == 'fraction' && this.styledOptions.fraction != undefined) {
+                    let styleOption: StyleOptions = {
+                        start: style[i].start,
+                        length: style[i].length,
+                        styledKey: StyledStringKey.FONT,
+                        styledValue: this.styledOptions.fraction as TextStyle
+                    };
+                    option.push(styleOption);
+                }
+                if (style[i].type == 'unit' && this.styledOptions.unit != undefined) {
+                    let styleOption: StyleOptions = {
+                        start: style[i].start,
+                        length: style[i].length,
+                        styledKey: StyledStringKey.FONT,
+                        styledValue: this.styledOptions.unit as TextStyle
+                    };
+                    option.push(styleOption);
+                }
             }
             return new StyledString(str, option);
         }
