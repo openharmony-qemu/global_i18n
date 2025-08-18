@@ -27,17 +27,15 @@ namespace I18n {
 class I18nStyledNumberFormatAddon {
 public:
     static I18nStyledNumberFormatAddon* UnwrapAddon(ani_env *env, ani_object object);
-    static ani_object Create(ani_env *env, [[maybe_unused]] ani_object object,
-        ani_object numberFormat, ani_object options);
+    static ani_object Create(ani_env *env, [[maybe_unused]] ani_object object, ani_object numberFormat);
     static ani_string GetFormattedNumber(ani_env *env, ani_object object, ani_double value);
     static ani_object GetStyle(ani_env *env, ani_object object, ani_double value);
     static ani_status BindContextStyledNumberFormat(ani_env *env);
-private:
-    void SetTextStyle(ani_env *env, ani_object options, const std::string &optionName);
-    bool InitStyledNumberFormatContent(ani_env *env, NumberFormatAddon* numberFormatAddon,
-        I18nSimpleNumberFormatAddon* simpleNumberFormatAddon, ani_object options);
 
-    std::unordered_map<std::string, ani_ref> styledNumberFormatOptions_ {};
+private:
+    bool InitStyledNumberFormatContent(ani_env *env, NumberFormatAddon* numberFormatAddon,
+        I18nSimpleNumberFormatAddon* simpleNumberFormatAddon);
+
     std::unique_ptr<StyledNumberFormat> styledNumberFormat_ = nullptr;
 };
 } // namespace I18n
