@@ -16,7 +16,7 @@ import("//base/global/i18n/i18n.gni")
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
-module_output_path = "global/i18n"
+module_output_path = "i18n/i18n"
 
 ##############################fuzztest##########################################
 ohos_fuzztest("DateTimeFilterFuzzTest") {

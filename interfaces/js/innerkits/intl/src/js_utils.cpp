@@ -40,7 +40,6 @@ napi_value JSUtils::CreateEmptyArray(napi_env env)
     napi_status status = napi_create_array(env, &result);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("JSUtils::CreateEmptyArray: Failed to create empty array");
-        return result;
     }
     return result;
 }
@@ -51,7 +50,6 @@ napi_value JSUtils::CreateEmptyObject(napi_env env)
     napi_status status = napi_create_object(env, &object);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("JSUtils::CreateEmptyObject: Create empty object failed.");
-        return object;
     }
     return object;
 }

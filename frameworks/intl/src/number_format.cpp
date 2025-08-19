@@ -210,13 +210,13 @@ void NumberFormat::CreateNumberFormatWithDefaultLocale(const std::string &system
     std::map<std::string, std::string> &configs)
 {
     if (!createSuccess) {
-        UErrorCode status = U_ZERO_ERROR;
         std::string curLocale = LocaleConfig::RemoveCustExtParam(systemLocale);
         localeInfo = std::make_unique<LocaleInfo>(curLocale, configs);
         CreateRelativeTimeFormat(systemLocale);
         if (localeInfo != nullptr && localeInfo->InitSuccess()) {
             locale = localeInfo->GetLocale();
             localeBaseName = localeInfo->GetBaseName();
+            UErrorCode status = U_ZERO_ERROR;
             icu::MeasureUnit::getAvailable(unitArray, MAX_UNIT_NUM, status);
             if (U_SUCCESS(status)) {
                 createSuccess = true;
