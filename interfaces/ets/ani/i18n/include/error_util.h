@@ -23,13 +23,13 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 // Common error code
-const int32_t I18N_NO_PERMISSION = 201; // The app don't have requested permission
+const int32_t I18N_NO_PERMISSION = 201; // The app doesn't have requested permission
 const int32_t I18N_NOT_SYSTEM_APP = 202; // The app isn't a system app
 const int32_t I18N_NOT_FOUND = 401; // Input parameter is missing
 
 // I18N error code
-const int32_t I18N_NOT_VALID = 890001; // Unspported para value
-const int32_t I18N_OPTION_NOT_VALID = 890002; // Unspported option value
+const int32_t I18N_NOT_VALID = 890001; // Unsupported para value
+const int32_t I18N_OPTION_NOT_VALID = 890002; // Unsupported option value
 const size_t FUNC_ARGS_COUNT = 2; // Function input parameter count
 
 class ErrorUtil {
