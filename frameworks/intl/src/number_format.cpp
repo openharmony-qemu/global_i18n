@@ -229,11 +229,32 @@ NumberFormat::~NumberFormat()
 
 void NumberFormat::InitNumberFormat()
 {
-    icu::number::UnlocalizedNumberFormatter formatter = icu::number::NumberFormatter::with();
-    InitProperties(formatter);
-    numberFormat = formatter.locale(locale);
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale icuLocale = icu::Locale::forLanguageTag(effectiveLocale.c_str(), status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("NumberFormat::InitNumberFormat: Create icu::Locale failed.");
+        return;
+    }
+    decimalFormatSymbols = std::make_unique<icu::DecimalFormatSymbols>(icuLocale, status);
+    if (U_FAILURE(status) || decimalFormatSymbols == nullptr) {
+        HILOG_ERROR_I18N("NumberFormat::InitNumberFormat: Create icu::DecimalFormatSymbols failed.");
+        return;
+    }
+    if (!groupingSymbol.empty()) {
+        decimalFormatSymbols->setSymbol(icu::DecimalFormatSymbols::ENumberFormatSymbol::kGroupingSeparatorSymbol,
+            groupingSymbol.c_str());
+    }
+    if (!decimalSymbol.empty()) {
+        decimalFormatSymbols->setSymbol(icu::DecimalFormatSymbols::ENumberFormatSymbol::kDecimalSeparatorSymbol,
+            decimalSymbol.c_str());
+    }
+
+    icu::number::UnlocalizedNumberFormatter tempFormatter = icu::number::NumberFormatter::with();
+    InitProperties(tempFormatter);
+    styleFormatter = tempFormatter;
+    numberFormat = tempFormatter.locale(locale);
     numberRangeFormat = icu::number::NumberRangeFormatter::with()
-        .numberFormatterBoth(formatter)
+        .numberFormatterBoth(tempFormatter)
         .locale(locale);
 }
 
@@ -260,29 +281,10 @@ void NumberFormat::InitProperties(icu::number::UnlocalizedNumberFormatter &forma
 
 void NumberFormat::InitNumberPattern(icu::number::UnlocalizedNumberFormatter &formatter)
 {
-    UErrorCode status = U_ZERO_ERROR;
-    icu::Locale icuLocale = icu::Locale::forLanguageTag(effectiveLocale.c_str(), status);
-    if (U_FAILURE(status)) {
-        HILOG_ERROR_I18N("NumberFormat::InitNumberPattern: Create icu::Locale failed.");
-        return;
-    }
-    icu::DecimalFormatSymbols* decimalFormatSymbols = new icu::DecimalFormatSymbols(icuLocale, status);
-    if (U_FAILURE(status) || decimalFormatSymbols == nullptr) {
-        HILOG_ERROR_I18N("NumberFormat::InitNumberPattern: Create icu::DecimalFormatSymbols failed.");
-        return;
-    }
     if (groupingSymbol.empty()) {
         formatter = formatter.grouping(UNumberGroupingStrategy::UNUM_GROUPING_OFF);
-    } else {
-        decimalFormatSymbols->setSymbol(icu::DecimalFormatSymbols::ENumberFormatSymbol::kGroupingSeparatorSymbol,
-            groupingSymbol.c_str());
-    }
-    if (!decimalSymbol.empty()) {
-        decimalFormatSymbols->setSymbol(icu::DecimalFormatSymbols::ENumberFormatSymbol::kDecimalSeparatorSymbol,
-            decimalSymbol.c_str());
     }
     formatter = formatter.symbols(*decimalFormatSymbols);
-    delete decimalFormatSymbols;
 }
 
 void NumberFormat::InitCurrencyProperties(icu::number::UnlocalizedNumberFormatter &formatter)
@@ -960,9 +962,11 @@ std::string NumberFormat::FormatRange(double start, double end)
         HILOG_ERROR_I18N("FormatRange: parameter:end less then parameter:start");
         return PseudoLocalizationProcessor("");
     }
+    icu::number::LocalizedNumberRangeFormatter tempNumberRangeFormat = icu::number::NumberRangeFormatter::with()
+        .numberFormatterBoth(styleFormatter)
+        .locale(locale);
     UErrorCode status = U_ZERO_ERROR;
-    icu::number::FormattedNumberRange numberRange =
-        numberRangeFormat.formatFormattableRange(start, end, status);
+    icu::number::FormattedNumberRange numberRange = tempNumberRangeFormat.formatFormattableRange(start, end, status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("FormatRange: formatFormattableRange failed.");
         return PseudoLocalizationProcessor("");
@@ -983,9 +987,12 @@ std::string NumberFormat::FormatJsRange(double first, double second)
         HILOG_ERROR_I18N("FormatRange: init numberRangeFormat failed.");
         return PseudoLocalizationProcessor("");
     }
+    icu::number::LocalizedNumberRangeFormatter tempNumberRangeFormat = icu::number::NumberRangeFormatter::with()
+        .numberFormatterBoth(styleFormatter)
+        .locale(locale);
     UErrorCode status = U_ZERO_ERROR;
     icu::number::FormattedNumberRange formatedNumberRange =
-        numberRangeFormat.formatFormattableRange(first, second, status);
+        tempNumberRangeFormat.formatFormattableRange(first, second, status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("FormatRange: formatFormattableRange failed.");
         return PseudoLocalizationProcessor("");
@@ -1013,9 +1020,12 @@ void NumberFormat::FormatableRangeToParts(const double &first, const double &sec
         HILOG_ERROR_I18N("NumberFormat::FormatableRangeToParts: init numberRangeFormat failed.");
         return;
     }
+    icu::number::LocalizedNumberRangeFormatter tempNumberRangeFormat = icu::number::NumberRangeFormatter::with()
+        .numberFormatterBoth(styleFormatter)
+        .locale(locale);
     UErrorCode status = U_ZERO_ERROR;
     icu::number::FormattedNumberRange numberRange =
-        numberRangeFormat.formatFormattableRange(first, second, status);
+        tempNumberRangeFormat.formatFormattableRange(first, second, status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("NumberFormat::FormatableRangeToParts: formatFormattableRange failed.");
         return;

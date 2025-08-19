@@ -120,8 +120,10 @@ private:
     bool isSetFraction = false;
     std::unique_ptr<LocaleInfo> localeInfo = nullptr;
     std::unique_ptr<RelativeTimeFormat> relativeTimeFormat = nullptr;
+    std::unique_ptr<icu::DecimalFormatSymbols> decimalFormatSymbols = nullptr;
     icu::number::LocalizedNumberFormatter numberFormat;
     icu::number::LocalizedNumberRangeFormatter numberRangeFormat;
+    icu::number::UnlocalizedNumberFormatter styleFormatter;
     icu::number::Notation notation = icu::number::Notation::simple();
     UNumberRoundingPriority roundingPriority = UNumberRoundingPriority::UNUM_ROUNDING_PRIORITY_STRICT;
     UNumberFormatRoundingMode roundingMode = UNumberFormatRoundingMode::UNUM_ROUND_HALFUP;

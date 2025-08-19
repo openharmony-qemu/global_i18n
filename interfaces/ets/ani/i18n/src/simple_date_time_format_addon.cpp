@@ -37,20 +37,17 @@ I18nSimpleDateTimeFormatAddon* I18nSimpleDateTimeFormatAddon::UnwrapAddon(ani_en
 ani_object I18nSimpleDateTimeFormatAddon::GetSimpleDateTimeFormatByPattern(ani_env *env,
     ani_string pattern, ani_object locale)
 {
-    std::shared_ptr<LocaleInfo> localeInfo = nullptr;
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(locale, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("GetSimpleDateTimeFormatByPattern: get locale Reference_IsUndefined failed");
         return nullptr;
     }
+
+    std::string localeTag = "";
     if (!isUndefined) {
-        ani_long ptr;
-        if (ANI_OK != env->Object_GetFieldByName_Long(locale, "nativeLocale", &ptr)) {
-            HILOG_ERROR_I18N("Get Long nativeLocale failed");
-            return nullptr;
-        }
-        localeInfo = reinterpret_cast<LocaleInfoAddon*>(ptr)->GetLocaleInfo();
+        localeTag = VariableConverter::GetLocaleTagFromBuiltinLocale(env, locale);
     }
+    std::shared_ptr<LocaleInfo> localeInfo = localeTag.empty() ? nullptr : std::make_shared<LocaleInfo>(localeTag);
 
     std::unique_ptr<I18nSimpleDateTimeFormatAddon> obj = std::make_unique<I18nSimpleDateTimeFormatAddon>();
     if (obj == nullptr) {
@@ -81,24 +78,20 @@ ani_object I18nSimpleDateTimeFormatAddon::GetSimpleDateTimeFormatByPattern(ani_e
 ani_object I18nSimpleDateTimeFormatAddon::GetSimpleDateTimeFormatBySkeleton(ani_env *env,
     ani_string skeleton, ani_object locale)
 {
-    std::shared_ptr<LocaleInfo> localeInfo = nullptr;
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(locale, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("GetSimpleDateTimeFormatBySkeleton: get locale Reference_IsUndefined failed");
         return nullptr;
     }
+    std::string localeTag = "";
     if (!isUndefined) {
-        ani_long ptr;
-        if (ANI_OK != env->Object_GetFieldByName_Long(locale, "nativeLocale", &ptr)) {
-            HILOG_ERROR_I18N("Get Long nativeLocale failed");
-            return nullptr;
-        }
-        localeInfo = reinterpret_cast<LocaleInfoAddon*>(ptr)->GetLocaleInfo();
+        localeTag = VariableConverter::GetLocaleTagFromBuiltinLocale(env, locale);
     }
+    std::shared_ptr<LocaleInfo> localeInfo = localeTag.empty() ? nullptr : std::make_shared<LocaleInfo>(localeTag);
 
     std::unique_ptr<I18nSimpleDateTimeFormatAddon> obj = std::make_unique<I18nSimpleDateTimeFormatAddon>();
     if (obj == nullptr) {
-        HILOG_ERROR_I18N("SimpleDateTimeFormatConstructor: Cerate I18nSimpleDateTimeFormatAddon failed.");
+        HILOG_ERROR_I18N("GetSimpleDateTimeFormatBySkeleton: Create I18nSimpleDateTimeFormatAddon failed.");
         return nullptr;
     }
 

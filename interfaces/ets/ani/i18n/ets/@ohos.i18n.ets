@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-import intl from '@ohos.intl';
 import { TextStyle, StyledString, StyleOptions, StyledStringKey } from 'arkui.component.styledString';
 
 namespace i18n {
@@ -207,6 +206,7 @@ namespace i18n {
         native static getBestMatchLocale(locale: string, localeList: string[]): string;
         native static getThreeLetterLanguage(locale: string): string;
         native static getThreeLetterRegion(locale: string): string;
+        native static getUnicodeWrappedFilePath(path: string, delimiter?: string, locale?: Intl.Locale): string;
     }
 
     export class PhoneNumberFormat {
@@ -463,14 +463,14 @@ namespace i18n {
             }
         }
 
-        constructor(numberFormat: intl.NumberFormat | SimpleNumberFormat, options?: StyledNumberFormatOptions) {
+        constructor(numberFormat: Intl.NumberFormat | SimpleNumberFormat, options?: StyledNumberFormatOptions) {
             this.nativeStyledNumberFormat = StyledNumberFormat.create(numberFormat).nativeStyledNumberFormat;
             if (options != undefined) {
                 this.styledOptions = options;
             }
         }
 
-        native static create(numberFormat: intl.NumberFormat | SimpleNumberFormat): StyledNumberFormat;
+        native static create(numberFormat: Intl.NumberFormat | SimpleNumberFormat): StyledNumberFormat;
         native getFormattedNumber(value: double): string;
         native getStyle(value: double): Array<StyledPartInner>;
         format(value: double): StyledString {
@@ -525,4 +525,9 @@ namespace i18n {
     export native function getLineInstance(locale: string): BreakIterator;
     export native function getInstance(locale?: string): IndexUtil;
     export native function getTimeZone(zoneID?: string): TimeZone;
+    export native function getSimpleDateTimeFormatByPattern(pattern: string,
+        locale?: Intl.Locale): SimpleDateTimeFormat;
+    export native function getSimpleDateTimeFormatBySkeleton(skeleton: string,
+        locale?: Intl.Locale): SimpleDateTimeFormat;
+    export native function getSimpleNumberFormatBySkeleton(skeleton: string, locale?: Intl.Locale): SimpleNumberFormat;
 }
