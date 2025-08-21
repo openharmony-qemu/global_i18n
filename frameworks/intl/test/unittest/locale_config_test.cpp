@@ -539,14 +539,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest024, TestSize.Level1)
     EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
     EXPECT_EQ(usingCollation, "stroke");
     std::string systemLocaleInstanceTag = LocaleConfig::GetSystemLocaleInstanceTag();
-    EXPECT_EQ(systemLocaleInstanceTag, "zh-Hant-HK-u-co-stroke");
-
-    LocaleConfig::SetSystemRegion("TW");
-    errCode = LocaleConfig::GetUsingCollation(usingCollation);
-    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
-    EXPECT_EQ(usingCollation, "zhuyin");
-    systemLocaleInstanceTag = LocaleConfig::GetSystemLocaleInstanceTag();
-    EXPECT_EQ(systemLocaleInstanceTag, "zh-Hant-TW-u-co-zhuyin");
+    EXPECT_EQ(systemLocaleInstanceTag, "zh-Hant-HK");
 
     LocaleConfig::SetSystemLanguage("en-Latn-US");
     errCode = LocaleConfig::GetSystemCollations(systemCollations);
@@ -557,7 +550,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest024, TestSize.Level1)
     EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
     EXPECT_EQ(usingCollation, "lower");
     systemLocaleInstanceTag = LocaleConfig::GetSystemLocaleInstanceTag();
-    EXPECT_EQ(systemLocaleInstanceTag, "en-Latn-TW-u-kf-lower");
+    EXPECT_EQ(systemLocaleInstanceTag, "en-Latn-HK");
 
     LocaleConfig::SetSystemLanguage("zh-Hans");
     errCode = LocaleConfig::GetSystemCollations(systemCollations);
@@ -567,7 +560,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest024, TestSize.Level1)
     EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
     EXPECT_EQ(usingCollation, "");
     systemLocaleInstanceTag = LocaleConfig::GetSystemLocaleInstanceTag();
-    EXPECT_EQ(systemLocaleInstanceTag, "zh-Hans-TW");
+    EXPECT_EQ(systemLocaleInstanceTag, "zh-Hans-HK");
     LocaleConfig::SetSystemLanguage(systemLanguage);
     LocaleConfig::SetSystemLocale(systemLocale);
 }
@@ -592,7 +585,7 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest025, TestSize.Level1)
     errCode = LocaleConfig::SetSystemCollation("upper");
     EXPECT_EQ(errCode, I18nErrorCode::INVALID_PARAM);
     systemLocaleInstanceTag = LocaleConfig::GetSystemLocaleInstanceTag();
-    EXPECT_EQ(systemLocaleInstanceTag, "zh-Hant-HK-u-co-stroke");
+    EXPECT_EQ(systemLocaleInstanceTag, "zh-Hant-HK");
 
     errCode = LocaleConfig::SetSystemCollation("pinyin");
     EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
@@ -733,6 +726,9 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest029, TestSize.Level1)
 
     errCode = LocaleConfig::SetSystemMeasurement("Invalid");
     EXPECT_EQ(errCode, I18nErrorCode::INVALID_PARAM);
+
+    std::string measurement = LocaleConfig::GetMeasurementFromLocale("zh-Hans-CN-u-ms-uksystem");
+    EXPECT_EQ(measurement, "uksystem");
 
     LocaleConfig::SetSystemLanguage(systemLanguage);
     LocaleConfig::SetSystemLocale(systemLocale);
