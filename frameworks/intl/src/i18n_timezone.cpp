@@ -697,11 +697,11 @@ bool I18nTimeZone::InitTimezoneCategoryMap()
         return true;
     }
     const char* numTimeZoneCfgPath = GetNumTimezoneCfgPath();
-    if (numTimeZoneCfgPath == nullptr) {
-        HILOG_ERROR_I18N("I18nTimeZone::InitTimezoneCategoryMap get NumTimezone config path failed.");
-        return false;
+    bool initStatus = ReadNumTimezoneConfigFile(numTimeZoneCfgPath);
+    if (initStatus) {
+        numTimezoneCategoryInitialized = true;
     }
-    return ReadNumTimezoneConfigFile(numTimeZoneCfgPath);
+    return initStatus;
 }
 
 bool I18nTimeZone::ReadNumTimezoneConfigFile(const char* configPath)
@@ -712,7 +712,7 @@ bool I18nTimeZone::ReadNumTimezoneConfigFile(const char* configPath)
     }
     std::string absPath = GetAbsoluteFilePath(configPath);
     if (absPath.empty()) {
-        HILOG_ERROR_I18N("I18nTimeZone::ReadNumTimezoneConfigFile: get %{public}s absolute path failed.", configPath);
+        HILOG_ERROR_I18N("I18nTimeZone::ReadNumTimezoneConfigFile: get absolute path failed.");
         return false;
     }
     FILE* configFile = fopen(absPath.c_str(), "r");
@@ -741,7 +741,6 @@ bool I18nTimeZone::ReadNumTimezoneConfigFile(const char* configPath)
         tzId = trim(tzId);
         AddNumTimezoneCategoryMap(curIndex, numStr, tzId);
     }
-    numTimezoneCategoryInitialized = true;
     int ret = fclose(configFile);
     if (ret != 0) {
         HILOG_ERROR_I18N("I18nTimeZone::ReadNumTimezoneConfigFile close %{public}s file error.", absPath.c_str());

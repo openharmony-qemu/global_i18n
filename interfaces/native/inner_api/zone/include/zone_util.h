@@ -181,7 +181,7 @@ private:
     static const char *CODE_TAG;
     static const char *TIMEZONE_KEY;
     static constexpr int SYS_PARAM_LEN = 128;
-    static constexpr size_t READ_BUFFER_SIZE = 1024;
+    static constexpr size_t READ_BUFFER_SIZE = 374;
     static const char *TZLOOKUP_FILE_PATH;
 };
 } // namespace I18n

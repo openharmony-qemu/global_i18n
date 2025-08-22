@@ -87,7 +87,7 @@ private:
     static std::map<int, std::string> categoryNum2TimezoneES;
     static std::map<std::string, std::string> BEST_MATCH_LOCALE;
     static constexpr int SYS_PARAM_LEN = 128;
-    static constexpr size_t READ_BUFFER_SIZE = 1024;
+    static constexpr size_t READ_BUFFER_SIZE = 374;
     icu::TimeZone *timezone = nullptr;
     static std::mutex matchLocaleMutex;
     static std::mutex initZoneInfoMutex;

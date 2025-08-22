@@ -15,6 +15,7 @@
 
 #include <filesystem>
 #include <sys/stat.h>
+#include <unistd.h>
 #include "i18n_hilog.h"
 #include "i18n_timezone.h"
 #include "ohos/init_data.h"
@@ -294,16 +295,13 @@ const char *ZoneUtil::GetTZLookupDataPath()
 
 const char *ZoneUtil::GetCountryCodeTimezoneCfgPath()
 {
-    using std::filesystem::directory_iterator;
-    struct stat s;
-    if (stat(DISTRO_DEFAULT_ZONE_CONFIG_PATH, &s) == 0) {
+    if (access(DISTRO_DEFAULT_ZONE_CONFIG_PATH, R_OK) != -1) {
         return DISTRO_DEFAULT_ZONE_CONFIG_PATH;
     }
-    if (stat(DEFAULT_ZONE_CONFIG_PATH, &s) == 0) {
+    if (access(DEFAULT_ZONE_CONFIG_PATH, R_OK) != -1) {
         return DEFAULT_ZONE_CONFIG_PATH;
-    } else {
-        return nullptr;
     }
+    return nullptr;
 }
 
 bool ZoneUtil::IsFindCountry(xmlDocPtr &doc, xmlNodePtr &cur, xmlNodePtr &value,
@@ -545,11 +543,11 @@ bool ZoneUtil::InitDefaultMap()
         return true;
     }
     const char* configPath = GetCountryCodeTimezoneCfgPath();
-    if (configPath == nullptr) {
-        HILOG_ERROR_I18N("ZoneUtil::InitDefaultMap get countryCodeTimezone config path failed.");
-        return false;
+    bool initStatus = ReadDefaultTimezoneConfigFile(configPath);
+    if (initStatus) {
+        defaultMapInitialized = true;
     }
-    return ReadDefaultTimezoneConfigFile(configPath);
+    return initStatus;
 }
 
 bool ZoneUtil::ReadDefaultTimezoneConfigFile(const char* configPath)
@@ -560,7 +558,7 @@ bool ZoneUtil::ReadDefaultTimezoneConfigFile(const char* configPath)
     }
     std::string absPath = GetAbsoluteFilePath(configPath);
     if (absPath.empty()) {
-        HILOG_ERROR_I18N("ZoneUtil::ReadDefaultTimezoneConfigFile: get %{public}s absolute path failed.", configPath);
+        HILOG_ERROR_I18N("ZoneUtil::ReadDefaultTimezoneConfigFile: get absolute path failed.");
         return false;
     }
     FILE* configFile = fopen(absPath.c_str(), "r");
@@ -571,11 +569,11 @@ bool ZoneUtil::ReadDefaultTimezoneConfigFile(const char* configPath)
     char buffer[READ_BUFFER_SIZE];
     while (fgets(buffer, READ_BUFFER_SIZE - 1, configFile) != nullptr) {
         std::string line(buffer);
-        if (line.find(":") == std::string::npos || line.find(";") == std::string::npos) {
-            continue;
-        }
         size_t start = line.find_first_of(":");
         size_t end = line.find_first_of(";");
+        if (start == std::string::npos || end == std::string::npos) {
+            continue;
+        }
         if (end < start + 1) {
             continue;
         }
@@ -583,7 +581,6 @@ bool ZoneUtil::ReadDefaultTimezoneConfigFile(const char* configPath)
         std::string tzId = line.substr(start + 1, end - start - 1);
         defaultMap.insert(std::make_pair(countryCode, tzId));
     }
-    defaultMapInitialized = true;
     int ret = fclose(configFile);
     if (ret != 0) {
         HILOG_ERROR_I18N("ZoneUtil::ReadDefaultTimezoneConfigFile close %{public}s file error.", absPath.c_str());
