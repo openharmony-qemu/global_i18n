@@ -54,6 +54,7 @@ ohos_shared_library("i18n_ani") {
     "libpng:libpng",
     "libxml2:libxml2",
     "runtime_core:ani",
+    "runtime_core:ani_helpers",
   ]
 
   defines = []

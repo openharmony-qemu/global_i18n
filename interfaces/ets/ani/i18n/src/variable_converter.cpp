@@ -30,6 +30,8 @@
 #include "styled_number_format_addon.h"
 #include "system_locale_manager_addon.h"
 
+#include <ani_signature_builder.h>
+
 using namespace OHOS;
 using namespace Global;
 using namespace I18n;
@@ -317,7 +319,8 @@ bool VariableConverter::ParseStringArray(ani_env *env, ani_object obj, std::vect
     }
 
     ani_method getLengthMethod;
-    if (ANI_OK != env->Class_FindMethod(cls, "<get>length", nullptr, &getLengthMethod)) {
+    if (ANI_OK != env->Class_FindMethod(cls, arkts::ani_signature::Builder::BuildGetterName("length").c_str(),
+        nullptr, &getLengthMethod)) {
         HILOG_ERROR_I18N("Find getter 'length' failed");
         return false;
     }
@@ -410,7 +413,8 @@ std::vector<std::string> VariableConverter::GetLocaleTags(ani_env *env, ani_obje
     }
 
     ani_method getLengthMethod;
-    if (ANI_OK != env->Class_FindMethod(cls, "<get>length", nullptr, &getLengthMethod)) {
+    if (ANI_OK != env->Class_FindMethod(cls, arkts::ani_signature::Builder::BuildGetterName("length").c_str(),
+        nullptr, &getLengthMethod)) {
         HILOG_ERROR_I18N("Find getter 'length' failed");
         return localeTags;
     }
