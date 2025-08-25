@@ -146,7 +146,7 @@ namespace i18n {
     }
 
     export class System {
-        static { loadLibrary("i18n_ani.z"); }
+        static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
 
         native static getDisplayCountry(country: string, locale: string, sentenceCase?: boolean): string;
         native static getDisplayLanguage(language: string, locale: string, sentenceCase?: boolean): string;
@@ -184,7 +184,7 @@ namespace i18n {
     }
 
     export class I18NUtil {
-        static { loadLibrary("i18n_ani.z"); }
+        static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
 
         native static unitConvert(fromUnit: UnitInfo, toUnit: UnitInfo,
             value: number, locale: string, style?: string): string;
@@ -196,7 +196,7 @@ namespace i18n {
     }
 
     export class PhoneNumberFormat {
-        static { loadLibrary("i18n_ani.z"); }
+        static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
 
         private nativePhoneNumberFormat: long = 0;
 
@@ -217,7 +217,7 @@ namespace i18n {
     }
 
     export class Calendar {
-        static { loadLibrary("i18n_ani.z"); }
+        static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
 
         private nativeCalendar: long = 0;
 
@@ -245,7 +245,7 @@ namespace i18n {
     }
 
     export class BreakIterator {
-        static { loadLibrary("i18n_ani.z"); }
+        static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
 
         private nativeBreakIterator: long = 0;
 
@@ -267,7 +267,7 @@ namespace i18n {
     }
 
     export class IndexUtil {
-        static { loadLibrary("i18n_ani.z"); }
+        static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
 
         private nativeIndexUtil: long = 0;
 
@@ -283,7 +283,7 @@ namespace i18n {
     }
 
     export class Unicode {
-        static { loadLibrary("i18n_ani.z"); }
+        static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
 
         native static isDigit(ch: string): boolean;
         native static isSpaceChar(ch: string): boolean;
@@ -297,7 +297,7 @@ namespace i18n {
     }
 
     export class TimeZone {
-        static { loadLibrary("i18n_ani.z"); }
+        static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
 
         private nativeTimeZone: long = 0;
 
@@ -319,7 +319,7 @@ namespace i18n {
     }
 
     export class Transliterator {
-        static { loadLibrary("i18n_ani.z"); }
+        static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
 
         private nativeTransliterator: long = 0;
 
@@ -335,7 +335,7 @@ namespace i18n {
     }
 
     export class Normalizer {
-        static { loadLibrary("i18n_ani.z"); }
+        static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
 
         private nativeNormalizer: long = 0;
 
@@ -350,7 +350,7 @@ namespace i18n {
     }
 
     export class SystemLocaleManager {
-        static { loadLibrary("i18n_ani.z"); }
+        static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
 
         private nativeSysLocaleMgr: long = 0;
 
@@ -371,7 +371,7 @@ namespace i18n {
     }
 
     export class HolidayManager {
-        static { loadLibrary("i18n_ani.z"); }
+        static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
 
         private nativeHolidayManager: long = 0;
 
@@ -391,7 +391,7 @@ namespace i18n {
     }
 
     export class EntityRecognizer {
-        static { loadLibrary("i18n_ani.z"); }
+        static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
 
         private nativeEntityRecognizer: long = 0;
 
@@ -410,7 +410,7 @@ namespace i18n {
     }
 
     export class SimpleDateTimeFormat {
-        static { loadLibrary("i18n_ani.z"); }
+        static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
 
         private nativeSimpleDateTimeFormat: long = 0;
 
@@ -424,7 +424,7 @@ namespace i18n {
     }
 
     export class SimpleNumberFormat {
-        static { loadLibrary("i18n_ani.z"); }
+        static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
 
         private nativeSimpleNumberFormat: long = 0;
 
@@ -437,7 +437,7 @@ namespace i18n {
         native format(value: number): string;
     }
 
-    loadLibrary("i18n_ani.z");
+    loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n");
     export native function getCalendar(locale: string, type?: string): Calendar;
     export native function isRTL(locale: string): boolean;
     export native function getLineInstance(locale: string): BreakIterator;
