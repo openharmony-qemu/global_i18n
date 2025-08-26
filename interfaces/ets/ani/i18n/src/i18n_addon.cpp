@@ -575,7 +575,7 @@ ani_string I18nAddon::GetUnicodeWrappedFilePath(ani_env *env, [[maybe_unused]] a
     char delimiterChar = PATH_SEPARATOR;
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(delimiter, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("GetUnicodeWrappedFilePath: get delimiter Reference_IsUndefined failed");
         return nullptr;
     }
     if (!isUndefined) {
@@ -588,22 +588,17 @@ ani_string I18nAddon::GetUnicodeWrappedFilePath(ani_env *env, [[maybe_unused]] a
         }
     }
 
-    LocaleInfoAddon* obj = nullptr;
     if (ANI_OK != env->Reference_IsUndefined(locale, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("GetUnicodeWrappedFilePath: get locale Reference_IsUndefined failed");
         return nullptr;
     }
+    std::string localeTag = "";
     if (!isUndefined) {
-        ani_long ptr;
-        if (ANI_OK != env->Object_GetFieldByName_Long(locale, "nativeLocale", &ptr)) {
-            HILOG_ERROR_I18N("Get Long nativeLocale failed");
-            return nullptr;
-        }
-        obj = reinterpret_cast<LocaleInfoAddon*>(ptr);
+        localeTag = VariableConverter::GetLocaleTagFromBuiltinLocale(env, locale);
     }
 
     std::string errorCode;
-    std::shared_ptr<LocaleInfo> localeInfoPtr = obj == nullptr ? nullptr : obj->GetLocaleInfo();
+    std::shared_ptr<LocaleInfo> localeInfoPtr = localeTag.empty() ? nullptr : std::make_shared<LocaleInfo>(localeTag);
     std::string result = LocaleConfig::GetUnicodeWrappedFilePath(VariableConverter::AniStrToString(env, path),
         delimiterChar, localeInfoPtr, errorCode);
     if (!errorCode.empty()) {
@@ -738,6 +733,8 @@ ani_status I18nAddon::BindContextI18NUtil(ani_env *env)
         ani_native_function { "getBestMatchLocale", nullptr, reinterpret_cast<void *>(GetBestMatchLocale) },
         ani_native_function { "getThreeLetterLanguage", nullptr, reinterpret_cast<void *>(GetThreeLetterLanguage) },
         ani_native_function { "getThreeLetterRegion", nullptr, reinterpret_cast<void *>(GetThreeLetterRegion) },
+        ani_native_function { "getUnicodeWrappedFilePath", nullptr,
+            reinterpret_cast<void *>(GetUnicodeWrappedFilePath) },
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
@@ -763,6 +760,12 @@ ani_status I18nAddon::BindContextNamespace(ani_env *env)
             reinterpret_cast<void *>(I18nBreakIteratorAddon::GetLineInstance) },
         ani_native_function { "getInstance", nullptr, reinterpret_cast<void *>(I18nIndexUtilAddon::GetInstance) },
         ani_native_function { "getTimeZone", nullptr, reinterpret_cast<void *>(I18nTimeZoneAddon::GetTimeZone) },
+        ani_native_function { "getSimpleDateTimeFormatByPattern", nullptr,
+            reinterpret_cast<void *>(I18nSimpleDateTimeFormatAddon::GetSimpleDateTimeFormatByPattern) },
+        ani_native_function { "getSimpleDateTimeFormatBySkeleton", nullptr,
+            reinterpret_cast<void *>(I18nSimpleDateTimeFormatAddon::GetSimpleDateTimeFormatBySkeleton) },
+        ani_native_function { "getSimpleNumberFormatBySkeleton", nullptr,
+            reinterpret_cast<void *>(I18nSimpleNumberFormatAddon::GetSimpleNumberFormatBySkeleton) },
     };
     if (ANI_OK != env->Namespace_BindNativeFunctions(ns, methods.data(), methods.size())) {
         HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", nameSpaceName);

@@ -14,7 +14,7 @@
  */
 
 #include "simple_number_format_addon.h"
- 
+
 #include "error_util.h"
 #include "i18n_hilog.h"
 #include "locale_info_addon.h"
@@ -37,20 +37,16 @@ I18nSimpleNumberFormatAddon* I18nSimpleNumberFormatAddon::UnwrapAddon(ani_env *e
 ani_object I18nSimpleNumberFormatAddon::GetSimpleNumberFormatBySkeleton(ani_env *env,
     ani_string skeleton, ani_object locale)
 {
-    std::shared_ptr<LocaleInfo> localeInfo = nullptr;
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(locale, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("GetSimpleNumberFormatBySkeleton: locale Reference_IsUndefined failed");
         return nullptr;
     }
+    std::string localeTag = "";
     if (!isUndefined) {
-        ani_long ptr;
-        if (ANI_OK != env->Object_GetFieldByName_Long(locale, "nativeLocale", &ptr)) {
-            HILOG_ERROR_I18N("Get Long nativeLocale failed");
-            return nullptr;
-        }
-        localeInfo = reinterpret_cast<LocaleInfoAddon*>(ptr)->GetLocaleInfo();
+        localeTag = VariableConverter::GetLocaleTagFromBuiltinLocale(env, locale);
     }
+    std::shared_ptr<LocaleInfo> localeInfo = localeTag.empty() ? nullptr : std::make_shared<LocaleInfo>(localeTag);
 
     std::unique_ptr<I18nSimpleNumberFormatAddon> obj = std::make_unique<I18nSimpleNumberFormatAddon>();
     if (!obj) {

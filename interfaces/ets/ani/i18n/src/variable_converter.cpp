@@ -245,6 +245,32 @@ bool VariableConverter::GetStringMember(ani_env *env, ani_object options, const 
     return true;
 }
 
+std::string VariableConverter::GetLocaleTagFromBuiltinLocale(ani_env *env, ani_object obj)
+{
+    static const char *className = "Lstd/core/Intl/Locale;";
+    ani_class cls;
+    auto status = env->FindClass(className, &cls);
+    if (status != ANI_OK) {
+        HILOG_ERROR_I18N("GetLocaleTagFromBuiltinLocale: Find class Intl.Locale failed: %{public}d", status);
+        return "";
+    }
+
+    ani_method toString;
+    status = env->Class_FindMethod(cls, "toString", ":Lstd/core/String;", &toString);
+    if (status != ANI_OK) {
+        HILOG_ERROR_I18N("GetLocaleTagFromBuiltinLocale: Find method toString failed: %{public}d", status);
+        return "";
+    }
+
+    ani_ref value;
+    status = env->Object_CallMethod_Ref(obj, toString, &value);
+    if (status != ANI_OK) {
+        HILOG_ERROR_I18N("GetLocaleTagFromBuiltinLocale: Call method toString failed: %{public}d", status);
+        return "";
+    }
+    return VariableConverter::AniStrToString(env, value);
+}
+
 ani_object VariableConverter::CreateArray(ani_env *env, const std::vector<std::string> &strs)
 {
     static const char *className = "Lescompat/Array;";
