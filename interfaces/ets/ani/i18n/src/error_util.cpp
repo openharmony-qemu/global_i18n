@@ -93,7 +93,7 @@ ani_object ErrorUtil::CreateError(ani_env *env, ani_int code, const std::string 
     }
     ani_object error = WrapAniError(env, msg);
     if (error == nullptr) {
-        HILOG_ERROR_I18N("error nulll");
+        HILOG_ERROR_I18N("error null");
         return nullptr;
     }
     if ((status = env->Object_New(cls, method, &obj, code, error)) != ANI_OK) {
