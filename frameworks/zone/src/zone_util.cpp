@@ -15,6 +15,7 @@
 
 #include <filesystem>
 #include <sys/stat.h>
+#include <unistd.h>
 #include "i18n_hilog.h"
 #include "i18n_timezone.h"
 #include "ohos/init_data.h"
@@ -30,6 +31,8 @@ using namespace std;
 
 const char *ZoneUtil::COUNTRY_ZONE_DATA_PATH = "/system/usr/ohos_timezone/tzlookup.xml";
 const char *ZoneUtil::DISTRO_COUNTRY_ZONE_DATA_PATH = "/system/etc/tzdata_distro/hos/tzlookup.xml";
+const char *ZoneUtil::DEFAULT_ZONE_CONFIG_PATH = "/system/usr/ohos_timezone/country_default_zone.cfg";
+const char *ZoneUtil::DISTRO_DEFAULT_ZONE_CONFIG_PATH = "/system/etc/tzdata_distro/hos/country_default_zone.cfg";
 const char *ZoneUtil::DEFAULT_TIMEZONE = "GMT";
 const char *ZoneUtil::TIMEZONES_TAG = "timezones";
 const char *ZoneUtil::ID_TAG = "id";
@@ -40,54 +43,20 @@ const char *ZoneUtil::SECOND_TAG = "country";
 const char *ZoneUtil::CODE_TAG = "code";
 const char *ZoneUtil::TIMEZONE_KEY = "persist.time.timezone";
 const char *ZoneUtil::TZLOOKUP_FILE_PATH = ZoneUtil::GetTZLookupDataPath();
+bool ZoneUtil::defaultMapInitialized;
+std::mutex ZoneUtil::defaultMapMutex;
 
-unordered_map<string, string> ZoneUtil::defaultMap = {
-    {"AQ", "Antarctica/McMurdo"},
-    {"AR", "America/Argentina/Buenos_Aires"},
-    {"AU", "Australia/Sydney"},
-    {"BR", "America/Noronha"},
-    {"BT", "Asia/Thimbu"}, // alias Asia/Thimphu
-    {"CA", "America/St_Johns"},
-    {"CD", "Africa/Kinshasa"},
-    {"CL", "America/Santiago"},
-    {"CN", "Asia/Shanghai"},
-    {"CY", "Asia/Nicosia"},
-    {"DE", "Europe/Berlin"},
-    {"DG", "Indian/Chagos"},
-    {"EA", "Africa/Ceuta"},
-    {"EC", "America/Guayaquil"},
-    {"ER", "Africa/Asmara"}, // alias Africa/Asmera
-    {"ES", "Europe/Madrid"},
-    {"FM", "Pacific/Pohnpei"},
-    {"FO", "Atlantic/Faroe"}, // alias Atlantic/Faeroe
-    {"GL", "America/Godthab"},
-    {"IC", "Atlantic/Canary"},
-    {"ID", "Asia/Jakarta"},
-    {"IN", "Asia/Kolkata"}, // alias Asia/Calcutta
-    {"KI", "Pacific/Tarawa"},
-    {"KZ", "Asia/Almaty"},
-    {"MH", "Pacific/Majuro"},
-    {"MN", "Asia/Ulaanbaatar"},
-    {"MX", "America/Mexico_City"},
-    {"MY", "Asia/Kuala_Lumpur"},
-    {"NP", "Asia/Kathmandu"}, // alias Asia/Katmandu
-    {"NZ", "Pacific/Auckland"},
-    {"PF", "Pacific/Tahiti"},
-    {"PG", "Pacific/Port_Moresby"},
-    {"PS", "Asia/Gaza"},
-    {"PT", "Europe/Lisbon"},
-    {"RU", "Europe/Moscow"},
-    {"UA", "Europe/Kiev"},
-    {"UM", "Pacific/Wake"},
-    {"US", "America/New_York"},
-    {"UZ", "Asia/Tashkent"},
-    {"VN", "Asia/Ho_Chi_Minh"}, // alias Asia/Saigon
-};
+unordered_map<string, string> ZoneUtil::defaultMap {};
 
 bool ZoneUtil::icuInitialized = ZoneUtil::Init();
 
 std::string ZoneUtil::GetDefaultZone(const std::string& country)
 {
+    string ret;
+    if (!InitDefaultMap()) {
+        HILOG_ERROR_I18N("ZoneUtil::GetDefaultZone: init defaultMap failed.");
+        return ret;
+    }
     string temp(country);
     for (size_t i = 0; i < temp.size(); i++) {
         temp[i] = (char)toupper(temp[i]);
@@ -95,7 +64,6 @@ std::string ZoneUtil::GetDefaultZone(const std::string& country)
     if (defaultMap.find(temp) != defaultMap.end()) {
         return defaultMap[temp];
     }
-    string ret;
     StringEnumeration *strEnum = TimeZone::createEnumeration(temp.c_str());
     GetString(strEnum, ret);
     if (strEnum != nullptr) {
@@ -325,6 +293,17 @@ const char *ZoneUtil::GetTZLookupDataPath()
     }
 }
 
+const char *ZoneUtil::GetCountryCodeTimezoneCfgPath()
+{
+    if (access(DISTRO_DEFAULT_ZONE_CONFIG_PATH, R_OK) != -1) {
+        return DISTRO_DEFAULT_ZONE_CONFIG_PATH;
+    }
+    if (access(DEFAULT_ZONE_CONFIG_PATH, R_OK) != -1) {
+        return DEFAULT_ZONE_CONFIG_PATH;
+    }
+    return nullptr;
+}
+
 bool ZoneUtil::IsFindCountry(xmlDocPtr &doc, xmlNodePtr &cur, xmlNodePtr &value,
     std::string &region)
 {
@@ -456,7 +435,7 @@ void ZoneUtil::GetICUCountryZones(std::string &region, std::vector<std::string> 
     for (auto it = countryZoneIds.begin(); it != countryZoneIds.end(); ++it) {
         zones.push_back(*it);
     }
-    if (defaultMap.find(region) != defaultMap.end()) {
+    if (InitDefaultMap() && defaultMap.find(region) != defaultMap.end()) {
         defaultTimezone = defaultMap[region];
     } else {
         if (zones.size() > 0) {
@@ -550,6 +529,61 @@ bool ZoneUtil::CheckSameDstOffset(std::vector<std::string> &zones, std::string &
             return false;
         }
         delete timezone;
+    }
+    return true;
+}
+
+bool ZoneUtil::InitDefaultMap()
+{
+    if (defaultMapInitialized) {
+        return true;
+    }
+    std::lock_guard<std::mutex> lock(defaultMapMutex);
+    if (defaultMapInitialized) {
+        return true;
+    }
+    const char* configPath = GetCountryCodeTimezoneCfgPath();
+    bool initStatus = ReadDefaultTimezoneConfigFile(configPath);
+    if (initStatus) {
+        defaultMapInitialized = true;
+    }
+    return initStatus;
+}
+
+bool ZoneUtil::ReadDefaultTimezoneConfigFile(const char* configPath)
+{
+    if (configPath == nullptr) {
+        HILOG_ERROR_I18N("ZoneUtil::ReadDefaultTimezoneConfigFile: configPath is NULL.");
+        return false;
+    }
+    std::string absPath = GetAbsoluteFilePath(configPath);
+    if (absPath.empty()) {
+        HILOG_ERROR_I18N("ZoneUtil::ReadDefaultTimezoneConfigFile: get absolute path failed.");
+        return false;
+    }
+    FILE* configFile = fopen(absPath.c_str(), "r");
+    if (configFile == nullptr) {
+        HILOG_ERROR_I18N("ZoneUtil::ReadDefaultTimezoneConfigFile: configFile is nullptr.");
+        return false;
+    }
+    char buffer[READ_BUFFER_SIZE];
+    while (fgets(buffer, READ_BUFFER_SIZE - 1, configFile) != nullptr) {
+        std::string line(buffer);
+        size_t start = line.find_first_of(":");
+        size_t end = line.find_first_of(";");
+        if (start == std::string::npos || end == std::string::npos) {
+            continue;
+        }
+        if (end < start + 1) {
+            continue;
+        }
+        std::string countryCode = line.substr(0, start);
+        std::string tzId = line.substr(start + 1, end - start - 1);
+        defaultMap.insert(std::make_pair(countryCode, tzId));
+    }
+    int ret = fclose(configFile);
+    if (ret != 0) {
+        HILOG_ERROR_I18N("ZoneUtil::ReadDefaultTimezoneConfigFile close %{public}s file error.", absPath.c_str());
     }
     return true;
 }
