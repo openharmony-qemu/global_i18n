@@ -452,8 +452,8 @@ ani_status I18nSystemAddon::BindContextSystem(ani_env *env)
         ani_native_function { "getFirstDayOfWeek", nullptr, reinterpret_cast<void *>(GetFirstDayOfWeek) },
     };
 
-    if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+    if (ANI_OK != env->Class_BindStaticNativeMethods(cls, methods.data(), methods.size())) {
+        HILOG_ERROR_I18N("Cannot bind static native methods to '%{public}s'", className);
         return (ani_status)ANI_ERROR;
     };
 

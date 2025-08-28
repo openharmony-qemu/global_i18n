@@ -90,8 +90,8 @@ ani_status I18nUnicodeAddon::BindContextUnicode(ani_env *env)
         ani_native_function { "getType", nullptr, reinterpret_cast<void *>(GetTypeAddon) },
     };
 
-    if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+    if (ANI_OK != env->Class_BindStaticNativeMethods(cls, methods.data(), methods.size())) {
+        HILOG_ERROR_I18N("Cannot bind static native methods to '%{public}s'", className);
         return (ani_status)ANI_ERROR;
     };
 

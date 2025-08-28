@@ -184,7 +184,7 @@ ani_status NumberFormatAddon::BindContext_NumberFormat(ani_env *env)
         return (ani_status)ANI_ERROR;
     }
 
-    std::array methods = {
+    std::array staticMethods = {
         ani_native_function {"create", ":C{@ohos.intl.intl.NumberFormat}",
             reinterpret_cast<void *>(NumberFormat_Create) },
         ani_native_function {
@@ -193,14 +193,20 @@ ani_status NumberFormatAddon::BindContext_NumberFormat(ani_env *env)
             "C{@ohos.intl.intl.NumberFormat}",
             reinterpret_cast<void *>(NumberFormat_CreateWithParam)
         },
+    };
+    if (ANI_OK != env->Class_BindStaticNativeMethods(cls, staticMethods.data(), staticMethods.size())) {
+        HILOG_ERROR_I18N("Cannot bind static native methods to '%{public}s'", className);
+        return (ani_status)ANI_ERROR;
+    }
+
+    std::array methods = {
         ani_native_function {"format", nullptr, reinterpret_cast<void *>(NumberFormat_Format) },
         ani_native_function {"formatRange", nullptr, reinterpret_cast<void *>(NumberFormat_FormatRange) },
         ani_native_function {"resolvedOptions", nullptr, reinterpret_cast<void *>(NumberFormat_ResolvedOptions) },
     };
-
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
         HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
         return (ani_status)ANI_ERROR;
-    };
+    }
     return ANI_OK;
 }
