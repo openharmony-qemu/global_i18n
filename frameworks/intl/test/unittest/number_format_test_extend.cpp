@@ -525,11 +525,11 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0062, TestSize.Level1)
     if (NumberFormatTest::deviceType == "wearable" || NumberFormatTest::deviceType == "liteWearable" ||
         NumberFormatTest::deviceType == "watch") {
         EXPECT_EQ(byteRes, "8B");
-        EXPECT_EQ(kbRes, "125kB");
+        EXPECT_EQ(kbRes, "125KB");
         EXPECT_EQ(mbRes, "3.50MB");
         EXPECT_EQ(gbRes, "23.12GB");
         EXPECT_EQ(shortByteRes, "8B");
-        EXPECT_EQ(shortKbRes, "125kB");
+        EXPECT_EQ(shortKbRes, "125KB");
         EXPECT_EQ(shortMbRes, "3.5MB");
         EXPECT_EQ(shortGbRes, "23GB");
     } else if (NumberFormatTest::deviceType == "tablet" || NumberFormatTest::deviceType == "2in1" ||
@@ -544,11 +544,11 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0062, TestSize.Level1)
         EXPECT_EQ(shortGbRes, "23 gigabytes");
     } else {
         EXPECT_EQ(byteRes, "8 byte");
-        EXPECT_EQ(kbRes, "125 kB");
+        EXPECT_EQ(kbRes, "125 KB");
         EXPECT_EQ(mbRes, "3.50 MB");
         EXPECT_EQ(gbRes, "23.12 GB");
         EXPECT_EQ(shortByteRes, "8 byte");
-        EXPECT_EQ(shortKbRes, "125 kB");
+        EXPECT_EQ(shortKbRes, "125 KB");
         EXPECT_EQ(shortMbRes, "3.5 MB");
         EXPECT_EQ(shortGbRes, "23 GB");
     }
