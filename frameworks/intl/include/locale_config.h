@@ -270,7 +270,9 @@ public:
     static std::string QueryExtParam(const std::string& locale, const std::string& key,
         const std::string& extParamKey);
     static std::string GetNumberingSystemDigit(const std::string& NumberingSystem);
+    static std::string GetMeasurementFromLocale(const std::string& localeTag);
     static std::string GetPatternNumberFromLocale(const std::string& locale);
+    static TemperatureType GetTemperatureTypeFromLocale(const std::string& localeTag);
     static const std::string HOUR_EVENT_DATA;
     static const std::string LANGUAGE_KEY;
     static const std::string LOCALE_KEY;
@@ -428,8 +430,6 @@ private:
      * @return std::string Return locale Tag.
      */
     static std::string UpdateRegionOfLocale(const std::string &regionTag);
-    static std::string GetBestMatchedLocaleOfCollation(const std::string& requestLocale);
-    static std::string GetBestMatchedLocaleOfNumberingSystem(const std::string& requestLocale);
     static I18nErrorCode GetSystemNumberPatternsFromLocale(
         std::unordered_map<std::string, std::string>& systemNumberPatterns, const std::string& locale);
     static std::string NumberPatternToHex(const std::string& groupingSymbol, const std::string& decimalSymbol);
@@ -461,11 +461,6 @@ private:
     static std::unordered_map<std::string, std::string> dialectMap;
     static std::unordered_map<std::string, std::string> dialectMapV15;
     static std::unordered_map<std::string, std::string> localDigitMap;
-    static std::unordered_map<TemperatureType, std::string> temperatureTypeToName;
-    static std::unordered_map<std::string, TemperatureType> nameToTemperatureType;
-    static std::unordered_set<std::string> fahrenheitUsingRegions;
-    static std::unordered_map<WeekDay, std::string> weekDayToName;
-    static std::unordered_map<std::string, WeekDay> nameToWeekDay;
     static std::map<std::string, std::string> locale2DisplayName;
     static std::map<std::string, std::string> region2DisplayName;
     static std::unordered_map<std::string, bool> is24HourLocaleMap;

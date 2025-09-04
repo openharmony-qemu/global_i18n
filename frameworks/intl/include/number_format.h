@@ -88,6 +88,8 @@ public:
         const std::map<std::string, std::string> &configs, I18nErrorCode &status);
     static std::string GetIcuDefaultLocale();
     static std::string CheckNumberFormatOptions(std::map<std::string, std::string> &map, int32_t &code);
+    static std::string GetNumberPatternSample(const std::string& localeTag,
+        const std::pair<std::string, std::string>& numberPattern);
 
 private:
     icu::Locale locale;
@@ -116,6 +118,8 @@ private:
     std::string roundingModeStr;
     std::string groupingSymbol;
     std::string decimalSymbol;
+    std::string preferredTemperature;
+    std::string measurement;
     std::string effectiveLocale;
     size_t roundingIncrement = 1;
     bool createSuccess = false;
@@ -172,7 +176,7 @@ private:
     void GetMinimumFractionDigitsOption(std::map<std::string, std::string> &map);
     void GetMaximumFractionDigitsOption(std::map<std::string, std::string> &map);
     int GetCurrencyFractionDigits(std::map<std::string, std::string> &map);
-    void ParseNumberPattern(const std::string& localeTag);
+    void ParseExtParam(const std::string& localeTag);
     void GetDigitsResolvedOptions(std::map<std::string, std::string> &map);
     void InitProperties(icu::number::UnlocalizedNumberFormatter &formatter);
     void InitUnitProperties(icu::number::UnlocalizedNumberFormatter &formatter);
