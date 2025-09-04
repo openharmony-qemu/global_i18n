@@ -59,7 +59,7 @@ extern "C"
             return { nullptr, 0 };
         }
         std::vector<std::string> idList;
-        icu::UnicodeString temp = nullptr;
+        icu::UnicodeString temp;
         while ((temp = idStrEnum->next(nullptr, icuStatus)) != nullptr) {
             std::string id;
             temp.toUTF8String(id);

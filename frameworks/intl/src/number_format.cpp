@@ -16,6 +16,7 @@
 
 #include <cctype>
 #include <cmath>
+#include <new>
 #include <sstream>
 #include <tuple>
 #include "format_utils.h"
@@ -39,6 +40,7 @@ std::mutex NumberFormat::numToCurrencyMutex;
 bool NumberFormat::initISO4217 = false;
 std::unordered_map<std::string, std::string> NumberFormat::numToCurrency = {};
 bool NumberFormat::icuInitialized = NumberFormat::Init();
+static const double DEFAULT_SAMPLE_NUMBER = 12345.67;
 
 std::unordered_map<std::string, UNumberUnitWidth> NumberFormat::unitStyle = {
     { "long", UNumberUnitWidth::UNUM_UNIT_WIDTH_FULL_NAME },
@@ -200,7 +202,7 @@ void NumberFormat::ResolveLocaleTags(const std::vector<std::string> &localeTags,
                 continue;
             }
             createSuccess = true;
-            ParseNumberPattern(localeTags[i]);
+            ParseExtParam(localeTags[i]);
             break;
         }
     }
@@ -210,17 +212,17 @@ void NumberFormat::CreateNumberFormatWithDefaultLocale(const std::string &system
     std::map<std::string, std::string> &configs)
 {
     if (!createSuccess) {
-        UErrorCode status = U_ZERO_ERROR;
         std::string curLocale = LocaleConfig::RemoveCustExtParam(systemLocale);
         localeInfo = std::make_unique<LocaleInfo>(curLocale, configs);
         CreateRelativeTimeFormat(systemLocale);
         if (localeInfo != nullptr && localeInfo->InitSuccess()) {
             locale = localeInfo->GetLocale();
             localeBaseName = localeInfo->GetBaseName();
+            UErrorCode status = U_ZERO_ERROR;
             icu::MeasureUnit::getAvailable(unitArray, MAX_UNIT_NUM, status);
             if (U_SUCCESS(status)) {
                 createSuccess = true;
-                ParseNumberPattern(systemLocale);
+                ParseExtParam(systemLocale);
             }
         }
     }
@@ -357,14 +359,12 @@ void NumberFormat::InitUnitProperties(icu::number::UnlocalizedNumberFormatter &f
     if (!foundUnit && fromArkTs) {
         SetPerUnit(formatter);
     }
-    std::string usingMeasurement;
-    I18nErrorCode errCode = LocaleConfig::GetUsingMeasurement(usingMeasurement);
-    if (errCode == I18nErrorCode::SUCCESS) {
-        auto iter = measurementSystem.find(usingMeasurement);
-        if (iter != measurementSystem.end()) {
-            unitMeasSys = iter->second;
-        }
+
+    auto iter = measurementSystem.find(measurement);
+    if (iter != measurementSystem.end()) {
+        unitMeasSys = iter->second;
     }
+
     formatter = formatter.unitWidth(unitDisplay);
     formatter = formatter.precision(icu::number::Precision::maxFraction(DEFAULT_FRACTION_DIGITS));
 }
@@ -616,7 +616,7 @@ void NumberFormat::ParseRoundingConfigs(std::map<std::string, std::string> &conf
     }
 }
 
-void NumberFormat::ParseNumberPattern(const std::string& localeTag)
+void NumberFormat::ParseExtParam(const std::string& localeTag)
 {
     std::pair<std::string, std::string> numberPattern = LocaleConfig::GetNumberPatternFromLocale(localeTag);
     if (numberPattern.second.empty()) {
@@ -624,10 +624,13 @@ void NumberFormat::ParseNumberPattern(const std::string& localeTag)
     }
     groupingSymbol = numberPattern.first;
     decimalSymbol = numberPattern.second;
+    preferredTemperature =
+        LocaleConfig::GetTemperatureName(LocaleConfig::GetTemperatureTypeFromLocale(localeTag));
     effectiveLocale = LocaleConfig::RemoveCustExtParam(localeTag);
     if (!numberingSystem.empty()) {
         effectiveLocale = LocaleConfig::ModifyExtParam(effectiveLocale, "nu", numberingSystem, "-u-");
     }
+    measurement = LocaleConfig::GetMeasurementFromLocale(localeTag);
 }
 
 void NumberFormat::SetUnit(std::string &preferredUnit)
@@ -1445,7 +1448,6 @@ bool NumberFormat::DealWithUnitConvert(double& finalNumber, std::string& finalUn
         }
         SetPrecisionWithByte(finalNumber, finalUnit);
     } else if (UNIT_USAGE_TEMPERATURE.find(unitUsage) != UNIT_USAGE_TEMPERATURE.end()) {
-        std::string preferredTemperature = LocaleConfig::GetTemperatureName(LocaleConfig::GetTemperatureType());
         if (preferredTemperature.empty() ||
             Convert(finalNumber, unit, unitMeasSys, preferredTemperature, unitMeasSys) == 0) {
             return false;
@@ -1525,6 +1527,53 @@ bool NumberFormat::IsWellFormedUnitIdentifier(icu::MeasureUnit &icuUnit,
         return false;
     }
     return true;
+}
+
+std::string NumberFormat::GetNumberPatternSample(const std::string& localeTag,
+    const std::pair<std::string, std::string>& numberPattern)
+{
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale icuLocale = icu::Locale::forLanguageTag(icu::StringPiece(localeTag), status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("NumberFormat::GetNumberPatternSample: Create icu::Locale failed.");
+        return "";
+    }
+
+    icu::DecimalFormatSymbols* decimalFormatSymbols = new icu::DecimalFormatSymbols(icuLocale, status);
+    if (U_FAILURE(status) || decimalFormatSymbols == nullptr) {
+        delete decimalFormatSymbols;
+        HILOG_ERROR_I18N("NumberFormat::GetNumberPatternSample: Create icu::DecimalFormatSymbols failed.");
+        return "";
+    }
+    icu::number::UnlocalizedNumberFormatter tempFormatter = icu::number::NumberFormatter::with();
+    std::string groupingSymbol = numberPattern.first;
+    if (groupingSymbol.empty()) {
+        tempFormatter = tempFormatter.grouping(UNumberGroupingStrategy::UNUM_GROUPING_OFF);
+    } else {
+        decimalFormatSymbols->setSymbol(icu::DecimalFormatSymbols::ENumberFormatSymbol::kGroupingSeparatorSymbol,
+            groupingSymbol.c_str());
+    }
+    std::string decimalSymbol = numberPattern.second;
+    if (!decimalSymbol.empty()) {
+        decimalFormatSymbols->setSymbol(icu::DecimalFormatSymbols::ENumberFormatSymbol::kDecimalSeparatorSymbol,
+            decimalSymbol.c_str());
+    }
+    tempFormatter = tempFormatter.symbols(*decimalFormatSymbols);
+    delete decimalFormatSymbols;
+    icu::number::LocalizedNumberFormatter numberFormat = tempFormatter.locale(icuLocale);
+    icu::number::FormattedNumber formattedNumber = numberFormat.formatDouble(DEFAULT_SAMPLE_NUMBER, status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("NumberFormat::GetNumberPatternSample: Format double failed.");
+        return "";
+    }
+    icu::UnicodeString formatResult = formattedNumber.toString(status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("NumberFormat::GetNumberPatternSample: ToString failed.");
+        return "";
+    }
+    std::string result;
+    formatResult.toUTF8String(result);
+    return result;
 }
 } // namespace I18n
 } // namespace Global
