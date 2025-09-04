@@ -308,8 +308,8 @@ HWTEST_F(I18nTest, I18nFuncTest007, TestSize.Level1)
     defaultCalendar.Add(UCalendarDateFields::UCAL_HOUR, 11);
     EXPECT_EQ(defaultCalendar.Get(UCalendarDateFields::UCAL_HOUR), 9);
     defaultCalendar.Set(UCalendarDateFields::UCAL_DATE, 20);
-    defaultCalendar.Add(UCalendarDateFields::UCAL_DATE, 15);
-    EXPECT_EQ(defaultCalendar.Get(UCalendarDateFields::UCAL_DATE), 4);
+    defaultCalendar.Add(UCalendarDateFields::UCAL_DATE, 5);
+    EXPECT_EQ(defaultCalendar.Get(UCalendarDateFields::UCAL_DATE), 25);
     defaultCalendar.Set(UCalendarDateFields::UCAL_MONTH, 10);
     defaultCalendar.Add(UCalendarDateFields::UCAL_MONTH, 2);
     EXPECT_EQ(defaultCalendar.Get(UCalendarDateFields::UCAL_MONTH), 0);
