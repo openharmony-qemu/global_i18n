@@ -994,7 +994,7 @@ void I18nTimeZone::SetVersionPathMap(std::string verison, std::string path,
 
 void I18nTimeZone::CloseFile(FILE *fp)
 {
-    if (fp != nullptr && fp != NULL) {
+    if (fp != nullptr) {
         fclose(fp);
     }
 }
