@@ -129,7 +129,7 @@ namespace intl {
     }
 
     export class DateTimeFormat {
-        static { loadLibrary("intl_ani.z"); }
+        static { loadLibraryWithPermissionCheck("intl_ani.z", "@ohos.intl"); }
 
         private nativeDateTimeFormat: long;
 
@@ -155,7 +155,7 @@ namespace intl {
     }
 
     export class NumberFormat {
-        static { loadLibrary("intl_ani.z"); }
+        static { loadLibraryWithPermissionCheck("intl_ani.z", "@ohos.intl"); }
 
         private nativeNumberFormat: long;
 
@@ -181,7 +181,7 @@ namespace intl {
     }
 
     export class Collator {
-        static { loadLibrary("intl_ani.z"); }
+        static { loadLibraryWithPermissionCheck("intl_ani.z", "@ohos.intl"); }
 
         private nativeCollator: long;
 
