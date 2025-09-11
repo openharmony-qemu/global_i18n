@@ -516,11 +516,7 @@ string LocaleConfig::GetCountry(const string& parameter)
         HILOG_ERROR_I18N("LocaleConfig::GetCountry: Create icu::Locale failed.");
         return "";
     }
-    const char* country = origin.getCountry();
-    if (country == nullptr) {
-        HILOG_ERROR_I18N("LocaleConfig::GetCountry: Get country from icu::Locale failed.");
-        return "";
-    }
+    std::string country = origin.getCountry();
     return country;
 }
 
