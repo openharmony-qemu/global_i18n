@@ -19,6 +19,7 @@
 #include "coptccal.h"
 #include "ethpccal.h"
 #include "hebrwcal.h"
+#include "i18n_hilog.h"
 #include "indiancal.h"
 #include "islamcal.h"
 #include "japancal.h"
@@ -188,7 +189,9 @@ void I18nCalendar::SetTime(double value)
     if (icuCalendar != nullptr) {
         UErrorCode status = U_ZERO_ERROR;
         icuCalendar->setTime(value, status);
-        return;
+        if (U_FAILURE(status)) {
+            HILOG_ERROR_I18N("I18nCalendar::SetTime: icuCalendar setTime failed.");
+        }
     }
 }
 
@@ -240,7 +243,12 @@ int32_t I18nCalendar::Get(UCalendarDateFields field) const
     icu::Calendar* icuCalendar = GetIcuCalendar();
     if (icuCalendar != nullptr) {
         UErrorCode status = U_ZERO_ERROR;
-        return icuCalendar->get(field, status);
+        int32_t result = icuCalendar->get(field, status);
+        if (U_FAILURE(status)) {
+            HILOG_ERROR_I18N("I18nCalendar::Get: icuCalendar get failed failed.");
+            return 0;
+        }
+        return result;
     }
     return 0;
 }
@@ -251,6 +259,9 @@ void I18nCalendar::Add(UCalendarDateFields field, int32_t amount)
     if (icuCalendar != nullptr) {
         UErrorCode status = U_ZERO_ERROR;
         icuCalendar->add(field, amount, status);
+        if (U_FAILURE(status)) {
+            HILOG_ERROR_I18N("I18nCalendar::Add: icuCalendar add failed failed.");
+        }
     }
 }
 
@@ -281,6 +292,9 @@ UDate I18nCalendar::GetTimeInMillis(void)
     if (icuCalendar != nullptr) {
         UErrorCode status = U_ZERO_ERROR;
         return icuCalendar->getTime(status);
+        if (U_FAILURE(status)) {
+            HILOG_ERROR_I18N("I18nCalendar::GetTimeInMillis: icuCalendar getTime failed.");
+        }
     }
     return 0;
 }
@@ -308,6 +322,9 @@ bool I18nCalendar::IsWeekend(int64_t date, UErrorCode &status)
     icu::Calendar* icuCalendar = GetIcuCalendar();
     if (icuCalendar != nullptr) {
         return icuCalendar->isWeekend(date, status);
+        if (U_FAILURE(status)) {
+            HILOG_ERROR_I18N("I18nCalendar::IsWeekend: icuCalendar isWeekend failed.");
+        }
     }
     return false;
 }
@@ -353,6 +370,10 @@ int32_t I18nCalendar::CompareDays(UDate date)
     if (icuCalendar != nullptr) {
         UErrorCode status = U_ZERO_ERROR;
         UDate nowMs = icuCalendar->getTime(status);
+        if (U_FAILURE(status)) {
+            HILOG_ERROR_I18N("I18nCalendar::CompareDays: icuCalendar getTime failed.");
+            return 0;
+        }
         double ret = (date - nowMs) / (24 * 60 * 60 * 1000); // Convert 24 hours into milliseconds
         return ret > 0 ? std::ceil(ret) : std::floor(ret);
     }
