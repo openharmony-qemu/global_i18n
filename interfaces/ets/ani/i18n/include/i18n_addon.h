@@ -29,9 +29,9 @@ class I18nPhoneNumberFormatAddon {
 public:
     static I18nPhoneNumberFormatAddon* UnwrapAddon(ani_env *env, ani_object object);
     static ani_object Create(ani_env *env, [[maybe_unused]] ani_object object, ani_string country, ani_object options);
-    static ani_boolean IsValidNumber(ani_env *env, ani_object object, ani_string number);
-    static ani_string Format(ani_env *env, ani_object object, ani_string number);
-    static ani_string GetLocationName(ani_env *env, ani_object object, ani_string number, ani_string locale);
+    static ani_boolean IsValidNumber(ani_env *env, ani_object object, ani_string phoneNumber);
+    static ani_string Format(ani_env *env, ani_object object, ani_string phoneNumber);
+    static ani_string GetLocationName(ani_env *env, ani_object object, ani_string phoneNumber, ani_string locale);
     static ani_status BindContextPhoneNumberFormat(ani_env *env);
 private:
     std::unique_ptr<PhoneNumberFormat> phonenumberfmt_ = nullptr;
@@ -41,15 +41,15 @@ class I18nBreakIteratorAddon {
 public:
     static I18nBreakIteratorAddon* UnwrapAddon(ani_env *env, ani_object object);
     static ani_object GetLineInstance(ani_env *env, ani_string locale);
-    static ani_double Current(ani_env *env, ani_object object);
-    static ani_double First(ani_env *env, ani_object object);
-    static ani_double Last(ani_env *env, ani_object object);
-    static ani_double Next(ani_env *env, ani_object object, ani_object index);
-    static ani_double Previous(ani_env *env, ani_object object);
+    static ani_int Current(ani_env *env, ani_object object);
+    static ani_int First(ani_env *env, ani_object object);
+    static ani_int Last(ani_env *env, ani_object object);
+    static ani_int Next(ani_env *env, ani_object object, ani_object index);
+    static ani_int Previous(ani_env *env, ani_object object);
     static void SetLineBreakText(ani_env *env, ani_object object, ani_string text);
-    static ani_double Following(ani_env *env, ani_object object, ani_double offset);
+    static ani_int Following(ani_env *env, ani_object object, ani_int offset);
     static ani_string GetLineBreakText(ani_env *env, ani_object object);
-    static ani_boolean IsBoundary(ani_env *env, ani_object object, ani_double offset);
+    static ani_boolean IsBoundary(ani_env *env, ani_object object, ani_int offset);
     static ani_status BindContextBreakIterator(ani_env *env);
 private:
     std::unique_ptr<I18nBreakIterator> brkiter_ = nullptr;
@@ -85,7 +85,7 @@ public:
         ani_object toUnit, ani_double value, ani_string locale, ani_string style);
     static ani_string GetDateOrder(ani_env *env, [[maybe_unused]] ani_object object, ani_string locale);
     static ani_string GetTimePeriodName(ani_env *env, [[maybe_unused]] ani_object object,
-        ani_double hour, ani_string locale);
+        ani_int hour, ani_string locale);
     static ani_string GetBestMatchLocale(ani_env *env, [[maybe_unused]] ani_object object,
         ani_string locale, ani_object localeList);
     static ani_string GetThreeLetterLanguage(ani_env *env, [[maybe_unused]] ani_object object, ani_string locale);

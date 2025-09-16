@@ -50,19 +50,19 @@ static ani_object CreateLocaleItem(ani_env *env, LocaleItem localeItem)
     static const char *className = "L@ohos/i18n/i18n/LocaleItemInner;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("CreateLocaleItem: Find class '%{public}s' failed", className);
         return nullptr;
     }
 
     ani_method ctor;
     if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
-        HILOG_ERROR_I18N("Find method '<ctor>' failed");
+        HILOG_ERROR_I18N("CreateLocaleItem: Find method '<ctor>' failed");
         return nullptr;
     }
 
     ani_object ret;
     if (ANI_OK != env->Object_New(cls, ctor, &ret)) {
-        HILOG_ERROR_I18N("New object '%{public}s' failed", className);
+        HILOG_ERROR_I18N("CreateLocaleItem: New object '%{public}s' failed", className);
         return nullptr;
     }
 
@@ -73,7 +73,7 @@ static ani_object CreateLocaleItem(ani_env *env, LocaleItem localeItem)
     static const char *enumName = "L@ohos/i18n/i18n/SuggestionType;";
     if (ANI_OK != env->Object_SetPropertyByName_Ref(ret, "suggestionType", VariableConverter::GetEnumItemByIndex(env,
         enumName, static_cast<int>(localeItem.suggestionType)))) {
-        HILOG_ERROR_I18N("Set property 'suggestionType' failed");
+        HILOG_ERROR_I18N("CreateLocaleItem: Set property 'suggestionType' failed");
     }
     return ret;
 }
@@ -83,31 +83,31 @@ static ani_object CreateLocaleItemArray(ani_env *env, std::vector<LocaleItem> Lo
     static const char *className = "Lescompat/Array;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("CreateLocaleItemArray: Find class '%{public}s' failed", className);
         return nullptr;
     }
 
     ani_method ctor;
     if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "I:V", &ctor)) {
-        HILOG_ERROR_I18N("Find method '<ctor>' failed");
+        HILOG_ERROR_I18N("CreateLocaleItemArray: Find method '<ctor>' failed");
         return nullptr;
     }
 
     ani_object ret;
     if (ANI_OK != env->Object_New(cls, ctor, &ret, LocaleItemList.size())) {
-        HILOG_ERROR_I18N("New object '%{public}s' failed", className);
+        HILOG_ERROR_I18N("CreateLocaleItemArray: New object '%{public}s' failed", className);
         return nullptr;
     }
 
     ani_method set;
     if (ANI_OK != env->Class_FindMethod(cls, "$_set", "ILstd/core/Object;:V", &set)) {
-        HILOG_ERROR_I18N("Find method '$_set' failed");
+        HILOG_ERROR_I18N("CreateLocaleItemArray: Find method '$_set' failed");
         return ret;
     }
 
     for (size_t i = 0; i < LocaleItemList.size(); ++i) {
         if (ANI_OK != env->Object_CallMethod_Void(ret, set, i, CreateLocaleItem(env, LocaleItemList[i]))) {
-            HILOG_ERROR_I18N("Call method '$_set' failed");
+            HILOG_ERROR_I18N("CreateLocaleItemArray: Call method '$_set' failed");
             return ret;
         }
     }
@@ -129,7 +129,7 @@ ani_object I18nSysLocaleMgrAddon::GetLanguageInfoArray(ani_env *env, ani_object 
 
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(options, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("I18nSysLocaleMgrAddon::GetLanguageInfoArray: Check options reference is undefined failed");
         return nullptr;
     }
     if (isUndefined) {
@@ -153,7 +153,7 @@ ani_object I18nSysLocaleMgrAddon::GetLanguageInfoArray(ani_env *env, ani_object 
 
     I18nSysLocaleMgrAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->systemLocaleManager_ == nullptr) {
-        HILOG_ERROR_I18N("GetLanguageInfoArray: Get SystemLocaleManager object failed");
+        HILOG_ERROR_I18N("I18nSysLocaleMgrAddon::GetLanguageInfoArray: Get SystemLocaleManager object failed");
         return nullptr;
     }
 
@@ -182,7 +182,7 @@ ani_object I18nSysLocaleMgrAddon::GetRegionInfoArray(ani_env *env, ani_object ob
 
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(options, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("I18nSysLocaleMgrAddon::GetRegionInfoArray: Check options reference is undefined failed");
         return nullptr;
     }
     if (isUndefined) {
@@ -206,7 +206,7 @@ ani_object I18nSysLocaleMgrAddon::GetRegionInfoArray(ani_env *env, ani_object ob
 
     I18nSysLocaleMgrAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->systemLocaleManager_ == nullptr) {
-        HILOG_ERROR_I18N("GetRegionInfoArray: Get SystemLocaleManager object failed");
+        HILOG_ERROR_I18N("I18nSysLocaleMgrAddon::GetRegionInfoArray: Get SystemLocaleManager object failed");
         return nullptr;
     }
 
@@ -225,19 +225,19 @@ static ani_object CreateTimeZoneCityItem(ani_env *env, TimeZoneCityItem item)
     static const char *className = "L@ohos/i18n/i18n/TimeZoneCityItemInner;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("CreateTimeZoneCityItem: Find class '%{public}s' failed", className);
         return nullptr;
     }
 
     ani_method ctor;
     if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
-        HILOG_ERROR_I18N("Find method '<ctor>' failed");
+        HILOG_ERROR_I18N("CreateTimeZoneCityItem: Find method '<ctor>' failed");
         return nullptr;
     }
 
     ani_object ret;
     if (ANI_OK != env->Object_New(cls, ctor, &ret)) {
-        HILOG_ERROR_I18N("New object '%{public}s' failed", className);
+        HILOG_ERROR_I18N("CreateTimeZoneCityItem: New object '%{public}s' failed", className);
         return nullptr;
     }
 
@@ -247,8 +247,8 @@ static ani_object CreateTimeZoneCityItem(ani_env *env, TimeZoneCityItem item)
     VariableConverter::SetStringMember(env, ret, "zoneDisplayName", item.zoneDisplayName);
     VariableConverter::SetNumberMember(env, ret, "rawOffset", item.rawOffset);
 
-    if (ANI_OK != env->Object_SetPropertyByName_Double(ret, "offset", item.offset)) {
-        HILOG_ERROR_I18N("Set property 'offset' failed");
+    if (ANI_OK != env->Object_SetPropertyByName_Int(ret, "offset", item.offset)) {
+        HILOG_ERROR_I18N("CreateTimeZoneCityItem: Set property 'offset' failed");
     }
     return ret;
 }
@@ -265,31 +265,31 @@ ani_object I18nSysLocaleMgrAddon::GetTimeZoneCityItemArray(ani_env *env, [[maybe
     static const char *className = "Lescompat/Array;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("GetTimeZoneCityItemArray: Find class '%{public}s' failed", className);
         return nullptr;
     }
 
     ani_method ctor;
     if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "I:V", &ctor)) {
-        HILOG_ERROR_I18N("Find method '<ctor>' failed");
+        HILOG_ERROR_I18N("GetTimeZoneCityItemArray: Find method '<ctor>' failed");
         return nullptr;
     }
 
     ani_object ret;
     if (ANI_OK != env->Object_New(cls, ctor, &ret, timezoneCityItemList.size())) {
-        HILOG_ERROR_I18N("New object '%{public}s' failed", className);
+        HILOG_ERROR_I18N("GetTimeZoneCityItemArray: New object '%{public}s' failed", className);
         return nullptr;
     }
 
     ani_method set;
     if (ANI_OK != env->Class_FindMethod(cls, "$_set", "ILstd/core/Object;:V", &set)) {
-        HILOG_ERROR_I18N("Find method '$_set' failed");
+        HILOG_ERROR_I18N("GetTimeZoneCityItemArray: Find method '$_set' failed");
         return ret;
     }
 
     for (size_t i = 0; i < timezoneCityItemList.size(); ++i) {
         if (ANI_OK != env->Object_CallMethod_Void(ret, set, i, CreateTimeZoneCityItem(env, timezoneCityItemList[i]))) {
-            HILOG_ERROR_I18N("Call method '$_set' failed");
+            HILOG_ERROR_I18N("GetTimeZoneCityItemArray: Call method '$_set' failed");
             return ret;
         }
     }
@@ -301,7 +301,7 @@ ani_status I18nSysLocaleMgrAddon::BindContextSysLocaleMgr(ani_env *env)
     static const char *className = "L@ohos/i18n/i18n/SystemLocaleManager;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("BindContextSysLocaleMgr: Find class '%{public}s' failed", className);
         return ANI_ERROR;
     }
 
@@ -316,7 +316,7 @@ ani_status I18nSysLocaleMgrAddon::BindContextSysLocaleMgr(ani_env *env)
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+        HILOG_ERROR_I18N("BindContextSysLocaleMgr: Cannot bind native methods to '%{public}s'", className);
         return ANI_ERROR;
     };
 

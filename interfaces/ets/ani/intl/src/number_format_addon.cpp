@@ -33,15 +33,15 @@ NumberFormatAddon* NumberFormatAddon::UnwrapAddon(ani_env *env, ani_object objec
     return reinterpret_cast<NumberFormatAddon*>(ptr);
 }
 
-ani_string NumberFormatAddon::NumberFormat_Format(ani_env *env, ani_object object, ani_double number)
+ani_string NumberFormatAddon::NumberFormat_Format(ani_env *env, ani_object object, ani_double num)
 {
     NumberFormatAddon *obj = UnwrapAddon(env, object, "nativeNumberFormat");
     if (obj == nullptr || obj->numberfmt_ == nullptr) {
-        HILOG_ERROR_I18N("FormatNumber: Get NumberFormat object failed");
+        HILOG_ERROR_I18N("NumberFormatAddon::NumberFormat_Format: Get NumberFormat object failed");
         return nullptr;
     }
 
-    std::string str = obj->numberfmt_->Format(number);
+    std::string str = obj->numberfmt_->Format(num);
     return VariableConverter::StringToAniStr(env, str);
 }
 
@@ -50,7 +50,7 @@ ani_string NumberFormatAddon::NumberFormat_FormatRange(ani_env *env, ani_object 
 {
     NumberFormatAddon *obj = UnwrapAddon(env, object, "nativeNumberFormat");
     if (obj == nullptr || obj->numberfmt_ == nullptr) {
-        HILOG_ERROR_I18N("FormatRangeNumber: Get NumberFormat object failed");
+        HILOG_ERROR_I18N("NumberFormatAddon::NumberFormat_FormatRange: Get NumberFormat object failed");
         return nullptr;
     }
 
@@ -62,7 +62,7 @@ ani_object NumberFormatAddon::NumberFormat_ResolvedOptions(ani_env *env, ani_obj
 {
     NumberFormatAddon *obj = UnwrapAddon(env, object, "nativeNumberFormat");
     if (obj == nullptr || obj->numberfmt_ == nullptr) {
-        HILOG_ERROR_I18N("GetNumberResolvedOptions: Get NumberFormat object failed");
+        HILOG_ERROR_I18N("NumberFormatAddon::NumberFormat_ResolvedOptions: Get NumberFormat object failed");
         return nullptr;
     }
     std::map<std::string, std::string> options = {};
@@ -71,19 +71,19 @@ ani_object NumberFormatAddon::NumberFormat_ResolvedOptions(ani_env *env, ani_obj
     static const char *className = "L@ohos/intl/intl/NumberOptionsInner;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("NumberFormatAddon::NumberFormat_ResolvedOptions: Find class %{public}s failed", className);
         return nullptr;
     }
 
     ani_method ctor;
     if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
-        HILOG_ERROR_I18N("Find method '<ctor>' failed");
+        HILOG_ERROR_I18N("NumberFormatAddon::NumberFormat_ResolvedOptions: Find method '<ctor>' failed");
         return nullptr;
     }
 
     ani_object numberOptions;
     if (ANI_OK != env->Object_New(cls, ctor, &numberOptions)) {
-        HILOG_ERROR_I18N("New object '%{public}s' failed", className);
+        HILOG_ERROR_I18N("NumberFormatAddon::NumberFormat_ResolvedOptions: New object %{public}s failed", className);
         return nullptr;
     }
 
@@ -127,7 +127,7 @@ static std::map<std::string, std::string> GetNumberFormatOptions(ani_env *env, a
     std::map<std::string, std::string> map;
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(options, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("GetNumberFormatOptions: Check options reference is undefined failed");
         return map;
     }
     if (!isUndefined) {
@@ -180,23 +180,26 @@ ani_status NumberFormatAddon::BindContext_NumberFormat(ani_env *env)
     static const char *className = "L@ohos/intl/intl/NumberFormat;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("BindContext_NumberFormat: Find class '%{public}s' failed", className);
         return ANI_ERROR;
     }
 
     std::array methods = {
         ani_native_function {"create", ":L@ohos/intl/intl/NumberFormat;",
             reinterpret_cast<void *>(NumberFormat_Create) },
-        ani_native_function {"create",
-            "Lstd/core/Object;L@ohos/intl/intl/NumberOptions;:L@ohos/intl/intl/NumberFormat;",
-            reinterpret_cast<void *>(NumberFormat_CreateWithParam) },
+        ani_native_function {
+            "create",
+            "X{C{escompat.Array}C{std.core.String}}C{@ohos.intl.intl.NumberOptions}:"
+            "C{@ohos.intl.intl.NumberFormat}",
+            reinterpret_cast<void *>(NumberFormat_CreateWithParam)
+        },
         ani_native_function {"format", nullptr, reinterpret_cast<void *>(NumberFormat_Format) },
         ani_native_function {"formatRange", nullptr, reinterpret_cast<void *>(NumberFormat_FormatRange) },
         ani_native_function {"resolvedOptions", nullptr, reinterpret_cast<void *>(NumberFormat_ResolvedOptions) },
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+        HILOG_ERROR_I18N("BindContext_NumberFormat: Cannot bind native methods to '%{public}s'", className);
         return ANI_ERROR;
     };
     return ANI_OK;

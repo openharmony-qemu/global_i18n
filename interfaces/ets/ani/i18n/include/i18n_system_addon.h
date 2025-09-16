@@ -42,7 +42,7 @@ public:
     static void AddPreferredLanguage(ani_env *env, [[maybe_unused]] ani_object object,
         ani_string language, ani_object number);
     static void RemovePreferredLanguage([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
-        ani_double index);
+        ani_int index);
     static ani_object GetPreferredLanguageList(ani_env *env, [[maybe_unused]] ani_object object);
     static ani_string GetFirstPreferredLanguage(ani_env *env, [[maybe_unused]] ani_object object);
     static void SetAppPreferredLanguage(ani_env *env, [[maybe_unused]] ani_object object, ani_string language);

@@ -42,7 +42,7 @@ ani_object I18nEntityRecognizerAddon::Create(ani_env *env, [[maybe_unused]] ani_
     std::string localeStr;
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(locale, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("I18nEntityRecognizerAddon::Create: Check locale reference is undefined failed");
         return nullptr;
     }
     if (isUndefined) {
@@ -74,28 +74,28 @@ static ani_object CreateEntityInfoItem(ani_env *env, const int begin, const int 
     static const char *className = "L@ohos/i18n/i18n/EntityInfoItemInner;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("CreateEntityInfoItem: Find class '%{public}s' failed", className);
         return nullptr;
     }
 
     ani_method ctor;
     if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
-        HILOG_ERROR_I18N("Find method '<ctor>' failed");
+        HILOG_ERROR_I18N("CreateEntityInfoItem: Find method '<ctor>' failed");
         return nullptr;
     }
 
     ani_object ret;
     if (ANI_OK != env->Object_New(cls, ctor, &ret)) {
-        HILOG_ERROR_I18N("New object '%{public}s' failed", className);
+        HILOG_ERROR_I18N("CreateEntityInfoItem: New object '%{public}s' failed", className);
         return nullptr;
     }
 
     VariableConverter::SetStringMember(env, ret, "type", type);
-    if (ANI_OK != env->Object_SetPropertyByName_Double(ret, "begin", begin)) {
-        HILOG_ERROR_I18N("Set property 'begin' failed");
+    if (ANI_OK != env->Object_SetPropertyByName_Int(ret, "begin", begin)) {
+        HILOG_ERROR_I18N("CreateEntityInfoItem: Set property 'begin' failed");
     }
-    if (ANI_OK != env->Object_SetPropertyByName_Double(ret, "end", end)) {
-        HILOG_ERROR_I18N("Set property 'end' failed");
+    if (ANI_OK != env->Object_SetPropertyByName_Int(ret, "end", end)) {
+        HILOG_ERROR_I18N("CreateEntityInfoItem: Set property 'end' failed");
     }
     return ret;
 }
@@ -105,33 +105,33 @@ static ani_object GetEntityInfoItem(ani_env *env, std::vector<std::vector<int>>&
     static const char *className = "Lescompat/Array;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("GetEntityInfoItem: Find class '%{public}s' failed", className);
         return nullptr;
     }
 
     ani_method ctor;
     if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "I:V", &ctor)) {
-        HILOG_ERROR_I18N("Find method '<ctor>' failed");
+        HILOG_ERROR_I18N("GetEntityInfoItem: Find method '<ctor>' failed");
         return nullptr;
     }
 
     if (entityInfo.size() <= INDEX_TWO_OF_VECTOR ||
         entityInfo[INDEX_ONE_OF_VECTOR].size() <= INDEX_ONE_OF_VECTOR ||
         entityInfo[INDEX_TWO_OF_VECTOR].size() <= INDEX_ONE_OF_VECTOR) {
-        HILOG_ERROR_I18N("Invalid entityInfo structure, potential out of bounds access");
+        HILOG_ERROR_I18N("GetEntityInfoItem: Invalid entityInfo structure, potential out of bounds access");
         return nullptr;
     }
 
     ani_object ret;
     if (ANI_OK != env->Object_New(cls, ctor, &ret, (entityInfo[INDEX_ONE_OF_VECTOR][INDEX_ONE_OF_VECTOR] +
             entityInfo[INDEX_TWO_OF_VECTOR][INDEX_ONE_OF_VECTOR]))) {
-        HILOG_ERROR_I18N("New object '%{public}s' failed", className);
+        HILOG_ERROR_I18N("GetEntityInfoItem: New object '%{public}s' failed", className);
         return nullptr;
     }
 
     ani_method set;
     if (ANI_OK != env->Class_FindMethod(cls, "$_set", "ILstd/core/Object;:V", &set)) {
-        HILOG_ERROR_I18N("Find method '$_set' failed");
+        HILOG_ERROR_I18N("GetEntityInfoItem: Find method '$_set' failed");
         return ret;
     }
 
@@ -143,7 +143,7 @@ static ani_object GetEntityInfoItem(ani_env *env, std::vector<std::vector<int>>&
             int end = entityInfo[t][2 * i + 2];
             std::string type = types[t];
             if (ANI_OK != env->Object_CallMethod_Void(ret, set, index, CreateEntityInfoItem(env, begin, end, type))) {
-                HILOG_ERROR_I18N("Call method '$_set' failed");
+                HILOG_ERROR_I18N("GetEntityInfoItem: Call method '$_set' failed");
                 return ret;
             }
             ++index;
@@ -156,7 +156,7 @@ ani_object I18nEntityRecognizerAddon::FindEntityInfo(ani_env *env, ani_object ob
 {
     I18nEntityRecognizerAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->entityRecognizer_ == nullptr) {
-        HILOG_ERROR_I18N("Get EntityRecognizer object failed");
+        HILOG_ERROR_I18N("I18nEntityRecognizerAddon::FindEntityInfo: Get EntityRecognizer object failed");
         return nullptr;
     }
 
@@ -170,7 +170,7 @@ ani_status I18nEntityRecognizerAddon::BindContextEntityRecognizer(ani_env *env)
     static const char *className = "L@ohos/i18n/i18n/EntityRecognizer;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("BindContextEntityRecognizer: Find class '%{public}s' failed", className);
         return ANI_ERROR;
     }
 
@@ -181,7 +181,7 @@ ani_status I18nEntityRecognizerAddon::BindContextEntityRecognizer(ani_env *env)
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+        HILOG_ERROR_I18N("BindContextEntityRecognizer: Cannot bind native methods to '%{public}s'", className);
         return ANI_ERROR;
     };
 

@@ -28,20 +28,20 @@ public:
     static ani_object GetCalendar(ani_env *env, ani_string locale, ani_string type);
     static void SetTimeByDate(ani_env *env, ani_object object, ani_object date);
     static void SetTime(ani_env *env, ani_object object, ani_double time);
-    static void Set(ani_env *env, ani_object object, ani_double year, ani_double month,
-        ani_double date, ani_object hour, ani_object minute, ani_object second);
+    static void Set(ani_env *env, ani_object object, ani_int year, ani_int month,
+        ani_int date, ani_object hour, ani_object minute, ani_object second);
     static void SetTimeZone(ani_env *env, ani_object object, ani_string timezone);
     static ani_string GetTimeZone(ani_env *env, ani_object object);
-    static ani_double GetFirstDayOfWeek(ani_env *env, ani_object object);
-    static void SetFirstDayOfWeek(ani_env *env, ani_object object, ani_double value);
-    static ani_double GetMinimalDaysInFirstWeek(ani_env *env, ani_object object);
-    static void SetMinimalDaysInFirstWeek(ani_env *env, ani_object object, ani_double value);
-    static ani_double Get(ani_env *env, ani_object object, ani_string field);
+    static ani_int GetFirstDayOfWeek(ani_env *env, ani_object object);
+    static void SetFirstDayOfWeek(ani_env *env, ani_object object, ani_int value);
+    static ani_int GetMinimalDaysInFirstWeek(ani_env *env, ani_object object);
+    static void SetMinimalDaysInFirstWeek(ani_env *env, ani_object object, ani_int value);
+    static ani_int Get(ani_env *env, ani_object object, ani_string field);
     static ani_string GetDisplayName(ani_env *env, ani_object object, ani_string locale);
     static ani_boolean IsWeekend(ani_env *env, ani_object object, ani_object date);
-    static void Add(ani_env *env, ani_object object, ani_string field, ani_double amount);
-    static ani_double GetTimeInMillis(ani_env *env, ani_object object);
-    static ani_double CompareDays(ani_env *env, ani_object object, ani_object date);
+    static void Add(ani_env *env, ani_object object, ani_string field, ani_int amount);
+    static ani_long GetTimeInMillis(ani_env *env, ani_object object);
+    static ani_int CompareDays(ani_env *env, ani_object object, ani_object date);
     static ani_status BindContextCalendar(ani_env *env);
 private:
     std::unique_ptr<I18nCalendar> calendar_ = nullptr;

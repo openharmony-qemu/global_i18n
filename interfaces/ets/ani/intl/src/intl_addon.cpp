@@ -38,25 +38,25 @@ ani_string IntlAddon::DateTimeFormat_Format(ani_env *env, ani_object object, ani
     static const char *className = "Lescompat/Date;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("IntlAddon::DateTimeFormat_Format: Find class '%{public}s' failed", className);
         return nullptr;
     }
 
     ani_method getms;
     if (ANI_OK != env->Class_FindMethod(cls, "valueOf", nullptr, &getms)) {
-        HILOG_ERROR_I18N("Find method 'valueOf' failed");
+        HILOG_ERROR_I18N("IntlAddon::DateTimeFormat_Format: Find method 'valueOf' failed");
         return nullptr;
     }
 
     ani_double milliseconds;
     if (ANI_OK != env->Object_CallMethod_Double(date, getms, &milliseconds)) {
-        HILOG_ERROR_I18N("Call method 'valueOf' failed");
+        HILOG_ERROR_I18N("IntlAddon::DateTimeFormat_Format: Call method 'valueOf' failed");
         return nullptr;
     }
 
     IntlAddon *obj = UnwrapAddon(env, object, "nativeDateTimeFormat");
     if (obj == nullptr || obj->datefmt_ == nullptr) {
-        HILOG_ERROR_I18N("FormatDateTime: Get DateTimeFormat object failed");
+        HILOG_ERROR_I18N("IntlAddon::DateTimeFormat_Format: Get DateTimeFormat object failed");
         return nullptr;
     }
 
@@ -70,31 +70,31 @@ ani_string IntlAddon::DateTimeFormat_FormatRange(ani_env *env, ani_object object
     static const char *className = "Lescompat/Date;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("IntlAddon::DateTimeFormat_FormatRange: Find class '%{public}s' failed", className);
         return nullptr;
     }
 
     ani_method getms;
     if (ANI_OK != env->Class_FindMethod(cls, "valueOf", nullptr, &getms)) {
-        HILOG_ERROR_I18N("Find method 'valueOf' failed");
+        HILOG_ERROR_I18N("IntlAddon::DateTimeFormat_FormatRange: Find method 'valueOf' failed");
         return nullptr;
     }
 
     ani_double firstMilliseconds;
     if (ANI_OK != env->Object_CallMethod_Double(startDate, getms, &firstMilliseconds)) {
-        HILOG_ERROR_I18N("Call method 'valueOf' failed");
+        HILOG_ERROR_I18N("IntlAddon::DateTimeFormat_FormatRange: Call method 'valueOf' failed");
         return nullptr;
     }
 
     ani_double secondMilliseconds;
     if (ANI_OK != env->Object_CallMethod_Double(endDate, getms, &secondMilliseconds)) {
-        HILOG_ERROR_I18N("Call method 'valueOf' failed");
+        HILOG_ERROR_I18N("IntlAddon::DateTimeFormat_FormatRange: Call method 'valueOf' failed");
         return nullptr;
     }
 
     IntlAddon *obj = UnwrapAddon(env, object, "nativeDateTimeFormat");
     if (obj == nullptr || obj->datefmt_ == nullptr) {
-        HILOG_ERROR_I18N("FormatDateTimeRange: Get DateTimeFormat object failed");
+        HILOG_ERROR_I18N("IntlAddon::DateTimeFormat_FormatRange: Get DateTimeFormat object failed");
         return nullptr;
     }
 
@@ -106,7 +106,7 @@ ani_object IntlAddon::DateTimeFormat_ResolvedOptions(ani_env *env, ani_object ob
 {
     IntlAddon *obj = UnwrapAddon(env, object, "nativeDateTimeFormat");
     if (obj == nullptr || obj->datefmt_ == nullptr) {
-        HILOG_ERROR_I18N("GetDateTimeResolvedOptions: Get DateTimeFormat object failed");
+        HILOG_ERROR_I18N("IntlAddon::DateTimeFormat_ResolvedOptions: Get DateTimeFormat object failed");
         return nullptr;
     }
     std::map<std::string, std::string> options = {};
@@ -115,19 +115,19 @@ ani_object IntlAddon::DateTimeFormat_ResolvedOptions(ani_env *env, ani_object ob
     static const char *className = "L@ohos/intl/intl/DateTimeOptionsInner;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("IntlAddon::DateTimeFormat_ResolvedOptions: Find class '%{public}s' failed", className);
         return nullptr;
     }
 
     ani_method ctor;
     if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
-        HILOG_ERROR_I18N("Find method '<ctor>' failed");
+        HILOG_ERROR_I18N("IntlAddon::DateTimeFormat_ResolvedOptions: Find method '<ctor>' failed");
         return nullptr;
     }
 
     ani_object dateTimeOptions;
     if (ANI_OK != env->Object_New(cls, ctor, &dateTimeOptions)) {
-        HILOG_ERROR_I18N("New object '%{public}s' failed", className);
+        HILOG_ERROR_I18N("IntlAddon::DateTimeFormat_ResolvedOptions: New object '%{public}s' failed", className);
         return nullptr;
     }
 
@@ -147,24 +147,24 @@ ani_object IntlAddon::DateTimeFormat_ResolvedOptions(ani_env *env, ani_object ob
 }
 
 
-ani_double IntlAddon::Collator_Compare(ani_env *env, ani_object object, ani_string first, ani_string second)
+ani_int IntlAddon::Collator_Compare(ani_env *env, ani_object object, ani_string first, ani_string second)
 {
     IntlAddon *obj = UnwrapAddon(env, object, "nativeCollator");
     if (obj == nullptr || obj->collator_ == nullptr) {
-        HILOG_ERROR_I18N("CompareString: Get Collator object failed");
+        HILOG_ERROR_I18N("IntlAddon::Collator_Compare: Get Collator object failed");
         return -1;
     }
 
     CompareResult compareResult = obj->collator_->Compare(
         VariableConverter::AniStrToString(env, first), VariableConverter::AniStrToString(env, second));
-    return static_cast<double>(compareResult);
+    return static_cast<int32_t>(compareResult);
 }
 
 ani_object IntlAddon::Collator_ResolvedOptions(ani_env *env, ani_object object)
 {
     IntlAddon *obj = UnwrapAddon(env, object, "nativeCollator");
     if (obj == nullptr || obj->collator_ == nullptr) {
-        HILOG_ERROR_I18N("GetCollatorResolvedOptions: Get Collator object failed");
+        HILOG_ERROR_I18N("IntlAddon::Collator_ResolvedOptions: Get Collator object failed");
         return nullptr;
     }
     std::map<std::string, std::string> options = {};
@@ -173,19 +173,19 @@ ani_object IntlAddon::Collator_ResolvedOptions(ani_env *env, ani_object object)
     static const char *className = "L@ohos/intl/intl/CollatorOptionsInner;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("IntlAddon::Collator_ResolvedOptions: Find class '%{public}s' failed", className);
         return nullptr;
     }
 
     ani_method ctor;
     if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
-        HILOG_ERROR_I18N("Find method '<ctor>' failed");
+        HILOG_ERROR_I18N("IntlAddon::Collator_ResolvedOptions: Find method '<ctor>' failed");
         return nullptr;
     }
 
     ani_object collatorOptions;
     if (ANI_OK != env->Object_New(cls, ctor, &collatorOptions)) {
-        HILOG_ERROR_I18N("New object '%{public}s' failed", className);
+        HILOG_ERROR_I18N("IntlAddon::Collator_ResolvedOptions: New object '%{public}s' failed", className);
         return nullptr;
     }
 
@@ -218,7 +218,7 @@ static std::map<std::string, std::string> GetDateTimeFormatOptions(ani_env *env,
     std::map<std::string, std::string> map;
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(options, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("GetDateTimeFormatOptions: Check options reference is undefined failed");
         return map;
     }
     if (!isUndefined) {
@@ -275,7 +275,7 @@ static std::map<std::string, std::string> GetCollatorOptions(ani_env *env, ani_o
     std::map<std::string, std::string> map;
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(options, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("GetCollatorOptions: Check options reference is undefined failed");
         return map;
     }
     if (!isUndefined) {
@@ -320,23 +320,26 @@ ani_status IntlAddon::BindContext_DateTimeFormat(ani_env *env)
     static const char *className = "L@ohos/intl/intl/DateTimeFormat;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("BindContext_DateTimeFormat: Find class '%{public}s' failed", className);
         return ANI_ERROR;
     }
 
     std::array methods = {
         ani_native_function {"create", ":L@ohos/intl/intl/DateTimeFormat;",
             reinterpret_cast<void *>(DateTimeFormat_Create) },
-        ani_native_function {"create",
-            "Lstd/core/Object;L@ohos/intl/intl/DateTimeOptions;:L@ohos/intl/intl/DateTimeFormat;",
-            reinterpret_cast<void *>(DateTimeFormat_CreateWithParam) },
+        ani_native_function {
+            "create",
+            "X{C{escompat.Array}C{std.core.String}}C{@ohos.intl.intl.DateTimeOptions}:"
+            "C{@ohos.intl.intl.DateTimeFormat}",
+            reinterpret_cast<void *>(DateTimeFormat_CreateWithParam)
+        },
         ani_native_function {"format", nullptr, reinterpret_cast<void *>(DateTimeFormat_Format) },
         ani_native_function {"formatRange", nullptr, reinterpret_cast<void *>(DateTimeFormat_FormatRange) },
         ani_native_function {"resolvedOptions", nullptr, reinterpret_cast<void *>(DateTimeFormat_ResolvedOptions) },
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+        HILOG_ERROR_I18N("BindContext_DateTimeFormat: Cannot bind native methods to '%{public}s'", className);
         return ANI_ERROR;
     };
     return ANI_OK;
@@ -347,21 +350,23 @@ ani_status IntlAddon::BindContext_Collator(ani_env *env)
     static const char *className = "L@ohos/intl/intl/Collator;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("BindContext_Collator: Find class '%{public}s' failed", className);
         return ANI_ERROR;
     }
 
     std::array methods = {
         ani_native_function {"create", ":L@ohos/intl/intl/Collator;", reinterpret_cast<void *>(Collator_Create) },
-        ani_native_function {"create",
-            "Lstd/core/Object;L@ohos/intl/intl/CollatorOptions;:L@ohos/intl/intl/Collator;",
-            reinterpret_cast<void *>(Collator_CreateWithParam) },
+        ani_native_function {
+            "create",
+            "X{C{std.core.String}C{escompat.Array}}C{@ohos.intl.intl.CollatorOptions}:C{@ohos.intl.intl.Collator}",
+            reinterpret_cast<void *>(Collator_CreateWithParam)
+        },
         ani_native_function {"compare", nullptr, reinterpret_cast<void *>(Collator_Compare) },
         ani_native_function {"resolvedOptions", nullptr, reinterpret_cast<void *>(Collator_ResolvedOptions) },
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+        HILOG_ERROR_I18N("BindContext_Collator: Cannot bind native methods to '%{public}s'", className);
         return ANI_ERROR;
     };
     return ANI_OK;

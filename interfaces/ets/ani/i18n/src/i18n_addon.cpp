@@ -26,11 +26,10 @@
 #include "i18n_timezone_addon.h"
 #include "i18n_unicode_addon.h"
 #include "locale_config.h"
-#include "locale_info_addon.h"
 #include "locale_matcher.h"
-#include "number_format.h"
 #include "simple_date_time_format_addon.h"
 #include "simple_number_format_addon.h"
+#include "styled_number_format_addon.h"
 #include "system_locale_manager_addon.h"
 #include "variable_converter.h"
 
@@ -58,7 +57,7 @@ ani_object I18nPhoneNumberFormatAddon::Create(ani_env *env, [[maybe_unused]] ani
     std::string typeStr;
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(options, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("I18nPhoneNumberFormatAddon::Create: Check options reference is undefined failed");
         return nullptr;
     }
     if (!isUndefined) {
@@ -76,38 +75,39 @@ ani_object I18nPhoneNumberFormatAddon::Create(ani_env *env, [[maybe_unused]] ani
     return phoneNumberFormatObject;
 }
 
-ani_boolean I18nPhoneNumberFormatAddon::IsValidNumber(ani_env *env, ani_object object, ani_string number)
+ani_boolean I18nPhoneNumberFormatAddon::IsValidNumber(ani_env *env, ani_object object, ani_string phoneNumber)
 {
     auto obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->phonenumberfmt_ == nullptr) {
-        HILOG_ERROR_I18N("IsValidPhoneNumber: GetPhoneNumberFormat object failed");
+        HILOG_ERROR_I18N("I18nPhoneNumberFormatAddon::IsValidNumber: GetPhoneNumberFormat object failed");
         return false;
     }
-    return obj->phonenumberfmt_->isValidPhoneNumber(VariableConverter::AniStrToString(env, number));
+    return obj->phonenumberfmt_->isValidPhoneNumber(VariableConverter::AniStrToString(env, phoneNumber));
 }
 
-ani_string I18nPhoneNumberFormatAddon::Format(ani_env *env, ani_object object, ani_string number)
+ani_string I18nPhoneNumberFormatAddon::Format(ani_env *env, ani_object object, ani_string phoneNumber)
 {
     auto obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->phonenumberfmt_ == nullptr) {
-        HILOG_ERROR_I18N("Get PhoneNumberFormat object failed");
+        HILOG_ERROR_I18N("I18nPhoneNumberFormatAddon::Format: Get PhoneNumberFormat object failed");
         return nullptr;
     }
 
-    std::string formattedPhoneNumber = obj->phonenumberfmt_->format(VariableConverter::AniStrToString(env, number));
+    std::string formattedPhoneNumber =
+        obj->phonenumberfmt_->format(VariableConverter::AniStrToString(env, phoneNumber));
     return VariableConverter::StringToAniStr(env, formattedPhoneNumber);
 }
 
 ani_string I18nPhoneNumberFormatAddon::GetLocationName(ani_env *env, ani_object object,
-    ani_string number, ani_string locale)
+    ani_string phoneNumber, ani_string locale)
 {
     auto obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->phonenumberfmt_ == nullptr) {
-        HILOG_ERROR_I18N("GetLocationName: GetPhoneNumberFormat object failed");
+        HILOG_ERROR_I18N("I18nPhoneNumberFormatAddon::GetLocationName: GetPhoneNumberFormat object failed");
         return nullptr;
     }
 
-    std::string resStr = obj->phonenumberfmt_->getLocationName(VariableConverter::AniStrToString(env, number),
+    std::string resStr = obj->phonenumberfmt_->getLocationName(VariableConverter::AniStrToString(env, phoneNumber),
         VariableConverter::AniStrToString(env, locale));
     return VariableConverter::StringToAniStr(env, resStr);
 }
@@ -133,66 +133,64 @@ ani_object I18nBreakIteratorAddon::GetLineInstance(ani_env *env, ani_string loca
     return breakIteratorObject;
 }
 
-ani_double I18nBreakIteratorAddon::Current(ani_env *env, ani_object object)
+ani_int I18nBreakIteratorAddon::Current(ani_env *env, ani_object object)
 {
     I18nBreakIteratorAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->brkiter_ == nullptr) {
-        HILOG_ERROR_I18N("Current: Get BreakIterator object failed");
+        HILOG_ERROR_I18N("I18nBreakIteratorAddon::Current: Get BreakIterator object failed");
         return -1;
     }
     return obj->brkiter_->Current();
 }
 
-ani_double I18nBreakIteratorAddon::First(ani_env *env, ani_object object)
+ani_int I18nBreakIteratorAddon::First(ani_env *env, ani_object object)
 {
     I18nBreakIteratorAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->brkiter_ == nullptr) {
-        HILOG_ERROR_I18N("First: Get BreakIterator object failed");
+        HILOG_ERROR_I18N("I18nBreakIteratorAddon::First: Get BreakIterator object failed");
         return -1;
     }
     return obj->brkiter_->First();
 }
 
-ani_double I18nBreakIteratorAddon::Last(ani_env *env, ani_object object)
+ani_int I18nBreakIteratorAddon::Last(ani_env *env, ani_object object)
 {
     I18nBreakIteratorAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->brkiter_ == nullptr) {
-        HILOG_ERROR_I18N("Last: Get BreakIterator object failed");
+        HILOG_ERROR_I18N("I18nBreakIteratorAddon::Last: Get BreakIterator object failed");
         return -1;
     }
     return obj->brkiter_->Last();
 }
 
-ani_double I18nBreakIteratorAddon::Next(ani_env *env, ani_object object, ani_object index)
+ani_int I18nBreakIteratorAddon::Next(ani_env *env, ani_object object, ani_object index)
 {
     I18nBreakIteratorAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->brkiter_ == nullptr) {
-        HILOG_ERROR_I18N("Next: Get BreakIterator object failed");
+        HILOG_ERROR_I18N("I18nBreakIteratorAddon::Next: Get BreakIterator object failed");
         return -1;
     }
 
-    int value = 1;
+    ani_int value = 1;
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(index, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("I18nBreakIteratorAddon::Next: Check index reference is undefined failed");
         return -1;
     }
     if (!isUndefined) {
-        ani_double temp;
-        if (ANI_OK != env->Object_CallMethodByName_Double(index, "unboxed", ":D", &temp)) {
-            HILOG_ERROR_I18N("Unbox Double failed");
+        if (ANI_OK != env->Object_CallMethodByName_Int(index, "unboxed", ":I", &value)) {
+            HILOG_ERROR_I18N("I18nBreakIteratorAddon::Next: Unbox Int failed");
             return -1;
         }
-        value = static_cast<int>(temp);
     }
     return obj->brkiter_->Next(value);
 }
 
-ani_double I18nBreakIteratorAddon::Previous(ani_env *env, ani_object object)
+ani_int I18nBreakIteratorAddon::Previous(ani_env *env, ani_object object)
 {
     I18nBreakIteratorAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->brkiter_ == nullptr) {
-        HILOG_ERROR_I18N("Previous: Get BreakIterator object failed");
+        HILOG_ERROR_I18N("I18nBreakIteratorAddon::Previous: Get BreakIterator object failed");
         return -1;
     }
     return obj->brkiter_->Previous();
@@ -202,17 +200,17 @@ void I18nBreakIteratorAddon::SetLineBreakText(ani_env *env, ani_object object, a
 {
     I18nBreakIteratorAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->brkiter_ == nullptr) {
-        HILOG_ERROR_I18N("SetText: Get BreakIterator object failed");
+        HILOG_ERROR_I18N("I18nBreakIteratorAddon::SetLineBreakText: Get BreakIterator object failed");
         return;
     }
     obj->brkiter_->SetText(VariableConverter::AniStrToString(env, text).c_str());
 }
 
-ani_double I18nBreakIteratorAddon::Following(ani_env *env, ani_object object, ani_double offset)
+ani_int I18nBreakIteratorAddon::Following(ani_env *env, ani_object object, ani_int offset)
 {
     I18nBreakIteratorAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->brkiter_ == nullptr) {
-        HILOG_ERROR_I18N("Following: Get BreakIterator object failed");
+        HILOG_ERROR_I18N("I18nBreakIteratorAddon::Following: Get BreakIterator object failed");
         return -1;
     }
     return obj->brkiter_->Following(offset);
@@ -222,7 +220,7 @@ ani_string I18nBreakIteratorAddon::GetLineBreakText(ani_env *env, ani_object obj
 {
     I18nBreakIteratorAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->brkiter_ == nullptr) {
-        HILOG_ERROR_I18N("GetText: Get BreakIterator object failed");
+        HILOG_ERROR_I18N("I18nBreakIteratorAddon::GetLineBreakText: Get BreakIterator object failed");
         return nullptr;
     }
 
@@ -231,11 +229,11 @@ ani_string I18nBreakIteratorAddon::GetLineBreakText(ani_env *env, ani_object obj
     return VariableConverter::StringToAniStr(env, temp);
 }
 
-ani_boolean I18nBreakIteratorAddon::IsBoundary(ani_env *env, ani_object object, ani_double offset)
+ani_boolean I18nBreakIteratorAddon::IsBoundary(ani_env *env, ani_object object, ani_int offset)
 {
     I18nBreakIteratorAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->brkiter_ == nullptr) {
-        HILOG_ERROR_I18N("IsBoundary: Get BreakIterator object failed");
+        HILOG_ERROR_I18N("I18nBreakIteratorAddon::IsBoundary: Get BreakIterator object failed");
         return false;
     }
     return obj->brkiter_->IsBoundary(offset);
@@ -256,7 +254,7 @@ ani_object I18nIndexUtilAddon::GetInstance(ani_env *env, ani_string string)
     std::string localeTag = "";
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(string, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("I18nIndexUtilAddon::GetInstance: Check string reference is undefined failed");
         return nullptr;
     }
     if (!isUndefined) {
@@ -276,7 +274,7 @@ ani_object I18nIndexUtilAddon::GetIndexList(ani_env *env, ani_object object)
 {
     I18nIndexUtilAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->indexUtil_ == nullptr) {
-        HILOG_ERROR_I18N("GetIndexList: GetPhoneNumberFormat object failed");
+        HILOG_ERROR_I18N("I18nIndexUtilAddon::GetIndexList: GetPhoneNumberFormat object failed");
         return nullptr;
     }
     std::vector<std::string> indexList = obj->indexUtil_->GetIndexList();
@@ -287,7 +285,7 @@ void I18nIndexUtilAddon::AddLocale(ani_env *env, ani_object object, ani_string l
 {
     I18nIndexUtilAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->indexUtil_ == nullptr) {
-        HILOG_ERROR_I18N("AddLocale: Get IndexUtil object failed");
+        HILOG_ERROR_I18N("I18nIndexUtilAddon::AddLocale: Get IndexUtil object failed");
         return;
     }
     obj->indexUtil_->AddLocale(VariableConverter::AniStrToString(env, locale));
@@ -297,7 +295,7 @@ ani_object I18nIndexUtilAddon::GetIndex(ani_env *env, ani_object object, ani_str
 {
     I18nIndexUtilAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->indexUtil_ == nullptr) {
-        HILOG_ERROR_I18N("GetIndex: Get IndexUtil object failed");
+        HILOG_ERROR_I18N("I18nIndexUtilAddon::GetIndex: Get IndexUtil object failed");
         return nullptr;
     }
 
@@ -320,7 +318,7 @@ ani_object I18nTransliteratorAddon::GetAvailableIDs(ani_env *env, [[maybe_unused
     UErrorCode icuStatus = U_ZERO_ERROR;
     icu::StringEnumeration *strenum = icu::Transliterator::getAvailableIDs(icuStatus);
     if (U_FAILURE(icuStatus)) {
-        HILOG_ERROR_I18N("Failed to get available ids");
+        HILOG_ERROR_I18N("I18nTransliteratorAddon::GetAvailableIDs: Failed to get available ids");
         if (strenum) {
             delete strenum;
         }
@@ -365,7 +363,7 @@ ani_string I18nTransliteratorAddon::Transform(ani_env *env, ani_object object, a
 {
     I18nTransliteratorAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->transliterator_ == nullptr) {
-        HILOG_ERROR_I18N("Get Transliterator object failed");
+        HILOG_ERROR_I18N("I18nTransliteratorAddon::Transform: Get Transliterator object failed");
         return nullptr;
     }
 
@@ -400,7 +398,7 @@ ani_string I18nAddon::UnitConvert(ani_env *env, [[maybe_unused]] ani_object obje
     std::string toUnitStr;
     std::string toMeasSys;
     if (!GetUnitInfo(env, fromUnit, fromUnitStr, fromMeasSys) || !GetUnitInfo(env, toUnit, toUnitStr, toMeasSys)) {
-        HILOG_ERROR_I18N("Get UnitInfo failed");
+        HILOG_ERROR_I18N("I18nAddon::UnitConvert: Get UnitInfo failed");
         return nullptr;
     }
 
@@ -415,7 +413,7 @@ ani_string I18nAddon::UnitConvert(ani_env *env, [[maybe_unused]] ani_object obje
 
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(style, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("I18nAddon::UnitConvert: Check style reference is undefined failed");
         return nullptr;
     }
     if (!isUndefined) {
@@ -436,12 +434,12 @@ ani_string I18nAddon::GetDateOrder(ani_env *env, [[maybe_unused]] ani_object obj
 }
 
 ani_string I18nAddon::GetTimePeriodName(ani_env *env, [[maybe_unused]] ani_object object,
-    ani_double hour, ani_string locale)
+    ani_int hour, ani_string locale)
 {
     std::string localeTag;
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(locale, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("I18nAddon::GetTimePeriodName: Check locale reference is undefined failed");
         return nullptr;
     }
     if (!isUndefined) {
@@ -459,7 +457,7 @@ ani_string I18nAddon::GetTimePeriodName(ani_env *env, [[maybe_unused]] ani_objec
     icu::SimpleDateFormat* formatter = dynamic_cast<icu::SimpleDateFormat*>
         (icu::DateFormat::createDateInstance(icu::DateFormat::EStyle::kDefault, icuLocale));
     if (!formatter) {
-        HILOG_ERROR_I18N("GetTimePeriodName Failed to create SimpleDateFormat");
+        HILOG_ERROR_I18N("I18nAddon::GetTimePeriodName: Failed to create SimpleDateFormat");
         return nullptr;
     }
     formatter->applyPattern("B");
@@ -507,7 +505,7 @@ static bool ProcessJsParamLocaleList(ani_env *env, ani_object localeList, std::v
         UErrorCode icuStatus = U_ZERO_ERROR;
         icu::Locale locale = icu::Locale::forLanguageTag(it->data(), icuStatus);
         if (U_FAILURE(icuStatus) || !IsValidLocaleTag(locale)) {
-            HILOG_ERROR_I18N("GetBestMatchLocale param localeList Invalid: %{public}s.", it->data());
+            HILOG_ERROR_I18N("ProcessJsParamLocaleList: locale invalid: %{public}s.", it->data());
             ErrorUtil::AniThrow(env, I18N_NOT_VALID, "locale of localeList", "a valid locale");
             return false;
         }
@@ -576,7 +574,7 @@ ani_string I18nAddon::GetUnicodeWrappedFilePath(ani_env *env, [[maybe_unused]] a
     char delimiterChar = PATH_SEPARATOR;
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(delimiter, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("I18nAddon::GetUnicodeWrappedFilePath: get delimiter Reference_IsUndefined failed");
         return nullptr;
     }
     if (!isUndefined) {
@@ -589,22 +587,17 @@ ani_string I18nAddon::GetUnicodeWrappedFilePath(ani_env *env, [[maybe_unused]] a
         }
     }
 
-    LocaleInfoAddon* obj = nullptr;
     if (ANI_OK != env->Reference_IsUndefined(locale, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("I18nAddon::GetUnicodeWrappedFilePath: get locale Reference_IsUndefined failed");
         return nullptr;
     }
+    std::string localeTag = "";
     if (!isUndefined) {
-        ani_long ptr;
-        if (ANI_OK != env->Object_GetFieldByName_Long(locale, "nativeLocale", &ptr)) {
-            HILOG_ERROR_I18N("Get Long nativeLocale failed");
-            return nullptr;
-        }
-        obj = reinterpret_cast<LocaleInfoAddon*>(ptr);
+        localeTag = VariableConverter::GetLocaleTagFromBuiltinLocale(env, locale);
     }
 
     std::string errorCode;
-    std::shared_ptr<LocaleInfo> localeInfoPtr = obj == nullptr ? nullptr : obj->GetLocaleInfo();
+    std::shared_ptr<LocaleInfo> localeInfoPtr = localeTag.empty() ? nullptr : std::make_shared<LocaleInfo>(localeTag);
     std::string result = LocaleConfig::GetUnicodeWrappedFilePath(VariableConverter::AniStrToString(env, path),
         delimiterChar, localeInfoPtr, errorCode);
     if (!errorCode.empty()) {
@@ -624,7 +617,7 @@ ani_status I18nPhoneNumberFormatAddon::BindContextPhoneNumberFormat(ani_env *env
     static const char *className = "L@ohos/i18n/i18n/PhoneNumberFormat;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("BindContextPhoneNumberFormat: Find class '%{public}s' failed", className);
         return ANI_ERROR;
     }
 
@@ -638,7 +631,7 @@ ani_status I18nPhoneNumberFormatAddon::BindContextPhoneNumberFormat(ani_env *env
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+        HILOG_ERROR_I18N("BindContextPhoneNumberFormat: Cannot bind native methods to '%{public}s'", className);
         return ANI_ERROR;
     };
 
@@ -650,7 +643,7 @@ ani_status I18nBreakIteratorAddon::BindContextBreakIterator(ani_env *env)
     static const char *className = "L@ohos/i18n/i18n/BreakIterator;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("BindContextBreakIterator: Find class '%{public}s' failed", className);
         return ANI_ERROR;
     }
 
@@ -669,7 +662,7 @@ ani_status I18nBreakIteratorAddon::BindContextBreakIterator(ani_env *env)
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+        HILOG_ERROR_I18N("BindContextBreakIterator: Cannot bind native methods to '%{public}s'", className);
         return ANI_ERROR;
     };
 
@@ -681,7 +674,7 @@ ani_status I18nIndexUtilAddon::BindContextIndexUtil(ani_env *env)
     static const char *className = "L@ohos/i18n/i18n/IndexUtil;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("BindContextIndexUtil: Find class '%{public}s' failed", className);
         return ANI_ERROR;
     }
 
@@ -692,7 +685,7 @@ ani_status I18nIndexUtilAddon::BindContextIndexUtil(ani_env *env)
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+        HILOG_ERROR_I18N("BindContextIndexUtil: Cannot bind native methods to '%{public}s'", className);
         return ANI_ERROR;
     };
 
@@ -704,7 +697,7 @@ ani_status I18nTransliteratorAddon::BindContextTransliterator(ani_env *env)
     static const char *className = "L@ohos/i18n/i18n/Transliterator;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("BindContextTransliterator: Find class '%{public}s' failed", className);
         return ANI_ERROR;
     }
 
@@ -716,7 +709,7 @@ ani_status I18nTransliteratorAddon::BindContextTransliterator(ani_env *env)
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+        HILOG_ERROR_I18N("BindContextTransliterator: Cannot bind native methods to '%{public}s'", className);
         return ANI_ERROR;
     };
 
@@ -728,7 +721,7 @@ ani_status I18nAddon::BindContextI18NUtil(ani_env *env)
     static const char *className = "L@ohos/i18n/i18n/I18NUtil;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("BindContextI18NUtil: Find class '%{public}s' failed", className);
         return ANI_ERROR;
     }
 
@@ -739,10 +732,12 @@ ani_status I18nAddon::BindContextI18NUtil(ani_env *env)
         ani_native_function { "getBestMatchLocale", nullptr, reinterpret_cast<void *>(GetBestMatchLocale) },
         ani_native_function { "getThreeLetterLanguage", nullptr, reinterpret_cast<void *>(GetThreeLetterLanguage) },
         ani_native_function { "getThreeLetterRegion", nullptr, reinterpret_cast<void *>(GetThreeLetterRegion) },
+        ani_native_function { "getUnicodeWrappedFilePath", nullptr,
+            reinterpret_cast<void *>(GetUnicodeWrappedFilePath) },
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+        HILOG_ERROR_I18N("BindContextI18NUtil: Cannot bind native methods to '%{public}s'", className);
         return ANI_ERROR;
     };
 
@@ -754,7 +749,7 @@ ani_status I18nAddon::BindContextNamespace(ani_env *env)
     static const char* nameSpaceName = "L@ohos/i18n/i18n;";
     ani_namespace ns;
     if (ANI_OK != env->FindNamespace(nameSpaceName, &ns)) {
-        HILOG_ERROR_I18N("Find namespace '%{public}s' failed", nameSpaceName);
+        HILOG_ERROR_I18N("BindContextNamespace: Find namespace '%{public}s' failed", nameSpaceName);
         return ANI_ERROR;
     }
     std::array methods = {
@@ -764,9 +759,15 @@ ani_status I18nAddon::BindContextNamespace(ani_env *env)
             reinterpret_cast<void *>(I18nBreakIteratorAddon::GetLineInstance) },
         ani_native_function { "getInstance", nullptr, reinterpret_cast<void *>(I18nIndexUtilAddon::GetInstance) },
         ani_native_function { "getTimeZone", nullptr, reinterpret_cast<void *>(I18nTimeZoneAddon::GetTimeZone) },
+        ani_native_function { "getSimpleDateTimeFormatByPattern", nullptr,
+            reinterpret_cast<void *>(I18nSimpleDateTimeFormatAddon::GetSimpleDateTimeFormatByPattern) },
+        ani_native_function { "getSimpleDateTimeFormatBySkeleton", nullptr,
+            reinterpret_cast<void *>(I18nSimpleDateTimeFormatAddon::GetSimpleDateTimeFormatBySkeleton) },
+        ani_native_function { "getSimpleNumberFormatBySkeleton", nullptr,
+            reinterpret_cast<void *>(I18nSimpleNumberFormatAddon::GetSimpleNumberFormatBySkeleton) },
     };
     if (ANI_OK != env->Namespace_BindNativeFunctions(ns, methods.data(), methods.size())) {
-        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", nameSpaceName);
+        HILOG_ERROR_I18N("BindContextNamespace: Cannot bind native methods to '%{public}s'", nameSpaceName);
         return ANI_ERROR;
     };
 
@@ -806,6 +807,11 @@ ani_status BindContext(ani_env *env)
     }
 
     status = I18nSimpleNumberFormatAddon::BindContextSimpleNumberFormat(env);
+    if (status != ANI_OK) {
+        return status;
+    }
+
+    status = I18nStyledNumberFormatAddon::BindContextStyledNumberFormat(env);
     if (status != ANI_OK) {
         return status;
     }

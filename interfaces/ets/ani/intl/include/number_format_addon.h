@@ -25,7 +25,7 @@ namespace I18n {
 class NumberFormatAddon {
 public:
     static NumberFormatAddon* UnwrapAddon(ani_env *env, ani_object object, const std::string &name);
-    static ani_string NumberFormat_Format(ani_env *env, ani_object object, ani_double number);
+    static ani_string NumberFormat_Format(ani_env *env, ani_object object, ani_double num);
     static ani_string NumberFormat_FormatRange(ani_env *env, ani_object object,
         ani_double startRange, ani_double endRange);
     static ani_object NumberFormat_ResolvedOptions(ani_env *env, ani_object object);

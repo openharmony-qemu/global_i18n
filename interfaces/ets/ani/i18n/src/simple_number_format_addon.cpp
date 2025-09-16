@@ -17,7 +17,6 @@
 
 #include "error_util.h"
 #include "i18n_hilog.h"
-#include "locale_info_addon.h"
 #include "variable_converter.h"
 
 using namespace OHOS;
@@ -37,24 +36,20 @@ I18nSimpleNumberFormatAddon* I18nSimpleNumberFormatAddon::UnwrapAddon(ani_env *e
 ani_object I18nSimpleNumberFormatAddon::GetSimpleNumberFormatBySkeleton(ani_env *env,
     ani_string skeleton, ani_object locale)
 {
-    std::shared_ptr<LocaleInfo> localeInfo = nullptr;
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(locale, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("GetSimpleNumberFormatBySkeleton: Check locale reference is undefined failed");
         return nullptr;
     }
+    std::string localeTag = "";
     if (!isUndefined) {
-        ani_long ptr;
-        if (ANI_OK != env->Object_GetFieldByName_Long(locale, "nativeLocale", &ptr)) {
-            HILOG_ERROR_I18N("Get Long nativeLocale failed");
-            return nullptr;
-        }
-        localeInfo = reinterpret_cast<LocaleInfoAddon*>(ptr)->GetLocaleInfo();
+        localeTag = VariableConverter::GetLocaleTagFromBuiltinLocale(env, locale);
     }
+    std::shared_ptr<LocaleInfo> localeInfo = localeTag.empty() ? nullptr : std::make_shared<LocaleInfo>(localeTag);
 
     std::unique_ptr<I18nSimpleNumberFormatAddon> obj = std::make_unique<I18nSimpleNumberFormatAddon>();
     if (!obj) {
-        HILOG_ERROR_I18N("SimpleNumberFormatConstructor: create I18nSimpleNumberFormatAddon failed.");
+        HILOG_ERROR_I18N("GetSimpleNumberFormatBySkeleton: create I18nSimpleNumberFormatAddon failed.");
         return nullptr;
     }
 
@@ -65,7 +60,7 @@ ani_object I18nSimpleNumberFormatAddon::GetSimpleNumberFormatBySkeleton(ani_env 
         ErrorUtil::AniThrow(env, I18N_NOT_VALID, "skeleton", "a valid number format skeleton");
         return nullptr;
     } else if (!obj->simpleNumberFormat_ || errCode != I18nErrorCode::SUCCESS) {
-        HILOG_ERROR_I18N("SimpleNumberFormatConstructor: Construct SimpleNumberFormat failed.");
+        HILOG_ERROR_I18N("GetSimpleNumberFormatBySkeleton: Construct SimpleNumberFormat failed.");
         return nullptr;
     }
 
@@ -95,7 +90,7 @@ ani_status I18nSimpleNumberFormatAddon::BindContextSimpleNumberFormat(ani_env *e
     static const char *className = "L@ohos/i18n/i18n/SimpleNumberFormat;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("BindContextSimpleNumberFormat: Find class '%{public}s' failed", className);
         return ANI_ERROR;
     }
 
@@ -104,7 +99,7 @@ ani_status I18nSimpleNumberFormatAddon::BindContextSimpleNumberFormat(ani_env *e
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+        HILOG_ERROR_I18N("BindContextSimpleNumberFormat: Cannot bind native methods to '%{public}s'", className);
         return ANI_ERROR;
     };
 
