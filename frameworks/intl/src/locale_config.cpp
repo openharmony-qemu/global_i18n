@@ -507,7 +507,6 @@ string LocaleConfig::GetCountry(const string& parameter)
 {
     std::string systemRegion = ReadSystemParameter(parameter.c_str(), CONFIG_LEN);
     if (systemRegion.empty()) {
-        HILOG_ERROR_I18N("LocaleConfig::GetCountry: ReadSystemParameter %{public}s failed.", parameter.c_str());
         return systemRegion;
     }
     UErrorCode status = U_ZERO_ERROR;
@@ -2623,8 +2622,6 @@ std::string LocaleConfig::GetNumberingSystemDigit(const std::string& NumberingSy
 {
     auto it = NUMBERING_SYSTEM_NAME_TO_DESCRIPTION.find(NumberingSystem);
     if (it == NUMBERING_SYSTEM_NAME_TO_DESCRIPTION.end()) {
-        HILOG_ERROR_I18N("LocaleConfig::GetNumberingSystemDigit: NumberingSystem is %{public}s.",
-            NumberingSystem.c_str());
         return "";
     }
     return it->second;
