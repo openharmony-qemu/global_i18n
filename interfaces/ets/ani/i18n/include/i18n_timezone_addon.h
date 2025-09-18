@@ -28,8 +28,8 @@ public:
     static ani_object GetTimeZone(ani_env *env, ani_string zoneID);
     static ani_string GetID(ani_env *env, ani_object object);
     static ani_string GetDisplayName(ani_env *env, ani_object object, ani_string locale, ani_object isDST);
-    static ani_double GetRawOffset(ani_env *env, ani_object object);
-    static ani_double GetOffset(ani_env *env, ani_object object, ani_object date);
+    static ani_int GetRawOffset(ani_env *env, ani_object object);
+    static ani_int GetOffset(ani_env *env, ani_object object, ani_object date);
     static ani_object GetAvailableIDs(ani_env *env, [[maybe_unused]] ani_object object);
     static ani_object GetAvailableZoneCityIDs(ani_env *env, [[maybe_unused]] ani_object object);
     static ani_object GetCityDisplayName(ani_env *env, [[maybe_unused]] ani_object object,

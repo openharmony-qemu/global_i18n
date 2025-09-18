@@ -29,7 +29,7 @@ public:
     static ani_string DateTimeFormat_FormatRange(ani_env *env, ani_object object,
         ani_object startDate, ani_object endDate);
     static ani_object DateTimeFormat_ResolvedOptions(ani_env *env, ani_object object);
-    static ani_double Collator_Compare(ani_env *env, ani_object object, ani_string first, ani_string second);
+    static ani_int Collator_Compare(ani_env *env, ani_object object, ani_string first, ani_string second);
     static ani_object Collator_ResolvedOptions(ani_env *env, ani_object object);
 
     static ani_object DateTimeFormat_Create(ani_env *env, [[maybe_unused]] ani_object object);
@@ -41,7 +41,8 @@ public:
 
     static ani_status BindContext_DateTimeFormat(ani_env *env);
     static ani_status BindContext_Collator(ani_env *env);
-
+    static ani_status BindContext_PluralRules(ani_env *env);
+    static ani_status BindContext_RelativeTimeFormat(ani_env *env);
 private:
     std::unique_ptr<Collator> collator_ = nullptr;
     std::unique_ptr<DateTimeFormat> datefmt_ = nullptr;

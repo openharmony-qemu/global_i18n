@@ -51,13 +51,13 @@ ani_string I18nSystemAddon::GetDisplayCountry(ani_env *env, [[maybe_unused]] ani
     bool sentenceCaseBool = true;
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(sentenceCase, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("I18nSystemAddon::GetDisplayCountry: Check sentenceCase reference is undefined failed");
         return nullptr;
     }
     if (!isUndefined) {
         ani_boolean value;
         if (ANI_OK != env->Object_CallMethodByName_Boolean(sentenceCase, "unboxed", ":Z", &value)) {
-            HILOG_ERROR_I18N("Unboxed Boolean failed");
+            HILOG_ERROR_I18N("I18nSystemAddon::GetDisplayCountry: Unboxed Boolean failed");
             return nullptr;
         }
         sentenceCaseBool = value;
@@ -79,13 +79,13 @@ ani_string I18nSystemAddon::GetDisplayLanguage(ani_env *env, [[maybe_unused]] an
     bool sentenceCaseBool = true;
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(sentenceCase, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("I18nSystemAddon::GetDisplayLanguage: Check sentenceCase reference is undefined failed");
         return nullptr;
     }
     if (!isUndefined) {
         ani_boolean value;
         if (ANI_OK != env->Object_CallMethodByName_Boolean(sentenceCase, "unboxed", ":Z", &value)) {
-            HILOG_ERROR_I18N("Unboxed Boolean failed");
+            HILOG_ERROR_I18N("I18nSystemAddon::GetDisplayLanguage: Unboxed Boolean failed");
             return nullptr;
         }
         sentenceCaseBool = value;
@@ -117,7 +117,7 @@ ani_boolean I18nSystemAddon::IsSuggested(ani_env *env, [[maybe_unused]] ani_obje
     bool isSuggested = false;
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(region, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("I18nSystemAddon::IsSuggested: Check region reference is undefined failed");
         return false;
     }
     if (!isUndefined) {
@@ -138,7 +138,7 @@ ani_string I18nSystemAddon::GetSystemLanguage(ani_env *env, [[maybe_unused]] ani
 void I18nSystemAddon::SetSystemLanguage(ani_env *env, [[maybe_unused]] ani_object object, ani_string language)
 {
     I18nErrorCode err = I18nServiceAbilityClient::SetSystemLanguage(VariableConverter::AniStrToString(env, language));
-    HILOG_INFO_I18N("I18nSystemAddon::SetSystemLanguageImpl with code %{public}d", static_cast<int32_t>(err));
+    HILOG_INFO_I18N("I18nSystemAddon::SetSystemLanguage with code %{public}d", static_cast<int32_t>(err));
     bool success = err == I18nErrorCode::SUCCESS;
     if (!success) {
         ErrorUtil::AniThrow(env, I18N_NO_PERMISSION, "", "");
@@ -154,7 +154,7 @@ ani_string I18nSystemAddon::GetSystemRegion(ani_env *env, [[maybe_unused]] ani_o
 void I18nSystemAddon::SetSystemRegion(ani_env *env, [[maybe_unused]] ani_object object, ani_string region)
 {
     I18nErrorCode err = I18nServiceAbilityClient::SetSystemRegion(VariableConverter::AniStrToString(env, region));
-    HILOG_INFO_I18N("I18nSystemAddon::SetSystemRegionImpl with code %{public}d", static_cast<int32_t>(err));
+    HILOG_INFO_I18N("I18nSystemAddon::SetSystemRegion with code %{public}d", static_cast<int32_t>(err));
     bool success = err == I18nErrorCode::SUCCESS;
     if (!success) {
         ErrorUtil::AniThrow(env, I18N_NO_PERMISSION, "", "");
@@ -196,23 +196,21 @@ void I18nSystemAddon::Set24HourClock([[maybe_unused]] ani_env *env, [[maybe_unus
 void I18nSystemAddon::AddPreferredLanguage(ani_env *env, [[maybe_unused]] ani_object object,
     ani_string language, ani_object number)
 {
-    int index = 1000000;
+    ani_int index = 1000000;
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(number, &isUndefined)) {
         HILOG_ERROR_I18N("Reference IsUndefined failed");
         return;
     }
     if (!isUndefined) {
-        ani_double value;
-        if (ANI_OK != env->Object_CallMethodByName_Double(number, "unboxed", ":D", &value)) {
-            HILOG_ERROR_I18N("Unboxed Double failed");
+        if (ANI_OK != env->Object_CallMethodByName_Int(number, "unboxed", ":I", &index)) {
+            HILOG_ERROR_I18N("I18nSystemAddon::AddPreferredLanguage: Unboxed number to int failed");
             return;
         }
-        index = static_cast<int>(value);
     }
     I18nErrorCode err = I18nServiceAbilityClient::AddPreferredLanguage(
         VariableConverter::AniStrToString(env, language), index);
-    HILOG_INFO_I18N("I18nSystemAddon::AddPreferredLanguageImpl with code %{public}d", static_cast<int32_t>(err));
+    HILOG_INFO_I18N("I18nSystemAddon::AddPreferredLanguage with code %{public}d", static_cast<int32_t>(err));
     if (err == I18nErrorCode::NO_PERMISSION) {
         ErrorUtil::AniThrow(env, I18N_NO_PERMISSION, "", "");
     }
@@ -222,7 +220,7 @@ void I18nSystemAddon::AddPreferredLanguage(ani_env *env, [[maybe_unused]] ani_ob
 }
 
 void I18nSystemAddon::RemovePreferredLanguage([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
-    ani_double index)
+    ani_int index)
 {
     int len = static_cast<int>(PreferredLanguage::GetPreferredLanguageList().size());
     if ((index < 0 || index > len - 1)) {
@@ -255,7 +253,7 @@ void I18nSystemAddon::SetAppPreferredLanguage(ani_env *env, [[maybe_unused]] ani
     UErrorCode icuStatus = U_ZERO_ERROR;
     icu::Locale locale = icu::Locale::forLanguageTag(localeTag, icuStatus);
     if (U_FAILURE(icuStatus) || !(IsValidLocaleTag(locale) || localeTag.compare("default") == 0)) {
-        HILOG_ERROR_I18N("SetAppPreferredLanguage does not support this locale");
+        HILOG_ERROR_I18N("I18nSystemAddon::SetAppPreferredLanguage: locale is not valid");
         ErrorUtil::AniThrow(env, I18N_NOT_VALID, "language", "a valid language");
         return;
     }
@@ -264,7 +262,7 @@ void I18nSystemAddon::SetAppPreferredLanguage(ani_env *env, [[maybe_unused]] ani
     I18nErrorCode errCode = I18nErrorCode::SUCCESS;
     PreferredLanguage::SetAppPreferredLanguage(localeTag, errCode);
     if (errCode != I18nErrorCode::SUCCESS) {
-        HILOG_ERROR_I18N("SetAppPreferredLanguage: set app language to i18n app preferences failed.");
+        HILOG_ERROR_I18N("I18nSystemAddon::SetAppPreferredLanguage: set app preferred language failed");
     }
 #endif
 }
@@ -283,8 +281,7 @@ void I18nSystemAddon::SetUsingLocalDigit([[maybe_unused]] ani_env *env, [[maybe_
     ani_boolean flag)
 {
     I18nErrorCode err = I18nServiceAbilityClient::SetUsingLocalDigit(flag);
-    HILOG_INFO_I18N("I18nSystemAddon::SetUsingLocalDigitAddonImpl with code %{public}d",
-        static_cast<int32_t>(err));
+    HILOG_INFO_I18N("I18nSystemAddon::SetUsingLocalDigit with code %{public}d", static_cast<int32_t>(err));
     bool res = err == I18nErrorCode::SUCCESS;
     if (!res) {
         ErrorUtil::AniThrow(env, I18N_NO_PERMISSION, "", "");
@@ -302,7 +299,7 @@ ani_string I18nSystemAddon::GetSimplifiedLanguage([[maybe_unused]] ani_env *env,
     std::string simplifiedLanguage = "";
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(language, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("I18nSystemAddon::GetSimplifiedLanguage: Check language reference is undefined failed");
         return nullptr;
     }
     if (isUndefined) {
@@ -312,7 +309,7 @@ ani_string I18nSystemAddon::GetSimplifiedLanguage([[maybe_unused]] ani_env *env,
         simplifiedLanguage = LocaleConfig::GetSimplifiedLanguage(
             VariableConverter::AniStrToString(env, language), code);
         if (code != 0) {
-            HILOG_ERROR_I18N("GetSimplifiedLanguage: language is not valid");
+            HILOG_ERROR_I18N("I18nSystemAddon::GetSimplifiedLanguage: language is not valid");
             ErrorUtil::AniThrow(env, I18N_NOT_VALID, "language", "a valid language");
             return nullptr;
         }
@@ -419,7 +416,7 @@ ani_status I18nSystemAddon::BindContextSystem(ani_env *env)
     static const char *className = "L@ohos/i18n/i18n/System;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("BindContextSystem: Find class '%{public}s' failed", className);
         return ANI_ERROR;
     }
 
@@ -455,7 +452,7 @@ ani_status I18nSystemAddon::BindContextSystem(ani_env *env)
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+        HILOG_ERROR_I18N("BindContextSystem: Cannot bind native methods to '%{public}s'", className);
         return ANI_ERROR;
     };
 

@@ -73,13 +73,13 @@ namespace intl {
         style?: string
         numberingSystem?: string
         useGrouping?: boolean;
-        minimumIntegerDigits?: number;
-        minimumFractionDigits?: number;
-        maximumFractionDigits?: number;
-        minimumSignificantDigits?: number;
-        maximumSignificantDigits?: number;
+        minimumIntegerDigits?: int;
+        minimumFractionDigits?: int;
+        maximumFractionDigits?: int;
+        minimumSignificantDigits?: int;
+        maximumSignificantDigits?: int;
         roundingPriority?: string
-        roundingIncrement?: number;
+        roundingIncrement?: int;
         roundingMode?: string
     }
 
@@ -98,13 +98,13 @@ namespace intl {
         style?: string;
         numberingSystem?: string;
         useGrouping?: boolean;
-        minimumIntegerDigits?: number;
-        minimumFractionDigits?: number;
-        maximumFractionDigits?: number;
-        minimumSignificantDigits?: number;
-        maximumSignificantDigits?: number;
+        minimumIntegerDigits?: int;
+        minimumFractionDigits?: int;
+        maximumFractionDigits?: int;
+        minimumSignificantDigits?: int;
+        maximumSignificantDigits?: int;
         roundingPriority?: string;
-        roundingIncrement?: number;
+        roundingIncrement?: int;
         roundingMode?: string;
     }
 
@@ -175,8 +175,8 @@ namespace intl {
 
         native static create(): NumberFormat;
         native static create(locale: string | Array<string>, options?: NumberOptions): NumberFormat;
-        native format(number: number): string;
-        native formatRange(startRange: number, endRange: number): string;
+        native format(num: double): string;
+        native formatRange(startRange: double, endRange: double): string;
         native resolvedOptions(): NumberOptions;
     }
 
@@ -201,7 +201,7 @@ namespace intl {
 
         native static create(): Collator;
         native static create(locale: string | Array<string>, options?: CollatorOptions): Collator;
-        native compare(first: string, second: string): number;
+        native compare(first: string, second: string): int;
         native resolvedOptions(): CollatorOptions;
     }
 }

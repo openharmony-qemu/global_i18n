@@ -17,7 +17,6 @@
 
 #include "error_util.h"
 #include "i18n_hilog.h"
-#include "locale_info_addon.h"
 #include "variable_converter.h"
 
 using namespace OHOS;
@@ -37,24 +36,21 @@ I18nSimpleDateTimeFormatAddon* I18nSimpleDateTimeFormatAddon::UnwrapAddon(ani_en
 ani_object I18nSimpleDateTimeFormatAddon::GetSimpleDateTimeFormatByPattern(ani_env *env,
     ani_string pattern, ani_object locale)
 {
-    std::shared_ptr<LocaleInfo> localeInfo = nullptr;
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(locale, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("GetSimpleDateTimeFormatByPattern: Check locale reference is undefined failed");
         return nullptr;
     }
+
+    std::string localeTag = "";
     if (!isUndefined) {
-        ani_long ptr;
-        if (ANI_OK != env->Object_GetFieldByName_Long(locale, "nativeLocale", &ptr)) {
-            HILOG_ERROR_I18N("Get Long nativeLocale failed");
-            return nullptr;
-        }
-        localeInfo = reinterpret_cast<LocaleInfoAddon*>(ptr)->GetLocaleInfo();
+        localeTag = VariableConverter::GetLocaleTagFromBuiltinLocale(env, locale);
     }
+    std::shared_ptr<LocaleInfo> localeInfo = localeTag.empty() ? nullptr : std::make_shared<LocaleInfo>(localeTag);
 
     std::unique_ptr<I18nSimpleDateTimeFormatAddon> obj = std::make_unique<I18nSimpleDateTimeFormatAddon>();
     if (obj == nullptr) {
-        HILOG_ERROR_I18N("SimpleDateTimeFormatConstructor: Create I18nSimpleDateTimeFormatAddon failed.");
+        HILOG_ERROR_I18N("GetSimpleDateTimeFormatByPattern: Create I18nSimpleDateTimeFormatAddon failed.");
         return nullptr;
     }
 
@@ -68,7 +64,7 @@ ani_object I18nSimpleDateTimeFormatAddon::GetSimpleDateTimeFormatByPattern(ani_e
         ErrorUtil::AniThrow(env, I18N_NOT_VALID, "pattern", "a valid date time format pattern");
         return nullptr;
     } else if (!obj->simpleDateTimeFormat_ || errCode != I18nErrorCode::SUCCESS) {
-        HILOG_ERROR_I18N("SimpleDateTimeFormatConstructor: Construct SimpleDateTimeFormat failed.");
+        HILOG_ERROR_I18N("GetSimpleDateTimeFormatByPattern: Construct SimpleDateTimeFormat failed.");
         return nullptr;
     }
 
@@ -81,24 +77,20 @@ ani_object I18nSimpleDateTimeFormatAddon::GetSimpleDateTimeFormatByPattern(ani_e
 ani_object I18nSimpleDateTimeFormatAddon::GetSimpleDateTimeFormatBySkeleton(ani_env *env,
     ani_string skeleton, ani_object locale)
 {
-    std::shared_ptr<LocaleInfo> localeInfo = nullptr;
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(locale, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("GetSimpleDateTimeFormatBySkeleton: Check locale reference is undefined failed");
         return nullptr;
     }
+    std::string localeTag = "";
     if (!isUndefined) {
-        ani_long ptr;
-        if (ANI_OK != env->Object_GetFieldByName_Long(locale, "nativeLocale", &ptr)) {
-            HILOG_ERROR_I18N("Get Long nativeLocale failed");
-            return nullptr;
-        }
-        localeInfo = reinterpret_cast<LocaleInfoAddon*>(ptr)->GetLocaleInfo();
+        localeTag = VariableConverter::GetLocaleTagFromBuiltinLocale(env, locale);
     }
+    std::shared_ptr<LocaleInfo> localeInfo = localeTag.empty() ? nullptr : std::make_shared<LocaleInfo>(localeTag);
 
     std::unique_ptr<I18nSimpleDateTimeFormatAddon> obj = std::make_unique<I18nSimpleDateTimeFormatAddon>();
     if (obj == nullptr) {
-        HILOG_ERROR_I18N("SimpleDateTimeFormatConstructor: Create I18nSimpleDateTimeFormatAddon failed.");
+        HILOG_ERROR_I18N("GetSimpleDateTimeFormatBySkeleton: Create I18nSimpleDateTimeFormatAddon failed.");
         return nullptr;
     }
 
@@ -112,7 +104,7 @@ ani_object I18nSimpleDateTimeFormatAddon::GetSimpleDateTimeFormatBySkeleton(ani_
         ErrorUtil::AniThrow(env, I18N_NOT_VALID, "pattern", "a valid date time format pattern");
         return nullptr;
     } else if (!obj->simpleDateTimeFormat_ || errCode != I18nErrorCode::SUCCESS) {
-        HILOG_ERROR_I18N("SimpleDateTimeFormatConstructor: Construct SimpleDateTimeFormat failed.");
+        HILOG_ERROR_I18N("GetSimpleDateTimeFormatBySkeleton: Construct SimpleDateTimeFormat failed.");
         return nullptr;
     }
 
@@ -126,32 +118,32 @@ ani_string I18nSimpleDateTimeFormatAddon::Format(ani_env *env, ani_object object
 {
     I18nSimpleDateTimeFormatAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->simpleDateTimeFormat_ == nullptr) {
-        HILOG_ERROR_I18N("SimpleDateTimeFormatConstructor: unwrap SimpleDateTimeFormatAddon failed.");
+        HILOG_ERROR_I18N("I18nSimpleDateTimeFormatAddon::Format: unwrap SimpleDateTimeFormatAddon failed.");
         return nullptr;
     }
 
     static const char *className = "Lescompat/Date;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("I18nSimpleDateTimeFormatAddon::Format: Find class '%{public}s' failed", className);
         return nullptr;
     }
 
     ani_method getms;
     if (ANI_OK != env->Class_FindMethod(cls, "valueOf", nullptr, &getms)) {
-        HILOG_ERROR_I18N("Find method 'valueOf' failed");
+        HILOG_ERROR_I18N("I18nSimpleDateTimeFormatAddon::Format: Find method 'valueOf' failed");
         return nullptr;
     }
 
     ani_double milliseconds;
     if (ANI_OK != env->Object_CallMethod_Double(date, getms, &milliseconds)) {
-        HILOG_ERROR_I18N("Call method 'valueOf' failed");
+        HILOG_ERROR_I18N("I18nSimpleDateTimeFormatAddon::Format: Call method 'valueOf' failed");
         return nullptr;
     }
 
     std::string formatResult = obj->simpleDateTimeFormat_->Format(milliseconds);
     if (formatResult.empty()) {
-        HILOG_ERROR_I18N("SimpleDateTimeFormatConstructor: format result is empty.");
+        HILOG_ERROR_I18N("I18nSimpleDateTimeFormatAddon::Format: format result is empty.");
     }
     return VariableConverter::StringToAniStr(env, formatResult);
 }
@@ -161,7 +153,7 @@ ani_status I18nSimpleDateTimeFormatAddon::BindContextSimpleDateTimeFormat(ani_en
     static const char *className = "L@ohos/i18n/i18n/SimpleDateTimeFormat;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("BindContextSimpleDateTimeFormat: Find class '%{public}s' failed", className);
         return ANI_ERROR;
     }
 
@@ -170,7 +162,7 @@ ani_status I18nSimpleDateTimeFormatAddon::BindContextSimpleDateTimeFormat(ani_en
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+        HILOG_ERROR_I18N("BindContextSimpleDateTimeFormat: Cannot bind native methods to '%{public}s'", className);
         return ANI_ERROR;
     };
 

@@ -37,7 +37,7 @@ ani_object I18nTimeZoneAddon::GetTimeZone(ani_env *env, ani_string zoneID)
     std::unique_ptr<I18nTimeZoneAddon> obj = std::make_unique<I18nTimeZoneAddon>();
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(zoneID, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("I18nTimeZoneAddon::GetTimeZone: Check zoneID reference is undefined failed");
         return nullptr;
     }
     std::string zoneIDStr = "";
@@ -56,7 +56,7 @@ ani_string I18nTimeZoneAddon::GetID(ani_env *env, ani_object object)
 {
     I18nTimeZoneAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->timezone_ == nullptr) {
-        HILOG_ERROR_I18N("GetID: Get TimeZone object failed");
+        HILOG_ERROR_I18N("I18nTimeZoneAddon::GetID: Get TimeZone object failed");
         return nullptr;
     }
 
@@ -68,14 +68,14 @@ ani_string I18nTimeZoneAddon::GetDisplayName(ani_env *env, ani_object object, an
 {
     I18nTimeZoneAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->timezone_ == nullptr) {
-        HILOG_ERROR_I18N("GetDisplayName: Get TimeZone object failed");
+        HILOG_ERROR_I18N("I18nTimeZoneAddon::GetDisplayName: Get TimeZone object failed");
         return nullptr;
     }
 
     bool localeFlag = false;
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(locale, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("I18nTimeZoneAddon::GetDisplayName: Check locale reference is undefined failed");
         return nullptr;
     }
     if (!isUndefined) {
@@ -85,13 +85,13 @@ ani_string I18nTimeZoneAddon::GetDisplayName(ani_env *env, ani_object object, an
     bool DSTFlag = false;
     ani_boolean isDSTBool;
     if (ANI_OK != env->Reference_IsUndefined(isDST, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("I18nTimeZoneAddon::GetDisplayName: Check isDST reference is undefined failed");
         return nullptr;
     }
     if (!isUndefined) {
         DSTFlag = true;
         if (ANI_OK != env->Object_CallMethodByName_Boolean(isDST, "unboxed", ":Z", &isDSTBool)) {
-            HILOG_ERROR_I18N("Unbox Boolean failed");
+            HILOG_ERROR_I18N("I18nTimeZoneAddon::GetDisplayName: Unbox Boolean failed");
             return nullptr;
         }
     }
@@ -109,33 +109,33 @@ ani_string I18nTimeZoneAddon::GetDisplayName(ani_env *env, ani_object object, an
     return VariableConverter::StringToAniStr(env, result);
 }
 
-ani_double I18nTimeZoneAddon::GetRawOffset(ani_env *env, ani_object object)
+ani_int I18nTimeZoneAddon::GetRawOffset(ani_env *env, ani_object object)
 {
     I18nTimeZoneAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->timezone_ == nullptr) {
-        HILOG_ERROR_I18N("GetRawOffset: Get TimeZone object failed");
+        HILOG_ERROR_I18N("I18nTimeZoneAddon::GetRawOffset: Get TimeZone object failed");
         return -1;
     }
     return obj->timezone_->GetRawOffset();
 }
 
-ani_double I18nTimeZoneAddon::GetOffset(ani_env *env, ani_object object, ani_object date)
+ani_int I18nTimeZoneAddon::GetOffset(ani_env *env, ani_object object, ani_object date)
 {
     I18nTimeZoneAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->timezone_ == nullptr) {
-        HILOG_ERROR_I18N("GetOffset: Get TimeZone object failed");
+        HILOG_ERROR_I18N("I18nTimeZoneAddon::GetOffset: Get TimeZone object failed");
         return -1;
     }
 
     double dateDouble = 0;
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(date, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("I18nTimeZoneAddon::GetOffset: Check type reference is undefined failed");
         return -1;
     }
     if (!isUndefined) {
         if (ANI_OK != env->Object_CallMethodByName_Double(date, "unboxed", ":D", &dateDouble)) {
-            HILOG_ERROR_I18N("Unbox Double failed");
+            HILOG_ERROR_I18N("I18nTimeZoneAddon::GetOffset: Unbox Double failed");
             return -1;
         }
     } else {
@@ -194,32 +194,32 @@ ani_object I18nTimeZoneAddon::GetTimezonesByLocation(ani_env *env, [[maybe_unuse
     static const char *className = "Lescompat/Array;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("I18nTimeZoneAddon::GetTimezonesByLocation: Find class '%{public}s' failed", className);
         return nullptr;
     }
 
     ani_method ctor;
     if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "I:V", &ctor)) {
-        HILOG_ERROR_I18N("Find method '<ctor>' failed");
+        HILOG_ERROR_I18N("I18nTimeZoneAddon::GetTimezonesByLocation: Find method '<ctor>' failed");
         return nullptr;
     }
 
     ani_object ret;
     if (ANI_OK != env->Object_New(cls, ctor, &ret, tempList.size())) {
-        HILOG_ERROR_I18N("New object '%{public}s' failed", className);
+        HILOG_ERROR_I18N("I18nTimeZoneAddon::GetTimezonesByLocation: New object '%{public}s' failed", className);
         return nullptr;
     }
 
     ani_method set;
     if (ANI_OK != env->Class_FindMethod(cls, "$_set", "ILstd/core/Object;:V", &set)) {
-        HILOG_ERROR_I18N("Find method '$_set' failed");
+        HILOG_ERROR_I18N("I18nTimeZoneAddon::GetTimezonesByLocation: Find method '$_set' failed");
         return nullptr;
     }
 
     for (size_t i = 0; i < tempList.size(); ++i) {
         ani_object timezone = GetTimezoneFromCity(env, object, VariableConverter::StringToAniStr(env, tempList[i]));
         if (ANI_OK != env->Object_CallMethod_Void(ret, set, i, timezone)) {
-            HILOG_ERROR_I18N("Call method '$_set' failed");
+            HILOG_ERROR_I18N("I18nTimeZoneAddon::GetTimezonesByLocation: Call method '$_set' failed");
             return nullptr;
         }
     }
@@ -231,8 +231,8 @@ ani_status I18nTimeZoneAddon::BindContextTimeZone(ani_env *env)
     static const char *className = "L@ohos/i18n/i18n/TimeZone;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
-        return ANI_ERROR;
+        HILOG_ERROR_I18N("BindContextTimeZone: Find class '%{public}s' failed", className);
+        return (ani_status)ANI_ERROR;
     }
 
     std::array methods = {
@@ -253,8 +253,8 @@ ani_status I18nTimeZoneAddon::BindContextTimeZone(ani_env *env)
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
-        return ANI_ERROR;
+        HILOG_ERROR_I18N("BindContextTimeZone: Cannot bind native methods to '%{public}s'", className);
+        return (ani_status)ANI_ERROR;
     };
 
     return ANI_OK;

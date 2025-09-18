@@ -26,7 +26,7 @@ I18nNormalizerAddon* I18nNormalizerAddon::UnwrapAddon(ani_env *env, ani_object o
 {
     ani_long ptr;
     if (ANI_OK != env->Object_GetFieldByName_Long(object, "nativeNormalizer", &ptr)) {
-        HILOG_ERROR_I18N("Get Long 'nativeNormalizer' failed");
+        HILOG_ERROR_I18N("I18nNormalizerAddon::UnwrapAddon: Get field nativeNormalizer to long failed");
         return nullptr;
     }
     return reinterpret_cast<I18nNormalizerAddon*>(ptr);
@@ -36,12 +36,13 @@ ani_object I18nNormalizerAddon::GetInstance(ani_env *env, [[maybe_unused]] ani_o
 {
     int32_t normalizerMode;
     if (ANI_OK != env->EnumItem_GetValue_Int(mode, &normalizerMode)) {
-        HILOG_ERROR_I18N("Enum get value 'normalizerMode' failed");
+        HILOG_ERROR_I18N("I18nNormalizerAddon::GetInstance: Enum get value 'normalizerMode' failed");
         return nullptr;
     }
 
     if (normalizerMode != NORMALIZER_MODE_NFC && normalizerMode != NORMALIZER_MODE_NFD &&
         normalizerMode != NORMALIZER_MODE_NFKC && normalizerMode != NORMALIZER_MODE_NFKD) {
+        HILOG_ERROR_I18N("I18nNormalizerAddon::GetInstance: Mode is not valid");
         ErrorUtil::AniThrow(env, I18N_NOT_FOUND, "mode", "a valid mode");
         return nullptr;
     }
@@ -64,7 +65,7 @@ ani_string I18nNormalizerAddon::Normalize(ani_env *env, ani_object object, ani_s
 {
     I18nNormalizerAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->normalizer_ == nullptr) {
-        HILOG_ERROR_I18N("Get Normalizer object failed");
+        HILOG_ERROR_I18N("I18nNormalizerAddon::Normalize: Get Normalizer object failed");
         return nullptr;
     }
 
@@ -83,7 +84,7 @@ ani_status I18nNormalizerAddon::BindContextNormalizer(ani_env *env)
     static const char *className = "L@ohos/i18n/i18n/Normalizer;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("BindContextNormalizer: Find class '%{public}s' failed", className);
         return ANI_ERROR;
     }
 
@@ -93,7 +94,7 @@ ani_status I18nNormalizerAddon::BindContextNormalizer(ani_env *env)
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+        HILOG_ERROR_I18N("BindContextNormalizer: Cannot bind native methods to '%{public}s'", className);
         return ANI_ERROR;
     };
 

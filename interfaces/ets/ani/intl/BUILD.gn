@@ -15,6 +15,7 @@ import("//build/config/components/ets_frontend/ets2abc_config.gni")
 import("//build/ohos.gni")
 
 ohos_shared_library("intl_ani") {
+  shlib_type = "ani"
   include_dirs = [
     "./include",
     "../i18n/include",
@@ -22,7 +23,6 @@ ohos_shared_library("intl_ani") {
   sources = [
     "../i18n/src/variable_converter.cpp",
     "./src/intl_addon.cpp",
-    "./src/locale_info_addon.cpp",
     "./src/number_format_addon.cpp",
   ]
   deps = [ "../../../../frameworks/intl:intl_util" ]

@@ -74,7 +74,7 @@ ani_status I18nUnicodeAddon::BindContextUnicode(ani_env *env)
     static const char *className = "L@ohos/i18n/i18n/Unicode;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("BindContextUnicode: Find class '%{public}s' failed", className);
         return ANI_ERROR;
     }
 
@@ -91,7 +91,7 @@ ani_status I18nUnicodeAddon::BindContextUnicode(ani_env *env)
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+        HILOG_ERROR_I18N("BindContextUnicode: Cannot bind native methods to '%{public}s'", className);
         return ANI_ERROR;
     };
 

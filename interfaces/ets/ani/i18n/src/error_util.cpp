@@ -35,39 +35,39 @@ static const std::unordered_map<int32_t, std::string> ErrorCodeToMsg {
 ani_object ErrorUtil::WrapAniError(ani_env *env, const std::string &msg)
 {
     if (env == nullptr) {
-        HILOG_ERROR_I18N("null env");
+        HILOG_ERROR_I18N("ErrorUtil::WrapAniError: env is null");
         return nullptr;
     }
 
     ani_string aniMsg = nullptr;
     ani_status status = ANI_ERROR;
     if ((status = env->String_NewUTF8(msg.c_str(), msg.size(), &aniMsg)) != ANI_OK) {
-        HILOG_ERROR_I18N("String_NewUTF8 failed %{public}d", status);
+        HILOG_ERROR_I18N("ErrorUtil::WrapAniError: String_NewUTF8 failed %{public}d", status);
         return nullptr;
     }
 
     ani_ref undefRef;
     if ((status = env->GetUndefined(&undefRef)) != ANI_OK) {
-        HILOG_ERROR_I18N("GetUndefined failed %{public}d", status);
+        HILOG_ERROR_I18N("ErrorUtil::WrapAniError: GetUndefined failed %{public}d", status);
         return nullptr;
     }
 
     ani_class cls {};
     if ((status = env->FindClass("Lescompat/Error;", &cls)) != ANI_OK) {
-        HILOG_ERROR_I18N("FindClass failed %{public}d", status);
+        HILOG_ERROR_I18N("ErrorUtil::WrapAniError: FindClass failed %{public}d", status);
         return nullptr;
     }
 
     ani_method method {};
     if ((status = env->Class_FindMethod(cls, "<ctor>", "Lstd/core/String;Lescompat/ErrorOptions;:V", &method)) !=
         ANI_OK) {
-        HILOG_ERROR_I18N("Class_FindMethod failed %{public}d", status);
+        HILOG_ERROR_I18N("ErrorUtil::WrapAniError: Class_FindMethod failed %{public}d", status);
         return nullptr;
     }
 
     ani_object obj = nullptr;
     if ((status = env->Object_New(cls, method, &obj, aniMsg, undefRef)) != ANI_OK) {
-        HILOG_ERROR_I18N("Object_New failed %{public}d", status);
+        HILOG_ERROR_I18N("ErrorUtil::WrapAniError: Object_New failed %{public}d", status);
         return nullptr;
     }
     return obj;
@@ -84,21 +84,20 @@ ani_object ErrorUtil::CreateError(ani_env *env, ani_int code, const std::string 
         return nullptr;
     }
     if ((status = env->FindClass("L@ohos/base/BusinessError;", &cls)) != ANI_OK) {
-        HILOG_ERROR_I18N("FindClass failed %{public}d", status);
+        HILOG_ERROR_I18N("ErrorUtil::CreateError: FindClass failed %{public}d", status);
         return nullptr;
     }
-    if ((status = env->Class_FindMethod(cls, "<ctor>", "DLescompat/Error;:V", &method)) != ANI_OK) {
-        HILOG_ERROR_I18N("Class_FindMethod failed %{public}d", status);
+    if ((status = env->Class_FindMethod(cls, "<ctor>", "ILescompat/Error;:V", &method)) != ANI_OK) {
+        HILOG_ERROR_I18N("ErrorUtil::CreateError: Class_FindMethod failed %{public}d", status);
         return nullptr;
     }
     ani_object error = WrapAniError(env, msg);
     if (error == nullptr) {
-        HILOG_ERROR_I18N("error null");
+        HILOG_ERROR_I18N("ErrorUtil::CreateError: error is null");
         return nullptr;
     }
-    ani_double dCode(code);
-    if ((status = env->Object_New(cls, method, &obj, dCode, error)) != ANI_OK) {
-        HILOG_ERROR_I18N("Object_New failed %{public}d", status);
+    if ((status = env->Object_New(cls, method, &obj, code, error)) != ANI_OK) {
+        HILOG_ERROR_I18N("ErrorUtil::CreateError: Object_New failed %{public}d", status);
         return nullptr;
     }
     return obj;
@@ -123,7 +122,7 @@ void ErrorUtil::AniThrow(ani_env *env, int32_t errCode, const std::string &value
 
     ani_object error = CreateError(env, errCode, allErrMsg);
     if (ANI_OK != env->ThrowError(static_cast<ani_error>(error))) {
-        HILOG_ERROR_I18N("Throw error failed");
+        HILOG_ERROR_I18N("ErrorUtil::AniThrow: Throw error failed");
         return;
     }
 }

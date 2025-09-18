@@ -53,14 +53,14 @@ ani_boolean I18nHolidayManagerAddon::IsHoliday(ani_env *env, ani_object object, 
 {
     I18nHolidayManagerAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->holidayManager_ == nullptr) {
-        HILOG_ERROR_I18N("IsHoliday: Get HolidayManager object failed");
+        HILOG_ERROR_I18N("18nHolidayManagerAddon::IsHoliday: Get HolidayManager object failed");
         return false;
     }
 
     bool res = false;
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(date, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("18nHolidayManagerAddon::IsHoliday: Check date reference is undefined failed");
         return false;
     }
     if (isUndefined) {
@@ -83,19 +83,19 @@ static ani_object CreateHolidayLocalName(ani_env *env, HolidayLocalName localNam
     static const char *className = "L@ohos/i18n/i18n/HolidayLocalNameInner;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("CreateHolidayLocalName: Find class '%{public}s' failed", className);
         return nullptr;
     }
 
     ani_method ctor;
     if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
-        HILOG_ERROR_I18N("Find method '<ctor>' failed");
+        HILOG_ERROR_I18N("CreateHolidayLocalName: Find method '<ctor>' failed");
         return nullptr;
     }
 
     ani_object ret;
     if (ANI_OK != env->Object_New(cls, ctor, &ret)) {
-        HILOG_ERROR_I18N("New object '%{public}s' failed", className);
+        HILOG_ERROR_I18N("CreateHolidayLocalName: New object '%{public}s' failed", className);
         return nullptr;
     }
 
@@ -109,31 +109,31 @@ static ani_object CreateHolidayLocalNameArray(ani_env *env, std::vector<HolidayL
     static const char *className = "Lescompat/Array;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("CreateHolidayLocalNameArray: Find class '%{public}s' failed", className);
         return nullptr;
     }
 
     ani_method ctor;
     if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "I:V", &ctor)) {
-        HILOG_ERROR_I18N("Find method '<ctor>' failed");
+        HILOG_ERROR_I18N("CreateHolidayLocalNameArray: Find method '<ctor>' failed");
         return nullptr;
     }
 
     ani_object ret;
     if (ANI_OK != env->Object_New(cls, ctor, &ret, localNames.size())) {
-        HILOG_ERROR_I18N("New object '%{public}s' failed", className);
+        HILOG_ERROR_I18N("CreateHolidayLocalNameArray: New object '%{public}s' failed", className);
         return nullptr;
     }
 
     ani_method set;
     if (ANI_OK != env->Class_FindMethod(cls, "$_set", "ILstd/core/Object;:V", &set)) {
-        HILOG_ERROR_I18N("Find method '$_set' failed");
+        HILOG_ERROR_I18N("CreateHolidayLocalNameArray: Find method '$_set' failed");
         return ret;
     }
 
     for (size_t i = 0; i < localNames.size(); ++i) {
         if (ANI_OK != env->Object_CallMethod_Void(ret, set, i, CreateHolidayLocalName(env, localNames[i]))) {
-            HILOG_ERROR_I18N("Call method '$_set' failed");
+            HILOG_ERROR_I18N("CreateHolidayLocalNameArray: Call method '$_set' failed");
             return ret;
         }
     }
@@ -145,39 +145,39 @@ static ani_object CreateHolidayInfoItem(ani_env *env, HolidayInfoItem item)
     static const char *className = "L@ohos/i18n/i18n/HolidayInfoItemInner;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("CreateHolidayInfoItem: Find class '%{public}s' failed", className);
         return nullptr;
     }
 
     ani_method ctor;
     if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
-        HILOG_ERROR_I18N("Find method '<ctor>' failed");
+        HILOG_ERROR_I18N("CreateHolidayInfoItem: Find method '<ctor>' failed");
         return nullptr;
     }
 
     ani_object ret;
     if (ANI_OK != env->Object_New(cls, ctor, &ret)) {
-        HILOG_ERROR_I18N("New object '%{public}s' failed", className);
+        HILOG_ERROR_I18N("CreateHolidayInfoItem: New object '%{public}s' failed", className);
         return nullptr;
     }
 
     VariableConverter::SetStringMember(env, ret, "baseName", item.baseName);
 
     if (ANI_OK != env->Object_SetPropertyByName_Double(ret, "year", item.year)) {
-        HILOG_ERROR_I18N("Set property 'year' failed");
+        HILOG_ERROR_I18N("CreateHolidayInfoItem: Set property 'year' failed");
     }
 
     if (ANI_OK != env->Object_SetPropertyByName_Double(ret, "month", item.month)) {
-        HILOG_ERROR_I18N("Set property 'month' failed");
+        HILOG_ERROR_I18N("CreateHolidayInfoItem: Set property 'month' failed");
     }
 
     if (ANI_OK != env->Object_SetPropertyByName_Double(ret, "day", item.day)) {
-        HILOG_ERROR_I18N("Set property 'day' failed");
+        HILOG_ERROR_I18N("CreateHolidayInfoItem: Set property 'day' failed");
     }
 
     if (ANI_OK != env->Object_SetPropertyByName_Ref(ret, "localNames",
         CreateHolidayLocalNameArray(env, item.localNames))) {
-        HILOG_ERROR_I18N("Set property 'localNames' failed");
+        HILOG_ERROR_I18N("CreateHolidayInfoItem: Set property 'localNames' failed");
     }
     return ret;
 }
@@ -187,31 +187,31 @@ static ani_object GetHolidayInfoItemResult(ani_env *env, std::vector<HolidayInfo
     static const char *className = "Lescompat/Array;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("GetHolidayInfoItemResult: Find class '%{public}s' failed", className);
         return nullptr;
     }
 
     ani_method ctor;
     if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "I:V", &ctor)) {
-        HILOG_ERROR_I18N("Find method '<ctor>' failed");
+        HILOG_ERROR_I18N("GetHolidayInfoItemResult: Find method '<ctor>' failed");
         return nullptr;
     }
 
     ani_object ret;
     if (ANI_OK != env->Object_New(cls, ctor, &ret, itemList.size())) {
-        HILOG_ERROR_I18N("New object '%{public}s' failed", className);
+        HILOG_ERROR_I18N("GetHolidayInfoItemResult: New object '%{public}s' failed", className);
         return nullptr;
     }
 
     ani_method set;
     if (ANI_OK != env->Class_FindMethod(cls, "$_set", "ILstd/core/Object;:V", &set)) {
-        HILOG_ERROR_I18N("Find method '$_set' failed");
+        HILOG_ERROR_I18N("GetHolidayInfoItemResult: Find method '$_set' failed");
         return ret;
     }
 
     for (size_t i = 0; i < itemList.size(); ++i) {
         if (ANI_OK != env->Object_CallMethod_Void(ret, set, i, CreateHolidayInfoItem(env, itemList[i]))) {
-            HILOG_ERROR_I18N("Call method '$_set' failed");
+            HILOG_ERROR_I18N("GetHolidayInfoItemResult: Call method '$_set' failed");
             return ret;
         }
     }
@@ -229,15 +229,15 @@ ani_object I18nHolidayManagerAddon::GetHolidayInfoItemArray(ani_env *env, ani_ob
     std::vector<HolidayInfoItem> itemList;
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(year, &isUndefined)) {
-        HILOG_ERROR_I18N("Reference IsUndefined failed");
+        HILOG_ERROR_I18N("GetHolidayInfoItemArray: Check year reference is undefined failed");
         return nullptr;
     }
     if (isUndefined) {
         itemList = obj->holidayManager_->GetHolidayInfoItemArray();
     } else {
-        ani_double yearValue;
-        if (ANI_OK != env->Object_CallMethodByName_Double(year, "unboxed", ":D", &yearValue)) {
-            HILOG_ERROR_I18N("Unbox Double failed");
+        ani_int yearValue;
+        if (ANI_OK != env->Object_CallMethodByName_Int(year, "unboxed", ":I", &yearValue)) {
+            HILOG_ERROR_I18N("Unbox Int failed");
             return nullptr;
         }
         if (yearValue < 0) {
@@ -255,7 +255,7 @@ ani_status I18nHolidayManagerAddon::BindContextHolidayManager(ani_env *env)
     static const char *className = "L@ohos/i18n/i18n/HolidayManager;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
+        HILOG_ERROR_I18N("BindContextHolidayManager: Find class '%{public}s' failed", className);
         return ANI_ERROR;
     }
 
@@ -267,7 +267,7 @@ ani_status I18nHolidayManagerAddon::BindContextHolidayManager(ani_env *env)
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
+        HILOG_ERROR_I18N("BindContextHolidayManager: Cannot bind native methods to '%{public}s'", className);
         return ANI_ERROR;
     };
 
