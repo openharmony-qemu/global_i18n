@@ -21,11 +21,12 @@
 #include "intl_date_time_format.h"
 #include "js_utils.h"
 #include "utils.h"
+#include "intl_napi_ref_wapper.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static thread_local napi_ref* g_IntlDateTimeFormatConstructor = nullptr;
+static thread_local std::unique_ptr<IntlNapiRefWapper> g_IntlDateTimeFormatConstructor = nullptr;
 static constexpr int NUMBER_OF_PARAMETER = 2;
 
 IntlDateTimeFormatAddon::IntlDateTimeFormatAddon()
@@ -71,20 +72,20 @@ napi_value IntlDateTimeFormatAddon::InitIntlDateTimeFormat(napi_env env, napi_va
         return nullptr;
     }
 
-    g_IntlDateTimeFormatConstructor = new (std::nothrow) napi_ref;
-    if (!g_IntlDateTimeFormatConstructor) {
+    napi_ref* napiRef = new (std::nothrow) napi_ref;
+    if (!napiRef) {
         HILOG_ERROR_I18N(
             "IntlDateTimeFormatAddon::InitIntlDateTimeFormat: Failed to create DateTimeFormat ref at init.");
         return nullptr;
     }
 
-    status = napi_create_reference(env, constructor, 1, g_IntlDateTimeFormatConstructor);
+    status = napi_create_reference(env, constructor, 1, napiRef);
     if (status != napi_ok) {
         HILOG_ERROR_I18N(
             "IntlDateTimeFormatAddon::InitIntlDateTimeFormat: Failed to create reference g_IntlLocaleConstructor.");
         return nullptr;
     }
-
+    g_IntlDateTimeFormatConstructor = std::make_unique<IntlNapiRefWapper>(env, *napiRef);
     return exports;
 }
 
@@ -149,7 +150,8 @@ napi_value IntlDateTimeFormatAddon::CreateDateTimeFormatWithoutNew(napi_env env,
     }
 
     napi_value constructor = nullptr;
-    status = napi_get_reference_value(env, *g_IntlDateTimeFormatConstructor, &constructor);
+    napi_ref napiRef = g_IntlDateTimeFormatConstructor->GetNapiRef();
+    status = napi_get_reference_value(env, napiRef, &constructor);
     if (status != napi_ok || constructor == nullptr) {
         HILOG_ERROR_I18N("IntlDateTimeFormatAddon::CreateDateTimeFormatWithoutNew: napi_get_reference_value failed");
         return nullptr;
