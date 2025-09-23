@@ -18,12 +18,10 @@
 #include "intl_addon.h"
 #include "i18n_hilog.h"
 #include "js_utils.h"
-#include "intl_napi_ref_wrapper.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static thread_local std::unique_ptr<IntlNapiRefWrapper> g_constructor = nullptr;
 
 CollatorAddon::CollatorAddon() : env_(nullptr) {}
 
@@ -61,13 +59,13 @@ napi_value CollatorAddon::InitCollator(napi_env env, napi_value exports)
         HILOG_ERROR_I18N("Set property failed when InitCollator");
         return nullptr;
     }
-    napi_ref napiRef = nullptr;
+    /**napi_ref napiRef = nullptr;
     status = napi_create_reference(env, constructor, 1, &napiRef);
     if (status != napi_ok || napiRef == nullptr) {
         HILOG_ERROR_I18N("InitCollator: napi_create_reference failed");
         return nullptr;
     }
-    g_constructor = std::make_unique<IntlNapiRefWrapper>(env, napiRef);
+    g_constructor = std::make_unique<IntlNapiRefWrapper>(env, napiRef);*/
     return exports;
 }
 
@@ -126,21 +124,7 @@ napi_value CollatorAddon::CreateCollatorWithoutNew(napi_env env, size_t argc, na
         HILOG_ERROR_I18N("CreateCollatorWithoutNew: napi_get_and_clear_last_exception failed");
         return nullptr;
     }
-    if (g_constructor == nullptr) {
-        HILOG_ERROR_I18N("CreateCollatorWithoutNew: g_constructor is nullptr");
-        return nullptr;
-    }
-    napi_ref napiRef = g_constructor->GetNapiRef();
-    if (napiRef == nullptr) {
-        HILOG_ERROR_I18N("CreateCollatorWithoutNew: napiRef is nullptr");
-        return nullptr;
-    }
-    napi_value constructor = nullptr;
-    status = napi_get_reference_value(env, napiRef, &constructor);
-    if (status != napi_ok || constructor == nullptr) {
-        HILOG_ERROR_I18N("CreateCollatorWithoutNew: napi_get_reference_value failed");
-        return nullptr;
-    }
+    napi_value constructor = JSUtils::GetConstructor(env, "Collator");
 
     napi_value instance = nullptr;
     status = napi_new_instance(env, constructor, argc, argv, &instance);
