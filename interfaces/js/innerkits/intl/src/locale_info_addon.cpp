@@ -154,6 +154,10 @@ bool LocaleInfoAddon::IsLocaleInfo(napi_env env, napi_value argv)
         return false;
     }
     napi_ref napiRef = g_constructor->GetNapiRef();
+    if (napiRef == nullptr) {
+        HILOG_ERROR_I18N("LocaleInfoAddon::IsLocaleInfo: napiRef is nullptr.");
+        return false;
+    }
     napi_status status = napi_get_reference_value(env, napiRef, &constructor);
     if (status != napi_ok || constructor == nullptr) {
         HILOG_ERROR_I18N("LocaleInfoAddon::IsLocaleInfo: Failed to create reference.");
@@ -386,8 +390,12 @@ napi_value LocaleInfoAddon::GetMaximizeOrMinimize(napi_env env, napi_callback_in
         HILOG_ERROR_I18N("Maximize: g_constructor is nullptr.");
         return nullptr;
     }
-    napi_value constructor = nullptr;
     napi_ref napiRef = g_constructor->GetNapiRef();
+    if (napiRef == nullptr) {
+        HILOG_ERROR_I18N("Maximize: napiRef is nullptr.");
+        return nullptr;
+    }
+    napi_value constructor = nullptr;
     status = napi_get_reference_value(env, napiRef, &constructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Maximize: Get locale constructor reference failed");

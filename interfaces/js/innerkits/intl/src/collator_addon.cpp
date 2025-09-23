@@ -130,8 +130,12 @@ napi_value CollatorAddon::CreateCollatorWithoutNew(napi_env env, size_t argc, na
         HILOG_ERROR_I18N("CreateCollatorWithoutNew: g_constructor is nullptr");
         return nullptr;
     }
-    napi_value constructor = nullptr;
     napi_ref napiRef = g_constructor->GetNapiRef();
+    if (napiRef == nullptr) {
+        HILOG_ERROR_I18N("CreateCollatorWithoutNew: napiRef is nullptr");
+        return nullptr;
+    }
+    napi_value constructor = nullptr;
     status = napi_get_reference_value(env, napiRef, &constructor);
     if (status != napi_ok || constructor == nullptr) {
         HILOG_ERROR_I18N("CreateCollatorWithoutNew: napi_get_reference_value failed");

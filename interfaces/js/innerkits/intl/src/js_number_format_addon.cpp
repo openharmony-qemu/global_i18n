@@ -170,8 +170,12 @@ napi_value JSNumberFormatAddon::CreateNumberFormatWithoutNew(napi_env env, size_
         HILOG_ERROR_I18N("CreateNumberFormatWithoutNew: g_JsNumberFormatConstructor is nullptr");
         return nullptr;
     }
-    napi_value constructor = nullptr;
     napi_ref napiRef = g_JsNumberFormatConstructor->GetNapiRef();
+    if (napiRef == nullptr) {
+        HILOG_ERROR_I18N("CreateNumberFormatWithoutNew: napiRef is nullptr.");
+        return nullptr;
+    }
+    napi_value constructor = nullptr;
     status = napi_get_reference_value(env, napiRef, &constructor);
     if (status != napi_ok || constructor == nullptr) {
         HILOG_ERROR_I18N("CreateNumberFormatWithoutNew: napi_get_reference_value failed");

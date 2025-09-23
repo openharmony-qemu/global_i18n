@@ -145,8 +145,12 @@ napi_value IntlDateTimeFormatAddon::CreateDateTimeFormatWithoutNew(napi_env env,
         HILOG_ERROR_I18N("CreateDateTimeFormatWithoutNew: g_IntlDateTimeFormatConstructor is nullptr");
         return nullptr;
     }
-    napi_value constructor = nullptr;
     napi_ref napiRef = g_IntlDateTimeFormatConstructor->GetNapiRef();
+    if (napiRef == nullptr) {
+        HILOG_ERROR_I18N("CreateDateTimeFormatWithoutNew: napiRef is nullptr");
+        return nullptr;
+    }
+    napi_value constructor = nullptr;
     status = napi_get_reference_value(env, napiRef, &constructor);
     if (status != napi_ok || constructor == nullptr) {
         HILOG_ERROR_I18N("IntlDateTimeFormatAddon::CreateDateTimeFormatWithoutNew: napi_get_reference_value failed");
