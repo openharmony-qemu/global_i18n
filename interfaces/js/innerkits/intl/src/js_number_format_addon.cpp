@@ -20,11 +20,12 @@
 #include "js_utils.h"
 #include "locale_helper.h"
 #include "utils.h"
+#include "intl_napi_ref_wapper.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static thread_local napi_ref g_JsNumberFormatConstructor = nullptr;
+static thread_local std::unique_ptr<IntlNapiRefWapper> g_JsNumberFormatConstructor = nullptr;
 
 JSNumberFormatAddon::JSNumberFormatAddon()
 {
@@ -66,11 +67,13 @@ napi_value JSNumberFormatAddon::InitJsNumberFormat(napi_env env, napi_value expo
         HILOG_ERROR_I18N("InitJsNumberFormat: Set property failed when InitNumberFormat");
         return nullptr;
     }
-    status = napi_create_reference(env, constructor, 1, &g_JsNumberFormatConstructor);
-    if (status != napi_ok || g_JsNumberFormatConstructor == nullptr) {
+    napi_ref napiRef = nullptr;
+    status = napi_create_reference(env, constructor, 1, &napiRef);
+    if (status != napi_ok || napiRef == nullptr) {
         HILOG_ERROR_I18N("InitJsNumberFormat: napi_create_reference failed");
         return nullptr;
     }
+    g_JsNumberFormatConstructor = std::make_unique<IntlNapiRefWapper>(env, napiRef);
     return exports;
 }
 
@@ -163,8 +166,17 @@ napi_value JSNumberFormatAddon::CreateNumberFormatWithoutNew(napi_env env, size_
         HILOG_ERROR_I18N("CreateNumberFormatWithoutNew: napi_get_and_clear_last_exception failed");
         return nullptr;
     }
+    if (g_JsNumberFormatConstructor == nullptr) {
+        HILOG_ERROR_I18N("CreateNumberFormatWithoutNew: g_JsNumberFormatConstructor is nullptr");
+        return nullptr;
+    }
+    napi_ref napiRef = g_JsNumberFormatConstructor->GetNapiRef();
+    if (napiRef == nullptr) {
+        HILOG_ERROR_I18N("CreateNumberFormatWithoutNew: napiRef is nullptr.");
+        return nullptr;
+    }
     napi_value constructor = nullptr;
-    status = napi_get_reference_value(env, g_JsNumberFormatConstructor, &constructor);
+    status = napi_get_reference_value(env, napiRef, &constructor);
     if (status != napi_ok || constructor == nullptr) {
         HILOG_ERROR_I18N("CreateNumberFormatWithoutNew: napi_get_reference_value failed");
         return nullptr;
