@@ -17,11 +17,12 @@
 #include "error_util.h"
 #include "i18n_hilog.h"
 #include "js_utils.h"
+#include "intl_napi_ref_wapper.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static thread_local napi_ref* g_IntlLocaleConstructor = nullptr;
+static thread_local std::unique_ptr<IntlNapiRefWapper> g_IntlLocaleConstructor = nullptr;
 const std::string NOT_STRING_OBJECT_ERROR_MESSAGE = "tag is not String or Object";
 
 IntlLocaleAddon::IntlLocaleAddon()
@@ -85,19 +86,14 @@ napi_value IntlLocaleAddon::InitIntlLocale(napi_env env, napi_value exports)
         return nullptr;
     }
 
-    g_IntlLocaleConstructor = new (std::nothrow) napi_ref;
-    if (!g_IntlLocaleConstructor) {
-        HILOG_ERROR_I18N("IntlLocaleAddon::InitIntlLocale: Failed to create Locale ref at init.");
-        return nullptr;
-    }
-
-    status = napi_create_reference(env, constructor, 1, g_IntlLocaleConstructor);
-    if (status != napi_ok) {
+    napi_ref napiRef = nullptr;
+    status = napi_create_reference(env, constructor, 1, &napiRef);
+    if (status != napi_ok || napiRef == nullptr) {
         HILOG_ERROR_I18N(
             "IntlLocaleAddon::InitIntlLocale: Failed to create reference g_IntlLocaleConstructor at init.");
         return nullptr;
     }
-
+    g_IntlLocaleConstructor = std::make_unique<IntlNapiRefWapper>(env, napiRef);
     return exports;
 }
 
@@ -158,8 +154,8 @@ bool IntlLocaleAddon::IsIntlLocale(napi_env env, napi_value argv)
         HILOG_ERROR_I18N("IntlLocaleAddon::IsIntlLocale: g_IntlLocaleConstructor is nullptr.");
         return false;
     }
-
-    napi_status status = napi_get_reference_value(env, *g_IntlLocaleConstructor, &constructor);
+    napi_ref napiRef = g_IntlLocaleConstructor->GetNapiRef();
+    napi_status status = napi_get_reference_value(env, napiRef, &constructor);
     if (status != napi_ok || constructor == nullptr) {
         HILOG_ERROR_I18N("IntlLocaleAddon::IsIntlLocale: Failed to create reference.");
         return false;
@@ -453,9 +449,9 @@ napi_value IntlLocaleAddon::CreateIntlLocaleObject(napi_env env, napi_value argv
         HILOG_ERROR_I18N("IntlLocaleAddon::CreateIntlLocaleObject: g_IntlLocaleConstructor is nullptr.");
         return nullptr;
     }
-
     napi_value constructor = nullptr;
-    napi_status status = napi_get_reference_value(env, *g_IntlLocaleConstructor, &constructor);
+    napi_ref napiRef = g_IntlLocaleConstructor->GetNapiRef();
+    napi_status status = napi_get_reference_value(env, napiRef, &constructor);
     if (status != napi_ok || constructor == nullptr) {
         HILOG_ERROR_I18N("IntlLocaleAddon::CreateIntlLocaleObject: Failed to create reference.");
         return nullptr;
