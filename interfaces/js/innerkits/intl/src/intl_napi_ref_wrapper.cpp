@@ -12,27 +12,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "intl_napi_ref_wapper.h"
+#include "intl_napi_ref_wrapper.h"
 #include "i18n_hilog.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
 
-IntlNapiRefWapper::IntlNapiRefWapper(const napi_env& env, const napi_ref& ref) : env_(env), ref_(ref) {}
+IntlNapiRefWrapper::IntlNapiRefWrapper(const napi_env& env, const napi_ref ref) : env_(env), ref_(ref) {}
 
-IntlNapiRefWapper::~IntlNapiRefWapper()
+IntlNapiRefWrapper::~IntlNapiRefWrapper()
 {
     if (env_ == nullptr || ref_ == nullptr) {
         return;
     }
     napi_status status = napi_delete_reference(env_, ref_);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("~IntlNapiRefWapper: release napi_ref failed");
+        HILOG_ERROR_I18N("~IntlNapiRefWrapper: release napi_ref failed");
     }
 }
 
-napi_ref IntlNapiRefWapper::GetNapiRef()
+napi_ref IntlNapiRefWrapper::GetNapiRef()
 {
     return ref_;
 }

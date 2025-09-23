@@ -19,12 +19,12 @@
 #include "error_util.h"
 #include "i18n_hilog.h"
 #include "js_utils.h"
-#include "intl_napi_ref_wapper.h"
+#include "intl_napi_ref_wrapper.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static thread_local std::unique_ptr<IntlNapiRefWapper> g_constructor = nullptr;
+static thread_local std::unique_ptr<IntlNapiRefWrapper> g_constructor = nullptr;
 
 LocaleInfoAddon::LocaleInfoAddon() : env_(nullptr) {}
 
@@ -84,7 +84,7 @@ napi_value LocaleInfoAddon::InitLocale(napi_env env, napi_value exports)
         HILOG_ERROR_I18N("Failed to create reference at init");
         return nullptr;
     }
-    g_constructor = std::make_unique<IntlNapiRefWapper>(env, napiRef);
+    g_constructor = std::make_unique<IntlNapiRefWrapper>(env, napiRef);
     return exports;
 }
 

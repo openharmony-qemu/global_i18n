@@ -17,12 +17,12 @@
 #include "error_util.h"
 #include "i18n_hilog.h"
 #include "js_utils.h"
-#include "intl_napi_ref_wapper.h"
+#include "intl_napi_ref_wrapper.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static thread_local std::unique_ptr<IntlNapiRefWapper> g_IntlLocaleConstructor = nullptr;
+static thread_local std::unique_ptr<IntlNapiRefWrapper> g_IntlLocaleConstructor = nullptr;
 const std::string NOT_STRING_OBJECT_ERROR_MESSAGE = "tag is not String or Object";
 
 IntlLocaleAddon::IntlLocaleAddon()
@@ -93,7 +93,7 @@ napi_value IntlLocaleAddon::InitIntlLocale(napi_env env, napi_value exports)
             "IntlLocaleAddon::InitIntlLocale: Failed to create reference g_IntlLocaleConstructor at init.");
         return nullptr;
     }
-    g_IntlLocaleConstructor = std::make_unique<IntlNapiRefWapper>(env, napiRef);
+    g_IntlLocaleConstructor = std::make_unique<IntlNapiRefWrapper>(env, napiRef);
     return exports;
 }
 

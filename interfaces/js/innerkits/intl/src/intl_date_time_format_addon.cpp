@@ -21,12 +21,12 @@
 #include "intl_date_time_format.h"
 #include "js_utils.h"
 #include "utils.h"
-#include "intl_napi_ref_wapper.h"
+#include "intl_napi_ref_wrapper.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static thread_local std::unique_ptr<IntlNapiRefWapper> g_IntlDateTimeFormatConstructor = nullptr;
+static thread_local std::unique_ptr<IntlNapiRefWrapper> g_IntlDateTimeFormatConstructor = nullptr;
 static constexpr int NUMBER_OF_PARAMETER = 2;
 
 IntlDateTimeFormatAddon::IntlDateTimeFormatAddon()
@@ -78,7 +78,7 @@ napi_value IntlDateTimeFormatAddon::InitIntlDateTimeFormat(napi_env env, napi_va
             "IntlDateTimeFormatAddon::InitIntlDateTimeFormat: Failed to create reference g_IntlLocaleConstructor.");
         return nullptr;
     }
-    g_IntlDateTimeFormatConstructor = std::make_unique<IntlNapiRefWapper>(env, napiRef);
+    g_IntlDateTimeFormatConstructor = std::make_unique<IntlNapiRefWrapper>(env, napiRef);
     return exports;
 }
 

@@ -20,12 +20,12 @@
 #include "js_utils.h"
 #include "locale_helper.h"
 #include "utils.h"
-#include "intl_napi_ref_wapper.h"
+#include "intl_napi_ref_wrapper.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static thread_local std::unique_ptr<IntlNapiRefWapper> g_JsNumberFormatConstructor = nullptr;
+static thread_local std::unique_ptr<IntlNapiRefWrapper> g_JsNumberFormatConstructor = nullptr;
 
 JSNumberFormatAddon::JSNumberFormatAddon()
 {
@@ -73,7 +73,7 @@ napi_value JSNumberFormatAddon::InitJsNumberFormat(napi_env env, napi_value expo
         HILOG_ERROR_I18N("InitJsNumberFormat: napi_create_reference failed");
         return nullptr;
     }
-    g_JsNumberFormatConstructor = std::make_unique<IntlNapiRefWapper>(env, napiRef);
+    g_JsNumberFormatConstructor = std::make_unique<IntlNapiRefWrapper>(env, napiRef);
     return exports;
 }
 
