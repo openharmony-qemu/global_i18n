@@ -19,7 +19,7 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 
-IntlNapiRefWrapper::IntlNapiRefWrapper(const napi_env& env, const napi_ref ref) : env_(env), ref_(ref) {}
+IntlNapiRefWrapper::IntlNapiRefWrapper(napi_env env, napi_ref ref) : env_(env), ref_(ref) {}
 
 IntlNapiRefWrapper::~IntlNapiRefWrapper()
 {

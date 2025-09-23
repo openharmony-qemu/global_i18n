@@ -26,7 +26,7 @@ namespace I18n {
 
 class IntlNapiRefWrapper {
 public:
-    IntlNapiRefWrapper(const napi_env& env, const napi_ref ref);
+    IntlNapiRefWrapper(napi_env env, napi_ref ref);
     ~IntlNapiRefWrapper();
     napi_ref GetNapiRef();
     IntlNapiRefWrapper(const IntlNapiRefWrapper&) = delete;
