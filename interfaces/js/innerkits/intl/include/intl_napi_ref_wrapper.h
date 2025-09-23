@@ -24,13 +24,13 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 
-class IntlNapiRefWapper {
+class IntlNapiRefWrapper {
 public:
-    IntlNapiRefWapper(const napi_env& env, const napi_ref ref);
-    ~IntlNapiRefWapper();
+    IntlNapiRefWrapper(const napi_env& env, const napi_ref ref);
+    ~IntlNapiRefWrapper();
     napi_ref GetNapiRef();
-    IntlNapiRefWapper(const IntlNapiRefWapper&) = delete;
-    IntlNapiRefWapper& operator = (const IntlNapiRefWapper&) = delete;
+    IntlNapiRefWrapper(const IntlNapiRefWrapper&) = delete;
+    IntlNapiRefWrapper& operator = (const IntlNapiRefWrapper&) = delete;
 
 private:
     napi_env env_;
