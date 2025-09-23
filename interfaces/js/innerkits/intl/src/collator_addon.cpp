@@ -125,7 +125,10 @@ napi_value CollatorAddon::CreateCollatorWithoutNew(napi_env env, size_t argc, na
         return nullptr;
     }
     napi_value constructor = JSUtils::GetConstructor(env, "Collator");
-
+    if (constructor == nullptr) {
+        HILOG_ERROR_I18N("CreateCollatorWithoutNew: get constructor failed");
+        return nullptr;
+    }
     napi_value instance = nullptr;
     status = napi_new_instance(env, constructor, argc, argv, &instance);
     if (status != napi_ok || instance == nullptr) {

@@ -165,7 +165,7 @@ bool LocaleInfoAddon::IsLocaleInfo(napi_env env, napi_value argv)
     }*/
 
     bool isLocaleInfo = false;
-    status = napi_instanceof(env, argv, constructor, &isLocaleInfo);
+    napi_status status = napi_instanceof(env, argv, constructor, &isLocaleInfo);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("LocaleInfoAddon::IsLocaleInfo: Failed to get instance of argv.");
         return false;
