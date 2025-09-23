@@ -29,6 +29,8 @@ public:
     IntlNapiRefWapper(const napi_env& env, const napi_ref& ref);
     ~IntlNapiRefWapper();
     napi_ref GetNapiRef();
+    IntlNapiRefWapper(const IntlNapiRefWapper&) = delete;
+    IntlNapiRefWapper& operator = (const IntlNapiRefWapper&) = delete;
 
 private:
     napi_env env_;

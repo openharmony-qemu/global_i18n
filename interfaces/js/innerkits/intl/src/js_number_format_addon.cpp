@@ -67,13 +67,13 @@ napi_value JSNumberFormatAddon::InitJsNumberFormat(napi_env env, napi_value expo
         HILOG_ERROR_I18N("InitJsNumberFormat: Set property failed when InitNumberFormat");
         return nullptr;
     }
-    napi_ref* napiRef = new (std::nothrow) napi_ref;
-    status = napi_create_reference(env, constructor, 1, napiRef);
+    napi_ref napiRef = nullptr;
+    status = napi_create_reference(env, constructor, 1, &napiRef);
     if (status != napi_ok || napiRef == nullptr) {
         HILOG_ERROR_I18N("InitJsNumberFormat: napi_create_reference failed");
         return nullptr;
     }
-    g_JsNumberFormatConstructor = std::make_unique<IntlNapiRefWapper>(env, *napiRef);
+    g_JsNumberFormatConstructor = std::make_unique<IntlNapiRefWapper>(env, napiRef);
     return exports;
 }
 
@@ -164,6 +164,10 @@ napi_value JSNumberFormatAddon::CreateNumberFormatWithoutNew(napi_env env, size_
     napi_status status = napi_get_and_clear_last_exception(env, &exception);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("CreateNumberFormatWithoutNew: napi_get_and_clear_last_exception failed");
+        return nullptr;
+    }
+    if (g_JsNumberFormatConstructor == nullptr) {
+        HILOG_ERROR_I18N("CreateNumberFormatWithoutNew: g_JsNumberFormatConstructor is nullptr");
         return nullptr;
     }
     napi_value constructor = nullptr;

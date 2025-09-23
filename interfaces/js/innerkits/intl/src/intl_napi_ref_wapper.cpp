@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "intl_napi_ref_wapper.h"
+#include "i18n_hilog.h"
 
 namespace OHOS {
 namespace Global {
@@ -22,8 +23,12 @@ IntlNapiRefWapper::IntlNapiRefWapper(const napi_env& env, const napi_ref& ref) :
 
 IntlNapiRefWapper::~IntlNapiRefWapper()
 {
-    if (env_ != nullptr && ref_ != nullptr) {
-        napi_delete_reference(env_, ref_);
+    if (env_ == nullptr || ref_ == nullptr) {
+        return;
+    }
+    napi_status status = napi_delete_reference(env_, ref_);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("~IntlNapiRefWapper: release napi_ref failed");
     }
 }
 

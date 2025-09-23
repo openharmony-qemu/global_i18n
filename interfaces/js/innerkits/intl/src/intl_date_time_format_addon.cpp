@@ -71,21 +71,14 @@ napi_value IntlDateTimeFormatAddon::InitIntlDateTimeFormat(napi_env env, napi_va
             "IntlDateTimeFormatAddon::InitIntlDateTimeFormat: Set property failed when InitIntlDateTimeFormat.");
         return nullptr;
     }
-
-    napi_ref* napiRef = new (std::nothrow) napi_ref;
-    if (!napiRef) {
-        HILOG_ERROR_I18N(
-            "IntlDateTimeFormatAddon::InitIntlDateTimeFormat: Failed to create DateTimeFormat ref at init.");
-        return nullptr;
-    }
-
-    status = napi_create_reference(env, constructor, 1, napiRef);
+    napi_ref napiRef = nullptr;
+    status = napi_create_reference(env, constructor, 1, &napiRef);
     if (status != napi_ok) {
         HILOG_ERROR_I18N(
             "IntlDateTimeFormatAddon::InitIntlDateTimeFormat: Failed to create reference g_IntlLocaleConstructor.");
         return nullptr;
     }
-    g_IntlDateTimeFormatConstructor = std::make_unique<IntlNapiRefWapper>(env, *napiRef);
+    g_IntlDateTimeFormatConstructor = std::make_unique<IntlNapiRefWapper>(env, napiRef);
     return exports;
 }
 
@@ -148,7 +141,10 @@ napi_value IntlDateTimeFormatAddon::CreateDateTimeFormatWithoutNew(napi_env env,
         HILOG_ERROR_I18N("IntlDateTimeFormatAddon::CreateDateTimeFormatWithoutNew: Clear last exception failed");
         return nullptr;
     }
-
+    if (g_IntlDateTimeFormatConstructor == nullptr) {
+        HILOG_ERROR_I18N("CreateDateTimeFormatWithoutNew: g_IntlDateTimeFormatConstructor is nullptr");
+        return nullptr;
+    }
     napi_value constructor = nullptr;
     napi_ref napiRef = g_IntlDateTimeFormatConstructor->GetNapiRef();
     status = napi_get_reference_value(env, napiRef, &constructor);
