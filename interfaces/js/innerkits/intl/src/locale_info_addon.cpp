@@ -23,6 +23,8 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
+static thread_local napi_ref *g_constructor = nullptr;
+
 LocaleInfoAddon::LocaleInfoAddon() : env_(nullptr) {}
 
 LocaleInfoAddon::~LocaleInfoAddon()
@@ -73,6 +75,11 @@ napi_value LocaleInfoAddon::InitLocale(napi_env env, napi_value exports)
     status = napi_set_named_property(env, exports, "Locale", constructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Set property failed when InitLocale");
+        return nullptr;
+    }
+    status = napi_create_reference(env, constructor, 1, g_constructor);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("Failed to create reference at init");
         return nullptr;
     }
     return exports;
@@ -138,12 +145,13 @@ bool LocaleInfoAddon::InitLocaleContext(napi_env env, napi_callback_info info, c
 
 bool LocaleInfoAddon::IsLocaleInfo(napi_env env, napi_value argv)
 {
-    napi_value constructor = JSUtils::GetLocaleConstructor(env);
-    if (constructor == nullptr) {
+    napi_value constructor = nullptr;
+    if (g_constructor == nullptr) {
         HILOG_ERROR_I18N("LocaleInfoAddon::IsLocaleInfo: g_constructor is nullptr.");
         return false;
     }
 
+    napi_status status = napi_get_reference_value(env, *g_constructor, &constructor);
     bool isLocaleInfo = false;
     napi_status status = napi_instanceof(env, argv, constructor, &isLocaleInfo);
     if (status != napi_ok) {
@@ -366,9 +374,14 @@ napi_value LocaleInfoAddon::GetMaximizeOrMinimize(napi_env env, napi_callback_in
     }
     std::string localeTag = func(obj->locale_);
 
-    napi_value constructor = JSUtils::GetLocaleConstructor(env);
-    if (constructor == nullptr) {
-        HILOG_ERROR_I18N("Maximize: get constructor failed.");
+    napi_value constructor = nullptr;
+    if (g_constructor == nullptr) {
+        HILOG_ERROR_I18N("Maximize: g_constructor is nullptr.");
+        return nullptr;
+    }
+    status = napi_get_reference_value(env, *g_constructor, &constructor);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("Maximize: Get locale constructor reference failed");
         return nullptr;
     }
     napi_value result = nullptr;

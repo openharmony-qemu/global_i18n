@@ -616,23 +616,6 @@ napi_value JSUtils::GetConstructor(napi_env env, const std::string& className)
     }
     return constructor;
 }
-
-napi_value JSUtils::GetLocaleConstructor(napi_env env)
-{
-    napi_value intlModule;
-    napi_status status = napi_load_module(env, "@ohos.intl", &intlModule);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("JSUtils::GetLocaleConstructor Failed to get intl module.");
-        return nullptr;
-    }
-    napi_value constructor = nullptr;
-    status = napi_get_named_property(env, intlModule, "Locale", &constructor);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("JSUtils::GetLocaleConstructor: get Locale constructor failed");
-        return nullptr;
-    }
-    return constructor;
-}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
