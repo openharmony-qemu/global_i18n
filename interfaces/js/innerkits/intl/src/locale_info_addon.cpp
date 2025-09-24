@@ -77,6 +77,11 @@ napi_value LocaleInfoAddon::InitLocale(napi_env env, napi_value exports)
         HILOG_ERROR_I18N("Set property failed when InitLocale");
         return nullptr;
     }
+    g_constructor = new (std::nothrow) napi_ref;
+    if (!g_constructor) {
+        HILOG_ERROR_I18N("Failed to create ref at init");
+        return nullptr;
+    }
     status = napi_create_reference(env, constructor, 1, g_constructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Failed to create reference at init");
