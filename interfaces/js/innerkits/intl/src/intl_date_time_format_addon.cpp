@@ -21,12 +21,10 @@
 #include "intl_date_time_format.h"
 #include "js_utils.h"
 #include "utils.h"
-#include "intl_napi_ref_wrapper.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static thread_local std::unique_ptr<IntlNapiRefWrapper> g_IntlDateTimeFormatConstructor = nullptr;
 static constexpr int NUMBER_OF_PARAMETER = 2;
 
 IntlDateTimeFormatAddon::IntlDateTimeFormatAddon()
@@ -71,14 +69,6 @@ napi_value IntlDateTimeFormatAddon::InitIntlDateTimeFormat(napi_env env, napi_va
             "IntlDateTimeFormatAddon::InitIntlDateTimeFormat: Set property failed when InitIntlDateTimeFormat.");
         return nullptr;
     }
-    /**napi_ref napiRef = nullptr;
-    status = napi_create_reference(env, constructor, 1, &napiRef);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N(
-            "IntlDateTimeFormatAddon::InitIntlDateTimeFormat: Failed to create reference g_IntlLocaleConstructor.");
-        return nullptr;
-    }
-    g_IntlDateTimeFormatConstructor = std::make_unique<IntlNapiRefWrapper>(env, napiRef);*/
     return exports;
 }
 
@@ -141,26 +131,11 @@ napi_value IntlDateTimeFormatAddon::CreateDateTimeFormatWithoutNew(napi_env env,
         HILOG_ERROR_I18N("IntlDateTimeFormatAddon::CreateDateTimeFormatWithoutNew: Clear last exception failed");
         return nullptr;
     }
-    /**if (g_IntlDateTimeFormatConstructor == nullptr) {
-        HILOG_ERROR_I18N("CreateDateTimeFormatWithoutNew: g_IntlDateTimeFormatConstructor is nullptr");
-        return nullptr;
-    }
-    napi_ref napiRef = g_IntlDateTimeFormatConstructor->GetNapiRef();
-    if (napiRef == nullptr) {
-        HILOG_ERROR_I18N("CreateDateTimeFormatWithoutNew: napiRef is nullptr");
-        return nullptr;
-    }*/
     napi_value constructor = JSUtils::GetConstructor(env, "DateTimeFormat");
     if (constructor == nullptr) {
         HILOG_ERROR_I18N("CreateDateTimeFormatWithoutNew: get constructor failed");
         return nullptr;
     }
-    /**status = napi_get_reference_value(env, napiRef, &constructor);
-    if (status != napi_ok || constructor == nullptr) {
-        HILOG_ERROR_I18N("IntlDateTimeFormatAddon::CreateDateTimeFormatWithoutNew: napi_get_reference_value failed");
-        return nullptr;
-    }*/
-
     napi_value instance = nullptr;
     status = napi_new_instance(env, constructor, argc, argv, &instance);
     if (status != napi_ok) {
