@@ -622,13 +622,13 @@ napi_value JSUtils::GetLocaleConstructor(napi_env env)
     napi_value intlModule;
     napi_status status = napi_load_module(env, "@ohos.intl", &intlModule);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("JSUtils::GetLocaleInfoConstructor Failed to get intl module.");
+        HILOG_ERROR_I18N("JSUtils::GetLocaleConstructor Failed to get intl module.");
         return nullptr;
     }
     napi_value constructor = nullptr;
     status = napi_get_named_property(env, intlModule, "Locale", &constructor);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("JSUtils::GetLocaleInfoConstructor: get Locale constructor failed");
+        HILOG_ERROR_I18N("JSUtils::GetLocaleConstructor: get Locale constructor failed");
         return nullptr;
     }
     return constructor;

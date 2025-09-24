@@ -141,7 +141,7 @@ bool IntlLocaleAddon::IsIntlLocale(napi_env env, napi_value argv)
     napi_value constructor = JSUtils::GetConstructor(env, "Locale");
     if (constructor == nullptr) {
         HILOG_ERROR_I18N("IntlLocaleAddon::IsIntlLocale: get constructor failed");
-        return nullptr;
+        return false;
     }
     bool isIntlLocale = false;
     status = napi_instanceof(env, argv, constructor, &isIntlLocale);
