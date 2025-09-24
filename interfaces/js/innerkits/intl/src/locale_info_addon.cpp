@@ -152,8 +152,13 @@ bool LocaleInfoAddon::IsLocaleInfo(napi_env env, napi_value argv)
     }
 
     napi_status status = napi_get_reference_value(env, *g_constructor, &constructor);
+    if (status != napi_ok || constructor == nullptr) {
+        HILOG_ERROR_I18N("LocaleInfoAddon::IsLocaleInfo: Failed to create reference.");
+        return false;
+    }
+
     bool isLocaleInfo = false;
-    napi_status status = napi_instanceof(env, argv, constructor, &isLocaleInfo);
+    status = napi_instanceof(env, argv, constructor, &isLocaleInfo);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("LocaleInfoAddon::IsLocaleInfo: Failed to get instance of argv.");
         return false;
