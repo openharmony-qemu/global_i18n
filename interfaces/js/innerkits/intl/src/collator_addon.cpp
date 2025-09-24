@@ -59,13 +59,6 @@ napi_value CollatorAddon::InitCollator(napi_env env, napi_value exports)
         HILOG_ERROR_I18N("Set property failed when InitCollator");
         return nullptr;
     }
-    /**napi_ref napiRef = nullptr;
-    status = napi_create_reference(env, constructor, 1, &napiRef);
-    if (status != napi_ok || napiRef == nullptr) {
-        HILOG_ERROR_I18N("InitCollator: napi_create_reference failed");
-        return nullptr;
-    }
-    g_constructor = std::make_unique<IntlNapiRefWrapper>(env, napiRef);*/
     return exports;
 }
 
