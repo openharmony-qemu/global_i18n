@@ -22,7 +22,6 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static thread_local napi_ref g_constructor = nullptr;
 
 CollatorAddon::CollatorAddon() : env_(nullptr) {}
 
@@ -60,13 +59,6 @@ napi_value CollatorAddon::InitCollator(napi_env env, napi_value exports)
         HILOG_ERROR_I18N("Set property failed when InitCollator");
         return nullptr;
     }
-
-    status = napi_create_reference(env, constructor, 1, &g_constructor);
-    if (status != napi_ok || g_constructor == nullptr) {
-        HILOG_ERROR_I18N("InitCollator: napi_create_reference failed");
-        return nullptr;
-    }
-
     return exports;
 }
 
@@ -125,14 +117,11 @@ napi_value CollatorAddon::CreateCollatorWithoutNew(napi_env env, size_t argc, na
         HILOG_ERROR_I18N("CreateCollatorWithoutNew: napi_get_and_clear_last_exception failed");
         return nullptr;
     }
-
-    napi_value constructor = nullptr;
-    status = napi_get_reference_value(env, g_constructor, &constructor);
-    if (status != napi_ok || constructor == nullptr) {
-        HILOG_ERROR_I18N("CreateCollatorWithoutNew: napi_get_reference_value failed");
+    napi_value constructor = JSUtils::GetConstructor(env, "Collator");
+    if (constructor == nullptr) {
+        HILOG_ERROR_I18N("CreateCollatorWithoutNew: get constructor failed");
         return nullptr;
     }
-
     napi_value instance = nullptr;
     status = napi_new_instance(env, constructor, argc, argv, &instance);
     if (status != napi_ok || instance == nullptr) {

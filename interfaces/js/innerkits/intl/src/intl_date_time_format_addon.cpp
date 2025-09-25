@@ -25,7 +25,6 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static thread_local napi_ref* g_IntlDateTimeFormatConstructor = nullptr;
 static constexpr int NUMBER_OF_PARAMETER = 2;
 
 IntlDateTimeFormatAddon::IntlDateTimeFormatAddon()
@@ -70,21 +69,6 @@ napi_value IntlDateTimeFormatAddon::InitIntlDateTimeFormat(napi_env env, napi_va
             "IntlDateTimeFormatAddon::InitIntlDateTimeFormat: Set property failed when InitIntlDateTimeFormat.");
         return nullptr;
     }
-
-    g_IntlDateTimeFormatConstructor = new (std::nothrow) napi_ref;
-    if (!g_IntlDateTimeFormatConstructor) {
-        HILOG_ERROR_I18N(
-            "IntlDateTimeFormatAddon::InitIntlDateTimeFormat: Failed to create DateTimeFormat ref at init.");
-        return nullptr;
-    }
-
-    status = napi_create_reference(env, constructor, 1, g_IntlDateTimeFormatConstructor);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N(
-            "IntlDateTimeFormatAddon::InitIntlDateTimeFormat: Failed to create reference g_IntlLocaleConstructor.");
-        return nullptr;
-    }
-
     return exports;
 }
 
@@ -147,14 +131,11 @@ napi_value IntlDateTimeFormatAddon::CreateDateTimeFormatWithoutNew(napi_env env,
         HILOG_ERROR_I18N("IntlDateTimeFormatAddon::CreateDateTimeFormatWithoutNew: Clear last exception failed");
         return nullptr;
     }
-
-    napi_value constructor = nullptr;
-    status = napi_get_reference_value(env, *g_IntlDateTimeFormatConstructor, &constructor);
-    if (status != napi_ok || constructor == nullptr) {
-        HILOG_ERROR_I18N("IntlDateTimeFormatAddon::CreateDateTimeFormatWithoutNew: napi_get_reference_value failed");
+    napi_value constructor = JSUtils::GetConstructor(env, "DateTimeFormat");
+    if (constructor == nullptr) {
+        HILOG_ERROR_I18N("CreateDateTimeFormatWithoutNew: get constructor failed");
         return nullptr;
     }
-
     napi_value instance = nullptr;
     status = napi_new_instance(env, constructor, argc, argv, &instance);
     if (status != napi_ok) {
