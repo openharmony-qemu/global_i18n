@@ -65,6 +65,7 @@ public:
         int32_t& errCode);
     static double GetNumberValue(napi_env env, napi_value param, int32_t &errorCode);
     static double GetDoubleFromNapiValue(napi_env env, napi_value param, napi_valuetype &valueType, int32_t &errorCode);
+    static napi_value GetConstructor(napi_env env, const std::string& className);
 
     // std::map and std::unordered_map
     template<typename T>
