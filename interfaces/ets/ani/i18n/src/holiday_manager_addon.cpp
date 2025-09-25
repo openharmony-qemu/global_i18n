@@ -163,15 +163,15 @@ static ani_object CreateHolidayInfoItem(ani_env *env, HolidayInfoItem item)
 
     VariableConverter::SetStringMember(env, ret, "baseName", item.baseName);
 
-    if (ANI_OK != env->Object_SetPropertyByName_Double(ret, "year", item.year)) {
+    if (ANI_OK != env->Object_SetPropertyByName_Int(ret, "year", item.year)) {
         HILOG_ERROR_I18N("Set property 'year' failed");
     }
 
-    if (ANI_OK != env->Object_SetPropertyByName_Double(ret, "month", item.month)) {
+    if (ANI_OK != env->Object_SetPropertyByName_Int(ret, "month", item.month)) {
         HILOG_ERROR_I18N("Set property 'month' failed");
     }
 
-    if (ANI_OK != env->Object_SetPropertyByName_Double(ret, "day", item.day)) {
+    if (ANI_OK != env->Object_SetPropertyByName_Int(ret, "day", item.day)) {
         HILOG_ERROR_I18N("Set property 'day' failed");
     }
 
