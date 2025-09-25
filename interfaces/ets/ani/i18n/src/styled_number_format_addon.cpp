@@ -68,6 +68,10 @@ bool I18nStyledNumberFormatAddon::InitStyledNumberFormatContent(ani_env *env, an
     if (isSimpleNumberFormat) {
         I18nSimpleNumberFormatAddon* simpleNumberFormatAddon =
             I18nSimpleNumberFormatAddon::UnwrapAddon(env, numberFormat);
+        if (simpleNumberFormatAddon == nullptr) {
+            HILOG_ERROR_I18N("InitStyledNumberFormatContent: simpleNumberFormatAddon is nullptr");
+            return false;
+        }
         styledNumberFormat_ = std::make_unique<StyledNumberFormat>(false, nullptr,
             simpleNumberFormatAddon->CopySimpleNumberFormat());
         return styledNumberFormat_ != nullptr;

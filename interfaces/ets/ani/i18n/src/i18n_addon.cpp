@@ -350,6 +350,7 @@ ani_object I18nTransliteratorAddon::GetInstance(ani_env *env, [[maybe_unused]] a
     icu::UnicodeString unistr = icu::UnicodeString::fromUTF8(VariableConverter::AniStrToString(env, id));
     icu::Transliterator *trans = icu::Transliterator::createInstance(unistr, UTransDirection::UTRANS_FORWARD, status);
     if (U_FAILURE(status) || (trans == nullptr)) {
+        HILOG_ERROR_I18N("I18nTransliteratorAddon::GetInstance: Get icu transliterator object failed");
         return nullptr;
     }
 
