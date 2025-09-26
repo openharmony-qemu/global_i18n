@@ -24,7 +24,6 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static thread_local napi_ref g_JsNumberFormatConstructor = nullptr;
 
 JSNumberFormatAddon::JSNumberFormatAddon()
 {
@@ -64,11 +63,6 @@ napi_value JSNumberFormatAddon::InitJsNumberFormat(napi_env env, napi_value expo
     status = napi_set_named_property(env, exports, "NumberFormat", constructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("InitJsNumberFormat: Set property failed when InitNumberFormat");
-        return nullptr;
-    }
-    status = napi_create_reference(env, constructor, 1, &g_JsNumberFormatConstructor);
-    if (status != napi_ok || g_JsNumberFormatConstructor == nullptr) {
-        HILOG_ERROR_I18N("InitJsNumberFormat: napi_create_reference failed");
         return nullptr;
     }
     return exports;
@@ -163,10 +157,9 @@ napi_value JSNumberFormatAddon::CreateNumberFormatWithoutNew(napi_env env, size_
         HILOG_ERROR_I18N("CreateNumberFormatWithoutNew: napi_get_and_clear_last_exception failed");
         return nullptr;
     }
-    napi_value constructor = nullptr;
-    status = napi_get_reference_value(env, g_JsNumberFormatConstructor, &constructor);
-    if (status != napi_ok || constructor == nullptr) {
-        HILOG_ERROR_I18N("CreateNumberFormatWithoutNew: napi_get_reference_value failed");
+    napi_value constructor = JSUtils::GetConstructor(env, "NumberFormat");
+    if (constructor == nullptr) {
+        HILOG_ERROR_I18N("CreateNumberFormatWithoutNew: get constructor failed");
         return nullptr;
     }
     napi_value instance = nullptr;
