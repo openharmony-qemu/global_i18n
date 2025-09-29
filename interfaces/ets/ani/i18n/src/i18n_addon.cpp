@@ -179,7 +179,7 @@ ani_int I18nBreakIteratorAddon::Next(ani_env *env, ani_object object, ani_object
         return -1;
     }
     if (!isUndefined) {
-        if (ANI_OK != env->Object_CallMethodByName_Int(index, "unboxed", ":i", &value)) {
+        if (ANI_OK != env->Object_CallMethodByName_Int(index, "toInt", ":i", &value)) {
             HILOG_ERROR_I18N("Unbox Int failed");
             return -1;
         }

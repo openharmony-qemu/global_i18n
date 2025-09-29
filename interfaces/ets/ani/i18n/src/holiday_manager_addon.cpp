@@ -236,7 +236,7 @@ ani_object I18nHolidayManagerAddon::GetHolidayInfoItemArray(ani_env *env, ani_ob
         itemList = obj->holidayManager_->GetHolidayInfoItemArray();
     } else {
         ani_int yearValue;
-        if (ANI_OK != env->Object_CallMethodByName_Int(year, "unboxed", ":i", &yearValue)) {
+        if (ANI_OK != env->Object_CallMethodByName_Int(year, "toInt", ":i", &yearValue)) {
             HILOG_ERROR_I18N("Unbox Int failed");
             return nullptr;
         }

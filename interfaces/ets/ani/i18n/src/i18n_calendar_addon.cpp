@@ -142,8 +142,8 @@ void I18nCalendarAddon::Set(ani_env *env, ani_object object, ani_int year, ani_i
     }
     if (!isUndefined) {
         ani_int hourValue;
-        if (ANI_OK != env->Object_CallMethodByName_Int(hour, "unboxed", ":i", &hourValue)) {
-            HILOG_ERROR_I18N("Unboxed Int failed");
+        if (ANI_OK != env->Object_CallMethodByName_Int(hour, "toInt", ":i", &hourValue)) {
+            HILOG_ERROR_I18N("Unbox Int failed");
             return;
         }
         obj->calendar_->Set(UCalendarDateFields::UCAL_HOUR_OF_DAY, hourValue);
@@ -155,8 +155,8 @@ void I18nCalendarAddon::Set(ani_env *env, ani_object object, ani_int year, ani_i
     }
     if (!isUndefined) {
         ani_int minuteValue;
-        if (ANI_OK != env->Object_CallMethodByName_Int(minute, "unboxed", ":i", &minuteValue)) {
-            HILOG_ERROR_I18N("Unboxed Int failed");
+        if (ANI_OK != env->Object_CallMethodByName_Int(minute, "toInt", ":i", &minuteValue)) {
+            HILOG_ERROR_I18N("Unbox Int failed");
             return;
         }
         obj->calendar_->Set(UCalendarDateFields::UCAL_MINUTE, minuteValue);
@@ -168,8 +168,8 @@ void I18nCalendarAddon::Set(ani_env *env, ani_object object, ani_int year, ani_i
     }
     if (!isUndefined) {
         ani_int secondValue;
-        if (ANI_OK != env->Object_CallMethodByName_Int(second, "unboxed", ":i", &secondValue)) {
-            HILOG_ERROR_I18N("Unboxed Int failed");
+        if (ANI_OK != env->Object_CallMethodByName_Int(second, "toInt", ":i", &secondValue)) {
+            HILOG_ERROR_I18N("Unbox Int failed");
             return;
         }
         obj->calendar_->Set(UCalendarDateFields::UCAL_SECOND, secondValue);
