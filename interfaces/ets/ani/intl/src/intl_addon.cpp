@@ -39,7 +39,7 @@ static IntlAddon* UnwrapAddon(ani_env *env, ani_object object, const std::string
 
 ani_string IntlAddon::DateTimeFormat_Format(ani_env *env, ani_object object, ani_object date)
 {
-    static const char *className = "escompat.Date";
+    static const char *className = "std.core.Date";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -71,7 +71,7 @@ ani_string IntlAddon::DateTimeFormat_Format(ani_env *env, ani_object object, ani
 ani_string IntlAddon::DateTimeFormat_FormatRange(ani_env *env, ani_object object,
     ani_object startDate, ani_object endDate)
 {
-    static const char *className = "escompat.Date";
+    static const char *className = "std.core.Date";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
