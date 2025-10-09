@@ -312,8 +312,7 @@ HWTEST_F(ZoneUtilTest, ZoneUtilFuncTest011, TestSize.Level1)
 HWTEST_F(ZoneUtilTest, ZoneUtilFuncTest0012, TestSize.Level1)
 {
     ZoneUtil util;
-    I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
-    std::set<std::string> timeZoneList = GetTimeZoneAvailableIDs(errorCode);
+    std::set<std::string> timeZoneList = GetTimeZoneAvailableIDs();
     std::unordered_set<std::string> systemCountries = LocaleConfig::GetSystemCountries();
     for (const auto& systemCountry : systemCountries) {
         std::string timeZoneId = util.GetDefaultZone(systemCountry);

@@ -44,8 +44,7 @@ namespace OHOS {
         timezone.GetDisplayName(text);
         timezone.GetDisplayName(text, isDST);
         I18nTimeZone::CreateInstance(text, isDST);
-        I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
-        I18nTimeZone::GetAvailableIDs(errorCode);
+        I18nTimeZone::GetAvailableIDs();
         I18nTimeZone::GetAvailableZoneCityIDs();
         I18nTimeZone::GetCityDisplayName(text, text);
         return true;

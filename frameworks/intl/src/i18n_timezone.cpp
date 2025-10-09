@@ -301,9 +301,9 @@ void I18nTimeZone::GetTimezoneIDFromZoneInfo(std::set<std::string> &availableIDs
     }
 }
 
-std::set<std::string> I18nTimeZone::GetAvailableIDs(I18nErrorCode &errorCode)
+std::set<std::string> I18nTimeZone::GetAvailableIDs()
 {
-    return GetTimeZoneAvailableIDs(errorCode);
+    return GetTimeZoneAvailableIDs();
 }
 
 std::unordered_set<std::string> I18nTimeZone::GetAvailableZoneCityIDs()

@@ -149,11 +149,7 @@ ani_int I18nTimeZoneAddon::GetOffset(ani_env *env, ani_object object, ani_object
 
 ani_object I18nTimeZoneAddon::GetAvailableIDs(ani_env *env, [[maybe_unused]] ani_object object)
 {
-    I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
-    std::set<std::string> timezoneIDs = I18nTimeZone::GetAvailableIDs(errorCode);
-    if (errorCode != I18nErrorCode::SUCCESS) {
-        return nullptr;
-    }
+    std::set<std::string> timezoneIDs = I18nTimeZone::GetAvailableIDs();
 
     std::vector<std::string> vector(timezoneIDs.begin(), timezoneIDs.end());
     return VariableConverter::CreateArray(env, vector);

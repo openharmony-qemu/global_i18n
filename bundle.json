@@ -91,7 +91,8 @@
                 "//base/global/i18n/ta:binary_files",
                 "//base/global/i18n/sa_profile:i18n_service_ability_profile",
                 "//base/global/i18n/services:i18n_service_ability",
-                "//base/global/i18n/interfaces/ets/ani:ani_package_i18n"
+                "//base/global/i18n/interfaces/ets/ani:ani_package_i18n",
+                "//base/global/i18n/ndk:native_i18n"
             ],
             "inner_kits": [
                 {
@@ -153,6 +154,7 @@
                 "//base/global/i18n/frameworks/intl/test:intl_test",
                 "//base/global/i18n/frameworks/zone/test:zone_util_test",
                 "//base/global/i18n/frameworks/intl/test/fuzztest:fuzztest",
+                "//base/global/i18n/ndk/test:ndk_test",
                 "//base/global/i18n/services/test:i18n_service_test"
             ]
         }

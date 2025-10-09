@@ -460,8 +460,7 @@ HWTEST_F(IntlTest, IntlFuncTest0058, TestSize.Level1)
     std::string cityDisplayName = I18nTimeZone::GetCityDisplayName(cityId, localeId);
     EXPECT_EQ(cityDisplayName, "Shanghai (China)");
     std::unique_ptr<I18nTimeZone> timezone = I18nTimeZone::CreateInstance(timezoneId, true);
-    I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
-    std::set<std::string> set0 = I18nTimeZone::GetAvailableIDs(errorCode);
+    std::set<std::string> set0 = I18nTimeZone::GetAvailableIDs();
     EXPECT_TRUE(set0.size() > 400);
     std::unordered_set<std::string> set1 = I18nTimeZone::GetAvailableZoneCityIDs();
     EXPECT_TRUE(set1.size() > 0);

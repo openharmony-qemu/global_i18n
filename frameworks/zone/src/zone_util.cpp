@@ -228,11 +228,7 @@ CountryResult ZoneUtil::LookupTimezoneByNITZ(NITZData &nitzData)
     if (systemTimezone.length() == 0) {
         systemTimezone = DEFAULT_TIMEZONE;
     }
-    I18nErrorCode status = I18nErrorCode::SUCCESS;
-    std::set<std::string> icuTimezones = I18nTimeZone::GetAvailableIDs(status);
-    if (status != I18nErrorCode::SUCCESS) {
-        HILOG_ERROR_I18N("ZoneUtil::LookupTimezoneByNITZ can not get icu data");
-    }
+    std::set<std::string> icuTimezones = I18nTimeZone::GetAvailableIDs();
     std::vector<std::string> validZones;
     for (auto it = icuTimezones.begin(); it != icuTimezones.end(); ++it) {
         validZones.push_back(*it);
@@ -413,11 +409,7 @@ void ZoneUtil::GetTimezones(xmlNodePtr &value, std::vector<std::string> &zones)
 
 void ZoneUtil::GetICUCountryZones(std::string &region, std::vector<std::string> &zones, std::string &defaultTimezone)
 {
-    I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
-    std::set<std::string> validZoneIds = I18nTimeZone::GetAvailableIDs(errorCode);
-    if (errorCode != I18nErrorCode::SUCCESS) {
-        HILOG_ERROR_I18N("ZoneUtil::GetICUCountryZones can not get icu data");
-    }
+    std::set<std::string> validZoneIds = I18nTimeZone::GetAvailableIDs();
     std::set<std::string> countryZoneIds;
     StringEnumeration *strEnum = TimeZone::createEnumeration(region.c_str());
     UErrorCode status = U_ZERO_ERROR;
