@@ -411,6 +411,259 @@ ani_enum_item I18nSystemAddon::GetFirstDayOfWeek([[maybe_unused]] ani_env *env, 
     return VariableConverter::GetEnumItemByIndex(env, enumName, index);
 }
 
+ani_object I18nSystemAddon::GetSystemCollations(ani_env *env, [[maybe_unused]] ani_object object)
+{
+    std::unordered_map<std::string, std::string> systemCollations;
+    I18nErrorCode err = I18nServiceAbilityClient::GetSystemCollations(systemCollations);
+    if (err == I18nErrorCode::NOT_SYSTEM_APP) {
+        ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
+        return nullptr;
+    }
+    return VariableConverter::CreateAniMap(env, systemCollations);
+}
+
+ani_string I18nSystemAddon::GetUsingCollation(ani_env *env, [[maybe_unused]] ani_object object)
+{
+    std::string usingCollation;
+    I18nErrorCode err = I18nServiceAbilityClient::GetUsingCollation(usingCollation);
+    if (err == I18nErrorCode::NOT_SYSTEM_APP) {
+        ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
+        return nullptr;
+    }
+    return VariableConverter::StringToAniStr(env, usingCollation);
+}
+
+void I18nSystemAddon::SetSystemCollation(ani_env *env, [[maybe_unused]] ani_object object, ani_string aniIdentifier)
+{
+    std::string identifier = VariableConverter::AniStrToString(env, aniIdentifier);
+    if (identifier.empty()) {
+        HILOG_ERROR_I18N("I18nSystemAddon::SetSystemCollation: param is empty.");
+        return;
+    }
+
+    I18nErrorCode err = I18nServiceAbilityClient::SetSystemCollation(identifier);
+    if (err == I18nErrorCode::SUCCESS) {
+        return;
+    }
+    switch (err) {
+        case I18nErrorCode::NOT_SYSTEM_APP:
+            ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
+            break;
+        case I18nErrorCode::NO_PERMISSION:
+            ErrorUtil::AniThrow(env, I18N_NO_PERMISSION, "", "");
+            break;
+        case I18nErrorCode::INVALID_PARAM:
+            ErrorUtil::AniThrow(env, I18N_NOT_VALID_NEW, "identifier", "in a collation supported by the system");
+            break;
+        default:
+            HILOG_ERROR_I18N("I18nSystemAddon::SetSystemCollation: Set system collation failed.");
+    }
+}
+
+ani_object I18nSystemAddon::GetSystemMeasurements([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
+{
+    std::unordered_map<std::string, std::string> systemMeasurements;
+    I18nErrorCode err = I18nServiceAbilityClient::GetSystemMeasurements(systemMeasurements);
+    if (err == I18nErrorCode::NOT_SYSTEM_APP) {
+        ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
+        return nullptr;
+    }
+    return VariableConverter::CreateAniMap(env, systemMeasurements);
+}
+
+ani_string I18nSystemAddon::GetUsingMeasurement([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
+{
+    std::string usingMeasurement;
+    I18nErrorCode err = I18nServiceAbilityClient::GetUsingMeasurement(usingMeasurement);
+    if (err == I18nErrorCode::NOT_SYSTEM_APP) {
+        ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
+        return nullptr;
+    }
+    return VariableConverter::StringToAniStr(env, usingMeasurement);
+}
+
+void I18nSystemAddon::SetSystemMeasurement([[maybe_unused]] ani_env *env,
+    [[maybe_unused]] ani_object object, ani_string aniIdentifier)
+{
+    std::string identifier = VariableConverter::AniStrToString(env, aniIdentifier);
+    if (identifier.empty()) {
+        HILOG_ERROR_I18N("I18nSystemAddon::SetSystemMeasurement: identifier is empty.");
+        return;
+    }
+
+    I18nErrorCode err = I18nServiceAbilityClient::SetSystemMeasurement(identifier);
+    if (err == I18nErrorCode::SUCCESS) {
+        return;
+    }
+    switch (err) {
+        case I18nErrorCode::NOT_SYSTEM_APP:
+            ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
+            break;
+        case I18nErrorCode::NO_PERMISSION:
+            ErrorUtil::AniThrow(env, I18N_NO_PERMISSION, "", "");
+            break;
+        case I18nErrorCode::INVALID_PARAM:
+            ErrorUtil::AniThrow(env, I18N_NOT_VALID_NEW, "identifier", "in a measurement supported by the system");
+            break;
+        default:
+            HILOG_ERROR_I18N("I18nSystemAddon::SetSystemMeasurement: Set system measurement failed.");
+    }
+}
+
+ani_string I18nSystemAddon::GetUsingNumberingSystem([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
+{
+    std::string usingNumberingSystem;
+    I18nErrorCode err = I18nServiceAbilityClient::GetUsingNumberingSystem(usingNumberingSystem);
+    if (err == I18nErrorCode::NOT_SYSTEM_APP) {
+        ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
+        return nullptr;
+    }
+    return VariableConverter::StringToAniStr(env, usingNumberingSystem);
+}
+
+void I18nSystemAddon::SetSystemNumberingSystem([[maybe_unused]] ani_env *env,
+    [[maybe_unused]] ani_object object, ani_string aniIdentifier)
+{
+    std::string identifier = VariableConverter::AniStrToString(env, aniIdentifier);
+    if (identifier.empty()) {
+        HILOG_ERROR_I18N("I18nSystemAddon::SetSystemNumberingSystem: identifier is empty.");
+        return;
+    }
+
+    I18nErrorCode err = I18nServiceAbilityClient::SetSystemNumberingSystem(identifier);
+    if (err == I18nErrorCode::SUCCESS) {
+        return;
+    }
+    switch (err) {
+        case I18nErrorCode::NOT_SYSTEM_APP:
+            ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
+            break;
+        case I18nErrorCode::NO_PERMISSION:
+            ErrorUtil::AniThrow(env, I18N_NO_PERMISSION, "", "");
+            break;
+        case I18nErrorCode::INVALID_PARAM:
+            ErrorUtil::AniThrow(env, I18N_NOT_VALID_NEW, "identifier", "in a numbering system supported "
+                "by the system");
+            break;
+        default:
+            HILOG_ERROR_I18N("I18nSystemAddon::SetSystemNumberingSystem: Set system numbering system failed.");
+    }
+}
+    
+ani_object I18nSystemAddon::GetSystemNumberingSystems([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
+{
+    std::unordered_map<std::string, std::string> systemNumberingSystems;
+    I18nErrorCode err = I18nServiceAbilityClient::GetSystemNumberingSystems(systemNumberingSystems);
+    if (err == I18nErrorCode::NOT_SYSTEM_APP) {
+        ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
+        return nullptr;
+    }
+    return VariableConverter::CreateAniMap(env, systemNumberingSystems);
+}
+
+ani_object I18nSystemAddon::GetSystemNumberPatterns([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
+{
+    std::unordered_map<std::string, std::string> systemNumberPatterns;
+    I18nErrorCode err = I18nServiceAbilityClient::GetSystemNumberPatterns(systemNumberPatterns);
+    if (err == I18nErrorCode::NOT_SYSTEM_APP) {
+        ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
+        return nullptr;
+    }
+    return VariableConverter::CreateAniMap(env, systemNumberPatterns);
+}
+
+void I18nSystemAddon::SetSystemNumberPattern([[maybe_unused]] ani_env *env,
+    [[maybe_unused]] ani_object object, ani_string aniPattern)
+{
+    std::string pattern = VariableConverter::AniStrToString(env, aniPattern);
+    if (pattern.empty()) {
+        HILOG_ERROR_I18N("I18nSystemAddon::SetSystemNumberPattern: pattern is empty.");
+        return;
+    }
+
+    I18nErrorCode err = I18nServiceAbilityClient::SetSystemNumberPattern(pattern);
+    if (err == I18nErrorCode::SUCCESS) {
+        return;
+    }
+    switch (err) {
+        case I18nErrorCode::NOT_SYSTEM_APP:
+            ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
+            break;
+        case I18nErrorCode::NO_PERMISSION:
+            ErrorUtil::AniThrow(env, I18N_NO_PERMISSION, "", "");
+            break;
+        case I18nErrorCode::INVALID_PARAM:
+            ErrorUtil::AniThrow(env, I18N_NOT_VALID_NEW, "pattern", "in a number pattern supported by the system");
+            break;
+        default:
+            HILOG_ERROR_I18N("I18nSystemAddon::SetSystemNumberPattern: Set system number pattern failed.");
+    }
+}
+
+ani_string I18nSystemAddon::GetUsingNumberPattern([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
+{
+    std::string usingNumberPattern;
+    I18nErrorCode err = I18nServiceAbilityClient::GetUsingNumberPattern(usingNumberPattern);
+    if (err == I18nErrorCode::NOT_SYSTEM_APP) {
+        ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
+        return nullptr;
+    }
+    return VariableConverter::StringToAniStr(env, usingNumberPattern);
+}
+
+ani_object I18nSystemAddon::GetSystemNumericalDatePatterns([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
+{
+    std::unordered_map<std::string, std::string> numericalDatePatterns;
+    I18nErrorCode err = I18nServiceAbilityClient::GetSystemNumericalDatePatterns(numericalDatePatterns);
+    if (err == I18nErrorCode::NOT_SYSTEM_APP) {
+        ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
+        return nullptr;
+    }
+    return VariableConverter::CreateAniMap(env, numericalDatePatterns);
+}
+
+void I18nSystemAddon::SetSystemNumericalDatePattern([[maybe_unused]] ani_env *env,
+    [[maybe_unused]] ani_object object, ani_string aniIdentifier)
+{
+    std::string identifier = VariableConverter::AniStrToString(env, aniIdentifier);
+    if (identifier.empty()) {
+        HILOG_ERROR_I18N("I18nSystemAddon::SetSystemNumericalDatePattern: identifier is empty");
+        return;
+    }
+
+    I18nErrorCode err = I18nServiceAbilityClient::SetSystemNumericalDatePattern(identifier);
+    if (err == I18nErrorCode::SUCCESS) {
+        return;
+    }
+    switch (err) {
+        case I18nErrorCode::NOT_SYSTEM_APP:
+            ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
+            break;
+        case I18nErrorCode::NO_PERMISSION:
+            ErrorUtil::AniThrow(env, I18N_NO_PERMISSION, "", "");
+            break;
+        case I18nErrorCode::INVALID_PARAM:
+            ErrorUtil::AniThrow(env, I18N_NOT_VALID_NEW, "identifier", "in a numerical date pattern supported by "
+                "the system");
+            break;
+        default:
+            HILOG_ERROR_I18N(
+                "I18nSystemAddon::SetSystemNumericalDatePattern: Set system numerical date pattern failed.");
+    }
+}
+
+ani_string I18nSystemAddon::GetUsingNumericalDatePattern([[maybe_unused]] ani_env *env,
+    [[maybe_unused]] ani_object object)
+{
+    std::string identifier;
+    I18nErrorCode err = I18nServiceAbilityClient::GetUsingNumericalDatePattern(identifier);
+    if (err == I18nErrorCode::NOT_SYSTEM_APP) {
+        ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
+        return nullptr;
+    }
+    return VariableConverter::StringToAniStr(env, identifier);
+}
+
 ani_status I18nSystemAddon::BindContextSystem(ani_env *env)
 {
     static const char *className = "L@ohos/i18n/i18n/System;";
@@ -449,6 +702,21 @@ ani_status I18nSystemAddon::BindContextSystem(ani_env *env)
         ani_native_function { "getTemperatureName", nullptr, reinterpret_cast<void *>(GetTemperatureName) },
         ani_native_function { "setFirstDayOfWeek", nullptr, reinterpret_cast<void *>(SetFirstDayOfWeek) },
         ani_native_function { "getFirstDayOfWeek", nullptr, reinterpret_cast<void *>(GetFirstDayOfWeek) },
+        ani_native_function { "getSystemCollations", nullptr, reinterpret_cast<void *>(GetSystemCollations) },
+        ani_native_function { "getUsingCollation", nullptr, reinterpret_cast<void *>(GetUsingCollation) },
+        ani_native_function { "setSystemCollation", nullptr, reinterpret_cast<void *>(SetSystemCollation) },
+        ani_native_function { "getSystemMeasurements", nullptr, reinterpret_cast<void *>(GetSystemMeasurements) },
+        ani_native_function { "getUsingMeasurement", nullptr, reinterpret_cast<void *>(GetUsingMeasurement) },
+        ani_native_function { "setSystemMeasurement", nullptr, reinterpret_cast<void *>(SetSystemMeasurement) },
+        ani_native_function { "getUsingNumberingSystem", nullptr, reinterpret_cast<void *>(GetUsingNumberingSystem) },
+        ani_native_function { "setSystemNumberingSystem", nullptr, reinterpret_cast<void *>(SetSystemNumberingSystem) },
+        ani_native_function { "getSystemNumberingSystems", nullptr, reinterpret_cast<void *>(GetSystemNumberingSystems) },
+        ani_native_function { "getSystemNumberPatterns", nullptr, reinterpret_cast<void *>(GetSystemNumberPatterns) },
+        ani_native_function { "setSystemNumberPattern", nullptr, reinterpret_cast<void *>(SetSystemNumberPattern) },
+        ani_native_function { "getUsingNumberPattern", nullptr, reinterpret_cast<void *>(GetUsingNumberPattern) },
+        ani_native_function { "getSystemNumericalDatePatterns", nullptr, reinterpret_cast<void *>(GetSystemNumericalDatePatterns) },
+        ani_native_function { "setSystemNumericalDatePattern", nullptr, reinterpret_cast<void *>(SetSystemNumericalDatePattern) },
+        ani_native_function { "getUsingNumericalDatePattern", nullptr, reinterpret_cast<void *>(GetUsingNumericalDatePattern) },
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {

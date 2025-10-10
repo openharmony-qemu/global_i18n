@@ -17,6 +17,7 @@
 
 #include "i18n_hilog.h"
 #include "variable_converter.h"
+#include "zone_rules_addon.h"
 
 using namespace OHOS;
 using namespace Global;
@@ -226,6 +227,18 @@ ani_object I18nTimeZoneAddon::GetTimezonesByLocation(ani_env *env, [[maybe_unuse
     return ret;
 }
 
+ani_object I18nTimeZoneAddon::GetZoneRules(ani_env *env, ani_object object)
+{
+    I18nTimeZoneAddon* obj = UnwrapAddon(env, object);
+    if (obj == nullptr || obj->timezone_ == nullptr) {
+        HILOG_ERROR_I18N("GetZoneRules: Get TimeZone object failed");
+        return nullptr;
+    }
+
+    std::string tzid = obj->timezone_->GetID();
+    return ZoneRulesAddon::GetZoneRulesObject(env, object, tzid);
+}
+
 ani_status I18nTimeZoneAddon::BindContextTimeZone(ani_env *env)
 {
     static const char *className = "L@ohos/i18n/i18n/TimeZone;";
@@ -240,6 +253,7 @@ ani_status I18nTimeZoneAddon::BindContextTimeZone(ani_env *env)
         ani_native_function { "getDisplayName", nullptr, reinterpret_cast<void *>(I18nTimeZoneAddon::GetDisplayName) },
         ani_native_function { "getRawOffset", nullptr, reinterpret_cast<void *>(I18nTimeZoneAddon::GetRawOffset) },
         ani_native_function { "getOffset", nullptr, reinterpret_cast<void *>(I18nTimeZoneAddon::GetOffset) },
+        ani_native_function { "getZoneRules", nullptr, reinterpret_cast<void *>(I18nTimeZoneAddon::GetZoneRules) },
         ani_native_function { "getAvailableIDs", nullptr,
             reinterpret_cast<void *>(I18nTimeZoneAddon::GetAvailableIDs) },
         ani_native_function { "getAvailableZoneCityIDs", nullptr,

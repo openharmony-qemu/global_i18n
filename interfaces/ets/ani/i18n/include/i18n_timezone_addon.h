@@ -37,6 +37,7 @@ public:
     static ani_object GetTimezoneFromCity(ani_env *env, [[maybe_unused]] ani_object object, ani_string cityID);
     static ani_object GetTimezonesByLocation(ani_env *env, [[maybe_unused]] ani_object object,
         ani_double longitude, ani_double latitude);
+    static ani_object GetZoneRules(ani_env *env, [[maybe_unused]] ani_object object);
     static ani_status BindContextTimeZone(ani_env *env);
 private:
     std::unique_ptr<I18nTimeZone> timezone_ = nullptr;
