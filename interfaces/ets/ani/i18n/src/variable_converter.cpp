@@ -116,7 +116,7 @@ bool VariableConverter::GetBooleanMember(ani_env *env, ani_object options, const
     }
 
     ani_boolean ret;
-    if (ANI_OK != env->Object_CallMethodByName_Boolean(static_cast<ani_object>(ref), "unboxed", ":z", &ret)) {
+    if (ANI_OK != env->Object_CallMethodByName_Boolean(static_cast<ani_object>(ref), "toBoolean", ":z", &ret)) {
         HILOG_ERROR_I18N("Call method by name failed");
         return false;
     }
@@ -206,8 +206,8 @@ bool VariableConverter::GetNumberMember(ani_env *env, ani_object options, const 
     }
 
     ani_int valueInt;
-    if (ANI_OK != env->Object_CallMethodByName_Int(static_cast<ani_object>(ref), "unboxed", ":i", &valueInt)) {
-        HILOG_ERROR_I18N("Unboxed Double failed");
+    if (ANI_OK != env->Object_CallMethodByName_Int(static_cast<ani_object>(ref), "toInt", ":i", &valueInt)) {
+        HILOG_ERROR_I18N("Unbox Double failed");
         return false;
     }
     value = valueInt;
