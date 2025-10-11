@@ -525,4 +525,4 @@ template ani_object VariableConverter::CreateAniObject<IntlAddon>(ani_env*, cons
 template ani_object VariableConverter::CreateAniObject<NumberFormatAddon>(ani_env*, const char*, NumberFormatAddon*);
 template ani_object VariableConverter::CreateAniObject<ZoneRulesAddon>(ani_env*, const char*, ZoneRulesAddon*);
 template ani_object VariableConverter::CreateAniObject<ZoneOffsetTransitionAddon>(
-    ani_env*,const char*, ZoneOffsetTransitionAddon*);
+    ani_env*, const char*, ZoneOffsetTransitionAddon*);

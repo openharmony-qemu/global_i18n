@@ -550,7 +550,8 @@ void I18nSystemAddon::SetSystemNumberingSystem([[maybe_unused]] ani_env *env,
     }
 }
     
-ani_object I18nSystemAddon::GetSystemNumberingSystems([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
+ani_object I18nSystemAddon::GetSystemNumberingSystems([[maybe_unused]] ani_env *env,
+    [[maybe_unused]] ani_object object)
 {
     std::unordered_map<std::string, std::string> systemNumberingSystems;
     I18nErrorCode err = I18nServiceAbilityClient::GetSystemNumberingSystems(systemNumberingSystems);
@@ -611,7 +612,8 @@ ani_string I18nSystemAddon::GetUsingNumberPattern([[maybe_unused]] ani_env *env,
     return VariableConverter::StringToAniStr(env, usingNumberPattern);
 }
 
-ani_object I18nSystemAddon::GetSystemNumericalDatePatterns([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
+ani_object I18nSystemAddon::GetSystemNumericalDatePatterns([[maybe_unused]] ani_env *env,
+    [[maybe_unused]] ani_object object)
 {
     std::unordered_map<std::string, std::string> numericalDatePatterns;
     I18nErrorCode err = I18nServiceAbilityClient::GetSystemNumericalDatePatterns(numericalDatePatterns);
@@ -710,13 +712,17 @@ ani_status I18nSystemAddon::BindContextSystem(ani_env *env)
         ani_native_function { "setSystemMeasurement", nullptr, reinterpret_cast<void *>(SetSystemMeasurement) },
         ani_native_function { "getUsingNumberingSystem", nullptr, reinterpret_cast<void *>(GetUsingNumberingSystem) },
         ani_native_function { "setSystemNumberingSystem", nullptr, reinterpret_cast<void *>(SetSystemNumberingSystem) },
-        ani_native_function { "getSystemNumberingSystems", nullptr, reinterpret_cast<void *>(GetSystemNumberingSystems) },
+        ani_native_function { "getSystemNumberingSystems",
+            nullptr, reinterpret_cast<void *>(GetSystemNumberingSystems) },
         ani_native_function { "getSystemNumberPatterns", nullptr, reinterpret_cast<void *>(GetSystemNumberPatterns) },
         ani_native_function { "setSystemNumberPattern", nullptr, reinterpret_cast<void *>(SetSystemNumberPattern) },
         ani_native_function { "getUsingNumberPattern", nullptr, reinterpret_cast<void *>(GetUsingNumberPattern) },
-        ani_native_function { "getSystemNumericalDatePatterns", nullptr, reinterpret_cast<void *>(GetSystemNumericalDatePatterns) },
-        ani_native_function { "setSystemNumericalDatePattern", nullptr, reinterpret_cast<void *>(SetSystemNumericalDatePattern) },
-        ani_native_function { "getUsingNumericalDatePattern", nullptr, reinterpret_cast<void *>(GetUsingNumericalDatePattern) },
+        ani_native_function { "getSystemNumericalDatePatterns",
+            nullptr, reinterpret_cast<void *>(GetSystemNumericalDatePatterns) },
+        ani_native_function { "setSystemNumericalDatePattern", nullptr,
+            reinterpret_cast<void *>(SetSystemNumericalDatePattern) },
+        ani_native_function { "getUsingNumericalDatePattern", nullptr,
+            reinterpret_cast<void *>(GetUsingNumericalDatePattern) },
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {

@@ -44,7 +44,8 @@ ani_object ZoneOffsetTransitionAddon::GetZoneOffsetTransObject(ani_env *env,
     int32_t offsetAfter = zoneOffsetTrans->GetOffsetAfter();
     static const char* className = "@ohos.i18n.i18n.ZoneOffsetTransition";
     std::unique_ptr<ZoneOffsetTransitionAddon> transObj = std::make_unique<ZoneOffsetTransitionAddon>();
-    transObj->zoneOffsetTransition_ = std::make_unique<ZoneOffsetTransition>(milliseconds, offsetBefore, offsetAfter);
+    transObj->zoneOffsetTransition_ =
+        std::make_unique<ZoneOffsetTransition>(milliseconds, offsetBefore, offsetAfter);
     ani_object zoneTransObject = VariableConverter::CreateAniObject(env, className, transObj.get());
     transObj.release();
     return zoneTransObject;
@@ -93,9 +94,12 @@ ani_status ZoneOffsetTransitionAddon::BindContextZoneOffsetTransition(ani_env *e
     }
 
     std::array methods = {
-        ani_native_function { "getMilliseconds", nullptr, reinterpret_cast<void *>(ZoneOffsetTransitionAddon::GetMilliseconds) },
-        ani_native_function { "getOffsetAfter", nullptr, reinterpret_cast<void *>(ZoneOffsetTransitionAddon::GetOffsetAfter) },
-        ani_native_function { "getOffsetBefore", nullptr, reinterpret_cast<void *>(ZoneOffsetTransitionAddon::GetOffsetBefore) },
+        ani_native_function { "getMilliseconds", nullptr,
+            reinterpret_cast<void *>(ZoneOffsetTransitionAddon::GetMilliseconds) },
+        ani_native_function { "getOffsetAfter", nullptr,
+            reinterpret_cast<void *>(ZoneOffsetTransitionAddon::GetOffsetAfter) },
+        ani_native_function { "getOffsetBefore", nullptr,
+            reinterpret_cast<void *>(ZoneOffsetTransitionAddon::GetOffsetBefore) },
     };
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
         HILOG_ERROR_I18N("Cannot bind native methods to '%{public}s'", className);
