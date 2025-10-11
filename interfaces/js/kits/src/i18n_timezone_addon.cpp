@@ -166,11 +166,7 @@ napi_value I18nTimeZoneAddon::I18nTimeZoneConstructor(napi_env env, napi_callbac
 
 napi_value I18nTimeZoneAddon::GetAvailableTimezoneIDs(napi_env env, napi_callback_info info)
 {
-    I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
-    std::set<std::string> timezoneIDs = I18nTimeZone::GetAvailableIDs(errorCode);
-    if (errorCode != I18nErrorCode::SUCCESS) {
-        return nullptr;
-    }
+    std::set<std::string> timezoneIDs = I18nTimeZone::GetAvailableIDs();
     napi_value result = nullptr;
     napi_status status = napi_create_array_with_length(env, timezoneIDs.size(), &result);
     if (status != napi_ok) {

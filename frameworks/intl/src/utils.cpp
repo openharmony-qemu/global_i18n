@@ -369,7 +369,7 @@ bool CheckSystemPermission()
     return true;
 }
 
-std::set<std::string> GetTimeZoneAvailableIDs(I18nErrorCode &errorCode)
+std::set<std::string> GetTimeZoneAvailableIDs()
 {
     if (availableIDs.size() != 0) {
         return availableIDs;

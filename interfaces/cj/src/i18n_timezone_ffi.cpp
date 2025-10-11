@@ -69,11 +69,7 @@ extern "C"
 
     CArrStr FfiI18nTimezoneGetAvailableIDs()
     {
-        I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
-        std::set<std::string> timezoneIDSet = I18nTimeZone::GetAvailableIDs(errorCode);
-        if (errorCode != I18nErrorCode::SUCCESS) {
-            return { nullptr, 0 };
-        }
+        std::set<std::string> timezoneIDSet = I18nTimeZone::GetAvailableIDs();
         std::vector<std::string> timezoneIDVec(timezoneIDSet.begin(), timezoneIDSet.end());
         return VectorStringToCArr(timezoneIDVec);
     }

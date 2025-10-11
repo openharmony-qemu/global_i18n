@@ -46,7 +46,7 @@ public:
     std::string GetDisplayName(std::string localeStr, bool isDST);
     virtual std::string GetDisplayNameByTaboo(const std::string& localeStr, const std::string& result);
     static std::unique_ptr<I18nTimeZone> CreateInstance(std::string &id, bool isZoneID);
-    static std::set<std::string> GetAvailableIDs(I18nErrorCode &errorCode);
+    static std::set<std::string> GetAvailableIDs();
     static std::unordered_set<std::string> GetAvailableZoneCityIDs();
     static std::string GetCityDisplayName(std::string &cityID, std::string &locale);
     static std::vector<std::string> GetTimezoneIdByLocation(const double x, const double y);
