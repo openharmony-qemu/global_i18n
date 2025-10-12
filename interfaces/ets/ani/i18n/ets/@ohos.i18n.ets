@@ -201,7 +201,7 @@ namespace i18n {
         native static setSystemNumberPattern(pattern: string): void;
         native static getUsingNumberPattern(): string;
         native static getSystemNumericalDatePatterns(): Map<string, string>;
-        native static setSystemNumericalDatePattern(identifier : string): void;
+        native static setSystemNumericalDatePattern(identifier: string): void;
         native static getUsingNumericalDatePattern(): string;
 
         public static getSystemLocaleInstance(): Intl.Locale {

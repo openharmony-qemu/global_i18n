@@ -50,20 +50,24 @@ ani_object ZoneRulesAddon::NextTransition(ani_env *env, ani_object object, ani_o
         HILOG_ERROR_I18N("ZoneRulesAddon::NextTransition Get ZoneRulesAddon object failed");
         return nullptr;
     }
-    std::unique_ptr<ZoneOffsetTransition> zoneOffsetTrans;
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(date, &isUndefined)) {
         HILOG_ERROR_I18N("NextTransition: Reference IsUndefined failed");
         return nullptr;
     }
+    HILOG_ERROR_I18N("zdd---11");
+    std::unique_ptr<ZoneOffsetTransition> zoneOffsetTrans;
     if (!isUndefined) {
+        HILOG_ERROR_I18N("zdd---22");
         double paramDate = 0;
         if (ANI_OK != env->Object_CallMethodByName_Double(date, "unboxed", ":d", &paramDate)) {
             HILOG_ERROR_I18N("NextTransition: Unbox Double failed");
             return nullptr;
         }
+        HILOG_ERROR_I18N("zdd---33");
         zoneOffsetTrans = obj->zoneRules_->NextTransition(paramDate);
     } else {
+        HILOG_ERROR_I18N("zdd---44");
         zoneOffsetTrans = obj->zoneRules_->NextTransition();
     }
     return ZoneOffsetTransitionAddon::GetZoneOffsetTransObject(env, zoneOffsetTrans.get());

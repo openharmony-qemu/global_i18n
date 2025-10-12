@@ -35,10 +35,12 @@ ZoneOffsetTransitionAddon* ZoneOffsetTransitionAddon::UnwrapAddon(ani_env *env, 
 ani_object ZoneOffsetTransitionAddon::GetZoneOffsetTransObject(ani_env *env,
     ZoneOffsetTransition* zoneOffsetTrans)
 {
+    HILOG_ERROR_I18N("zdd---55");
     if (zoneOffsetTrans == nullptr) {
         HILOG_ERROR_I18N("GetZoneOffsetTransObject: zoneOffsetTrans is nullptr");
         return nullptr;
     }
+    HILOG_ERROR_I18N("zdd---66");
     double milliseconds = zoneOffsetTrans->GetMilliseconds();
     int32_t offsetBefore = zoneOffsetTrans->GetOffsetBefore();
     int32_t offsetAfter = zoneOffsetTrans->GetOffsetAfter();
