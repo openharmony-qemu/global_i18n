@@ -326,7 +326,7 @@ namespace i18n {
     }
 
     export class ZoneOffsetTransition {
-        static { loadLibrary("i18n_ani.z"); }
+        static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
 
         native getMilliseconds(): double;
         native getOffsetAfter(): int;
@@ -334,7 +334,7 @@ namespace i18n {
     }
 
     export class ZoneRules {
-        static { loadLibrary("i18n_ani.z"); }
+        static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
 
         native nextTransition(date?: double): ZoneOffsetTransition;
     }
