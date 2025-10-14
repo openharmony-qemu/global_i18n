@@ -889,7 +889,7 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
     status = BindZoneContext(env);
     if (status != ANI_OK) {
         return status;
-    }    
+    }
     status = BindContext(env);
     *result = ANI_VERSION_1;
     return ANI_OK;
