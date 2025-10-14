@@ -414,7 +414,8 @@ ani_enum_item I18nSystemAddon::GetFirstDayOfWeek([[maybe_unused]] ani_env *env, 
 ani_object I18nSystemAddon::GetSystemCollations(ani_env *env, [[maybe_unused]] ani_object object)
 {
     std::unordered_map<std::string, std::string> systemCollations;
-    I18nErrorCode err = I18nServiceAbilityClient::GetSystemCollations(systemCollations);
+    I18nErrorCode err = LocaleConfig::GetSystemCollations(systemCollations);
+    //I18nErrorCode err = I18nServiceAbilityClient::GetSystemCollations(systemCollations);
     if (err == I18nErrorCode::NOT_SYSTEM_APP) {
         ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
         return nullptr;
@@ -426,7 +427,8 @@ ani_object I18nSystemAddon::GetSystemCollations(ani_env *env, [[maybe_unused]] a
 ani_string I18nSystemAddon::GetUsingCollation(ani_env *env, [[maybe_unused]] ani_object object)
 {
     std::string usingCollation;
-    I18nErrorCode err = I18nServiceAbilityClient::GetUsingCollation(usingCollation);
+    I18nErrorCode err = LocaleConfig::GetUsingCollation(usingCollation);
+    //I18nErrorCode err = I18nServiceAbilityClient::GetUsingCollation(usingCollation);
     if (err == I18nErrorCode::NOT_SYSTEM_APP) {
         ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
         return nullptr;
@@ -443,7 +445,8 @@ void I18nSystemAddon::SetSystemCollation(ani_env *env, [[maybe_unused]] ani_obje
         return;
     }
     HILOG_ERROR_I18N("zdd--SetSystemCollation:%{public}s", identifier.c_str());
-    I18nErrorCode err = I18nServiceAbilityClient::SetSystemCollation(identifier);
+    I18nErrorCode err = LocaleConfig::SetSystemCollation(identifier);
+    //I18nErrorCode err = I18nServiceAbilityClient::SetSystemCollation(identifier);
     if (err == I18nErrorCode::SUCCESS) {
         HILOG_ERROR_I18N("zdd--SetSystemCollation:success");
         return;
@@ -462,7 +465,7 @@ void I18nSystemAddon::SetSystemCollation(ani_env *env, [[maybe_unused]] ani_obje
             ErrorUtil::AniThrow(env, I18N_NOT_VALID_NEW, "identifier", "in a collation supported by the system");
             break;
         default:
-            HILOG_ERROR_I18N("zdd--SetSystemCollation:error 4");
+            HILOG_ERROR_I18N("zdd--SetSystemCollation:error 4,%{public}d", err);
             HILOG_ERROR_I18N("I18nSystemAddon::SetSystemCollation: Set system collation failed.");
     }
 }
@@ -470,8 +473,9 @@ void I18nSystemAddon::SetSystemCollation(ani_env *env, [[maybe_unused]] ani_obje
 ani_object I18nSystemAddon::GetSystemMeasurements([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
 {
     std::unordered_map<std::string, std::string> systemMeasurements;
-    I18nErrorCode err = I18nServiceAbilityClient::GetSystemMeasurements(systemMeasurements);
-                HILOG_ERROR_I18N("zdd--GetSystemMeasurements %{public}zu", systemMeasurements.size());
+    I18nErrorCode err = LocaleConfig::GetSystemMeasurements(systemMeasurements);
+    //I18nErrorCode err = I18nServiceAbilityClient::GetSystemMeasurements(systemMeasurements);
+    HILOG_ERROR_I18N("zdd--GetSystemMeasurements %{public}zu", systemMeasurements.size());
     if (err == I18nErrorCode::NOT_SYSTEM_APP) {
         ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
         return nullptr;
@@ -483,7 +487,8 @@ ani_object I18nSystemAddon::GetSystemMeasurements([[maybe_unused]] ani_env *env,
 ani_string I18nSystemAddon::GetUsingMeasurement([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
 {
     std::string usingMeasurement;
-    I18nErrorCode err = I18nServiceAbilityClient::GetUsingMeasurement(usingMeasurement);
+    I18nErrorCode err = LocaleConfig::GetUsingMeasurement(usingMeasurement);
+    //I18nErrorCode err = I18nServiceAbilityClient::GetUsingMeasurement(usingMeasurement);
     HILOG_ERROR_I18N("zdd--GetUsingMeasurement %{public}s", usingMeasurement.c_str());
     if (err == I18nErrorCode::NOT_SYSTEM_APP) {
         ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
@@ -502,8 +507,8 @@ void I18nSystemAddon::SetSystemMeasurement([[maybe_unused]] ani_env *env,
         HILOG_ERROR_I18N("I18nSystemAddon::SetSystemMeasurement: identifier is empty.");
         return;
     }
-
-    I18nErrorCode err = I18nServiceAbilityClient::SetSystemMeasurement(identifier);
+    I18nErrorCode err = LocaleConfig::SetSystemMeasurement(identifier);
+    //I18nErrorCode err = I18nServiceAbilityClient::SetSystemMeasurement(identifier);
     if (err == I18nErrorCode::SUCCESS) {
             HILOG_ERROR_I18N("zdd--SetSystemMeasurement success");
         return;
@@ -527,7 +532,8 @@ void I18nSystemAddon::SetSystemMeasurement([[maybe_unused]] ani_env *env,
 ani_string I18nSystemAddon::GetUsingNumberingSystem([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
 {
     std::string usingNumberingSystem;
-    I18nErrorCode err = I18nServiceAbilityClient::GetUsingNumberingSystem(usingNumberingSystem);
+    I18nErrorCode err = LocaleConfig::GetUsingNumberingSystem(usingNumberingSystem);
+    //I18nErrorCode err = I18nServiceAbilityClient::GetUsingNumberingSystem(usingNumberingSystem);
     HILOG_ERROR_I18N("zdd--GetUsingNumberingSystem %{public}s", usingNumberingSystem.c_str());
     if (err == I18nErrorCode::NOT_SYSTEM_APP) {
         ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
@@ -546,8 +552,8 @@ void I18nSystemAddon::SetSystemNumberingSystem([[maybe_unused]] ani_env *env,
         HILOG_ERROR_I18N("I18nSystemAddon::SetSystemNumberingSystem: identifier is empty.");
         return;
     }
-
-    I18nErrorCode err = I18nServiceAbilityClient::SetSystemNumberingSystem(identifier);
+    I18nErrorCode err = LocaleConfig::SetSystemNumberingSystem(identifier);
+    //I18nErrorCode err = I18nServiceAbilityClient::SetSystemNumberingSystem(identifier);
     if (err == I18nErrorCode::SUCCESS) {
         HILOG_ERROR_I18N("zdd--SetSystemNumberingSystem success");
         return;
@@ -573,7 +579,8 @@ ani_object I18nSystemAddon::GetSystemNumberingSystems([[maybe_unused]] ani_env *
     [[maybe_unused]] ani_object object)
 {
     std::unordered_map<std::string, std::string> systemNumberingSystems;
-    I18nErrorCode err = I18nServiceAbilityClient::GetSystemNumberingSystems(systemNumberingSystems);
+    I18nErrorCode err = LocaleConfig::GetSystemNumberingSystems(systemNumberingSystems);
+    //I18nErrorCode err = I18nServiceAbilityClient::GetSystemNumberingSystems(systemNumberingSystems);
     HILOG_ERROR_I18N("zdd--GetSystemNumberingSystems %{public}zu", systemNumberingSystems.size());
     if (err == I18nErrorCode::NOT_SYSTEM_APP) {
         ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
@@ -585,7 +592,8 @@ ani_object I18nSystemAddon::GetSystemNumberingSystems([[maybe_unused]] ani_env *
 ani_object I18nSystemAddon::GetSystemNumberPatterns([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
 {
     std::unordered_map<std::string, std::string> systemNumberPatterns;
-    I18nErrorCode err = I18nServiceAbilityClient::GetSystemNumberPatterns(systemNumberPatterns);
+    I18nErrorCode err = LocaleConfig::GetSystemNumberPatterns(systemNumberPatterns);
+    //I18nErrorCode err = I18nServiceAbilityClient::GetSystemNumberPatterns(systemNumberPatterns);
     HILOG_ERROR_I18N("zdd--GetSystemNumberPatterns %{public}zu", systemNumberPatterns.size());
     if (err == I18nErrorCode::NOT_SYSTEM_APP) {
         ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
@@ -603,8 +611,8 @@ void I18nSystemAddon::SetSystemNumberPattern([[maybe_unused]] ani_env *env,
         HILOG_ERROR_I18N("I18nSystemAddon::SetSystemNumberPattern: pattern is empty.");
         return;
     }
-
-    I18nErrorCode err = I18nServiceAbilityClient::SetSystemNumberPattern(pattern);
+    I18nErrorCode err = LocaleConfig::SetSystemNumberPattern(pattern);
+    //I18nErrorCode err = I18nServiceAbilityClient::SetSystemNumberPattern(pattern);
     if (err == I18nErrorCode::SUCCESS) {
         HILOG_ERROR_I18N("zdd--SetSystemNumberPattern success");
         return;
@@ -628,7 +636,8 @@ void I18nSystemAddon::SetSystemNumberPattern([[maybe_unused]] ani_env *env,
 ani_string I18nSystemAddon::GetUsingNumberPattern([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
 {
     std::string usingNumberPattern;
-    I18nErrorCode err = I18nServiceAbilityClient::GetUsingNumberPattern(usingNumberPattern);
+    I18nErrorCode err = LocaleConfig::GetUsingNumberPattern(usingNumberPattern);
+    //I18nErrorCode err = I18nServiceAbilityClient::GetUsingNumberPattern(usingNumberPattern);
     HILOG_ERROR_I18N("zdd--GetUsingNumberPattern %{public}s", usingNumberPattern.c_str());
     if (err == I18nErrorCode::NOT_SYSTEM_APP) {
         ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
@@ -641,7 +650,8 @@ ani_object I18nSystemAddon::GetSystemNumericalDatePatterns([[maybe_unused]] ani_
     [[maybe_unused]] ani_object object)
 {
     std::unordered_map<std::string, std::string> numericalDatePatterns;
-    I18nErrorCode err = I18nServiceAbilityClient::GetSystemNumericalDatePatterns(numericalDatePatterns);
+    I18nErrorCode err = LocaleConfig::GetSystemNumericalDatePatterns(numericalDatePatterns);
+    //I18nErrorCode err = I18nServiceAbilityClient::GetSystemNumericalDatePatterns(numericalDatePatterns);
     HILOG_ERROR_I18N("zdd--GetSystemNumericalDatePatterns %{public}zu", numericalDatePatterns.size());
     if (err == I18nErrorCode::NOT_SYSTEM_APP) {
         ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
@@ -659,8 +669,8 @@ void I18nSystemAddon::SetSystemNumericalDatePattern([[maybe_unused]] ani_env *en
         HILOG_ERROR_I18N("I18nSystemAddon::SetSystemNumericalDatePattern: identifier is empty");
         return;
     }
-
-    I18nErrorCode err = I18nServiceAbilityClient::SetSystemNumericalDatePattern(identifier);
+    I18nErrorCode err = LocaleConfig::SetSystemNumericalDatePattern(identifier);
+    //I18nErrorCode err = I18nServiceAbilityClient::SetSystemNumericalDatePattern(identifier);
     if (err == I18nErrorCode::SUCCESS) {
         HILOG_ERROR_I18N("zdd--SetSystemNumericalDatePattern success");
         return;
@@ -687,7 +697,8 @@ ani_string I18nSystemAddon::GetUsingNumericalDatePattern([[maybe_unused]] ani_en
     [[maybe_unused]] ani_object object)
 {
     std::string identifier;
-    I18nErrorCode err = I18nServiceAbilityClient::GetUsingNumericalDatePattern(identifier);
+    I18nErrorCode err = LocaleConfig::GetUsingNumericalDatePattern(identifier);
+    //I18nErrorCode err = I18nServiceAbilityClient::GetUsingNumericalDatePattern(identifier);
     HILOG_ERROR_I18N("zdd--GetUsingNumericalDatePattern %{public}s", identifier.c_str());
     if (err == I18nErrorCode::NOT_SYSTEM_APP) {
         ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");

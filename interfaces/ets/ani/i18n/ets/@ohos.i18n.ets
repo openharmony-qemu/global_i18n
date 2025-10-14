@@ -328,6 +328,14 @@ namespace i18n {
     export class ZoneOffsetTransition {
         static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
 
+        private nativeZoneOffsetTransition: long = 0;
+
+        constructor(context: long) {
+            if (this.nativeZoneOffsetTransition == 0) {
+                this.nativeZoneOffsetTransition = context;
+            }
+        }
+
         native getMilliseconds(): double;
         native getOffsetAfter(): int;
         native getOffsetBefore(): int;
@@ -335,6 +343,14 @@ namespace i18n {
 
     export class ZoneRules {
         static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
+
+        private nativeZoneRules: long = 0;
+
+        constructor(context: long) {
+            if (this.nativeZoneRules == 0) {
+                this.nativeZoneRules = context;
+            }
+        }
 
         native nextTransition(date?: double): ZoneOffsetTransition;
     }

@@ -28,7 +28,7 @@ public:
     static ZoneRulesAddon* UnwrapAddon(ani_env *env, ani_object object);
     static ani_status BindContextZoneRules(ani_env *env);
     static ani_object GetZoneRulesObject(ani_env *env, ani_object object, std::string tzId);
-    static ani_object NextTransition(ani_env *env, ani_object object, [[maybe_unused]] ani_object date);
+    static ani_object NextTransition(ani_env *env, ani_object object, ani_object date);
 
 private:
     std::unique_ptr<ZoneRules> zoneRules_ = nullptr;
