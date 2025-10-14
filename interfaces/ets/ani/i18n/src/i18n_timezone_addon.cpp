@@ -229,7 +229,6 @@ ani_object I18nTimeZoneAddon::GetTimezonesByLocation(ani_env *env, [[maybe_unuse
 
 ani_object I18nTimeZoneAddon::GetZoneRules(ani_env *env, ani_object object)
 {
-    HILOG_ERROR_I18N("zdd--GetZoneRules: start");
     I18nTimeZoneAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->timezone_ == nullptr) {
         HILOG_ERROR_I18N("GetZoneRules: Get TimeZone object failed");
@@ -237,7 +236,6 @@ ani_object I18nTimeZoneAddon::GetZoneRules(ani_env *env, ani_object object)
     }
 
     std::string tzid = obj->timezone_->GetID();
-    HILOG_ERROR_I18N("zdd--GetZoneRules: tzid %{public}s", tzid.c_str());
     return ZoneRulesAddon::GetZoneRulesObject(env, object, tzid);
 }
 

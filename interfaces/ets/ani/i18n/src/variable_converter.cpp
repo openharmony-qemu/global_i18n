@@ -457,15 +457,8 @@ ani_object VariableConverter::CreateAniMap(ani_env* env,
         HILOG_ERROR_I18N("CreateAniMap: New object 'escompat.Map' failed");
         return nullptr;
     }
-    /**ani_method setMethod;
-    if (ANI_OK != env->Class_FindMethod(mapClass, "set",
-        "C{std.core.Object}C{std.core.Object}:C{escompat.Map}", &setMethod)) {
-        HILOG_ERROR_I18N("CreateAniMap: Find method 'set' failed");
-        return nullptr;
-    }*/
     ani_ref value;
     for (auto iter = map.begin(); iter != map.end(); ++iter) {
-        HILOG_ERROR_I18N("zdd--key: %{public}s, value:%{public}s", (iter->first).c_str(), (iter->second).c_str());
         ani_string key = StringToAniStr(env, iter->first);
         ani_string val = StringToAniStr(env, iter->second);
         ani_object keyObj = static_cast<ani_object>(key);

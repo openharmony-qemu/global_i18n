@@ -35,43 +35,35 @@ ZoneRulesAddon* ZoneRulesAddon::UnwrapAddon(ani_env *env, ani_object object)
 
 ani_object ZoneRulesAddon::GetZoneRulesObject(ani_env *env, ani_object object, std::string tzId)
 {
-    HILOG_ERROR_I18N("zdd--GetZoneRulesObject: tzId %{public}s", tzId.c_str());
     std::unique_ptr<ZoneRulesAddon> obj = std::make_unique<ZoneRulesAddon>();
     obj->zoneRules_ = std::make_unique<ZoneRules>(tzId);
     static const char* className = "@ohos.i18n.i18n.ZoneRules";
     ani_object zoneRulesObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
-    HILOG_ERROR_I18N("zdd--GetZoneRulesObject: className %{public}s", className);
     return zoneRulesObject;
 }
 
 ani_object ZoneRulesAddon::NextTransition(ani_env *env, ani_object object, ani_object date)
 {
-    HILOG_ERROR_I18N("zdd--NextTransition: 00");
     ZoneRulesAddon *obj = UnwrapAddon(env, object);
     if (!obj || !obj->zoneRules_) {
         HILOG_ERROR_I18N("ZoneRulesAddon::NextTransition Get ZoneRulesAddon object failed");
         return nullptr;
     }
-    HILOG_ERROR_I18N("zdd--NextTransition: 11");
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(date, &isUndefined)) {
         HILOG_ERROR_I18N("NextTransition: Reference IsUndefined failed");
         return nullptr;
     }
-    HILOG_ERROR_I18N("zdd---11");
     std::unique_ptr<ZoneOffsetTransition> zoneOffsetTrans;
     if (!isUndefined) {
-        HILOG_ERROR_I18N("zdd---22");
         double paramDate = 0;
         if (ANI_OK != env->Object_CallMethodByName_Double(date, "unboxed", ":d", &paramDate)) {
             HILOG_ERROR_I18N("NextTransition: Unbox Double failed");
             return nullptr;
         }
-        HILOG_ERROR_I18N("zdd---33,%{public}f", paramDate);
         zoneOffsetTrans = obj->zoneRules_->NextTransition(paramDate);
     } else {
-        HILOG_ERROR_I18N("zdd---44");
         zoneOffsetTrans = obj->zoneRules_->NextTransition();
     }
     return ZoneOffsetTransitionAddon::GetZoneOffsetTransObject(env, zoneOffsetTrans.get());
