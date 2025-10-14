@@ -40,7 +40,7 @@ public:
     static ani_enum_item GetEnumItemByIndex(ani_env* env, const char* enumClassName, const int index);
     static ani_double GetDateValue(ani_env *env, ani_object date, const std::string &method);
     static std::vector<std::string> GetLocaleTags(ani_env *env, ani_object locale);
-    static ani_object CreateAniMap(ani_env* env, std::unordered_map<std::string, std::string> &map);
+    static ani_object CreateAniMap(ani_env* env, const std::unordered_map<std::string, std::string> &map);
     template<typename T>
     static ani_object CreateAniObject(ani_env* env, const char* className, T* ptr);
 };

@@ -440,7 +440,7 @@ std::vector<std::string> VariableConverter::GetLocaleTags(ani_env *env, ani_obje
 }
 
 ani_object VariableConverter::CreateAniMap(ani_env* env,
-    std::unordered_map<std::string, std::string> &map)
+    const std::unordered_map<std::string, std::string> &map)
 {
     ani_class mapClass;
     if (ANI_OK != env->FindClass("escompat.Map", &mapClass)) {

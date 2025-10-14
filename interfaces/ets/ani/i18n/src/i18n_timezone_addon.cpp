@@ -231,7 +231,7 @@ ani_object I18nTimeZoneAddon::GetZoneRules(ani_env *env, ani_object object)
 {
     I18nTimeZoneAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->timezone_ == nullptr) {
-        HILOG_ERROR_I18N("GetZoneRules: Get TimeZone object failed");
+        HILOG_ERROR_I18N("GetZoneRules: Failed to unwrap addon or get timezone object");
         return nullptr;
     }
 
