@@ -832,11 +832,7 @@ ani_status BindZoneContext(ani_env *env)
     if (status != ANI_OK) {
         return status;
     }
-    status = ZoneOffsetTransitionAddon::BindContextZoneOffsetTransition(env);
-    if (status != ANI_OK) {
-        return status;
-    }
-    return status;
+    return ZoneOffsetTransitionAddon::BindContextZoneOffsetTransition(env);
 }
 
 ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
