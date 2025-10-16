@@ -72,7 +72,7 @@ ani_object I18nPhoneNumberFormatAddon::Create(ani_env *env, [[maybe_unused]] ani
     obj->phonenumberfmt_ = PhoneNumberFormat::CreateInstance(
         VariableConverter::AniStrToString(env, country), optionsStr);
 
-    static const char *className = "L@ohos/i18n/i18n/PhoneNumberFormat;";
+    static const char *className = "@ohos.i18n.i18n.PhoneNumberFormat";
     ani_object phoneNumberFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return phoneNumberFormatObject;
@@ -130,7 +130,7 @@ ani_object I18nBreakIteratorAddon::GetLineInstance(ani_env *env, ani_string loca
     std::unique_ptr<I18nBreakIteratorAddon> obj = std::make_unique<I18nBreakIteratorAddon>();
     obj->brkiter_ = std::make_unique<I18nBreakIterator>(VariableConverter::AniStrToString(env, locale));
 
-    static const char* className = "L@ohos/i18n/i18n/BreakIterator;";
+    static const char* className = "@ohos.i18n.i18n.BreakIterator";
     ani_object breakIteratorObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return breakIteratorObject;
@@ -181,7 +181,7 @@ ani_int I18nBreakIteratorAddon::Next(ani_env *env, ani_object object, ani_object
         return -1;
     }
     if (!isUndefined) {
-        if (ANI_OK != env->Object_CallMethodByName_Int(index, "unboxed", ":I", &value)) {
+        if (ANI_OK != env->Object_CallMethodByName_Int(index, "unboxed", ":i", &value)) {
             HILOG_ERROR_I18N("I18nBreakIteratorAddon::Next: Unbox Int failed");
             return -1;
         }
@@ -267,7 +267,7 @@ ani_object I18nIndexUtilAddon::GetInstance(ani_env *env, ani_string string)
     std::unique_ptr<I18nIndexUtilAddon> obj = std::make_unique<I18nIndexUtilAddon>();
     obj->indexUtil_ = std::make_unique<IndexUtil>(localeTag);
 
-    static const char* className = "L@ohos/i18n/i18n/IndexUtil;";
+    static const char* className = "@ohos.i18n.i18n.IndexUtil";
     ani_object indexUtilObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return indexUtilObject;
@@ -356,7 +356,7 @@ ani_object I18nTransliteratorAddon::GetInstance(ani_env *env, [[maybe_unused]] a
     }
 
     obj->transliterator_ = std::unique_ptr<icu::Transliterator>(trans);
-    static const char* className = "L@ohos/i18n/i18n/Transliterator;";
+    static const char* className = "@ohos.i18n.i18n.Transliterator";
     ani_object transliteratorObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return transliteratorObject;
@@ -617,33 +617,38 @@ ani_boolean I18nAddon::IsRTL(ani_env *env, ani_string locale)
 
 ani_status I18nPhoneNumberFormatAddon::BindContextPhoneNumberFormat(ani_env *env)
 {
-    static const char *className = "L@ohos/i18n/i18n/PhoneNumberFormat;";
+    static const char *className = "@ohos.i18n.i18n.PhoneNumberFormat";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("BindContextPhoneNumberFormat: Find class '%{public}s' failed", className);
         return ANI_ERROR;
     }
 
-    std::array methods = {
+    std::array staticMethods = {
         ani_native_function { "create", nullptr, reinterpret_cast<void *>(I18nPhoneNumberFormatAddon::Create) },
+    };
+    if (ANI_OK != env->Class_BindStaticNativeMethods(cls, staticMethods.data(), staticMethods.size())) {
+        HILOG_ERROR_I18N("Cannot bind static native methods to '%{public}s'", className);
+        return ANI_ERROR;
+    }
+
+    std::array methods = {
         ani_native_function { "isValidNumber", nullptr,
             reinterpret_cast<void *>(I18nPhoneNumberFormatAddon::IsValidNumber) },
         ani_native_function { "format", nullptr, reinterpret_cast<void *>(I18nPhoneNumberFormatAddon::Format) },
         ani_native_function { "getLocationName", nullptr,
             reinterpret_cast<void *>(I18nPhoneNumberFormatAddon::GetLocationName) },
     };
-
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
         HILOG_ERROR_I18N("BindContextPhoneNumberFormat: Cannot bind native methods to '%{public}s'", className);
         return ANI_ERROR;
-    };
-
+    }
     return ANI_OK;
 }
 
 ani_status I18nBreakIteratorAddon::BindContextBreakIterator(ani_env *env)
 {
-    static const char *className = "L@ohos/i18n/i18n/BreakIterator;";
+    static const char *className = "@ohos.i18n.i18n.BreakIterator";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("BindContextBreakIterator: Find class '%{public}s' failed", className);
@@ -674,7 +679,7 @@ ani_status I18nBreakIteratorAddon::BindContextBreakIterator(ani_env *env)
 
 ani_status I18nIndexUtilAddon::BindContextIndexUtil(ani_env *env)
 {
-    static const char *className = "L@ohos/i18n/i18n/IndexUtil;";
+    static const char *className = "@ohos.i18n.i18n.IndexUtil";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("BindContextIndexUtil: Find class '%{public}s' failed", className);
@@ -697,31 +702,36 @@ ani_status I18nIndexUtilAddon::BindContextIndexUtil(ani_env *env)
 
 ani_status I18nTransliteratorAddon::BindContextTransliterator(ani_env *env)
 {
-    static const char *className = "L@ohos/i18n/i18n/Transliterator;";
+    static const char *className = "@ohos.i18n.i18n.Transliterator";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("BindContextTransliterator: Find class '%{public}s' failed", className);
         return ANI_ERROR;
     }
 
-    std::array methods = {
+    std::array staticMethods = {
         ani_native_function { "getAvailableIDs", nullptr,
             reinterpret_cast<void *>(I18nTransliteratorAddon::GetAvailableIDs) },
         ani_native_function { "getInstance", nullptr, reinterpret_cast<void *>(I18nTransliteratorAddon::GetInstance) },
+    };
+    if (ANI_OK != env->Class_BindStaticNativeMethods(cls, staticMethods.data(), staticMethods.size())) {
+        HILOG_ERROR_I18N("Cannot bind static native methods to '%{public}s'", className);
+        return ANI_ERROR;
+    }
+
+    std::array methods = {
         ani_native_function { "transform", nullptr, reinterpret_cast<void *>(I18nTransliteratorAddon::Transform) },
     };
-
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
         HILOG_ERROR_I18N("BindContextTransliterator: Cannot bind native methods to '%{public}s'", className);
         return ANI_ERROR;
-    };
-
+    }
     return ANI_OK;
 }
 
 ani_status I18nAddon::BindContextI18NUtil(ani_env *env)
 {
-    static const char *className = "L@ohos/i18n/i18n/I18NUtil;";
+    static const char *className = "@ohos.i18n.i18n.I18NUtil";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("BindContextI18NUtil: Find class '%{public}s' failed", className);
@@ -739,7 +749,7 @@ ani_status I18nAddon::BindContextI18NUtil(ani_env *env)
             reinterpret_cast<void *>(GetUnicodeWrappedFilePath) },
     };
 
-    if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
+    if (ANI_OK != env->Class_BindStaticNativeMethods(cls, methods.data(), methods.size())) {
         HILOG_ERROR_I18N("BindContextI18NUtil: Cannot bind native methods to '%{public}s'", className);
         return ANI_ERROR;
     };
@@ -749,7 +759,7 @@ ani_status I18nAddon::BindContextI18NUtil(ani_env *env)
 
 ani_status I18nAddon::BindContextNamespace(ani_env *env)
 {
-    static const char* nameSpaceName = "L@ohos/i18n/i18n;";
+    static const char* nameSpaceName = "@ohos.i18n.i18n";
     ani_namespace ns;
     if (ANI_OK != env->FindNamespace(nameSpaceName, &ns)) {
         HILOG_ERROR_I18N("BindContextNamespace: Find namespace '%{public}s' failed", nameSpaceName);

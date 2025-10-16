@@ -99,7 +99,7 @@ ani_object I18nCalendarAddon::GetCalendar(ani_env *env, ani_string locale, ani_s
     }
 
     obj->calendar_ = std::make_unique<I18nCalendar>(VariableConverter::AniStrToString(env, locale), calendartype);
-    static const char* className = "L@ohos/i18n/i18n/Calendar;";
+    static const char* className = "@ohos.i18n.i18n.Calendar";
     ani_object calendarObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return calendarObject;
@@ -142,7 +142,7 @@ void I18nCalendarAddon::Set(ani_env *env, ani_object object, ani_int year, ani_i
     }
     if (!isUndefined) {
         ani_int hourValue;
-        if (ANI_OK != env->Object_CallMethodByName_Int(hour, "unboxed", ":I", &hourValue)) {
+        if (ANI_OK != env->Object_CallMethodByName_Int(hour, "unboxed", ":i", &hourValue)) {
             HILOG_ERROR_I18N("I18nCalendarAddon::Set: Unboxed hour to int failed");
             return;
         }
@@ -155,7 +155,7 @@ void I18nCalendarAddon::Set(ani_env *env, ani_object object, ani_int year, ani_i
     }
     if (!isUndefined) {
         ani_int minuteValue;
-        if (ANI_OK != env->Object_CallMethodByName_Int(minute, "unboxed", ":I", &minuteValue)) {
+        if (ANI_OK != env->Object_CallMethodByName_Int(minute, "unboxed", ":i", &minuteValue)) {
             HILOG_ERROR_I18N("I18nCalendarAddon::Set: Unboxed minute to int failed");
             return;
         }
@@ -168,7 +168,7 @@ void I18nCalendarAddon::Set(ani_env *env, ani_object object, ani_int year, ani_i
     }
     if (!isUndefined) {
         ani_int secondValue;
-        if (ANI_OK != env->Object_CallMethodByName_Int(second, "unboxed", ":I", &secondValue)) {
+        if (ANI_OK != env->Object_CallMethodByName_Int(second, "unboxed", ":i", &secondValue)) {
             HILOG_ERROR_I18N("I18nCalendarAddon::Set: Unboxed second to int failed");
             return;
         }
@@ -335,7 +335,7 @@ ani_int I18nCalendarAddon::CompareDays(ani_env *env, ani_object object, ani_obje
 
 ani_status I18nCalendarAddon::BindContextCalendar(ani_env *env)
 {
-    static const char *className = "L@ohos/i18n/i18n/Calendar;";
+    static const char *className = "@ohos.i18n.i18n.Calendar";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("BindContextCalendar: Find class '%{public}s' failed", className);
@@ -343,9 +343,9 @@ ani_status I18nCalendarAddon::BindContextCalendar(ani_env *env)
     }
 
     std::array methods = {
-        ani_native_function { "setTime", "Lescompat/Date;:V",
+        ani_native_function { "setTime", "C{escompat.Date}:",
             reinterpret_cast<void *>(I18nCalendarAddon::SetTimeByDate) },
-        ani_native_function { "setTime", "D:V", reinterpret_cast<void *>(I18nCalendarAddon::SetTime) },
+        ani_native_function { "setTime", "d:", reinterpret_cast<void *>(I18nCalendarAddon::SetTime) },
         ani_native_function { "set", nullptr, reinterpret_cast<void *>(I18nCalendarAddon::Set) },
         ani_native_function { "setTimeZone", nullptr, reinterpret_cast<void *>(I18nCalendarAddon::SetTimeZone) },
         ani_native_function { "getTimeZone", nullptr, reinterpret_cast<void *>(I18nCalendarAddon::GetTimeZone) },

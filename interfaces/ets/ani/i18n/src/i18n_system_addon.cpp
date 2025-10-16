@@ -33,6 +33,57 @@ static const std::string TYPE_OF_TEMPERATURE = "TemperatureType";
 static const std::string NAME_OF_WEEKDAY = "type";
 static const std::string TYPE_OF_WEEKDAY = "WeekDay";
 static const int OFFSET_OF_ENUM = 1;
+const std::vector<ani_native_function> I18nSystemAddon::METHODS = {
+    ani_native_function { "getDisplayCountry", nullptr, reinterpret_cast<void *>(GetDisplayCountry) },
+    ani_native_function { "getDisplayLanguage", nullptr, reinterpret_cast<void *>(GetDisplayLanguage) },
+    ani_native_function { "getSystemLanguages", nullptr, reinterpret_cast<void *>(GetSystemLanguages) },
+    ani_native_function { "getSystemCountries", nullptr, reinterpret_cast<void *>(GetSystemCountries) },
+    ani_native_function { "isSuggested", nullptr, reinterpret_cast<void *>(IsSuggested) },
+    ani_native_function { "getSystemLanguage", nullptr, reinterpret_cast<void *>(GetSystemLanguage) },
+    ani_native_function { "setSystemLanguage", nullptr, reinterpret_cast<void *>(SetSystemLanguage) },
+    ani_native_function { "getSystemRegion", nullptr, reinterpret_cast<void *>(GetSystemRegion) },
+    ani_native_function { "setSystemRegion", nullptr, reinterpret_cast<void *>(SetSystemRegion) },
+    ani_native_function { "getSystemLocale", nullptr, reinterpret_cast<void *>(GetSystemLocale) },
+    ani_native_function { "setSystemLocale", nullptr, reinterpret_cast<void *>(SetSystemLocale) },
+    ani_native_function { "is24HourClock", nullptr, reinterpret_cast<void *>(Is24HourClock) },
+    ani_native_function { "set24HourClock", nullptr, reinterpret_cast<void *>(Set24HourClock) },
+    ani_native_function { "addPreferredLanguage", nullptr, reinterpret_cast<void *>(AddPreferredLanguage) },
+    ani_native_function { "removePreferredLanguage", nullptr, reinterpret_cast<void *>(RemovePreferredLanguage) },
+    ani_native_function { "getPreferredLanguageList", nullptr,
+        reinterpret_cast<void *>(GetPreferredLanguageList) },
+    ani_native_function { "getFirstPreferredLanguage", nullptr,
+        reinterpret_cast<void *>(GetFirstPreferredLanguage) },
+    ani_native_function { "setAppPreferredLanguage", nullptr, reinterpret_cast<void *>(SetAppPreferredLanguage) },
+    ani_native_function { "getAppPreferredLanguage", nullptr, reinterpret_cast<void *>(GetAppPreferredLanguage) },
+    ani_native_function { "setUsingLocalDigit", nullptr, reinterpret_cast<void *>(SetUsingLocalDigit) },
+    ani_native_function { "getUsingLocalDigit", nullptr, reinterpret_cast<void *>(GetUsingLocalDigit) },
+    ani_native_function { "getSimplifiedLanguage", nullptr, reinterpret_cast<void *>(GetSimplifiedLanguage) },
+    ani_native_function { "setTemperatureType", nullptr, reinterpret_cast<void *>(SetTemperatureType) },
+    ani_native_function { "getTemperatureType", nullptr, reinterpret_cast<void *>(GetTemperatureType) },
+    ani_native_function { "getTemperatureName", nullptr, reinterpret_cast<void *>(GetTemperatureName) },
+    ani_native_function { "setFirstDayOfWeek", nullptr, reinterpret_cast<void *>(SetFirstDayOfWeek) },
+    ani_native_function { "getFirstDayOfWeek", nullptr, reinterpret_cast<void *>(GetFirstDayOfWeek) },
+    ani_native_function { "getSystemCollations", nullptr, reinterpret_cast<void *>(GetSystemCollations) },
+    ani_native_function { "getUsingCollation", nullptr, reinterpret_cast<void *>(GetUsingCollation) },
+    ani_native_function { "setSystemCollation", nullptr, reinterpret_cast<void *>(SetSystemCollation) },
+    ani_native_function { "getSystemMeasurements", nullptr, reinterpret_cast<void *>(GetSystemMeasurements) },
+    ani_native_function { "getUsingMeasurement", nullptr, reinterpret_cast<void *>(GetUsingMeasurement) },
+    ani_native_function { "setSystemMeasurement", nullptr, reinterpret_cast<void *>(SetSystemMeasurement) },
+    ani_native_function { "getUsingNumberingSystem", nullptr, reinterpret_cast<void *>(GetUsingNumberingSystem) },
+    ani_native_function { "setSystemNumberingSystem",
+        nullptr, reinterpret_cast<void *>(SetSystemNumberingSystem) },
+    ani_native_function { "getSystemNumberingSystems",
+        nullptr, reinterpret_cast<void *>(GetSystemNumberingSystems) },
+    ani_native_function { "getSystemNumberPatterns", nullptr, reinterpret_cast<void *>(GetSystemNumberPatterns) },
+    ani_native_function { "setSystemNumberPattern", nullptr, reinterpret_cast<void *>(SetSystemNumberPattern) },
+    ani_native_function { "getUsingNumberPattern", nullptr, reinterpret_cast<void *>(GetUsingNumberPattern) },
+    ani_native_function { "getSystemNumericalDatePatterns",
+        nullptr, reinterpret_cast<void *>(GetSystemNumericalDatePatterns) },
+    ani_native_function { "setSystemNumericalDatePattern", nullptr,
+        reinterpret_cast<void *>(SetSystemNumericalDatePattern) },
+    ani_native_function { "getUsingNumericalDatePattern", nullptr,
+        reinterpret_cast<void *>(GetUsingNumericalDatePattern) },
+};
 
 ani_string I18nSystemAddon::GetDisplayCountry(ani_env *env, [[maybe_unused]] ani_object object,
     ani_string country, ani_string locale, ani_object sentenceCase)
@@ -56,7 +107,7 @@ ani_string I18nSystemAddon::GetDisplayCountry(ani_env *env, [[maybe_unused]] ani
     }
     if (!isUndefined) {
         ani_boolean value;
-        if (ANI_OK != env->Object_CallMethodByName_Boolean(sentenceCase, "unboxed", ":Z", &value)) {
+        if (ANI_OK != env->Object_CallMethodByName_Boolean(sentenceCase, "unboxed", ":z", &value)) {
             HILOG_ERROR_I18N("I18nSystemAddon::GetDisplayCountry: Unboxed Boolean failed");
             return nullptr;
         }
@@ -84,7 +135,7 @@ ani_string I18nSystemAddon::GetDisplayLanguage(ani_env *env, [[maybe_unused]] an
     }
     if (!isUndefined) {
         ani_boolean value;
-        if (ANI_OK != env->Object_CallMethodByName_Boolean(sentenceCase, "unboxed", ":Z", &value)) {
+        if (ANI_OK != env->Object_CallMethodByName_Boolean(sentenceCase, "unboxed", ":z", &value)) {
             HILOG_ERROR_I18N("I18nSystemAddon::GetDisplayLanguage: Unboxed Boolean failed");
             return nullptr;
         }
@@ -203,7 +254,7 @@ void I18nSystemAddon::AddPreferredLanguage(ani_env *env, [[maybe_unused]] ani_ob
         return;
     }
     if (!isUndefined) {
-        if (ANI_OK != env->Object_CallMethodByName_Int(number, "unboxed", ":I", &index)) {
+        if (ANI_OK != env->Object_CallMethodByName_Int(number, "unboxed", ":i", &index)) {
             HILOG_ERROR_I18N("I18nSystemAddon::AddPreferredLanguage: Unboxed number to int failed");
             return;
         }
@@ -351,7 +402,7 @@ ani_enum_item I18nSystemAddon::GetTemperatureType([[maybe_unused]] ani_env *env,
 {
     TemperatureType type = LocaleConfig::GetTemperatureType();
     int32_t index = static_cast<int32_t>(type) - OFFSET_OF_ENUM;
-    static const char *enumName = "L@ohos/i18n/i18n/TemperatureType;";
+    static const char *enumName = "@ohos.i18n.i18n.TemperatureType";
     return VariableConverter::GetEnumItemByIndex(env, enumName, index);
 }
 
@@ -407,7 +458,7 @@ ani_enum_item I18nSystemAddon::GetFirstDayOfWeek([[maybe_unused]] ani_env *env, 
 {
     WeekDay type = LocaleConfig::GetFirstDayOfWeek();
     int32_t index = static_cast<int32_t>(type) - OFFSET_OF_ENUM;
-    static const char *enumName = "L@ohos/i18n/i18n/WeekDay;";
+    static const char *enumName = "@ohos.i18n.i18n.WeekDay";
     return VariableConverter::GetEnumItemByIndex(env, enumName, index);
 }
 
@@ -663,67 +714,17 @@ ani_string I18nSystemAddon::GetUsingNumericalDatePattern([[maybe_unused]] ani_en
 
 ani_status I18nSystemAddon::BindContextSystem(ani_env *env)
 {
-    static const char *className = "L@ohos/i18n/i18n/System;";
+    static const char *className = "@ohos.i18n.i18n.System";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("BindContextSystem: Find class '%{public}s' failed", className);
         return ANI_ERROR;
     }
 
-    std::array methods = {
-        ani_native_function { "getDisplayCountry", nullptr, reinterpret_cast<void *>(GetDisplayCountry) },
-        ani_native_function { "getDisplayLanguage", nullptr, reinterpret_cast<void *>(GetDisplayLanguage) },
-        ani_native_function { "getSystemLanguages", nullptr, reinterpret_cast<void *>(GetSystemLanguages) },
-        ani_native_function { "getSystemCountries", nullptr, reinterpret_cast<void *>(GetSystemCountries) },
-        ani_native_function { "isSuggested", nullptr, reinterpret_cast<void *>(IsSuggested) },
-        ani_native_function { "getSystemLanguage", nullptr, reinterpret_cast<void *>(GetSystemLanguage) },
-        ani_native_function { "setSystemLanguage", nullptr, reinterpret_cast<void *>(SetSystemLanguage) },
-        ani_native_function { "getSystemRegion", nullptr, reinterpret_cast<void *>(GetSystemRegion) },
-        ani_native_function { "setSystemRegion", nullptr, reinterpret_cast<void *>(SetSystemRegion) },
-        ani_native_function { "getSystemLocale", nullptr, reinterpret_cast<void *>(GetSystemLocale) },
-        ani_native_function { "setSystemLocale", nullptr, reinterpret_cast<void *>(SetSystemLocale) },
-        ani_native_function { "is24HourClock", nullptr, reinterpret_cast<void *>(Is24HourClock) },
-        ani_native_function { "set24HourClock", nullptr, reinterpret_cast<void *>(Set24HourClock) },
-        ani_native_function { "addPreferredLanguage", nullptr, reinterpret_cast<void *>(AddPreferredLanguage) },
-        ani_native_function { "removePreferredLanguage", nullptr, reinterpret_cast<void *>(RemovePreferredLanguage) },
-        ani_native_function { "getPreferredLanguageList", nullptr, reinterpret_cast<void *>(GetPreferredLanguageList) },
-        ani_native_function { "getFirstPreferredLanguage", nullptr,
-            reinterpret_cast<void *>(GetFirstPreferredLanguage) },
-        ani_native_function { "setAppPreferredLanguage", nullptr, reinterpret_cast<void *>(SetAppPreferredLanguage) },
-        ani_native_function { "getAppPreferredLanguage", nullptr, reinterpret_cast<void *>(GetAppPreferredLanguage) },
-        ani_native_function { "setUsingLocalDigit", nullptr, reinterpret_cast<void *>(SetUsingLocalDigit) },
-        ani_native_function { "getUsingLocalDigit", nullptr, reinterpret_cast<void *>(GetUsingLocalDigit) },
-        ani_native_function { "getSimplifiedLanguage", nullptr, reinterpret_cast<void *>(GetSimplifiedLanguage) },
-        ani_native_function { "setTemperatureType", nullptr, reinterpret_cast<void *>(SetTemperatureType) },
-        ani_native_function { "getTemperatureType", nullptr, reinterpret_cast<void *>(GetTemperatureType) },
-        ani_native_function { "getTemperatureName", nullptr, reinterpret_cast<void *>(GetTemperatureName) },
-        ani_native_function { "setFirstDayOfWeek", nullptr, reinterpret_cast<void *>(SetFirstDayOfWeek) },
-        ani_native_function { "getFirstDayOfWeek", nullptr, reinterpret_cast<void *>(GetFirstDayOfWeek) },
-        ani_native_function { "getSystemCollations", nullptr, reinterpret_cast<void *>(GetSystemCollations) },
-        ani_native_function { "getUsingCollation", nullptr, reinterpret_cast<void *>(GetUsingCollation) },
-        ani_native_function { "setSystemCollation", nullptr, reinterpret_cast<void *>(SetSystemCollation) },
-        ani_native_function { "getSystemMeasurements", nullptr, reinterpret_cast<void *>(GetSystemMeasurements) },
-        ani_native_function { "getUsingMeasurement", nullptr, reinterpret_cast<void *>(GetUsingMeasurement) },
-        ani_native_function { "setSystemMeasurement", nullptr, reinterpret_cast<void *>(SetSystemMeasurement) },
-        ani_native_function { "getUsingNumberingSystem", nullptr, reinterpret_cast<void *>(GetUsingNumberingSystem) },
-        ani_native_function { "setSystemNumberingSystem", nullptr, reinterpret_cast<void *>(SetSystemNumberingSystem) },
-        ani_native_function { "getSystemNumberingSystems",
-            nullptr, reinterpret_cast<void *>(GetSystemNumberingSystems) },
-        ani_native_function { "getSystemNumberPatterns", nullptr, reinterpret_cast<void *>(GetSystemNumberPatterns) },
-        ani_native_function { "setSystemNumberPattern", nullptr, reinterpret_cast<void *>(SetSystemNumberPattern) },
-        ani_native_function { "getUsingNumberPattern", nullptr, reinterpret_cast<void *>(GetUsingNumberPattern) },
-        ani_native_function { "getSystemNumericalDatePatterns",
-            nullptr, reinterpret_cast<void *>(GetSystemNumericalDatePatterns) },
-        ani_native_function { "setSystemNumericalDatePattern", nullptr,
-            reinterpret_cast<void *>(SetSystemNumericalDatePattern) },
-        ani_native_function { "getUsingNumericalDatePattern", nullptr,
-            reinterpret_cast<void *>(GetUsingNumericalDatePattern) },
-    };
-
-    if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
+    if (ANI_OK != env->Class_BindStaticNativeMethods(cls, METHODS.data(), METHODS.size())) {
         HILOG_ERROR_I18N("BindContextSystem: Cannot bind native methods to '%{public}s'", className);
         return ANI_ERROR;
-    };
+    }
 
     return ANI_OK;
 }

@@ -33,6 +33,7 @@ ohos_shared_library("intl_ani") {
     "libpng:libpng",
     "libxml2:libxml2",
     "runtime_core:ani",
+    "runtime_core:ani_helpers",
   ]
   part_name = "i18n"
   subsystem_name = "global"

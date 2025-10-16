@@ -17,6 +17,7 @@
 #define OHOS_GLOBAL_I18N_SYSTEM_ADDON_H
 
 #include "ani.h"
+#include <vector>
 
 namespace OHOS {
 namespace Global {
@@ -79,6 +80,9 @@ public:
         ani_string aniIdentifier);
     static ani_string GetUsingNumericalDatePattern([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object);
     static ani_status BindContextSystem(ani_env *env);
+
+private:
+    static const std::vector<ani_native_function> METHODS;
 };
 } // namespace I18n
 } // namespace Global

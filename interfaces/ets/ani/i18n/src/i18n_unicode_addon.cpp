@@ -71,7 +71,7 @@ ani_string I18nUnicodeAddon::GetTypeAddon(ani_env *env, [[maybe_unused]] ani_obj
 
 ani_status I18nUnicodeAddon::BindContextUnicode(ani_env *env)
 {
-    static const char *className = "L@ohos/i18n/i18n/Unicode;";
+    static const char *className = "@ohos.i18n.i18n.Unicode";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("BindContextUnicode: Find class '%{public}s' failed", className);
@@ -90,10 +90,10 @@ ani_status I18nUnicodeAddon::BindContextUnicode(ani_env *env)
         ani_native_function { "getType", nullptr, reinterpret_cast<void *>(GetTypeAddon) },
     };
 
-    if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
+    if (ANI_OK != env->Class_BindStaticNativeMethods(cls, methods.data(), methods.size())) {
         HILOG_ERROR_I18N("BindContextUnicode: Cannot bind native methods to '%{public}s'", className);
         return ANI_ERROR;
-    };
+    }
 
     return ANI_OK;
 }
