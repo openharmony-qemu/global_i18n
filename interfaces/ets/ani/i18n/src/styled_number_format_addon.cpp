@@ -55,8 +55,8 @@ I18nStyledNumberFormatAddon* I18nStyledNumberFormatAddon::UnwrapAddon(ani_env *e
 bool I18nStyledNumberFormatAddon::InitStyledNumberFormatContent(ani_env *env, ani_object numberFormat)
 {
     ani_class simpleNumberFormatClass;
-    if (ANI_OK != env->FindClass("L@ohos/i18n/i18n/SimpleNumberFormat;", &simpleNumberFormatClass)) {
-        HILOG_ERROR_I18N("InitStyledNumberFormatContent Find class 'L@ohos/i18n/i18n/SimpleNumberFormat;' failed");
+    if (ANI_OK != env->FindClass("@ohos.i18n.i18n.SimpleNumberFormat", &simpleNumberFormatClass)) {
+        HILOG_ERROR_I18N("InitStyledNumberFormatContent Find class '@ohos.i18n.i18n.SimpleNumberFormat' failed");
         return false;
     }
 
@@ -101,7 +101,7 @@ ani_object I18nStyledNumberFormatAddon::Create(ani_env *env, [[maybe_unused]] an
         return nullptr;
     }
 
-    static const char *className = "L@ohos/i18n/i18n/StyledNumberFormat;";
+    static const char *className = "@ohos.i18n.i18n.StyledNumberFormat";
     ani_object styledNumberFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return styledNumberFormatObject;
@@ -109,7 +109,7 @@ ani_object I18nStyledNumberFormatAddon::Create(ani_env *env, [[maybe_unused]] an
 
 static ani_object CreateStyledPart(ani_env *env, StyledNumberFormat::NumberPart numberPart)
 {
-    static const char *className = "L@ohos/i18n/i18n/StyledPartInner;";
+    static const char *className = "@ohos.i18n.i18n.StyledPartInner";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("CreateStyledPart: Find class '%{public}s' failed", className);
@@ -144,7 +144,7 @@ static ani_object CreateStyledPart(ani_env *env, StyledNumberFormat::NumberPart 
 
 static ani_object CreateStyledPartArray(ani_env *env, const std::vector<StyledNumberFormat::NumberPart> &numberParts)
 {
-    static const char *className = "Lescompat/Array;";
+    static const char *className = "escompat.Array";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("CreateStyledPartArray: Find class '%{public}s' failed", className);
@@ -152,7 +152,7 @@ static ani_object CreateStyledPartArray(ani_env *env, const std::vector<StyledNu
     }
 
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "I:V", &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "i:", &ctor)) {
         HILOG_ERROR_I18N("CreateStyledPartArray: Find constructor of Array failed");
         return nullptr;
     }
@@ -164,7 +164,7 @@ static ani_object CreateStyledPartArray(ani_env *env, const std::vector<StyledNu
     }
 
     ani_method set;
-    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "ILstd/core/Object;:V", &set)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "iC{std.core.Object}:", &set)) {
         HILOG_ERROR_I18N("CreateStyledPartArray: Find method '$_set' of Array failed");
         return nullptr;
     }
@@ -230,25 +230,30 @@ std::map<std::string, std::string> I18nStyledNumberFormatAddon::ParseIntlOptions
 
 ani_status I18nStyledNumberFormatAddon::BindContextStyledNumberFormat(ani_env *env)
 {
-    static const char *className = "L@ohos/i18n/i18n/StyledNumberFormat;";
+    static const char *className = "@ohos.i18n.i18n.StyledNumberFormat";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("BindContextStyledNumberFormat: Find class '%{public}s' failed", className);
         return ANI_ERROR;
     }
 
-    std::array methods = {
+    std::array staticMethods = {
         ani_native_function { "create", nullptr, reinterpret_cast<void *>(I18nStyledNumberFormatAddon::Create) },
+    };
+    if (ANI_OK != env->Class_BindStaticNativeMethods(cls, staticMethods.data(), staticMethods.size())) {
+        HILOG_ERROR_I18N("Cannot bind static native methods to '%{public}s'", className);
+        return ANI_ERROR;
+    }
+
+    std::array methods = {
         ani_native_function { "getFormattedNumber", nullptr,
             reinterpret_cast<void *>(I18nStyledNumberFormatAddon::GetFormattedNumber) },
         ani_native_function { "getStyle", nullptr, reinterpret_cast<void *>(I18nStyledNumberFormatAddon::GetStyle) },
     };
-
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
         HILOG_ERROR_I18N("BindContextStyledNumberFormat: Cannot bind native methods to '%{public}s'", className);
         return ANI_ERROR;
-    };
-
+    }
     return ANI_OK;
 }
 } // namespace I18n

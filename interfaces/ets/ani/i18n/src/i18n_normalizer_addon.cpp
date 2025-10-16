@@ -55,7 +55,7 @@ ani_object I18nNormalizerAddon::GetInstance(ani_env *env, [[maybe_unused]] ani_o
         return nullptr;
     }
 
-    static const char* className = "L@ohos/i18n/i18n/Normalizer;";
+    static const char* className = "@ohos.i18n.i18n.Normalizer";
     ani_object normalizerObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return normalizerObject;
@@ -81,22 +81,27 @@ ani_string I18nNormalizerAddon::Normalize(ani_env *env, ani_object object, ani_s
 
 ani_status I18nNormalizerAddon::BindContextNormalizer(ani_env *env)
 {
-    static const char *className = "L@ohos/i18n/i18n/Normalizer;";
+    static const char *className = "@ohos.i18n.i18n.Normalizer";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("BindContextNormalizer: Find class '%{public}s' failed", className);
         return ANI_ERROR;
     }
 
-    std::array methods = {
+    std::array staticMethods = {
         ani_native_function { "getInstance", nullptr, reinterpret_cast<void *>(I18nNormalizerAddon::GetInstance) },
+    };
+    if (ANI_OK != env->Class_BindStaticNativeMethods(cls, staticMethods.data(), staticMethods.size())) {
+        HILOG_ERROR_I18N("BindContextNormalizer: Cannot bind static native methods to '%{public}s'", className);
+        return ANI_ERROR;
+    }
+
+    std::array methods = {
         ani_native_function { "normalize", nullptr, reinterpret_cast<void *>(I18nNormalizerAddon::Normalize) },
     };
-
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
         HILOG_ERROR_I18N("BindContextNormalizer: Cannot bind native methods to '%{public}s'", className);
         return ANI_ERROR;
-    };
-
+    }
     return ANI_OK;
 }
