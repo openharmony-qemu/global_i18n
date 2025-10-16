@@ -40,6 +40,8 @@ ohos_shared_library("i18n_ani") {
     "./src/styled_number_format_addon.cpp",
     "./src/system_locale_manager_addon.cpp",
     "./src/variable_converter.cpp",
+    "./src/zone_offset_transition_addon.cpp",
+    "./src/zone_rules_addon.cpp",
   ]
   deps = [
     "../../../../frameworks/intl:intl_util",

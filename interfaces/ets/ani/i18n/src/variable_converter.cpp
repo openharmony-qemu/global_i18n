@@ -28,6 +28,8 @@
 #include "simple_number_format_addon.h"
 #include "styled_number_format_addon.h"
 #include "system_locale_manager_addon.h"
+#include "zone_rules_addon.h"
+#include "zone_offset_transition_addon.h"
 
 using namespace OHOS;
 using namespace Global;
@@ -437,6 +439,39 @@ std::vector<std::string> VariableConverter::GetLocaleTags(ani_env *env, ani_obje
     return localeTags;
 }
 
+ani_object VariableConverter::CreateAniMap(ani_env* env,
+    const std::unordered_map<std::string, std::string> &map)
+{
+    ani_class mapClass;
+    if (ANI_OK != env->FindClass("escompat.Map", &mapClass)) {
+        HILOG_ERROR_I18N("CreateAniMap: Find class 'escompat.Map' failed");
+        return nullptr;
+    }
+    ani_method ctor;
+    if (ANI_OK != env->Class_FindMethod(mapClass, "<ctor>", ":", &ctor)) {
+        HILOG_ERROR_I18N("CreateAniMap: Find method '<ctor>' failed");
+        return nullptr;
+    }
+    ani_object obj;
+    if (ANI_OK != env->Object_New(mapClass, ctor, &obj)) {
+        HILOG_ERROR_I18N("CreateAniMap: New object 'escompat.Map' failed");
+        return nullptr;
+    }
+    ani_ref value;
+    for (auto iter = map.begin(); iter != map.end(); ++iter) {
+        ani_string key = StringToAniStr(env, iter->first);
+        ani_string val = StringToAniStr(env, iter->second);
+        ani_object keyObj = static_cast<ani_object>(key);
+        ani_object valObj = static_cast<ani_object>(val);
+        if (ANI_OK != env->Object_CallMethodByName_Ref(obj, "set",
+            "C{std.core.Object}C{std.core.Object}:C{escompat.Map}", &value, keyObj, valObj)) {
+            HILOG_ERROR_I18N("CreateAniMap: Call method 'set' failed");
+            return nullptr;
+        }
+    }
+    return obj;
+}
+
 template<typename T>
 ani_object VariableConverter::CreateAniObject(ani_env* env, const char* className, T* ptr)
 {
@@ -485,3 +520,6 @@ template ani_object VariableConverter::CreateAniObject<I18nTransliteratorAddon>(
     ani_env*, const char*, I18nTransliteratorAddon*);
 template ani_object VariableConverter::CreateAniObject<IntlAddon>(ani_env*, const char*, IntlAddon*);
 template ani_object VariableConverter::CreateAniObject<NumberFormatAddon>(ani_env*, const char*, NumberFormatAddon*);
+template ani_object VariableConverter::CreateAniObject<ZoneRulesAddon>(ani_env*, const char*, ZoneRulesAddon*);
+template ani_object VariableConverter::CreateAniObject<ZoneOffsetTransitionAddon>(
+    ani_env*, const char*, ZoneOffsetTransitionAddon*);

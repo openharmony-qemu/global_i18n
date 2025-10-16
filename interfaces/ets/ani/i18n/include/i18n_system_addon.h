@@ -59,6 +59,25 @@ public:
     static void SetFirstDayOfWeek([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
         ani_enum_item type);
     static ani_enum_item GetFirstDayOfWeek([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object);
+    static ani_object GetSystemCollations(ani_env *env, [[maybe_unused]] ani_object object);
+    static ani_string GetUsingCollation(ani_env *env, [[maybe_unused]] ani_object object);
+    static void SetSystemCollation(ani_env *env, [[maybe_unused]] ani_object object, ani_string aniIdentifier);
+    static ani_object GetSystemMeasurements([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object);
+    static ani_string GetUsingMeasurement([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object);
+    static void SetSystemMeasurement([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
+        ani_string aniIdentifier);
+    static ani_string GetUsingNumberingSystem([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object);
+    static void SetSystemNumberingSystem([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
+        ani_string aniIdentifier);
+    static ani_object GetSystemNumberingSystems([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object);
+    static ani_object GetSystemNumberPatterns([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object);
+    static void SetSystemNumberPattern([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
+        ani_string aniPattern);
+    static ani_string GetUsingNumberPattern([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object);
+    static ani_object GetSystemNumericalDatePatterns([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object);
+    static void SetSystemNumericalDatePattern([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
+        ani_string aniIdentifier);
+    static ani_string GetUsingNumericalDatePattern([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object);
     static ani_status BindContextSystem(ani_env *env);
 };
 } // namespace I18n

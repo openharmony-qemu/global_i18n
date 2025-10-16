@@ -188,6 +188,21 @@ namespace i18n {
         native static getTemperatureName(type: TemperatureType): string;
         native static setFirstDayOfWeek(type: WeekDay): void;
         native static getFirstDayOfWeek(): WeekDay;
+        native static getSystemCollations(): Map<string, string>;
+        native static getUsingCollation(): string;
+        native static setSystemCollation(identifier: string): void;
+        native static getSystemMeasurements(): Map<string, string>;
+        native static getUsingMeasurement(): string;
+        native static setSystemMeasurement(identifier: string): void;
+        native static getUsingNumberingSystem(): string;
+        native static setSystemNumberingSystem(identifier: string): void;
+        native static getSystemNumberingSystems(): Map<string, string>;
+        native static getSystemNumberPatterns(): Map<string, string>;
+        native static setSystemNumberPattern(pattern: string): void;
+        native static getUsingNumberPattern(): string;
+        native static getSystemNumericalDatePatterns(): Map<string, string>;
+        native static setSystemNumericalDatePattern(identifier: string): void;
+        native static getUsingNumericalDatePattern(): string;
 
         public static getSystemLocaleInstance(): Intl.Locale {
             let systemLocaleStr = System.getSystemLocale();
@@ -310,6 +325,36 @@ namespace i18n {
         native static getType(ch: string): string;
     }
 
+    export class ZoneOffsetTransition {
+        static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
+
+        private nativeZoneOffsetTransition: long = 0;
+
+        constructor(context: long) {
+            if (this.nativeZoneOffsetTransition == 0) {
+                this.nativeZoneOffsetTransition = context;
+            }
+        }
+
+        native getMilliseconds(): double;
+        native getOffsetAfter(): int;
+        native getOffsetBefore(): int;
+    }
+
+    export class ZoneRules {
+        static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
+
+        private nativeZoneRules: long = 0;
+
+        constructor(context: long) {
+            if (this.nativeZoneRules == 0) {
+                this.nativeZoneRules = context;
+            }
+        }
+
+        native nextTransition(date?: double): ZoneOffsetTransition;
+    }
+
     export class TimeZone {
         static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
 
@@ -325,6 +370,7 @@ namespace i18n {
         native getDisplayName(locale?: string, isDST?: boolean): string;
         native getRawOffset(): int;
         native getOffset(date?: double): int;
+        native getZoneRules(): ZoneRules;
         native static getAvailableIDs(): Array<string>;
         native static getAvailableZoneCityIDs(): Array<string>;
         native static getCityDisplayName(cityID: string, locale: string): string;

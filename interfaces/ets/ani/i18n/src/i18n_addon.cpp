@@ -32,6 +32,9 @@
 #include "styled_number_format_addon.h"
 #include "system_locale_manager_addon.h"
 #include "variable_converter.h"
+#include "zone_offset_transition_addon.h"
+#include "zone_rules_addon.h"
+
 
 using namespace OHOS;
 using namespace Global;
@@ -823,6 +826,15 @@ ani_status BindContext(ani_env *env)
     return status;
 }
 
+ani_status BindZoneContext(ani_env *env)
+{
+    auto status = ZoneRulesAddon::BindContextZoneRules(env);
+    if (status != ANI_OK) {
+        return status;
+    }
+    return ZoneOffsetTransitionAddon::BindContextZoneOffsetTransition(env);
+}
+
 ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
 {
     ani_env *env;
@@ -870,7 +882,10 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
     if (status != ANI_OK) {
         return status;
     }
-
+    status = BindZoneContext(env);
+    if (status != ANI_OK) {
+        return status;
+    }
     status = BindContext(env);
     *result = ANI_VERSION_1;
     return ANI_OK;
