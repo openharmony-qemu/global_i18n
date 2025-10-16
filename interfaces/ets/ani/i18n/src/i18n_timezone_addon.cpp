@@ -241,7 +241,7 @@ ani_status I18nTimeZoneAddon::BindContextTimeZone(ani_env *env)
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("BindContextTimeZone: Find class '%{public}s' failed", className);
-        return (ani_status)ANI_ERROR;
+        return ANI_ERROR;
     }
 
     std::array methods = {
@@ -270,7 +270,7 @@ ani_status I18nTimeZoneAddon::BindContextTimeZone(ani_env *env)
     };
     if (ANI_OK != env->Class_BindStaticNativeMethods(cls, staticMethods.data(), staticMethods.size())) {
         HILOG_ERROR_I18N("BindContextTimeZone: Cannot bind native methods to '%{public}s'", className);
-        return (ani_status)ANI_ERROR;
+        return ANI_ERROR;
     }
 
     return ANI_OK;
