@@ -67,9 +67,9 @@ ani_boolean I18nHolidayManagerAddon::IsHoliday(ani_env *env, ani_object object, 
         res = obj->holidayManager_->IsHoliday();
     } else {
         std::vector<int> list;
-        list.push_back(VariableConverter::GetDateValue(env, date, "getFullYear"));
-        list.push_back(VariableConverter::GetDateValue(env, date, "getMonth") + MONTH_INCREASE_ONE);
-        list.push_back(VariableConverter::GetDateValue(env, date, "getDate"));
+        list.push_back(VariableConverter::GetDateInt(env, date, "getFullYear"));
+        list.push_back(VariableConverter::GetDateInt(env, date, "getMonth") + MONTH_INCREASE_ONE);
+        list.push_back(VariableConverter::GetDateInt(env, date, "getDate"));
         if (list.size() == SIZE_OF_LIST) {
             res = obj->holidayManager_->IsHoliday(list.at(INDEX_ONE_OF_LIST),
                 list.at(INDEX_TWO_OF_LIST), list.at(INDEX_THREE_OF_LIST));

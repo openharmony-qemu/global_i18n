@@ -112,7 +112,8 @@ void I18nCalendarAddon::SetTimeByDate(ani_env *env, ani_object object, ani_objec
         HILOG_ERROR_I18N("SetTime: Get calendar object failed");
         return;
     }
-    obj->calendar_->SetTime(VariableConverter::GetDateValue(env, date, "valueOf"));
+    ani_long millisecond = VariableConverter::GetDateValue(env, date, "valueOf");
+    obj->calendar_->SetTime(static_cast<double>(millisecond));
 }
 
 void I18nCalendarAddon::SetTime(ani_env *env, ani_object object, ani_double time)
@@ -285,7 +286,8 @@ ani_boolean I18nCalendarAddon::IsWeekend(ani_env *env, ani_object object, ani_ob
         isWeekEnd = obj->calendar_->IsWeekend();
     } else {
         UErrorCode error = U_ZERO_ERROR;
-        isWeekEnd = obj->calendar_->IsWeekend(VariableConverter::GetDateValue(env, date, "valueOf"), error);
+        ani_long millisecond = VariableConverter::GetDateValue(env, date, "valueOf");
+        isWeekEnd = obj->calendar_->IsWeekend(static_cast<double>(millisecond), error);
     }
     return isWeekEnd;
 }
@@ -330,7 +332,8 @@ ani_int I18nCalendarAddon::CompareDays(ani_env *env, ani_object object, ani_obje
         HILOG_ERROR_I18N("CompareDays: Get calendar object failed");
         return 0;
     }
-    return obj->calendar_->CompareDays(VariableConverter::GetDateValue(env, date, "valueOf"));
+    ani_long millisecond = VariableConverter::GetDateValue(env, date, "valueOf");
+    return obj->calendar_->CompareDays(static_cast<double>(millisecond));
 }
 
 ani_status I18nCalendarAddon::BindContextCalendar(ani_env *env)
