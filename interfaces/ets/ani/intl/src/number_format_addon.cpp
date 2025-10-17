@@ -53,7 +53,7 @@ ani_string NumberFormatAddon::NumberFormat_FormatRange(ani_env *env, ani_object 
         HILOG_ERROR_I18N("FormatRangeNumber: Get NumberFormat object failed");
         return nullptr;
     }
-    HILOG_ERROR_I18N("zdd--: %{public}s, %{public}s", std::to_string(startRange).c_str(), std::to_string(endRange).c_str());
+
     std::string str = obj->numberfmt_->FormatRange(startRange, endRange);
     return VariableConverter::StringToAniStr(env, str);
 }
