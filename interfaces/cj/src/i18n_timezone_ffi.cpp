@@ -32,7 +32,7 @@ using namespace OHOS::FFI;
 using namespace OHOS::HiviewDFX;
 extern "C"
 {
-    int64_t FfiI18nTimezoneConstructor(char* id, bool isZoneId)
+    int64_t FfiI18nTimezoneConstructor(const char* id, bool isZoneId)
     {
         std::string zoneId(id);
         std::unique_ptr<I18nTimeZone> timezoneInstance = I18nTimeZone::CreateInstance(zoneId, isZoneId);
@@ -53,7 +53,7 @@ extern "C"
         return VectorStringToCArr(I18nTimeZone::GetTimezoneIdByLocation(longitude, latitude));
     }
 
-    char* FfiI18nTimezoneGetCityDisplayName(char* cityID, char* locale)
+    char* FfiI18nTimezoneGetCityDisplayName(const char* cityID, const char* locale)
     {
         std::string zoneCityID(cityID);
         std::string zoneLocale(locale);
@@ -78,7 +78,7 @@ extern "C"
         return VectorStringToCArr(timezoneIDVec);
     }
 
-    char* FfiI18nTimezoneGetDisplayName(int64_t remoteDataID, char* locale, bool isDST, int32_t parameterStatus)
+    char* FfiI18nTimezoneGetDisplayName(int64_t remoteDataID, const char* locale, bool isDST, int32_t parameterStatus)
     {
         auto timezone = FFIData::GetData<FfiI18nTimeZone>(remoteDataID);
         if (!timezone) {
@@ -108,8 +108,8 @@ extern "C"
         double cDate = 0;
         if (parameterStatus == 0) { // 0 reprensents date is null, use system time instead
             auto time = std::chrono::system_clock::now();
-            auto since_epoch = time.time_since_epoch();
-            auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(since_epoch);
+            auto sinceEpoch = time.time_since_epoch();
+            auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(sinceEpoch);
             cDate = (double)millis.count();
         } else {
             cDate = date;

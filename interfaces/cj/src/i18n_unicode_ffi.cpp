@@ -22,47 +22,47 @@ namespace Global {
 namespace I18n {
 extern "C"
 {
-    char* FfiI18nUnicodeGetType(char* text)
+    char* FfiI18nUnicodeGetType(const char* text)
     {
         return MallocCString(GetType(text));
     }
 
-    bool FfiI18nUnicodeIsUpperCase(char* text)
+    bool FfiI18nUnicodeIsUpperCase(const char* text)
     {
         return IsUpperCase(text);
     }
 
-    bool FfiI18nUnicodeIsLowerCase(char* text)
+    bool FfiI18nUnicodeIsLowerCase(const char* text)
     {
         return IsLowerCase(text);
     }
 
-    bool FfiI18nUnicodeIsLetter(char* text)
+    bool FfiI18nUnicodeIsLetter(const char* text)
     {
         return IsLetter(text);
     }
 
-    bool FfiI18nUnicodeIsIdeograph(char* text)
+    bool FfiI18nUnicodeIsIdeograph(const char* text)
     {
         return IsIdeoGraphic(text);
     }
 
-    bool FfiI18nUnicodeIsRTL(char* text)
+    bool FfiI18nUnicodeIsRTL(const char* text)
     {
         return IsRTLCharacter(text);
     }
 
-    bool FfiI18nUnicodeIsWhitespace(char* text)
+    bool FfiI18nUnicodeIsWhitespace(const char* text)
     {
         return IsWhiteSpace(text);
     }
 
-    bool FfiI18nUnicodeIsSpaceChar(char* text)
+    bool FfiI18nUnicodeIsSpaceChar(const char* text)
     {
         return IsSpaceChar(text);
     }
 
-    bool FfiI18nUnicodeIsDigit(char* text)
+    bool FfiI18nUnicodeIsDigit(const char* text)
     {
         return IsDigit(text);
     }

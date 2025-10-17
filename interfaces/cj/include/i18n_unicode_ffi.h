@@ -21,15 +21,15 @@
 #include "i18n_struct.h"
 
 extern "C" {
-    FFI_EXPORT char* FfiI18nUnicodeGetType(char* text);
-    FFI_EXPORT bool FfiI18nUnicodeIsUpperCase(char* text);
-    FFI_EXPORT bool FfiI18nUnicodeIsLowerCase(char* text);
-    FFI_EXPORT bool FfiI18nUnicodeIsLetter(char* text);
-    FFI_EXPORT bool FfiI18nUnicodeIsIdeograph(char* text);
-    FFI_EXPORT bool FfiI18nUnicodeIsRTL(char* text);
-    FFI_EXPORT bool FfiI18nUnicodeIsWhitespace(char* text);
-    FFI_EXPORT bool FfiI18nUnicodeIsSpaceChar(char* text);
-    FFI_EXPORT bool FfiI18nUnicodeIsDigit(char* text);
+    FFI_EXPORT char* FfiI18nUnicodeGetType(const char* text);
+    FFI_EXPORT bool FfiI18nUnicodeIsUpperCase(const char* text);
+    FFI_EXPORT bool FfiI18nUnicodeIsLowerCase(const char* text);
+    FFI_EXPORT bool FfiI18nUnicodeIsLetter(const char* text);
+    FFI_EXPORT bool FfiI18nUnicodeIsIdeograph(const char* text);
+    FFI_EXPORT bool FfiI18nUnicodeIsRTL(const char* text);
+    FFI_EXPORT bool FfiI18nUnicodeIsWhitespace(const char* text);
+    FFI_EXPORT bool FfiI18nUnicodeIsSpaceChar(const char* text);
+    FFI_EXPORT bool FfiI18nUnicodeIsDigit(const char* text);
 }
 
 #endif

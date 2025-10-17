@@ -57,7 +57,7 @@ extern "C"
         return MallocCString(LocaleConfig::GetSystemRegion());
     }
 
-    bool FfiI18nSystemIsSuggested(char* language, char* region, int32_t parameterStatus)
+    bool FfiI18nSystemIsSuggested(const char* language, const char* region, int32_t parameterStatus)
     {
         bool isSuggested = false;
         if (parameterStatus == 1) {
@@ -68,7 +68,7 @@ extern "C"
         return isSuggested;
     }
 
-    CArrStr FfiI18nSystemGetSystemCountries(char* language)
+    CArrStr FfiI18nSystemGetSystemCountries(const char* language)
     {
         std::unordered_set<std::string> systemCountries = LocaleConfig::GetSystemCountries(language);
         std::vector<std::string> result;
@@ -76,7 +76,7 @@ extern "C"
         return VectorStringToCArr(result);
     }
 
-    char* FfiI18nSystemGetDisplayCountry(char* country, char* locale, bool sentenceCase, int32_t* errcode)
+    char* FfiI18nSystemGetDisplayCountry(const char* country, const char* locale, bool sentenceCase, int32_t* errcode)
     {
         std::string countryStr(country);
         std::string localeStr(locale);
@@ -99,7 +99,7 @@ extern "C"
         return LocaleConfig::GetUsingLocalDigit();
     }
 
-    int32_t FfiI18nSystemSetAppPreferredLanguage(char* language)
+    int32_t FfiI18nSystemSetAppPreferredLanguage(const char* language)
     {
         UErrorCode icuStatus = U_ZERO_ERROR;
         std::string localeTag(language);
@@ -142,7 +142,7 @@ extern "C"
         return VectorStringToCArr(result);
     }
 
-    char* FfiI18nSystemGetDisplayLanguage(char* language, char* locale, bool sentenceCase, int32_t* errCode)
+    char* FfiI18nSystemGetDisplayLanguage(const char* language, const char* locale, bool sentenceCase, int32_t* errCode)
     {
         std::string languageStr(language);
         std::string localeStr(locale);
