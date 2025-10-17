@@ -276,18 +276,20 @@ ani_boolean I18nCalendarAddon::IsWeekend(ani_env *env, ani_object object, ani_ob
         return false;
     }
 
-    bool isWeekEnd = false;
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(date, &isUndefined)) {
         HILOG_ERROR_I18N("Reference IsUndefined failed");
         return false;
     }
     if (isUndefined) {
-        isWeekEnd = obj->calendar_->IsWeekend();
-    } else {
-        UErrorCode error = U_ZERO_ERROR;
-        ani_long millisecond = VariableConverter::GetDateValue(env, date, "valueOf");
-        isWeekEnd = obj->calendar_->IsWeekend(static_cast<double>(millisecond), error);
+        return obj->calendar_->IsWeekend();
+    }
+    UErrorCode error = U_ZERO_ERROR;
+    ani_long millisecond = VariableConverter::GetDateValue(env, date, "valueOf");
+    bool isWeekEnd = obj->calendar_->IsWeekend(static_cast<double>(millisecond), error);
+    if (U_FAILURE(error)) {
+        HILOG_ERROR_I18N("Call icuCalendar.isWeekend() failed");
+        return false;
     }
     return isWeekEnd;
 }
