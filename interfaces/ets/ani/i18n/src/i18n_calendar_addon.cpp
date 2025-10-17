@@ -112,7 +112,8 @@ void I18nCalendarAddon::SetTimeByDate(ani_env *env, ani_object object, ani_objec
         HILOG_ERROR_I18N("SetTime: Get calendar object failed");
         return;
     }
-    obj->calendar_->SetTime(VariableConverter::GetDateValue(env, date, "valueOf"));
+    ani_long millisecond = VariableConverter::GetDateValue(env, date, "valueOf");
+    obj->calendar_->SetTime(static_cast<double>(millisecond));
 }
 
 void I18nCalendarAddon::SetTime(ani_env *env, ani_object object, ani_double time)
@@ -275,17 +276,20 @@ ani_boolean I18nCalendarAddon::IsWeekend(ani_env *env, ani_object object, ani_ob
         return false;
     }
 
-    bool isWeekEnd = false;
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(date, &isUndefined)) {
         HILOG_ERROR_I18N("Reference IsUndefined failed");
         return false;
     }
     if (isUndefined) {
-        isWeekEnd = obj->calendar_->IsWeekend();
-    } else {
-        UErrorCode error = U_ZERO_ERROR;
-        isWeekEnd = obj->calendar_->IsWeekend(VariableConverter::GetDateValue(env, date, "valueOf"), error);
+        return obj->calendar_->IsWeekend();
+    }
+    UErrorCode error = U_ZERO_ERROR;
+    ani_long millisecond = VariableConverter::GetDateValue(env, date, "valueOf");
+    bool isWeekEnd = obj->calendar_->IsWeekend(static_cast<double>(millisecond), error);
+    if (U_FAILURE(error)) {
+        HILOG_ERROR_I18N("Call icuCalendar.isWeekend() failed");
+        return false;
     }
     return isWeekEnd;
 }
@@ -330,7 +334,8 @@ ani_int I18nCalendarAddon::CompareDays(ani_env *env, ani_object object, ani_obje
         HILOG_ERROR_I18N("CompareDays: Get calendar object failed");
         return 0;
     }
-    return obj->calendar_->CompareDays(VariableConverter::GetDateValue(env, date, "valueOf"));
+    ani_long millisecond = VariableConverter::GetDateValue(env, date, "valueOf");
+    return obj->calendar_->CompareDays(static_cast<double>(millisecond));
 }
 
 ani_status I18nCalendarAddon::BindContextCalendar(ani_env *env)

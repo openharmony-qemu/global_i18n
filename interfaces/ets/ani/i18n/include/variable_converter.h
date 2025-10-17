@@ -38,7 +38,8 @@ public:
     static ani_object CreateArray(ani_env *env, const std::vector<std::string> &strs);
     static bool ParseStringArray(ani_env *env, ani_object obj, std::vector<std::string> &strs);
     static ani_enum_item GetEnumItemByIndex(ani_env* env, const char* enumClassName, const int index);
-    static ani_double GetDateValue(ani_env *env, ani_object date, const std::string &method);
+    static ani_long GetDateValue(ani_env *env, ani_object date, const std::string &method);
+    static ani_int GetDateInt(ani_env *env, ani_object date, const std::string &method);
     static std::vector<std::string> GetLocaleTags(ani_env *env, ani_object locale);
     template<typename T>
     static ani_object CreateAniObject(ani_env* env, const char* className, T* ptr);
