@@ -22,13 +22,13 @@
 #define FFI_EXPORT __attribute__((visibility("default")))
 
 extern "C" {
-    FFI_EXPORT int64_t FfiI18nTimezoneConstructor(char* id, bool isZoneId);
+    FFI_EXPORT int64_t FfiI18nTimezoneConstructor(const char* id, bool isZoneId);
     FFI_EXPORT CArrStr FfiI18nTimezoneGetTimezonesByLocation(double longitude, double latitude);
-    FFI_EXPORT char* FfiI18nTimezoneGetCityDisplayName(char* cityID, char* locale);
+    FFI_EXPORT char* FfiI18nTimezoneGetCityDisplayName(const char* cityID, const char* locale);
     FFI_EXPORT CArrStr FfiI18nTimezoneGetAvailableZoneCityIDs();
     FFI_EXPORT CArrStr FfiI18nTimezoneGetAvailableIDs();
     FFI_EXPORT char* FfiI18nTimezoneGetDisplayName(int64_t remoteDataID,
-        char* locale, bool isDST, int32_t parameterStatus);
+        const char* locale, bool isDST, int32_t parameterStatus);
     FFI_EXPORT int32_t FfiI18nTimezoneGetOffset(int64_t remoteDataID, double date, int32_t parameterStatus);
     FFI_EXPORT int32_t FfiI18nTimezoneGetRawOffset(int64_t remoteDataID);
     FFI_EXPORT char* FfiI18nTimezoneGetID(int64_t remoteDataID);

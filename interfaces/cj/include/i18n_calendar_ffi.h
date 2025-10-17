@@ -32,10 +32,10 @@ extern "C" {
     FFI_EXPORT int32_t FfiOHOSCalendarGetFirstDayOfWeek(int64_t id);
     FFI_EXPORT void FfiOHOSCalendarSetMinimalDaysInFirstWeek(int64_t id, int32_t minimalDaysInFirstWeek);
     FFI_EXPORT int32_t FfiOHOSCalendarGetMinimalDaysInFirstWeek(int64_t id);
-    FFI_EXPORT int32_t FfiOHOSCalendarGet(int64_t id, char* field);
-    FFI_EXPORT char* FfiOHOSCalendarGetDisplayName(int64_t id, char* locale);
+    FFI_EXPORT int32_t FfiOHOSCalendarGet(int64_t id, const char* field);
+    FFI_EXPORT char* FfiOHOSCalendarGetDisplayName(int64_t id, const char* locale);
     FFI_EXPORT bool FfiOHOSCalendarIsWeekend(int64_t id, CDate date);
-    FFI_EXPORT void FfiOHOSCalendarAdd(int64_t id, char* field, int32_t amount, int32_t* errcode);
+    FFI_EXPORT void FfiOHOSCalendarAdd(int64_t id, const char* field, int32_t amount, int32_t* errcode);
     FFI_EXPORT double FfiOHOSCalendarGetTimeInMillis(int64_t id);
     FFI_EXPORT int32_t FfiOHOSCalendarCompareDays(int64_t id, CDate date);
     FFI_EXPORT int64_t FfiOHOSGetCalendar(const char* locale, const char* type);

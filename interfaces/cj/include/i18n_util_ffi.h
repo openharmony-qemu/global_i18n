@@ -22,12 +22,12 @@
 
 extern "C" {
     FFI_EXPORT char* FfiI18nUtilUnitConvert(UnitInfo fromUnit, UnitInfo toUnit,
-        double value, char* locale, char* style);
-    FFI_EXPORT char* FfiI18nUtilGetDateOrder(char* locale);
-    FFI_EXPORT char* FfiI18nUtilGetTimePeriodName(int32_t hour, char* locale, int32_t* errcode);
-    FFI_EXPORT char* FfiI18nUtilGetThreeLetterLanguage(char* locale, int32_t* errcode);
-    FFI_EXPORT char* FfiI18nUtilGetThreeLetterRegion(char* locale, int32_t* errcode);
-    FFI_EXPORT char* FfiI18nUtilGetBestMatchLocale(char* locale, CArrStr localeList, int32_t* errcode);
+        double value, const char* locale, const char* style);
+    FFI_EXPORT char* FfiI18nUtilGetDateOrder(const char* locale);
+    FFI_EXPORT char* FfiI18nUtilGetTimePeriodName(int32_t hour, const char* locale, int32_t* errcode);
+    FFI_EXPORT char* FfiI18nUtilGetThreeLetterLanguage(const char* locale, int32_t* errcode);
+    FFI_EXPORT char* FfiI18nUtilGetThreeLetterRegion(const char* locale, int32_t* errcode);
+    FFI_EXPORT char* FfiI18nUtilGetBestMatchLocale(const char* locale, CArrStr localeList, int32_t* errcode);
 }
 
 #endif  // INTERFACES_CJ_INCLUDE_I18N_UTIL_FFI_H_
