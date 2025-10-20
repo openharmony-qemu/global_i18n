@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include <unistd.h>
 #include "i18n_hilog.h"
 #include "i18n_service_ability_load_manager.h"
 #include "ii18n_service_ability.h"
@@ -27,9 +26,6 @@ namespace I18n {
 template<typename Method, typename... Args>
 I18nErrorCode I18nServiceAbilityClient::CallI18nServiceMethod(Method method, const char* methodName, Args&&... args)
 {
-    pid_t processId = getpid();
-    HILOG_INFO_I18N("I18nServiceAbilityClient: process %{public}d calls i18n service-%{public}s: .",
-        static_cast<int>(processId), methodName);
     I18nErrorCode err = I18nErrorCode::SUCCESS;
     sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
     if (i18nServiceAbilityObj == nullptr) {
