@@ -27,16 +27,18 @@ extern "C" {
     FFI_EXPORT char* FfiI18nSystemGetAppPreferredLanguage();
     FFI_EXPORT char* FfiI18nSystemGetSystemLanguage();
     FFI_EXPORT char* FfiI18nSystemGetSystemRegion();
-    FFI_EXPORT bool FfiI18nSystemIsSuggested(char* language, char* region, int32_t parameterStatus);
-    FFI_EXPORT CArrStr FfiI18nSystemGetSystemCountries(char* language);
-    FFI_EXPORT char* FfiI18nSystemGetDisplayCountry(char* country, char* locale, bool sentenceCase, int32_t* errcode);
+    FFI_EXPORT bool FfiI18nSystemIsSuggested(const char* language, const char* region, int32_t parameterStatus);
+    FFI_EXPORT CArrStr FfiI18nSystemGetSystemCountries(const char* language);
+    FFI_EXPORT char* FfiI18nSystemGetDisplayCountry(const char* country, const char* locale, bool sentenceCase,
+        int32_t* errcode);
     FFI_EXPORT bool FfiI18nSystemGetUsingLocalDigit();
-    FFI_EXPORT int32_t FfiI18nSystemSetAppPreferredLanguage(char* language);
+    FFI_EXPORT int32_t FfiI18nSystemSetAppPreferredLanguage(const char* language);
     FFI_EXPORT char* FfiI18nSystemGetFirstPreferredLanguage();
     FFI_EXPORT CArrStr FfiI18nSystemGetPreferredLanguageList();
     FFI_EXPORT bool FfiI18nSystemIs24HourClock();
     FFI_EXPORT CArrStr FfiI18nSystemGetSystemLanguages();
-    FFI_EXPORT char* FfiI18nSystemGetDisplayLanguage(char* language, char* locale, bool sentenceCase, int32_t* errCode);
+    FFI_EXPORT char* FfiI18nSystemGetDisplayLanguage(const char* language, const char* locale, bool sentenceCase,
+        int32_t* errCode);
     FFI_EXPORT char* FfiI18nSystemGetSystemLocale();
 }
 

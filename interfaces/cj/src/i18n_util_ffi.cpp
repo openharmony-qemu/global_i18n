@@ -90,7 +90,7 @@ bool ProcessLocaleList(std::vector<std::string> localeTagList,
     return true;
 }
 
-char* FfiI18nUtilUnitConvert(UnitInfo fromUnit, UnitInfo toUnit, double value, char* locale, char* style)
+char* FfiI18nUtilUnitConvert(UnitInfo fromUnit, UnitInfo toUnit, double value, const char* locale, const char* style)
 {
     double number = value;
     std::string fromInfoUnit(fromUnit.unit);
@@ -119,7 +119,7 @@ char* FfiI18nUtilUnitConvert(UnitInfo fromUnit, UnitInfo toUnit, double value, c
     return res;
 }
 
-char* FfiI18nUtilGetBestMatchLocale(char* locale, CArrStr localeList, int32_t* errCode)
+char* FfiI18nUtilGetBestMatchLocale(const char* locale, CArrStr localeList, int32_t* errCode)
 {
     std::vector<std::string> localeArr = convert2CppStringArray(localeList);
     std::string localeStr(locale);
@@ -149,14 +149,14 @@ char* FfiI18nUtilGetBestMatchLocale(char* locale, CArrStr localeList, int32_t* e
     return res;
 }
 
-char* FfiI18nUtilGetDateOrder(char* locale)
+char* FfiI18nUtilGetDateOrder(const char* locale)
 {
     std::string loacleStr(locale);
     char* res = MallocCString(DateTimeSequence::GetDateOrder(loacleStr));
     return res;
 }
 
-char* FfiI18nUtilGetTimePeriodName(int32_t hour, char* locale, int32_t* errcode)
+char* FfiI18nUtilGetTimePeriodName(int32_t hour, const char* locale, int32_t* errcode)
 {
     std::string localeTag;
     if (locale == nullptr) {
@@ -194,7 +194,7 @@ char* FfiI18nUtilGetTimePeriodName(int32_t hour, char* locale, int32_t* errcode)
     return res;
 }
 
-char* FfiI18nUtilGetThreeLetterLanguage(char* locale, int32_t* errcode)
+char* FfiI18nUtilGetThreeLetterLanguage(const char* locale, int32_t* errcode)
 {
     std::string language = GetISO3Language(std::string(locale));
     if (language.empty()) {
@@ -206,7 +206,7 @@ char* FfiI18nUtilGetThreeLetterLanguage(char* locale, int32_t* errcode)
     return res;
 }
 
-char* FfiI18nUtilGetThreeLetterRegion(char* locale, int32_t* errcode)
+char* FfiI18nUtilGetThreeLetterRegion(const char* locale, int32_t* errcode)
 {
     std::string country = GetISO3Country(std::string(locale));
     if (country.empty()) {
