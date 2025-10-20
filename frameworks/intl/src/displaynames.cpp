@@ -16,6 +16,7 @@
 #include "i18n_hilog.h"
 #include "locale_config.h"
 #include "locale_helper.h"
+#include "taboo_utils.h"
 #include "utils.h"
 
 namespace OHOS {
@@ -202,7 +203,12 @@ std::string DisplayNames::DisplayLanguage(const std::string &code)
     if (!displayname.isBogus()) {
         displayname.toUTF8String(result);
     }
-    return result;
+    TabooUtils* tabooUtils = TabooUtils::GetInstance();
+    if (tabooUtils == nullptr) {
+        HILOG_ERROR_I18N("DisplayNames::DisplayLanguage: tabooUtils is nullptr.");
+        return result;
+    }
+    return tabooUtils->ReplaceLanguageName(code, localeStr, result);
 }
 
 std::string DisplayNames::DisplayRegion(const std::string &code)
@@ -218,7 +224,12 @@ std::string DisplayNames::DisplayRegion(const std::string &code)
     if (!displayname.isBogus()) {
         displayname.toUTF8String(result);
     }
-    return result;
+    TabooUtils* tabooUtils = TabooUtils::GetInstance();
+    if (tabooUtils == nullptr) {
+        HILOG_ERROR_I18N("DisplayNames::DisplayRegion: tabooUtils is nullptr.");
+        return result;
+    }
+    return tabooUtils->ReplaceCountryName(code, localeStr, result);
 }
 
 std::string DisplayNames::DisplayScript(const std::string &code)
