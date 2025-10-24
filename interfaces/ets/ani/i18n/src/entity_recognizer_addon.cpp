@@ -102,7 +102,7 @@ static ani_object CreateEntityInfoItem(ani_env *env, const int begin, const int 
 
 static ani_object GetEntityInfoItem(ani_env *env, std::vector<std::vector<int>>& entityInfo)
 {
-    static const char *className = "escompat.Array";
+    static const char *className = "std.core.Array";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);

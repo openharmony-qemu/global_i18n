@@ -148,7 +148,7 @@ static ani_object CreateStyledPart(ani_env *env, StyledNumberFormat::NumberPart 
 
 static ani_object CreateStyledPartArray(ani_env *env, const std::vector<StyledNumberFormat::NumberPart> &numberParts)
 {
-    static const char *className = "escompat.Array";
+    static const char *className = "std.core.Array";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("CreateStyledPartArray: Find class '%{public}s' failed", className);

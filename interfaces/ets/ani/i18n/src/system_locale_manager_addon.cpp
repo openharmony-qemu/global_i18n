@@ -80,7 +80,7 @@ static ani_object CreateLocaleItem(ani_env *env, LocaleItem localeItem)
 
 static ani_object CreateLocaleItemArray(ani_env *env, std::vector<LocaleItem> LocaleItemList)
 {
-    static const char *className = "escompat.Array";
+    static const char *className = "std.core.Array";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -262,7 +262,7 @@ ani_object I18nSysLocaleMgrAddon::GetTimeZoneCityItemArray(ani_env *env, [[maybe
         return nullptr;
     }
 
-    static const char *className = "escompat.Array";
+    static const char *className = "std.core.Array";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);

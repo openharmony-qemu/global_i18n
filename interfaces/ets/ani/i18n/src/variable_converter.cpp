@@ -275,7 +275,7 @@ std::string VariableConverter::GetLocaleTagFromBuiltinLocale(ani_env *env, ani_o
 
 ani_object VariableConverter::CreateArray(ani_env *env, const std::vector<std::string> &strs)
 {
-    static const char *className = "escompat.Array";
+    static const char *className = "std.core.Array";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -311,7 +311,7 @@ ani_object VariableConverter::CreateArray(ani_env *env, const std::vector<std::s
 
 bool VariableConverter::ParseStringArray(ani_env *env, ani_object obj, std::vector<std::string> &strs)
 {
-    static const char *className = "escompat.Array";
+    static const char *className = "std.core.Array";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -428,7 +428,7 @@ std::vector<std::string> VariableConverter::GetLocaleTags(ani_env *env, ani_obje
         localeTags.push_back(AniStrToString(env, locale));
         return localeTags;
     }
-    static const char *className = "escompat.Array";
+    static const char *className = "std.core.Array";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
