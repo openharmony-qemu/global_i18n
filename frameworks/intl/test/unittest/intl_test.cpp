@@ -231,7 +231,7 @@ HWTEST_F(IntlTest, IntlFuncTest003, TestSize.Level1)
 HWTEST_F(IntlTest, IntlFuncTest004, TestSize.Level1)
 {
     string locale = "en-GB";
-    string expects = "2 January 1970, 18:17 – 12 January 1970, 18:20";
+    string expects = "2 January 1970 at 18:17 – 12 January 1970 at 18:20";
     vector<string> locales;
     locales.push_back(locale);
     string dateStyle = "long";
@@ -1958,13 +1958,13 @@ HWTEST_F(IntlTest, IntlFuncTest0046, TestSize.Level1)
     DateTimeFormat *dateFormat = new (std::nothrow) DateTimeFormat(locales, options);
     double milliseconds = zoneTrans->GetMilliseconds();
     std::string result = dateFormat->Format(static_cast<int64_t>(milliseconds));
-    EXPECT_EQ(result, "March 9, 2025, 03:00:00 PDT");
+    EXPECT_EQ(result, "March 9, 2025 at 03:00:00 PDT");
 
     std::unique_ptr<ZoneOffsetTransition> zoneOffsetTrans = zoneRules->NextTransition(milliseconds);
     ASSERT_TRUE(zoneOffsetTrans != nullptr);
     milliseconds = zoneOffsetTrans->GetMilliseconds();
     result = dateFormat->Format(static_cast<int64_t>(milliseconds));
-    EXPECT_EQ(result, "November 2, 2025, 01:00:00 PST");
+    EXPECT_EQ(result, "November 2, 2025 at 01:00:00 PST");
 
     tzId = "America/Santiago";
     options["timeZone"] = tzId;
@@ -1975,12 +1975,12 @@ HWTEST_F(IntlTest, IntlFuncTest0046, TestSize.Level1)
     ASSERT_TRUE(zoneTrans2 != nullptr);
     milliseconds = zoneTrans2->GetMilliseconds();
     result = dateFormat2->Format(static_cast<int64_t>(milliseconds));
-    EXPECT_EQ(result, "April 5, 2025, 23:00:00 GMT-4");
+    EXPECT_EQ(result, "April 5, 2025 at 23:00:00 GMT-4");
     std::unique_ptr<ZoneOffsetTransition> zoneOffsetTrans2 = zoneRules2->NextTransition(milliseconds);
     ASSERT_TRUE(zoneOffsetTrans2 != nullptr);
     milliseconds = zoneOffsetTrans2->GetMilliseconds();
     result = dateFormat2->Format(static_cast<int64_t>(milliseconds));
-    EXPECT_EQ(result, "September 7, 2025, 01:00:00 GMT-3");
+    EXPECT_EQ(result, "September 7, 2025 at 01:00:00 GMT-3");
     EXPECT_EQ(zoneOffsetTrans2->GetOffsetAfter(), -10800000);
     EXPECT_EQ(zoneOffsetTrans2->GetOffsetBefore(), -14400000);
     delete dateFormat;
