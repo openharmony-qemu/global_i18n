@@ -91,6 +91,11 @@ CalendarType GetCalendarType(const std::string& calendarType)
     return type;
 }
 
+bool HasFlag(uint32_t flags, uint32_t target)
+{
+    return (flags & target) == target;
+}
+
 int64_t FfiOHOSGetCalendar(const char* locale, const char* type)
 {
     CalendarType calendarType = CalendarType::UNDEFINED;
@@ -161,20 +166,20 @@ void FfiOHOSCalendarSetOfDay(int64_t id, int32_t hour, int32_t minute, int32_t s
     instance->Set(UCalendarDateFields::UCAL_SECOND, second);
 }
 
-void FfiOHOSCalendarSetTimeOfDay(int64_t id, int32_t hour, int32_t minute, int32_t second, uint32_t flag)
+void FfiOHOSCalendarSetTimeOfDay(int64_t id, int32_t hour, int32_t minute, int32_t second, uint32_t flags)
 {
     auto instance = FFIData::GetData<CCalendar>(id);
     if (!instance) {
         HILOG_ERROR_I18N("The CCalendar instance is nullptr");
         return;
     }
-    if (flag & HOUR_FLAG) {
+    if (HasFlag(flags, HOUR_FLAG)) {
         instance->Set(UCalendarDateFields::UCAL_HOUR_OF_DAY, hour);
     }
-    if (flag & MINUTE_FLAG) {
+    if (HasFlag(flags, MINUTE_FLAG)) {
         instance->Set(UCalendarDateFields::UCAL_MINUTE, minute);
     }
-    if (flag & SECOND_FLAG) {
+    if (HasFlag(flags, SECOND_FLAG)) {
         instance->Set(UCalendarDateFields::UCAL_SECOND, second);
     }
 }
@@ -240,7 +245,7 @@ int32_t FfiOHOSCalendarGetMinimalDaysInFirstWeek(int64_t id)
     return instance->GetMinimalDaysInFirstWeek();
 }
 
-int32_t FfiOHOSCalendarGet(int64_t id, char* field)
+int32_t FfiOHOSCalendarGet(int64_t id, const char* field)
 {
     auto instance = FFIData::GetData<CCalendar>(id);
     if (!instance) {
@@ -251,7 +256,7 @@ int32_t FfiOHOSCalendarGet(int64_t id, char* field)
     return instance->Get(g_fieldsMap[fieldName]);
 }
 
-char* FfiOHOSCalendarGetDisplayName(int64_t id, char* locale)
+char* FfiOHOSCalendarGetDisplayName(int64_t id, const char* locale)
 {
     std::string localeStr(locale);
     auto instance = FFIData::GetData<CCalendar>(id);
@@ -279,7 +284,7 @@ bool FfiOHOSCalendarIsWeekend(int64_t id, CDate date)
     }
 }
 
-void FfiOHOSCalendarAdd(int64_t id, char* field, int32_t amount, int32_t* errcode)
+void FfiOHOSCalendarAdd(int64_t id, const char* field, int32_t amount, int32_t* errcode)
 {
     auto instance = FFIData::GetData<CCalendar>(id);
     if (!instance) {
