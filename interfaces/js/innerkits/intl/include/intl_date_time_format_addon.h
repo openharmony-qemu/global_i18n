@@ -27,7 +27,9 @@ class IntlDateTimeFormatAddon {
 public:
     IntlDateTimeFormatAddon();
     virtual ~IntlDateTimeFormatAddon();
+    std::shared_ptr<IntlDateTimeFormat> GetDateTimeFormat();
     static napi_value InitIntlDateTimeFormat(napi_env env, napi_value exports);
+    static bool IsIntlDateTimeFormat(napi_env env, napi_value argv);
 
 private:
     static void Destructor(napi_env env, void* nativeObject, void* hint);

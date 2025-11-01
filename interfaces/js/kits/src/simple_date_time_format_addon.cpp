@@ -25,7 +25,6 @@ namespace I18n {
 static thread_local napi_ref* g_SimpleDateTimeFormatConstructor = nullptr;
 static const size_t SIZE_WITHOUR_LOCALE = 2;
 static const size_t SIZE_WITH_LOCALE = 3;
-static const std::string GET_TIME_NAME = "getTime";
 
 SimpleDateTimeFormatAddon::SimpleDateTimeFormatAddon() {}
 
@@ -148,8 +147,8 @@ napi_value SimpleDateTimeFormatAddon::Format(napi_env env, napi_callback_info in
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "date", "", true);
         return VariableConvertor::CreateString(env, "");
     }
-    int64_t milliseconds = 0;
-    if (!GetDateTime(env, argv[0], milliseconds)) {
+    double milliseconds = 0;
+    if (!VariableConvertor::GetDateTime(env, argv[0], milliseconds)) {
         HILOG_ERROR_I18N("SimpleDateTimeFormatAddon::Format: get date time failed.");
         return VariableConvertor::CreateString(env, "");
     }
@@ -264,57 +263,51 @@ napi_value SimpleDateTimeFormatAddon::SimpleDateTimeFormatConstructor(napi_env e
     return thisVar;
 }
 
-std::unique_ptr<SimpleDateTimeFormat> SimpleDateTimeFormatAddon::InitSimpleDateTimeFormatContext(napi_env env,
+std::shared_ptr<SimpleDateTimeFormat> SimpleDateTimeFormatAddon::InitSimpleDateTimeFormatContext(napi_env env,
     napi_value locale, const std::string& skeleton, bool isBestPattern, I18nErrorCode& errCode)
 {
     if (locale == nullptr) {
         std::shared_ptr<LocaleInfo> localeInfo = nullptr;
-        return std::make_unique<SimpleDateTimeFormat>(skeleton, localeInfo, isBestPattern, errCode);
+        return std::make_shared<SimpleDateTimeFormat>(skeleton, localeInfo, isBestPattern, errCode);
     }
 
     if (VariableConvertor::GetLocaleType(env, locale) == LocaleType::BUILTINS_LOCALE) {
         std::string localeTag = VariableConvertor::ParseBuiltinsLocale(env, locale);
-        return std::make_unique<SimpleDateTimeFormat>(skeleton, localeTag, isBestPattern, errCode);
+        return std::make_shared<SimpleDateTimeFormat>(skeleton, localeTag, isBestPattern, errCode);
     } else if (VariableConvertor::GetLocaleType(env, locale) == LocaleType::LOCALE_INFO) {
         std::shared_ptr<LocaleInfo> localeInfo = VariableConvertor::ParseLocaleInfo(env, locale);
-        return std::make_unique<SimpleDateTimeFormat>(skeleton, localeInfo, isBestPattern, errCode);
+        return std::make_shared<SimpleDateTimeFormat>(skeleton, localeInfo, isBestPattern, errCode);
     }
     HILOG_ERROR_I18N("SimpleDateTimeFormatAddon::InitSimpleDateTimeFormatContext: Init context failed.");
     return nullptr;
 }
 
-bool SimpleDateTimeFormatAddon::GetDateTime(napi_env env, napi_value date, int64_t& milliseconds)
+std::shared_ptr<SimpleDateTimeFormat> SimpleDateTimeFormatAddon::GetDateTimeFormat()
 {
-    bool isDate = false;
-    napi_status status = napi_is_date(env, date, &isDate);
+    return simpleDateTimeFormat_;
+}
+
+bool SimpleDateTimeFormatAddon::IsSimpleDateTimeFormat(napi_env env, napi_value argv)
+{
+    if (g_SimpleDateTimeFormatConstructor == nullptr) {
+        HILOG_ERROR_I18N(
+            "SimpleDateTimeFormatAddon::IsSimpleDateTimeFormat: g_SimpleDateTimeFormatConstructor is nullptr.");
+        return false;
+    }
+    napi_value constructor = nullptr;
+    napi_status status = napi_get_reference_value(env, *g_SimpleDateTimeFormatConstructor, &constructor);
+    if (status != napi_ok || constructor == nullptr) {
+        HILOG_ERROR_I18N("SimpleDateTimeFormatAddon::IsSimpleDateTimeFormat: Failed to create reference.");
+        return false;
+    }
+
+    bool isSimpleDateTimeFormat = false;
+    status = napi_instanceof(env, argv, constructor, &isSimpleDateTimeFormat);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("SimpleDateTimeFormatAddon: Failed to call napi_is_date.");
-        return false;
-    } else if (!isDate) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "date", "Date", true);
+        HILOG_ERROR_I18N("SimpleDateTimeFormatAddon::IsSimpleDateTimeFormat: Failed to get instance of argv.");
         return false;
     }
-
-    napi_value funcGetTime = nullptr;
-    status = napi_get_named_property(env, date, GET_TIME_NAME.c_str(), &funcGetTime);
-    if (status != napi_ok || funcGetTime == nullptr) {
-        HILOG_ERROR_I18N("SimpleDateTimeFormatAddon::GetDateTime: Get named property failed.");
-        return false;
-    }
-
-    napi_value value = nullptr;
-    status = napi_call_function(env, date, funcGetTime, 0, nullptr, &value);
-    if (status != napi_ok || value == nullptr) {
-        HILOG_ERROR_I18N("SimpleDateTimeFormatAddon::GetDateTime: Call getTime failed.");
-        return false;
-    }
-
-    status = napi_get_value_int64(env, value, &milliseconds);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("SimpleDateTimeFormatAddon::GetDateTime: Get milliseconds failed.");
-        return false;
-    }
-    return true;
+    return isSimpleDateTimeFormat;
 }
 } // namespace I18n
 } // namespace Global

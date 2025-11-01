@@ -20,6 +20,7 @@
 #include "locale_info.h"
 #include "unicode/locid.h"
 #include "unicode/smpdtfmt.h"
+#include "date_time_format_part.h"
 
 namespace OHOS {
 namespace Global {
@@ -31,6 +32,7 @@ public:
     SimpleDateTimeFormat(const std::string& skeletonOrPattern, const std::string& localeTag,
         bool isBestPattern, I18nErrorCode& errCode);
     std::string Format(int64_t milliseconds);
+    std::pair<std::string, std::vector<DateTimeFormatPart>> FormatToParts(double milliseconds);
 
 private:
     void InitSimpleDateTimeFormat(const std::string& skeletonOrPattern, const std::string& locale, bool isBestPattern,
