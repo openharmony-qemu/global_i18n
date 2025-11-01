@@ -29,6 +29,7 @@
 #include "locale_matcher.h"
 #include "simple_date_time_format_addon.h"
 #include "simple_number_format_addon.h"
+#include "styled_date_time_format_addon.h"
 #include "styled_number_format_addon.h"
 #include "system_locale_manager_addon.h"
 #include "variable_converter.h"
@@ -825,6 +826,11 @@ ani_status BindContext(ani_env *env)
     }
 
     status = I18nStyledNumberFormatAddon::BindContextStyledNumberFormat(env);
+    if (status != ANI_OK) {
+        return status;
+    }
+
+    status = I18nStyledDateTimeFormatAddon::BindContextStyledDateTimeFormat(env);
     if (status != ANI_OK) {
         return status;
     }

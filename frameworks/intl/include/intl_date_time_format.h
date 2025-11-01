@@ -26,6 +26,7 @@
 #include "unicode/localebuilder.h"
 #include "unicode/locid.h"
 #include "i18n_types.h"
+#include "date_time_format_part.h"
 
 namespace OHOS {
 namespace Global {
@@ -80,6 +81,7 @@ public:
     std::string Format(double milliseconds);
     std::vector<std::pair<std::string, std::string>> FormatToParts(double milliseconds, std::string& errMessage);
     std::string FormatRange(double start, double end, std::string& errMessage);
+    std::pair<std::string, std::vector<DateTimeFormatPart>> FormatToParts(double milliseconds);
     std::vector<std::pair<std::string, std::string>> FormatRangeToParts(double start, double end,
         std::string& errMessage);
     void ResolvedOptions(std::unordered_map<std::string, std::string>& configs);
@@ -123,7 +125,7 @@ private:
         const std::string& effectiveHourCycle, bool isHourDefined, std::string& errMessage);
     void InitDateTimeSkeleton(const std::vector<std::string> &options, std::string &skeleton, const std::string& hc);
     bool InitIcuSimpleDateFormat(bool isExistComponents, std::string& errMessage);
-    std::unique_ptr<icu::SimpleDateFormat> GetSimpleDateFormatFromStyle();
+    std::shared_ptr<icu::SimpleDateFormat> GetSimpleDateFormatFromStyle();
     bool InitIcuCalendar();
     bool InitDateIntervalFormat();
     void ResolvedCalendarAndTimeZone(std::unordered_map<std::string, std::string>& configs);
@@ -136,7 +138,6 @@ private:
     static icu::UnicodeString ReplaceHourCycleOfSkeleton(const icu::UnicodeString& skeleton,
         const std::string& hc);
     static std::string ConvertUDateFormatHourCycleToString(UDateFormatHourCycle hc);
-    static std::string ConvertFieldIdToDateType(int32_t fieldId);
     static std::vector<CommonDateFormatPart> CreateDateIntervalParts(const icu::FormattedDateInterval& formatted,
         icu::UnicodeString& formattedParts, std::string& errMessage);
     static bool IsValidTimeZoneName(const icu::TimeZone &tz);
@@ -170,7 +171,7 @@ private:
     icu::DateTimePatternGenerator* icuDateTimePatternGenerator = nullptr;
     icu::TimeZone* icuTimeZone = nullptr;
     icu::Calendar* icuCalendar = nullptr;
-    std::unique_ptr<icu::SimpleDateFormat> icuSimpleDateFormat = nullptr;
+    std::shared_ptr<icu::SimpleDateFormat> icuSimpleDateFormat = nullptr;
     icu::DateIntervalFormat* dateIntervalFormat = nullptr;
     static bool icuInitialized;
     static bool Init();

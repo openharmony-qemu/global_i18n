@@ -152,10 +152,34 @@ namespace i18n {
         unit?: TextStyle;
     }
 
+    export interface StyledDateTimeFormatOptions {
+        year?: TextStyle;
+        month?: TextStyle;
+        day?: TextStyle;
+        hour?: TextStyle;
+        minute?: TextStyle;
+        second?: TextStyle;
+        weekday?: TextStyle;
+        era?: TextStyle;
+        timeZoneName?: TextStyle;
+        dayPeriod?: TextStyle;
+    }
+
     class StyledPartInner {
+        constructor(start: int, length: int, type: string) {
+            this.start = start;
+            this.length = length;
+            this.type = type;
+        }
+
         start: int;
         length: int;
         type: string;
+    }
+
+    class StyledFormatResult {
+        styledParts: Array<StyledPartInner>;
+        content: string;
     }
 
     export class System {
@@ -562,6 +586,82 @@ namespace i18n {
                 }
             }
             return new StyledString(str, option);
+        }
+    }
+
+    export class StyledDateTimeFormat {
+        static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
+
+        private nativeStyledDateTimeFormat: long = 0;
+        private styledOptionsMap = new Map<string, TextStyle | undefined>();
+        private dateTimeFormat: Intl.DateTimeFormat;
+        private isIntlDateTimeFormat: boolean = false;
+
+        constructor(context: long) {
+            if (this.nativeStyledDateTimeFormat == 0) {
+                this.nativeStyledDateTimeFormat = context;
+            }
+        }
+
+        constructor(dateTimeFormat: Intl.DateTimeFormat | SimpleDateTimeFormat,
+            options?: StyledDateTimeFormatOptions) {
+            this.isIntlDateTimeFormat = dateTimeFormat instanceof Intl.DateTimeFormat;
+            if (this.isIntlDateTimeFormat) {
+                this.dateTimeFormat = dateTimeFormat as Intl.DateTimeFormat;
+            } else {
+                this.nativeStyledDateTimeFormat =
+                    StyledDateTimeFormat.create(dateTimeFormat).nativeStyledDateTimeFormat;
+            }
+
+            if (options != undefined) {
+                this.styledOptionsMap.set('year', options.year);
+                this.styledOptionsMap.set('month', options.month);
+                this.styledOptionsMap.set('day', options.day);
+                this.styledOptionsMap.set('hour', options.hour);
+                this.styledOptionsMap.set('minute', options.minute);
+                this.styledOptionsMap.set('second', options.second);
+                this.styledOptionsMap.set('weekday', options.weekday);
+                this.styledOptionsMap.set('era', options.era);
+                this.styledOptionsMap.set('timeZoneName', options.timeZoneName);
+                this.styledOptionsMap.set('dayPeriod', options.dayPeriod);
+            }
+        }
+
+        native static create(dateTimeFormat: Intl.DateTimeFormat | SimpleDateTimeFormat): StyledDateTimeFormat;
+        native formatToPats(date: Date): StyledFormatResult;
+
+        format(date: Date): StyledString {
+            let formatResult = "";
+            let formatParts: Array<StyledPartInner>;
+            if (this.isIntlDateTimeFormat) {
+                formatParts = new Array<StyledPartInner>();
+                let parts = this.dateTimeFormat.formatToParts(date);
+                for (let i = 0; i < parts.length; i++) {
+                    let styledPartInner = new StyledPartInner(formatResult.length, parts[i].value.length,
+                        parts[i].type);
+                    formatParts.push(styledPartInner);
+                    formatResult += parts[i].value;
+                }
+            } else {
+                let StyledFormatResult = this.formatToPats(date);
+                formatResult = StyledFormatResult.content;
+                formatParts = StyledFormatResult.styledParts;
+            }
+
+            let option: Array<StyleOptions> = new Array<StyleOptions>();
+            for (let i = 0; i < formatParts.length; i++) {
+                let styled = this.styledOptionsMap.get(formatParts[i].type);
+                if (styled != undefined) {
+                    let styleOption: StyleOptions = {
+                        start: formatParts[i].start,
+                        length: formatParts[i].length,
+                        styledKey: StyledStringKey.FONT,
+                        styledValue: styled as TextStyle
+                    };
+                    option.push(styleOption);
+                }
+            }
+            return new StyledString(formatResult, option);
         }
     }
 

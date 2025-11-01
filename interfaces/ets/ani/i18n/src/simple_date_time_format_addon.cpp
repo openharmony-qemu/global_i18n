@@ -55,7 +55,7 @@ ani_object I18nSimpleDateTimeFormatAddon::GetSimpleDateTimeFormatByPattern(ani_e
     }
 
     I18nErrorCode errCode = I18nErrorCode::SUCCESS;
-    obj->simpleDateTimeFormat_ = std::make_unique<SimpleDateTimeFormat>(
+    obj->simpleDateTimeFormat_ = std::make_shared<SimpleDateTimeFormat>(
         VariableConverter::AniStrToString(env, pattern), localeInfo, true, errCode);
     if (errCode == I18nErrorCode::INVALID_DATE_TIME_FORMAT_SKELETON) {
         ErrorUtil::AniThrow(env, I18N_NOT_VALID, "skeleton", "a valid date time format skeleton");
@@ -95,7 +95,7 @@ ani_object I18nSimpleDateTimeFormatAddon::GetSimpleDateTimeFormatBySkeleton(ani_
     }
 
     I18nErrorCode errCode = I18nErrorCode::SUCCESS;
-    obj->simpleDateTimeFormat_ = std::make_unique<SimpleDateTimeFormat>(
+    obj->simpleDateTimeFormat_ = std::make_shared<SimpleDateTimeFormat>(
         VariableConverter::AniStrToString(env, skeleton), localeInfo, false, errCode);
     if (errCode == I18nErrorCode::INVALID_DATE_TIME_FORMAT_SKELETON) {
         ErrorUtil::AniThrow(env, I18N_NOT_VALID, "skeleton", "a valid date time format skeleton");
@@ -167,4 +167,9 @@ ani_status I18nSimpleDateTimeFormatAddon::BindContextSimpleDateTimeFormat(ani_en
     };
 
     return ANI_OK;
+}
+
+std::shared_ptr<SimpleDateTimeFormat> I18nSimpleDateTimeFormatAddon::GetDateTimeFormat()
+{
+    return simpleDateTimeFormat_;
 }

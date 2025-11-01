@@ -533,6 +533,27 @@ napi_value IntlDateTimeFormatAddon::CreateResolvedOptions(napi_env env,
     }
     return object;
 }
+
+std::shared_ptr<IntlDateTimeFormat> IntlDateTimeFormatAddon::GetDateTimeFormat()
+{
+    return intlDateTimeFormat;
+}
+
+bool IntlDateTimeFormatAddon::IsIntlDateTimeFormat(napi_env env, napi_value argv)
+{
+    napi_value constructor = JSUtils::GetConstructor(env, "DateTimeFormat");
+    if (constructor == nullptr) {
+        HILOG_ERROR_I18N("IntlDateTimeFormatAddon::IsIntlDateTimeFormat: get constructor failed");
+        return false;
+    }
+    bool isIntlDateTimeFormat = false;
+    napi_status status = napi_instanceof(env, argv, constructor, &isIntlDateTimeFormat);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("IntlDateTimeFormatAddon::IsIntlDateTimeFormat: Failed to get instance of argv.");
+        return false;
+    }
+    return isIntlDateTimeFormat;
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

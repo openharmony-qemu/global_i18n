@@ -122,6 +122,46 @@ std::string SimpleDateTimeFormat::Format(int64_t milliseconds)
     return PseudoLocalizationProcessor(result);
 }
 
+std::pair<std::string, std::vector<DateTimeFormatPart>> SimpleDateTimeFormat::FormatToParts(double milliseconds)
+{
+    if (!initSuccess) {
+        HILOG_ERROR_I18N("SimpleDateTimeFormat::FormatToParts: init failed.");
+        return {};
+    }
+    std::string systemTimeZone = LocaleConfig::GetSystemTimezone();
+    auto timeZone = std::unique_ptr<icu::TimeZone>(icu::TimeZone::createTimeZone(systemTimeZone.c_str()));
+    UDate date = static_cast<UDate>(milliseconds);
+    icu::UnicodeString formatResult;
+    std::vector<DateTimeFormatPart> formatParts;
+    for (size_t pos = 0; pos < formatters.size(); pos++) {
+        size_t offset = static_cast<size_t>(formatResult.length());
+        std::string pattern = patterns[pos];
+        if (!isPatterns[pos]) {
+            icu::UnicodeString temp = pattern.c_str();
+            formatParts.emplace_back(DateTimeFormatPart(-1, offset, static_cast<size_t>(temp.length())));
+            formatResult.append(temp);
+            continue;
+        }
+        auto formatter = formatters[pos];
+        if (formatter == nullptr) {
+            HILOG_ERROR_I18N("SimpleDateTimeFormat::FormatToParts: formatter is nullptr.");
+            return {};
+        }
+        if (timeZone != nullptr) {
+            formatter->setTimeZone(*timeZone);
+        }
+        auto parts = DateTimeFormatPart::ParseToParts(formatter, date);
+        for (auto& item : parts.second) {
+            item.SetStart(item.GetStart() + offset);
+            formatParts.push_back(item);
+        }
+        formatResult.append(parts.first);
+    }
+    std::string result;
+    formatResult.toUTF8String(result);
+    return std::pair(result, formatParts);
+}
+
 I18nErrorCode SimpleDateTimeFormat::ParsePattern(const std::string& pattern)
 {
     bool isPattern = true;

@@ -113,33 +113,33 @@ napi_value StyledNumberFormatAddon::Format(napi_env env, napi_callback_info info
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("StyledNumberFormatAddon::Format: Get cb info failed.");
-        return CreateStyledString(env, "", nullptr);
+        return VariableConvertor::CreateStyledString(env, "", nullptr);
     } else if (argc < 1) {
         ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, "value", true);
-        return CreateStyledString(env, "", nullptr);
+        return VariableConvertor::CreateStyledString(env, "", nullptr);
     }
 
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     status = napi_typeof(env, argv[0], &valueType);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("StyledNumberFormatAddon::Format: Failed to get type of argv[0].");
-        return CreateStyledString(env, "", nullptr);
+        return VariableConvertor::CreateStyledString(env, "", nullptr);
     } else if (valueType != napi_valuetype::napi_number) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "value", "number", true);
-        return CreateStyledString(env, "", nullptr);
+        return VariableConvertor::CreateStyledString(env, "", nullptr);
     }
 
     double number = 0;
     status = napi_get_value_double(env, argv[0], &number);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Format: Get double from napi failed");
-        return CreateStyledString(env, "", nullptr);
+        return VariableConvertor::CreateStyledString(env, "", nullptr);
     }
     StyledNumberFormatAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->styledNumberFormat_) {
         HILOG_ERROR_I18N("Format: Get StyledNumberFormat object failed");
-        return CreateStyledString(env, "", nullptr);
+        return VariableConvertor::CreateStyledString(env, "", nullptr);
     }
 
     std::string formattedNumber = obj->styledNumberFormat_->Format(number);
@@ -147,7 +147,7 @@ napi_value StyledNumberFormatAddon::Format(napi_env env, napi_callback_info info
 
     napi_value styleOption = CreateStyleOptions(env, numberParts, obj->styledNumberFormatOptions_);
     
-    napi_value styledString = CreateStyledString(env, formattedNumber, styleOption);
+    napi_value styledString = VariableConvertor::CreateStyledString(env, formattedNumber, styleOption);
     return styledString;
 }
 
@@ -208,36 +208,6 @@ void StyledNumberFormatAddon::SetTextStyle(napi_env env, napi_value options, con
         styledNumberFormatOptions_[optionName] = nullptr;
         return;
     }
-}
-
-napi_value StyledNumberFormatAddon::CreateStyledString(napi_env env, const std::string &formattedNumber,
-    napi_value styleOption)
-{
-    size_t argc = 2;    // StyledString need 2 args
-    napi_value argv[2] = {nullptr};
-    argv[0] = VariableConvertor::CreateString(env, formattedNumber);
-    argv[1] = styleOption;
-
-    napi_value global = nullptr;
-    napi_status status = napi_get_global(env, &global);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("CreateStyledString: get global object failed");
-        return nullptr;
-    }
-    napi_value constructor = nullptr;
-    status = napi_get_named_property(env, global, "StyledString", &constructor);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("CreateStyledString: get StyledString failed");
-        return nullptr;
-    }
-
-    napi_value styleString = nullptr;
-    status = napi_new_instance(env, constructor, argc, argv, &styleString);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("CreateStyledString: napi_new_instance failed");
-        return nullptr;
-    }
-    return styleString;
 }
 
 napi_value StyledNumberFormatAddon::CreateStyleOptions(napi_env env,

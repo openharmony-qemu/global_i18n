@@ -97,37 +97,6 @@ const std::unordered_map<UDateFormatHourCycle, std::string> UDATE_FORMAT_HOUR_CY
     { UDAT_HOUR_CYCLE_24, "h24" }
 };
 
-const std::unordered_map<int32_t, std::string> FIELD_ID_TO_DATE_TYPE = {
-    { UDAT_YEAR_FIELD, "year" },
-    { UDAT_EXTENDED_YEAR_FIELD, "year" },
-    { UDAT_YEAR_NAME_FIELD, "yearName" },
-    { UDAT_MONTH_FIELD, "month" },
-    { UDAT_STANDALONE_MONTH_FIELD, "month" },
-    { UDAT_DATE_FIELD, "day" },
-    { UDAT_HOUR_OF_DAY1_FIELD, "hour" },
-    { UDAT_HOUR_OF_DAY0_FIELD, "hour" },
-    { UDAT_HOUR1_FIELD, "hour" },
-    { UDAT_HOUR0_FIELD, "hour" },
-    { UDAT_MINUTE_FIELD, "minute" },
-    { UDAT_SECOND_FIELD, "second" },
-    { UDAT_DAY_OF_WEEK_FIELD, "weekday" },
-    { UDAT_DOW_LOCAL_FIELD, "weekday" },
-    { UDAT_STANDALONE_DAY_FIELD, "weekday" },
-    { UDAT_AM_PM_FIELD, "dayPeriod" },
-    { UDAT_AM_PM_MIDNIGHT_NOON_FIELD, "dayPeriod" },
-    { UDAT_FLEXIBLE_DAY_PERIOD_FIELD, "dayPeriod" },
-    { UDAT_TIMEZONE_FIELD, "timeZoneName" },
-    { UDAT_TIMEZONE_RFC_FIELD, "timeZoneName" },
-    { UDAT_TIMEZONE_GENERIC_FIELD, "timeZoneName" },
-    { UDAT_TIMEZONE_SPECIAL_FIELD, "timeZoneName" },
-    { UDAT_TIMEZONE_LOCALIZED_GMT_OFFSET_FIELD, "timeZoneName" },
-    { UDAT_TIMEZONE_ISO_FIELD, "timeZoneName" },
-    { UDAT_TIMEZONE_ISO_LOCAL_FIELD, "timeZoneName" },
-    { UDAT_ERA_FIELD, "era" },
-    { UDAT_FRACTIONAL_SECOND_FIELD, "fractionalSecond" },
-    { UDAT_RELATED_YEAR_FIELD, "relatedYear" }
-};
-
 const std::vector<std::string> ICU_LONG_SHORT = {
     "long", "short",
     "longOffset", "shortOffset",
@@ -360,13 +329,21 @@ std::vector<std::pair<std::string, std::string>> IntlDateTimeFormat::FormatToPar
         tempString.toUTF8String(value);
         std::string type;
         if (part.isPreExist) {
-            type = ConvertFieldIdToDateType(-1);
+            type = DateTimeFormatPart::ConvertFieldIdToDateType(-1);
         } else {
-            type = ConvertFieldIdToDateType(part.fField);
+            type = DateTimeFormatPart::ConvertFieldIdToDateType(part.fField);
         }
         result[i] = std::make_pair(type, value);
     }
     return result;
+}
+
+std::pair<std::string, std::vector<DateTimeFormatPart>> IntlDateTimeFormat::FormatToParts(double milliseconds)
+{
+    auto parts = DateTimeFormatPart::ParseToParts(icuSimpleDateFormat, milliseconds);
+    std::string formatResult;
+    parts.first.toUTF8String(formatResult);
+    return std::pair(formatResult, parts.second);
 }
 
 std::string IntlDateTimeFormat::FormatRange(double start, double end, std::string& errMessage)
@@ -447,9 +424,9 @@ std::vector<std::pair<std::string, std::string>> IntlDateTimeFormat::FormatRange
         tempString.toUTF8String(value);
         std::string type;
         if (part.isPreExist) {
-            type = ConvertFieldIdToDateType(-1);
+            type = DateTimeFormatPart::ConvertFieldIdToDateType(-1);
         } else {
-            type = ConvertFieldIdToDateType(part.fField);
+            type = DateTimeFormatPart::ConvertFieldIdToDateType(part.fField);
         }
         result[i] = std::make_pair(type, value);
     }
@@ -807,7 +784,7 @@ bool IntlDateTimeFormat::InitIcuSimpleDateFormat(bool isExistComponents, std::st
         return false;
     }
     icu::UnicodeString pattern = IntlDateTimeFormat::ChangeHourCyclePattern(bestPattern, hourCycle);
-    icuSimpleDateFormat = std::make_unique<icu::SimpleDateFormat>(pattern, icuLocale, icuStatus);
+    icuSimpleDateFormat = std::make_shared<icu::SimpleDateFormat>(pattern, icuLocale, icuStatus);
     if (!dateStyle.empty() || !timeStyle.empty()) {
         if (isExistComponents) {
             errMessage = "Invalid option : option";
@@ -816,7 +793,7 @@ bool IntlDateTimeFormat::InitIcuSimpleDateFormat(bool isExistComponents, std::st
         icuSimpleDateFormat = IntlDateTimeFormat::GetSimpleDateFormatFromStyle();
     }
     if (U_FAILURE(icuStatus)) {
-        icuSimpleDateFormat = std::unique_ptr<icu::SimpleDateFormat>();
+        icuSimpleDateFormat = std::shared_ptr<icu::SimpleDateFormat>();
     }
     if (IntlDateTimeFormat::InitIcuCalendar() && icuSimpleDateFormat != nullptr) {
         icuSimpleDateFormat->adoptCalendar(icuCalendar);
@@ -883,9 +860,9 @@ icu::UnicodeString IntlDateTimeFormat::ChangeHourCyclePattern(const icu::Unicode
     return result;
 }
 
-std::unique_ptr<icu::SimpleDateFormat> IntlDateTimeFormat::GetSimpleDateFormatFromStyle()
+std::shared_ptr<icu::SimpleDateFormat> IntlDateTimeFormat::GetSimpleDateFormatFromStyle()
 {
-    std::unique_ptr<icu::SimpleDateFormat> result;
+    std::shared_ptr<icu::SimpleDateFormat> result;
     icu::DateFormat::EStyle icuDateStyle = GetEStyleFromDateTimeStyle(dateStyle);
     icu::DateFormat::EStyle icuTimeStyle = GetEStyleFromDateTimeStyle(timeStyle);
     result.reset(reinterpret_cast<icu::SimpleDateFormat *>(
@@ -914,7 +891,7 @@ std::unique_ptr<icu::SimpleDateFormat> IntlDateTimeFormat::GetSimpleDateFormatFr
         HILOG_ERROR_I18N("IntlDateTimeFormat::GetSimpleDateFormatFromStyle: Get best pattern failed.");
         return nullptr;
     }
-    result = std::make_unique<icu::SimpleDateFormat>(pattern, icuLocale, status);
+    result = std::make_shared<icu::SimpleDateFormat>(pattern, icuLocale, status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("IntlDateTimeFormat::GetSimpleDateFormatFromStyle: Create SimpleDateFormat failed.");
         return nullptr;
@@ -1037,15 +1014,6 @@ std::string IntlDateTimeFormat::ConvertUDateFormatHourCycleToString(UDateFormatH
     if (iter == UDATE_FORMAT_HOUR_CYCLE_TO_STRING.end()) {
         HILOG_ERROR_I18N("IntlDateTimeFormat::ConvertUDateFormatHourCycleToString: Invalid hourCycle.");
         return "";
-    }
-    return iter->second;
-}
-
-std::string IntlDateTimeFormat::ConvertFieldIdToDateType(int32_t fieldId)
-{
-    auto iter = FIELD_ID_TO_DATE_TYPE.find(fieldId);
-    if (iter == FIELD_ID_TO_DATE_TYPE.end()) {
-        return "literal";
     }
     return iter->second;
 }

@@ -31,6 +31,7 @@
 #include "node_api.h"
 #include "simple_date_time_format_addon.h"
 #include "simple_number_format_addon.h"
+#include "styled_date_time_format_addon.h"
 #include "styled_number_format_addon.h"
 #include "system_locale_manager_addon.h"
 #include "unicode/datefmt.h"
@@ -1867,6 +1868,7 @@ napi_value Init(napi_env env, napi_value exports)
     val = StyledNumberFormatAddon::InitStyledNumberFormat(env, val);
     val = ZoneRulesAddon::InitI18nZoneRules(env, val);
     val = ZoneOffsetTransitionAddon::InitZoneOffsetTransition(env, val);
+    val = StyledDateTimeFormatAddon::InitStyledDateTimeFormat(env, val);
     return val;
 }
 

@@ -27,20 +27,21 @@ class SimpleDateTimeFormatAddon {
 public:
     SimpleDateTimeFormatAddon();
     ~SimpleDateTimeFormatAddon();
+    std::shared_ptr<SimpleDateTimeFormat> GetDateTimeFormat();
     static void Destructor(napi_env env, void *nativeObject, void *hint);
     static napi_value InitSimpleDateTimeFormat(napi_env env, napi_value exports);
     static napi_value GetSimpleDateTimeFormatBySkeleton(napi_env env, napi_callback_info info);
     static napi_value GetSimpleDateTimeFormatByPattern(napi_env env, napi_callback_info info);
+    static bool IsSimpleDateTimeFormat(napi_env env, napi_value argv);
 
 private:
     static napi_value Format(napi_env env, napi_callback_info info);
     static std::vector<napi_value> GenerateParameter(napi_env env, napi_callback_info info, bool isBestPattern,
         size_t& num);
-    static bool GetDateTime(napi_env env, napi_value date, int64_t& milliseconds);
     static napi_value SimpleDateTimeFormatConstructor(napi_env env, napi_callback_info info);
-    static std::unique_ptr<SimpleDateTimeFormat> InitSimpleDateTimeFormatContext(napi_env env, napi_value locale,
+    static std::shared_ptr<SimpleDateTimeFormat> InitSimpleDateTimeFormatContext(napi_env env, napi_value locale,
         const std::string& skeleton, bool isBestPattern, I18nErrorCode& errCode);
-    std::unique_ptr<SimpleDateTimeFormat> simpleDateTimeFormat_ = nullptr;
+    std::shared_ptr<SimpleDateTimeFormat> simpleDateTimeFormat_ = nullptr;
 };
 } // namespace I18n
 } // namespace Global

@@ -32,6 +32,8 @@ const std::map<napi_valuetype, std::string> VariableConvertor::NAPI_TYPE_MAP {
     {napi_valuetype::napi_undefined, "undefined"},
 };
 
+const std::string GET_TIME_NAME = "getTime";
+
 bool VariableConvertor::CheckNapiIsNull(napi_env env, napi_value value)
 {
     if (value != nullptr) {
@@ -435,6 +437,70 @@ bool VariableConvertor::IsBuiltinsLocale(napi_env env, napi_value locale)
         return false;
     }
     return isBuiltinsLocale;
+}
+
+bool VariableConvertor::GetDateTime(napi_env env, napi_value date, double& milliseconds)
+{
+    bool isDate = false;
+    napi_status status = napi_is_date(env, date, &isDate);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("VariableConvertor::GetDateTime: Failed to call napi_is_date.");
+        return false;
+    } else if (!isDate) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "date", "Date", true);
+        return false;
+    }
+
+    napi_value funcGetTime = nullptr;
+    status = napi_get_named_property(env, date, GET_TIME_NAME.c_str(), &funcGetTime);
+    if (status != napi_ok || funcGetTime == nullptr) {
+        HILOG_ERROR_I18N("VariableConvertor::GetDateTime: Get named property failed.");
+        return false;
+    }
+
+    napi_value value = nullptr;
+    status = napi_call_function(env, date, funcGetTime, 0, nullptr, &value);
+    if (status != napi_ok || value == nullptr) {
+        HILOG_ERROR_I18N("VariableConvertor::GetDateTime: Call getTime failed.");
+        return false;
+    }
+
+    status = napi_get_value_double(env, value, &milliseconds);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("VariableConvertor::GetDateTime: Get milliseconds failed.");
+        return false;
+    }
+    return true;
+}
+
+napi_value VariableConvertor::CreateStyledString(napi_env env, const std::string &content,
+    napi_value styleOption)
+{
+    size_t argc = 2;    // StyledString need 2 args
+    napi_value argv[2] = {nullptr};
+    argv[0] = VariableConvertor::CreateString(env, content);
+    argv[1] = styleOption;
+
+    napi_value global = nullptr;
+    napi_status status = napi_get_global(env, &global);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("VariableConvertor::CreateStyledString: get global object failed");
+        return nullptr;
+    }
+    napi_value constructor = nullptr;
+    status = napi_get_named_property(env, global, "StyledString", &constructor);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("VariableConvertor::CreateStyledString: get StyledString failed");
+        return nullptr;
+    }
+
+    napi_value styleString = nullptr;
+    status = napi_new_instance(env, constructor, argc, argv, &styleString);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("VariableConvertor::CreateStyledString: napi_new_instance failed");
+        return nullptr;
+    }
+    return styleString;
 }
 } // namespace I18n
 } // namespace Global

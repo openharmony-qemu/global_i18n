@@ -50,6 +50,8 @@ public:
     static std::string ParseBuiltinsLocale(napi_env env, napi_value intlLocale);
     static napi_value CreateBuiltinsLocaleObject(napi_env env, const std::string& locale);
     static napi_value CreateMap(napi_env env, std::unordered_map<std::string, std::string>& ump);
+    static bool GetDateTime(napi_env env, napi_value date, double& milliseconds);
+    static napi_value CreateStyledString(napi_env env, const std::string& content, napi_value styleOption);
 
 private:
     static napi_value GetBuiltinsLocaleConstructor(napi_env env);

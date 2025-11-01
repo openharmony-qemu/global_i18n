@@ -26,6 +26,7 @@
 #include "number_format_addon.h"
 #include "simple_date_time_format_addon.h"
 #include "simple_number_format_addon.h"
+#include "styled_date_time_format_addon.h"
 #include "styled_number_format_addon.h"
 #include "system_locale_manager_addon.h"
 #include "zone_rules_addon.h"
@@ -514,6 +515,8 @@ template ani_object VariableConverter::CreateAniObject<I18nSimpleDateTimeFormatA
     ani_env*, const char*, I18nSimpleDateTimeFormatAddon*);
 template ani_object VariableConverter::CreateAniObject<I18nSimpleNumberFormatAddon>(
     ani_env*, const char*, I18nSimpleNumberFormatAddon*);
+template ani_object VariableConverter::CreateAniObject<I18nStyledDateTimeFormatAddon>(
+    ani_env*, const char*, I18nStyledDateTimeFormatAddon*);
 template ani_object VariableConverter::CreateAniObject<I18nStyledNumberFormatAddon>(
     ani_env*, const char*, I18nStyledNumberFormatAddon*);
 template ani_object VariableConverter::CreateAniObject<I18nSysLocaleMgrAddon>(
