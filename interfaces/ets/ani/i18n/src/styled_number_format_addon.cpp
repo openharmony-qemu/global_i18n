@@ -153,7 +153,7 @@ static ani_object CreateStyledPartArray(ani_env *env, const std::vector<StyledNu
     if (ANI_OK != env->Array_New(numberParts.size(), undef, &ret)) {
         HILOG_ERROR_I18N("CreateStyledPartArray: Create new array failed");
         return nullptr;
-    }   
+    }
     for (size_t index = 0; index < numberParts.size(); ++index) {
         ani_object styledPart = CreateStyledPart(env, numberParts[index]);
         if (ANI_OK != env->Array_Set(ret, index, styledPart)) {
