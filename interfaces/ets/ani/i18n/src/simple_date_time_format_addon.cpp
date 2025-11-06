@@ -123,7 +123,7 @@ ani_string I18nSimpleDateTimeFormatAddon::Format(ani_env *env, ani_object object
         return nullptr;
     }
 
-    static const char *className = "escompat.Date";
+    static const char *className = "std.core.Date";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);

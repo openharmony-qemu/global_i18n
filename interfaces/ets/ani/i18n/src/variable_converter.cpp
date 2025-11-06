@@ -366,7 +366,7 @@ ani_enum_item VariableConverter::GetEnumItemByIndex(ani_env* env, const char* en
 
 ani_long VariableConverter::GetDateValue(ani_env *env, ani_object date, const std::string &method)
 {
-    static const char* className = "escompat.Date";
+    static const char* className = "std.core.Date";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
