@@ -136,13 +136,14 @@ ani_string I18nSimpleDateTimeFormatAddon::Format(ani_env *env, ani_object object
         return nullptr;
     }
 
-    ani_double milliseconds;
-    if (ANI_OK != env->Object_CallMethod_Double(date, getms, &milliseconds)) {
+    ani_long milliseconds;
+    if (ANI_OK != env->Object_CallMethod_Long(date, getms, &milliseconds)) {
         HILOG_ERROR_I18N("Call method 'valueOf' failed");
         return nullptr;
     }
 
-    std::string formatResult = obj->simpleDateTimeFormat_->Format(milliseconds);
+    std::string formatResult = obj->simpleDateTimeFormat_->Format(
+        static_cast<double>(milliseconds));
     if (formatResult.empty()) {
         HILOG_ERROR_I18N("SimpleDateTimeFormatConstructor: format result is empty.");
     }
