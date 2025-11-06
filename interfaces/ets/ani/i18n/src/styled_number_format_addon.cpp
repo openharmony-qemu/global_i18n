@@ -144,35 +144,20 @@ static ani_object CreateStyledPart(ani_env *env, StyledNumberFormat::NumberPart 
 
 static ani_object CreateStyledPartArray(ani_env *env, const std::vector<StyledNumberFormat::NumberPart> &numberParts)
 {
-    static const char *className = "escompat.Array";
-    ani_class cls;
-    if (ANI_OK != env->FindClass(className, &cls)) {
-        HILOG_ERROR_I18N("CreateStyledPartArray: Find class '%{public}s' failed", className);
+    ani_array ret;
+    ani_ref undef;
+    if (ANI_OK != env->GetUndefined(&undef)) {
+        HILOG_ERROR_I18N("CreateStyledPartArray: GetUndefined failed");
         return nullptr;
     }
-
-    ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "i:", &ctor)) {
-        HILOG_ERROR_I18N("CreateStyledPartArray: Find constructor of Array failed");
+    if (ANI_OK != env->Array_New(numberParts.size(), undef, &ret)) {
+        HILOG_ERROR_I18N("CreateStyledPartArray: Create new array failed");
         return nullptr;
     }
-
-    ani_object ret;
-    if (ANI_OK != env->Object_New(cls, ctor, &ret, numberParts.size())) {
-        HILOG_ERROR_I18N("CreateStyledPartArray: New object '%{public}s' failed", className);
-        return nullptr;
-    }
-
-    ani_method set;
-    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "iC{std.core.Object}:", &set)) {
-        HILOG_ERROR_I18N("CreateStyledPartArray: Find method '$_set' of Array failed");
-        return nullptr;
-    }
-
     for (size_t index = 0; index < numberParts.size(); ++index) {
         ani_object styledPart = CreateStyledPart(env, numberParts[index]);
-        if (ANI_OK != env->Object_CallMethod_Void(ret, set, index, styledPart)) {
-            HILOG_ERROR_I18N("CreateStyledPartArray: Call method '$_set' failed");
+        if (ANI_OK != env->Array_Set(ret, index, styledPart)) {
+            HILOG_ERROR_I18N("CreateStyledPartArray: Call method 'Array_Set' failed");
             return nullptr;
         }
     }
