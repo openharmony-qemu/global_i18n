@@ -165,7 +165,9 @@ private:
     static void CheckNumberFormatOptionsExt(std::map<std::string, std::string> &map, int32_t &code,
         const std::string &optionName, int min, int max);
     static std::string CheckFormatOptions(std::map<std::string, std::string> &map, int32_t &code);
+    static std::string CheckRoundingOptions(std::map<std::string, std::string> &map, int32_t &code);
     static std::string GetCurrencyFromConfig(const std::string& currency);
+    static std::vector<std::string> GetAvailableNumberSystems();
 
     void CreateRelativeTimeFormat(const std::string& locale);
     void ParseConfigs(std::map<std::string, std::string> &configs);

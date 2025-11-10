@@ -1339,6 +1339,10 @@ std::string NumberFormat::CheckNumberFormatOptions(std::map<std::string, std::st
     if (!message.empty()) {
         return message;
     }
+    message = CheckRoundingOptions(map, code);
+    if (!message.empty()) {
+        return message;
+    }
     std::vector<std::tuple<std::string, int, int>> vect = {
         {"minimumIntegerDigits", 1, 21}, // 21 is maximum of minimumIntegerDigits
         {"minimumFractionDigits", 0, 20}, // 20 is maximum of minimumFractionDigits
@@ -1394,7 +1398,62 @@ std::string NumberFormat::CheckFormatOptions(std::map<std::string, std::string> 
             return "getStringOption failed";
         }
     }
+    if (map.find("numberingSystem") != map.end()) {
+        std::string numberSystemStr = map["numberingSystem"];
+        std::vector<std::string> numberSystems = GetAvailableNumberSystems();
+        if (numberSystems.find(numberSystemStr) == numberSystems.end()) {
+            code = -1;
+            return "getStringOption failed";
+        }
+    }
     return "";
+}
+
+std::string NumberFormat::CheckRoundingOptions(std::map<std::string, std::string> &map, int32_t &code)
+{
+    if (map.find("roundingMode") != map.end()) {
+        std::string roundingModeStr = map["roundingMode"];
+        if (roundingModeStyle.find(roundingModeStr) == roundingModeStyle.end()) {
+            code = -1;
+            return "getStringOption failed";
+        }
+    }
+    if (map.find("roundingPriority") != map.end()) {
+        std::string roundingPriorityStr = map["roundingPriority"];
+        if (roundingPriorityStyle.find(roundingPriorityStr) == roundingPriorityStyle.end()) {
+            code = -1;
+            return "getStringOption failed";
+        }
+    }
+    if (map.find("roundingIncrement") != map.end()) {
+        std::string roundingIncrementStr = map["roundingIncrement"];
+        std::vector<std::string> availableValues;
+        std::for_each(roundingIncrementList.begin(), roundingIncrementList.end(), 
+            [&availableValues](int num)->{ availableValues.push_back(std::to_string(num)); });
+        if (availableValues.find(roundingIncrementStr) == availableValues.end()) {
+            code = -1;
+            return "getStringOption failed";
+        }
+    }
+    return "";
+}
+
+std::vector<std::string> NumberFormat::GetAvailableNumberSystems()
+{
+    std::vector<std::string> result;
+    UErrorCode status = U_ZERO_ERROR;
+    icu::StringEnumeration* iter = icu::NumberingSystem::getAvailableNames(UErrorCode& status);
+    if (U_FAILURE(status) || iter == nullptr) {
+        HILOG_ERROR_I18N("GetAvailableNumberSystems: Get NumberingSystems failed.");
+        return result;
+    }
+    icu::UnicodeString temp;
+    while ((temp = iter->next(nullptr, status)) != nullptr) {
+        std::string numberSys;
+        temp.toUTF8String(numberSys);
+        result.push_back(numberSys);
+    }
+    return result;
 }
 
 void NumberFormat::CheckNumberFormatOptionsExt(std::map<std::string, std::string> &map, int32_t &code,
