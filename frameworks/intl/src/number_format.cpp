@@ -1401,7 +1401,8 @@ std::string NumberFormat::CheckFormatOptions(std::map<std::string, std::string> 
     if (map.find("numberingSystem") != map.end()) {
         std::string numberSystemStr = map["numberingSystem"];
         std::vector<std::string> numberSystems = GetAvailableNumberSystems();
-        if (numberSystems.find(numberSystemStr) == numberSystems.end()) {
+        auto iter = std::find(numberSystems.begin(), numberSystems.end(), numberSystemStr);
+        if (iter == numberSystems.end()) {
             code = -1;
             return "getStringOption failed";
         }
@@ -1429,8 +1430,9 @@ std::string NumberFormat::CheckRoundingOptions(std::map<std::string, std::string
         std::string roundingIncrementStr = map["roundingIncrement"];
         std::vector<std::string> availableValues;
         std::for_each(roundingIncrementList.begin(), roundingIncrementList.end(), 
-            [&availableValues](int num)->{ availableValues.push_back(std::to_string(num)); });
-        if (availableValues.find(roundingIncrementStr) == availableValues.end()) {
+            [&availableValues](int num){ availableValues.push_back(std::to_string(num)); });
+        auto iter = std::find(availableValues.begin(), availableValues.end(), roundingIncrementStr);
+        if (iter == availableValues.end()) {
             code = -1;
             return "getStringOption failed";
         }
@@ -1442,7 +1444,7 @@ std::vector<std::string> NumberFormat::GetAvailableNumberSystems()
 {
     std::vector<std::string> result;
     UErrorCode status = U_ZERO_ERROR;
-    icu::StringEnumeration* iter = icu::NumberingSystem::getAvailableNames(UErrorCode& status);
+    icu::StringEnumeration* iter = icu::NumberingSystem::getAvailableNames(status);
     if (U_FAILURE(status) || iter == nullptr) {
         HILOG_ERROR_I18N("GetAvailableNumberSystems: Get NumberingSystems failed.");
         return result;
