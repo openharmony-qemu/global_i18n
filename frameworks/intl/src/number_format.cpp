@@ -1429,7 +1429,7 @@ std::string NumberFormat::CheckRoundingOptions(std::map<std::string, std::string
     if (map.find("roundingIncrement") != map.end()) {
         std::string roundingIncrementStr = map["roundingIncrement"];
         std::vector<std::string> availableValues;
-        std::for_each(roundingIncrementList.begin(), roundingIncrementList.end(), 
+        std::for_each(roundingIncrementList.begin(), roundingIncrementList.end(),
             [&availableValues](int num){ availableValues.push_back(std::to_string(num)); });
         auto iter = std::find(availableValues.begin(), availableValues.end(), roundingIncrementStr);
         if (iter == availableValues.end()) {
