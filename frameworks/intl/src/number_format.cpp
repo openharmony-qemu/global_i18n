@@ -1445,12 +1445,13 @@ std::vector<std::string> NumberFormat::GetAvailableNumberSystems()
     std::vector<std::string> result;
     UErrorCode status = U_ZERO_ERROR;
     icu::StringEnumeration* iter = icu::NumberingSystem::getAvailableNames(status);
-    if (U_FAILURE(status) || iter == nullptr) {
+    std::unique_ptr<icu::StringEnumeration> stringEnumeratePtr(iter);
+    if (U_FAILURE(status) || stringEnumeratePtr == nullptr) {
         HILOG_ERROR_I18N("GetAvailableNumberSystems: Get NumberingSystems failed.");
         return result;
     }
     icu::UnicodeString temp;
-    while ((temp = iter->next(nullptr, status)) != nullptr) {
+    while ((temp = stringEnumeratePtr->next(nullptr, status)) != nullptr) {
         std::string numberSys;
         temp.toUTF8String(numberSys);
         result.push_back(numberSys);
