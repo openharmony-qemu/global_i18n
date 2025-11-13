@@ -90,6 +90,55 @@ HWTEST_F(PhoneNumberFormatTest, PhoneNumberFormatTest0002, TestSize.Level1)
     EXPECT_EQ(phoneNumberFormat->getLocationName("+886491234567", "en"), "Nantou (China)");
     EXPECT_EQ(phoneNumberFormat->getLocationName("+88652123456", "zh"), "中国嘉义、中国云林");
 }
+
+/**
+ * @tc.name: PhoneNumberFormatTest0003
+ * @tc.desc: Test getLocationName when using the typing mode
+ * @tc.type: FUNC
+ */
+HWTEST_F(PhoneNumberFormatTest, PhoneNumberFormatTest0003, TestSize.Level1)
+{
+    map<string, string> options = {{"type", "TYPING"}};
+    std::unique_ptr<PhoneNumberFormat> phoneNumberFormat =
+        std::make_unique<PhoneNumberFormat>("US", options);
+    EXPECT_EQ(phoneNumberFormat->getLocationName("+", "en"), "");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("+1", "en"), "");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("+12", "en"), "");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("+120", "en"), "United States");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("+1201", "en"), "New Jersey");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("+12012", "en"), "New Jersey");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("+120120", "en"), "New Jersey");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("+1201200", "en"), "Jersey City, NJ");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("+12012001", "en"), "Jersey City, NJ");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("+120120012", "en"), "Jersey City, NJ");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("+1201200123", "en"), "Jersey City, NJ");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("+12012001234", "en"), "Jersey City, NJ");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("+120120012345", "en"), "");
+}
+
+/**
+ * @tc.name: PhoneNumberFormatTest0004
+ * @tc.desc: Test getLocationName when using the typing mode
+ * @tc.type: FUNC
+ */
+HWTEST_F(PhoneNumberFormatTest, PhoneNumberFormatTest0004, TestSize.Level1)
+{
+    map<string, string> options = {{"type", "TYPING"}};
+    std::unique_ptr<PhoneNumberFormat> phoneNumberFormat =
+        std::make_unique<PhoneNumberFormat>("CN", options);
+    EXPECT_EQ(phoneNumberFormat->getLocationName("1", "zh"), "");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("13", "zh"), "中国");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("133", "zh"), "中国");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("1334", "zh"), "中国");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("13342", "zh"), "中国");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("133426", "zh"), "广东省东莞市");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("1334261", "zh"), "广东省东莞市");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("13342612", "zh"), "广东省东莞市");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("133426123", "zh"), "广东省东莞市");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("1334261234", "zh"), "广东省东莞市");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("13342612345", "zh"), "广东省东莞市");
+    EXPECT_EQ(phoneNumberFormat->getLocationName("133426123456", "zh"), "");
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
