@@ -182,6 +182,10 @@ namespace i18n {
         content: string;
     }
 
+    export interface AdvancedMeasureOptions {
+        unitUsage?: string;
+    }
+
     export class System {
         static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
 
@@ -662,6 +666,30 @@ namespace i18n {
                 }
             }
             return new StyledString(formatResult, option);
+        }
+    }
+
+    export class AdvancedMeasureFormat {
+        static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
+
+        private nativeAdvancedMeasureFormat: long = 0;
+
+        constructor(context: long) {
+            if (this.nativeAdvancedMeasureFormat == 0) {
+                this.nativeAdvancedMeasureFormat = context;
+            }
+        }
+
+        constructor(numberFormat: Intl.NumberFormat, options: AdvancedMeasureOptions) {
+            this.nativeAdvancedMeasureFormat =
+                AdvancedMeasureFormat.create(numberFormat, options).nativeAdvancedMeasureFormat;
+        }
+
+        native static create(numberFormat: Intl.NumberFormat, options: AdvancedMeasureOptions): AdvancedMeasureFormat;
+        native formatNumber(value: double): string;
+
+        format(num: double): string {
+            return this.formatNumber(num);
         }
     }
 

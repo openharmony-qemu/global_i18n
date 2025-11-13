@@ -33,9 +33,9 @@ public:
     static ani_string GetFormattedNumber(ani_env *env, ani_object object, ani_double value);
     static ani_object GetStyle(ani_env *env, ani_object object, ani_double value);
     static ani_status BindContextStyledNumberFormat(ani_env *env);
+    static std::map<std::string, std::string> ParseIntlOptions(ani_env *env, ani_object obj);
 
 private:
-    static std::map<std::string, std::string> ParseIntlOptions(ani_env *env, ani_object obj);
     bool InitStyledNumberFormatContent(ani_env *env, ani_object numberFormat);
 
     static const std::unordered_map<std::string, std::string> PROPERTY_NAME_TO_KEY;

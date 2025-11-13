@@ -248,11 +248,9 @@ void NumberFormat::InitNumberFormat()
 
 void NumberFormat::CreateRelativeTimeFormat(const std::string& locale)
 {
-    if (unitUsage == "elapsed-time-second") {
-        std::vector<std::string> locales = { locale };
-        relativeTimeFormat = std::make_unique<RelativeTimeFormat>(locales,
-            RelativeTimeFormatConfigs);
-    }
+    std::vector<std::string> locales = { locale };
+    relativeTimeFormat = std::make_unique<RelativeTimeFormat>(locales,
+        RelativeTimeFormatConfigs);
 }
 
 void NumberFormat::InitProperties(icu::number::UnlocalizedNumberFormatter &formatter)
@@ -1249,6 +1247,11 @@ std::string NumberFormat::GetMaximumSignificantDigits() const
 std::string NumberFormat::GetLocaleMatcher() const
 {
     return localeMatcher;
+}
+
+void NumberFormat::SetUnitUsage(const std::string& value)
+{
+    unitUsage = value;
 }
 
 bool NumberFormat::Init()

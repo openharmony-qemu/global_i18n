@@ -15,6 +15,7 @@
 
 #include <i18n_addon.h>
 
+#include "advanced_measure_format_addon.h"
 #include "date_time_sequence.h"
 #include "entity_recognizer_addon.h"
 #include "error_util.h"
@@ -831,6 +832,11 @@ ani_status BindContext(ani_env *env)
     }
 
     status = I18nStyledDateTimeFormatAddon::BindContextStyledDateTimeFormat(env);
+    if (status != ANI_OK) {
+        return status;
+    }
+
+    status = AdvancedMeasureFormatAddon::BindContextAdvancedMeasureFormat(env);
     if (status != ANI_OK) {
         return status;
     }

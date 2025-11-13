@@ -15,6 +15,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "advanced_measure_format_addon.h"
 #include "error_util.h"
 #include "i18n_hilog.h"
 #include "holiday_manager_addon.h"
@@ -1869,6 +1870,7 @@ napi_value Init(napi_env env, napi_value exports)
     val = ZoneRulesAddon::InitI18nZoneRules(env, val);
     val = ZoneOffsetTransitionAddon::InitZoneOffsetTransition(env, val);
     val = StyledDateTimeFormatAddon::InitStyledDateTimeFormat(env, val);
+    val = AdvancedMeasureFormatAddon::InitAdvancedMeasureFormat(env, val);
     return val;
 }
 

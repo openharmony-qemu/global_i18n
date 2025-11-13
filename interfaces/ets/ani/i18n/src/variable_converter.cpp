@@ -15,6 +15,7 @@
 
 #include "variable_converter.h"
 
+#include "advanced_measure_format_addon.h"
 #include "entity_recognizer_addon.h"
 #include "holiday_manager_addon.h"
 #include "i18n_addon.h"
@@ -499,6 +500,8 @@ ani_object VariableConverter::CreateAniObject(ani_env* env, const char* classNam
     return obj;
 }
 
+template ani_object VariableConverter::CreateAniObject<AdvancedMeasureFormatAddon>(
+    ani_env*, const char*, AdvancedMeasureFormatAddon*);
 template ani_object VariableConverter::CreateAniObject<I18nBreakIteratorAddon>(
     ani_env*, const char*, I18nBreakIteratorAddon*);
 template ani_object VariableConverter::CreateAniObject<I18nCalendarAddon>(ani_env*, const char*, I18nCalendarAddon*);
