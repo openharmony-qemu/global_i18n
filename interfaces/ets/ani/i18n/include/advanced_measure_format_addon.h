@@ -32,7 +32,7 @@ private:
 
     static ani_object Create(ani_env *env, [[maybe_unused]] ani_object object, ani_object numberFormat,
         ani_object options);
-    static AdvancedMeasureOptions ParseAdvancedMeasureOptions(ani_env *env, ani_object options);
+    static AdvancedMeasureFormatOptions ParseAdvancedMeasureOptions(ani_env *env, ani_object options);
     static ani_string FormatNumber(ani_env *env, ani_object object, ani_double value);
 
     std::shared_ptr<AdvancedMeasureFormat> advancedMeasureFormat_ = nullptr;

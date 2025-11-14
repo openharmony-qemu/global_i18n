@@ -23,20 +23,39 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-class enum UnitUsage {
+enum class UnitUsage {
     AREA_LAND_AGRICULT = 1,
-    AREA_LAND_COMMERACL = 2,
-    AREA_LAND_RESIDNTL = 3
-
+    AREA_LAND_COMMERCL = 2,
+    AREA_LAND_RESIDNTL = 3,
+    LENGTH_PERSON = 4,
+    LENGTH_PERSON_SMALL = 5,
+    LENGTH_RAINFALL = 6,
+    LENGTH_ROAD = 7,
+    LENGTH_ROAD_SMALL = 8,
+    LENGTH_SNOWFALL = 9,
+    LENGTH_VEHICLE = 10,
+    LENGTH_VISIBLTY = 11,
+    LENGTH_VISIBLTY_SMALL = 12,
+    LENGTH_PERSON_INFORMAL = 13,
+    LENGTH_PERSON_SMALL_INFORMAL = 14,
+    LENGTH_ROAD_INFORMAL = 15,
+    SPEED_ROAD_TRAVEL = 16,
+    SPEED_WIND = 17,
+    TEMPERATURE_PERSON = 18,
+    TEMPERATURE_WEATHER = 19,
+    VOLUME_VEHICLE_FUEL = 20,
+    ELAPSED_TIME_SECOND = 21,
+    SIZE_FILE_BYTE = 22,
+    SIZE_SHORTFILE_BYTE = 23
 };
 
-struct AdvancedMeasureOptions {
-    std::string unitUsage;
+struct AdvancedMeasureFormatOptions {
+    UnitUsage unitUsage;
 };
 
 class AdvancedMeasureFormat {
 public:
-    AdvancedMeasureFormat(std::shared_ptr<NumberFormat> numberFormat, const AdvancedMeasureOptions& options);
+    AdvancedMeasureFormat(std::shared_ptr<NumberFormat> numberFormat, const AdvancedMeasureFormatOptions& options);
     ~AdvancedMeasureFormat();
 
     std::string FormatNumber(double value);
@@ -45,7 +64,7 @@ private:
     void InitContext();
     void InitUnitUsage();
 
-    AdvancedMeasureOptions options_;
+    AdvancedMeasureFormatOptions options_;
     std::shared_ptr<NumberFormat> numberFormat_ = nullptr;
 };
 } // namespace I18n

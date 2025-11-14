@@ -31,10 +31,10 @@ public:
     static napi_value InitAdvancedMeasureFormat(napi_env env, napi_value exports);
 
 private:
-    bool InitContext(napi_env env, std::shared_ptr<NumberFormat> numberFormat, AdvancedMeasureOptions options);
+    bool InitContext(napi_env env, std::shared_ptr<NumberFormat> numberFormat, AdvancedMeasureFormatOptions options);
 
     static napi_value Constructor(napi_env env, napi_callback_info info);
-    static AdvancedMeasureOptions ParseOptions(napi_env env, napi_value object);
+    static AdvancedMeasureFormatOptions ParseOptions(napi_env env, napi_value object);
     static napi_value Format(napi_env env, napi_callback_info info);
     static std::string FormatNumber(napi_env env, napi_value value,
         std::shared_ptr<AdvancedMeasureFormat> advancedMeasureFormat);

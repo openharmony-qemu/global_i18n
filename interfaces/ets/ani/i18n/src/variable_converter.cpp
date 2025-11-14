@@ -249,6 +249,32 @@ bool VariableConverter::GetStringMember(ani_env *env, ani_object options, const 
     return true;
 }
 
+bool VariableConverter::GetEnumIndexMember(ani_env *env, ani_object options, const std::string &name, int32_t &value)
+{
+    ani_ref ref;
+    if (ANI_OK != env->Object_GetPropertyByName_Ref(options, name.c_str(), &ref)) {
+        HILOG_ERROR_I18N("VariableConverter::GetEnumIndexMember: Get property '%{public}s' failed", name.c_str());
+        return false;
+    }
+
+    ani_boolean isUndefined;
+    if (ANI_OK != env->Reference_IsUndefined(ref, &isUndefined)) {
+        HILOG_ERROR_I18N("VariableConverter::GetStringMember: Check reference is undefined failed");
+        return false;
+    }
+    if (isUndefined) {
+        return false;
+    }
+
+    ani_int index;
+    if (ANI_OK != env->EnumItem_GetValue_Int(static_cast<ani_enum_item>(ref), &index)) {
+        HILOG_ERROR_I18N("VariableConverter::GetStringMember: Get value failed");
+    }
+
+    value = index;
+    return true;
+}
+
 std::string VariableConverter::GetLocaleTagFromBuiltinLocale(ani_env *env, ani_object obj)
 {
     static const char *className = "std.core.Intl.Locale";

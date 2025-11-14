@@ -78,7 +78,7 @@ napi_value AdvancedMeasureFormatAddon::Constructor(napi_env env, napi_callback_i
         return nullptr;
     }
 
-    AdvancedMeasureOptions options = ParseOptions(env, argv[1]);
+    AdvancedMeasureFormatOptions options = ParseOptions(env, argv[1]);
 
     std::unique_ptr<AdvancedMeasureFormatAddon> obj = std::make_unique<AdvancedMeasureFormatAddon>();
     status = napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), Destructor, nullptr, nullptr);
@@ -95,7 +95,7 @@ napi_value AdvancedMeasureFormatAddon::Constructor(napi_env env, napi_callback_i
 }
 
 bool AdvancedMeasureFormatAddon::InitContext(napi_env env, std::shared_ptr<NumberFormat> numberFormat,
-    AdvancedMeasureOptions options)
+    AdvancedMeasureFormatOptions options)
 {
     if (numberFormat == nullptr) {
         HILOG_ERROR_I18N("AdvancedMeasureFormatAddon::InitContext: numberFormat is nullptr.");
@@ -114,9 +114,9 @@ bool AdvancedMeasureFormatAddon::InitContext(napi_env env, std::shared_ptr<Numbe
     return advancedMeasureFormat_ != nullptr;
 }
 
-AdvancedMeasureOptions AdvancedMeasureFormatAddon::ParseOptions(napi_env env, napi_value object)
+AdvancedMeasureFormatOptions AdvancedMeasureFormatAddon::ParseOptions(napi_env env, napi_value object)
 {
-    AdvancedMeasureOptions options;
+    AdvancedMeasureFormatOptions options;
     if (object == nullptr) {
         HILOG_ERROR_I18N("AdvancedMeasureFormatAddon::ParseOptions: object is nullptr.");
         return options;
@@ -125,23 +125,24 @@ AdvancedMeasureOptions AdvancedMeasureFormatAddon::ParseOptions(napi_env env, na
     napi_valuetype type = napi_undefined;
     napi_status status = napi_typeof(env, object, &type);
     if (status != napi_ok && type != napi_object) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "options", "AdvancedMeasureOptions", true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "options", "AdvancedMeasureFormatOptions", true);
         return options;
     }
 
     int32_t errCode = 0;
     napi_value unitUsage = JSUtils::GetNapiPropertyFormObject(env, object, "unitUsage", errCode);
-    if (errCode) {
+    if (errCode != 0) {
         HILOG_ERROR_I18N("AdvancedMeasureFormatAddon::ParseOptions: Get property failed.");
         return options;
     }
 
-    std::string unitUsageStr = VariableConvertor::GetString(env, unitUsage, errCode);
-    if (errCode) {
-        HILOG_ERROR_I18N("AdvancedMeasureFormatAddon::ParseOptions: Get string failed.");
+    int32_t unitUsageValue = 0;
+    status = napi_get_value_int32(env, unitUsage, &unitUsageValue);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("AdvancedMeasureFormatAddon::ParseOptions: get unitUsageValue failed.");
         return options;
     }
-    options.unitUsage = unitUsageStr;
+    options.unitUsage = static_cast<UnitUsage>(unitUsageValue);
     return options;
 }
 

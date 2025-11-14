@@ -59,17 +59,17 @@ bool AdvancedMeasureFormatAddon::InitContext(ani_env *env, ani_object numberForm
     auto nativeNumberFormat =
         std::make_shared<NumberFormat>(std::vector<std::string>{ iter->second }, numberFormatOptions);
 
-    AdvancedMeasureOptions advancedMeasureOptions = ParseAdvancedMeasureOptions(env, options);
+    AdvancedMeasureFormatOptions advancedMeasureOptions = ParseAdvancedMeasureOptions(env, options);
     advancedMeasureFormat_ = std::make_shared<AdvancedMeasureFormat>(nativeNumberFormat, advancedMeasureOptions);
     return advancedMeasureFormat_ != nullptr;
 }
 
-AdvancedMeasureOptions AdvancedMeasureFormatAddon::ParseAdvancedMeasureOptions(ani_env *env, ani_object options)
+AdvancedMeasureFormatOptions AdvancedMeasureFormatAddon::ParseAdvancedMeasureOptions(ani_env *env, ani_object options)
 {
-    AdvancedMeasureOptions result;
-    std::string unitUsage;
-    if (VariableConverter::GetStringMember(env, options, "unitUsage", unitUsage)) {
-        result.unitUsage = unitUsage;
+    AdvancedMeasureFormatOptions result;
+    int32_t unitUsage;
+    if (VariableConverter::GetEnumIndexMember(env, options, "unitUsage", unitUsage)) {
+        result.unitUsage = static_cast<UnitUsage>(unitUsage);
     }
     return result;
 }

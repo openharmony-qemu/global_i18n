@@ -787,8 +787,8 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0070, TestSize.Level1)
         { "unit", "fahrenheit" }
     };
     std::shared_ptr<NumberFormat> numberFormat = std::make_shared<NumberFormat>(locales, numberFormatOptions, true);
-    AdvancedMeasureOptions advancedMeasureOptions;
-    advancedMeasureOptions.unitUsage = "temperature-person";
+    AdvancedMeasureFormatOptions advancedMeasureOptions;
+    advancedMeasureOptions.unitUsage = UnitUsage::TEMPERATURE_PERSON;
     auto advancedMeasureFormat = std::make_unique<AdvancedMeasureFormat>(numberFormat, advancedMeasureOptions);
     std::string result = advancedMeasureFormat->FormatNumber(100);
     EXPECT_EQ(result, "37.778°C");
@@ -807,10 +807,10 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0071, TestSize.Level1)
         { "unit", "byte" }
     };
     std::shared_ptr<NumberFormat> numberFormat = std::make_shared<NumberFormat>(locales, numberFormatOptions, true);
-    AdvancedMeasureOptions advancedMeasureOptions;
-    advancedMeasureOptions.unitUsage = "size-shortfile-byte";
+    AdvancedMeasureFormatOptions advancedMeasureOptions;
+    advancedMeasureOptions.unitUsage = UnitUsage::SIZE_SHORTFILE_BYTE;
     auto advancedMeasureFormat = std::make_unique<AdvancedMeasureFormat>(numberFormat, advancedMeasureOptions);
-    std::string result = advancedMeasureFormat->FormatNumber(100);
+    std::string result = advancedMeasureFormat->FormatNumber(1234);
     EXPECT_EQ(result, "1.2 KB");
 }
 
@@ -827,10 +827,10 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0072, TestSize.Level1)
         { "unit", "day" }
     };
     std::shared_ptr<NumberFormat> numberFormat = std::make_shared<NumberFormat>(locales, numberFormatOptions, true);
-    AdvancedMeasureOptions advancedMeasureOptions;
-    advancedMeasureOptions.unitUsage = "elapsed-time-second";
+    AdvancedMeasureFormatOptions advancedMeasureOptions;
+    advancedMeasureOptions.unitUsage = UnitUsage::ELAPSED_TIME_SECOND;
     auto advancedMeasureFormat = std::make_unique<AdvancedMeasureFormat>(numberFormat, advancedMeasureOptions);
-    std::string result = advancedMeasureFormat->FormatNumber(100);
+    std::string result = advancedMeasureFormat->FormatNumber(3);
     EXPECT_EQ(result, "3天前");
 }
 } // namespace I18n
