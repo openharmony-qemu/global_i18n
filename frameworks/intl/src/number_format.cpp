@@ -1108,12 +1108,18 @@ void NumberFormat::GetDigitsResolvedOptionsExt(std::map<std::string, std::string
     }
     if (!roundingModeStr.empty()) {
         map.insert(std::make_pair("roundingMode", roundingModeStr));
+    } else if (setDefault) {
+        map.insert(std::make_pair("roundingMode", "halfExpand"));
     }
     if (!roundingPriorityStr.empty()) {
         map.insert(std::make_pair("roundingPriority", roundingPriorityStr));
+    } else if (setDefault) {
+        map.insert(std::make_pair("roundingPriority", "auto"));
     }
     if (roundingIncrement != 1) {
         map.insert(std::make_pair("roundingIncrement", std::to_string(roundingIncrement)));
+    } else if (setDefault) {
+        map.insert(std::make_pair("roundingIncrement", "1"));
     }
 }
 
