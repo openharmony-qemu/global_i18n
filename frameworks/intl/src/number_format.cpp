@@ -1055,110 +1055,110 @@ std::vector<std::string> NumberFormat::SupportedLocalesOf(const std::vector<std:
     return LocaleHelper::SupportedLocalesOf(requestLocales, configs, status);
 }
 
-void NumberFormat::GetDigitsResolvedOptions(std::map<std::string, std::string> &map, bool setDefault)
+void NumberFormat::GetDigitsResolvedOptions(std::map<std::string, std::string> &result, bool setDefault)
 {
     if (!numberingSystem.empty()) {
-        map.insert(std::make_pair("numberingSystem", numberingSystem));
+        result.insert(std::make_pair("numberingSystem", numberingSystem));
     } else if (!(localeInfo->GetNumberingSystem()).empty()) {
-        map.insert(std::make_pair("numberingSystem", localeInfo->GetNumberingSystem()));
+        result.insert(std::make_pair("numberingSystem", localeInfo->GetNumberingSystem()));
     } else {
         UErrorCode status = U_ZERO_ERROR;
         auto numSys = std::unique_ptr<icu::NumberingSystem>(icu::NumberingSystem::createInstance(locale, status));
         if (U_SUCCESS(status)) {
-            map.insert(std::make_pair("numberingSystem", numSys->getName()));
+            result.insert(std::make_pair("numberingSystem", numSys->getName()));
         }
     }
     if (!useGrouping.empty()) {
-        map.insert(std::make_pair("useGrouping", useGrouping));
+        result.insert(std::make_pair("useGrouping", useGrouping));
     } else if (setDefault) {
-        map.insert(std::make_pair("useGrouping", "true"));
+        result.insert(std::make_pair("useGrouping", "true"));
     }
     if (!minimumIntegerDigits.empty()) {
-        map.insert(std::make_pair("minimumIntegerDigits", minimumIntegerDigits));
+        result.insert(std::make_pair("minimumIntegerDigits", minimumIntegerDigits));
     } else if (setDefault) {
-        map.insert(std::make_pair("minimumIntegerDigits", "1"));
+        result.insert(std::make_pair("minimumIntegerDigits", "1"));
     }
     if (!minimumFractionDigits.empty()) {
-        map.insert(std::make_pair("minimumFractionDigits", minimumFractionDigits));
+        result.insert(std::make_pair("minimumFractionDigits", minimumFractionDigits));
     } else if (setDefault) {
-        GetMinimumFractionDigitsOption(map);
+        GetMinimumFractionDigitsOption(result);
     }
     if (!maximumFractionDigits.empty()) {
-        map.insert(std::make_pair("maximumFractionDigits", maximumFractionDigits));
+        result.insert(std::make_pair("maximumFractionDigits", maximumFractionDigits));
     } else if (setDefault) {
-        GetMaximumFractionDigitsOption(map);
+        GetMaximumFractionDigitsOption(result);
     }
     if (!minimumSignificantDigits.empty()) {
-        map.insert(std::make_pair("minimumSignificantDigits", minimumSignificantDigits));
+        result.insert(std::make_pair("minimumSignificantDigits", minimumSignificantDigits));
     }
     if (!maximumSignificantDigits.empty()) {
-        map.insert(std::make_pair("maximumSignificantDigits", maximumSignificantDigits));
+        result.insert(std::make_pair("maximumSignificantDigits", maximumSignificantDigits));
     }
 }
 
-void NumberFormat::GetDigitsResolvedOptionsExt(std::map<std::string, std::string> &map, bool setDefault)
+void NumberFormat::GetDigitsResolvedOptionsExt(std::map<std::string, std::string> &result, bool setDefault)
 {
     if (!localeMatcher.empty()) {
-        map.insert(std::make_pair("localeMatcher", localeMatcher));
+        result.insert(std::make_pair("localeMatcher", localeMatcher));
     }
     if (!notationString.empty()) {
-        map.insert(std::make_pair("notation", notationString));
+        result.insert(std::make_pair("notation", notationString));
     } else if (setDefault) {
-        map.insert(std::make_pair("notation", "standard"));
+        result.insert(std::make_pair("notation", "standard"));
     }
     if (!roundingModeStr.empty()) {
-        map.insert(std::make_pair("roundingMode", roundingModeStr));
+        result.insert(std::make_pair("roundingMode", roundingModeStr));
     } else if (setDefault) {
-        map.insert(std::make_pair("roundingMode", "halfExpand"));
+        result.insert(std::make_pair("roundingMode", "halfExpand"));
     }
     if (!roundingPriorityStr.empty()) {
-        map.insert(std::make_pair("roundingPriority", roundingPriorityStr));
+        result.insert(std::make_pair("roundingPriority", roundingPriorityStr));
     } else if (setDefault) {
-        map.insert(std::make_pair("roundingPriority", "auto"));
+        result.insert(std::make_pair("roundingPriority", "auto"));
     }
     if (roundingIncrement != 1) {
-        map.insert(std::make_pair("roundingIncrement", std::to_string(roundingIncrement)));
+        result.insert(std::make_pair("roundingIncrement", std::to_string(roundingIncrement)));
     } else if (setDefault) {
-        map.insert(std::make_pair("roundingIncrement", "1"));
+        result.insert(std::make_pair("roundingIncrement", "1"));
     }
 }
 
-void NumberFormat::GetMinimumFractionDigitsOption(std::map<std::string, std::string> &map)
+void NumberFormat::GetMinimumFractionDigitsOption(std::map<std::string, std::string> &result)
 {
     std::string style = "decimal";
-    if (map.find("style") != map.end()) {
-        style = map["style"];
+    if (result.find("style") != result.end()) {
+        style = result["style"];
     }
     if (style == "decimal" || style == "percent") {
-        map.insert(std::make_pair("minimumFractionDigits", "0"));
+        result.insert(std::make_pair("minimumFractionDigits", "0"));
     } else if (style == "currency") {
-        int fraction = GetCurrencyFractionDigits(map);
-        map.insert(std::make_pair("minimumFractionDigits", std::to_string(fraction)));
+        int fraction = GetCurrencyFractionDigits(result);
+        result.insert(std::make_pair("minimumFractionDigits", std::to_string(fraction)));
     }
 }
 
-void NumberFormat::GetMaximumFractionDigitsOption(std::map<std::string, std::string> &map)
+void NumberFormat::GetMaximumFractionDigitsOption(std::map<std::string, std::string> &result)
 {
     std::string style = "decimal";
-    if (map.find("style") != map.end()) {
-        style = map["style"];
+    if (result.find("style") != result.end()) {
+        style = result["style"];
     }
     if (style == "decimal") {
-        map.insert(std::make_pair("maximumFractionDigits", "3"));
+        result.insert(std::make_pair("maximumFractionDigits", "3"));
     } else if (style == "percent") {
-        map.insert(std::make_pair("maximumFractionDigits", "0"));
+        result.insert(std::make_pair("maximumFractionDigits", "0"));
     } else if (style == "currency") {
-        int fraction = GetCurrencyFractionDigits(map);
-        map.insert(std::make_pair("maximumFractionDigits", std::to_string(fraction)));
+        int fraction = GetCurrencyFractionDigits(result);
+        result.insert(std::make_pair("maximumFractionDigits", std::to_string(fraction)));
     }
 }
 
-int NumberFormat::GetCurrencyFractionDigits(std::map<std::string, std::string> &map)
+int NumberFormat::GetCurrencyFractionDigits(std::map<std::string, std::string> &resultMap)
 {
     int result = 2; // 2 is default value
     std::string currency;
-    if (map.find("currency") != map.end()) {
-        currency = map["currency"];
+    if (resultMap.find("currency") != resultMap.end()) {
+        currency = resultMap["currency"];
         currency = GetCurrencyFromConfig(currency);
     }
     if (defaultCurrencyFractionMap.find(currency) != defaultCurrencyFractionMap.end()) {
@@ -1339,13 +1339,13 @@ std::string NumberFormat::GetIcuDefaultLocale()
     return "en-US";
 }
 
-std::string NumberFormat::CheckNumberFormatOptions(std::map<std::string, std::string> &map, int32_t &code)
+std::string NumberFormat::CheckNumberFormatOptions(std::map<std::string, std::string> &options, int32_t &code)
 {
-    std::string message = CheckFormatOptions(map, code);
+    std::string message = CheckFormatOptions(options, code);
     if (!message.empty()) {
         return message;
     }
-    message = CheckRoundingOptions(map, code);
+    message = CheckRoundingOptions(options, code);
     if (!message.empty()) {
         return message;
     }
@@ -1360,7 +1360,7 @@ std::string NumberFormat::CheckNumberFormatOptions(std::map<std::string, std::st
         std::string optionName = std::get<0>(*iter);
         int min = std::get<1>(*iter); // 1 is item index
         int max = std::get<2>(*iter); // 2 is item index
-        CheckNumberFormatOptionsExt(map, code, optionName, min, max);
+        CheckNumberFormatOptionsExt(options, code, optionName, min, max);
         if (code != 0) {
             return "";
         }
@@ -1368,44 +1368,45 @@ std::string NumberFormat::CheckNumberFormatOptions(std::map<std::string, std::st
     return "";
 }
 
-std::string NumberFormat::CheckFormatOptions(std::map<std::string, std::string> &map, int32_t &code)
+std::string NumberFormat::CheckFormatOptions(std::map<std::string, std::string> &options, int32_t &code)
 {
-    if (map.find("style") != map.end()) {
-        std::string style = map["style"];
-        if (style.compare("currency") == 0 && map.find("currency") == map.end()) {
+    if (options.find("style") != options.end()) {
+        std::string style = options["style"];
+        if (style.compare("currency") == 0 && options.find("currency") == options.end()) {
             code = -1;
             return "style is currency but currency is undefined";
         }
-        if (style.compare("unit") == 0 && map.find("unit") == map.end()) {
+        if (style.compare("unit") == 0 && options.find("unit") == options.end()) {
             code = -1;
             return "style is unit but unit is undefined";
         }
     }
-    if (map.find("currency") != map.end()) {
-        std::string currency = map["currency"];
+    if (options.find("currency") != options.end()) {
+        std::string currency = options["currency"];
         std::string checkCurr = GetCurrencyFromConfig(currency);
         if (checkCurr.empty()) {
             code = -1;
             return "not a wellformed code";
         }
     }
-    if (map.find("localeMatcher") != map.end()) {
+    if (options.find("localeMatcher") != options.end()) {
         I18nErrorCode status = I18nErrorCode::SUCCESS;
-        std::string localeMatcher = LocaleHelper::ParseOption(map, "localeMatcher", "best fit", false, status);
+        std::string localeMatcher = LocaleHelper::ParseOption(options,
+            "localeMatcher", "best fit", false, status);
         if (status != I18nErrorCode::SUCCESS) {
             code = -1;
             return "getStringOption failed";
         }
     }
-    if (map.find("currencySign") != map.end()) {
-        std::string currencySign = map["currencySign"];
+    if (options.find("currencySign") != options.end()) {
+        std::string currencySign = options["currencySign"];
         if (currencySign.compare("standard") != 0 && currencySign.compare("accounting") != 0) {
             code = -1;
             return "getStringOption failed";
         }
     }
-    if (map.find("numberingSystem") != map.end()) {
-        std::string numberSystemStr = map["numberingSystem"];
+    if (options.find("numberingSystem") != options.end()) {
+        std::string numberSystemStr = options["numberingSystem"];
         std::vector<std::string> numberSystems = GetAvailableNumberSystems();
         auto iter = std::find(numberSystems.begin(), numberSystems.end(), numberSystemStr);
         if (iter == numberSystems.end()) {
@@ -1416,24 +1417,24 @@ std::string NumberFormat::CheckFormatOptions(std::map<std::string, std::string> 
     return "";
 }
 
-std::string NumberFormat::CheckRoundingOptions(std::map<std::string, std::string> &map, int32_t &code)
+std::string NumberFormat::CheckRoundingOptions(std::map<std::string, std::string> &options, int32_t &code)
 {
-    if (map.find("roundingMode") != map.end()) {
-        std::string roundingModeStr = map["roundingMode"];
+    if (options.find("roundingMode") != options.end()) {
+        std::string roundingModeStr = options["roundingMode"];
         if (roundingModeStyle.find(roundingModeStr) == roundingModeStyle.end()) {
             code = -1;
             return "getStringOption failed";
         }
     }
-    if (map.find("roundingPriority") != map.end()) {
-        std::string roundingPriorityStr = map["roundingPriority"];
+    if (options.find("roundingPriority") != options.end()) {
+        std::string roundingPriorityStr = options["roundingPriority"];
         if (roundingPriorityStyle.find(roundingPriorityStr) == roundingPriorityStyle.end()) {
             code = -1;
             return "getStringOption failed";
         }
     }
-    if (map.find("roundingIncrement") != map.end()) {
-        std::string roundingIncrementStr = map["roundingIncrement"];
+    if (options.find("roundingIncrement") != options.end()) {
+        std::string roundingIncrementStr = options["roundingIncrement"];
         std::vector<std::string> availableValues;
         std::for_each(roundingIncrementList.begin(), roundingIncrementList.end(),
             [&availableValues](int num) { availableValues.push_back(std::to_string(num)); });
