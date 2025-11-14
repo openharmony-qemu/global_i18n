@@ -326,7 +326,10 @@ napi_value JSNumberFormatAddon::GetNumberResolvedOptions(napi_env env, napi_call
     JSUtils::SetIntegerOptionProperties(env, result, options, "maximumFractionDigits");
     JSUtils::SetIntegerOptionProperties(env, result, options, "minimumSignificantDigits");
     JSUtils::SetIntegerOptionProperties(env, result, options, "maximumSignificantDigits");
+    JSUtils::SetIntegerOptionProperties(env, result, options, "roundingIncrement");
     JSUtils::SetOptionProperties(env, result, options, "localeMatcher");
+    JSUtils::SetOptionProperties(env, result, options, "roundingMode");
+    JSUtils::SetOptionProperties(env, result, options, "roundingPriority");
     return result;
 }
 
