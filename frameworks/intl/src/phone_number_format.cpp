@@ -112,10 +112,9 @@ PhoneNumberFormat::PhoneNumberFormat(const std::string &countryTag,
         icu::Locale locale = icu::Locale::createFromName(countryTag.c_str());
         country = locale.getCountry();
     }
-    std::string type = "";
     auto search = options.find("type");
     if (search != options.end()) {
-        type = search->second;
+        formatType = search->second;
     }
 
     std::map<std::string, PhoneNumberUtil::PhoneNumberFormat> type2PhoneNumberFormat = {
@@ -126,13 +125,13 @@ PhoneNumberFormat::PhoneNumberFormat(const std::string &countryTag,
     };
 
     std::set<std::string> validType = {"E164", "RFC3966", "INTERNATIONAL", "NATIONAL"};
-    if (validType.find(type) != validType.end()) {
+    if (validType.find(formatType) != validType.end()) {
         withOptions = true;
-        phoneNumberFormat = type2PhoneNumberFormat[type];
+        phoneNumberFormat = type2PhoneNumberFormat[formatType];
     } else {
         phoneNumberFormat = PhoneNumberUtil::PhoneNumberFormat::NATIONAL;
     }
-    if (type.compare("TYPING") == 0 && util != nullptr) {
+    if (formatType.compare("TYPING") == 0 && util != nullptr) {
         formatter = std::unique_ptr<AsYouTypeFormatter>(util->GetAsYouTypeFormatter(country));
     }
 }
@@ -268,8 +267,23 @@ std::string PhoneNumberFormat::FormatAllInputNumber(const std::string &originalN
     return formattedNumber;
 }
 
-std::string PhoneNumberFormat::getLocationName(
-    const std::string &number, const std::string &locale)
+std::string GetRegionDisplayName(const std::string &regionCode, const icu::Locale &displayLocale)
+{
+    UErrorCode status = U_ZERO_ERROR;
+    icu::LocaleBuilder regionbuilder = icu::LocaleBuilder().setRegion(regionCode);
+    icu::Locale regionLocale = regionbuilder.build(status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("GetRegionDisplayName: Build region locale failed.");
+        return "";
+    }
+    icu::UnicodeString displayRegion;
+    regionLocale.getDisplayCountry(displayLocale, displayRegion);
+    std::string displayCountryName;
+    displayRegion.toUTF8String(displayCountryName);
+    return displayCountryName;
+}
+
+std::string PhoneNumberFormat::getLocationName(const std::string &number, const std::string &locale)
 {
     if (util == nullptr) {
         return "";
@@ -294,18 +308,17 @@ std::string PhoneNumberFormat::getLocationName(
     if (type != PhoneNumberUtil::ErrorType::NO_PARSING_ERROR) {
         return "";
     }
-    std::string regionCode;
-    util->GetRegionCodeForNumber(phoneNumber, &regionCode);
-
+    // If the number is too long, there is no associated location.
+    if (formatType == "TYPING" && IsNumberTooLong(phoneNumber)) {
+        return "";
+    }
     std::string locName = getPhoneLocationName(number, phoneLocale.getName(), locale);
-
-    icu::LocaleBuilder regionbuilder = icu::LocaleBuilder().setRegion(regionCode);
-    icu::Locale regionLocale = regionbuilder.build(status);
-    icu::UnicodeString displayRegion;
-    regionLocale.getDisplayCountry(displayLocale, displayRegion);
-    std::string displayCountryName;
-    displayRegion.toUTF8String(displayCountryName);
-
+    std::string regionCode = GetPossibleRegionCode(phoneNumber);
+    std::string displayCountryName = GetRegionDisplayName(regionCode, displayLocale);
+    // In typing mode, there may be a country code without locName.
+    if (formatType == "TYPING" && locName == "") {
+        locName = displayCountryName;
+    }
     // Check if region name is a country name
     if (locName.compare(displayCountryName) == 0) {
         if (getBlockedRegionName(regionCode, displayLocale.getLanguage())) {
@@ -333,7 +346,7 @@ std::string PhoneNumberFormat::getPhoneLocationName(
     std::lock_guard<std::mutex> phoneLock(phoneMutex);
     std::string locName;
     if (dynamicHandler) {
-        HILOG_ERROR_I18N("LocationNameFunc Init");
+        HILOG_INFO_I18N("LocationNameFunc Init");
         ExposeLocationName locationNameFunc = reinterpret_cast<ExposeLocationName>(
             dlsym(dynamicHandler, "exposeLocationName"));
         if (locationNameFunc) {
@@ -341,7 +354,7 @@ std::string PhoneNumberFormat::getPhoneLocationName(
             char recvArr[RECV_CHAR_LEN];
             const char* numberArr = number.c_str();
             const char* phoneLocaleArr = phoneLocale.c_str();
-            locationNameFunc(numberArr, phoneLocaleArr, recvArr, RECV_CHAR_LEN);
+            locationNameFunc(numberArr, phoneLocaleArr, recvArr, RECV_CHAR_LEN, (formatType == "TYPING"));
             locName = recvArr;
         }
     }
@@ -393,6 +406,26 @@ std::string PhoneNumberFormat::getCityName(const std::string& language, const st
         }
     }
     return tabooUtils->ReplacePhoneLocationName(phonenumber, language, locationName);
+}
+
+bool PhoneNumberFormat::IsNumberTooLong(i18n::phonenumbers::PhoneNumber phoneNumber)
+{
+    uint64_t ralNationalNumber = phoneNumber.national_number();
+    if (!util->TruncateTooLongNumber(&phoneNumber)) {
+        return false;
+    }
+    return ralNationalNumber != phoneNumber.national_number();
+}
+
+std::string PhoneNumberFormat::GetPossibleRegionCode(const i18n::phonenumbers::PhoneNumber &phoneNumber)
+{
+    std::string regionCode;
+    util->GetRegionCodeForNumber(phoneNumber, &regionCode);
+    // When the number is incomplete in typing mode, region code is empty, but the country code is available.
+    if (formatType == "TYPING" && regionCode == "ZZ") {
+        util->GetRegionCodeForCountryCode(phoneNumber.country_code(), &regionCode);
+    }
+    return regionCode;
 }
 } // namespace I18n
 } // namespace Global

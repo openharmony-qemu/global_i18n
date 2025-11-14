@@ -29,6 +29,8 @@ public:
 
 int PhoneNumberFormatTest0001(void);
 int PhoneNumberFormatTest0002(void);
+int PhoneNumberFormatTest0003(void);
+int PhoneNumberFormatTest0004(void);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

@@ -28,7 +28,7 @@ namespace Global {
 namespace I18n {
 using i18n::phonenumbers::PhoneNumberUtil;
 using i18n::phonenumbers::AsYouTypeFormatter;
-using ExposeLocationName = int (*)(const char*, const char*, char*, const int);
+using ExposeLocationName = int (*)(const char*, const char*, char*, const int, bool);
 
 class PhoneNumberFormat {
 public:
@@ -51,9 +51,12 @@ private:
     void OpenHandler();
     std::string GetAsYouTypeFormatResult(const std::string &number);
     std::string FormatAllInputNumber(const std::string &originalNumber, std::string &replacedNumber);
+    bool IsNumberTooLong(i18n::phonenumbers::PhoneNumber phoneNumber);
+    std::string GetPossibleRegionCode(const i18n::phonenumbers::PhoneNumber &phoneNumber);
     PhoneNumberUtil *util;
     std::unique_ptr<AsYouTypeFormatter> formatter = nullptr;
     std::string country;
+    std::string formatType;
     PhoneNumberUtil::PhoneNumberFormat phoneNumberFormat;
     static void* dynamicHandler;
     static std::mutex phoneMutex;
