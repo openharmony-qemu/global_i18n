@@ -117,6 +117,7 @@ ohos_shared_library("intl_util") {
       "entity_recognition/src/entity_recognizer.cpp",
       "parameter_upgrade/src/signature_verifier.cpp",
       "parameter_upgrade/src/upgrade_utils.cpp",
+      "src/advanced_measure_format.cpp",
       "src/character.cpp",
       "src/collator.cpp",
       "src/date_time_format.cpp",

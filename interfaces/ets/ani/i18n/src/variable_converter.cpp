@@ -15,6 +15,7 @@
 
 #include "variable_converter.h"
 
+#include "advanced_measure_format_addon.h"
 #include "entity_recognizer_addon.h"
 #include "holiday_manager_addon.h"
 #include "i18n_addon.h"
@@ -245,6 +246,32 @@ bool VariableConverter::GetStringMember(ani_env *env, ani_object options, const 
     }
 
     value = VariableConverter::AniStrToString(env, ref);
+    return true;
+}
+
+bool VariableConverter::GetEnumIndexMember(ani_env *env, ani_object options, const std::string &name, int32_t &value)
+{
+    ani_ref ref;
+    if (ANI_OK != env->Object_GetPropertyByName_Ref(options, name.c_str(), &ref)) {
+        HILOG_ERROR_I18N("VariableConverter::GetEnumIndexMember: Get property '%{public}s' failed", name.c_str());
+        return false;
+    }
+
+    ani_boolean isUndefined;
+    if (ANI_OK != env->Reference_IsUndefined(ref, &isUndefined)) {
+        HILOG_ERROR_I18N("VariableConverter::GetStringMember: Check reference is undefined failed");
+        return false;
+    }
+    if (isUndefined) {
+        return false;
+    }
+
+    ani_int index;
+    if (ANI_OK != env->EnumItem_GetValue_Int(static_cast<ani_enum_item>(ref), &index)) {
+        HILOG_ERROR_I18N("VariableConverter::GetStringMember: Get value failed");
+    }
+
+    value = index;
     return true;
 }
 
@@ -499,6 +526,8 @@ ani_object VariableConverter::CreateAniObject(ani_env* env, const char* classNam
     return obj;
 }
 
+template ani_object VariableConverter::CreateAniObject<AdvancedMeasureFormatAddon>(
+    ani_env*, const char*, AdvancedMeasureFormatAddon*);
 template ani_object VariableConverter::CreateAniObject<I18nBreakIteratorAddon>(
     ani_env*, const char*, I18nBreakIteratorAddon*);
 template ani_object VariableConverter::CreateAniObject<I18nCalendarAddon>(ani_env*, const char*, I18nCalendarAddon*);

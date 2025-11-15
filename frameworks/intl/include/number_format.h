@@ -79,6 +79,7 @@ public:
     std::string GetMinimumSignificantDigits() const;
     std::string GetMaximumSignificantDigits() const;
     std::string GetLocaleMatcher() const;
+    void SetUnitUsage(const std::string& value);
     void FormatToParts(std::vector<std::vector<std::string>> &result);
     void FormatToParts(double number, std::vector<std::vector<std::string>> &result);
     void FormatBigIntToParts(std::string &number, std::vector<std::vector<std::string>> &result);

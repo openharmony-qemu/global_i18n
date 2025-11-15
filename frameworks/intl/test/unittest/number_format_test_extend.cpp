@@ -15,6 +15,7 @@
 
 #include "number_format_test_extend.h"
 #include <gtest/gtest.h>
+#include "advanced_measure_format.h"
 #include "locale_config.h"
 #include "number_format.h"
 #include "simple_number_format.h"
@@ -771,6 +772,66 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0069, TestSize.Level1)
     std::pair<std::string, std::string> numberPattern = { "", "," };
     std::string sample = NumberFormat::GetNumberPatternSample("ar-CN-u-nu-latn", numberPattern);
     EXPECT_EQ(sample, "12345,67");
+}
+
+/**
+ * @tc.name: NumberFormatFuncTest0070
+ * @tc.desc: Test AdvancedMeasureFormat
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0070, TestSize.Level1)
+{
+    std::vector<std::string> locales { "zh-Hans-CN" };
+    std::map<std::string, std::string> numberFormatOptions = {
+        { "style", "unit" },
+        { "unit", "fahrenheit" }
+    };
+    std::shared_ptr<NumberFormat> numberFormat = std::make_shared<NumberFormat>(locales, numberFormatOptions, true);
+    AdvancedMeasureFormatOptions advancedMeasureOptions;
+    advancedMeasureOptions.unitUsage = UnitUsage::TEMPERATURE_PERSON;
+    auto advancedMeasureFormat = std::make_unique<AdvancedMeasureFormat>(numberFormat, advancedMeasureOptions);
+    std::string result = advancedMeasureFormat->FormatNumber(100);
+    EXPECT_EQ(result, "37.778°C");
+}
+
+/**
+ * @tc.name: NumberFormatFuncTest0071
+ * @tc.desc: Test AdvancedMeasureFormat
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0071, TestSize.Level1)
+{
+    std::vector<std::string> locales { "zh-Hans-CN" };
+    std::map<std::string, std::string> numberFormatOptions = {
+        { "style", "unit" },
+        { "unit", "byte" }
+    };
+    std::shared_ptr<NumberFormat> numberFormat = std::make_shared<NumberFormat>(locales, numberFormatOptions, true);
+    AdvancedMeasureFormatOptions advancedMeasureOptions;
+    advancedMeasureOptions.unitUsage = UnitUsage::SIZE_SHORTFILE_BYTE;
+    auto advancedMeasureFormat = std::make_unique<AdvancedMeasureFormat>(numberFormat, advancedMeasureOptions);
+    std::string result = advancedMeasureFormat->FormatNumber(1234);
+    EXPECT_EQ(result, "1.2 KB");
+}
+
+/**
+ * @tc.name: NumberFormatFuncTest0072
+ * @tc.desc: Test AdvancedMeasureFormat
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0072, TestSize.Level1)
+{
+    std::vector<std::string> locales { "zh-Hans-CN" };
+    std::map<std::string, std::string> numberFormatOptions = {
+        { "style", "unit" },
+        { "unit", "day" }
+    };
+    std::shared_ptr<NumberFormat> numberFormat = std::make_shared<NumberFormat>(locales, numberFormatOptions, true);
+    AdvancedMeasureFormatOptions advancedMeasureOptions;
+    advancedMeasureOptions.unitUsage = UnitUsage::ELAPSED_TIME_SECOND;
+    auto advancedMeasureFormat = std::make_unique<AdvancedMeasureFormat>(numberFormat, advancedMeasureOptions);
+    std::string result = advancedMeasureFormat->FormatNumber(3);
+    EXPECT_EQ(result, "3天前");
 }
 } // namespace I18n
 } // namespace Global

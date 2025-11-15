@@ -45,6 +45,32 @@ namespace i18n {
         SUGGESTION_TYPE_SIM = 2,
     }
 
+    export enum UnitUsage {
+        AREA_LAND_AGRICULT = 1,
+        AREA_LAND_COMMERCL = 2,
+        AREA_LAND_RESIDNTL = 3,
+        LENGTH_PERSON = 4,
+        LENGTH_PERSON_SMALL = 5,
+        LENGTH_RAINFALL = 6,
+        LENGTH_ROAD = 7,
+        LENGTH_ROAD_SMALL = 8,
+        LENGTH_SNOWFALL = 9,
+        LENGTH_VEHICLE = 10,
+        LENGTH_VISIBLTY = 11,
+        LENGTH_VISIBLTY_SMALL = 12,
+        LENGTH_PERSON_INFORMAL = 13,
+        LENGTH_PERSON_SMALL_INFORMAL = 14,
+        LENGTH_ROAD_INFORMAL = 15,
+        SPEED_ROAD_TRAVEL = 16,
+        SPEED_WIND = 17,
+        TEMPERATURE_PERSON = 18,
+        TEMPERATURE_WEATHER = 19,
+        VOLUME_VEHICLE_FUEL = 20,
+        ELAPSED_TIME_SECOND = 21,
+        SIZE_FILE_BYTE = 22,
+        SIZE_SHORTFILE_BYTE = 23
+    }
+
     export interface UnitInfo {
         unit: string;
         measureSystem: string;
@@ -180,6 +206,10 @@ namespace i18n {
     class StyledFormatResult {
         styledParts: Array<StyledPartInner>;
         content: string;
+    }
+
+    export interface AdvancedMeasureFormatOptions {
+        unitUsage?: UnitUsage;
     }
 
     export class System {
@@ -662,6 +692,31 @@ namespace i18n {
                 }
             }
             return new StyledString(formatResult, option);
+        }
+    }
+
+    export class AdvancedMeasureFormat {
+        static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
+
+        private nativeAdvancedMeasureFormat: long = 0;
+
+        constructor(context: long) {
+            if (this.nativeAdvancedMeasureFormat == 0) {
+                this.nativeAdvancedMeasureFormat = context;
+            }
+        }
+
+        constructor(numberFormat: Intl.NumberFormat, options: AdvancedMeasureFormatOptions) {
+            this.nativeAdvancedMeasureFormat =
+                AdvancedMeasureFormat.create(numberFormat, options).nativeAdvancedMeasureFormat;
+        }
+
+        native static create(numberFormat: Intl.NumberFormat,
+            options: AdvancedMeasureFormatOptions): AdvancedMeasureFormat;
+        native formatNumber(value: double): string;
+
+        format(num: double): string {
+            return this.formatNumber(num);
         }
     }
 
