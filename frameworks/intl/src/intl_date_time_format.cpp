@@ -282,7 +282,7 @@ std::string IntlDateTimeFormat::Format(double milliseconds)
     icuSimpleDateFormat->format(milliseconds, formatResult);
     std::string result;
     formatResult.toUTF8String(result);
-    return result;
+    return PseudoLocalizationProcessor(result);
 }
 
 std::vector<std::pair<std::string, std::string>> IntlDateTimeFormat::FormatToParts(double milliseconds,
@@ -386,7 +386,7 @@ std::string IntlDateTimeFormat::FormatRange(double start, double end, std::strin
     }
     std::string result;
     formatResult.toUTF8String(result);
-    return result;
+    return PseudoLocalizationProcessor(result);
 }
 
 std::vector<std::pair<std::string, std::string>> IntlDateTimeFormat::FormatRangeToParts(double start,

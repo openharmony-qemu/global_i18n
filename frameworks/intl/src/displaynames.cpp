@@ -169,7 +169,7 @@ std::string DisplayNames::Display(const std::string &code)
     if (displayName.empty() && status == I18nErrorCode::SUCCESS) {
         displayName = code;
     }
-    return displayName;
+    return PseudoLocalizationProcessor(displayName);
 }
 
 void DisplayNames::ParseAllOptions(const std::map<std::string, std::string> &options)
