@@ -162,22 +162,23 @@ private:
     static std::map<std::string, std::string> RelativeTimeFormatConfigs;
     static std::unordered_map<std::string, int> defaultCurrencyFractionMap;
     static bool ReadISO4217Datas();
-    static void CheckNumberFormatOptionsExt(std::map<std::string, std::string> &map, int32_t &code,
-        const std::string &optionName, int min, int max);
-    static std::string CheckFormatOptions(std::map<std::string, std::string> &map, int32_t &code);
+    static void CheckNumberFormatOptionsExt(std::map<std::string, std::string> &options,
+        int32_t &code, const std::string &optionName, int min, int max);
+    static std::string CheckFormatOptions(std::map<std::string, std::string> &options, int32_t &code);
+    static std::string CheckRoundingOptions(std::map<std::string, std::string> &options, int32_t &code);
     static std::string GetCurrencyFromConfig(const std::string& currency);
+    static std::vector<std::string> GetAvailableNumberSystems();
 
     void CreateRelativeTimeFormat(const std::string& locale);
     void ParseConfigs(std::map<std::string, std::string> &configs);
     void ParseDigitsConfigs(std::map<std::string, std::string> &configs);
     void ParseRoundingConfigs(std::map<std::string, std::string> &configs);
-    void GetDigitsResolvedOptions(std::map<std::string, std::string> &map, bool setDefault);
-    void GetDigitsResolvedOptionsExt(std::map<std::string, std::string> &map, bool setDefault);
-    void GetMinimumFractionDigitsOption(std::map<std::string, std::string> &map);
-    void GetMaximumFractionDigitsOption(std::map<std::string, std::string> &map);
-    int GetCurrencyFractionDigits(std::map<std::string, std::string> &map);
+    void GetDigitsResolvedOptions(std::map<std::string, std::string> &result, bool setDefault);
+    void GetDigitsResolvedOptionsExt(std::map<std::string, std::string> &result, bool setDefault);
+    void GetMinimumFractionDigitsOption(std::map<std::string, std::string> &result);
+    void GetMaximumFractionDigitsOption(std::map<std::string, std::string> &result);
+    int GetCurrencyFractionDigits(std::map<std::string, std::string> &resultMap);
     void ParseExtParam(const std::string& localeTag);
-    void GetDigitsResolvedOptions(std::map<std::string, std::string> &map);
     void InitProperties(icu::number::UnlocalizedNumberFormatter &formatter);
     void InitUnitProperties(icu::number::UnlocalizedNumberFormatter &formatter);
     void InitNumberPattern(icu::number::UnlocalizedNumberFormatter &formatter);
