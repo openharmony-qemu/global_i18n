@@ -198,6 +198,8 @@ namespace i18n {
             this.type = type;
         }
 
+        constructor() {}
+
         start: int;
         length: int;
         type: string;
