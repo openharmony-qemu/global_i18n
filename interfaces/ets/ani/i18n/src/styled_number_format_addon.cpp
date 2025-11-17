@@ -123,12 +123,22 @@ static ani_object CreateStyledPart(ani_env *env, StyledNumberFormat::NumberPart 
     }
 
     ani_object styledPart;
-    if (ANI_OK != env->Object_New(cls, ctor, &styledPart, static_cast<int32_t>(numberPart.start),
-        static_cast<int32_t>(numberPart.length), numberPart.part_name.c_str())) {
+    if (ANI_OK != env->Object_New(cls, ctor, &styledPart)) {
         HILOG_ERROR_I18N("CreateStyledPart: New object '%{public}s' failed", className);
         return nullptr;
     }
 
+    auto status = env->Object_SetPropertyByName_Int(styledPart, "start", static_cast<int32_t>(numberPart.start));
+    if (status != ANI_OK) {
+        HILOG_ERROR_I18N("CreateStyledPart: Set property 'start' failed, status: %{public}d", status);
+        return nullptr;
+    }
+    status = env->Object_SetPropertyByName_Int(styledPart, "length", static_cast<int32_t>(numberPart.length));
+    if (status != ANI_OK) {
+        HILOG_ERROR_I18N("CreateStyledPart: Set property 'length' failed, status: %{public}d", status);
+        return nullptr;
+    }
+    VariableConverter::SetStringMember(env, styledPart, "type", numberPart.part_name);
     return styledPart;
 }
 

@@ -197,6 +197,7 @@ namespace i18n {
             this.length = length;
             this.type = type;
         }
+        constructor() {}
 
         start: int;
         length: int;
