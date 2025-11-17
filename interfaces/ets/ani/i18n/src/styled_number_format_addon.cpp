@@ -117,7 +117,7 @@ static ani_object CreateStyledPart(ani_env *env, StyledNumberFormat::NumberPart 
     }
 
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":", &ctor)) {
         HILOG_ERROR_I18N("CreateStyledPart: Find method '<ctor>' failed");
         return nullptr;
     }
