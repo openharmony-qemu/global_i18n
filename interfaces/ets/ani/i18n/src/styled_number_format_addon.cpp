@@ -124,7 +124,7 @@ static ani_object CreateStyledPart(ani_env *env, StyledNumberFormat::NumberPart 
 
     ani_object styledPart;
     if (ANI_OK != env->Object_New(cls, ctor, &styledPart, static_cast<int32_t>(numberPart.start),
-        static_cast<int32_t>(numberPart.length), numberPart.part_name)) {
+        static_cast<int32_t>(numberPart.length), numberPart.part_name.c_str())) {
         HILOG_ERROR_I18N("CreateStyledPart: New object '%{public}s' failed", className);
         return nullptr;
     }
