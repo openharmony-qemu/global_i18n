@@ -191,12 +191,13 @@ namespace i18n {
         dayPeriod?: TextStyle;
     }
 
-    class StyledPartInner {
+    export class StyledPartInner {
         constructor(start: int, length: int, type: string) {
             this.start = start;
             this.length = length;
             this.type = type;
         }
+
         constructor() {}
 
         start: int;
