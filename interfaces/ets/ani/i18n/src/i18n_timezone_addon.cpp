@@ -211,7 +211,7 @@ ani_object I18nTimeZoneAddon::GetTimezonesByLocation(ani_env *env, [[maybe_unuse
     }
 
     ani_method set;
-    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "iC{std.core.Object}:", &set)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "iY:", &set)) {
         HILOG_ERROR_I18N("Find method '$_set' failed");
         return nullptr;
     }

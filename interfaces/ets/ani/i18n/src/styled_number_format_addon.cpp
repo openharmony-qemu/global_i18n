@@ -168,7 +168,7 @@ static ani_object CreateStyledPartArray(ani_env *env, const std::vector<StyledNu
     }
 
     ani_method set;
-    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "iC{std.core.Object}:", &set)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "iY:", &set)) {
         HILOG_ERROR_I18N("CreateStyledPartArray: Find method '$_set' failed");
         return nullptr;
     }
