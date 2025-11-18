@@ -100,7 +100,7 @@ static ani_object CreateLocaleItemArray(ani_env *env, std::vector<LocaleItem> Lo
     }
 
     ani_method set;
-    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "iC{std.core.Object}:", &set)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "iY:", &set)) {
         HILOG_ERROR_I18N("Find method '$_set' failed");
         return ret;
     }
@@ -282,7 +282,7 @@ ani_object I18nSysLocaleMgrAddon::GetTimeZoneCityItemArray(ani_env *env, [[maybe
     }
 
     ani_method set;
-    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "iC{std.core.Object}:", &set)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "iY:", &set)) {
         HILOG_ERROR_I18N("Find method '$_set' failed");
         return ret;
     }

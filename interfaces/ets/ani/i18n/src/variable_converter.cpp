@@ -295,7 +295,7 @@ ani_object VariableConverter::CreateArray(ani_env *env, const std::vector<std::s
     }
 
     ani_method set;
-    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "iC{std.core.Object}:", &set)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "iY:", &set)) {
         HILOG_ERROR_I18N("Find method '$_set' failed");
         return ret;
     }
@@ -332,7 +332,7 @@ bool VariableConverter::ParseStringArray(ani_env *env, ani_object obj, std::vect
     }
 
     ani_method get;
-    if (ANI_OK != env->Class_FindMethod(cls, "$_get", "i:C{std.core.Object}", &get)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "$_get", "i:Y", &get)) {
         HILOG_ERROR_I18N("Find method '$_get' failed");
         return false;
     }
@@ -449,7 +449,7 @@ std::vector<std::string> VariableConverter::GetLocaleTags(ani_env *env, ani_obje
     }
 
     ani_method get;
-    if (ANI_OK != env->Class_FindMethod(cls, "$_get", "i:C{std.core.Object}", &get)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "$_get", "i:Y", &get)) {
         HILOG_ERROR_I18N("Find method '$_get' failed");
         return localeTags;
     }
