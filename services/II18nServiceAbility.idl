@@ -38,5 +38,4 @@ interface OHOS.Global.I18n.II18nServiceAbility {
     void GetSystemNumericalDatePatterns([inout] Map<String, String> numericalDatePatterns, [out] int code);
     void GetUsingNumericalDatePattern([inout] String identifier, [out] int code);
     void SetSystemNumericalDatePattern([in] String identifier, [out] int code);
-    void GetLanguageFromUserId([in] int userId, [out] String language);
 };
