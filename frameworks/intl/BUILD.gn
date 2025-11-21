@@ -17,6 +17,7 @@ import("//build/ohos.gni")
 
 group("build_module") {
   deps = [
+    ":init_multi_users_data",
     ":intl_util",
     ":num_timezone_cfg",
     ":preferred_language",
@@ -391,6 +392,26 @@ ohos_prebuilt_etc("dialect_languages_xml") {
 ohos_prebuilt_etc("num_timezone_cfg") {
   source = "//base/global/i18n/frameworks/intl/etc/location/num_timezone.cfg"
   module_install_dir = "usr/ohos_locale_config/"
+  part_name = "i18n"
+  subsystem_name = "global"
+}
+
+ohos_executable("init_multi_users_data") {
+  sources = [ "src/init_multi_users_data.cpp" ]
+  deps = [
+    ":intl_util"
+  ]
+  external_deps = [
+    "hilog:libhilog",
+    "init:libbegetutil",
+    "preferences:native_preferences",
+  ]
+
+  defines = []
+  if (target_platform == "pc") {
+    defines += [ "SUPPORT_MULTI_USER" ]
+  }
+  install_images = [ "system" ]
   part_name = "i18n"
   subsystem_name = "global"
 }
