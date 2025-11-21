@@ -39,6 +39,11 @@ void NumberFormatAddon::Destructor(napi_env env, void *nativeObject, void *hint)
 
 napi_value NumberFormatAddon::InitNumberFormat(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitNumberFormat");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("format", FormatNumber),
         DECLARE_NAPI_FUNCTION("formatRange", FormatRangeNumber),

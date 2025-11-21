@@ -86,6 +86,11 @@ void I18nCalendarAddon::Destructor(napi_env env, void *nativeObject, void *hint)
 
 napi_value I18nCalendarAddon::InitI18nCalendar(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitI18nCalendar");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("setTime", SetTime),
         DECLARE_NAPI_FUNCTION("set", Set),
@@ -125,6 +130,11 @@ napi_value I18nCalendarAddon::InitI18nCalendar(napi_env env, napi_value exports)
 
 napi_value I18nCalendarAddon::InitCalendar(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitCalendar");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {};
     napi_value constructor = nullptr;
     napi_status status = napi_define_class(env, "I18nCalendar", NAPI_AUTO_LENGTH, JSUtils::DefaultConstructor, nullptr,

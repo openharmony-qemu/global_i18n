@@ -37,6 +37,11 @@ void I18nUnicodeAddon::Destructor(napi_env env, void *nativeObject, void *hint)
 
 napi_value I18nUnicodeAddon::InitI18nUnicode(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitI18nUnicode");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_STATIC_FUNCTION("isDigit", IsDigitAddon),
         DECLARE_NAPI_STATIC_FUNCTION("isSpaceChar", IsSpaceCharAddon),
@@ -66,6 +71,11 @@ napi_value I18nUnicodeAddon::InitI18nUnicode(napi_env env, napi_value exports)
 
 napi_value I18nUnicodeAddon::InitCharacter(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitCharacter");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("isDigit", IsDigitAddon),
         DECLARE_NAPI_FUNCTION("isSpaceChar", IsSpaceCharAddon),

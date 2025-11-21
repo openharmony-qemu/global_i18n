@@ -17,6 +17,7 @@
 
 #include "error_util.h"
 #include "i18n_hilog.h"
+#include "js_utils.h"
 #include "variable_convertor.h"
 
 namespace OHOS {
@@ -44,6 +45,11 @@ void StyledNumberFormatAddon::Destructor(napi_env env, void *nativeObject, void 
 
 napi_value StyledNumberFormatAddon::InitStyledNumberFormat(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitStyledNumberFormat");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("format", Format)
     };

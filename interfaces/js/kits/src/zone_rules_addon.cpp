@@ -41,6 +41,11 @@ void ZoneRulesAddon::Destructor(napi_env env, void *nativeObject, void *hint)
 
 napi_value ZoneRulesAddon::InitI18nZoneRules(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitI18nZoneRules");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("nextTransition", NextTransition),
     };

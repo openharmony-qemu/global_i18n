@@ -52,6 +52,11 @@ void IntlAddon::Destructor(napi_env env, void *nativeObject, void *hint)
 
 napi_value IntlAddon::InitDateTimeFormat(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitDateTimeFormat");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("format", FormatDateTime),
         DECLARE_NAPI_FUNCTION("formatRange", FormatDateTimeRange),
@@ -76,6 +81,11 @@ napi_value IntlAddon::InitDateTimeFormat(napi_env env, napi_value exports)
 
 napi_value IntlAddon::InitRelativeTimeFormat(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitRelativeTimeFormat");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("format", FormatRelativeTime),
         DECLARE_NAPI_FUNCTION("formatToParts", FormatToParts),
@@ -556,6 +566,11 @@ void GetCollatorOptionValue(napi_env env, napi_value options, std::map<std::stri
 
 napi_value IntlAddon::InitCollator(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitCollator");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("compare", CompareString),
         DECLARE_NAPI_FUNCTION("resolvedOptions", GetCollatorResolvedOptions)
@@ -953,6 +968,11 @@ void GetPluralRulesOptionValues(napi_env env, napi_value options, std::map<std::
 
 napi_value IntlAddon::InitPluralRules(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitPluralRules");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("select", Select)
     };
@@ -1089,6 +1109,11 @@ napi_value IntlAddon::Init(napi_env env, napi_value exports)
 
 bool SetBuildInIntlModule(napi_env &env, napi_value &intlModule, napi_value &buildinIntlModule, const std::string& key)
 {
+    OHOS::Global::I18n::HandleScope scope(env, "SetBuildInIntlModule");
+    if (!scope.IsOpen()) {
+        return false;
+    }
+
     napi_value buildinClass = nullptr;
     napi_status status = napi_get_named_property(env, buildinIntlModule, key.c_str(), &buildinClass);
     if (status != napi_ok || buildinClass == nullptr) {
@@ -1105,6 +1130,11 @@ bool SetBuildInIntlModule(napi_env &env, napi_value &intlModule, napi_value &bui
 
 bool SetBuildInIntl(napi_env &env, napi_value &global, napi_value &intlModule)
 {
+    OHOS::Global::I18n::HandleScope scope(env, "SetBuildInIntl");
+    if (!scope.IsOpen()) {
+        return false;
+    }
+
     bool hasProperty = false;
     napi_status status = napi_has_named_property(env, global, "Intl", &hasProperty);
     if (status != napi_ok || !hasProperty) {
@@ -1167,6 +1197,11 @@ bool BindingIntlModules(napi_env env, napi_value &intlModule)
 
 bool RegisterIntl(napi_env env)
 {
+    OHOS::Global::I18n::HandleScope scope(env, "RegisterIntl");
+    if (!scope.IsOpen()) {
+        return false;
+    }
+
     if (env == nullptr) {
         HILOG_ERROR_I18N("RegisterIntl: env is null");
         return false;
@@ -1199,6 +1234,5 @@ bool RegisterIntl(napi_env env)
         HILOG_ERROR_I18N("RegisterIntl: Set property failed when Init Intl module.");
         return false;
     }
-    HILOG_INFO_I18N("RegisterIntl: Replace buildin Intl Success.");
     return true;
 }

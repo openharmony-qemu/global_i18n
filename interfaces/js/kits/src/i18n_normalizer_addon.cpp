@@ -46,6 +46,11 @@ void I18nNormalizerAddon::Destructor(napi_env env, void *nativeObject, void *hin
 
 napi_value I18nNormalizerAddon::InitI18nNormalizer(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitI18nNormalizer");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("normalize", Normalize),
     };
@@ -72,6 +77,11 @@ napi_value I18nNormalizerAddon::InitI18nNormalizer(napi_env env, napi_value expo
 
 napi_value I18nNormalizerAddon::InitNormalizer(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitNormalizer");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_STATIC_FUNCTION("getInstance", GetI18nNormalizerInstance)
     };

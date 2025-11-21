@@ -16,6 +16,7 @@
 #include <unicode/locid.h>
 #include "error_util.h"
 #include "i18n_hilog.h"
+#include "js_utils.h"
 #include "utils.h"
 #include "variable_convertor.h"
 #include "entity_recognizer_addon.h"
@@ -42,6 +43,11 @@ void EntityRecognizerAddon::Destructor(napi_env env, void *nativeObject, void *h
 
 napi_value EntityRecognizerAddon::InitEntityRecognizer(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitEntityRecognizer");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("findEntityInfo", FindEntityInfo)
     };
