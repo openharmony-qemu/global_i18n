@@ -438,8 +438,26 @@ void NumberFormat::SetRoundingProperties(icu::number::UnlocalizedNumberFormatter
 
 void NumberFormat::HandleRoundingPriority(icu::number::UnlocalizedNumberFormatter &formatter)
 {
-    if (roundingPriorityStr.empty()) {
+    if (roundingPriorityStr.empty() && !fromArkTs) {
         return;
+    }
+    int32_t minFractionDigits = GetMinimumFractionDigitsValue();
+    int32_t maxFractionDigits = GetMaximumFractionDigitsValue();
+    int32_t maxSigDigits = GetMaximumSignificantDigitsIntValue();
+    int32_t minSigDigits = GetMinimumSignificantDigitsIntValue();
+    auto precision = icu::number::Precision::minMaxFraction(minFractionDigits, maxFractionDigits)
+        .withSignificantDigits(minSigDigits, maxSigDigits, roundingPriority);
+    formatter = formatter.precision(precision);
+}
+
+void NumberFormat::HandleRoundingPriorityFromArkts(icu::number::UnlocalizedNumberFormatter &formatter)
+{
+    if ((!minimumFractionDigits.empty() || !maximumFractionDigits.empty()) &&
+        (!minimumSignificantDigits.empty() || !maximumSignificantDigits.empty())) {
+        return;
+    }
+    if () {
+
     }
     int32_t minFractionDigits = GetMinimumFractionDigitsValue();
     int32_t maxFractionDigits = GetMaximumFractionDigitsValue();
