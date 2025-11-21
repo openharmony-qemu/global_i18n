@@ -38,6 +38,11 @@ void AdvancedMeasureFormatAddon::Destructor(napi_env env, void *nativeObject, vo
 
 napi_value AdvancedMeasureFormatAddon::InitAdvancedMeasureFormat(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitAdvancedMeasureFormat");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("format", Format)
     };

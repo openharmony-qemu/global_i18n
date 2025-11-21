@@ -15,6 +15,7 @@
  
 #include "error_util.h"
 #include "i18n_hilog.h"
+#include "js_utils.h"
 #include "locale_info_addon.h"
 #include "variable_convertor.h"
 #include "simple_number_format_addon.h"
@@ -39,6 +40,11 @@ void SimpleNumberFormatAddon::Destructor(napi_env env, void *nativeObject, void 
 
 napi_value SimpleNumberFormatAddon::InitSimpleNumberFormat(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitSimpleNumberFormat");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("format", Format),
     };

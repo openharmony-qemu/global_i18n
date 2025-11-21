@@ -16,6 +16,7 @@
 #define OHOS_GLOBAL_I18N_SYSTEM_ADDON_H
 
 #include <memory>
+#include <vector>
 #include "i18n_timezone.h"
 #include "i18n_types.h"
 #include "napi/native_api.h"
@@ -45,6 +46,7 @@ public:
     static napi_value GetDisplayCountry(napi_env env, napi_callback_info info);
 
 private:
+    static std::vector<napi_property_descriptor> GetI18nSystemProperty();
     static napi_value GetSystemCountries(napi_env env, napi_callback_info info);
     static napi_value IsSuggested(napi_env env, napi_callback_info info);
     static napi_value SetSystemLanguage(napi_env env, napi_callback_info info);

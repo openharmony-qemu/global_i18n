@@ -17,6 +17,7 @@
 
 #include "error_util.h"
 #include "i18n_hilog.h"
+#include "js_utils.h"
 #include "variable_convertor.h"
 
 namespace OHOS {
@@ -44,6 +45,11 @@ void StyledDateTimeFormatAddon::Destructor(napi_env env, void *nativeObject, voi
 
 napi_value StyledDateTimeFormatAddon::InitStyledDateTimeFormat(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitStyledDateTimeFormat");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("format", Format)
     };

@@ -53,6 +53,11 @@ void JSRelativeTimeFormatAddon::Destructor(napi_env env, void *nativeObject, voi
 
 napi_value JSRelativeTimeFormatAddon::InitJsRelativeTimeFormat(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitJsRelativeTimeFormat");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("format", Format),
         DECLARE_NAPI_FUNCTION("formatToParts", FormatToParts),

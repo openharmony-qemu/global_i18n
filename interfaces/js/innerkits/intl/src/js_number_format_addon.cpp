@@ -44,6 +44,11 @@ void JSNumberFormatAddon::Destructor(napi_env env, void *nativeObject, void *hin
 
 napi_value JSNumberFormatAddon::InitJsNumberFormat(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitJsNumberFormat");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("format", FormatNumber),
         DECLARE_NAPI_FUNCTION("formatToParts", FormatToParts),
