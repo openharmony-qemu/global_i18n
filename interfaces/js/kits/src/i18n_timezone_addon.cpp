@@ -60,6 +60,11 @@ napi_value I18nTimeZoneAddon::GetI18nTimeZone(napi_env env, napi_callback_info i
 
 napi_value I18nTimeZoneAddon::InitI18nTimeZone(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitI18nTimeZone");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("getID", GetID),
         DECLARE_NAPI_FUNCTION("getDisplayName", GetTimeZoneDisplayName),
@@ -90,6 +95,11 @@ napi_value I18nTimeZoneAddon::InitI18nTimeZone(napi_env env, napi_value exports)
 
 napi_value I18nTimeZoneAddon::InitTimeZone(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitTimeZone");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_STATIC_FUNCTION("getAvailableIDs", GetAvailableTimezoneIDs),
         DECLARE_NAPI_STATIC_FUNCTION("getAvailableZoneCityIDs", GetAvailableZoneCityIDs),

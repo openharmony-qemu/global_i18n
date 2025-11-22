@@ -50,6 +50,11 @@ napi_value LocaleInfoAddon::SetProperty(napi_env env, napi_callback_info info)
 
 napi_value LocaleInfoAddon::InitLocale(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitLocale");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_GETTER_SETTER("language", GetLanguage, SetProperty),
         DECLARE_NAPI_GETTER_SETTER("baseName", GetBaseName, SetProperty),

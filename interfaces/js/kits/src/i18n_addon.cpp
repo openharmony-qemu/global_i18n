@@ -88,6 +88,11 @@ void I18nAddon::Destructor(napi_env env, void *nativeObject, void *hint)
 
 napi_value I18nAddon::InitI18nUtil(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitI18nUtil");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_STATIC_FUNCTION("unitConvert", UnitConvert),
         DECLARE_NAPI_STATIC_FUNCTION("getDateOrder", GetDateOrder),
@@ -528,6 +533,11 @@ napi_value I18nAddon::GetThreeLetterRegion(napi_env env, napi_callback_info info
 
 napi_value I18nAddon::InitI18nTransliterator(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitI18nTransliterator");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("transform", Transform),
     };
@@ -554,6 +564,11 @@ napi_value I18nAddon::InitI18nTransliterator(napi_env env, napi_value exports)
 
 napi_value I18nAddon::InitTransliterator(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitTransliterator");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_STATIC_FUNCTION("getAvailableIDs", GetAvailableIDs),
         DECLARE_NAPI_STATIC_FUNCTION("getInstance", GetTransliteratorInstance)
@@ -851,6 +866,11 @@ char I18nAddon::GetDelimiter(napi_env env, napi_value argVal)
 
 napi_value I18nAddon::InitPhoneNumberFormat(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitPhoneNumberFormat");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("isValidNumber", IsValidPhoneNumber),
         DECLARE_NAPI_FUNCTION("format", FormatPhoneNumber),
@@ -1070,6 +1090,11 @@ napi_value I18nAddon::FormatPhoneNumber(napi_env env, napi_callback_info info)
 
 napi_value I18nAddon::InitI18nIndexUtil(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitI18nIndexUtil");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("getIndexList", GetIndexList),
         DECLARE_NAPI_FUNCTION("addLocale", AddLocale),
@@ -1094,6 +1119,11 @@ napi_value I18nAddon::InitI18nIndexUtil(napi_env env, napi_value exports)
 
 napi_value I18nAddon::InitIndexUtil(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitIndexUtil");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {};
     napi_value constructor = nullptr;
     napi_status status = napi_define_class(env, "I18nIndexUtil", NAPI_AUTO_LENGTH, JSUtils::DefaultConstructor,
@@ -1155,6 +1185,11 @@ napi_value I18nAddon::I18nBreakIteratorConstructor(napi_env env, napi_callback_i
 
 napi_value I18nAddon::InitI18nBreakIterator(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitI18nBreakIterator");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("current", Current),
         DECLARE_NAPI_FUNCTION("first", First),
@@ -1189,6 +1224,11 @@ napi_value I18nAddon::InitI18nBreakIterator(napi_env env, napi_value exports)
 
 napi_value I18nAddon::InitBreakIterator(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitBreakIterator");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {};
     napi_value constructor = nullptr;
     napi_status status = napi_define_class(env, "I18nBreakIterator", NAPI_AUTO_LENGTH, JSUtils::DefaultConstructor,
@@ -1784,6 +1824,11 @@ napi_value I18nAddon::ObjectConstructor(napi_env env, napi_callback_info info)
 
 napi_value I18nAddon::InitUtil(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitUtil");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("unitConvert", UnitConvert)
     };

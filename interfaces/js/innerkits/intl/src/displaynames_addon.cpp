@@ -39,6 +39,11 @@ void DisplayNamesAddon::Destructor(napi_env env, void *nativeObject, void *hint)
 
 napi_value DisplayNamesAddon::InitDisplayNames(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitDisplayNames");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("of", Of),
         DECLARE_NAPI_FUNCTION("resolvedOptions", ResolvedOptions),

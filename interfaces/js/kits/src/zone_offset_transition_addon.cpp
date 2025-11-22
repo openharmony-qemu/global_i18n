@@ -39,6 +39,11 @@ void ZoneOffsetTransitionAddon::Destructor(napi_env env, void *nativeObject, voi
 
 napi_value ZoneOffsetTransitionAddon::InitZoneOffsetTransition(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitZoneOffsetTransition");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("getMilliseconds", GetMilliseconds),
         DECLARE_NAPI_FUNCTION("getOffsetAfter", GetOffsetAfter),

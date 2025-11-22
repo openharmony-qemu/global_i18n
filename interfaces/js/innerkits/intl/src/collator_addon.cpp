@@ -40,6 +40,11 @@ void CollatorAddon::Destructor(napi_env env, void *nativeObject, void *hint)
 
 napi_value CollatorAddon::InitCollator(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitCollator");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("compare", CompareString),
         DECLARE_NAPI_FUNCTION("resolvedOptions", GetCollatorResolvedOptions),

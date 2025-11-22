@@ -46,6 +46,11 @@ void IntlDateTimeFormatAddon::Destructor(napi_env /* env */, void* nativeObject,
 
 napi_value IntlDateTimeFormatAddon::InitIntlDateTimeFormat(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitIntlDateTimeFormat");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("format", Format),
         DECLARE_NAPI_FUNCTION("formatToParts", FormatToParts),

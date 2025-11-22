@@ -16,6 +16,7 @@
 #include <vector>
 #include "error_util.h"
 #include "i18n_hilog.h"
+#include "js_utils.h"
 #include "locale_config.h"
 #include "variable_convertor.h"
 #include "holiday_manager_addon.h"
@@ -40,6 +41,11 @@ void HolidayManagerAddon::Destructor(napi_env env, void *nativeObject, void *hin
 
 napi_value HolidayManagerAddon::InitHolidayManager(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitHolidayManager");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("isHoliday", IsHoliday),
         DECLARE_NAPI_FUNCTION("getHolidayInfoItemArray", GetHolidayInfoItemArray)
