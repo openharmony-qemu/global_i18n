@@ -438,9 +438,15 @@ void NumberFormat::SetRoundingProperties(icu::number::UnlocalizedNumberFormatter
 
 void NumberFormat::HandleRoundingPriority(icu::number::UnlocalizedNumberFormatter &formatter)
 {
-    if (roundingPriorityStr.empty()) {
+    if (roundingPriorityStr.empty() && !fromArkTs) {
         return;
     }
+    bool setFractionDigits = !minimumFractionDigits.empty() || !maximumFractionDigits.empty();
+    bool setSignificantDigit = !minimumSignificantDigits.empty() || !maximumSignificantDigits.empty();
+    if (fromArkTs && !(setFractionDigits && setSignificantDigit)) {
+        return;
+    }
+
     int32_t minFractionDigits = GetMinimumFractionDigitsValue();
     int32_t maxFractionDigits = GetMaximumFractionDigitsValue();
     int32_t maxSigDigits = GetMaximumSignificantDigitsIntValue();
