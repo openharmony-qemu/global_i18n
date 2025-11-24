@@ -70,6 +70,32 @@ std::unordered_map<std::string, int32_t> I18nAddon::EnumWeekDay {
     { "SUN", 7 }
 };
 
+std::unordered_map<std::string, int32_t> I18nAddon::EnumUnitUsage {
+    { "AREA_LAND_AGRICULT", 1 },
+    { "AREA_LAND_COMMERCL", 2 },
+    { "AREA_LAND_RESIDNTL", 3 },
+    { "LENGTH_PERSON", 4 },
+    { "LENGTH_PERSON_SMALL", 5 },
+    { "LENGTH_RAINFALL", 6 },
+    { "LENGTH_ROAD", 7 },
+    { "LENGTH_ROAD_SMALL", 8 },
+    { "LENGTH_SNOWFALL", 9 },
+    { "LENGTH_VEHICLE", 10 },
+    { "LENGTH_VISIBLTY", 11 },
+    { "LENGTH_VISIBLTY_SMALL", 12 },
+    { "LENGTH_PERSON_INFORMAL", 13 },
+    { "LENGTH_PERSON_SMALL_INFORMAL", 14 },
+    { "LENGTH_ROAD_INFORMAL", 15 },
+    { "SPEED_ROAD_TRAVEL", 16 },
+    { "SPEED_WIND", 17 },
+    { "TEMPERATURE_PERSON", 18 },
+    { "TEMPERATURE_WEATHER", 19 },
+    { "VOLUME_VEHICLE_FUEL", 20 },
+    { "ELAPSED_TIME_SECOND", 21 },
+    { "SIZE_FILE_BYTE", 22 },
+    { "SIZE_SHORTFILE_BYTE", 23 }
+};
+
 I18nAddon::I18nAddon() : env_(nullptr) {}
 
 I18nAddon::~I18nAddon()
@@ -145,7 +171,8 @@ napi_value I18nAddon::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getTimeZone", I18nTimeZoneAddon::GetI18nTimeZone),
         DECLARE_NAPI_PROPERTY("NormalizerMode", I18nNormalizerAddon::CreateI18NNormalizerModeEnum(env)),
         DECLARE_NAPI_PROPERTY("TemperatureType", CreateTemperatureTypeEnum(env)),
-        DECLARE_NAPI_PROPERTY("WeekDay", CreateWeekDayEnum(env))
+        DECLARE_NAPI_PROPERTY("WeekDay", CreateWeekDayEnum(env)),
+        DECLARE_NAPI_PROPERTY("UnitUsage", CreateUnitUsageEnum(env))
     };
     napi_status initStatus = napi_define_properties(env, exports, sizeof(properties) / sizeof(napi_property_descriptor),
         properties);
@@ -1889,6 +1916,27 @@ napi_value I18nAddon::CreateWeekDayEnum(napi_env env)
         }
     }
     return weekDay;
+}
+
+napi_value I18nAddon::CreateUnitUsageEnum(napi_env env)
+{
+    napi_value unitUsage = nullptr;
+    napi_status status = napi_create_object(env, &unitUsage);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("I18nAddon::CreateUnitUsageEnum: Create unitUsage failed.");
+        return nullptr;
+    }
+    for (auto& nameToValue : EnumUnitUsage) {
+        std::string name = nameToValue.first;
+        int32_t value = static_cast<int32_t>(nameToValue.second);
+        status = VariableConvertor::SetEnumValue(env, unitUsage, name, value);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("I18nAddon::CreateUnitUsageEnum: set enum name %{public}s failed.",
+                name.c_str());
+            return nullptr;
+        }
+    }
+    return unitUsage;
 }
 
 napi_value Init(napi_env env, napi_value exports)

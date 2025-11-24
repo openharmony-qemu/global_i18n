@@ -105,8 +105,10 @@ private:
     static napi_value ObjectConstructor(napi_env env, napi_callback_info info);
     static napi_value CreateTemperatureTypeEnum(napi_env env);
     static napi_value CreateWeekDayEnum(napi_env env);
+    static napi_value CreateUnitUsageEnum(napi_env env);
     static std::unordered_map<std::string, int32_t> EnumTemperatureType;
     static std::unordered_map<std::string, int32_t> EnumWeekDay;
+    static std::unordered_map<std::string, int32_t> EnumUnitUsage;
 
     napi_env env_;
     static const char PATH_SEPARATOR = '/';
