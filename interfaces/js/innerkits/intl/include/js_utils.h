@@ -183,35 +183,6 @@ public:
         }
     }
 };
-
-class HandleScope {
-public:
-    /**
-     * @brief Constructs a new napi_handle_scope for managing JavaScript object lifetimes.
-     *
-     * @param env Node-API environment object.
-     * @param location Debug location information identifying where the HandleScope was created.
-     */
-    HandleScope(napi_env env, const std::string& location);
-
-    /**
-     * @brief Destructor that automatically closes the HandleScope.
-     */
-    ~HandleScope();
-
-    /**
-     * @brief Checks if the HandleScope is currently open.
-     *
-     * @return bool Returns true if the HandleScope is open, false if closed.
-     */
-    bool IsOpen() const;
-
-private:
-    napi_env env_;
-    napi_handle_scope scope_;
-    std::string location_;
-    bool isOpen_;
-};
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

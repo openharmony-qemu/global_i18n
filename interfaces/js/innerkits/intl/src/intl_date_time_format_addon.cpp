@@ -19,6 +19,7 @@
 #include "error_util.h"
 #include "i18n_hilog.h"
 #include "intl_date_time_format.h"
+#include "js_lifecycle_managers.h"
 #include "js_utils.h"
 #include "utils.h"
 

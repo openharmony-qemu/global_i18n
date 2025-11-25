@@ -17,6 +17,7 @@
 #include <cmath>
 #include "error_util.h"
 #include "i18n_hilog.h"
+#include "js_lifecycle_managers.h"
 #include "js_utils.h"
 #include "locale_helper.h"
 #include "utils.h"

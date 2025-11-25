@@ -616,32 +616,6 @@ napi_value JSUtils::GetConstructor(napi_env env, const std::string& className)
     }
     return constructor;
 }
-
-HandleScope::HandleScope(napi_env env, const std::string& location) : env_(env), location_(location)
-{
-    isOpen_ = true;
-    napi_status status = napi_open_handle_scope(env_, &scope_);
-    if (status != napi_ok) {
-        isOpen_ = false;
-        HILOG_ERROR_I18N("Failed to open handle scope at: %{public}s", location_.c_str());
-    }
-}
-
-HandleScope::~HandleScope()
-{
-    if (!isOpen_) {
-        return;
-    }
-    napi_status status = napi_close_handle_scope(env_, scope_);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("Failed to close handle scope at: %{public}s", location_.c_str());
-    }
-}
-
-bool HandleScope::IsOpen() const
-{
-    return isOpen_;
-}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

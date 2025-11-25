@@ -58,6 +58,7 @@ ohos_shared_library("intl_napi") {
     "src/intl_number_format_addon.cpp",
     "src/intl_plural_rules_addon.cpp",
     "src/intl_relative_time_format_addon.cpp",
+    "src/js_lifecycle_managers.cpp",
     "src/js_utils.cpp",
     "src/locale_info_addon.cpp",
     "src/number_format_addon.cpp",

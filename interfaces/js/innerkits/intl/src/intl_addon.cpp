@@ -27,6 +27,7 @@
 #include "intl_number_format_addon.h"
 #include "intl_plural_rules_addon.h"
 #include "intl_relative_time_format_addon.h"
+#include "js_lifecycle_managers.h"
 #include "js_utils.h"
 #include "locale_info_addon.h"
 #include "number_format_addon.h"

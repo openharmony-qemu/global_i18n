@@ -17,6 +17,7 @@
 
 #include "error_util.h"
 #include "i18n_hilog.h"
+#include "js_lifecycle_managers.h"
 #include "js_utils.h"
 #include "variable_convertor.h"
 
@@ -152,7 +153,7 @@ napi_value StyledNumberFormatAddon::Format(napi_env env, napi_callback_info info
     std::vector<StyledNumberFormat::NumberPart> numberParts = obj->styledNumberFormat_->ParseToParts(number);
 
     napi_value styleOption = CreateStyleOptions(env, numberParts, obj->styledNumberFormatOptions_);
-    
+
     napi_value styledString = CreateStyledString(env, formattedNumber, styleOption);
     return styledString;
 }
