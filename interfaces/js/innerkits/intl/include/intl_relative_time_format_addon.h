@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_GLOBAL_I18N_JS_RELATIVE_TIME_FORMAT_ADDON_H
-#define OHOS_GLOBAL_I18N_JS_RELATIVE_TIME_FORMAT_ADDON_H
+#ifndef OHOS_GLOBAL_I18N_INTL_RELATIVE_TIME_FORMAT_ADDON_H
+#define OHOS_GLOBAL_I18N_INTL_RELATIVE_TIME_FORMAT_ADDON_H
 
 #include <memory>
 
@@ -28,12 +28,12 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-class JSRelativeTimeFormatAddon {
+class IntlRelativeTimeFormatAddon {
 public:
-    JSRelativeTimeFormatAddon();
-    ~JSRelativeTimeFormatAddon();
+    IntlRelativeTimeFormatAddon();
+    ~IntlRelativeTimeFormatAddon();
     static void Destructor(napi_env env, void *nativeObject, void *hint);
-    static napi_value InitJsRelativeTimeFormat(napi_env env, napi_value exports);
+    static napi_value InitIntlRelativeTimeFormat(napi_env env, napi_value exports);
 
 private:
     static napi_value RelativeTimeFormatConstructor(napi_env env, napi_callback_info info);

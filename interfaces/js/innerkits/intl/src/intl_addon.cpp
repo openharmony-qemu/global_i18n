@@ -24,9 +24,9 @@
 #include "error_util.h"
 #include "i18n_hilog.h"
 #include "intl_date_time_format_addon.h"
+#include "intl_number_format_addon.h"
 #include "intl_plural_rules_addon.h"
-#include "js_number_format_addon.h"
-#include "js_relative_time_format_addon.h"
+#include "intl_relative_time_format_addon.h"
 #include "js_utils.h"
 #include "locale_info_addon.h"
 #include "number_format_addon.h"
@@ -1172,7 +1172,7 @@ bool BindingIntlModules(napi_env env, napi_value &intlModule)
         HILOG_ERROR_I18N("RegisterIntl: init Intl DisplayNames Module failed");
         return false;
     }
-    intlModule = OHOS::Global::I18n::JSNumberFormatAddon::InitJsNumberFormat(env, intlModule);
+    intlModule = OHOS::Global::I18n::IntlNumberFormatAddon::InitIntlNumberFormat(env, intlModule);
     if (intlModule == nullptr) {
         HILOG_ERROR_I18N("RegisterIntl: init Intl NumberFormat Module failed");
         return false;
@@ -1187,7 +1187,7 @@ bool BindingIntlModules(napi_env env, napi_value &intlModule)
         HILOG_ERROR_I18N("RegisterIntl: init Intl PluralRules Module failed");
         return false;
     }
-    intlModule = OHOS::Global::I18n::JSRelativeTimeFormatAddon::InitJsRelativeTimeFormat(env, intlModule);
+    intlModule = OHOS::Global::I18n::IntlRelativeTimeFormatAddon::InitIntlRelativeTimeFormat(env, intlModule);
     if (intlModule == nullptr) {
         HILOG_ERROR_I18N("RegisterIntl: init Intl RelativeTimeFormat Module failed");
         return false;

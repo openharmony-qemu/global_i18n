@@ -84,10 +84,10 @@ napi_value StyledNumberFormatAddon::constructor(napi_env env, napi_callback_info
         return nullptr;
     }
     NumberFormatAddon *numberFormatAddon = nullptr;
-    JSNumberFormatAddon *jsNumberFormatAddon = nullptr;
+    IntlNumberFormatAddon *intlNumberFormatAddon = nullptr;
     SimpleNumberFormatAddon *simpleNumberFormatAddon = nullptr;
-    GetNumberFmtOrSimpleNumberFmt(env, argv[0], &jsNumberFormatAddon, &simpleNumberFormatAddon, &numberFormatAddon);
-    if (!numberFormatAddon && !simpleNumberFormatAddon && !jsNumberFormatAddon) {
+    GetNumberFmtOrSimpleNumberFmt(env, argv[0], &intlNumberFormatAddon, &simpleNumberFormatAddon, &numberFormatAddon);
+    if (!numberFormatAddon && !simpleNumberFormatAddon && !intlNumberFormatAddon) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "numberFormat",
             "intl.NumberFormat or SimpleNumberFormat or Intl.NumberFormat", true);
         return nullptr;
@@ -102,7 +102,7 @@ napi_value StyledNumberFormatAddon::constructor(napi_env env, napi_callback_info
         HILOG_ERROR_I18N("StyledNumberFormatAddon::constructor napi_wrap error");
         return nullptr;
     }
-    if (!obj->InitStyledNumberFormatContent(env, jsNumberFormatAddon, simpleNumberFormatAddon,
+    if (!obj->InitStyledNumberFormatContent(env, intlNumberFormatAddon, simpleNumberFormatAddon,
         numberFormatAddon, argv[1])) {
         return nullptr;
     }
@@ -157,12 +157,12 @@ napi_value StyledNumberFormatAddon::Format(napi_env env, napi_callback_info info
     return styledString;
 }
 
-bool StyledNumberFormatAddon::InitStyledNumberFormatContent(napi_env env, JSNumberFormatAddon* jsNumberFormatAddon,
+bool StyledNumberFormatAddon::InitStyledNumberFormatContent(napi_env env, IntlNumberFormatAddon* intlNumberFormatAddon,
     SimpleNumberFormatAddon* simpleNumberFormatAddon, NumberFormatAddon *numberFormatAddon, napi_value options)
 {
-    if (jsNumberFormatAddon) {
+    if (intlNumberFormatAddon) {
         styledNumberFormat_ =
-            std::make_unique<StyledNumberFormat>(true, jsNumberFormatAddon->GetNumberFormat(), nullptr);
+            std::make_unique<StyledNumberFormat>(true, intlNumberFormatAddon->GetNumberFormat(), nullptr);
     } else if (numberFormatAddon) {
         styledNumberFormat_ =
             std::make_unique<StyledNumberFormat>(true, numberFormatAddon->CopyNumberFormat(), nullptr);
@@ -330,7 +330,7 @@ void StyledNumberFormatAddon::SetNamedProperty(napi_env env, napi_value &option,
 }
 
 void StyledNumberFormatAddon::GetNumberFmtOrSimpleNumberFmt(napi_env env, napi_value arg,
-    JSNumberFormatAddon **jsNumberformatAddon, SimpleNumberFormatAddon **simpleNumberFormatAddon,
+    IntlNumberFormatAddon **intlNumberFormatAddon, SimpleNumberFormatAddon **simpleNumberFormatAddon,
     NumberFormatAddon **numberFormatAddon)
 {
     napi_valuetype valueType = napi_valuetype::napi_undefined;
@@ -343,9 +343,9 @@ void StyledNumberFormatAddon::GetNumberFmtOrSimpleNumberFmt(napi_env env, napi_v
         return;
     }
     if (IsIntlNumberFormatInstance(env, arg)) {
-        status = napi_unwrap(env, arg, reinterpret_cast<void **>(jsNumberformatAddon));
-        if (status != napi_ok && jsNumberformatAddon != nullptr) {
-            *jsNumberformatAddon = nullptr;
+        status = napi_unwrap(env, arg, reinterpret_cast<void **>(intlNumberFormatAddon));
+        if (status != napi_ok && intlNumberFormatAddon != nullptr) {
+            *intlNumberFormatAddon = nullptr;
         }
     } else if (IsNumberFormatInstance(env, arg, "@ohos.intl")) {
         status = napi_unwrap(env, arg, reinterpret_cast<void **>(numberFormatAddon));
