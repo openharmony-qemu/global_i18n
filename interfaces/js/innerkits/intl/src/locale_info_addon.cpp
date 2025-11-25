@@ -90,6 +90,8 @@ napi_value LocaleInfoAddon::InitLocale(napi_env env, napi_value exports)
     status = napi_create_reference(env, constructor, 1, g_constructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Failed to create reference at init");
+        delete g_constructor;
+        g_constructor = nullptr;
         return nullptr;
     }
     return exports;
