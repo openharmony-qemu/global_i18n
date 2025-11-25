@@ -25,6 +25,7 @@
 #include "i18n_system_addon.h"
 #include "i18n_timezone_addon.h"
 #include "i18n_unicode_addon.h"
+#include "js_lifecycle_managers.h"
 #include "js_utils.h"
 #include "locale_config.h"
 #include "locale_info.h"
@@ -50,9 +51,9 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static thread_local napi_ref* g_brkConstructor = nullptr;
-static thread_local napi_ref g_indexUtilConstructor = nullptr;
-static thread_local napi_ref* g_transConstructor = nullptr;
+static thread_local ThreadReference* g_brkConstructor = nullptr;
+static thread_local ThreadReference* g_indexUtilConstructor = nullptr;
+static thread_local ThreadReference* g_transConstructor = nullptr;
 
 std::unordered_map<std::string, int32_t> I18nAddon::EnumTemperatureType {
     { "CELSIUS", 1 },
@@ -576,14 +577,9 @@ napi_value I18nAddon::InitI18nTransliterator(napi_env env, napi_value exports)
         return nullptr;
     }
     exports = I18nAddon::InitTransliterator(env, exports);
-    g_transConstructor = new (std::nothrow) napi_ref;
+    g_transConstructor = ThreadReference::CreateInstance(env, constructor, 1);
     if (!g_transConstructor) {
         HILOG_ERROR_I18N("InitI18nTransliterator: Failed to create trans ref at init");
-        return nullptr;
-    }
-    status = napi_create_reference(env, constructor, 1, g_transConstructor);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("InitI18nTransliterator: Failed to create trans reference at init");
         return nullptr;
     }
     return exports;
@@ -776,8 +772,7 @@ napi_value I18nAddon::GetTransliteratorInstance(napi_env env, napi_callback_info
         HILOG_ERROR_I18N("Failed to create g_transConstructor");
         return nullptr;
     }
-    status = napi_get_reference_value(env, *g_transConstructor, &constructor);
-    if (status != napi_ok) {
+    if (!g_transConstructor->GetReferenceValue(env, &constructor)) {
         HILOG_ERROR_I18N("Failed to create reference at GetCalendar");
         return nullptr;
     }
@@ -1136,8 +1131,8 @@ napi_value I18nAddon::InitI18nIndexUtil(napi_env env, napi_value exports)
         return nullptr;
     }
     exports = I18nAddon::InitIndexUtil(env, exports);
-    status = napi_create_reference(env, constructor, 1, &g_indexUtilConstructor);
-    if (status != napi_ok) {
+    g_indexUtilConstructor = ThreadReference::CreateInstance(env, constructor, 1);
+    if (!g_indexUtilConstructor) {
         HILOG_ERROR_I18N("InitI18nIndexUtil: Failed to create reference at init.");
         return nullptr;
     }
@@ -1236,14 +1231,9 @@ napi_value I18nAddon::InitI18nBreakIterator(napi_env env, napi_value exports)
         return nullptr;
     }
     exports = I18nAddon::InitBreakIterator(env, exports);
-    g_brkConstructor = new (std::nothrow) napi_ref;
+    g_brkConstructor = ThreadReference::CreateInstance(env, constructor, 1);
     if (!g_brkConstructor) {
         HILOG_ERROR_I18N("InitI18nBreakIterator: Failed to create brkiterator ref at init");
-        return nullptr;
-    }
-    status = napi_create_reference(env, constructor, 1, g_brkConstructor);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("InitI18nBreakIterator: Failed to create reference g_brkConstructor at init");
         return nullptr;
     }
     return exports;
@@ -1287,8 +1277,7 @@ napi_value I18nAddon::GetLineInstance(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("Failed to create g_brkConstructor");
         return nullptr;
     }
-    status = napi_get_reference_value(env, *g_brkConstructor, &constructor);
-    if (status != napi_ok) {
+    if (!g_brkConstructor->GetReferenceValue(env, &constructor)) {
         HILOG_ERROR_I18N("Failed to create reference at GetLineInstance");
         return nullptr;
     }
@@ -1686,8 +1675,7 @@ napi_value I18nAddon::GetIndexUtil(napi_env env, napi_callback_info info)
         return nullptr;
     }
     napi_value constructor = nullptr;
-    status = napi_get_reference_value(env, g_indexUtilConstructor, &constructor);
-    if (status != napi_ok) {
+    if (!g_indexUtilConstructor->GetReferenceValue(env, &constructor)) {
         HILOG_ERROR_I18N("Failed to create reference at GetIndexUtil");
         return nullptr;
     }

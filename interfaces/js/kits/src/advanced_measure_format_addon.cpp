@@ -16,6 +16,7 @@
 
 #include "error_util.h"
 #include "intl_number_format_addon.h"
+#include "js_lifecycle_managers.h"
 #include "js_utils.h"
 #include "variable_convertor.h"
 

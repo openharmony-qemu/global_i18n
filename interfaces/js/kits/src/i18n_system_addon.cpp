@@ -19,6 +19,7 @@
 #include "i18n_service_ability_client.h"
 #include "i18n_service_ability_load_manager.h"
 #include "i18n_system_addon.h"
+#include "js_lifecycle_managers.h"
 #include "js_utils.h"
 #include "locale_config.h"
 #include "locale_info.h"
@@ -103,7 +104,7 @@ napi_value I18nSystemAddon::InitI18nSystem(napi_env env, napi_value exports)
     if (!scope.IsOpen()) {
         return nullptr;
     }
-   
+
     std::vector<napi_property_descriptor> properties = GetI18nSystemProperty();
     napi_value constructor = nullptr;
     napi_status status = napi_define_class(env, "System", NAPI_AUTO_LENGTH, JSUtils::DefaultConstructor, nullptr,

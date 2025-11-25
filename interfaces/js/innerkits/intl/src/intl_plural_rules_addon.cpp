@@ -15,6 +15,7 @@
 
 #include "intl_plural_rules_addon.h"
 #include "i18n_hilog.h"
+#include "js_lifecycle_managers.h"
 #include "js_utils.h"
 
 namespace OHOS {
