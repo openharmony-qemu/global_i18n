@@ -16,6 +16,7 @@
 #include "error_util.h"
 #include "i18n_hilog.h"
 #include "i18n_timezone_addon.h"
+#include "js_lifecycle_managers.h"
 #include "js_utils.h"
 #include "variable_convertor.h"
 #include "zone_rules_addon.h"
@@ -23,7 +24,7 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static thread_local napi_ref* g_timezoneConstructor = nullptr;
+static thread_local ThreadReference* g_timezoneConstructor = nullptr;
 
 I18nTimeZoneAddon::I18nTimeZoneAddon() {}
 
@@ -80,14 +81,9 @@ napi_value I18nTimeZoneAddon::InitI18nTimeZone(napi_env env, napi_value exports)
         return nullptr;
     }
     exports = I18nTimeZoneAddon::InitTimeZone(env, exports);
-    g_timezoneConstructor = new (std::nothrow) napi_ref;
+    g_timezoneConstructor = ThreadReference::CreateInstance(env, constructor, 1);
     if (!g_timezoneConstructor) {
         HILOG_ERROR_I18N("InitI18nTimeZone: Failed to create TimeZone ref at init");
-        return nullptr;
-    }
-    status = napi_create_reference(env, constructor, 1, g_timezoneConstructor);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("InitI18nTimeZone: Failed to create reference g_timezoneConstructor at init");
         return nullptr;
     }
     return exports;
@@ -533,14 +529,13 @@ napi_value I18nTimeZoneAddon::StaticGetTimeZone(napi_env env, napi_value *argv, 
         HILOG_ERROR_I18N("Failed to create g_timezoneConstructor");
         return nullptr;
     }
-    napi_status status = napi_get_reference_value(env, *g_timezoneConstructor, &constructor);
-    if (status != napi_ok) {
+    if (!g_timezoneConstructor->GetReferenceValue(env, &constructor)) {
         HILOG_ERROR_I18N("Failed to create reference at StaticGetTimeZone");
         return nullptr;
     }
     napi_value newArgv[2] = { 0 };
     newArgv[0] = argv[0];
-    status = napi_get_boolean(env, isZoneID, &newArgv[1]);
+    napi_status status = napi_get_boolean(env, isZoneID, &newArgv[1]);
     if (status != napi_ok) {
         return nullptr;
     }

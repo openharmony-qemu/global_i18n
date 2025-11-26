@@ -15,7 +15,8 @@
 #include "advanced_measure_format_addon.h"
 
 #include "error_util.h"
-#include "js_number_format_addon.h"
+#include "intl_number_format_addon.h"
+#include "js_lifecycle_managers.h"
 #include "js_utils.h"
 #include "variable_convertor.h"
 
@@ -76,10 +77,10 @@ napi_value AdvancedMeasureFormatAddon::Constructor(napi_env env, napi_callback_i
         return nullptr;
     }
 
-    JSNumberFormatAddon* jsNumberFormatAddon = nullptr;
-    status = napi_unwrap(env, argv[0], reinterpret_cast<void **>(&jsNumberFormatAddon));
-    if (status != napi_ok || jsNumberFormatAddon == nullptr) {
-        HILOG_ERROR_I18N("AdvancedMeasureFormatAddon::Constructor: Unwrap JSNumberFormatAddon failed.");
+    IntlNumberFormatAddon* intlNumberFormatAddon = nullptr;
+    status = napi_unwrap(env, argv[0], reinterpret_cast<void **>(&intlNumberFormatAddon));
+    if (status != napi_ok || intlNumberFormatAddon == nullptr) {
+        HILOG_ERROR_I18N("AdvancedMeasureFormatAddon::Constructor: Unwrap IntlNumberFormatAddon failed.");
         return nullptr;
     }
 
@@ -91,7 +92,7 @@ napi_value AdvancedMeasureFormatAddon::Constructor(napi_env env, napi_callback_i
         HILOG_ERROR_I18N("AdvancedMeasureFormatAddon::Constructor: Wrap AdvancedMeasureFormatAddon failed.");
         return nullptr;
     }
-    if (!obj->InitContext(env, jsNumberFormatAddon->GetNumberFormat(), options)) {
+    if (!obj->InitContext(env, intlNumberFormatAddon->GetNumberFormat(), options)) {
         HILOG_ERROR_I18N("AdvancedMeasureFormatAddon::Constructor: Init context failed.");
         return nullptr;
     }

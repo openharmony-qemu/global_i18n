@@ -12,9 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include "error_util.h"
 #include "i18n_hilog.h"
+#include "js_lifecycle_managers.h"
 #include "js_utils.h"
 #include "locale_info_addon.h"
 #include "variable_convertor.h"
@@ -23,7 +24,7 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static thread_local napi_ref* g_SimpleDateTimeFormatConstructor = nullptr;
+static thread_local ThreadReference* g_SimpleDateTimeFormatConstructor = nullptr;
 static const size_t SIZE_WITHOUR_LOCALE = 2;
 static const size_t SIZE_WITH_LOCALE = 3;
 
@@ -60,15 +61,9 @@ napi_value SimpleDateTimeFormatAddon::InitSimpleDateTimeFormat(napi_env env, nap
         return nullptr;
     }
 
-    g_SimpleDateTimeFormatConstructor = new (std::nothrow) napi_ref;
+    g_SimpleDateTimeFormatConstructor = ThreadReference::CreateInstance(env, constructor, 1);
     if (!g_SimpleDateTimeFormatConstructor) {
         HILOG_ERROR_I18N("InitSimpleDateTimeFormat: Failed to create SimpleDateTimeFormat ref at init");
-        return nullptr;
-    }
-    status = napi_create_reference(env, constructor, 1, g_SimpleDateTimeFormatConstructor);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N(
-            "InitSimpleDateTimeFormat: Failed to create reference g_SimpleDateTimeFormatConstructor at init.");
         return nullptr;
     }
 
@@ -93,8 +88,7 @@ napi_value SimpleDateTimeFormatAddon::GetSimpleDateTimeFormatByPattern(napi_env 
         HILOG_ERROR_I18N("Failed to create g_SimpleDateTimeFormatConstructor");
         return nullptr;
     }
-    napi_status status = napi_get_reference_value(env, *g_SimpleDateTimeFormatConstructor, &constructor);
-    if (status != napi_ok) {
+    if (!g_SimpleDateTimeFormatConstructor->GetReferenceValue(env, &constructor)) {
         HILOG_ERROR_I18N("GetSimpleDateTimeFormatByPattern: Failed to create reference.");
         return nullptr;
     }
@@ -103,7 +97,7 @@ napi_value SimpleDateTimeFormatAddon::GetSimpleDateTimeFormatByPattern(napi_env 
         argv[i] = parameters[i];
     }
     napi_value result = nullptr;
-    status = napi_new_instance(env, constructor, argc, argv, &result);
+    napi_status status = napi_new_instance(env, constructor, argc, argv, &result);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("GetSimpleDateTimeFormatByPattern: Create instance failed");
         return nullptr;
@@ -120,8 +114,11 @@ napi_value SimpleDateTimeFormatAddon::GetSimpleDateTimeFormatBySkeleton(napi_env
         return nullptr;
     }
     napi_value constructor = nullptr;
-    napi_status status = napi_get_reference_value(env, *g_SimpleDateTimeFormatConstructor, &constructor);
-    if (status != napi_ok) {
+    if (g_SimpleDateTimeFormatConstructor == nullptr) {
+        HILOG_ERROR_I18N("Failed to create g_SimpleDateTimeFormatConstructor.");
+        return nullptr;
+    }
+    if (!g_SimpleDateTimeFormatConstructor->GetReferenceValue(env, &constructor)) {
         HILOG_ERROR_I18N("GetSimpleDateTimeFormatBySkeleton: Failed to create reference.");
         return nullptr;
     }
@@ -130,7 +127,7 @@ napi_value SimpleDateTimeFormatAddon::GetSimpleDateTimeFormatBySkeleton(napi_env
         argv[i] = parameters[i];
     }
     napi_value result = nullptr;
-    status = napi_new_instance(env, constructor, argc, argv, &result);
+    napi_status status = napi_new_instance(env, constructor, argc, argv, &result);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("GetSimpleDateTimeFormatBySkeleton: Create instance failed");
         return nullptr;
@@ -301,14 +298,13 @@ bool SimpleDateTimeFormatAddon::IsSimpleDateTimeFormat(napi_env env, napi_value 
         return false;
     }
     napi_value constructor = nullptr;
-    napi_status status = napi_get_reference_value(env, *g_SimpleDateTimeFormatConstructor, &constructor);
-    if (status != napi_ok || constructor == nullptr) {
+    if (!g_SimpleDateTimeFormatConstructor->GetReferenceValue(env, &constructor)) {
         HILOG_ERROR_I18N("SimpleDateTimeFormatAddon::IsSimpleDateTimeFormat: Failed to create reference.");
         return false;
     }
 
     bool isSimpleDateTimeFormat = false;
-    status = napi_instanceof(env, argv, constructor, &isSimpleDateTimeFormat);
+    napi_status status = napi_instanceof(env, argv, constructor, &isSimpleDateTimeFormat);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("SimpleDateTimeFormatAddon::IsSimpleDateTimeFormat: Failed to get instance of argv.");
         return false;

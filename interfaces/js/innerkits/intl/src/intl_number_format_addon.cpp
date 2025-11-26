@@ -12,11 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "js_number_format_addon.h"
+#include "intl_number_format_addon.h"
 
 #include <cmath>
 #include "error_util.h"
 #include "i18n_hilog.h"
+#include "js_lifecycle_managers.h"
 #include "js_utils.h"
 #include "locale_helper.h"
 #include "utils.h"
@@ -25,26 +26,26 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 
-JSNumberFormatAddon::JSNumberFormatAddon()
+IntlNumberFormatAddon::IntlNumberFormatAddon()
 {
 }
 
-JSNumberFormatAddon::~JSNumberFormatAddon()
+IntlNumberFormatAddon::~IntlNumberFormatAddon()
 {
 }
 
-void JSNumberFormatAddon::Destructor(napi_env env, void *nativeObject, void *hint)
+void IntlNumberFormatAddon::Destructor(napi_env env, void *nativeObject, void *hint)
 {
     if (!nativeObject) {
         return;
     }
-    delete reinterpret_cast<JSNumberFormatAddon *>(nativeObject);
+    delete reinterpret_cast<IntlNumberFormatAddon *>(nativeObject);
     nativeObject = nullptr;
 }
 
-napi_value JSNumberFormatAddon::InitJsNumberFormat(napi_env env, napi_value exports)
+napi_value IntlNumberFormatAddon::InitIntlNumberFormat(napi_env env, napi_value exports)
 {
-    HandleScope scope(env, "InitJsNumberFormat");
+    HandleScope scope(env, "InitIntlNumberFormat");
     if (!scope.IsOpen()) {
         return nullptr;
     }
@@ -62,18 +63,18 @@ napi_value JSNumberFormatAddon::InitJsNumberFormat(napi_env env, napi_value expo
     napi_status status = napi_define_class(env, "NumberFormat", NAPI_AUTO_LENGTH, NumberFormatConstructor, nullptr,
         sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("InitJsNumberFormat: Define class failed when InitNumberFormat");
+        HILOG_ERROR_I18N("InitIntlNumberFormat: Define class failed when InitNumberFormat");
         return nullptr;
     }
     status = napi_set_named_property(env, exports, "NumberFormat", constructor);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("InitJsNumberFormat: Set property failed when InitNumberFormat");
+        HILOG_ERROR_I18N("InitIntlNumberFormat: Set property failed when InitNumberFormat");
         return nullptr;
     }
     return exports;
 }
 
-napi_value JSNumberFormatAddon::NumberFormatConstructor(napi_env env, napi_callback_info info)
+napi_value IntlNumberFormatAddon::NumberFormatConstructor(napi_env env, napi_callback_info info)
 {
     size_t argc = 2;
     napi_value argv[2] = { nullptr };
@@ -88,9 +89,9 @@ napi_value JSNumberFormatAddon::NumberFormatConstructor(napi_env env, napi_callb
     if (status == napi_pending_exception || new_target == nullptr) {
         return CreateNumberFormatWithoutNew(env, argc, argv);
     }
-    JSNumberFormatAddon* obj = new (std::nothrow) JSNumberFormatAddon();
+    IntlNumberFormatAddon* obj = new (std::nothrow) IntlNumberFormatAddon();
     if (obj == nullptr) {
-        HILOG_ERROR_I18N("NumberFormatConstructor: Create JSNumberFormatAddon object failed");
+        HILOG_ERROR_I18N("NumberFormatConstructor: Create IntlNumberFormatAddon object failed");
         return nullptr;
     }
     std::vector<std::string> localeTags;
@@ -103,10 +104,10 @@ napi_value JSNumberFormatAddon::NumberFormatConstructor(napi_env env, napi_callb
         JSUtils::GetNumberOptionValues(env, argv[1], map);
     }
     status =
-        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj), JSNumberFormatAddon::Destructor, nullptr, nullptr);
+        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj), IntlNumberFormatAddon::Destructor, nullptr, nullptr);
     if (status != napi_ok) {
         delete obj;
-        HILOG_ERROR_I18N("NumberFormatConstructor: Wrap JSNumberFormatAddon failed");
+        HILOG_ERROR_I18N("NumberFormatConstructor: Wrap IntlNumberFormatAddon failed");
         return nullptr;
     }
     if (!obj->InitNumberFormatContext(env, localeTags, map)) {
@@ -116,7 +117,7 @@ napi_value JSNumberFormatAddon::NumberFormatConstructor(napi_env env, napi_callb
     return thisVar;
 }
 
-bool JSNumberFormatAddon::HandleArguments(napi_env env, napi_value argVal, size_t argc,
+bool IntlNumberFormatAddon::HandleArguments(napi_env env, napi_value argVal, size_t argc,
     std::vector<std::string> &localeTags)
 {
     if (argc < 1) {
@@ -140,7 +141,7 @@ bool JSNumberFormatAddon::HandleArguments(napi_env env, napi_value argVal, size_
     return true;
 }
 
-bool JSNumberFormatAddon::InitNumberFormatContext(napi_env env,
+bool IntlNumberFormatAddon::InitNumberFormatContext(napi_env env,
     const std::vector<std::string> &localeTags, std::map<std::string, std::string> &map)
 {
     int32_t code = 0;
@@ -153,7 +154,7 @@ bool JSNumberFormatAddon::InitNumberFormatContext(napi_env env,
     return numberfmt_ != nullptr;
 }
 
-napi_value JSNumberFormatAddon::CreateNumberFormatWithoutNew(napi_env env, size_t argc,
+napi_value IntlNumberFormatAddon::CreateNumberFormatWithoutNew(napi_env env, size_t argc,
     napi_value *argv)
 {
     napi_value exception;
@@ -176,7 +177,7 @@ napi_value JSNumberFormatAddon::CreateNumberFormatWithoutNew(napi_env env, size_
     return instance;
 }
 
-napi_value JSNumberFormatAddon::FormatNumber(napi_env env, napi_callback_info info)
+napi_value IntlNumberFormatAddon::FormatNumber(napi_env env, napi_callback_info info)
 {
     size_t argc = 1;
     napi_value argv[1] = { nullptr };
@@ -184,24 +185,24 @@ napi_value JSNumberFormatAddon::FormatNumber(napi_env env, napi_callback_info in
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("JSNumberFormatAddon::FormatNumber: Get patameter info failed");
+        HILOG_ERROR_I18N("IntlNumberFormatAddon::FormatNumber: Get patameter info failed");
         return JSUtils::CreateEmptyString(env);
     }
     if (argc < 1) {
-        HILOG_ERROR_I18N("JSNumberFormatAddon::FormatNumber: Param count less then required");
+        HILOG_ERROR_I18N("IntlNumberFormatAddon::FormatNumber: Param count less then required");
         ErrorUtil::NapiThrowUndefined(env, "parameter is empty");
         return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     status = napi_typeof(env, argv[0], &valueType);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("JSNumberFormatAddon::FormatNumber: Get parameter type failed");
+        HILOG_ERROR_I18N("IntlNumberFormatAddon::FormatNumber: Get parameter type failed");
         return JSUtils::CreateEmptyString(env);
     }
     return FormatWithDiffParamType(env, argv[0], valueType, thisVar);
 }
 
-napi_value JSNumberFormatAddon::FormatRangeNumber(napi_env env, napi_callback_info info)
+napi_value IntlNumberFormatAddon::FormatRangeNumber(napi_env env, napi_callback_info info)
 {
     size_t argc = 2;
     napi_value argv[2] = { nullptr };
@@ -227,7 +228,7 @@ napi_value JSNumberFormatAddon::FormatRangeNumber(napi_env env, napi_callback_in
         HILOG_ERROR_I18N("FormatRangeNumber: Get second param value failed");
         return JSUtils::CreateEmptyString(env);
     }
-    JSNumberFormatAddon *obj = nullptr;
+    IntlNumberFormatAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->numberfmt_) {
         HILOG_ERROR_I18N("FormatRangeNumber: Get NumberFormat object failed");
@@ -243,7 +244,7 @@ napi_value JSNumberFormatAddon::FormatRangeNumber(napi_env env, napi_callback_in
     return result;
 }
 
-napi_value JSNumberFormatAddon::FormatRangeToParts(napi_env env, napi_callback_info info)
+napi_value IntlNumberFormatAddon::FormatRangeToParts(napi_env env, napi_callback_info info)
 {
     size_t argc = 2;
     napi_value argv[2] = { nullptr };
@@ -269,7 +270,7 @@ napi_value JSNumberFormatAddon::FormatRangeToParts(napi_env env, napi_callback_i
         HILOG_ERROR_I18N("FormatRangeToParts: Get second param value failed");
         return JSUtils::CreateEmptyArray(env);
     }
-    JSNumberFormatAddon *obj = nullptr;
+    IntlNumberFormatAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->numberfmt_) {
         HILOG_ERROR_I18N("FormatRangeToParts: Get NumberFormat object failed");
@@ -280,19 +281,19 @@ napi_value JSNumberFormatAddon::FormatRangeToParts(napi_env env, napi_callback_i
     return SetNumberFormatParts(env, status, result);
 }
 
-double JSNumberFormatAddon::GetFormatParam(napi_env env, napi_value param, int32_t &code)
+double IntlNumberFormatAddon::GetFormatParam(napi_env env, napi_value param, int32_t &code)
 {
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_status status = napi_typeof(env, param, &valueType);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("JSNumberFormatAddon::GetFormatParam: Get parameter type failed");
+        HILOG_ERROR_I18N("IntlNumberFormatAddon::GetFormatParam: Get parameter type failed");
         code = -1;
         return 0;
     }
     return JSUtils::GetDoubleFromNapiValue(env, param, valueType, code);
 }
 
-napi_value JSNumberFormatAddon::GetNumberResolvedOptions(napi_env env, napi_callback_info info)
+napi_value IntlNumberFormatAddon::GetNumberResolvedOptions(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     void *data = nullptr;
@@ -300,7 +301,7 @@ napi_value JSNumberFormatAddon::GetNumberResolvedOptions(napi_env env, napi_call
     if (status != napi_ok) {
         return JSUtils::CreateEmptyObject(env);
     }
-    JSNumberFormatAddon *obj = nullptr;
+    IntlNumberFormatAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->numberfmt_) {
         HILOG_ERROR_I18N("GetNumberResolvedOptions: Get NumberFormat object failed");
@@ -338,7 +339,7 @@ napi_value JSNumberFormatAddon::GetNumberResolvedOptions(napi_env env, napi_call
     return result;
 }
 
-napi_value JSNumberFormatAddon::FormatToParts(napi_env env, napi_callback_info info)
+napi_value IntlNumberFormatAddon::FormatToParts(napi_env env, napi_callback_info info)
 {
     size_t argc = 1;
     napi_value argv[1] = { nullptr };
@@ -353,16 +354,16 @@ napi_value JSNumberFormatAddon::FormatToParts(napi_env env, napi_callback_info i
     }
     status = napi_typeof(env, argv[0], &valueType);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("JSNumberFormatAddon::FormatToParts: Get param type failed.");
+        HILOG_ERROR_I18N("IntlNumberFormatAddon::FormatToParts: Get param type failed.");
         return JSUtils::CreateEmptyArray(env);
     }
     return GetFormatToPartsInner(env, argv[0], valueType, thisVar);
 }
 
-napi_value JSNumberFormatAddon::FormatWithDiffParamType(napi_env env, napi_value param,
+napi_value IntlNumberFormatAddon::FormatWithDiffParamType(napi_env env, napi_value param,
     napi_valuetype &valueType, napi_value &thisVar)
 {
-    JSNumberFormatAddon *obj = nullptr;
+    IntlNumberFormatAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->numberfmt_) {
         HILOG_ERROR_I18N("FormatWithDiffParamType: Get NumberFormat object failed");
@@ -397,10 +398,10 @@ napi_value JSNumberFormatAddon::FormatWithDiffParamType(napi_env env, napi_value
     return JSUtils::CreateString(env, formatedValue);
 }
 
-napi_value JSNumberFormatAddon::GetFormatToPartsInner(napi_env env, napi_value param,
+napi_value IntlNumberFormatAddon::GetFormatToPartsInner(napi_env env, napi_value param,
     napi_valuetype &valueType, napi_value &thisVar)
 {
-    JSNumberFormatAddon *obj = nullptr;
+    IntlNumberFormatAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->numberfmt_) {
         HILOG_ERROR_I18N("GetFormatToPartsInner: Get NumberFormat object failed");
@@ -439,14 +440,14 @@ napi_value JSNumberFormatAddon::GetFormatToPartsInner(napi_env env, napi_value p
     return SetNumberFormatParts(env, status, numberParts);
 }
 
-napi_value JSNumberFormatAddon::SupportedLocalesOf(napi_env env, napi_callback_info info)
+napi_value IntlNumberFormatAddon::SupportedLocalesOf(napi_env env, napi_callback_info info)
 {
     size_t argc = 2;
     napi_value argv[2] = { nullptr };
     napi_value thisVar = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("JSNumberFormatAddon::SupportedLocalesOf: Get parameter info failed");
+        HILOG_ERROR_I18N("IntlNumberFormatAddon::SupportedLocalesOf: Get parameter info failed");
         return JSUtils::CreateEmptyArray(env);
     }
     std::vector<std::string> localeTags;
@@ -462,7 +463,7 @@ napi_value JSNumberFormatAddon::SupportedLocalesOf(napi_env env, napi_callback_i
     I18nErrorCode i18nStatus = I18nErrorCode::SUCCESS;
     std::vector<std::string> resultLocales = NumberFormat::SupportedLocalesOf(localeTags, map, i18nStatus);
     if (i18nStatus == I18nErrorCode::INVALID_LOCALE_TAG) {
-        HILOG_ERROR_I18N("JSNumberFormatAddon::SupportedLocalesOf: SupportedLocalesOf status fail");
+        HILOG_ERROR_I18N("IntlNumberFormatAddon::SupportedLocalesOf: SupportedLocalesOf status fail");
         ErrorUtil::NapiThrowUndefined(env, "invalid locale");
         return nullptr;
     } else if (i18nStatus != I18nErrorCode::SUCCESS) {
@@ -472,7 +473,7 @@ napi_value JSNumberFormatAddon::SupportedLocalesOf(napi_env env, napi_callback_i
     return JSUtils::CreateArray(env, resultLocales);
 }
 
-napi_value JSNumberFormatAddon::SetNumberFormatParts(napi_env env, napi_status &status,
+napi_value IntlNumberFormatAddon::SetNumberFormatParts(napi_env env, napi_status &status,
     const std::vector<std::vector<std::string>> &numberParts)
 {
     napi_value result = nullptr;
@@ -513,7 +514,7 @@ napi_value JSNumberFormatAddon::SetNumberFormatParts(napi_env env, napi_status &
     return result;
 }
 
-std::shared_ptr<NumberFormat> JSNumberFormatAddon::GetNumberFormat()
+std::shared_ptr<NumberFormat> IntlNumberFormatAddon::GetNumberFormat()
 {
     return numberfmt_;
 }

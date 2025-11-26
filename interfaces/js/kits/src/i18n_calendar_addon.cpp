@@ -19,13 +19,14 @@
 #include "error_util.h"
 #include "i18n_hilog.h"
 #include "i18n_calendar_addon.h"
+#include "js_lifecycle_managers.h"
 #include "js_utils.h"
 #include "variable_convertor.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static thread_local napi_ref* g_constructor = nullptr;
+static thread_local ThreadReference* g_constructor = nullptr;
 static std::unordered_map<std::string, UCalendarDateFields> g_fieldsMap {
     { "era", UCAL_ERA },
     { "year", UCAL_YEAR },
@@ -115,14 +116,9 @@ napi_value I18nCalendarAddon::InitI18nCalendar(napi_env env, napi_value exports)
         return nullptr;
     }
     exports = I18nCalendarAddon::InitCalendar(env, exports);
-    g_constructor = new (std::nothrow) napi_ref;
+    g_constructor = ThreadReference::CreateInstance(env, constructor, 1);
     if (!g_constructor) {
         HILOG_ERROR_I18N("Failed to create ref at init");
-        return nullptr;
-    }
-    status = napi_create_reference(env, constructor, 1, g_constructor);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("Failed to create reference at init");
         return nullptr;
     }
     return exports;
@@ -168,8 +164,7 @@ napi_value I18nCalendarAddon::GetCalendar(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("Failed to create g_constructor");
         return nullptr;
     }
-    status = napi_get_reference_value(env, *g_constructor, &constructor);
-    if (status != napi_ok) {
+    if (!g_constructor->GetReferenceValue(env, &constructor)) {
         HILOG_ERROR_I18N("Failed to create reference at GetCalendar");
         return nullptr;
     }
@@ -287,6 +282,10 @@ napi_value I18nCalendarAddon::Set(napi_env env, napi_callback_info info)
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
+        return nullptr;
+    }
+    if (argc < 3) { // There are at least 3 arguments.
+        HILOG_ERROR_I18N("Set: Insufficient number of arguments");
         return nullptr;
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;

@@ -12,12 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "js_relative_time_format_addon.h"
+#include "intl_relative_time_format_addon.h"
 
 #include <cmath>
 #include "error_util.h"
 #include "i18n_hilog.h"
 #include "i18n_types.h"
+#include "js_lifecycle_managers.h"
 #include "js_utils.h"
 #include "locale_helper.h"
 #include "utils.h"
@@ -26,7 +27,7 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 
-std::unordered_map<std::string, std::vector<std::string>> JSRelativeTimeFormatAddon::optionAvaliableMap {
+std::unordered_map<std::string, std::vector<std::string>> IntlRelativeTimeFormatAddon::optionAvaliableMap {
     {"localeMatcher", {"lookup", "best fit"}},
     {"numeric", {"always", "auto"}},
     {"style", {"long", "short", "narrow"}},
@@ -34,26 +35,26 @@ std::unordered_map<std::string, std::vector<std::string>> JSRelativeTimeFormatAd
             "day", "days", "hour", "hours", "minute", "minutes", "second", "seconds"}},
 };
 
-JSRelativeTimeFormatAddon::JSRelativeTimeFormatAddon()
+IntlRelativeTimeFormatAddon::IntlRelativeTimeFormatAddon()
 {
 }
 
-JSRelativeTimeFormatAddon::~JSRelativeTimeFormatAddon()
+IntlRelativeTimeFormatAddon::~IntlRelativeTimeFormatAddon()
 {
 }
 
-void JSRelativeTimeFormatAddon::Destructor(napi_env env, void *nativeObject, void *hint)
+void IntlRelativeTimeFormatAddon::Destructor(napi_env env, void *nativeObject, void *hint)
 {
     if (!nativeObject) {
         return;
     }
-    delete reinterpret_cast<JSRelativeTimeFormatAddon *>(nativeObject);
+    delete reinterpret_cast<IntlRelativeTimeFormatAddon *>(nativeObject);
     nativeObject = nullptr;
 }
 
-napi_value JSRelativeTimeFormatAddon::InitJsRelativeTimeFormat(napi_env env, napi_value exports)
+napi_value IntlRelativeTimeFormatAddon::InitIntlRelativeTimeFormat(napi_env env, napi_value exports)
 {
-    HandleScope scope(env, "InitJsRelativeTimeFormat");
+    HandleScope scope(env, "InitIntlRelativeTimeFormat");
     if (!scope.IsOpen()) {
         return nullptr;
     }
@@ -69,18 +70,18 @@ napi_value JSRelativeTimeFormatAddon::InitJsRelativeTimeFormat(napi_env env, nap
         RelativeTimeFormatConstructor, nullptr,
         sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("InitJsRelativeTimeFormat: Define class failed when init JsRelativeTimeFormat");
+        HILOG_ERROR_I18N("InitIntlRelativeTimeFormat: Define class failed when init JsRelativeTimeFormat");
         return nullptr;
     }
     status = napi_set_named_property(env, exports, "RelativeTimeFormat", constructor);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("InitJsRelativeTimeFormat: Set property failed when init JsRelativeTimeFormat");
+        HILOG_ERROR_I18N("InitIntlRelativeTimeFormat: Set property failed when init JsRelativeTimeFormat");
         return nullptr;
     }
     return exports;
 }
 
-napi_value JSRelativeTimeFormatAddon::RelativeTimeFormatConstructor(napi_env env, napi_callback_info info)
+napi_value IntlRelativeTimeFormatAddon::RelativeTimeFormatConstructor(napi_env env, napi_callback_info info)
 {
     size_t argc = 2;
     napi_value argv[2] = { nullptr };
@@ -98,9 +99,9 @@ napi_value JSRelativeTimeFormatAddon::RelativeTimeFormatConstructor(napi_env env
         napi_throw_type_error(env, nullptr, "newTarget is undefined");
         return nullptr;
     }
-    JSRelativeTimeFormatAddon* obj = new (std::nothrow) JSRelativeTimeFormatAddon();
+    IntlRelativeTimeFormatAddon* obj = new (std::nothrow) IntlRelativeTimeFormatAddon();
     if (obj == nullptr) {
-        HILOG_ERROR_I18N("RelativeTimeFormatConstructor: Create JSRelativeTimeFormatAddon failed");
+        HILOG_ERROR_I18N("RelativeTimeFormatConstructor: Create IntlRelativeTimeFormatAddon failed");
         return nullptr;
     }
     std::vector<std::string> localeTags;
@@ -112,11 +113,11 @@ napi_value JSRelativeTimeFormatAddon::RelativeTimeFormatConstructor(napi_env env
     if (argc > 1) {
         GetRelativeTimeOptionValues(env, argv[1], map);
     }
-    status = napi_wrap(env, thisVar, reinterpret_cast<void *>(obj), JSRelativeTimeFormatAddon::Destructor,
+    status = napi_wrap(env, thisVar, reinterpret_cast<void *>(obj), IntlRelativeTimeFormatAddon::Destructor,
         nullptr, nullptr);
     if (status != napi_ok) {
         delete obj;
-        HILOG_ERROR_I18N("RelativeTimeFormatConstructor: Wrap JSRelativeTimeFormatAddon failed");
+        HILOG_ERROR_I18N("RelativeTimeFormatConstructor: Wrap IntlRelativeTimeFormatAddon failed");
         return nullptr;
     }
     if (!obj->InitRelativeTimeFormatContext(env, info, localeTags, map)) {
@@ -126,7 +127,7 @@ napi_value JSRelativeTimeFormatAddon::RelativeTimeFormatConstructor(napi_env env
     return thisVar;
 }
 
-bool JSRelativeTimeFormatAddon::GetParameterLocales(napi_env env,
+bool IntlRelativeTimeFormatAddon::GetParameterLocales(napi_env env,
     std::vector<std::string> &localeTags, const size_t &argc, napi_value* argv)
 {
     if (argc < 1) {
@@ -154,7 +155,7 @@ bool JSRelativeTimeFormatAddon::GetParameterLocales(napi_env env,
     return true;
 }
 
-void JSRelativeTimeFormatAddon::GetRelativeTimeOptionValues(napi_env env,
+void IntlRelativeTimeFormatAddon::GetRelativeTimeOptionValues(napi_env env,
     napi_value options, std::map<std::string, std::string> &map)
 {
     JSUtils::GetOptionValue(env, options, "localeMatcher", map);
@@ -165,7 +166,7 @@ void JSRelativeTimeFormatAddon::GetRelativeTimeOptionValues(napi_env env,
     CheckOptionValue(env, map, "style");
 }
 
-void JSRelativeTimeFormatAddon::CheckOptionValue(napi_env env, std::map<std::string, std::string> &map,
+void IntlRelativeTimeFormatAddon::CheckOptionValue(napi_env env, std::map<std::string, std::string> &map,
     const std::string &optionName)
 {
     if (optionAvaliableMap.find(optionName) == optionAvaliableMap.end()) {
@@ -177,7 +178,7 @@ void JSRelativeTimeFormatAddon::CheckOptionValue(napi_env env, std::map<std::str
     }
 }
 
-void JSRelativeTimeFormatAddon::CheckOptionValue(napi_env env, const std::string &optionValue,
+void IntlRelativeTimeFormatAddon::CheckOptionValue(napi_env env, const std::string &optionValue,
     const std::string &optionName)
 {
     if (optionAvaliableMap.find(optionName) == optionAvaliableMap.end()) {
@@ -189,54 +190,54 @@ void JSRelativeTimeFormatAddon::CheckOptionValue(napi_env env, const std::string
         return;
     }
     if (!ThrowRangeError(env)) {
-        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::CheckOptionValue:"
+        HILOG_ERROR_I18N("IntlRelativeTimeFormatAddon::CheckOptionValue:"
             "throw error for %{public}s failed", optionName.c_str());
         return;
     }
 }
 
-bool JSRelativeTimeFormatAddon::ThrowRangeError(napi_env env)
+bool IntlRelativeTimeFormatAddon::ThrowRangeError(napi_env env)
 {
     const char* msg = "Value out of range for locale options property";
     napi_status status = napi_throw_range_error(env, nullptr, msg);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::ThrowRangeError: throw range error failed");
+        HILOG_ERROR_I18N("IntlRelativeTimeFormatAddon::ThrowRangeError: throw range error failed");
         return false;
     }
     return true;
 }
 
-bool JSRelativeTimeFormatAddon::InitRelativeTimeFormatContext(napi_env env, napi_callback_info info,
+bool IntlRelativeTimeFormatAddon::InitRelativeTimeFormatContext(napi_env env, napi_callback_info info,
     std::vector<std::string> localeTags, std::map<std::string, std::string> &map)
 {
     relativetimefmt_ = std::make_shared<RelativeTimeFormat>(localeTags, map, true);
     return relativetimefmt_ != nullptr;
 }
 
-napi_value JSRelativeTimeFormatAddon::Format(napi_env env, napi_callback_info info)
+napi_value IntlRelativeTimeFormatAddon::Format(napi_env env, napi_callback_info info)
 {
     size_t argc = 2;
     napi_value argv[2] = { nullptr };
     napi_value thisVar = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::Format: Get parameter info failed");
+        HILOG_ERROR_I18N("IntlRelativeTimeFormatAddon::Format: Get parameter info failed");
         return JSUtils::CreateEmptyString(env);
     }
     if (argc < 2) { // 2 is required parameter count
-        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::Format: parameter less then required");
+        HILOG_ERROR_I18N("IntlRelativeTimeFormatAddon::Format: parameter less then required");
         return JSUtils::CreateEmptyString(env);
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     status = napi_typeof(env, argv[0], &valueType);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::Format: Get param type failed.");
+        HILOG_ERROR_I18N("IntlRelativeTimeFormatAddon::Format: Get param type failed.");
         return JSUtils::CreateEmptyString(env);
     }
     int32_t code = 0;
     double number = JSUtils::GetDoubleFromNapiValue(env, argv[0], valueType, code);
     if (code != 0) {
-        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::Format: Get number failed");
+        HILOG_ERROR_I18N("IntlRelativeTimeFormatAddon::Format: Get number failed");
         return JSUtils::CreateEmptyString(env);
     }
     std::string unit = JSUtils::GetString(env, argv[1], code);
@@ -244,26 +245,26 @@ napi_value JSRelativeTimeFormatAddon::Format(napi_env env, napi_callback_info in
         return JSUtils::CreateEmptyString(env);
     }
     CheckOptionValue(env, unit, "unit");
-    JSRelativeTimeFormatAddon *obj = nullptr;
+    IntlRelativeTimeFormatAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->relativetimefmt_) {
-        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::Format: Get RelativeTimeFormat object failed");
+        HILOG_ERROR_I18N("IntlRelativeTimeFormatAddon::Format: Get RelativeTimeFormat object failed");
         return JSUtils::CreateEmptyString(env);
     }
     std::string value = obj->relativetimefmt_->Format(number, unit);
     return JSUtils::CreateString(env, value);
 }
 
-napi_value JSRelativeTimeFormatAddon::GetNumberResolvedOptions(napi_env env, napi_callback_info info)
+napi_value IntlRelativeTimeFormatAddon::GetNumberResolvedOptions(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::GetNumberResolvedOptions: Get parameter info failed");
+        HILOG_ERROR_I18N("IntlRelativeTimeFormatAddon::GetNumberResolvedOptions: Get parameter info failed");
         return JSUtils::CreateEmptyObject(env);
     }
-    JSRelativeTimeFormatAddon *obj = nullptr;
+    IntlRelativeTimeFormatAddon *obj = nullptr;
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->relativetimefmt_) {
         HILOG_ERROR_I18N("GetNumberResolvedOptions: Get RelativeTimeFormat object failed");
@@ -272,7 +273,7 @@ napi_value JSRelativeTimeFormatAddon::GetNumberResolvedOptions(napi_env env, nap
     napi_value result = nullptr;
     status = napi_create_object(env, &result);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::GetNumberResolvedOptions: napi_create_object failed");
+        HILOG_ERROR_I18N("IntlRelativeTimeFormatAddon::GetNumberResolvedOptions: napi_create_object failed");
         return JSUtils::CreateEmptyObject(env);
     }
     std::map<std::string, std::string> options = {};
@@ -284,7 +285,7 @@ napi_value JSRelativeTimeFormatAddon::GetNumberResolvedOptions(napi_env env, nap
     return result;
 }
 
-napi_value JSRelativeTimeFormatAddon::FormatToParts(napi_env env, napi_callback_info info)
+napi_value IntlRelativeTimeFormatAddon::FormatToParts(napi_env env, napi_callback_info info)
 {
     size_t argc = 2;
     const size_t argsCount = 2; // 2 is required parameter count
@@ -292,37 +293,37 @@ napi_value JSRelativeTimeFormatAddon::FormatToParts(napi_env env, napi_callback_
     napi_value thisVar = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::FormatToParts: Get parameter info failed");
+        HILOG_ERROR_I18N("IntlRelativeTimeFormatAddon::FormatToParts: Get parameter info failed");
         return JSUtils::CreateEmptyArray(env);
     }
     if (argc < argsCount) {
-        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::FormatToParts: parameter count less then required.");
+        HILOG_ERROR_I18N("IntlRelativeTimeFormatAddon::FormatToParts: parameter count less then required.");
         return JSUtils::CreateEmptyArray(env);
     }
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     status = napi_typeof(env, argv[0], &valueType);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::FormatToParts: Get param type failed.");
+        HILOG_ERROR_I18N("IntlRelativeTimeFormatAddon::FormatToParts: Get param type failed.");
         return JSUtils::CreateEmptyArray(env);
     }
     int32_t code = 0;
     double number = JSUtils::GetDoubleFromNapiValue(env, argv[0], valueType, code);
     if (code != 0) {
-        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::FormatToParts: Get parameter number failed");
+        HILOG_ERROR_I18N("IntlRelativeTimeFormatAddon::FormatToParts: Get parameter number failed");
         return JSUtils::CreateEmptyArray(env);
     }
     std::string unit = JSUtils::GetString(env, argv[argsCount - 1], code);
     if (code != 0) {
-        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::FormatToParts: Get second parameter failed");
+        HILOG_ERROR_I18N("IntlRelativeTimeFormatAddon::FormatToParts: Get second parameter failed");
         return JSUtils::CreateEmptyArray(env);
     }
     return GetFormatToPartsInner(env, number, unit, thisVar);
 }
 
-napi_value JSRelativeTimeFormatAddon::GetFormatToPartsInner(napi_env env, double number,
+napi_value IntlRelativeTimeFormatAddon::GetFormatToPartsInner(napi_env env, double number,
     const std::string &unit, napi_value &thisVar)
 {
-    JSRelativeTimeFormatAddon *obj = nullptr;
+    IntlRelativeTimeFormatAddon *obj = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->relativetimefmt_) {
         HILOG_ERROR_I18N("GetFormatToPartsInner: Get NumberFormat object failed");
@@ -333,14 +334,14 @@ napi_value JSRelativeTimeFormatAddon::GetFormatToPartsInner(napi_env env, double
     return SetNumberFormatParts(env, relativeTimeParts);
 }
 
-napi_value JSRelativeTimeFormatAddon::SupportedLocalesOf(napi_env env, napi_callback_info info)
+napi_value IntlRelativeTimeFormatAddon::SupportedLocalesOf(napi_env env, napi_callback_info info)
 {
     size_t argc = 2;
     napi_value argv[2] = { nullptr };
     napi_value thisVar = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::SupportedLocalesOf: Get parameter info failed");
+        HILOG_ERROR_I18N("IntlRelativeTimeFormatAddon::SupportedLocalesOf: Get parameter info failed");
         return JSUtils::CreateEmptyArray(env);
     }
     std::vector<std::string> localeTags;
@@ -358,7 +359,7 @@ napi_value JSRelativeTimeFormatAddon::SupportedLocalesOf(napi_env env, napi_call
     I18nErrorCode i18nStatus = I18nErrorCode::SUCCESS;
     std::vector<std::string> resultLocales = RelativeTimeFormat::SupportedLocalesOf(localeTags, map, i18nStatus);
     if (i18nStatus == I18nErrorCode::INVALID_LOCALE_TAG) {
-        HILOG_ERROR_I18N("JSRelativeTimeFormatAddon::SupportedLocalesOf: SupportedLocalesOf status fail");
+        HILOG_ERROR_I18N("IntlRelativeTimeFormatAddon::SupportedLocalesOf: SupportedLocalesOf status fail");
         ErrorUtil::NapiThrowUndefined(env, "invalid locale");
         return nullptr;
     } else if (i18nStatus != I18nErrorCode::SUCCESS) {
@@ -368,7 +369,7 @@ napi_value JSRelativeTimeFormatAddon::SupportedLocalesOf(napi_env env, napi_call
     return JSUtils::CreateArray(env, resultLocales);
 }
 
-napi_value JSRelativeTimeFormatAddon::SetNumberFormatParts(napi_env env,
+napi_value IntlRelativeTimeFormatAddon::SetNumberFormatParts(napi_env env,
     const std::vector<std::vector<std::string>> &numberParts)
 {
     napi_value result = nullptr;
