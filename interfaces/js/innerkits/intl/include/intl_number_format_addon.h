@@ -44,6 +44,7 @@ private:
     static napi_value FormatRangeNumber(napi_env env, napi_callback_info info);
     static napi_value FormatRangeToParts(napi_env env, napi_callback_info info);
     static napi_value FormatToParts(napi_env env, napi_callback_info info);
+    static napi_value ToString(napi_env env, napi_callback_info info);
     static napi_value SupportedLocalesOf(napi_env env, napi_callback_info info);
     static napi_value GetFormatToPartsInner(napi_env env, napi_value param, napi_valuetype &valueType,
         napi_value &thisVar);

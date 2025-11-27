@@ -35,6 +35,7 @@ private:
     static napi_value DisplayNamesConstructor(napi_env env, napi_callback_info info);
     static napi_value SupportedLocalesOf(napi_env env, napi_callback_info info);
     static napi_value Of(napi_env env, napi_callback_info info);
+    static napi_value ToString(napi_env env, napi_callback_info info);
     static napi_value ResolvedOptions(napi_env env, napi_callback_info info);
     static void GetOptionValues(napi_env env, napi_value options, std::map<std::string, std::string> &map);
 

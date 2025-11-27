@@ -56,6 +56,7 @@ napi_value IntlNumberFormatAddon::InitIntlNumberFormat(napi_env env, napi_value 
         DECLARE_NAPI_FUNCTION("formatRange", FormatRangeNumber),
         DECLARE_NAPI_FUNCTION("formatRangeToParts", FormatRangeToParts),
         DECLARE_NAPI_FUNCTION("resolvedOptions", GetNumberResolvedOptions),
+        DECLARE_NAPI_FUNCTION("toString", ToString),
         DECLARE_NAPI_STATIC_FUNCTION("supportedLocalesOf", SupportedLocalesOf),
     };
 
@@ -358,6 +359,11 @@ napi_value IntlNumberFormatAddon::FormatToParts(napi_env env, napi_callback_info
         return JSUtils::CreateEmptyArray(env);
     }
     return GetFormatToPartsInner(env, argv[0], valueType, thisVar);
+}
+
+napi_value IntlNumberFormatAddon::ToString(napi_env env, napi_callback_info info)
+{
+    return JSUtils::CreateString(env, "[object Intl.NumberFormat]");
 }
 
 napi_value IntlNumberFormatAddon::FormatWithDiffParamType(napi_env env, napi_value param,

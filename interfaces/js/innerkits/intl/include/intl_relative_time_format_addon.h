@@ -40,6 +40,7 @@ private:
     static napi_value Format(napi_env env, napi_callback_info info);
     static napi_value GetNumberResolvedOptions(napi_env env, napi_callback_info info);
     static napi_value FormatToParts(napi_env env, napi_callback_info info);
+    static napi_value ToString(napi_env env, napi_callback_info info);
     static napi_value SupportedLocalesOf(napi_env env, napi_callback_info info);
     static napi_value GetFormatToPartsInner(napi_env env, double number, const std::string &unit,
         napi_value &thisVar);

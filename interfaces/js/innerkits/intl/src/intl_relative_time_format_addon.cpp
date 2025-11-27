@@ -62,6 +62,7 @@ napi_value IntlRelativeTimeFormatAddon::InitIntlRelativeTimeFormat(napi_env env,
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("format", Format),
         DECLARE_NAPI_FUNCTION("formatToParts", FormatToParts),
+        DECLARE_NAPI_FUNCTION("toString", ToString),
         DECLARE_NAPI_FUNCTION("resolvedOptions", GetNumberResolvedOptions),
         DECLARE_NAPI_STATIC_FUNCTION("supportedLocalesOf", SupportedLocalesOf),
     };
@@ -332,6 +333,11 @@ napi_value IntlRelativeTimeFormatAddon::GetFormatToPartsInner(napi_env env, doub
     std::vector<std::vector<std::string>> relativeTimeParts;
     obj->relativetimefmt_->FormatToParts(number, unit, relativeTimeParts);
     return SetNumberFormatParts(env, relativeTimeParts);
+}
+
+napi_value IntlRelativeTimeFormatAddon::ToString(napi_env env, napi_callback_info info)
+{
+    return JSUtils::CreateString(env, "[object Intl.RelativeTimeFormat]");
 }
 
 napi_value IntlRelativeTimeFormatAddon::SupportedLocalesOf(napi_env env, napi_callback_info info)
