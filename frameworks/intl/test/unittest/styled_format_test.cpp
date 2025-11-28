@@ -113,16 +113,16 @@ HWTEST_F(StyledFormatTest, StyledFormatTest003, TestSize.Level1)
         = std::make_shared<StyledDateTimeFormat>(nullptr, intlDateFormatter);
     double date = 1761984846000;
     std::pair<std::string, std::vector<DateTimeFormatPart>> result = formatter->Format(date);
-    EXPECT_EQ(result.first, "Saturday, 1 November 2025, 16:14:06 Central Standard Time");
+    EXPECT_EQ(result.first, "Saturday 1 November 2025 at 16:14:06 Central Standard Time");
     EXPECT_EQ(result.second.size(), 15);
     EXPECT_EQ(result.second[0].GetPartName(), "weekday");
     EXPECT_EQ(result.second[0].GetStart(), 0);
     EXPECT_EQ(result.second[0].GetLength(), 8);
     EXPECT_EQ(result.second[1].GetPartName(), "literal");
     EXPECT_EQ(result.second[1].GetStart(), 8);
-    EXPECT_EQ(result.second[1].GetLength(), 2);
+    EXPECT_EQ(result.second[1].GetLength(), 1);
     EXPECT_EQ(result.second[2].GetPartName(), "day");
-    EXPECT_EQ(result.second[2].GetStart(), 10);
+    EXPECT_EQ(result.second[2].GetStart(), 9);
     EXPECT_EQ(result.second[2].GetLength(), 1);
 }
 
