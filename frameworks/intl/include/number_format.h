@@ -41,7 +41,6 @@
 #include "locale_info.h"
 #include "measure_data.h"
 #include "relative_time_format.h"
-#include "unicode/numberrangeformatter.h"
 
 namespace OHOS {
 namespace Global {
@@ -129,7 +128,6 @@ private:
     std::unique_ptr<LocaleInfo> localeInfo = nullptr;
     std::unique_ptr<RelativeTimeFormat> relativeTimeFormat = nullptr;
     icu::number::LocalizedNumberFormatter numberFormat;
-    icu::number::LocalizedNumberRangeFormatter numberRangeFormat;
     icu::number::UnlocalizedNumberFormatter styleFormatter;
     icu::number::Notation notation = icu::number::Notation::simple();
     UNumberRoundingPriority roundingPriority = UNumberRoundingPriority::UNUM_ROUNDING_PRIORITY_STRICT;
@@ -137,7 +135,7 @@ private:
     UNumberUnitWidth unitDisplay = UNumberUnitWidth::UNUM_UNIT_WIDTH_SHORT;
     UNumberUnitWidth currencyDisplay = UNumberUnitWidth::UNUM_UNIT_WIDTH_SHORT;
     UNumberSignDisplay signDisplay = UNumberSignDisplay::UNUM_SIGN_AUTO;
-    static const int MAX_UNIT_NUM = 500;
+    static const int MAX_UNIT_NUM = 502;
     static const int DEFAULT_FRACTION_DIGITS = 3;
     static const int DEFAULT_MAX_SIGNIFICANT_DIGITS = 21;
     static const char *DEVICE_TYPE_NAME;
