@@ -345,6 +345,7 @@ bool LocaleHelper::DealwithLanguageTag(const std::vector<std::string> &container
         return true;
     }
 
+    address = 1;  // Start parsing from the second element of the container.
     if (IsScriptSubtag(containers[address])) {
         address++;
         if (containers.size() == address) {
