@@ -57,6 +57,7 @@ napi_value IntlDateTimeFormatAddon::InitIntlDateTimeFormat(napi_env env, napi_va
         DECLARE_NAPI_FUNCTION("formatToParts", FormatToParts),
         DECLARE_NAPI_FUNCTION("formatRange", FormatRange),
         DECLARE_NAPI_FUNCTION("formatRangeToParts", FormatRangeToParts),
+        DECLARE_NAPI_FUNCTION("toString", ToString),
         DECLARE_NAPI_FUNCTION("resolvedOptions", ResolvedOptions),
         DECLARE_NAPI_STATIC_FUNCTION("supportedLocalesOf", SupportedLocalesOf),
     };
@@ -356,6 +357,11 @@ napi_value IntlDateTimeFormatAddon::FormatRangeToParts(napi_env env, napi_callba
         return nullptr;
     }
     return CreateFormatPart(env, formatResult);
+}
+
+napi_value IntlDateTimeFormatAddon::ToString(napi_env env, napi_callback_info info)
+{
+    return JSUtils::CreateString(env, "[object Intl.DateTimeFormat]");
 }
 
 napi_value IntlDateTimeFormatAddon::ResolvedOptions(napi_env env, napi_callback_info info)

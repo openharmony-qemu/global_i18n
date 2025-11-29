@@ -47,6 +47,7 @@ napi_value DisplayNamesAddon::InitDisplayNames(napi_env env, napi_value exports)
 
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("of", Of),
+        DECLARE_NAPI_FUNCTION("toString", ToString),
         DECLARE_NAPI_FUNCTION("resolvedOptions", ResolvedOptions),
         DECLARE_NAPI_STATIC_FUNCTION("supportedLocalesOf", SupportedLocalesOf),
     };
@@ -209,6 +210,11 @@ napi_value DisplayNamesAddon::Of(napi_env env, napi_callback_info info)
         return JSUtils::CreateEmptyString(env);
     }
     return JSUtils::CreateString(env, displayResult);
+}
+
+napi_value DisplayNamesAddon::ToString(napi_env env, napi_callback_info info)
+{
+    return JSUtils::CreateString(env, "[object Intl.DisplayNames]");
 }
 
 napi_value DisplayNamesAddon::ResolvedOptions(napi_env env, napi_callback_info info)

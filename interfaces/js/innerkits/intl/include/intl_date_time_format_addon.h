@@ -43,6 +43,7 @@ private:
     static napi_value FormatToParts(napi_env env, napi_callback_info info);
     static napi_value FormatRange(napi_env env, napi_callback_info info);
     static napi_value FormatRangeToParts(napi_env env, napi_callback_info info);
+    static napi_value ToString(napi_env env, napi_callback_info info);
     static napi_value ResolvedOptions(napi_env env, napi_callback_info info);
     static napi_value SupportedLocalesOf(napi_env env, napi_callback_info info);
 

@@ -36,6 +36,7 @@ private:
     static napi_value CollatorConstructor(napi_env env, napi_callback_info info);
     static napi_value SupportedLocalesOf(napi_env env, napi_callback_info info);
     static napi_value CompareString(napi_env env, napi_callback_info info);
+    static napi_value ToString(napi_env env, napi_callback_info info);
     static napi_value GetCollatorResolvedOptions(napi_env env, napi_callback_info info);
 
     bool InitCollatorContext(napi_env env, napi_callback_info info, std::vector<std::string> localeTags,

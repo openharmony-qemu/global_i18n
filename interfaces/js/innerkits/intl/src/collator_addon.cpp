@@ -49,6 +49,7 @@ napi_value CollatorAddon::InitCollator(napi_env env, napi_value exports)
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("compare", CompareString),
         DECLARE_NAPI_FUNCTION("resolvedOptions", GetCollatorResolvedOptions),
+        DECLARE_NAPI_FUNCTION("toString", ToString),
         DECLARE_NAPI_STATIC_FUNCTION("supportedLocalesOf", SupportedLocalesOf),
     };
 
@@ -229,6 +230,11 @@ napi_value CollatorAddon::CompareString(napi_env env, napi_callback_info info)
     }
 
     return result;
+}
+
+napi_value CollatorAddon::ToString(napi_env env, napi_callback_info info)
+{
+    return JSUtils::CreateString(env, "[object Intl.Collator]");
 }
 
 napi_value CollatorAddon::GetCollatorResolvedOptions(napi_env env, napi_callback_info info)
