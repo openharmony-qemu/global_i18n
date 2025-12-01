@@ -288,7 +288,7 @@ ani_object IntlAddon::RelativeTimeFormat_FormatToParts(ani_env *env, ani_object 
     std::vector<std::vector<std::string>> timeVector;
     obj->relativetimefmt_->FormatToParts(value, VariableConverter::AniStrToString(env, unit), timeVector);
 
-    static const char *className = "escompat.Array";
+    static const char *className = "std.core.Array";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);
@@ -594,7 +594,7 @@ ani_status IntlAddon::BindContext_DateTimeFormat(ani_env *env)
             reinterpret_cast<void *>(DateTimeFormat_Create) },
         ani_native_function {
             "create",
-            "X{C{escompat.Array}C{std.core.String}}C{@ohos.intl.intl.DateTimeOptions}:"
+            "X{C{std.core.Array}C{std.core.String}}C{@ohos.intl.intl.DateTimeOptions}:"
             "C{@ohos.intl.intl.DateTimeFormat}",
             reinterpret_cast<void *>(DateTimeFormat_CreateWithParam)
         },
@@ -628,7 +628,7 @@ ani_status IntlAddon::BindContext_Collator(ani_env *env)
         ani_native_function {"create", ":C{@ohos.intl.intl.Collator}", reinterpret_cast<void *>(Collator_Create) },
         ani_native_function {
             "create",
-            "X{C{std.core.String}C{escompat.Array}}C{@ohos.intl.intl.CollatorOptions}:C{@ohos.intl.intl.Collator}",
+            "X{C{std.core.String}C{std.core.Array}}C{@ohos.intl.intl.CollatorOptions}:C{@ohos.intl.intl.Collator}",
             reinterpret_cast<void *>(Collator_CreateWithParam)
         },
     };
@@ -662,7 +662,7 @@ ani_status IntlAddon::BindContext_PluralRules(ani_env *env)
             reinterpret_cast<void *>(PluralRules_Create) },
         ani_native_function {
             "create",
-            "X{C{escompat.Array}C{std.core.String}}C{@ohos.intl.intl.PluralRulesOptions}:"
+            "X{C{std.core.Array}C{std.core.String}}C{@ohos.intl.intl.PluralRulesOptions}:"
             "C{@ohos.intl.intl.PluralRules}",
             reinterpret_cast<void *>(PluralRules_CreateWithParam)
         },
@@ -698,7 +698,7 @@ ani_status IntlAddon::BindContext_RelativeTimeFormat(ani_env *env)
             reinterpret_cast<void *>(RelativeTimeFormat_Create) },
         ani_native_function {
             "create",
-            "X{C{escompat.Array}C{std.core.String}}C{@ohos.intl.intl.RelativeTimeFormatInputOptions}:"
+            "X{C{std.core.Array}C{std.core.String}}C{@ohos.intl.intl.RelativeTimeFormatInputOptions}:"
             "C{@ohos.intl.intl.RelativeTimeFormat}",
             reinterpret_cast<void *>(RelativeTimeFormat_CreateWithParam)
         },

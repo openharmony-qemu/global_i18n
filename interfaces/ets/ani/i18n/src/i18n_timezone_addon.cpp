@@ -191,7 +191,7 @@ ani_object I18nTimeZoneAddon::GetTimezonesByLocation(ani_env *env, [[maybe_unuse
     ani_double longitude, ani_double latitude)
 {
     std::vector<std::string> tempList = I18nTimeZone::GetTimezoneIdByLocation(longitude, latitude);
-    static const char *className = "escompat.Array";
+    static const char *className = "std.core.Array";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("Find class '%{public}s' failed", className);

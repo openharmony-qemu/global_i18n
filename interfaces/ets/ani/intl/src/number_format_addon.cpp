@@ -189,7 +189,7 @@ ani_status NumberFormatAddon::BindContext_NumberFormat(ani_env *env)
             reinterpret_cast<void *>(NumberFormat_Create) },
         ani_native_function {
             "create",
-            "X{C{escompat.Array}C{std.core.String}}C{@ohos.intl.intl.NumberOptions}:"
+            "X{C{std.core.Array}C{std.core.String}}C{@ohos.intl.intl.NumberOptions}:"
             "C{@ohos.intl.intl.NumberFormat}",
             reinterpret_cast<void *>(NumberFormat_CreateWithParam)
         },
