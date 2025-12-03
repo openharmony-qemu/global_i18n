@@ -59,24 +59,6 @@ int CustomizedDataTest0029(void);
 int CustomizedDataTest0030(void);
 int CustomizedDataTest0031(void);
 int CustomizedDataTest0032(void);
-int CustomizedDataTest0033(void);
-int CustomizedDataTest0034(void);
-int CustomizedDataTest0035(void);
-int CustomizedDataTest0036(void);
-int CustomizedDataTest0037(void);
-int CustomizedDataTest0038(void);
-int CustomizedDataTest0039(void);
-int CustomizedDataTest0040(void);
-int CustomizedDataTest0041(void);
-int CustomizedDataTest0042(void);
-int CustomizedDataTest0043(void);
-int CustomizedDataTest0044(void);
-int CustomizedDataTest0045(void);
-int CustomizedDataTest0046(void);
-int CustomizedDataTest0047(void);
-int CustomizedDataTest0048(void);
-int CustomizedDataTest0049(void);
-int CustomizedDataTest0050(void);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
