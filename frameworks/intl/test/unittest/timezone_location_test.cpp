@@ -707,6 +707,9 @@ HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0001, TestSize.Level1)
         EXPECT_EQ(tz.size(), expects.size());
         for (unsigned int i = 0; i < tz.size(); i++) {
             EXPECT_EQ(tz[i], expects[i]);
+            if (tz[i] != expects[i]) {
+                printf("line: %d", (i+30));
+            }
         }
     }
 }
