@@ -17,7 +17,6 @@ import("//build/ohos.gni")
 
 group("build_module") {
   deps = [
-    ":init_multi_users_data",
     ":intl_util",
     ":num_timezone_cfg",
     ":preferred_language",
@@ -27,6 +26,10 @@ group("build_module") {
     "./parameter_upgrade:taboo_version_txt",
     "./parameter_upgrade:timezone_version_txt",
   ]
+
+  if (target_platform == "pc") {
+    deps += [ ":init_multi_users_data" ]
+  }
 }
 
 group("geocoding_depends") {

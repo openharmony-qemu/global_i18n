@@ -15,6 +15,7 @@
 #include <sys/dir.h>
 #include <sys/stat.h>
 #include <string>
+#include <unistd.h>
 #include "i18n_hilog.h"
 #include "multi_users.h"
 
@@ -68,6 +69,7 @@ int main(int argc, char* argv[])
 #ifdef SUPPORT_MULTI_USER
     HILOG_INFO_I18N("Start init multi users data.");
     OHOS::Global::I18n::Init();
+    _exit(0);
 #endif
     return 0;
 }
