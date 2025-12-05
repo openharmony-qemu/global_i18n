@@ -699,6 +699,7 @@ void TimeZoneLocationTest::TearDown(void)
  */
 HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0001, TestSize.Level1)
 {
+    int index = 0;
     for (auto iter = timeZoneTestcases.begin(); iter != timeZoneTestcases.end(); ++iter) {
         double longitude = std::get<0>(*iter);
         double latitude = std::get<1>(*iter);
@@ -708,9 +709,10 @@ HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0001, TestSize.Level1)
         for (unsigned int i = 0; i < tz.size(); i++) {
             EXPECT_EQ(tz[i], expects[i]);
             if (tz[i] != expects[i]) {
-                printf("line: %d", (i+30));
+                printf("line: %d", (index+30));
             }
         }
+        ++index;
     }
 }
 
