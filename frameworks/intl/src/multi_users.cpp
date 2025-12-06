@@ -175,6 +175,7 @@ I18nErrorCode MultiUsers::SaveIs24Hour(const std::string& localId, const std::st
 
 std::string MultiUsers::GetLanguageFromUserId(int32_t userId)
 {
+#ifdef SUPPORT_MULTI_USER
     std::string localId = std::to_string(userId);
     std::string locale = ReadMultiUsersParameter(MULTI_USERS_LOCALE_KEY, localId);
     std::string language = ReadMultiUsersParameter(MULTI_USERS_LANGUAGE_KEY, localId);
@@ -184,6 +185,9 @@ std::string MultiUsers::GetLanguageFromUserId(int32_t userId)
         return LocaleConfig::GetEffectiveLanguage();
     }
     return LocaleConfig::ComputeEffectiveLanguage(locale, language);
+#else
+    return LocaleConfig::GetEffectiveLanguage();
+#endif
 }
 
 std::string MultiUsers::GetSystemLanguageFromUserId(int32_t userId)
