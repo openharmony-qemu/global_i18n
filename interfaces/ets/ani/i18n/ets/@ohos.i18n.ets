@@ -188,12 +188,7 @@ namespace i18n {
         native static getTemperatureName(type: TemperatureType): string;
         native static setFirstDayOfWeek(type: WeekDay): void;
         native static getFirstDayOfWeek(): WeekDay;
-
-        public static getSystemLocaleInstance(): Intl.Locale {
-            let systemLocaleStr = System.getSystemLocale();
-            let systemLocale = new Intl.Locale(systemLocaleStr);
-            return systemLocale;
-        }
+        native static getSystemLocaleInstance(): Intl.Locale;
     }
 
     export class I18NUtil {
