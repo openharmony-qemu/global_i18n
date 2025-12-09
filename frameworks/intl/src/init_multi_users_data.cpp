@@ -42,11 +42,11 @@ void ModifyDirPermission()
         std::string fullPath = DIR_PATH + "/" + fileName;
         struct stat st;
         if (stat(fullPath.c_str(), &st) == -1) {
-            HILOG_ERROR_I18N("ModifyDirPermission: stat %{public}s failed.", fullPath.c_str());
+            HILOG_ERROR_I18N("ModifyDirPermission: stat file failed.");
             continue;
         }
         if (chmod(fullPath.c_str(), mode) == -1) {
-            HILOG_ERROR_I18N("ModifyDirPermission: chmod %{public}s failed.", fullPath.c_str());
+            HILOG_ERROR_I18N("ModifyDirPermission: chmod file failed.");
             continue;
         }
     }

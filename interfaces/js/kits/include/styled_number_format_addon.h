@@ -54,7 +54,7 @@ private:
     static void SetNamedProperty(napi_env env, napi_value &option, const std::string& name, napi_value &property);
 
     bool InitStyledNumberFormatContent(napi_env env, IntlNumberFormatAddon* intlNumberFormatAddon,
-        SimpleNumberFormatAddon* simpleNumberFormatAddon, NumberFormatAddon *numberFormatAddonAddon,
+        SimpleNumberFormatAddon* simpleNumberFormatAddon, NumberFormatAddon *numberFormatAddon,
         napi_value options);
     void SetTextStyle(napi_env env, napi_value options, const std::string &optionName);
 
