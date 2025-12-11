@@ -423,7 +423,8 @@ ani_object I18nSystemAddon::GetSystemLocaleInstance([[maybe_unused]] ani_env *en
     }
 
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "C{std.core.String}:", &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>",
+        "X{C{std.core.Intl.Locale}C{std.core.String}}C{std.core.Intl.LocaleOptions}:", &ctor)) {
         HILOG_ERROR_I18N("GetSystemLocaleInstance: Find method '<ctor>' failed");
         return nullptr;
     }
