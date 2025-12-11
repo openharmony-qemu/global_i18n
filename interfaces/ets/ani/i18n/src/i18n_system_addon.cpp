@@ -107,8 +107,8 @@ ani_string I18nSystemAddon::GetDisplayCountry(ani_env *env, [[maybe_unused]] ani
     }
     if (!isUndefined) {
         ani_boolean value;
-        if (ANI_OK != env->Object_CallMethodByName_Boolean(sentenceCase, "unboxed", ":z", &value)) {
-            HILOG_ERROR_I18N("I18nSystemAddon::GetDisplayCountry: Unboxed Boolean failed");
+        if (ANI_OK != env->Object_CallMethodByName_Boolean(sentenceCase, "toBoolean", ":z", &value)) {
+            HILOG_ERROR_I18N("I18nSystemAddon::GetDisplayCountry: Unbox Boolean failed");
             return nullptr;
         }
         sentenceCaseBool = value;
@@ -135,8 +135,8 @@ ani_string I18nSystemAddon::GetDisplayLanguage(ani_env *env, [[maybe_unused]] an
     }
     if (!isUndefined) {
         ani_boolean value;
-        if (ANI_OK != env->Object_CallMethodByName_Boolean(sentenceCase, "unboxed", ":z", &value)) {
-            HILOG_ERROR_I18N("I18nSystemAddon::GetDisplayLanguage: Unboxed Boolean failed");
+        if (ANI_OK != env->Object_CallMethodByName_Boolean(sentenceCase, "toBoolean", ":z", &value)) {
+            HILOG_ERROR_I18N("I18nSystemAddon::GetDisplayLanguage: Unbox Boolean failed");
             return nullptr;
         }
         sentenceCaseBool = value;
@@ -254,8 +254,8 @@ void I18nSystemAddon::AddPreferredLanguage(ani_env *env, [[maybe_unused]] ani_ob
         return;
     }
     if (!isUndefined) {
-        if (ANI_OK != env->Object_CallMethodByName_Int(number, "unboxed", ":i", &index)) {
-            HILOG_ERROR_I18N("I18nSystemAddon::AddPreferredLanguage: Unboxed number to int failed");
+        if (ANI_OK != env->Object_CallMethodByName_Int(number, "toInt", ":i", &index)) {
+            HILOG_ERROR_I18N("I18nSystemAddon::AddPreferredLanguage: Unbox number to int failed");
             return;
         }
     }

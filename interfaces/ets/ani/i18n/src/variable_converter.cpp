@@ -118,7 +118,7 @@ bool VariableConverter::GetBooleanMember(ani_env *env, ani_object options, const
     }
 
     ani_boolean ret;
-    if (ANI_OK != env->Object_CallMethodByName_Boolean(static_cast<ani_object>(ref), "unboxed", ":z", &ret)) {
+    if (ANI_OK != env->Object_CallMethodByName_Boolean(static_cast<ani_object>(ref), "toBoolean", ":z", &ret)) {
         HILOG_ERROR_I18N("VariableConverter::GetBooleanMember: Call method by name failed");
         return false;
     }
@@ -208,8 +208,8 @@ bool VariableConverter::GetNumberMember(ani_env *env, ani_object options, const 
     }
 
     ani_int valueInt;
-    if (ANI_OK != env->Object_CallMethodByName_Int(static_cast<ani_object>(ref), "unboxed", ":i", &valueInt)) {
-        HILOG_ERROR_I18N("VariableConverter::GetNumberMember: Unboxed Double failed");
+    if (ANI_OK != env->Object_CallMethodByName_Int(static_cast<ani_object>(ref), "toInt", ":i", &valueInt)) {
+        HILOG_ERROR_I18N("VariableConverter::GetNumberMember: Unbox Double failed");
         return false;
     }
     value = valueInt;
@@ -303,7 +303,7 @@ std::string VariableConverter::GetLocaleTagFromBuiltinLocale(ani_env *env, ani_o
 
 ani_object VariableConverter::CreateArray(ani_env *env, const std::vector<std::string> &strs)
 {
-    static const char *className = "escompat.Array";
+    static const char *className = "std.core.Array";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("VariableConverter::CreateArray: Find class '%{public}s' failed", className);
@@ -339,7 +339,7 @@ ani_object VariableConverter::CreateArray(ani_env *env, const std::vector<std::s
 
 bool VariableConverter::ParseStringArray(ani_env *env, ani_object obj, std::vector<std::string> &strs)
 {
-    static const char *className = "escompat.Array";
+    static const char *className = "std.core.Array";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("VariableConverter::ParseStringArray: Find class '%{public}s' failed", className);
@@ -394,7 +394,7 @@ ani_enum_item VariableConverter::GetEnumItemByIndex(ani_env* env, const char* en
 
 ani_double VariableConverter::GetDateValue(ani_env *env, ani_object date, const std::string &method)
 {
-    static const char* className = "escompat.Date";
+    static const char* className = "std.core.Date";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("VariableConverter::GetDateValue: Find class '%{public}s' failed", className);
@@ -433,7 +433,7 @@ std::vector<std::string> VariableConverter::GetLocaleTags(ani_env *env, ani_obje
         localeTags.push_back(AniStrToString(env, locale));
         return localeTags;
     }
-    static const char *className = "escompat.Array";
+    static const char *className = "std.core.Array";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("VariableConverter::GetLocaleTags: Find class '%{public}s' failed", className);
@@ -474,8 +474,8 @@ ani_object VariableConverter::CreateAniMap(ani_env* env,
     const std::unordered_map<std::string, std::string> &map)
 {
     ani_class mapClass;
-    if (ANI_OK != env->FindClass("escompat.Map", &mapClass)) {
-        HILOG_ERROR_I18N("CreateAniMap: Find class 'escompat.Map' failed");
+    if (ANI_OK != env->FindClass("std.core.Map", &mapClass)) {
+        HILOG_ERROR_I18N("CreateAniMap: Find class 'std.core.Map' failed");
         return nullptr;
     }
     ani_method ctor;
@@ -485,7 +485,7 @@ ani_object VariableConverter::CreateAniMap(ani_env* env,
     }
     ani_object obj;
     if (ANI_OK != env->Object_New(mapClass, ctor, &obj)) {
-        HILOG_ERROR_I18N("CreateAniMap: New object 'escompat.Map' failed");
+        HILOG_ERROR_I18N("CreateAniMap: New object 'std.core.Map' failed");
         return nullptr;
     }
     ani_ref value;
@@ -495,7 +495,7 @@ ani_object VariableConverter::CreateAniMap(ani_env* env,
         ani_object keyObj = static_cast<ani_object>(key);
         ani_object valObj = static_cast<ani_object>(val);
         if (ANI_OK != env->Object_CallMethodByName_Ref(obj, "set",
-            "C{std.core.Object}C{std.core.Object}:C{escompat.Map}", &value, keyObj, valObj)) {
+            "C{std.core.Object}C{std.core.Object}:C{std.core.Map}", &value, keyObj, valObj)) {
             HILOG_ERROR_I18N("CreateAniMap: Call method 'set' failed");
             return nullptr;
         }

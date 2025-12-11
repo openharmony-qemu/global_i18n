@@ -35,7 +35,7 @@ static IntlAddon* UnwrapAddon(ani_env *env, ani_object object, const std::string
 
 ani_string IntlAddon::DateTimeFormat_Format(ani_env *env, ani_object object, ani_object date)
 {
-    static const char *className = "escompat.Date";
+    static const char *className = "std.core.Date";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("IntlAddon::DateTimeFormat_Format: Find class '%{public}s' failed", className);
@@ -67,7 +67,7 @@ ani_string IntlAddon::DateTimeFormat_Format(ani_env *env, ani_object object, ani
 ani_string IntlAddon::DateTimeFormat_FormatRange(ani_env *env, ani_object object,
     ani_object startDate, ani_object endDate)
 {
-    static const char *className = "escompat.Date";
+    static const char *className = "std.core.Date";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("IntlAddon::DateTimeFormat_FormatRange: Find class '%{public}s' failed", className);
@@ -339,7 +339,7 @@ ani_status IntlAddon::BindContext_DateTimeFormat(ani_env *env)
             reinterpret_cast<void *>(DateTimeFormat_Create) },
         ani_native_function {
             "create",
-            "X{C{escompat.Array}C{std.core.String}}C{@ohos.intl.intl.DateTimeOptions}:"
+            "X{C{std.core.Array}C{std.core.String}}C{@ohos.intl.intl.DateTimeOptions}:"
             "C{@ohos.intl.intl.DateTimeFormat}",
             reinterpret_cast<void *>(DateTimeFormat_CreateWithParam)
         },
@@ -373,7 +373,7 @@ ani_status IntlAddon::BindContext_Collator(ani_env *env)
         ani_native_function {"create", ":C{@ohos.intl.intl.Collator}", reinterpret_cast<void *>(Collator_Create) },
         ani_native_function {
             "create",
-            "X{C{std.core.String}C{escompat.Array}}C{@ohos.intl.intl.CollatorOptions}:C{@ohos.intl.intl.Collator}",
+            "X{C{std.core.String}C{std.core.Array}}C{@ohos.intl.intl.CollatorOptions}:C{@ohos.intl.intl.Collator}",
             reinterpret_cast<void *>(Collator_CreateWithParam)
         },
     };
