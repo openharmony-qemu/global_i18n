@@ -430,7 +430,7 @@ ani_object I18nSystemAddon::GetSystemLocaleInstance([[maybe_unused]] ani_env *en
     }
     std::string locale = LocaleConfig::GetSystemLocaleInstanceTag();
     ani_object ret;
-    if (ANI_OK != env->Object_New(cls, ctor, &ret, locale.c_str())) {
+    if (ANI_OK != env->Object_New(cls, ctor, &ret, locale.c_str(), nullptr)) {
         HILOG_ERROR_I18N("GetSystemLocaleInstance: New object '%{public}s' failed", className);
         return nullptr;
     }
