@@ -428,9 +428,19 @@ ani_object I18nSystemAddon::GetSystemLocaleInstance([[maybe_unused]] ani_env *en
         HILOG_ERROR_I18N("GetSystemLocaleInstance: Find method '<ctor>' failed");
         return nullptr;
     }
+    ani_ref undefinedRef;
+    if (ANI_OK != env->GetUndefined(&undefinedRef)) {
+        HILOG_ERROR_I18N("GetSystemLocaleInstance: GetUndefined failed");
+        return nullptr;
+    }
     std::string locale = LocaleConfig::GetSystemLocaleInstanceTag();
+    ani_string localeAniStr = VariableConverter::StringToAniStr(env, locale);
+    if (localeAniStr == nullptr) {
+        HILOG_ERROR_I18N("GetSystemLocaleInstance: Get ani string failed");
+        return nullptr;
+    }
     ani_object ret;
-    if (ANI_OK != env->Object_New(cls, ctor, &ret, locale.c_str(), nullptr)) {
+    if (ANI_OK != env->Object_New(cls, ctor, &ret, localeAniStr, undefinedRef)) {
         HILOG_ERROR_I18N("GetSystemLocaleInstance: New object '%{public}s' failed", className);
         return nullptr;
     }
