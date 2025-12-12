@@ -19,6 +19,7 @@
 #include "error_util.h"
 #include "i18n_hilog.h"
 #include "intl_date_time_format.h"
+#include "js_lifecycle_managers.h"
 #include "js_utils.h"
 #include "utils.h"
 
@@ -46,6 +47,11 @@ void IntlDateTimeFormatAddon::Destructor(napi_env /* env */, void* nativeObject,
 
 napi_value IntlDateTimeFormatAddon::InitIntlDateTimeFormat(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitIntlDateTimeFormat");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("format", Format),
         DECLARE_NAPI_FUNCTION("formatToParts", FormatToParts),

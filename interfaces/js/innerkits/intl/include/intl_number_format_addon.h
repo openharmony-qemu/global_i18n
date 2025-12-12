@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_GLOBAL_I18N_JS_NUMBER_FORMAT_ADDON_H
-#define OHOS_GLOBAL_I18N_JS_NUMBER_FORMAT_ADDON_H
+#ifndef OHOS_GLOBAL_I18N_INTL_NUMBER_FORMAT_ADDON_H
+#define OHOS_GLOBAL_I18N_INTL_NUMBER_FORMAT_ADDON_H
 
 #include <memory>
 
@@ -26,12 +26,12 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-class JSNumberFormatAddon {
+class IntlNumberFormatAddon {
 public:
-    JSNumberFormatAddon();
-    ~JSNumberFormatAddon();
+    IntlNumberFormatAddon();
+    ~IntlNumberFormatAddon();
     static void Destructor(napi_env env, void *nativeObject, void *hint);
-    static napi_value InitJsNumberFormat(napi_env env, napi_value exports);
+    static napi_value InitIntlNumberFormat(napi_env env, napi_value exports);
 
     std::shared_ptr<NumberFormat> GetNumberFormat();
 

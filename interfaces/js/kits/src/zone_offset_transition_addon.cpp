@@ -16,13 +16,14 @@
 #include "error_util.h"
 #include "i18n_hilog.h"
 #include "zone_offset_transition_addon.h"
+#include "js_lifecycle_managers.h"
 #include "js_utils.h"
 #include "variable_convertor.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static thread_local napi_ref g_zoneOffsetTransConstructor = nullptr;
+static thread_local ThreadReference* g_zoneOffsetTransConstructor = nullptr;
 
 ZoneOffsetTransitionAddon::ZoneOffsetTransitionAddon() {}
 
@@ -39,6 +40,11 @@ void ZoneOffsetTransitionAddon::Destructor(napi_env env, void *nativeObject, voi
 
 napi_value ZoneOffsetTransitionAddon::InitZoneOffsetTransition(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitZoneOffsetTransition");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("getMilliseconds", GetMilliseconds),
         DECLARE_NAPI_FUNCTION("getOffsetAfter", GetOffsetAfter),
@@ -57,8 +63,8 @@ napi_value ZoneOffsetTransitionAddon::InitZoneOffsetTransition(napi_env env, nap
         HILOG_ERROR_I18N("InitZoneOffsetTransition: Set property ZoneOffsetTransition failed.");
         return nullptr;
     }
-    status = napi_create_reference(env, constructor, 1, &g_zoneOffsetTransConstructor);
-    if (status != napi_ok) {
+    g_zoneOffsetTransConstructor = ThreadReference::CreateInstance(env, constructor, 1);
+    if (!g_zoneOffsetTransConstructor) {
         HILOG_ERROR_I18N("InitZoneOffsetTransition: Failed to create reference g_timezoneConstructor at init");
         return nullptr;
     }
@@ -143,8 +149,7 @@ napi_value ZoneOffsetTransitionAddon::GetZoneOffsetTransObject(napi_env env, Zon
     }
     argv[CONSTRUCTOR_ARGS_COUNT - 1] = offsetAfter;
     napi_value constructor = nullptr;
-    status = napi_get_reference_value(env, g_zoneOffsetTransConstructor, &constructor);
-    if (status != napi_ok || constructor == nullptr) {
+    if (!g_zoneOffsetTransConstructor->GetReferenceValue(env, &constructor)) {
         HILOG_ERROR_I18N("Failed to create reference of normalizer Constructor");
         return nullptr;
     }

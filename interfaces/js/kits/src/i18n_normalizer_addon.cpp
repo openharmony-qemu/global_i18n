@@ -12,9 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include "error_util.h"
 #include "i18n_hilog.h"
+#include "js_lifecycle_managers.h"
 #include "js_utils.h"
 #include "locale_config.h"
 #include "variable_convertor.h"
@@ -23,7 +24,7 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static thread_local napi_ref* g_normalizerConstructor = nullptr;
+static thread_local ThreadReference* g_normalizerConstructor = nullptr;
 
 const char *I18nNormalizerAddon::NORMALIZER_MODE_NFC_NAME = "NFC";
 const char *I18nNormalizerAddon::NORMALIZER_MODE_NFD_NAME = "NFD";
@@ -46,6 +47,11 @@ void I18nNormalizerAddon::Destructor(napi_env env, void *nativeObject, void *hin
 
 napi_value I18nNormalizerAddon::InitI18nNormalizer(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitI18nNormalizer");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("normalize", Normalize),
     };
@@ -57,14 +63,9 @@ napi_value I18nNormalizerAddon::InitI18nNormalizer(napi_env env, napi_value expo
         return nullptr;
     }
     exports = I18nNormalizerAddon::InitNormalizer(env, exports);
-    g_normalizerConstructor = new (std::nothrow) napi_ref;
+    g_normalizerConstructor = ThreadReference::CreateInstance(env, constructor, 1);
     if (!g_normalizerConstructor) {
         HILOG_ERROR_I18N("InitI18nNormalizer: Failed to create Normalizer ref at init");
-        return nullptr;
-    }
-    status = napi_create_reference(env, constructor, 1, g_normalizerConstructor);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("InitI18nNormalizer: Failed to create reference g_normalizerConstructor at init.");
         return nullptr;
     }
     return exports;
@@ -72,6 +73,11 @@ napi_value I18nNormalizerAddon::InitI18nNormalizer(napi_env env, napi_value expo
 
 napi_value I18nNormalizerAddon::InitNormalizer(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitNormalizer");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_STATIC_FUNCTION("getInstance", GetI18nNormalizerInstance)
     };
@@ -239,8 +245,7 @@ napi_value I18nNormalizerAddon::GetI18nNormalizerInstance(napi_env env, napi_cal
         HILOG_ERROR_I18N("Failed to create g_normalizerConstructor");
         return nullptr;
     }
-    status = napi_get_reference_value(env, *g_normalizerConstructor, &constructor);
-    if (status != napi_ok) {
+    if (!g_normalizerConstructor->GetReferenceValue(env, &constructor)) {
         HILOG_ERROR_I18N("Failed to create reference of normalizer Constructor");
         return nullptr;
     }

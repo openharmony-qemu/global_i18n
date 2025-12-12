@@ -19,6 +19,7 @@
 #include "i18n_service_ability_client.h"
 #include "i18n_service_ability_load_manager.h"
 #include "i18n_system_addon.h"
+#include "js_lifecycle_managers.h"
 #include "js_utils.h"
 #include "locale_config.h"
 #include "locale_info.h"
@@ -47,9 +48,9 @@ void I18nSystemAddon::Destructor(napi_env env, void *nativeObject, void *finaliz
     nativeObject = nullptr;
 }
 
-napi_value I18nSystemAddon::InitI18nSystem(napi_env env, napi_value exports)
+std::vector<napi_property_descriptor> I18nSystemAddon::GetI18nSystemProperty()
 {
-    napi_property_descriptor properties[] = {
+    std::vector<napi_property_descriptor> properties = {
         DECLARE_NAPI_STATIC_FUNCTION("getDisplayCountry", GetDisplayCountryWithError),
         DECLARE_NAPI_STATIC_FUNCTION("getDisplayLanguage", GetDisplayLanguageWithError),
         DECLARE_NAPI_STATIC_FUNCTION("getSystemLanguages", GetSystemLanguages),
@@ -94,9 +95,20 @@ napi_value I18nSystemAddon::InitI18nSystem(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getUsingNumericalDatePattern", GetUsingNumericalDatePattern),
         DECLARE_NAPI_STATIC_FUNCTION("setSystemNumericalDatePattern", SetSystemNumericalDatePattern),
     };
+    return properties;
+}
+
+napi_value I18nSystemAddon::InitI18nSystem(napi_env env, napi_value exports)
+{
+    HandleScope scope(env, "InitI18nSystem");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
+    std::vector<napi_property_descriptor> properties = GetI18nSystemProperty();
     napi_value constructor = nullptr;
     napi_status status = napi_define_class(env, "System", NAPI_AUTO_LENGTH, JSUtils::DefaultConstructor, nullptr,
-        sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
+        properties.size(), properties.data(), &constructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Define class failed when InitSystem.");
         return nullptr;

@@ -15,6 +15,8 @@
 
 #include "error_util.h"
 #include "i18n_hilog.h"
+#include "js_lifecycle_managers.h"
+#include "js_utils.h"
 #include "locale_config.h"
 #include "utils.h"
 #include "variable_convertor.h"
@@ -40,6 +42,11 @@ void SystemLocaleManagerAddon::Destructor(napi_env env, void *nativeObject, void
 
 napi_value SystemLocaleManagerAddon::InitSystemLocaleManager(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitSystemLocaleManager");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("getLanguageInfoArray", GetLanguageInfoArray),
         DECLARE_NAPI_FUNCTION("getRegionInfoArray", GetCountryInfoArray),

@@ -15,6 +15,7 @@
 
 #include "intl_plural_rules_addon.h"
 #include "i18n_hilog.h"
+#include "js_lifecycle_managers.h"
 #include "js_utils.h"
 
 namespace OHOS {
@@ -31,6 +32,11 @@ void IntlPluralRulesAddon::Destructor(napi_env env, void* nativeObject, void* fi
 
 napi_value IntlPluralRulesAddon::InitIntlPluralRules(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitIntlPluralRules");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("select", Select),
         DECLARE_NAPI_FUNCTION("resolvedOptions", ResolvedOptions),

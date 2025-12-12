@@ -12,9 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include "error_util.h"
 #include "i18n_hilog.h"
+#include "js_lifecycle_managers.h"
+#include "js_utils.h"
 #include "locale_info_addon.h"
 #include "variable_convertor.h"
 #include "simple_number_format_addon.h"
@@ -22,7 +24,7 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static thread_local napi_ref* g_SimpleNumberFormatConstructor = nullptr;
+static thread_local ThreadReference* g_SimpleNumberFormatConstructor = nullptr;
 
 SimpleNumberFormatAddon::SimpleNumberFormatAddon() {}
 
@@ -39,6 +41,11 @@ void SimpleNumberFormatAddon::Destructor(napi_env env, void *nativeObject, void 
 
 napi_value SimpleNumberFormatAddon::InitSimpleNumberFormat(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitSimpleNumberFormat");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("format", Format),
     };
@@ -52,15 +59,9 @@ napi_value SimpleNumberFormatAddon::InitSimpleNumberFormat(napi_env env, napi_va
         return nullptr;
     }
 
-    g_SimpleNumberFormatConstructor = new (std::nothrow) napi_ref;
+    g_SimpleNumberFormatConstructor = ThreadReference::CreateInstance(env, constructor, 1);
     if (!g_SimpleNumberFormatConstructor) {
         HILOG_ERROR_I18N("InitSimpleNumberFormat: Failed to create SimpleNumberFormat ref at init.");
-        return nullptr;
-    }
-    status = napi_create_reference(env, constructor, 1, g_SimpleNumberFormatConstructor);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N(
-            "InitSimpleNumberFormat: Failed to create reference g_SimpleNumberFormatConstructor at init.");
         return nullptr;
     }
 
@@ -89,8 +90,7 @@ napi_value SimpleNumberFormatAddon::GetSimpleNumberFormatBySkeleton(napi_env env
         HILOG_ERROR_I18N("Failed to create g_SimpleNumberFormatConstructor");
         return nullptr;
     }
-    status = napi_get_reference_value(env, *g_SimpleNumberFormatConstructor, &constructor);
-    if (status != napi_ok) {
+    if (!g_SimpleNumberFormatConstructor->GetReferenceValue(env, &constructor)) {
         HILOG_ERROR_I18N("GetSimpleNumberFormatBySkeleton: Failed to create reference.");
         return nullptr;
     }

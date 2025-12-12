@@ -17,6 +17,7 @@
 #include "character.h"
 #include "error_util.h"
 #include "i18n_hilog.h"
+#include "js_lifecycle_managers.h"
 #include "js_utils.h"
 #include "variable_convertor.h"
 #include "zone_offset_transition_addon.h"
@@ -24,7 +25,7 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static thread_local napi_ref g_zoneRulesConstructor = nullptr;
+static thread_local ThreadReference* g_zoneRulesConstructor = nullptr;
 
 ZoneRulesAddon::ZoneRulesAddon() {}
 
@@ -41,6 +42,11 @@ void ZoneRulesAddon::Destructor(napi_env env, void *nativeObject, void *hint)
 
 napi_value ZoneRulesAddon::InitI18nZoneRules(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitI18nZoneRules");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("nextTransition", NextTransition),
     };
@@ -57,8 +63,8 @@ napi_value ZoneRulesAddon::InitI18nZoneRules(napi_env env, napi_value exports)
         HILOG_ERROR_I18N("InitI18nZoneRules: Set property ZoneRules failed.");
         return nullptr;
     }
-    status = napi_create_reference(env, constructor, 1, &g_zoneRulesConstructor);
-    if (status != napi_ok) {
+    g_zoneRulesConstructor = ThreadReference::CreateInstance(env, constructor, 1);
+    if (!g_zoneRulesConstructor) {
         HILOG_ERROR_I18N("InitI18nZoneRules: Failed to create reference at init.");
         return nullptr;
     }
@@ -191,8 +197,7 @@ napi_value ZoneRulesAddon::GetZoneRulesObject(napi_env env, std::string tzId)
     }
     argv[0] = param;
     napi_value constructor = nullptr;
-    status = napi_get_reference_value(env, g_zoneRulesConstructor, &constructor);
-    if (status != napi_ok || constructor == nullptr) {
+    if (!g_zoneRulesConstructor->GetReferenceValue(env, &constructor)) {
         HILOG_ERROR_I18N("Failed to create reference of normalizer Constructor");
         return nullptr;
     }

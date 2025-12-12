@@ -18,12 +18,13 @@
 
 #include "error_util.h"
 #include "i18n_hilog.h"
+#include "js_lifecycle_managers.h"
 #include "js_utils.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-static thread_local napi_ref *g_constructor = nullptr;
+static thread_local ThreadReference *g_constructor = nullptr;
 
 LocaleInfoAddon::LocaleInfoAddon() : env_(nullptr) {}
 
@@ -50,6 +51,11 @@ napi_value LocaleInfoAddon::SetProperty(napi_env env, napi_callback_info info)
 
 napi_value LocaleInfoAddon::InitLocale(napi_env env, napi_value exports)
 {
+    HandleScope scope(env, "InitLocale");
+    if (!scope.IsOpen()) {
+        return nullptr;
+    }
+
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_GETTER_SETTER("language", GetLanguage, SetProperty),
         DECLARE_NAPI_GETTER_SETTER("baseName", GetBaseName, SetProperty),
@@ -77,14 +83,9 @@ napi_value LocaleInfoAddon::InitLocale(napi_env env, napi_value exports)
         HILOG_ERROR_I18N("Set property failed when InitLocale");
         return nullptr;
     }
-    g_constructor = new (std::nothrow) napi_ref;
+    g_constructor = ThreadReference::CreateInstance(env, constructor, 1);
     if (!g_constructor) {
-        HILOG_ERROR_I18N("Failed to create ref at init");
-        return nullptr;
-    }
-    status = napi_create_reference(env, constructor, 1, g_constructor);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("Failed to create reference at init");
+        HILOG_ERROR_I18N("LocaleInfoAddon::InitLocale: Failed to create ThreadReference");
         return nullptr;
     }
     return exports;
@@ -155,15 +156,13 @@ bool LocaleInfoAddon::IsLocaleInfo(napi_env env, napi_value argv)
         HILOG_ERROR_I18N("LocaleInfoAddon::IsLocaleInfo: g_constructor is nullptr.");
         return false;
     }
-
-    napi_status status = napi_get_reference_value(env, *g_constructor, &constructor);
-    if (status != napi_ok || constructor == nullptr) {
+    if (!g_constructor->GetReferenceValue(env, &constructor)) {
         HILOG_ERROR_I18N("LocaleInfoAddon::IsLocaleInfo: Failed to create reference.");
         return false;
     }
 
     bool isLocaleInfo = false;
-    status = napi_instanceof(env, argv, constructor, &isLocaleInfo);
+    napi_status status = napi_instanceof(env, argv, constructor, &isLocaleInfo);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("LocaleInfoAddon::IsLocaleInfo: Failed to get instance of argv.");
         return false;
@@ -389,8 +388,7 @@ napi_value LocaleInfoAddon::GetMaximizeOrMinimize(napi_env env, napi_callback_in
         HILOG_ERROR_I18N("Maximize: g_constructor is nullptr.");
         return nullptr;
     }
-    status = napi_get_reference_value(env, *g_constructor, &constructor);
-    if (status != napi_ok) {
+    if (!g_constructor->GetReferenceValue(env, &constructor)) {
         HILOG_ERROR_I18N("Maximize: Get locale constructor reference failed");
         return nullptr;
     }
