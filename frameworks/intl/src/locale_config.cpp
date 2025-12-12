@@ -181,7 +181,6 @@ unordered_map<string, string> LocaleConfig::localDigitMap {
 
 std::unordered_map<std::string, std::vector<std::string>> LocaleConfig::dialectLanguages {
     { "en-Latn", { "en-Latn-US", "en-Latn-GB" } },
-    { "pt-Latn", { "pt-Latn-PT", "pt-Latn-BR" } },
     { "zh-Hant", { "zh-Hant-HK", "zh-Hant-TW" } },
 };
 
