@@ -83,6 +83,7 @@ const std::vector<ani_native_function> I18nSystemAddon::METHODS = {
         reinterpret_cast<void *>(SetSystemNumericalDatePattern) },
     ani_native_function { "getUsingNumericalDatePattern", nullptr,
         reinterpret_cast<void *>(GetUsingNumericalDatePattern) },
+    ani_native_function { "getSystemLocaleInstance", nullptr, reinterpret_cast<void *>(GetSystemLocaleInstance) },
 };
 
 ani_string I18nSystemAddon::GetDisplayCountry(ani_env *env, [[maybe_unused]] ani_object object,
@@ -710,6 +711,41 @@ ani_string I18nSystemAddon::GetUsingNumericalDatePattern([[maybe_unused]] ani_en
         return nullptr;
     }
     return VariableConverter::StringToAniStr(env, identifier);
+}
+
+ani_object I18nSystemAddon::GetSystemLocaleInstance([[maybe_unused]] ani_env *env,
+    [[maybe_unused]] ani_object object)
+{
+    static const char *className = "std.core.Intl.Locale";
+    ani_class cls;
+    if (ANI_OK != env->FindClass(className, &cls)) {
+        HILOG_ERROR_I18N("GetSystemLocaleInstance: Find class '%{public}s' failed", className);
+        return nullptr;
+    }
+
+    ani_method ctor;
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>",
+        "X{C{std.core.Intl.Locale}C{std.core.String}}C{std.core.Intl.LocaleOptions}:", &ctor)) {
+        HILOG_ERROR_I18N("GetSystemLocaleInstance: Find method '<ctor>' failed");
+        return nullptr;
+    }
+    ani_ref undefinedRef;
+    if (ANI_OK != env->GetUndefined(&undefinedRef)) {
+        HILOG_ERROR_I18N("GetSystemLocaleInstance: GetUndefined failed");
+        return nullptr;
+    }
+    std::string locale = LocaleConfig::GetSystemLocaleInstanceTag();
+    ani_string localeAniStr = VariableConverter::StringToAniStr(env, locale);
+    if (localeAniStr == nullptr) {
+        HILOG_ERROR_I18N("GetSystemLocaleInstance: Get ani string failed");
+        return nullptr;
+    }
+    ani_object ret;
+    if (ANI_OK != env->Object_New(cls, ctor, &ret, localeAniStr, undefinedRef)) {
+        HILOG_ERROR_I18N("GetSystemLocaleInstance: New object '%{public}s' failed", className);
+        return nullptr;
+    }
+    return ret;
 }
 
 ani_status I18nSystemAddon::BindContextSystem(ani_env *env)
