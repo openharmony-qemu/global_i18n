@@ -126,7 +126,7 @@ static ani_object CreateHolidayLocalNameArray(ani_env *env, std::vector<HolidayL
     }
 
     ani_method set;
-    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "iC{std.core.Object}:", &set)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "iY:", &set)) {
         HILOG_ERROR_I18N("CreateHolidayLocalNameArray: Find method '$_set' failed");
         return ret;
     }
@@ -204,7 +204,7 @@ static ani_object GetHolidayInfoItemResult(ani_env *env, std::vector<HolidayInfo
     }
 
     ani_method set;
-    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "iC{std.core.Object}:", &set)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "iY:", &set)) {
         HILOG_ERROR_I18N("GetHolidayInfoItemResult: Find method '$_set' failed");
         return ret;
     }
