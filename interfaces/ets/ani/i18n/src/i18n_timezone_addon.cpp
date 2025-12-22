@@ -91,7 +91,7 @@ ani_string I18nTimeZoneAddon::GetDisplayName(ani_env *env, ani_object object, an
     }
     if (!isUndefined) {
         DSTFlag = true;
-        if (ANI_OK != env->Object_CallMethodByName_Boolean(isDST, "unboxed", ":z", &isDSTBool)) {
+        if (ANI_OK != env->Object_CallMethodByName_Boolean(isDST, "toBoolean", ":z", &isDSTBool)) {
             HILOG_ERROR_I18N("I18nTimeZoneAddon::GetDisplayName: Unbox Boolean failed");
             return nullptr;
         }
@@ -135,7 +135,7 @@ ani_int I18nTimeZoneAddon::GetOffset(ani_env *env, ani_object object, ani_object
         return -1;
     }
     if (!isUndefined) {
-        if (ANI_OK != env->Object_CallMethodByName_Double(date, "unboxed", ":d", &dateDouble)) {
+        if (ANI_OK != env->Object_CallMethodByName_Double(date, "toDouble", ":d", &dateDouble)) {
             HILOG_ERROR_I18N("I18nTimeZoneAddon::GetOffset: Unbox Double failed");
             return -1;
         }
@@ -188,7 +188,7 @@ ani_object I18nTimeZoneAddon::GetTimezonesByLocation(ani_env *env, [[maybe_unuse
     ani_double longitude, ani_double latitude)
 {
     std::vector<std::string> tempList = I18nTimeZone::GetTimezoneIdByLocation(longitude, latitude);
-    static const char *className = "escompat.Array";
+    static const char *className = "std.core.Array";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("I18nTimeZoneAddon::GetTimezonesByLocation: Find class '%{public}s' failed", className);

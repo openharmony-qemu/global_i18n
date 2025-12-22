@@ -142,8 +142,9 @@ void I18nCalendarAddon::Set(ani_env *env, ani_object object, ani_int year, ani_i
     }
     if (!isUndefined) {
         ani_int hourValue;
-        if (ANI_OK != env->Object_CallMethodByName_Int(hour, "unboxed", ":i", &hourValue)) {
-            HILOG_ERROR_I18N("I18nCalendarAddon::Set: Unboxed hour to int failed");
+        if (ANI_OK != env->Object_CallMethodByName_Int(hour, "toInt", ":i", &hourValue)) {
+            HILOG_ERROR_I18N("I18nCalendarAddon::Set: Unbox hour to int failed");
+            HILOG_ERROR_I18N("Unbox Int failed");
             return;
         }
         obj->calendar_->Set(UCalendarDateFields::UCAL_HOUR_OF_DAY, hourValue);
@@ -155,8 +156,8 @@ void I18nCalendarAddon::Set(ani_env *env, ani_object object, ani_int year, ani_i
     }
     if (!isUndefined) {
         ani_int minuteValue;
-        if (ANI_OK != env->Object_CallMethodByName_Int(minute, "unboxed", ":i", &minuteValue)) {
-            HILOG_ERROR_I18N("I18nCalendarAddon::Set: Unboxed minute to int failed");
+        if (ANI_OK != env->Object_CallMethodByName_Int(minute, "toInt", ":i", &minuteValue)) {
+            HILOG_ERROR_I18N("I18nCalendarAddon::Set: Unbox minute to int failed");
             return;
         }
         obj->calendar_->Set(UCalendarDateFields::UCAL_MINUTE, minuteValue);
@@ -168,8 +169,8 @@ void I18nCalendarAddon::Set(ani_env *env, ani_object object, ani_int year, ani_i
     }
     if (!isUndefined) {
         ani_int secondValue;
-        if (ANI_OK != env->Object_CallMethodByName_Int(second, "unboxed", ":i", &secondValue)) {
-            HILOG_ERROR_I18N("I18nCalendarAddon::Set: Unboxed second to int failed");
+        if (ANI_OK != env->Object_CallMethodByName_Int(second, "toInt", ":i", &secondValue)) {
+            HILOG_ERROR_I18N("I18nCalendarAddon::Set: Unbox second to int failed");
             return;
         }
         obj->calendar_->Set(UCalendarDateFields::UCAL_SECOND, secondValue);
@@ -343,7 +344,7 @@ ani_status I18nCalendarAddon::BindContextCalendar(ani_env *env)
     }
 
     std::array methods = {
-        ani_native_function { "setTime", "C{escompat.Date}:",
+        ani_native_function { "setTime", "C{std.core.Date}:",
             reinterpret_cast<void *>(I18nCalendarAddon::SetTimeByDate) },
         ani_native_function { "setTime", "d:", reinterpret_cast<void *>(I18nCalendarAddon::SetTime) },
         ani_native_function { "set", nullptr, reinterpret_cast<void *>(I18nCalendarAddon::Set) },

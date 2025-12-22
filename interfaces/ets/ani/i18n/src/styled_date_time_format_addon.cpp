@@ -147,7 +147,7 @@ static ani_object CreateStyledPart(ani_env *env, DateTimeFormatPart part)
 
 static ani_object CreateStyledPartArray(ani_env *env, const std::vector<DateTimeFormatPart>& parts)
 {
-    static const char *className = "escompat.Array";
+    static const char *className = "std.core.Array";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("CreateStyledPartArray: Find class '%{public}s' failed", className);
@@ -219,7 +219,7 @@ ani_object I18nStyledDateTimeFormatAddon::FormatToPats(ani_env *env, ani_object 
         return nullptr;
     }
 
-    static const char *className = "escompat.Date";
+    static const char *className = "std.core.Date";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("I18nSimpleDateTimeFormatAddon::Format: Find class '%{public}s' failed", className);

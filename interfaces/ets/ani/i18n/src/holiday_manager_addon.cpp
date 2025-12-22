@@ -106,7 +106,7 @@ static ani_object CreateHolidayLocalName(ani_env *env, HolidayLocalName localNam
 
 static ani_object CreateHolidayLocalNameArray(ani_env *env, std::vector<HolidayLocalName> localNames)
 {
-    static const char *className = "escompat.Array";
+    static const char *className = "std.core.Array";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("CreateHolidayLocalNameArray: Find class '%{public}s' failed", className);
@@ -184,7 +184,7 @@ static ani_object CreateHolidayInfoItem(ani_env *env, HolidayInfoItem item)
 
 static ani_object GetHolidayInfoItemResult(ani_env *env, std::vector<HolidayInfoItem> itemList)
 {
-    static const char *className = "escompat.Array";
+    static const char *className = "std.core.Array";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("GetHolidayInfoItemResult: Find class '%{public}s' failed", className);
@@ -236,7 +236,7 @@ ani_object I18nHolidayManagerAddon::GetHolidayInfoItemArray(ani_env *env, ani_ob
         itemList = obj->holidayManager_->GetHolidayInfoItemArray();
     } else {
         ani_int yearValue;
-        if (ANI_OK != env->Object_CallMethodByName_Int(year, "unboxed", ":i", &yearValue)) {
+        if (ANI_OK != env->Object_CallMethodByName_Int(year, "toInt", ":i", &yearValue)) {
             HILOG_ERROR_I18N("Unbox Int failed");
             return nullptr;
         }

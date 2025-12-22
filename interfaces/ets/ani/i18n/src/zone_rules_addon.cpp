@@ -58,7 +58,7 @@ ani_object ZoneRulesAddon::NextTransition(ani_env *env, ani_object object, ani_o
     std::unique_ptr<ZoneOffsetTransition> zoneOffsetTrans;
     if (!isUndefined) {
         double paramDate = 0;
-        if (ANI_OK != env->Object_CallMethodByName_Double(date, "unboxed", ":d", &paramDate)) {
+        if (ANI_OK != env->Object_CallMethodByName_Double(date, "toDouble", ":d", &paramDate)) {
             HILOG_ERROR_I18N("NextTransition: Unbox Double failed");
             return nullptr;
         }
