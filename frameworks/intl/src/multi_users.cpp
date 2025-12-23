@@ -40,29 +40,30 @@ const int32_t MultiUsers::DEFAULT_LOCAL_ID = 100;
 const int MultiUsers::CONFIG_LEN = 128;
 std::shared_ptr<NativePreferences::Preferences> MultiUsers::preferences = nullptr;
 
-bool MultiUsers::InitMultiUserData()
+void MultiUsers::InitMultiUser()
 {
-#ifdef SUPPORT_MULTI_USER
     InitPreferences();
     if (preferences == nullptr) {
-        HILOG_ERROR_I18N("InitMultiUserData: InitPreferences failed.");
-        return false;
+        HILOG_ERROR_I18N("InitMultiUser: InitPreferences failed");
+        return;
     }
     bool init = preferences->GetBool(INIT_KEY, false);
-    if (init) {
-        HILOG_INFO_I18N("InitMultiUserData: data has been initialized.");
-        return false;
+    std::string localId;
+    I18nErrorCode errCode = GetForegroundLocalId(localId);
+    if (errCode != I18nErrorCode::SUCCESS) {
+        HILOG_ERROR_I18N("InitMultiUser: get foreground local id failed");
+        return;
     }
-    AddUser("0");
-    preferences->PutBool(INIT_KEY, true);
-    HILOG_INFO_I18N("InitMultiUserData: init multi user data success");
-#endif
-    return true;
+    if (!init) {
+        AddUser(localId);
+        preferences->PutBool(INIT_KEY, true);
+        preferences->Flush();
+        HILOG_INFO_I18N("InitMultiUser: init multi user data success");
+    }
 }
 
 void MultiUsers::SwitchUser(const std::string& curLocalId)
 {
-    HILOG_INFO_I18N("SwitchUser: switch user %{public}s", curLocalId.c_str());
     if (!IsValidLocalId(curLocalId)) {
         HILOG_ERROR_I18N("SwitchUser: curLocalId is an invalid LocalId");
         return;
@@ -75,7 +76,6 @@ void MultiUsers::SwitchUser(const std::string& curLocalId)
 
 void MultiUsers::AddUser(const std::string& localId)
 {
-    HILOG_INFO_I18N("AddUser: add user %{public}s", localId.c_str());
     if (!IsValidLocalId(localId)) {
         HILOG_ERROR_I18N("AddUser: localId is invalid");
         return;
@@ -88,7 +88,6 @@ void MultiUsers::AddUser(const std::string& localId)
 
 void MultiUsers::RemoveUser(const std::string& localId)
 {
-    HILOG_INFO_I18N("RemoveUser: remove user %{public}s", localId.c_str());
     if (!IsValidLocalId(localId)) {
         HILOG_ERROR_I18N("RemoveUser: localId is invalid");
         return;
@@ -175,7 +174,6 @@ I18nErrorCode MultiUsers::SaveIs24Hour(const std::string& localId, const std::st
 
 std::string MultiUsers::GetLanguageFromUserId(int32_t userId)
 {
-#ifdef SUPPORT_MULTI_USER
     std::string localId = std::to_string(userId);
     std::string locale = ReadMultiUsersParameter(MULTI_USERS_LOCALE_KEY, localId);
     std::string language = ReadMultiUsersParameter(MULTI_USERS_LANGUAGE_KEY, localId);
@@ -185,9 +183,6 @@ std::string MultiUsers::GetLanguageFromUserId(int32_t userId)
         return LocaleConfig::GetEffectiveLanguage();
     }
     return LocaleConfig::ComputeEffectiveLanguage(locale, language);
-#else
-    return LocaleConfig::GetEffectiveLanguage();
-#endif
 }
 
 std::string MultiUsers::GetSystemLanguageFromUserId(int32_t userId)
@@ -363,7 +358,7 @@ I18nErrorCode MultiUsers::WriteMultiUsersParameter(const std::string& paramKey, 
 
 bool MultiUsers::IsValidLocalId(const std::string& localId)
 {
-    if (std::atoi(localId.c_str()) < DEFAULT_LOCAL_ID && localId != "0") {
+    if (std::atoi(localId.c_str()) < DEFAULT_LOCAL_ID) {
         HILOG_ERROR_I18N("IsValidLocalId: invalid local ID");
         return false;
     }
@@ -374,7 +369,7 @@ void MultiUsers::InitPreferences()
 {
     if (preferences == nullptr) {
         HILOG_INFO_I18N("InitPreferences: preferences Init");
-        OHOS::NativePreferences::Options opt(PREFERENCE_PATH, "", "", true);
+        OHOS::NativePreferences::Options opt(PREFERENCE_PATH);
         int status = 0;
         preferences = NativePreferences::PreferencesHelper::GetPreferences(opt, status);
         if (status != 0) {
@@ -406,6 +401,7 @@ I18nErrorCode MultiUsers::SetParamFromPreferences(const std::string& paramKey, c
         HILOG_ERROR_I18N("SetParamFromPreferences: put param %{public}s failed", paramKey.c_str());
         return I18nErrorCode::FAILED;
     }
+    preferences->Flush();
     return I18nErrorCode::SUCCESS;
 }
 
@@ -430,7 +426,7 @@ void MultiUsers::UpdateConfiguration(const std::string& locale, const std::strin
 I18nErrorCode MultiUsers::PublishCommonEvent(int32_t userId)
 {
     OHOS::AAFwk::Want localeChangeWant;
-    localeChangeWant.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_TIME_CHANGED);
+    localeChangeWant.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED);
     OHOS::EventFwk::CommonEventData localeChangeEvent(localeChangeWant);
     if (!OHOS::EventFwk::CommonEventManager::PublishCommonEventAsUser(localeChangeEvent, userId)) {
         HILOG_ERROR_I18N("MultiUsers::PublishCommonEvent: Failed to publish locale change event, userId %{public}d.",

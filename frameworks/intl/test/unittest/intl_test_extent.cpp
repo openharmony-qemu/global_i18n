@@ -1821,7 +1821,6 @@ HWTEST_F(IntlTest, IntlFuncTest0097, TestSize.Level1)
 HWTEST_F(IntlTest, IntlFuncTest0098, TestSize.Level1)
 {
 #ifdef SUPPORT_MULTI_USER
-    MultiUsers::InitMultiUserData();
     std::string path = "/data/service/el1/public/i18n/global/GlobalParamData";
     OHOS::NativePreferences::Options opt(path);
     int status;

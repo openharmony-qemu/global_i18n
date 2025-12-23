@@ -231,6 +231,8 @@ public:
      */
     static I18nErrorCode SetSystemNumericalDatePattern(const std::string& identifier);
 
+    static std::string GetLanguageFromUserId(int32_t userId);
+
 private:
     /**
      * @brief Construct a new I18nServiceAbilityClient::CallI18nServiceMethod object
