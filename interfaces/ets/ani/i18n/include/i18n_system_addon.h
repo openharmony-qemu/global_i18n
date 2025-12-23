@@ -59,6 +59,7 @@ public:
     static void SetFirstDayOfWeek([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
         ani_enum_item type);
     static ani_enum_item GetFirstDayOfWeek([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object);
+    static ani_object GetSystemLocaleInstance([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object);
     static ani_status BindContextSystem(ani_env *env);
 };
 } // namespace I18n

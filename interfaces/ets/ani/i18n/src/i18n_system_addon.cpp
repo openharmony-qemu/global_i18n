@@ -412,6 +412,41 @@ ani_enum_item I18nSystemAddon::GetFirstDayOfWeek([[maybe_unused]] ani_env *env, 
     return VariableConverter::GetEnumItemByIndex(env, enumName, index);
 }
 
+ani_object I18nSystemAddon::GetSystemLocaleInstance([[maybe_unused]] ani_env *env,
+    [[maybe_unused]] ani_object object)
+{
+    static const char *className = "std.core.Intl.Locale";
+    ani_class cls;
+    if (ANI_OK != env->FindClass(className, &cls)) {
+        HILOG_ERROR_I18N("GetSystemLocaleInstance: Find class '%{public}s' failed", className);
+        return nullptr;
+    }
+
+    ani_method ctor;
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>",
+        "X{C{std.core.Intl.Locale}C{std.core.String}}C{std.core.Intl.LocaleOptions}:", &ctor)) {
+        HILOG_ERROR_I18N("GetSystemLocaleInstance: Find method '<ctor>' failed");
+        return nullptr;
+    }
+    ani_ref undefinedRef;
+    if (ANI_OK != env->GetUndefined(&undefinedRef)) {
+        HILOG_ERROR_I18N("GetSystemLocaleInstance: GetUndefined failed");
+        return nullptr;
+    }
+    std::string locale = LocaleConfig::GetSystemLocaleInstanceTag();
+    ani_string localeAniStr = VariableConverter::StringToAniStr(env, locale);
+    if (localeAniStr == nullptr) {
+        HILOG_ERROR_I18N("GetSystemLocaleInstance: Get ani string failed");
+        return nullptr;
+    }
+    ani_object ret;
+    if (ANI_OK != env->Object_New(cls, ctor, &ret, localeAniStr, undefinedRef)) {
+        HILOG_ERROR_I18N("GetSystemLocaleInstance: New object '%{public}s' failed", className);
+        return nullptr;
+    }
+    return ret;
+}
+
 ani_status I18nSystemAddon::BindContextSystem(ani_env *env)
 {
     static const char *className = "@ohos.i18n.i18n.System";
@@ -450,6 +485,8 @@ ani_status I18nSystemAddon::BindContextSystem(ani_env *env)
         ani_native_function { "getTemperatureName", nullptr, reinterpret_cast<void *>(GetTemperatureName) },
         ani_native_function { "setFirstDayOfWeek", nullptr, reinterpret_cast<void *>(SetFirstDayOfWeek) },
         ani_native_function { "getFirstDayOfWeek", nullptr, reinterpret_cast<void *>(GetFirstDayOfWeek) },
+        ani_native_function { "getSystemLocaleInstance", nullptr,
+            reinterpret_cast<void *>(GetSystemLocaleInstance) },
     };
 
     if (ANI_OK != env->Class_BindStaticNativeMethods(cls, methods.data(), methods.size())) {
