@@ -79,6 +79,7 @@ public:
     static void SetSystemNumericalDatePattern([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
         ani_string aniIdentifier);
     static ani_string GetUsingNumericalDatePattern([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object);
+    static ani_object GetSystemLocaleInstance([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object);
     static ani_status BindContextSystem(ani_env *env);
 
 private:

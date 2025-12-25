@@ -259,12 +259,7 @@ namespace i18n {
         native static getSystemNumericalDatePatterns(): Map<string, string>;
         native static setSystemNumericalDatePattern(identifier: string): void;
         native static getUsingNumericalDatePattern(): string;
-
-        public static getSystemLocaleInstance(): Intl.Locale {
-            let systemLocaleStr = System.getSystemLocale();
-            let systemLocale = new Intl.Locale(systemLocaleStr);
-            return systemLocale;
-        }
+        native static getSystemLocaleInstance(): Intl.Locale;
     }
 
     export class I18NUtil {
