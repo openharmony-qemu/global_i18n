@@ -25,7 +25,7 @@ namespace Global {
 namespace I18n {
 class MultiUsers {
 public:
-    static bool InitMultiUserData();
+    static void InitMultiUser();
     static void SwitchUser(const std::string& curLocalId);
     static void AddUser(const std::string& localId);
     static void RemoveUser(const std::string& localId);

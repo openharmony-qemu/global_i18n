@@ -523,6 +523,17 @@ ErrCode I18nServiceAbility::SetSystemNumericalDatePattern(const std::string& ide
     return ERR_OK;
 }
 
+ErrCode I18nServiceAbility::GetLanguageFromUserId(int32_t userId, std::string& language)
+{
+    int pid = getpid();
+    StartTask(pid);
+#ifdef SUPPORT_MULTI_USER
+    language = MultiUsers::GetLanguageFromUserId(userId);
+#endif
+    FinishTask(pid);
+    return ERR_OK;
+}
+
 void I18nServiceAbility::DelayUnloadI18nServiceAbility()
 {
     if (handler != nullptr) {
@@ -548,6 +559,9 @@ void I18nServiceAbility::OnStart(const SystemAbilityOnDemandReason& startReason)
         i18nServiceEvent->SubscriberEvent();
         i18nServiceEvent->CheckStartReason(startReason);
     }
+#ifdef SUPPORT_MULTI_USER
+    MultiUsers::InitMultiUser();
+#endif
     bool status = Publish(this);
     if (status) {
         HILOG_INFO_I18N("I18nServiceAbility Publish success.");

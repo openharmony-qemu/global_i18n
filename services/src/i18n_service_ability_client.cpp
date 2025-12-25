@@ -190,6 +190,24 @@ I18nErrorCode I18nServiceAbilityClient::SetSystemNumericalDatePattern(const std:
     return CallI18nServiceMethod(&II18nServiceAbility::SetSystemNumericalDatePattern, "SetSystemNumericalDatePattern",
         identifier);
 }
+
+std::string I18nServiceAbilityClient::GetLanguageFromUserId(int32_t userId)
+{
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetLanguageFromUserId: Get proxy failed.");
+        return "";
+    }
+    std::string language;
+    ErrCode errCode = i18nServiceAbilityObj->GetLanguageFromUserId(userId, language);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetLanguageFromUserId: Get language from userID failed, "
+            "errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return "";
+    }
+    return language;
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
