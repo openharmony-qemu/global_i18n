@@ -60,7 +60,7 @@ ani_string IntlAddon::DateTimeFormat_Format(ani_env *env, ani_object object, ani
         return nullptr;
     }
 
-    std::string str = obj->datefmt_->Format(milliseconds);
+    std::string str = obj->datefmt_->Format(static_cast<double>(milliseconds));
     return VariableConverter::StringToAniStr(env, str);
 }
 

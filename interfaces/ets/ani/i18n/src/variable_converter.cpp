@@ -415,6 +415,29 @@ ani_long VariableConverter::GetDateValue(ani_env *env, ani_object date, const st
     return ret;
 }
 
+ani_int VariableConverter::GetDateInt(ani_env *env, ani_object date, const std::string &method)
+{
+    static const char* className = "escompat.Date";
+    ani_class cls;
+    if (ANI_OK != env->FindClass(className, &cls)) {
+        HILOG_ERROR_I18N("GetDateInt: Find class '%{public}s' failed", className);
+        return -1;
+    }
+
+    ani_method get;
+    if (ANI_OK != env->Class_FindMethod(cls, method.c_str(), nullptr, &get)) {
+        HILOG_ERROR_I18N("GetDateInt: Find method '%{public}s' failed", method.c_str());
+        return -1;
+    }
+
+    ani_int ret;
+    if (ANI_OK != env->Object_CallMethod_Int(date, get, &ret)) {
+        HILOG_ERROR_I18N("GetDateInt: Call method '%{public}s' failed", method.c_str());
+        return -1;
+    }
+    return ret;
+}
+
 std::vector<std::string> VariableConverter::GetLocaleTags(ani_env *env, ani_object locale)
 {
     std::vector<std::string> localeTags;
