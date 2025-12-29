@@ -243,14 +243,14 @@ ohos_prebuilt_para("i18n.para.dac") {
 
 ohos_prebuilt_etc("config_locales_xml") {
   source = "//base/global/i18n/frameworks/intl/etc/supported_locales.xml"
-  module_install_dir = "usr/ohos_locale_config/"
+  module_install_dir = "etc/ohos_locale_config/"
   part_name = "i18n"
   subsystem_name = "global"
 }
 
 ohos_prebuilt_etc("config_locales_old_xml") {
   source = "//base/global/i18n/frameworks/intl/etc/supported_locales_old.xml"
-  module_install_dir = "usr/ohos_locale_config/"
+  module_install_dir = "etc/ohos_locale_config/"
   part_name = "i18n"
   subsystem_name = "global"
 }
@@ -376,14 +376,14 @@ ohos_prebuilt_etc("timezones_xml") {
 
 ohos_prebuilt_etc("region_supported_locales_xml") {
   source = "//base/global/i18n/frameworks/intl/etc/region/supported_regions.xml"
-  module_install_dir = "usr/ohos_locale_config/region/"
+  module_install_dir = "etc/ohos_locale_config/region/"
   part_name = "i18n"
   subsystem_name = "global"
 }
 
 ohos_prebuilt_etc("dialect_languages_xml") {
   source = "//base/global/i18n/frameworks/intl/etc/dialect_languages.xml"
-  module_install_dir = "usr/ohos_locale_config/"
+  module_install_dir = "etc/ohos_locale_config/"
   part_name = "i18n"
   subsystem_name = "global"
 }
