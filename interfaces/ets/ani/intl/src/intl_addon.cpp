@@ -48,8 +48,8 @@ ani_string IntlAddon::DateTimeFormat_Format(ani_env *env, ani_object object, ani
         return nullptr;
     }
 
-    ani_double milliseconds;
-    if (ANI_OK != env->Object_CallMethod_Double(date, getms, &milliseconds)) {
+    ani_long milliseconds;
+    if (ANI_OK != env->Object_CallMethod_Long(date, getms, &milliseconds)) {
         HILOG_ERROR_I18N("IntlAddon::DateTimeFormat_Format: Call method 'valueOf' failed");
         return nullptr;
     }
@@ -80,14 +80,14 @@ ani_string IntlAddon::DateTimeFormat_FormatRange(ani_env *env, ani_object object
         return nullptr;
     }
 
-    ani_double firstMilliseconds;
-    if (ANI_OK != env->Object_CallMethod_Double(startDate, getms, &firstMilliseconds)) {
+    ani_long firstMilliseconds;
+    if (ANI_OK != env->Object_CallMethod_Long(startDate, getms, &firstMilliseconds)) {
         HILOG_ERROR_I18N("IntlAddon::DateTimeFormat_FormatRange: Call method 'valueOf' failed");
         return nullptr;
     }
 
-    ani_double secondMilliseconds;
-    if (ANI_OK != env->Object_CallMethod_Double(endDate, getms, &secondMilliseconds)) {
+    ani_long secondMilliseconds;
+    if (ANI_OK != env->Object_CallMethod_Long(endDate, getms, &secondMilliseconds)) {
         HILOG_ERROR_I18N("IntlAddon::DateTimeFormat_FormatRange: Call method 'valueOf' failed");
         return nullptr;
     }
@@ -98,7 +98,8 @@ ani_string IntlAddon::DateTimeFormat_FormatRange(ani_env *env, ani_object object
         return nullptr;
     }
 
-    std::string str = obj->datefmt_->FormatRange(firstMilliseconds, secondMilliseconds);
+    std::string str = obj->datefmt_->FormatRange(
+        static_cast<double>(firstMilliseconds), static_cast<double>(secondMilliseconds));
     return VariableConverter::StringToAniStr(env, str);
 }
 

@@ -392,7 +392,7 @@ ani_enum_item VariableConverter::GetEnumItemByIndex(ani_env* env, const char* en
     return enumItem;
 }
 
-ani_double VariableConverter::GetDateValue(ani_env *env, ani_object date, const std::string &method)
+ani_long VariableConverter::GetDateValue(ani_env *env, ani_object date, const std::string &method)
 {
     static const char* className = "std.core.Date";
     ani_class cls;
@@ -407,8 +407,8 @@ ani_double VariableConverter::GetDateValue(ani_env *env, ani_object date, const 
         return -1;
     }
 
-    ani_double ret;
-    if (ANI_OK != env->Object_CallMethod_Double(date, get, &ret)) {
+    ani_long ret;
+    if (ANI_OK != env->Object_CallMethod_Long(date, get, &ret)) {
         HILOG_ERROR_I18N("VariableConverter::GetDateValue: Call method '%{public}s' failed", method.c_str());
         return -1;
     }
