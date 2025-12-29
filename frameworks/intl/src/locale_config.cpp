@@ -76,19 +76,19 @@ const char *LocaleConfig::REGIONS_LANGUAGES_PATH = "etc/xml/i18n_param_config.xm
 const char *LocaleConfig::REGIONS_LANGUAGES_NAME = "i18n_param_config";
 const char *LocaleConfig::SUPPORTED_REGIONS_NAME = "supported_regions";
 const char *LocaleConfig::WHITE_LANGUAGES_NAME = "white_languages";
-const char *LocaleConfig::SUPPORTED_LOCALES_PATH = "/system/usr/ohos_locale_config/supported_locales.xml";
-const char *LocaleConfig::SUPPORTED_LOCALES_OLD_PATH = "/system/usr/ohos_locale_config/supported_locales_old.xml";
+const char *LocaleConfig::SUPPORTED_LOCALES_PATH = "/etc/ohos_locale_config/supported_locales.xml";
+const char *LocaleConfig::SUPPORTED_LOCALES_OLD_PATH = "/etc/ohos_locale_config/supported_locales_old.xml";
 const char *LocaleConfig::SUPPORT_LOCALES_PATH = "/etc/ohos_lang_config/supported_locales.xml";
 const char *LocaleConfig::SUPPORT_LOCALES_NAME = "supported_locales";
-const char *LocaleConfig::DIALECT_LANGS_PATH = "/system/usr/ohos_locale_config/dialect_languages.xml";
+const char *LocaleConfig::DIALECT_LANGS_PATH = "/etc/ohos_locale_config/dialect_languages.xml";
 const char *LocaleConfig::DIALECT_LANGS_NAME = "dialect_langs";
 const char *LocaleConfig::OVERRIDE_SUPPORTED_REGIONS_NAME = "supported_regions";
 const char *LocaleConfig::OVERRIDE_SUPPORTED_REGIONS_PATH =
-    "/system/usr/ohos_locale_config/region/supported_regions.xml";
+    "/etc/ohos_locale_config/region/supported_regions.xml";
 const char *LocaleConfig::DEFAULT_LOCALE = "en-Latn";
 const char *LocaleConfig::supportLocalesTag = "supported_locales";
 const char *LocaleConfig::LANG_PATH = "/etc/ohos_lang_config/";
-const char *LocaleConfig::REGION_PATH = "/system/usr/ohos_locale_config/region/";
+const char *LocaleConfig::REGION_PATH = "/etc/ohos_locale_config/region/";
 const char *LocaleConfig::rootTag = "languages";
 const char *LocaleConfig::secondRootTag = "lang";
 const char *LocaleConfig::rootRegion = "regions";
