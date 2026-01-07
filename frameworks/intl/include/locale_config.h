@@ -283,7 +283,6 @@ public:
 private:
     static void Split(const std::string &src, const std::string &sep, std::vector<std::string> &dest);
     static void Split(const std::string &src, const std::string &sep, std::unordered_set<std::string> &dest);
-    static I18nErrorCode UpdateSystemLocale(const std::string &language);
     static constexpr uint32_t LANGUAGE_LEN = 2;
     static constexpr uint32_t LOCALE_ITEM_COUNT = 3;
     static constexpr uint32_t SCRIPT_OFFSET = 2;
@@ -324,6 +323,7 @@ private:
     static std::mutex dialectLocaleMutex;
     static std::mutex region2DisplayNameMutex;
     static std::mutex locale2DisplayNameMutex;
+    static std::mutex languageWhitelistMutex;
     static std::shared_mutex is24HourLocaleMapMutex;
     static const std::string STANDARD_EXT_PARAM_KEY;
     static const std::string CUST_EXT_PARAM_KEY;
