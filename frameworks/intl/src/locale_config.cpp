@@ -254,6 +254,7 @@ std::string LocaleConfig::currentOverrideRegion = "";
 std::mutex LocaleConfig::dialectLocaleMutex;
 std::mutex LocaleConfig::region2DisplayNameMutex;
 std::mutex LocaleConfig::locale2DisplayNameMutex;
+std::mutex LocaleConfig::languageWhitelistMutex;
 std::shared_mutex LocaleConfig::is24HourLocaleMapMutex;
 
 set<std::string> LocaleConfig::validCaTag {
@@ -641,6 +642,7 @@ std::unordered_set<std::string> LocaleConfig::GetSystemCountries(const std::stri
 
 bool LocaleConfig::IsSuggested(const string &language)
 {
+    ExtendWhiteLanguages();
     unordered_set<string> relatedLocales;
     vector<string> simCountries;
     GetCountriesFromSim(simCountries);
@@ -658,6 +660,7 @@ bool LocaleConfig::IsSuggested(const string &language)
 
 bool LocaleConfig::IsSuggested(const std::string &language, const std::string &region)
 {
+    ExtendWhiteLanguages();
     unordered_set<string> relatedLocales;
     vector<string> countries { region };
     GetRelatedLocales(relatedLocales, countries);
@@ -674,6 +677,7 @@ bool LocaleConfig::IsSuggested(const std::string &language, const std::string &r
 
 bool LocaleConfig::IsSuggestedV15(const string &language)
 {
+    ExtendWhiteLanguages();
     unordered_set<string> relatedLocales;
     vector<string> simCountries;
     GetCountriesFromSim(simCountries);
@@ -692,6 +696,7 @@ bool LocaleConfig::IsSuggestedV15(const string &language)
 
 bool LocaleConfig::IsSuggestedV15(const std::string &language, const std::string &region)
 {
+    ExtendWhiteLanguages();
     unordered_set<string> relatedLocales;
     vector<string> countries { region };
     GetRelatedLocalesV15(relatedLocales, countries);
@@ -709,6 +714,14 @@ bool LocaleConfig::IsSuggestedV15(const std::string &language, const std::string
 
 void LocaleConfig::ExtendWhiteLanguages()
 {
+    static bool isLanguageWhitelistInit = false;
+    if (isLanguageWhitelistInit) {
+        return;
+    }
+    std::lock_guard<std::mutex> languageWhitelistLock(languageWhitelistMutex);
+    if (isLanguageWhitelistInit) {
+        return;
+    }
     UErrorCode status = U_ZERO_ERROR;
     for (auto iter = whiteLanguages.begin(); iter != whiteLanguages.end(); ++iter) {
         extendWhiteLanguageList.insert(*iter);
@@ -731,6 +744,7 @@ void LocaleConfig::ExtendWhiteLanguages()
             ExtendLanguageWithScript(languageStr);
         }
     }
+    isLanguageWhitelistInit = true;
 }
 
 void LocaleConfig::ExtendLanguageWithScript(const std::string &languageStr)
@@ -867,7 +881,6 @@ bool LocaleConfig::InitializeLists()
     GetListFromFile(SUPPORT_LOCALES_PATH, SUPPORT_LOCALES_NAME, supportLocales);
     GetListFromFile(OVERRIDE_SUPPORTED_REGIONS_PATH, OVERRIDE_SUPPORTED_REGIONS_NAME, overrideSupportedRegions);
     GetListFromFile(DIALECT_LANGS_PATH, DIALECT_LANGS_NAME, dialectLang);
-    ExtendWhiteLanguages();
     return true;
 }
 
@@ -2351,7 +2364,7 @@ std::string LocaleConfig::UpdateLanguageOfLocale(const std::string &languageTag)
     std::string systemLocaleTag = GetEffectiveLocale();
     icu::Locale systemLocale = icu::Locale::forLanguageTag(systemLocaleTag.c_str(), status);
     if (U_FAILURE(status)) {
-        HILOG_ERROR_I18N("LocaleConfig::UpdateSystemLocale init icu Locale for locale %{public}s failed.",
+        HILOG_ERROR_I18N("LocaleConfig::UpdateLanguageOfLocale init icu Locale for locale %{public}s failed.",
             systemLocaleTag.c_str());
         return systemLocaleTag;
     }
