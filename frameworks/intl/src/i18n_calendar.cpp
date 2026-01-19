@@ -199,13 +199,16 @@ void I18nCalendar::SetTimeZone(std::string id)
 {
     icu::UnicodeString zone = icu::UnicodeString::fromUTF8(id);
     icu::TimeZone *timezone = icu::TimeZone::createTimeZone(zone);
-    if (timezone != nullptr) {
-        icu::Calendar* icuCalendar = GetIcuCalendar();
-        if (icuCalendar != nullptr) {
-            icuCalendar->setTimeZone(*timezone);
-        }
-        delete(timezone);
+    if (timezone == nullptr) {
+        HILOG_ERROR_I18N("I18nCalendar::SetTimeZone: Create icu::TimeZone %{public}s failed.", id.c_str());
+        return;
     }
+    icu::Calendar* icuCalendar = GetIcuCalendar();
+    if (icuCalendar != nullptr) {
+        std::lock_guard<std::mutex> zoneLock(zoneMutex);
+        icuCalendar->setTimeZone(*timezone);
+    }
+    delete timezone;
 }
 
 std::string I18nCalendar::GetTimeZone(void)
@@ -214,6 +217,7 @@ std::string I18nCalendar::GetTimeZone(void)
     icu::Calendar* icuCalendar = GetIcuCalendar();
     if (icuCalendar) {
         icu::UnicodeString unistr;
+        std::lock_guard<std::mutex> zoneLock(zoneMutex);
         icuCalendar->getTimeZone().getID(unistr);
         unistr.toUTF8String<std::string>(ret);
     }
@@ -224,8 +228,8 @@ void I18nCalendar::Set(int32_t year, int32_t month, int32_t date)
 {
     icu::Calendar* icuCalendar = GetIcuCalendar();
     if (icuCalendar != nullptr) {
+        std::lock_guard<std::mutex> zoneLock(zoneMutex);
         icuCalendar->set(year, month, date);
-        return;
     }
 }
 
@@ -233,16 +237,17 @@ void I18nCalendar::Set(UCalendarDateFields field, int32_t value)
 {
     icu::Calendar* icuCalendar = GetIcuCalendar();
     if (icuCalendar != nullptr) {
+        std::lock_guard<std::mutex> zoneLock(zoneMutex);
         icuCalendar->set(field, value);
-        return;
     }
 }
 
-int32_t I18nCalendar::Get(UCalendarDateFields field) const
+int32_t I18nCalendar::Get(UCalendarDateFields field)
 {
     icu::Calendar* icuCalendar = GetIcuCalendar();
     if (icuCalendar != nullptr) {
         UErrorCode status = U_ZERO_ERROR;
+        std::lock_guard<std::mutex> zoneLock(zoneMutex);
         int32_t result = icuCalendar->get(field, status);
         if (U_FAILURE(status)) {
             HILOG_ERROR_I18N("I18nCalendar::Get: icuCalendar get failed failed.");
@@ -258,6 +263,7 @@ void I18nCalendar::Add(UCalendarDateFields field, int32_t amount)
     icu::Calendar* icuCalendar = GetIcuCalendar();
     if (icuCalendar != nullptr) {
         UErrorCode status = U_ZERO_ERROR;
+        std::lock_guard<std::mutex> zoneLock(zoneMutex);
         icuCalendar->add(field, amount, status);
         if (U_FAILURE(status)) {
             HILOG_ERROR_I18N("I18nCalendar::Add: icuCalendar add failed failed.");
@@ -291,10 +297,13 @@ UDate I18nCalendar::GetTimeInMillis(void)
     icu::Calendar* icuCalendar = GetIcuCalendar();
     if (icuCalendar != nullptr) {
         UErrorCode status = U_ZERO_ERROR;
-        return icuCalendar->getTime(status);
+        std::lock_guard<std::mutex> zoneLock(zoneMutex);
+        UDate date = icuCalendar->getTime(status);
         if (U_FAILURE(status)) {
             HILOG_ERROR_I18N("I18nCalendar::GetTimeInMillis: icuCalendar getTime failed.");
+            return 0;
         }
+        return date;
     }
     return 0;
 }
@@ -321,10 +330,13 @@ bool I18nCalendar::IsWeekend(int64_t date, UErrorCode &status)
 {
     icu::Calendar* icuCalendar = GetIcuCalendar();
     if (icuCalendar != nullptr) {
-        return icuCalendar->isWeekend(date, status);
+        std::lock_guard<std::mutex> zoneLock(zoneMutex);
+        bool isWeekend = icuCalendar->isWeekend(date, status);
         if (U_FAILURE(status)) {
             HILOG_ERROR_I18N("I18nCalendar::IsWeekend: icuCalendar isWeekend failed.");
+            return false;
         }
+        return isWeekend;
     }
     return false;
 }
@@ -333,6 +345,7 @@ bool I18nCalendar::IsWeekend(void)
 {
     icu::Calendar* icuCalendar = GetIcuCalendar();
     if (icuCalendar != nullptr) {
+        std::lock_guard<std::mutex> zoneLock(zoneMutex);
         return icuCalendar->isWeekend();
     }
     return false;
@@ -369,6 +382,7 @@ int32_t I18nCalendar::CompareDays(UDate date)
     icu::Calendar* icuCalendar = GetIcuCalendar();
     if (icuCalendar != nullptr) {
         UErrorCode status = U_ZERO_ERROR;
+        std::lock_guard<std::mutex> zoneLock(zoneMutex);
         UDate nowMs = icuCalendar->getTime(status);
         if (U_FAILURE(status)) {
             HILOG_ERROR_I18N("I18nCalendar::CompareDays: icuCalendar getTime failed.");
