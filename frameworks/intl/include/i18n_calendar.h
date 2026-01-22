@@ -17,6 +17,7 @@
 
 #include <cmath>
 #include <cstdint>
+#include <mutex>
 
 #include "iosfwd"
 #include "unicode/locid.h"
@@ -53,7 +54,7 @@ public:
     void Set(UCalendarDateFields field, int32_t value);
     std::string GetTimeZone(void);
     void SetTimeZone(std::string timezoneId);
-    int32_t Get(UCalendarDateFields field) const;
+    int32_t Get(UCalendarDateFields field);
     void Add(UCalendarDateFields field, int32_t amount);
     void SetMinimalDaysInFirstWeek(int32_t value);
     void SetFirstDayOfWeek(int32_t value);
@@ -70,6 +71,7 @@ protected:
   
 private:
     icu::Calendar *calendar_;
+    std::mutex zoneMutex;
     void InitCalendar(const icu::Locale &locale, CalendarType type);
     void InitCalendar2(const icu::Locale &locale, CalendarType type, UErrorCode &status);
     void InitFirstDayOfWeek(const std::string& localeTag);
