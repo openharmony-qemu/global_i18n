@@ -341,9 +341,6 @@ std::unordered_set<std::string> I18nTimeZone::GetAvailableZoneCityIDs()
 
 std::string I18nTimeZone::FindCityDisplayNameFromXml(std::string &cityID, std::string &locale)
 {
-    if (cityDisplayNameCacheLocale.compare(locale) == 0) {
-        return GetCityDisplayNameFromCache(cityID);
-    }
     std::lock_guard<std::mutex> lock(cityDisplayNameMutex);
     if (cityDisplayNameCacheLocale.compare(locale) == 0) {
         return GetCityDisplayNameFromCache(cityID);
