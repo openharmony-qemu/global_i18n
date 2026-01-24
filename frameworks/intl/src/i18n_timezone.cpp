@@ -50,6 +50,7 @@ namespace I18n {
 using namespace std::filesystem;
 
 const char *I18nTimeZone::TIMEZONE_KEY = "persist.time.timezone";
+const char *I18nTimeZone::TZ_OVERRIDE_KEY = "persist.global.tz_override";
 const char *I18nTimeZone::DEFAULT_TIMEZONE = "GMT";
 
 const char *I18nTimeZone::CITY_TIMEZONE_DATA_PATH = "/system/usr/ohos_timezone/ohos_timezones.xml";
@@ -82,6 +83,7 @@ std::mutex I18nTimeZone::cityDisplayNameMutex;
 bool I18nTimeZone::initAvailableZoneInfo = false;
 bool I18nTimeZone::initSupportedLocales = false;
 bool I18nTimeZone::numTimezoneCategoryInitialized = false;
+std::string I18nTimeZone::lastTzOverride = "";
 std::mutex I18nTimeZone::initNumTimezoneCategoryMutex;
 
 std::map<int, std::string> I18nTimeZone::categoryNum2TimezoneWN {};
@@ -686,6 +688,12 @@ const char *I18nTimeZone::GetNumTimezoneCfgPath()
 
 bool I18nTimeZone::InitTimezoneCategoryMap()
 {
+    std::string tzOverride = ReadSystemParameter(TZ_OVERRIDE_KEY, LocaleConfig::SYS_PARAM_LEN);
+    if (lastTzOverride.compare(tzOverride) != 0) {
+        HILOG_INFO_I18N("I18nTimeZone::InitTimezoneCategoryMap: tzOverride changed: %{public}s", tzOverride.c_str());
+        lastTzOverride = tzOverride;
+        numTimezoneCategoryInitialized = false;
+    }
     if (numTimezoneCategoryInitialized) {
         return true;
     }
@@ -717,6 +725,10 @@ bool I18nTimeZone::ReadNumTimezoneConfigFile(const char* configPath)
         HILOG_ERROR_I18N("I18nTimeZone::ReadNumTimezoneConfigFile: configFile is nullptr.");
         return false;
     }
+    categoryNum2TimezoneWN.clear();
+    categoryNum2TimezoneEN.clear();
+    categoryNum2TimezoneWS.clear();
+    categoryNum2TimezoneES.clear();
     char buffer[READ_BUFFER_SIZE];
     std::string curIndex;
     while (fgets(buffer, READ_BUFFER_SIZE - 1, configFile) != nullptr) {

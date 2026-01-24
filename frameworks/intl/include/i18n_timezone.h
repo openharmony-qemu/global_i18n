@@ -56,6 +56,7 @@ public:
 
 private:
     static const char *TIMEZONE_KEY;
+    static const char *TZ_OVERRIDE_KEY;
     static const char *DEFAULT_TIMEZONE;
     static const char *CITY_TIMEZONE_DATA_PATH;
     static const char *DEVICE_CITY_TIMEZONE_DATA_PATH;
@@ -99,6 +100,7 @@ private:
     static const char *NUM_TIMEZONE_CFG_PATH;
     static const char *DISTRO_NUM_TIMEZONE_CFG_PATH;
     static bool numTimezoneCategoryInitialized;
+    static std::string lastTzOverride;
     static std::mutex initNumTimezoneCategoryMutex;
     static bool ReadTimeZoneData(const char *xmlPath);
     static std::string ComputeLocale(std::string &locale);

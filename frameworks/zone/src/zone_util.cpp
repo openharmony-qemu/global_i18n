@@ -42,6 +42,8 @@ const char *ZoneUtil::ROOT_TAG = "countryzones";
 const char *ZoneUtil::SECOND_TAG = "country";
 const char *ZoneUtil::CODE_TAG = "code";
 const char *ZoneUtil::TIMEZONE_KEY = "persist.time.timezone";
+const char *ZoneUtil::TZ_OVERRIDE_PARAM_KEY = "persist.global.tz_override";
+std::string ZoneUtil::lastTzOverride = "";
 const char *ZoneUtil::TZLOOKUP_FILE_PATH = ZoneUtil::GetTZLookupDataPath();
 bool ZoneUtil::defaultMapInitialized;
 std::mutex ZoneUtil::defaultMapMutex;
@@ -527,6 +529,12 @@ bool ZoneUtil::CheckSameDstOffset(std::vector<std::string> &zones, std::string &
 
 bool ZoneUtil::InitDefaultMap()
 {
+    std::string tzOverride = ReadSystemParameter(TZ_OVERRIDE_PARAM_KEY, SYS_PARAM_LEN);
+    if (lastTzOverride.compare(tzOverride) != 0) {
+        HILOG_INFO_I18N("ZoneUtil::InitDefaultMap: tzOverride changed: %{public}s", tzOverride.c_str());
+        lastTzOverride = tzOverride;
+        defaultMapInitialized = false;
+    }
     if (defaultMapInitialized) {
         return true;
     }
@@ -558,6 +566,7 @@ bool ZoneUtil::ReadDefaultTimezoneConfigFile(const char* configPath)
         HILOG_ERROR_I18N("ZoneUtil::ReadDefaultTimezoneConfigFile: configFile is nullptr.");
         return false;
     }
+    defaultMap.clear();
     char buffer[READ_BUFFER_SIZE];
     while (fgets(buffer, READ_BUFFER_SIZE - 1, configFile) != nullptr) {
         std::string line(buffer);
