@@ -312,6 +312,10 @@ I18n_ErrorCode GetFirstStartFromTimeArrayTimeZoneRule(TimeArrayTimeZoneRule* rul
         return I18n_ErrorCode::ERROR_INVALID_PARAMETER;
     }
     icu::TimeArrayTimeZoneRule* icuRule = CreateIcuTimeArrayRule(rule);
+    if (icuRule == nullptr) {
+        HILOG_ERROR_I18N("GetFirstStartFromTimeArrayTimeZoneRule: icuRule is nullptr.");
+        return I18n_ErrorCode::UNEXPECTED_ERROR;
+    }
     if (!icuRule->getFirstStart(query->prevRawOffset, query->prevDSTSavings, query->result)) {
         delete icuRule;
         HILOG_ERROR_I18N("GetFirstStartFromTimeArrayTimeZoneRule: Get start failed.");
@@ -344,6 +348,10 @@ I18n_ErrorCode GetFinalStartFromTimeArrayTimeZoneRule(TimeArrayTimeZoneRule* rul
         return I18n_ErrorCode::ERROR_INVALID_PARAMETER;
     }
     icu::TimeArrayTimeZoneRule* icuRule = CreateIcuTimeArrayRule(rule);
+    if (icuRule == nullptr) {
+        HILOG_ERROR_I18N("GetFinalStartFromTimeArrayTimeZoneRule: icuRule is nullptr.");
+        return I18n_ErrorCode::UNEXPECTED_ERROR;
+    }
     if (!icuRule->getFinalStart(query->prevRawOffset, query->prevDSTSavings, query->result)) {
         delete icuRule;
         HILOG_ERROR_I18N("GetFinalStartFromTimeArrayTimeZoneRule: Get start failed.");
@@ -376,6 +384,10 @@ I18n_ErrorCode GetNextStartFromTimeArrayTimeZoneRule(TimeArrayTimeZoneRule* rule
         return I18n_ErrorCode::ERROR_INVALID_PARAMETER;
     }
     icu::TimeArrayTimeZoneRule* icuRule = CreateIcuTimeArrayRule(rule);
+    if (icuRule == nullptr) {
+        HILOG_ERROR_I18N("GetNextStartFromTimeArrayTimeZoneRule: icuRule is nullptr.");
+        return I18n_ErrorCode::UNEXPECTED_ERROR;
+    }
     if (!icuRule->getNextStart(query->base, query->prevRawOffset, query->prevDSTSavings, query->inclusive,
         query->result)) {
         delete icuRule;
@@ -410,6 +422,10 @@ I18n_ErrorCode GetPrevStartFromTimeArrayTimeZoneRule(TimeArrayTimeZoneRule* rule
         return I18n_ErrorCode::ERROR_INVALID_PARAMETER;
     }
     icu::TimeArrayTimeZoneRule* icuRule = CreateIcuTimeArrayRule(rule);
+    if (icuRule == nullptr) {
+        HILOG_ERROR_I18N("GetPrevStartFromTimeArrayTimeZoneRule: icuRule is nullptr.");
+        return I18n_ErrorCode::UNEXPECTED_ERROR;
+    }
     if (!icuRule->getPreviousStart(query->base, query->prevRawOffset, query->prevDSTSavings, query->inclusive,
         query->result)) {
         delete icuRule;
@@ -444,6 +460,10 @@ I18n_ErrorCode GetStartTimeAt(TimeArrayTimeZoneRule* rule, int32_t index, double
         return I18n_ErrorCode::ERROR_INVALID_PARAMETER;
     }
     icu::TimeArrayTimeZoneRule* icuRule = CreateIcuTimeArrayRule(rule);
+    if (icuRule == nullptr) {
+        HILOG_ERROR_I18N("GetStartTimeAt: icuRule is nullptr.");
+        return I18n_ErrorCode::UNEXPECTED_ERROR;
+    }
     double startTime = 0;
     if (!icuRule->getStartTimeAt(index, startTime)) {
         delete icuRule;
