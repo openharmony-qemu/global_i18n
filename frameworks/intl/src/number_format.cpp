@@ -1461,10 +1461,10 @@ std::vector<std::string> NumberFormat::GetAvailableNumberSystems()
     icu::UnicodeString temp;
     while ((temp = stringEnumeratePtr->next(nullptr, status)) != nullptr) {
         if (U_FAILURE(status)) {
- 	        HILOG_ERROR_I18N("GetAvailableNumberSystems: Get next name failed");
- 	        result.clear();
- 	        return result;
- 	    }
+            HILOG_ERROR_I18N("GetAvailableNumberSystems: Get next name failed");
+            result.clear();
+            return result;
+        }
         std::string numberSys;
         temp.toUTF8String(numberSys);
         result.push_back(numberSys);
