@@ -1110,18 +1110,12 @@ void NumberFormat::GetDigitsResolvedOptionsExt(std::map<std::string, std::string
     }
     if (!roundingModeStr.empty()) {
         result.insert(std::make_pair("roundingMode", roundingModeStr));
-    } else if (setDefault) {
-        result.insert(std::make_pair("roundingMode", "halfExpand"));
     }
     if (!roundingPriorityStr.empty()) {
         result.insert(std::make_pair("roundingPriority", roundingPriorityStr));
-    } else if (setDefault) {
-        result.insert(std::make_pair("roundingPriority", "auto"));
     }
     if (roundingIncrement != 1) {
         result.insert(std::make_pair("roundingIncrement", std::to_string(roundingIncrement)));
-    } else if (setDefault) {
-        result.insert(std::make_pair("roundingIncrement", "1"));
     }
 }
 
@@ -1466,6 +1460,11 @@ std::vector<std::string> NumberFormat::GetAvailableNumberSystems()
     }
     icu::UnicodeString temp;
     while ((temp = stringEnumeratePtr->next(nullptr, status)) != nullptr) {
+        if (U_FAILURE(status)) {
+ 	        HILOG_ERROR_I18N("GetAvailableNumberSystems: Get next name failed");
+ 	        result.clear();
+ 	        return result;
+ 	    }
         std::string numberSys;
         temp.toUTF8String(numberSys);
         result.push_back(numberSys);

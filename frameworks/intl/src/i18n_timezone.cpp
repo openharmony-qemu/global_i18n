@@ -688,7 +688,7 @@ const char *I18nTimeZone::GetNumTimezoneCfgPath()
 
 bool I18nTimeZone::InitTimezoneCategoryMap()
 {
-    std::string tzOverride = ReadSystemParameter(TZ_OVERRIDE_KEY, LocaleConfig::SYS_PARAM_LEN);
+    std::string tzOverride = ReadSystemParameter(TZ_OVERRIDE_KEY, LocaleConfig::CONFIG_LEN);
     if (lastTzOverride.compare(tzOverride) != 0) {
         HILOG_INFO_I18N("I18nTimeZone::InitTimezoneCategoryMap: tzOverride changed: %{public}s", tzOverride.c_str());
         lastTzOverride = tzOverride;
