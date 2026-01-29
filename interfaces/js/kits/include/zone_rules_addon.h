@@ -36,6 +36,8 @@ private:
     static napi_value ZoneRulesConstructor(napi_env env, napi_callback_info info);
     static double GetFirstParameter(napi_env env, napi_value argValue, int32_t &errorCode);
 
+    static constexpr napi_type_tag TYPE_TAG = { 0x14337847c0f14dcd, 0xb41f8ce4d418a713 };
+
     std::unique_ptr<ZoneRules> zoneRules_ = nullptr;
 };
 } // namespace I18n

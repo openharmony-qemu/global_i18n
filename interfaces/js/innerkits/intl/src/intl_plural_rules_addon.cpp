@@ -99,8 +99,8 @@ napi_value IntlPluralRulesAddon::IntlPluralRulesConstructor(napi_env env, napi_c
         HILOG_ERROR_I18N("IntlPluralRulesConstructor: Create obj failed.");
         return nullptr;
     }
-    status = napi_wrap(env, thisVar, reinterpret_cast<void *>(obj), IntlPluralRulesAddon::Destructor,
-        nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj), IntlPluralRulesAddon::Destructor,
+        nullptr, &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         delete obj;
         HILOG_ERROR_I18N("IntlPluralRulesConstructor: Wrap IntlPluralRulesAddon failed.");
@@ -155,7 +155,7 @@ napi_value IntlPluralRulesAddon::Select(napi_env env, napi_callback_info info)
     }
 
     IntlPluralRulesAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->intlPluralRules) {
         HILOG_ERROR_I18N("IntlPluralRulesAddon::Select: Get IntlPluralRules object failed.");
         return nullptr;
@@ -181,7 +181,7 @@ napi_value IntlPluralRulesAddon::ResolvedOptions(napi_env env, napi_callback_inf
         return nullptr;
     }
     IntlPluralRulesAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->intlPluralRules) {
         HILOG_ERROR_I18N("IntlPluralRulesAddon::ResolvedOptions: Get IntlPluralRules object failed.");
         return nullptr;

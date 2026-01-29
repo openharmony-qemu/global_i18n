@@ -122,8 +122,8 @@ napi_value LocaleInfoAddon::LocaleConstructor(napi_env env, napi_callback_info i
     if (obj == nullptr) {
         return nullptr;
     }
-    status =
-        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), LocaleInfoAddon::Destructor, nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj.get()), LocaleInfoAddon::Destructor, nullptr,
+        &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("LocaleConstructor: Wrap LocaleInfoAddon failed");
         return nullptr;
@@ -276,7 +276,7 @@ napi_value LocaleInfoAddon::GetLocaleInfoAttribute(napi_env env, napi_callback_i
         return nullptr;
     }
     LocaleInfoAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->locale_) {
         HILOG_ERROR_I18N("GetLocaleInfoAttribute: Get Locale object failed");
         return nullptr;
@@ -340,7 +340,7 @@ napi_value LocaleInfoAddon::GetNumeric(napi_env env, napi_callback_info info)
         return nullptr;
     }
     LocaleInfoAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->locale_) {
         HILOG_ERROR_I18N("GetNumeric: Get Locale object failed");
         return nullptr;
@@ -376,7 +376,7 @@ napi_value LocaleInfoAddon::GetMaximizeOrMinimize(napi_env env, napi_callback_in
         return nullptr;
     }
     LocaleInfoAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->locale_) {
         HILOG_ERROR_I18N("Maximize: Get Locale object failed");
         return nullptr;
@@ -415,6 +415,12 @@ napi_value LocaleInfoAddon::Maximize(napi_env env, napi_callback_info info)
 napi_value LocaleInfoAddon::Minimize(napi_env env, napi_callback_info info)
 {
     return GetMaximizeOrMinimize(env, info, MinimizeInner);
+}
+
+napi_status LocaleInfoAddon::UnwrapLocaleInfoAddon(napi_env env, napi_value value,
+    LocaleInfoAddon** localeInfo)
+{
+    return napi_unwrap_s(env, value, &TYPE_TAG, reinterpret_cast<void **>(localeInfo));
 }
 
 std::shared_ptr<LocaleInfo> LocaleInfoAddon::GetLocaleInfo()

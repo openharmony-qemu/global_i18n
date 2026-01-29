@@ -41,6 +41,8 @@ private:
     static napi_value GetTypeAddon(napi_env env, napi_callback_info info);
 
     static napi_value ObjectConstructor(napi_env env, napi_callback_info info);
+
+    static constexpr napi_type_tag TYPE_TAG = { 0xdda8662fe0254dd2, 0x845bf9aa8ce3c2b1 };
 };
 } // namespace I18n
 } // namespace Global

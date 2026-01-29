@@ -86,8 +86,8 @@ napi_value SystemLocaleManagerAddon::SystemLocaleManagerConstructor(napi_env env
     if (obj == nullptr) {
         return nullptr;
     }
-    status = napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), SystemLocaleManagerAddon::Destructor,
-        nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj.get()), SystemLocaleManagerAddon::Destructor,
+        nullptr, &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Wrap SystemLocaleManagerAddon failed");
         return nullptr;
@@ -137,7 +137,7 @@ napi_value SystemLocaleManagerAddon::GetLanguageInfoArray(napi_env env, napi_cal
     SortOptions options;
     GetSortOptionsFromJsParam(env, argv[1], options, false);
     SystemLocaleManagerAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->systemLocaleManager_) {
         HILOG_ERROR_I18N("GetLanguageInfoArray: Get SystemLocaleManager object failed");
         return nullptr;
@@ -176,7 +176,7 @@ napi_value SystemLocaleManagerAddon::GetCountryInfoArray(napi_env env, napi_call
     SortOptions options;
     GetSortOptionsFromJsParam(env, argv[1], options, true);
     SystemLocaleManagerAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->systemLocaleManager_) {
         HILOG_ERROR_I18N("GetCountryInfoArray: Get SystemLocaleManager object failed");
         return nullptr;

@@ -38,6 +38,8 @@ private:
     static napi_value I18nZoneOffsetTransitionConstructor(napi_env env, napi_callback_info info);
 
     static const size_t CONSTRUCTOR_ARGS_COUNT = 3;    // Function input parameter count
+    static constexpr napi_type_tag TYPE_TAG = { 0x18f9c32d9f754ec7, 0x86b50eea164101ec };
+
     std::unique_ptr<ZoneOffsetTransition> zoneOffsetTransition_ = nullptr;
 };
 } // namespace I18n

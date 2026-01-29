@@ -114,8 +114,8 @@ napi_value IntlRelativeTimeFormatAddon::RelativeTimeFormatConstructor(napi_env e
     if (argc > 1) {
         GetRelativeTimeOptionValues(env, argv[1], map);
     }
-    status = napi_wrap(env, thisVar, reinterpret_cast<void *>(obj), IntlRelativeTimeFormatAddon::Destructor,
-        nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj), IntlRelativeTimeFormatAddon::Destructor,
+        nullptr, &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         delete obj;
         HILOG_ERROR_I18N("RelativeTimeFormatConstructor: Wrap IntlRelativeTimeFormatAddon failed");
@@ -247,7 +247,7 @@ napi_value IntlRelativeTimeFormatAddon::Format(napi_env env, napi_callback_info 
     }
     CheckOptionValue(env, unit, "unit");
     IntlRelativeTimeFormatAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->relativetimefmt_) {
         HILOG_ERROR_I18N("IntlRelativeTimeFormatAddon::Format: Get RelativeTimeFormat object failed");
         return JSUtils::CreateEmptyString(env);
@@ -266,7 +266,7 @@ napi_value IntlRelativeTimeFormatAddon::GetNumberResolvedOptions(napi_env env, n
         return JSUtils::CreateEmptyObject(env);
     }
     IntlRelativeTimeFormatAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->relativetimefmt_) {
         HILOG_ERROR_I18N("GetNumberResolvedOptions: Get RelativeTimeFormat object failed");
         return JSUtils::CreateEmptyObject(env);
@@ -325,7 +325,7 @@ napi_value IntlRelativeTimeFormatAddon::GetFormatToPartsInner(napi_env env, doub
     const std::string &unit, napi_value &thisVar)
 {
     IntlRelativeTimeFormatAddon *obj = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    napi_status status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->relativetimefmt_) {
         HILOG_ERROR_I18N("GetFormatToPartsInner: Get NumberFormat object failed");
         return JSUtils::CreateEmptyArray(env);

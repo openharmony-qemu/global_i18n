@@ -30,6 +30,8 @@ public:
     static void Destructor(napi_env env, void *nativeObject, void *hint);
     static napi_value InitSimpleNumberFormat(napi_env env, napi_value exports);
     static napi_value GetSimpleNumberFormatBySkeleton(napi_env env, napi_callback_info info);
+    static napi_status UnwrapSimpleNumberFormat(napi_env env, napi_value value,
+        SimpleNumberFormatAddon** numberFormat);
 
     std::shared_ptr<SimpleNumberFormat> CopySimpleNumberFormat();
 
@@ -38,6 +40,9 @@ private:
     static napi_value SimpleNumberFormatConstructor(napi_env env, napi_callback_info info);
     static std::unique_ptr<SimpleNumberFormat> InitSimpleNumberFormatContext(napi_env env, napi_value locale,
         const std::string& skeleton, I18nErrorCode& errCode);
+
+    static constexpr napi_type_tag TYPE_TAG = { 0xed8299aa625c45c0, 0xb7343bc2c2a4645f };
+
     std::shared_ptr<SimpleNumberFormat> simpleNumberFormat_ = nullptr;
 };
 } // namespace I18n

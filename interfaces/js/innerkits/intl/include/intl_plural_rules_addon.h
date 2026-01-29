@@ -42,6 +42,8 @@ private:
     bool InitIntlPluralRulesContext(napi_env env, const std::vector<std::string>& localeTags,
         const std::unordered_map<std::string, std::string>& configs);
 
+    static constexpr napi_type_tag TYPE_TAG = { 0x637bf1f64eb04bfd, 0x960365e3cee24d13 };
+
     std::shared_ptr<IntlPluralRules> intlPluralRules = nullptr;
 };
 } // namespace I18n

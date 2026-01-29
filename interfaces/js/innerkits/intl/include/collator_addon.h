@@ -42,6 +42,8 @@ private:
     bool InitCollatorContext(napi_env env, napi_callback_info info, std::vector<std::string> localeTags,
         std::map<std::string, std::string> &map);
 
+    static constexpr napi_type_tag TYPE_TAG = { 0xf8f8839acc0b4034, 0xbeb94fff32cd557a };
+
     napi_env env_;
     std::unique_ptr<Collator> collator_ = nullptr;
 };

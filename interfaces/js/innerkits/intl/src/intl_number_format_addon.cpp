@@ -104,8 +104,8 @@ napi_value IntlNumberFormatAddon::NumberFormatConstructor(napi_env env, napi_cal
     if (argc > 1) {
         JSUtils::GetNumberOptionValues(env, argv[1], map);
     }
-    status =
-        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj), IntlNumberFormatAddon::Destructor, nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj), IntlNumberFormatAddon::Destructor, nullptr,
+        &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         delete obj;
         HILOG_ERROR_I18N("NumberFormatConstructor: Wrap IntlNumberFormatAddon failed");
@@ -230,7 +230,7 @@ napi_value IntlNumberFormatAddon::FormatRangeNumber(napi_env env, napi_callback_
         return JSUtils::CreateEmptyString(env);
     }
     IntlNumberFormatAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->numberfmt_) {
         HILOG_ERROR_I18N("FormatRangeNumber: Get NumberFormat object failed");
         return JSUtils::CreateEmptyString(env);
@@ -272,7 +272,7 @@ napi_value IntlNumberFormatAddon::FormatRangeToParts(napi_env env, napi_callback
         return JSUtils::CreateEmptyArray(env);
     }
     IntlNumberFormatAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->numberfmt_) {
         HILOG_ERROR_I18N("FormatRangeToParts: Get NumberFormat object failed");
         return JSUtils::CreateEmptyArray(env);
@@ -303,7 +303,7 @@ napi_value IntlNumberFormatAddon::GetNumberResolvedOptions(napi_env env, napi_ca
         return JSUtils::CreateEmptyObject(env);
     }
     IntlNumberFormatAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->numberfmt_) {
         HILOG_ERROR_I18N("GetNumberResolvedOptions: Get NumberFormat object failed");
         return JSUtils::CreateEmptyObject(env);
@@ -370,7 +370,7 @@ napi_value IntlNumberFormatAddon::FormatWithDiffParamType(napi_env env, napi_val
     napi_valuetype &valueType, napi_value &thisVar)
 {
     IntlNumberFormatAddon *obj = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    napi_status status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->numberfmt_) {
         HILOG_ERROR_I18N("FormatWithDiffParamType: Get NumberFormat object failed");
         return JSUtils::CreateEmptyString(env);
@@ -408,7 +408,7 @@ napi_value IntlNumberFormatAddon::GetFormatToPartsInner(napi_env env, napi_value
     napi_valuetype &valueType, napi_value &thisVar)
 {
     IntlNumberFormatAddon *obj = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    napi_status status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->numberfmt_) {
         HILOG_ERROR_I18N("GetFormatToPartsInner: Get NumberFormat object failed");
         return JSUtils::CreateEmptyArray(env);
@@ -518,6 +518,12 @@ napi_value IntlNumberFormatAddon::SetNumberFormatParts(napi_env env, napi_status
         }
     }
     return result;
+}
+
+napi_status IntlNumberFormatAddon::UnwrapIntlNumberFormat(napi_env env, napi_value value,
+    IntlNumberFormatAddon** numberFormat)
+{
+    return napi_unwrap_s(env, value, &TYPE_TAG, reinterpret_cast<void **>(numberFormat));
 }
 
 std::shared_ptr<NumberFormat> IntlNumberFormatAddon::GetNumberFormat()

@@ -58,6 +58,8 @@ private:
         napi_value options);
     void SetTextStyle(napi_env env, napi_value options, const std::string &optionName);
 
+    static constexpr napi_type_tag TYPE_TAG = { 0x364e1f3e330c464f, 0x8aadb11a141d335f };
+
     napi_env env_ = nullptr;
     std::unordered_map<std::string, napi_ref> styledNumberFormatOptions_ {};
     std::unique_ptr<StyledNumberFormat> styledNumberFormat_ = nullptr;

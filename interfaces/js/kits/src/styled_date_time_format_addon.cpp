@@ -94,7 +94,7 @@ napi_value StyledDateTimeFormatAddon::constructor(napi_env env, napi_callback_in
     }
 
     std::unique_ptr<StyledDateTimeFormatAddon> obj = std::make_unique<StyledDateTimeFormatAddon>();
-    status = napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), Destructor, nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj.get()), Destructor, nullptr, &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("StyledDateTimeFormatAddon::constructor: napi_wrap error.");
         return nullptr;
@@ -120,13 +120,13 @@ void StyledDateTimeFormatAddon::ParseDateTimeFormat(napi_env env, napi_value val
     }
 
     if (IntlDateTimeFormatAddon::IsIntlDateTimeFormat(env, value)) {
-        status = napi_unwrap(env, value, reinterpret_cast<void **>(intlFormat));
+        status = IntlDateTimeFormatAddon::UnwrapIntlDateTimeFormat(env, value, intlFormat);
         if (status != napi_ok && intlFormat != nullptr) {
             *intlFormat = nullptr;
             HILOG_ERROR_I18N("StyledDateTimeFormatAddon::ParseDateTimeFormat: intlFormat unwrap failed.");
         }
     } else if (SimpleDateTimeFormatAddon::IsSimpleDateTimeFormat(env, value)) {
-        status = napi_unwrap(env, value, reinterpret_cast<void **>(simpleFormat));
+        status = SimpleDateTimeFormatAddon::UnwrapSimpleDateTimeFormat(env, value, simpleFormat);
         if (status != napi_ok && simpleFormat != nullptr) {
             *simpleFormat = nullptr;
             HILOG_ERROR_I18N("StyledDateTimeFormatAddon::ParseDateTimeFormat: simpleFormat unwrap failed.");
@@ -214,7 +214,7 @@ napi_value StyledDateTimeFormatAddon::Format(napi_env env, napi_callback_info in
     }
 
     StyledDateTimeFormatAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->styledDateTimeFormat_) {
         HILOG_ERROR_I18N("SimpleDateTimeFormatAddon::Format: Get StyledDateTimeFormat object failed.");
         return VariableConvertor::CreateStyledString(env, "", nullptr);

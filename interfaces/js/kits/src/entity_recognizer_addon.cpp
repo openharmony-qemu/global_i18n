@@ -106,8 +106,8 @@ napi_value EntityRecognizerAddon::constructor(napi_env env, napi_callback_info i
         return nullptr;
     }
     std::unique_ptr<EntityRecognizerAddon> obj = std::make_unique<EntityRecognizerAddon>();
-    status = napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()),
-        EntityRecognizerAddon::Destructor, nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj.get()),
+        EntityRecognizerAddon::Destructor, nullptr, &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         return nullptr;
     }
@@ -147,7 +147,7 @@ napi_value EntityRecognizerAddon::FindEntityInfo(napi_env env, napi_callback_inf
         return nullptr;
     }
     EntityRecognizerAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || obj == nullptr || obj->entityRecognizer_ == nullptr) {
         HILOG_ERROR_I18N("Get EntityRecognizer object failed");
         return nullptr;

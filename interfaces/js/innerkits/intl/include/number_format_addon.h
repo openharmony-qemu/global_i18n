@@ -32,6 +32,7 @@ public:
     ~NumberFormatAddon();
     static void Destructor(napi_env env, void *nativeObject, void *hint);
     static napi_value InitNumberFormat(napi_env env, napi_value exports);
+    static napi_status UnwrapNumberFormat(napi_env env, napi_value value, NumberFormatAddon** numberFormat);
 
     std::shared_ptr<NumberFormat> CopyNumberFormat();
 
@@ -43,6 +44,8 @@ private:
 
     bool InitNumberFormatContext(napi_env env, napi_callback_info info, std::vector<std::string> localeTags,
         std::map<std::string, std::string> &map);
+
+    static constexpr napi_type_tag TYPE_TAG = { 0x4783eef06c554489, 0xa3da7a277e1cff92 };
 
     std::shared_ptr<NumberFormat> numberfmt_ = nullptr;
 };

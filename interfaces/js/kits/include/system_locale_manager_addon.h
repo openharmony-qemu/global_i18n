@@ -47,6 +47,8 @@ private:
     static napi_value CreateLocaleItem(napi_env env, const LocaleItem &localeItem);
     static napi_value CreateSuggestionType(napi_env env, SuggestionType suggestionType);
 
+    static constexpr napi_type_tag TYPE_TAG = { 0xc912db77823a4d53, 0x9be2990477b5fd2d };
+
     napi_env env_;
     std::unique_ptr<SystemLocaleManager> systemLocaleManager_ = nullptr;
 };

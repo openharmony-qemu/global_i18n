@@ -39,6 +39,8 @@ private:
     static std::string FormatNumber(napi_env env, napi_value value,
         std::shared_ptr<AdvancedMeasureFormat> advancedMeasureFormat);
 
+    static constexpr napi_type_tag TYPE_TAG = { 0x64bcd3964dda4d64, 0x9bb210875629e6cd };
+
     std::shared_ptr<AdvancedMeasureFormat> advancedMeasureFormat_ = nullptr;
 };
 } // namespace I18n

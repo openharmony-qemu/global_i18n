@@ -200,8 +200,8 @@ napi_value IntlAddon::DateTimeFormatConstructor(napi_env env, napi_callback_info
     if (obj == nullptr) {
         return nullptr;
     }
-    status =
-        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), IntlAddon::Destructor, nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj.get()), IntlAddon::Destructor, nullptr,
+        &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("DateTimeFormatConstructor: Wrap IntlAddon failed");
         return nullptr;
@@ -256,8 +256,8 @@ napi_value IntlAddon::RelativeTimeFormatConstructor(napi_env env, napi_callback_
     if (obj == nullptr) {
         return nullptr;
     }
-    status =
-        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), IntlAddon::Destructor, nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj.get()), IntlAddon::Destructor, nullptr,
+        &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("RelativeTimeFormatConstructor: Wrap IntlAddon failed");
         return nullptr;
@@ -294,7 +294,7 @@ napi_value IntlAddon::FormatDateTime(napi_env env, napi_callback_info info)
         return nullptr;
     }
     IntlAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->datefmt_) {
         HILOG_ERROR_I18N("FormatDateTime: Get DateTimeFormat object failed");
         return nullptr;
@@ -329,7 +329,7 @@ napi_value IntlAddon::FormatDateTimeRange(napi_env env, napi_callback_info info)
         return nullptr;
     }
     IntlAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->datefmt_) {
         HILOG_ERROR_I18N("FormatDateTimeRange: Get DateTimeFormat object failed");
         return nullptr;
@@ -376,7 +376,7 @@ napi_value IntlAddon::GetRelativeTimeResolvedOptions(napi_env env, napi_callback
         return nullptr;
     }
     IntlAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->relativetimefmt_) {
         HILOG_ERROR_I18N("GetRelativeTimeResolvedOptions: Get RelativeTimeFormat object failed");
         return nullptr;
@@ -404,7 +404,7 @@ napi_value IntlAddon::GetDateTimeResolvedOptions(napi_env env, napi_callback_inf
         return nullptr;
     }
     IntlAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->datefmt_) {
         HILOG_ERROR_I18N("GetDateTimeResolvedOptions: Get DateTimeFormat object failed");
         return nullptr;
@@ -620,8 +620,8 @@ napi_value IntlAddon::CollatorConstructor(napi_env env, napi_callback_info info)
     if (obj == nullptr) {
         return nullptr;
     }
-    status =
-        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), IntlAddon::Destructor, nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj.get()), IntlAddon::Destructor, nullptr,
+        &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("CollatorConstructor: Wrap IntlAddon failed");
         return nullptr;
@@ -696,7 +696,7 @@ napi_value IntlAddon::FormatRelativeTime(napi_env env, napi_callback_info info)
         return nullptr;
     }
     IntlAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->relativetimefmt_) {
         HILOG_ERROR_I18N("FormatRelativeTime: Get RelativeTimeFormat object failed");
         return nullptr;
@@ -779,7 +779,7 @@ napi_value IntlAddon::FormatToParts(napi_env env, napi_callback_info info)
         return nullptr;
     }
     IntlAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->relativetimefmt_) {
         HILOG_ERROR_I18N("FormatToParts: Get RelativeTimeFormat object failed");
         return nullptr;
@@ -817,7 +817,7 @@ napi_value IntlAddon::CompareString(napi_env env, napi_callback_info info)
     }
 
     IntlAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->collator_) {
         HILOG_ERROR_I18N("CompareString: Get Collator object failed");
         return nullptr;
@@ -843,7 +843,7 @@ napi_value IntlAddon::GetCollatorResolvedOptions(napi_env env, napi_callback_inf
         return nullptr;
     }
     IntlAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->collator_) {
         HILOG_ERROR_I18N("GetCollatorResolvedOptions: Get Collator object failed");
         return nullptr;
@@ -1021,8 +1021,8 @@ napi_value IntlAddon::PluralRulesConstructor(napi_env env, napi_callback_info in
     if (obj == nullptr) {
         return nullptr;
     }
-    status =
-        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), IntlAddon::Destructor, nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj.get()), IntlAddon::Destructor, nullptr,
+        &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("PluralRulesConstructor: Wrap IntlAddon failed");
         return nullptr;
@@ -1078,7 +1078,7 @@ napi_value IntlAddon::Select(napi_env env, napi_callback_info info)
     }
 
     IntlAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->pluralrules_) {
         HILOG_ERROR_I18N("Get PluralRules object failed");
         return nullptr;

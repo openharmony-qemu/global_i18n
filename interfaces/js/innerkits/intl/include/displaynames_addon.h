@@ -42,6 +42,8 @@ private:
     bool InitDisplayNamesContext(napi_env env, napi_callback_info info, const std::vector<std::string> &localeTags,
         const std::map<std::string, std::string> &map);
 
+    static constexpr napi_type_tag TYPE_TAG = { 0x4b0c31655bb14771, 0x8c376b26c09d5eb4 };
+
     napi_env env_;
     std::unique_ptr<DisplayNames> displaynames_ = nullptr;
 };

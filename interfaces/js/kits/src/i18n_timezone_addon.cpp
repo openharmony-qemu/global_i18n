@@ -157,8 +157,8 @@ napi_value I18nTimeZoneAddon::I18nTimeZoneConstructor(napi_env env, napi_callbac
     if (obj == nullptr) {
         return nullptr;
     }
-    status =
-        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), I18nTimeZoneAddon::Destructor, nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj.get()), I18nTimeZoneAddon::Destructor, nullptr,
+        &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         return nullptr;
     }
@@ -365,7 +365,7 @@ napi_value I18nTimeZoneAddon::GetID(napi_env env, napi_callback_info info)
         return nullptr;
     }
     I18nTimeZoneAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->timezone_) {
         HILOG_ERROR_I18N("GetID: Get TimeZone object failed");
         return nullptr;
@@ -392,7 +392,7 @@ napi_value I18nTimeZoneAddon::GetTimeZoneDisplayName(napi_env env, napi_callback
     }
 
     I18nTimeZoneAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->timezone_) {
         HILOG_ERROR_I18N("GetTimeZoneDisplayName: Get TimeZone object failed");
         return nullptr;
@@ -436,7 +436,7 @@ napi_value I18nTimeZoneAddon::GetRawOffset(napi_env env, napi_callback_info info
         return nullptr;
     }
     I18nTimeZoneAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->timezone_) {
         HILOG_ERROR_I18N("GetRawOffset: Get TimeZone object failed");
         return nullptr;
@@ -486,7 +486,7 @@ napi_value I18nTimeZoneAddon::GetOffset(napi_env env, napi_callback_info info)
     }
 
     I18nTimeZoneAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->timezone_) {
         HILOG_ERROR_I18N("GetOffset: Get TimeZone object failed");
         return nullptr;
@@ -513,7 +513,7 @@ napi_value I18nTimeZoneAddon::GetZoneRules(napi_env env, napi_callback_info info
         return nullptr;
     }
     I18nTimeZoneAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->timezone_) {
         HILOG_ERROR_I18N("GetZoneRules: Get TimeZone object failed");
         return nullptr;

@@ -33,6 +33,8 @@ public:
     static napi_value GetSimpleDateTimeFormatBySkeleton(napi_env env, napi_callback_info info);
     static napi_value GetSimpleDateTimeFormatByPattern(napi_env env, napi_callback_info info);
     static bool IsSimpleDateTimeFormat(napi_env env, napi_value argv);
+    static napi_status UnwrapSimpleDateTimeFormat(napi_env env, napi_value value,
+        SimpleDateTimeFormatAddon** dateTimeFormat);
 
 private:
     static napi_value Format(napi_env env, napi_callback_info info);
@@ -41,6 +43,9 @@ private:
     static napi_value SimpleDateTimeFormatConstructor(napi_env env, napi_callback_info info);
     static std::shared_ptr<SimpleDateTimeFormat> InitSimpleDateTimeFormatContext(napi_env env, napi_value locale,
         const std::string& skeleton, bool isBestPattern, I18nErrorCode& errCode);
+
+    static constexpr napi_type_tag TYPE_TAG = { 0xa1587ea41cbc40ad, 0xa38af333561e5f65 };
+
     std::shared_ptr<SimpleDateTimeFormat> simpleDateTimeFormat_ = nullptr;
 };
 } // namespace I18n

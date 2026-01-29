@@ -115,8 +115,8 @@ napi_value IntlDateTimeFormatAddon::IntlDateTimeFormatConstructor(napi_env env, 
         HILOG_ERROR_I18N("IntlDateTimeFormatAddon::IntlDateTimeFormatConstructor: Create obj failed.");
         return nullptr;
     }
-    status = napi_wrap(env, thisVar, reinterpret_cast<void *>(obj), IntlDateTimeFormatAddon::Destructor,
-        nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj), IntlDateTimeFormatAddon::Destructor,
+        nullptr, &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         delete obj;
         HILOG_ERROR_I18N(
@@ -220,7 +220,7 @@ napi_value IntlDateTimeFormatAddon::Format(napi_env env, napi_callback_info info
     }
 
     IntlDateTimeFormatAddon* obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->intlDateTimeFormat) {
         HILOG_ERROR_I18N("IntlDateTimeFormatAddon::Format: unwrap IntlDateTimeFormatAddon failed.");
         return JSUtils::CreateEmptyString(env);
@@ -255,7 +255,7 @@ napi_value IntlDateTimeFormatAddon::FormatToParts(napi_env env, napi_callback_in
     }
 
     IntlDateTimeFormatAddon* obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->intlDateTimeFormat) {
         HILOG_ERROR_I18N("IntlDateTimeFormatAddon::FormatToParts: unwrap IntlDateTimeFormatAddon failed.");
         return JSUtils::CreateEmptyArray(env);
@@ -297,7 +297,7 @@ napi_value IntlDateTimeFormatAddon::FormatRange(napi_env env, napi_callback_info
     }
 
     IntlDateTimeFormatAddon* obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->intlDateTimeFormat) {
         HILOG_ERROR_I18N("IntlDateTimeFormatAddon::FormatRange: unwrap IntlDateTimeFormatAddon failed.");
         return JSUtils::CreateEmptyString(env);
@@ -344,7 +344,7 @@ napi_value IntlDateTimeFormatAddon::FormatRangeToParts(napi_env env, napi_callba
     }
 
     IntlDateTimeFormatAddon* obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->intlDateTimeFormat) {
         HILOG_ERROR_I18N("IntlDateTimeFormatAddon::FormatRangeToParts: unwrap IntlDateTimeFormatAddon failed.");
         return JSUtils::CreateEmptyArray(env);
@@ -376,7 +376,7 @@ napi_value IntlDateTimeFormatAddon::ResolvedOptions(napi_env env, napi_callback_
         return JSUtils::CreateEmptyObject(env);
     }
     IntlDateTimeFormatAddon* obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->intlDateTimeFormat) {
         HILOG_ERROR_I18N("IntlDateTimeFormatAddon::ResolvedOptions: unwrap IntlDateTimeFormatAddon failed.");
         return JSUtils::CreateEmptyObject(env);
@@ -565,6 +565,12 @@ bool IntlDateTimeFormatAddon::IsIntlDateTimeFormat(napi_env env, napi_value argv
         return false;
     }
     return isIntlDateTimeFormat;
+}
+
+napi_status IntlDateTimeFormatAddon::UnwrapIntlDateTimeFormat(napi_env env, napi_value value,
+    IntlDateTimeFormatAddon** dateTimeFormat)
+{
+    return napi_unwrap_s(env, value, &TYPE_TAG, reinterpret_cast<void **>(dateTimeFormat));
 }
 } // namespace I18n
 } // namespace Global

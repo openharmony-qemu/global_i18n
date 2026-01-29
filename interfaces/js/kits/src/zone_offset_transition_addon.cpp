@@ -103,8 +103,8 @@ napi_value ZoneOffsetTransitionAddon::I18nZoneOffsetTransitionConstructor(napi_e
         HILOG_ERROR_I18N("ZoneOffsetTransitionAddon: Create ZoneOffsetTransitionAddon object failed");
         return nullptr;
     }
-    status = napi_wrap(env, thisVar, reinterpret_cast<void *>(obj),
-        ZoneOffsetTransitionAddon::Destructor, nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj),
+        ZoneOffsetTransitionAddon::Destructor, nullptr, &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         delete obj;
         HILOG_ERROR_I18N("ZoneOffsetTransitionAddon: Wrap ZoneOffsetTransition failed");
@@ -173,7 +173,7 @@ napi_value ZoneOffsetTransitionAddon::GetMilliseconds(napi_env env, napi_callbac
         return nullptr;
     }
     ZoneOffsetTransitionAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->zoneOffsetTransition_) {
         HILOG_ERROR_I18N("GetMilliseconds: Get ZoneOffsetTransition object failed");
         return nullptr;
@@ -199,7 +199,7 @@ napi_value ZoneOffsetTransitionAddon::GetOffsetAfter(napi_env env, napi_callback
         return nullptr;
     }
     ZoneOffsetTransitionAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->zoneOffsetTransition_) {
         HILOG_ERROR_I18N("GetOffsetAfter: Get ZoneOffsetTransition object failed");
         return nullptr;
@@ -219,7 +219,7 @@ napi_value ZoneOffsetTransitionAddon::GetOffsetBefore(napi_env env, napi_callbac
         return nullptr;
     }
     ZoneOffsetTransitionAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->zoneOffsetTransition_) {
         HILOG_ERROR_I18N("GetOffsetBefore: Get ZoneOffsetTransition object failed");
         return nullptr;

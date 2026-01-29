@@ -134,8 +134,8 @@ napi_value I18nNormalizerAddon::I18nNormalizerConstructor(napi_env env, napi_cal
     if (obj == nullptr) {
         return nullptr;
     }
-    status =
-        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), I18nNormalizerAddon::Destructor, nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj.get()), I18nNormalizerAddon::Destructor, nullptr,
+        &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         return nullptr;
     }
@@ -180,7 +180,7 @@ napi_value I18nNormalizerAddon::Normalize(napi_env env, napi_callback_info info)
     }
 
     I18nNormalizerAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || obj == nullptr || obj->normalizer_ == nullptr) {
         HILOG_ERROR_I18N("Get Normalizer object failed");
         return nullptr;

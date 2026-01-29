@@ -106,8 +106,8 @@ napi_value ZoneRulesAddon::ZoneRulesConstructor(napi_env env, napi_callback_info
         HILOG_ERROR_I18N("ZoneRulesConstructor: Create ZoneRulesAddon failed.");
         return nullptr;
     }
-    status =
-        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj), ZoneRulesAddon::Destructor, nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj), ZoneRulesAddon::Destructor, nullptr,
+        &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         delete obj;
         HILOG_ERROR_I18N("ZoneRulesConstructor: warp ZoneRulesAddon failed.");
@@ -133,7 +133,7 @@ napi_value ZoneRulesAddon::NextTransition(napi_env env, napi_callback_info info)
         return nullptr;
     }
     ZoneRulesAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->zoneRules_) {
         HILOG_ERROR_I18N("ZoneRulesAddon::NextTransition, Get ZoneRulesAddon object failed");
         return nullptr;

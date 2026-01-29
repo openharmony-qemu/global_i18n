@@ -78,7 +78,7 @@ napi_value AdvancedMeasureFormatAddon::Constructor(napi_env env, napi_callback_i
     }
 
     IntlNumberFormatAddon* intlNumberFormatAddon = nullptr;
-    status = napi_unwrap(env, argv[0], reinterpret_cast<void **>(&intlNumberFormatAddon));
+    status = IntlNumberFormatAddon::UnwrapIntlNumberFormat(env, argv[0], &intlNumberFormatAddon);
     if (status != napi_ok || intlNumberFormatAddon == nullptr) {
         HILOG_ERROR_I18N("AdvancedMeasureFormatAddon::Constructor: Unwrap IntlNumberFormatAddon failed.");
         return nullptr;
@@ -87,7 +87,7 @@ napi_value AdvancedMeasureFormatAddon::Constructor(napi_env env, napi_callback_i
     AdvancedMeasureFormatOptions options = ParseOptions(env, argv[1]);
 
     std::unique_ptr<AdvancedMeasureFormatAddon> obj = std::make_unique<AdvancedMeasureFormatAddon>();
-    status = napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), Destructor, nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj.get()), Destructor, nullptr, &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("AdvancedMeasureFormatAddon::Constructor: Wrap AdvancedMeasureFormatAddon failed.");
         return nullptr;
@@ -168,7 +168,7 @@ napi_value AdvancedMeasureFormatAddon::Format(napi_env env, napi_callback_info i
     }
 
     AdvancedMeasureFormatAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->advancedMeasureFormat_) {
         HILOG_ERROR_I18N("AdvancedMeasureFormatAddon::Format: Unwrap failed.");
         return VariableConvertor::CreateString(env, "");

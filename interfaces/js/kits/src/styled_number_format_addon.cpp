@@ -98,7 +98,8 @@ napi_value StyledNumberFormatAddon::constructor(napi_env env, napi_callback_info
         HILOG_ERROR_I18N("StyledNumberFormatAddon::constructor make unique ptr error");
         return nullptr;
     }
-    status = napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), Destructor, nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj.get()), Destructor, nullptr,
+        &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("StyledNumberFormatAddon::constructor napi_wrap error");
         return nullptr;
@@ -143,7 +144,7 @@ napi_value StyledNumberFormatAddon::Format(napi_env env, napi_callback_info info
         return VariableConvertor::CreateStyledString(env, "", nullptr);
     }
     StyledNumberFormatAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->styledNumberFormat_) {
         HILOG_ERROR_I18N("Format: Get StyledNumberFormat object failed");
         return VariableConvertor::CreateStyledString(env, "", nullptr);
@@ -314,17 +315,17 @@ void StyledNumberFormatAddon::GetNumberFmtOrSimpleNumberFmt(napi_env env, napi_v
         return;
     }
     if (IsIntlNumberFormatInstance(env, arg)) {
-        status = napi_unwrap(env, arg, reinterpret_cast<void **>(intlNumberFormatAddon));
+        status = IntlNumberFormatAddon::UnwrapIntlNumberFormat(env, arg, intlNumberFormatAddon);
         if (status != napi_ok && intlNumberFormatAddon != nullptr) {
             *intlNumberFormatAddon = nullptr;
         }
     } else if (IsNumberFormatInstance(env, arg, "@ohos.intl")) {
-        status = napi_unwrap(env, arg, reinterpret_cast<void **>(numberFormatAddon));
+        status = NumberFormatAddon::UnwrapNumberFormat(env, arg, numberFormatAddon);
         if (status != napi_ok && numberFormatAddon != nullptr) {
             *numberFormatAddon = nullptr;
         }
     } else {
-        status = napi_unwrap(env, arg, reinterpret_cast<void **>(simpleNumberFormatAddon));
+        status = SimpleNumberFormatAddon::UnwrapSimpleNumberFormat(env, arg, simpleNumberFormatAddon);
         if (status != napi_ok && simpleNumberFormatAddon != nullptr) {
             *simpleNumberFormatAddon = nullptr;
         }

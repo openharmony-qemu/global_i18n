@@ -35,6 +35,7 @@ public:
     static napi_value InitLocale(napi_env env, napi_value exports);
     std::shared_ptr<LocaleInfo> GetLocaleInfo();
     static bool IsLocaleInfo(napi_env env, napi_value argv);
+    static napi_status UnwrapLocaleInfoAddon(napi_env env, napi_value value, LocaleInfoAddon** localeInfo);
 
 private:
     static napi_value LocaleConstructor(napi_env env, napi_callback_info info);
@@ -69,6 +70,8 @@ private:
     static napi_value GetMaximizeOrMinimize(napi_env env, napi_callback_info info, GetLocaleInfoProperty func);
     
     static napi_value SetProperty(napi_env env, napi_callback_info info);
+
+    static constexpr napi_type_tag TYPE_TAG = { 0x6ad4792b02c9495b, 0x9e25904b3f2e3e9d };
 
     napi_env env_;
     std::shared_ptr<LocaleInfo> locale_ = nullptr;

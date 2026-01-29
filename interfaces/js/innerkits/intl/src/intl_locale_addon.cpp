@@ -128,8 +128,8 @@ napi_value IntlLocaleAddon::IntlLocaleConstructor(napi_env env, napi_callback_in
         HILOG_ERROR_I18N("IntlLocaleAddon::IntlLocaleConstructor: Create IntlLocaleAddon failed.");
         return nullptr;
     }
-    status =
-        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj), IntlLocaleAddon::Destructor, nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj), IntlLocaleAddon::Destructor, nullptr,
+        &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("IntlLocaleAddon::IntlLocaleConstructor: Wrap IntlLocaleAddon failed.");
         delete obj;
@@ -254,7 +254,7 @@ napi_value IntlLocaleAddon::ToString(napi_env env, napi_callback_info info)
         return nullptr;
     }
     IntlLocaleAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->intlLocale) {
         HILOG_ERROR_I18N("IntlLocaleAddon::ToString: Get IntlLocale object failed.");
         return nullptr;
@@ -393,7 +393,7 @@ napi_value IntlLocaleAddon::GetIntlLocaleAttribute(napi_env env, napi_callback_i
         return nullptr;
     }
     IntlLocaleAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->intlLocale) {
         HILOG_ERROR_I18N("IntlLocaleAddon::GetIntlLocaleAttribute: Get Locale object failed.");
         return nullptr;

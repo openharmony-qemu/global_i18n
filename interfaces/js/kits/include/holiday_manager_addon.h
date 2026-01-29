@@ -45,6 +45,7 @@ private:
     static int GetDateValue(napi_env env, napi_value value, const std::string method);
 
     static const int32_t MONTH_INCREASE_ONE = 1; // 1 is real month greater than display
+    static constexpr napi_type_tag TYPE_TAG = { 0xd36e991a7c004bf8, 0x8c0b345394822b05 };
 
     napi_env env_;
     std::unique_ptr<HolidayManager> holidayManager_ = nullptr;

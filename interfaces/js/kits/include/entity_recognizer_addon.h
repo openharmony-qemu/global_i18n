@@ -36,8 +36,11 @@ private:
     static napi_value FindEntityInfo(napi_env env, napi_callback_info info);
     static napi_value CreateEntityInfoItem(napi_env env, const int begin, const int end, const std::string& type);
     static napi_value GetEntityInfoItem(napi_env env, std::vector<std::vector<int>>& entityInfo);
-    std::unique_ptr<EntityRecognizer> entityRecognizer_ = nullptr;
+
     static const size_t ENTITY_INFO_LEN;
+    static constexpr napi_type_tag TYPE_TAG = { 0xe2cea774a7404a93, 0x9e57da2932a00fb0 };
+
+    std::unique_ptr<EntityRecognizer> entityRecognizer_ = nullptr;
 };
 } // namespace I18n
 } // namespace Global
