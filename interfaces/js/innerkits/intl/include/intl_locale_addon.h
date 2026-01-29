@@ -73,6 +73,9 @@ private:
         napi_valuetype type);
     static std::string ParseLocaleTag(napi_env env, napi_value value, napi_valuetype type);
     static void ParseConfigs(napi_env env, napi_value options, std::unordered_map<std::string, std::string>& configs);
+
+    static constexpr napi_type_tag TYPE_TAG = { 0xf8a4eb747b854c8f, 0xae58d824ccf59c05 };
+
     std::shared_ptr<IntlLocale> intlLocale = nullptr;
 };
 } // namespace I18n

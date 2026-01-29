@@ -97,7 +97,7 @@ std::unordered_map<std::string, int32_t> I18nAddon::EnumUnitUsage {
     { "SIZE_SHORTFILE_BYTE", 23 }
 };
 
-I18nAddon::I18nAddon() : env_(nullptr) {}
+I18nAddon::I18nAddon() {}
 
 I18nAddon::~I18nAddon()
 {
@@ -639,8 +639,8 @@ napi_value I18nAddon::I18nTransliteratorConstructor(napi_env env, napi_callback_
     if (obj == nullptr) {
         return nullptr;
     }
-    status =
-        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), I18nAddon::Destructor, nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj.get()), I18nAddon::Destructor, nullptr,
+        &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("I18nTransliteratorConstructor: TransliteratorConstructor: Wrap II18nAddon failed");
         return nullptr;
@@ -676,7 +676,7 @@ napi_value I18nAddon::Transform(napi_env env, napi_callback_info info)
         return nullptr;
     }
     I18nAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->transliterator_) {
         HILOG_ERROR_I18N("Get Transliterator object failed");
         return nullptr;
@@ -954,8 +954,8 @@ napi_value I18nAddon::PhoneNumberFormatConstructor(napi_env env, napi_callback_i
     if (obj == nullptr) {
         return nullptr;
     }
-    status = napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()),
-                       I18nAddon::Destructor, nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj.get()), I18nAddon::Destructor, nullptr,
+        &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("PhoneNumberFormatConstructor: Wrap I18nAddon failed");
         return nullptr;
@@ -976,7 +976,7 @@ bool I18nAddon::InitPhoneNumberFormatContext(napi_env env, napi_callback_info in
         HILOG_ERROR_I18N("InitPhoneNumberFormatContext: Get global failed");
         return false;
     }
-    env_ = env;
+
     phonenumberfmt_ = PhoneNumberFormat::CreateInstance(country, options);
 
     return phonenumberfmt_ != nullptr;
@@ -1009,7 +1009,7 @@ napi_value I18nAddon::IsValidPhoneNumber(napi_env env, napi_callback_info info)
     }
 
     I18nAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->phonenumberfmt_) {
         HILOG_ERROR_I18N("IsValidPhoneNumber: GetPhoneNumberFormat object failed");
         return nullptr;
@@ -1048,7 +1048,7 @@ napi_value I18nAddon::GetLocationName(napi_env env, napi_callback_info info)
     }
 
     I18nAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->phonenumberfmt_) {
         HILOG_ERROR_I18N("GetLocationName: GetPhoneNumberFormat object failed");
         return nullptr;
@@ -1093,7 +1093,7 @@ napi_value I18nAddon::FormatPhoneNumber(napi_env env, napi_callback_info info)
     }
 
     I18nAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->phonenumberfmt_) {
         HILOG_ERROR_I18N("Get PhoneNumberFormat object failed");
         return nullptr;
@@ -1190,8 +1190,8 @@ napi_value I18nAddon::I18nBreakIteratorConstructor(napi_env env, napi_callback_i
     if (obj == nullptr) {
         return nullptr;
     }
-    status =
-        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), I18nAddon::Destructor, nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj.get()), I18nAddon::Destructor, nullptr,
+        &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("BreakIteratorConstructor: Wrap II18nAddon failed");
         return nullptr;
@@ -1304,7 +1304,7 @@ napi_value I18nAddon::Current(napi_env env, napi_callback_info info)
         return nullptr;
     }
     I18nAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->brkiter_) {
         HILOG_ERROR_I18N("Current: Get BreakIterator object failed");
         return nullptr;
@@ -1330,7 +1330,7 @@ napi_value I18nAddon::First(napi_env env, napi_callback_info info)
         return nullptr;
     }
     I18nAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->brkiter_) {
         HILOG_ERROR_I18N("First: Get BreakIterator object failed");
         return nullptr;
@@ -1356,7 +1356,7 @@ napi_value I18nAddon::Last(napi_env env, napi_callback_info info)
         return nullptr;
     }
     I18nAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->brkiter_) {
         HILOG_ERROR_I18N("Last: Get BreakIterator object failed");
         return nullptr;
@@ -1382,7 +1382,7 @@ napi_value I18nAddon::Previous(napi_env env, napi_callback_info info)
         return nullptr;
     }
     I18nAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->brkiter_) {
         HILOG_ERROR_I18N("Previous: Get BreakIterator object failed");
         return nullptr;
@@ -1408,7 +1408,7 @@ napi_value I18nAddon::Next(napi_env env, napi_callback_info info)
         return nullptr;
     }
     I18nAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->brkiter_) {
         HILOG_ERROR_I18N("Next: Get BreakIterator object failed");
         return nullptr;
@@ -1451,7 +1451,7 @@ napi_value I18nAddon::SetText(napi_env env, napi_callback_info info)
         return nullptr;
     }
     I18nAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->brkiter_) {
         HILOG_ERROR_I18N("SetText: Get BreakIterator object failed");
         return nullptr;
@@ -1495,7 +1495,7 @@ napi_value I18nAddon::GetText(napi_env env, napi_callback_info info)
         return nullptr;
     }
     I18nAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->brkiter_) {
         HILOG_ERROR_I18N("GetText: Get BreakIterator object failed");
         return nullptr;
@@ -1522,7 +1522,7 @@ napi_value I18nAddon::Following(napi_env env, napi_callback_info info)
         return nullptr;
     }
     I18nAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->brkiter_) {
         HILOG_ERROR_I18N("Following: Get BreakIterator object failed");
         return nullptr;
@@ -1566,7 +1566,7 @@ napi_value I18nAddon::IsBoundary(napi_env env, napi_callback_info info)
         return nullptr;
     }
     I18nAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->brkiter_) {
         HILOG_ERROR_I18N("IsBoundary: Get BreakIterator object failed");
         return nullptr;
@@ -1638,8 +1638,8 @@ napi_value I18nAddon::I18nIndexUtilConstructor(napi_env env, napi_callback_info 
     if (obj == nullptr) {
         return nullptr;
     }
-    status =
-        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), I18nAddon::Destructor, nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj.get()), I18nAddon::Destructor, nullptr,
+        &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("IndexUtilConstructor: Wrap II18nAddon failed");
         return nullptr;
@@ -1659,7 +1659,7 @@ bool I18nAddon::InitIndexUtilContext(napi_env env, napi_callback_info info, cons
         HILOG_ERROR_I18N("InitIndexUtilContext: Get global failed");
         return false;
     }
-    env_ = env;
+
     indexUtil_ = std::make_unique<IndexUtil>(localeTag);
     return indexUtil_ != nullptr;
 }
@@ -1701,7 +1701,7 @@ napi_value I18nAddon::GetIndexList(napi_env env, napi_callback_info info)
         return nullptr;
     }
     I18nAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->indexUtil_) {
         HILOG_ERROR_I18N("GetIndexList: GetPhoneNumberFormat object failed");
         return nullptr;
@@ -1762,7 +1762,7 @@ napi_value I18nAddon::AddLocale(napi_env env, napi_callback_info info)
         return nullptr;
     }
     I18nAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->indexUtil_) {
         HILOG_ERROR_I18N("AddLocale: Get IndexUtil object failed");
         return nullptr;
@@ -1803,7 +1803,7 @@ napi_value I18nAddon::GetIndex(napi_env env, napi_callback_info info)
         return nullptr;
     }
     I18nAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->indexUtil_) {
         HILOG_ERROR_I18N("GetIndex: Get IndexUtil object failed");
         return nullptr;
@@ -1827,8 +1827,8 @@ napi_value I18nAddon::ObjectConstructor(napi_env env, napi_callback_info info)
         return nullptr;
     }
     std::unique_ptr<I18nAddon> obj = std::make_unique<I18nAddon>();
-    status =
-        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), I18nAddon::Destructor, nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj.get()), I18nAddon::Destructor, nullptr,
+        &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("ObjectConstructor: Wrap I18nAddon failed");
         return nullptr;

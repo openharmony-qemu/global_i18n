@@ -52,6 +52,8 @@ private:
     static bool GetStringFromJS(napi_env env, napi_value argv, std::string &jsString);
     static int32_t GetFirstParameter(napi_env env, napi_value value, std::string &localeStr, bool &isDST);
 
+    static constexpr napi_type_tag TYPE_TAG = { 0x6ba054e16a96492d, 0xbd0d2d59542d490d };
+
     std::unique_ptr<I18nTimeZone> timezone_ = nullptr;
 };
 } // namespace I18n

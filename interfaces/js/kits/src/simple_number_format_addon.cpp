@@ -137,7 +137,7 @@ napi_value SimpleNumberFormatAddon::Format(napi_env env, napi_callback_info info
     }
 
     SimpleNumberFormatAddon* obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->simpleNumberFormat_) {
         HILOG_ERROR_I18N("SimpleNumberFormatAddon::Format: Unwrap SimpleNumberFormatAddon failed.");
         return VariableConvertor::CreateString(env, "");
@@ -179,8 +179,8 @@ napi_value SimpleNumberFormatAddon::SimpleNumberFormatConstructor(napi_env env, 
         HILOG_ERROR_I18N("SimpleNumberFormatConstructor: create SimpleNumberFormatAddon failed.");
         return nullptr;
     }
-    status = napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()),
-        SimpleNumberFormatAddon::Destructor, nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj.get()),
+        SimpleNumberFormatAddon::Destructor, nullptr, &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("SimpleNumberFormatConstructor: Wrap SimpleNumberFormatAddon failed.");
         return nullptr;
@@ -218,6 +218,12 @@ std::unique_ptr<SimpleNumberFormat> SimpleNumberFormatAddon::InitSimpleNumberFor
     }
     HILOG_ERROR_I18N("SimpleNumberFormatAddon::InitSimpleNumberFormatContext: Init context failed.");
     return nullptr;
+}
+
+napi_status SimpleNumberFormatAddon::UnwrapSimpleNumberFormat(napi_env env, napi_value value,
+    SimpleNumberFormatAddon** numberFormat)
+{
+    return napi_unwrap_s(env, value, &TYPE_TAG, reinterpret_cast<void **>(numberFormat));
 }
 
 std::shared_ptr<SimpleNumberFormat> SimpleNumberFormatAddon::CopySimpleNumberFormat()

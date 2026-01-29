@@ -302,7 +302,7 @@ LocaleType VariableConvertor::GetLocaleType(napi_env env, napi_value locale)
 std::shared_ptr<LocaleInfo> VariableConvertor::ParseLocaleInfo(napi_env env, napi_value localeInfo)
 {
     LocaleInfoAddon *localeInfoAddon = nullptr;
-    napi_status status = napi_unwrap(env, localeInfo, reinterpret_cast<void **>(&localeInfoAddon));
+    napi_status status = LocaleInfoAddon::UnwrapLocaleInfoAddon(env, localeInfo, &localeInfoAddon);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("VariableConvertor::ParseLocaleInfo: Failed to unwrap localeInfo.");
         return nullptr;

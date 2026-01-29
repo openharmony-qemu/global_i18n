@@ -52,6 +52,8 @@ private:
     static void SetTextStyle(napi_env env, napi_value &option, const std::string& name,
         napi_value &property);
 
+    static constexpr napi_type_tag TYPE_TAG = { 0x474eba8414634a91, 0x9675dcb6d57817b0 };
+
     napi_env env_ = nullptr;
     std::unordered_map<std::string, napi_ref> styledFormatOptions_ {};
     std::unique_ptr<StyledDateTimeFormat> styledDateTimeFormat_ = nullptr;

@@ -46,6 +46,7 @@ private:
     static const char *NORMALIZER_MODE_NFD_NAME;
     static const char *NORMALIZER_MODE_NFKC_NAME;
     static const char *NORMALIZER_MODE_NFKD_NAME;
+    static constexpr napi_type_tag TYPE_TAG = { 0xd5d059d08dca419b, 0x82d25fd4cdc1a466 };
 
     std::unique_ptr<I18nNormalizer> normalizer_ = nullptr;
 };

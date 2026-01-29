@@ -57,6 +57,8 @@ private:
         std::vector<std::string> localeTags, std::map<std::string, std::string> &map);
 
     static std::unordered_map<std::string, std::vector<std::string>> optionAvaliableMap;
+    static constexpr napi_type_tag TYPE_TAG = { 0xa4e471ac504a493d, 0x9ddd318ef76b1707 };
+
     std::shared_ptr<RelativeTimeFormat> relativetimefmt_ = nullptr;
 };
 } // namespace I18n

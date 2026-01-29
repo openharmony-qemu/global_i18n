@@ -157,7 +157,7 @@ napi_value SimpleDateTimeFormatAddon::Format(napi_env env, napi_callback_info in
     }
 
     SimpleDateTimeFormatAddon* obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->simpleDateTimeFormat_) {
         HILOG_ERROR_I18N("SimpleDateTimeFormatConstructor: unwrap SimpleDateTimeFormatAddon failed.");
         return VariableConvertor::CreateString(env, "");
@@ -242,8 +242,8 @@ napi_value SimpleDateTimeFormatAddon::SimpleDateTimeFormatConstructor(napi_env e
         HILOG_ERROR_I18N("SimpleDateTimeFormatConstructor: Cerate SimpleDateTimeFormatAddon failed.");
         return nullptr;
     }
-    status = napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()),
-        SimpleDateTimeFormatAddon::Destructor, nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj.get()),
+        SimpleDateTimeFormatAddon::Destructor, nullptr, &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("SimpleDateTimeFormatConstructor: wrap SimpleDateTimeFormatAddon failed");
         return nullptr;
@@ -310,6 +310,12 @@ bool SimpleDateTimeFormatAddon::IsSimpleDateTimeFormat(napi_env env, napi_value 
         return false;
     }
     return isSimpleDateTimeFormat;
+}
+
+napi_status SimpleDateTimeFormatAddon::UnwrapSimpleDateTimeFormat(napi_env env, napi_value value,
+    SimpleDateTimeFormatAddon** dateTimeFormat)
+{
+    return napi_unwrap_s(env, value, &TYPE_TAG, reinterpret_cast<void **>(dateTimeFormat));
 }
 } // namespace I18n
 } // namespace Global

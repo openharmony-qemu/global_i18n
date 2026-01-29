@@ -95,8 +95,8 @@ napi_value DisplayNamesAddon::DisplayNamesConstructor(napi_env env, napi_callbac
         HILOG_ERROR_I18N("DisplayNamesConstructor: make unique ptr failed.");
         return nullptr;
     }
-    status =
-        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj), DisplayNamesAddon::Destructor, nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj), DisplayNamesAddon::Destructor, nullptr,
+        &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("DisplayNamesConstructor: Wrap DisplayNamesAddon failed");
         delete obj;
@@ -196,7 +196,7 @@ napi_value DisplayNamesAddon::Of(napi_env env, napi_callback_info info)
     }
 
     DisplayNamesAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->displaynames_) {
         HILOG_ERROR_I18N("DisplayNamesAddon::Of: Get DisplayNames object failed");
         return JSUtils::CreateEmptyString(env);
@@ -232,7 +232,7 @@ napi_value DisplayNamesAddon::ResolvedOptions(napi_env env, napi_callback_info i
         return result;
     }
     DisplayNamesAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->displaynames_) {
         HILOG_ERROR_I18N("DisplayNamesAddon::ResolvedOptions: Get DisplayNames object failed");
         return result;

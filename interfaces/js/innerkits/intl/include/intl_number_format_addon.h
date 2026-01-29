@@ -32,6 +32,7 @@ public:
     ~IntlNumberFormatAddon();
     static void Destructor(napi_env env, void *nativeObject, void *hint);
     static napi_value InitIntlNumberFormat(napi_env env, napi_value exports);
+    static napi_status UnwrapIntlNumberFormat(napi_env env, napi_value value, IntlNumberFormatAddon** numberFormat);
 
     std::shared_ptr<NumberFormat> GetNumberFormat();
 
@@ -57,6 +58,8 @@ private:
 
     bool InitNumberFormatContext(napi_env env, const std::vector<std::string> &localeTags,
         std::map<std::string, std::string> &map);
+
+    static constexpr napi_type_tag TYPE_TAG = { 0xd0435ea30bd94ac2, 0xbba013c582b30986 };
 
     std::shared_ptr<NumberFormat> numberfmt_ = nullptr;
 };

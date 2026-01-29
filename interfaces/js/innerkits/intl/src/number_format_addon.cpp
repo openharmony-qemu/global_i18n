@@ -94,8 +94,8 @@ napi_value NumberFormatAddon::NumberFormatConstructor(napi_env env, napi_callbac
     if (obj == nullptr) {
         return nullptr;
     }
-    status =
-        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), NumberFormatAddon::Destructor, nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj.get()), NumberFormatAddon::Destructor, nullptr,
+        &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("NumberFormatConstructor: Wrap NumberFormatAddon failed");
         return nullptr;
@@ -138,7 +138,7 @@ napi_value NumberFormatAddon::FormatNumber(napi_env env, napi_callback_info info
         return nullptr;
     }
     NumberFormatAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->numberfmt_) {
         HILOG_ERROR_I18N("FormatNumber: Get NumberFormat object failed");
         return nullptr;
@@ -181,7 +181,7 @@ napi_value NumberFormatAddon::FormatRangeNumber(napi_env env, napi_callback_info
         return JSUtils::CreateEmptyString(env);
     }
     NumberFormatAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->numberfmt_) {
         HILOG_ERROR_I18N("FormatRangeNumber: Get NumberFormat object failed");
         return JSUtils::CreateEmptyString(env);
@@ -205,7 +205,7 @@ napi_value NumberFormatAddon::GetNumberResolvedOptions(napi_env env, napi_callba
         return nullptr;
     }
     NumberFormatAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->numberfmt_) {
         HILOG_ERROR_I18N("GetNumberResolvedOptions: Get NumberFormat object failed");
         return nullptr;
@@ -237,6 +237,12 @@ napi_value NumberFormatAddon::GetNumberResolvedOptions(napi_env env, napi_callba
     JSUtils::SetIntegerOptionProperties(env, result, options, "maximumSignificantDigits");
     JSUtils::SetOptionProperties(env, result, options, "localeMatcher");
     return result;
+}
+
+napi_status NumberFormatAddon::UnwrapNumberFormat(napi_env env, napi_value value,
+    NumberFormatAddon** numberFormat)
+{
+    return napi_unwrap_s(env, value, &TYPE_TAG, reinterpret_cast<void **>(numberFormat));
 }
 
 std::shared_ptr<NumberFormat> NumberFormatAddon::CopyNumberFormat()

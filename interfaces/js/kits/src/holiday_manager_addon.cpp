@@ -91,8 +91,8 @@ napi_value HolidayManagerAddon::HolidayManagerConstructor(napi_env env, napi_cal
         return nullptr;
     }
     std::unique_ptr<HolidayManagerAddon> obj = std::make_unique<HolidayManagerAddon>();
-    status =
-        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), HolidayManagerAddon::Destructor, nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj.get()), HolidayManagerAddon::Destructor,
+        nullptr, &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Wrap HolidayManagerAddon failed");
         return nullptr;
@@ -133,7 +133,7 @@ napi_value HolidayManagerAddon::IsHoliday(napi_env env, napi_callback_info info)
         return nullptr;
     }
     HolidayManagerAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->holidayManager_) {
         HILOG_ERROR_I18N("IsHoliday: Get HolidayManager object failed");
         return nullptr;
@@ -168,7 +168,7 @@ napi_value HolidayManagerAddon::GetHolidayInfoItemArray(napi_env env, napi_callb
         return nullptr;
     }
     HolidayManagerAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->holidayManager_) {
         HILOG_ERROR_I18N("GetHolidayInfoItemArray: Get HolidayManager object failed");
         return nullptr;

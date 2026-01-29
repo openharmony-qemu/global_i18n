@@ -427,8 +427,8 @@ napi_value I18nUnicodeAddon::ObjectConstructor(napi_env env, napi_callback_info 
     }
     std::unique_ptr<I18nUnicodeAddon> obj = nullptr;
     obj = std::make_unique<I18nUnicodeAddon>();
-    status =
-        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj.get()), I18nUnicodeAddon::Destructor, nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj.get()), I18nUnicodeAddon::Destructor, nullptr,
+        &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Wrap I18nAddon failed");
         return nullptr;

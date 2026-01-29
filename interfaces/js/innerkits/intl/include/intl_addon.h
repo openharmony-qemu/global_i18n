@@ -79,6 +79,8 @@ private:
     bool InitPluralRulesContext(napi_env env, napi_callback_info info, std::vector<std::string> localeTags,
         std::map<std::string, std::string> &map);
 
+    static constexpr napi_type_tag TYPE_TAG = { 0x5dcb8d6b32f04178, 0xb6e54d595c49281b };
+
     napi_env env_;
     std::unique_ptr<DateTimeFormat> datefmt_ = nullptr;
     std::unique_ptr<RelativeTimeFormat> relativetimefmt_ = nullptr;

@@ -102,8 +102,8 @@ napi_value CollatorAddon::CollatorConstructor(napi_env env, napi_callback_info i
         HILOG_ERROR_I18N("CollatorConstructor: make_unique CollatorAddon failed");
         return nullptr;
     }
-    status =
-        napi_wrap(env, thisVar, reinterpret_cast<void *>(obj), CollatorAddon::Destructor, nullptr, nullptr);
+    status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj), CollatorAddon::Destructor, nullptr,
+        &TYPE_TAG, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("CollatorConstructor: Wrap CollatorAddon failed");
         delete obj;
@@ -215,7 +215,7 @@ napi_value CollatorAddon::CompareString(napi_env env, napi_callback_info info)
     }
 
     CollatorAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->collator_) {
         HILOG_ERROR_I18N("CompareString: Get Collator object failed");
         return nullptr;
@@ -246,7 +246,7 @@ napi_value CollatorAddon::GetCollatorResolvedOptions(napi_env env, napi_callback
         return JSUtils::CreateEmptyObject(env);
     }
     CollatorAddon *obj = nullptr;
-    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&obj));
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->collator_) {
         HILOG_ERROR_I18N("GetCollatorResolvedOptions: Get Collator object failed");
         return JSUtils::CreateEmptyObject(env);

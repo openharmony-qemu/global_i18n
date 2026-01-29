@@ -30,6 +30,8 @@ public:
     std::shared_ptr<IntlDateTimeFormat> GetDateTimeFormat();
     static napi_value InitIntlDateTimeFormat(napi_env env, napi_value exports);
     static bool IsIntlDateTimeFormat(napi_env env, napi_value argv);
+    static napi_status UnwrapIntlDateTimeFormat(napi_env env, napi_value value,
+        IntlDateTimeFormatAddon** dateTimeFormat);
 
 private:
     static void Destructor(napi_env env, void* nativeObject, void* hint);
@@ -51,6 +53,8 @@ private:
     static napi_value CreateFormatPart(napi_env env,
         const std::vector<std::pair<std::string, std::string>>& formatResult);
     static napi_value CreateResolvedOptions(napi_env env, const std::unordered_map<std::string, std::string>& configs);
+
+    static constexpr napi_type_tag TYPE_TAG = { 0xd4d19fabc19f4cc0, 0x8294da532c5c4104 };
 
     std::shared_ptr<IntlDateTimeFormat> intlDateTimeFormat = nullptr;
 };

@@ -58,6 +58,8 @@ private:
     void SetField(napi_env env, napi_value value, UCalendarDateFields field);
     void SetMilliseconds(napi_env env, napi_value value);
 
+    static constexpr napi_type_tag TYPE_TAG = { 0xde5454b5f4fa4f57, 0x8fbe1bda72973b44 };
+
     std::unique_ptr<I18nCalendar> calendar_ = nullptr;
 };
 } // namespace I18n
