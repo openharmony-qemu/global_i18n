@@ -435,16 +435,7 @@ void NumberFormat::SetRoundingProperties(icu::number::UnlocalizedNumberFormatter
     if (!roundingModeStr.empty()) {
         formatter = formatter.roundingMode(roundingMode);
     }
-}
-
-void NumberFormat::HandleRoundingPriority(icu::number::UnlocalizedNumberFormatter &formatter)
-{
-    if (roundingPriorityStr.empty() && !fromArkTs) {
-        return;
-    }
-    bool setFractionDigits = !minimumFractionDigits.empty() || !maximumFractionDigits.empty();
-    bool setSignificantDigit = !minimumSignificantDigits.empty() || !maximumSignificantDigits.empty();
-    if (fromArkTs && !(setFractionDigits && setSignificantDigit)) {
+    if (roundingPriorityStr.empty()) {
         return;
     }
 
@@ -479,7 +470,6 @@ void NumberFormat::HandleArktsRoundingProperties(icu::number::UnlocalizedNumberF
             .withSignificantDigits(minSigDigits, maxSigDigits, roundingPriority);
         formatter = formatter.precision(precision);
     }
-}
 }
 
 int32_t NumberFormat::GetMinimumSignificantDigitsIntValue()
