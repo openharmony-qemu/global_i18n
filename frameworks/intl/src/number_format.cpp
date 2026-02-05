@@ -403,7 +403,6 @@ void NumberFormat::InitDigitsProperties(icu::number::UnlocalizedNumberFormatter 
             formatter = formatter.precision(icu::number::Precision::minSignificantDigits(minSignificantDigits));
         }
     } else {
-
         int32_t minFdStatus = 0;
         int32_t minFractionDigits = ConvertString2Int(minimumFractionDigits, minFdStatus);
         int32_t maxFdStatus = 0;
