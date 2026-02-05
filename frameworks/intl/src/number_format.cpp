@@ -260,7 +260,12 @@ void NumberFormat::InitProperties(icu::number::UnlocalizedNumberFormatter &forma
     InitUseGroupingProperties(formatter);
     InitSignProperties(formatter);
     InitNotationProperties(formatter);
-    InitDigitsProperties(formatter);
+    if (fromArkTs) {
+        HandleArktsRoundingProperties(formatter);
+    } else {
+        InitDigitsProperties(formatter);
+        SetRoundingProperties(formatter);
+    }
 }
 
 void NumberFormat::InitNumberPattern(icu::number::UnlocalizedNumberFormatter &formatter)
@@ -418,8 +423,6 @@ void NumberFormat::InitDigitsProperties(icu::number::UnlocalizedNumberFormatter 
                 formatter.precision(icu::number::Precision::minMaxFraction(minFractionDigits, maxFractionDigits));
         }
     }
-    SetRoundingProperties(formatter);
-    HandleRoundingPriority(formatter);
 }
 
 void NumberFormat::SetRoundingProperties(icu::number::UnlocalizedNumberFormatter &formatter)
@@ -452,6 +455,31 @@ void NumberFormat::HandleRoundingPriority(icu::number::UnlocalizedNumberFormatte
     auto precision = icu::number::Precision::minMaxFraction(minFractionDigits, maxFractionDigits)
         .withSignificantDigits(minSigDigits, maxSigDigits, roundingPriority);
     formatter = formatter.precision(precision);
+}
+
+void NumberFormat::HandleArktsRoundingProperties(icu::number::UnlocalizedNumberFormatter &formatter)
+{
+    if (!roundingModeStr.empty()) {
+        formatter = formatter.roundingMode(roundingMode);
+    }
+    if (roundingIncrement != 1) {
+        int32_t maxFractionDigits = GetMaximumFractionDigitsValue();
+        double increment = pow(POW_BASE_NUMBER, -1.0 * maxFractionDigits) * roundingIncrement;
+        formatter = formatter.precision(icu::number::Precision::increment(increment));
+    } else {
+        if (roundingPriorityStr.empty()) {
+            InitDigitsProperties(formatter);
+            return;
+        }
+        int32_t minFractionDigits = GetMinimumFractionDigitsValue();
+        int32_t maxFractionDigits = GetMaximumFractionDigitsValue();
+        int32_t maxSigDigits = GetMaximumSignificantDigitsIntValue();
+        int32_t minSigDigits = GetMinimumSignificantDigitsIntValue();
+        auto precision = icu::number::Precision::minMaxFraction(minFractionDigits, maxFractionDigits)
+            .withSignificantDigits(minSigDigits, maxSigDigits, roundingPriority);
+        formatter = formatter.precision(precision);
+    }
+}
 }
 
 int32_t NumberFormat::GetMinimumSignificantDigitsIntValue()

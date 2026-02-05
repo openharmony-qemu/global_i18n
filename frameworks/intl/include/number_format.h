@@ -191,7 +191,7 @@ private:
     void SetUnit(std::string &preferredUnit);
     void SetDefaultStyle();
     void SetPrecisionWithByte(double number, const std::string& finalUnit);
-    void HandleRoundingPriority(icu::number::UnlocalizedNumberFormatter &formatter);
+    void HandleArktsRoundingProperties(icu::number::UnlocalizedNumberFormatter &formatter);
     void SetRoundingProperties(icu::number::UnlocalizedNumberFormatter &formatter);
     int32_t GetMinimumSignificantDigitsIntValue();
     int32_t GetMaximumSignificantDigitsIntValue();
