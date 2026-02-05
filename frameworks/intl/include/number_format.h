@@ -187,6 +187,7 @@ private:
     void InitNotationProperties(icu::number::UnlocalizedNumberFormatter &formatter);
     void InitSignProperties(icu::number::UnlocalizedNumberFormatter &formatter);
     void InitDigitsProperties(icu::number::UnlocalizedNumberFormatter &formatter);
+    void InitIntegerDigits(icu::number::UnlocalizedNumberFormatter &formatter);
     void InitNumberFormat();
     void SetUnit(std::string &preferredUnit);
     void SetDefaultStyle();
