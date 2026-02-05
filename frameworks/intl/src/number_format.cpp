@@ -459,6 +459,9 @@ void NumberFormat::HandleArktsRoundingProperties(icu::number::UnlocalizedNumberF
     if (!roundingModeStr.empty()) {
         formatter = formatter.roundingMode(roundingMode);
     }
+    if (maximumSignificantDigits.empty() && minimumSignificantDigits.empty()) {
+        InitIntegerDigits(formatter);
+    }
     if (roundingIncrement != 1) {
         int32_t maxFractionDigits = GetMaximumFractionDigitsValue();
         double increment = pow(POW_BASE_NUMBER, -1.0 * maxFractionDigits) * roundingIncrement;
@@ -467,9 +470,6 @@ void NumberFormat::HandleArktsRoundingProperties(icu::number::UnlocalizedNumberF
         if (roundingPriorityStr.empty()) {
             InitDigitsProperties(formatter);
             return;
-        }
-        if (maximumSignificantDigits.empty() && minimumSignificantDigits.empty()) {
-            InitIntegerDigits(formatter);
         }
         int32_t minFractionDigits = GetMinimumFractionDigitsValue();
         int32_t maxFractionDigits = GetMaximumFractionDigitsValue();
