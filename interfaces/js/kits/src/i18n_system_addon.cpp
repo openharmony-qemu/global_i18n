@@ -636,34 +636,33 @@ napi_value I18nSystemAddon::SetSystemLanguageImpl(napi_env env, napi_callback_in
         ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, "language", throwError);
         return nullptr;
     }
-    size_t len = 0;
-    status = napi_get_value_string_utf8(env, argv[0], nullptr, 0, &len);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("SetSystemLanguageImpl: Failed to get string len argv[0].");
+    int32_t code = 0;
+    std::string language = VariableConvertor::GetString(env, argv[0], code);
+    if (code != 0) {
+        HILOG_ERROR_I18N("SetSystemLanguageImpl: Get language failed.");
         return nullptr;
     }
-    std::vector<char> languageBuf(len + 1);
-    status = napi_get_value_string_utf8(env, argv[0], languageBuf.data(), len + 1, &len);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("SetSystemLanguageImpl: Failed to get string item");
-        return nullptr;
-    }
-    I18nErrorCode err = I18nServiceAbilityClient::SetSystemLanguage(languageBuf.data());
+    I18nErrorCode err = I18nServiceAbilityClient::SetSystemLanguage(language);
     HILOG_INFO_I18N("I18nSystemAddon::SetSystemLanguageImpl with code %{public}d", static_cast<int32_t>(err));
-    bool success = err == I18nErrorCode::SUCCESS;
     if (throwError) {
-        if (!success) {
-            ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, "", "", throwError);
+        if (err != I18nErrorCode::SUCCESS) {
+            switch (err) {
+                case I18nErrorCode::NOT_SYSTEM_APP:
+                    ErrorUtil::NapiThrow(env, I18N_NOT_SYSTEM_APP, "", "", true);
+                    break;
+                case I18nErrorCode::NO_PERMISSION:
+                    ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, "", "", true);
+                    break;
+                case I18nErrorCode::INVALID_LANGUAGE_TAG:
+                    ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "language", "a valid language", true);
+                    break;
+                default:
+                    HILOG_ERROR_I18N("SetSystemLanguageImpl: Update language failed.");
+            }
         }
         return nullptr;
     }
-    napi_value result = nullptr;
-    status = napi_get_boolean(env, success, &result);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("SetSystemLanguageImpl: Create set system language boolean value failed");
-        return nullptr;
-    }
-    return result;
+    return VariableConvertor::CreateBoolean(env, err == I18nErrorCode::SUCCESS);
 }
 
 napi_value I18nSystemAddon::SetSystemRegionImpl(napi_env env, napi_callback_info info, bool throwError)
@@ -689,20 +688,25 @@ napi_value I18nSystemAddon::SetSystemRegionImpl(napi_env env, napi_callback_info
     }
     I18nErrorCode err = I18nServiceAbilityClient::SetSystemRegion(regionBuf.data());
     HILOG_INFO_I18N("I18nSystemAddon::SetSystemRegionImpl with code %{public}d", static_cast<int32_t>(err));
-    bool success = err == I18nErrorCode::SUCCESS;
     if (throwError) {
-        if (!success) {
-            ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, "", "", throwError);
+        if (err != I18nErrorCode::SUCCESS) {
+            switch (err) {
+                case I18nErrorCode::NOT_SYSTEM_APP:
+                    ErrorUtil::NapiThrow(env, I18N_NOT_SYSTEM_APP, "", "", true);
+                    break;
+                case I18nErrorCode::NO_PERMISSION:
+                    ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, "", "", true);
+                    break;
+                case I18nErrorCode::INVALID_REGION_TAG:
+                    ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "region", "a valid region", true);
+                    break;
+                default:
+                    HILOG_ERROR_I18N("SetSystemRegionImpl: Update region failed.");
+            }
         }
         return nullptr;
     }
-    napi_value result = nullptr;
-    status = napi_get_boolean(env, success, &result);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("SetSystemRegionImpl: Create set system language boolean value failed");
-        return nullptr;
-    }
-    return result;
+    return VariableConvertor::CreateBoolean(env, err == I18nErrorCode::SUCCESS);
 }
 
 napi_value I18nSystemAddon::SetSystemLocaleImpl(napi_env env, napi_callback_info info, bool throwError)
@@ -728,20 +732,25 @@ napi_value I18nSystemAddon::SetSystemLocaleImpl(napi_env env, napi_callback_info
     }
     I18nErrorCode err = I18nServiceAbilityClient::SetSystemLocale(localeBuf.data());
     HILOG_INFO_I18N("I18nSystemAddon::SetSystemLocaleImpl with code %{public}d", static_cast<int32_t>(err));
-    bool success = err == I18nErrorCode::SUCCESS;
     if (throwError) {
-        if (!success) {
-            ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, "", "", throwError);
+        if (err != I18nErrorCode::SUCCESS) {
+            switch (err) {
+                case I18nErrorCode::NOT_SYSTEM_APP:
+                    ErrorUtil::NapiThrow(env, I18N_NOT_SYSTEM_APP, "", "", true);
+                    break;
+                case I18nErrorCode::NO_PERMISSION:
+                    ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, "", "", true);
+                    break;
+                case I18nErrorCode::INVALID_LOCALE_TAG:
+                    ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "locale", "a valid locale", true);
+                    break;
+                default:
+                    HILOG_ERROR_I18N("SetSystemRegionImpl: Update locale failed.");
+            }
         }
         return nullptr;
     }
-    napi_value result = nullptr;
-    status = napi_get_boolean(env, success, &result);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("SetSystemLocaleImpl: Create set system language boolean value failed");
-        return nullptr;
-    }
-    return result;
+    return VariableConvertor::CreateBoolean(env, err == I18nErrorCode::SUCCESS);
 }
 
 napi_value I18nSystemAddon::Set24HourClockImpl(napi_env env, napi_callback_info info, bool throwError)
@@ -769,20 +778,25 @@ napi_value I18nSystemAddon::Set24HourClockImpl(napi_env env, napi_callback_info 
     std::string optionStr = option ? "true" : "false";
     I18nErrorCode err = I18nServiceAbilityClient::Set24HourClock(optionStr);
     HILOG_INFO_I18N("I18nSystemAddon::Set24HourClock with code %{public}d", static_cast<int32_t>(err));
-    bool success = err == I18nErrorCode::SUCCESS;
     if (throwError) {
-        if (!success) {
-            ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, "", "", throwError);
+        if (err != I18nErrorCode::SUCCESS) {
+            switch (err) {
+                case I18nErrorCode::NOT_SYSTEM_APP:
+                    ErrorUtil::NapiThrow(env, I18N_NOT_SYSTEM_APP, "", "", true);
+                    break;
+                case I18nErrorCode::NO_PERMISSION:
+                    ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, "", "", true);
+                    break;
+                case I18nErrorCode::INVALID_24_HOUR_CLOCK_TAG:
+                    ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "option", "true or false", true);
+                    break;
+                default:
+                    HILOG_ERROR_I18N("SetSystemRegionImpl: Update 24HourClock failed.");
+            }
         }
         return nullptr;
     }
-    napi_value result = nullptr;
-    status = napi_get_boolean(env, success, &result);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("Create set 24HourClock boolean value failed");
-        return nullptr;
-    }
-    return result;
+    return VariableConvertor::CreateBoolean(env, err == I18nErrorCode::SUCCESS);
 }
 
 napi_value I18nSystemAddon::AddPreferredLanguageImpl(napi_env env, napi_callback_info info, bool throwError)
@@ -795,12 +809,10 @@ napi_value I18nSystemAddon::AddPreferredLanguageImpl(napi_env env, napi_callback
     if (status != napi_ok) {
         return nullptr;
     }
-
     std::string language;
     if (!ParseStringParam(env, argc > 0 ? argv[0] : nullptr, throwError, language)) {
         return nullptr;
     }
-
     int index = 1000000;
     if (VariableConvertor::CheckNapiIsNull(env, argc > 1 ? argv[1] : nullptr)) {
         status = napi_get_value_int32(env, argv[1], &index);
@@ -812,25 +824,33 @@ napi_value I18nSystemAddon::AddPreferredLanguageImpl(napi_env env, napi_callback
     I18nErrorCode err = I18nServiceAbilityClient::AddPreferredLanguage(language.data(), index);
     HILOG_INFO_I18N("I18nSystemAddon::AddPreferredLanguageImpl with code %{public}d", static_cast<int32_t>(err));
     if (throwError) {
-        if (err == I18nErrorCode::NO_PERMISSION || err == I18nErrorCode::NOT_SYSTEM_APP) {
-            ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, "", "", throwError);
-        }
         if (err != I18nErrorCode::SUCCESS) {
-            ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "language", "a valid language", throwError);
+            switch (err) {
+                case I18nErrorCode::NOT_SYSTEM_APP:
+                    ErrorUtil::NapiThrow(env, I18N_NOT_SYSTEM_APP, "", "", true);
+                    break;
+                case I18nErrorCode::NO_PERMISSION:
+                    ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, "", "", true);
+                    break;
+                case I18nErrorCode::INVALID_LANGUAGE_TAG:
+                    ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "language", "a valid language", true);
+                    break;
+                default:
+                    HILOG_ERROR_I18N("addPreferrdLanguage: Update preferrd language failed.");
+            }
         }
         return nullptr;
     }
-    bool addResult = true;
-    if (err != I18nErrorCode::SUCCESS) {
-        addResult = false;
+    return VariableConvertor::CreateBoolean(env, err == I18nErrorCode::SUCCESS);
+}
+
+bool I18nSystemAddon::CheckPreferredLanguageIndex(int index)
+{
+    int len = static_cast<int>(PreferredLanguage::GetPreferredLanguageList().size());
+    if ((index < 0 || index > len - 1)) {
+        return false;
     }
-    napi_value result = nullptr;
-    status = napi_get_boolean(env, addResult, &result);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("addPreferrdLanguage: create boolean result failed");
-        return nullptr;
-    }
-    return result;
+    return true;
 }
 
 napi_value I18nSystemAddon::RemovePreferredLanguageImpl(napi_env env, napi_callback_info info, bool throwError)
@@ -839,7 +859,6 @@ napi_value I18nSystemAddon::RemovePreferredLanguageImpl(napi_env env, napi_callb
     napi_value argv[1] = { nullptr };
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    int len = 0;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
         return nullptr;
@@ -849,7 +868,6 @@ napi_value I18nSystemAddon::RemovePreferredLanguageImpl(napi_env env, napi_callb
         ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, "index", throwError);
         return nullptr;
     }
-
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     status = napi_typeof(env, argv[0], &valueType);
     if (status != napi_ok) {
@@ -864,27 +882,27 @@ napi_value I18nSystemAddon::RemovePreferredLanguageImpl(napi_env env, napi_callb
         HILOG_ERROR_I18N("removePreferrdLanguage: get index failed");
         return nullptr;
     }
-    len = static_cast<int>(PreferredLanguage::GetPreferredLanguageList().size());
-    if ((index < 0 || index > len - 1) && throwError) {
+    if (!CheckPreferredLanguageIndex(index)) {
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "index", "within the valid range", throwError);
         return nullptr;
     }
     I18nErrorCode err = I18nServiceAbilityClient::RemovePreferredLanguage(index);
-    bool success = err == I18nErrorCode::SUCCESS;
-
     if (throwError) {
-        if (!success) {
-            ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, "", "", throwError);
+        if (err != I18nErrorCode::SUCCESS) {
+            switch (err) {
+                case I18nErrorCode::NOT_SYSTEM_APP:
+                    ErrorUtil::NapiThrow(env, I18N_NOT_SYSTEM_APP, "", "", true);
+                    break;
+                case I18nErrorCode::NO_PERMISSION:
+                    ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, "", "", true);
+                    break;
+                default:
+                    HILOG_ERROR_I18N("removePreferrdLanguage: Remove preferrd language failed.");
+            }
         }
         return nullptr;
     }
-    napi_value result = nullptr;
-    status = napi_get_boolean(env, success, &result);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("removePreferrdLanguage: create boolean result failed");
-        return nullptr;
-    }
-    return result;
+    return VariableConvertor::CreateBoolean(env, err == I18nErrorCode::SUCCESS);
 }
 
 napi_value I18nSystemAddon::SetUsingLocalDigitAddonImpl(napi_env env, napi_callback_info info, bool throwError)
@@ -919,22 +937,23 @@ napi_value I18nSystemAddon::SetUsingLocalDigitAddonImpl(napi_env env, napi_callb
         return nullptr;
     }
     I18nErrorCode err = I18nServiceAbilityClient::SetUsingLocalDigit(flag);
-    HILOG_INFO_I18N("I18nSystemAddon::SetUsingLocalDigitAddonImpl with code %{public}d",
-        static_cast<int32_t>(err));
-    bool res = err == I18nErrorCode::SUCCESS;
+    HILOG_INFO_I18N("I18nSystemAddon::SetUsingLocalDigitAddonImpl with code %{public}d", static_cast<int32_t>(err));
     if (throwError) {
-        if (!res) {
-            ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, "", "", throwError);
+        if (err != I18nErrorCode::SUCCESS) {
+            switch (err) {
+                case I18nErrorCode::NOT_SYSTEM_APP:
+                    ErrorUtil::NapiThrow(env, I18N_NOT_SYSTEM_APP, "", "", true);
+                    break;
+                case I18nErrorCode::NO_PERMISSION:
+                    ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, "", "", true);
+                    break;
+                default:
+                    HILOG_ERROR_I18N("SetUsingLocalDigitAddonImpl: Set using local digit failed.");
+            }
         }
         return nullptr;
     }
-    napi_value value = nullptr;
-    status = napi_get_boolean(env, res, &value);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("Invalid result");
-        return nullptr;
-    }
-    return value;
+    return VariableConvertor::CreateBoolean(env, err == I18nErrorCode::SUCCESS);
 }
 
 bool I18nSystemAddon::ParseStringParam(napi_env env, napi_value argv, bool throwError, std::string &strParam)

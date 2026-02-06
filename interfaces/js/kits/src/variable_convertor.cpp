@@ -236,6 +236,17 @@ napi_value VariableConvertor::CreateNumber(napi_env env, const int32_t &num)
     return result;
 }
 
+napi_value VariableConvertor::CreateBoolean(napi_env env, bool flag)
+{
+    napi_value result = nullptr;
+    napi_status status = napi_get_boolean(env, flag, &result);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("create boolean js variable failed.");
+        return nullptr;
+    }
+    return result;
+}
+
 void VariableConvertor::VerifyType(napi_env env, const std::string& valueName, napi_valuetype napiType,
     napi_value argv)
 {
