@@ -972,10 +972,10 @@ HWTEST_F(IntlTest, IntlFuncTest0073, TestSize.Level1)
     for (char c : number) {
         if (c == '4') {
             formated = formated.substr(0, formated.length() - 1);
-            formated = phoneNumFmt->format(formated);
+            formated = phoneNumFmt2->format(formated);
         }
         formated = formated + c;
-        formated = phoneNumFmt->format(formated);
+        formated = phoneNumFmt2->format(formated);
     }
     EXPECT_EQ(formated, "712 345");
     PhoneNumberFormat::CloseDynamicHandler();
