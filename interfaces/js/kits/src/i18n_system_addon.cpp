@@ -882,7 +882,7 @@ napi_value I18nSystemAddon::RemovePreferredLanguageImpl(napi_env env, napi_callb
         HILOG_ERROR_I18N("removePreferrdLanguage: get index failed");
         return nullptr;
     }
-    if (!CheckPreferredLanguageIndex(index)) {
+    if (!CheckPreferredLanguageIndex(index) && throwError) {
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "index", "within the valid range", throwError);
         return nullptr;
     }
