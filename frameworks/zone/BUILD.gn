@@ -13,13 +13,6 @@
 
 import("//build/ohos.gni")
 
-group("build_module") {
-  deps = [
-    ":country_code_2_timezone",
-    ":zone_util",
-  ]
-}
-
 config("zone_util_public_configs") {
   include_dirs = [
     "//base/global/i18n/frameworks/intl/include",
@@ -46,11 +39,4 @@ ohos_shared_library("zone_util") {
   ]
   subsystem_name = "global"
   part_name = "i18n"
-}
-
-ohos_prebuilt_etc("country_code_2_timezone") {
-  source = "//base/global/i18n/frameworks/zone/etc/country_default_zone.cfg"
-  module_install_dir = "usr/ohos_timezone/"
-  part_name = "i18n"
-  subsystem_name = "global"
 }

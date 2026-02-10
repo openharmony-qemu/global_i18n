@@ -21,7 +21,7 @@ ohos_unittest("ndk_test") {
 
   cflags_cc = [ "-Wno-inconsistent-missing-override" ]
 
-  sources = [ "unittest/oh_timezone_test.cpp" ]
+  sources = [ "unittest/timezone_test.cpp" ]
   include_dirs = [ "//base/global/i18n/ndk/include" ]
 
   external_deps = [
