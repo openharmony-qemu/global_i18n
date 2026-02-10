@@ -18,7 +18,6 @@ import("//build/ohos.gni")
 group("build_module") {
   deps = [
     ":intl_util",
-    ":num_timezone_cfg",
     ":preferred_language",
     "./parameter_upgrade:libphonenumber_version_txt",
     "./parameter_upgrade:prefabrication_libphonenumber",
@@ -384,13 +383,6 @@ ohos_prebuilt_etc("region_supported_locales_xml") {
 ohos_prebuilt_etc("dialect_languages_xml") {
   source = "//base/global/i18n/frameworks/intl/etc/dialect_languages.xml"
   module_install_dir = "etc/ohos_locale_config/"
-  part_name = "i18n"
-  subsystem_name = "global"
-}
-
-ohos_prebuilt_etc("num_timezone_cfg") {
-  source = "//base/global/i18n/frameworks/intl/etc/location/num_timezone.cfg"
-  module_install_dir = "usr/ohos_locale_config/"
   part_name = "i18n"
   subsystem_name = "global"
 }

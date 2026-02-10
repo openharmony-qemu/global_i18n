@@ -42,7 +42,7 @@ const char *ZoneUtil::TIMEZONE_KEY = "persist.time.timezone";
 const char *ZoneUtil::TZLOOKUP_FILE_PATH = ZoneUtil::GetTZLookupDataPath();
 
 unordered_map<string, string> ZoneUtil::defaultMap = {
-    {""AQ, "Antarctica/McMurdo"},
+    {"AQ", "Antarctica/McMurdo"},
     {"AR", "America/Argentina/Buenos_Aires"},
     {"AU", "Australia/Sydney"},
     {"BR", "America/Noronha"},
