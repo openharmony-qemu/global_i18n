@@ -87,7 +87,6 @@ private:
     static std::map<int, std::string> categoryNum2TimezoneES;
     static std::map<std::string, std::string> BEST_MATCH_LOCALE;
     static constexpr int SYS_PARAM_LEN = 128;
-    static constexpr size_t READ_BUFFER_SIZE = 374;
     icu::TimeZone *timezone = nullptr;
     static std::mutex matchLocaleMutex;
     static std::mutex initZoneInfoMutex;
@@ -96,10 +95,6 @@ private:
     static std::string cityDisplayNameCacheLocale;
     static bool initAvailableZoneInfo;
     static bool initSupportedLocales;
-    static const char *NUM_TIMEZONE_CFG_PATH;
-    static const char *DISTRO_NUM_TIMEZONE_CFG_PATH;
-    static bool numTimezoneCategoryInitialized;
-    static std::mutex initNumTimezoneCategoryMutex;
     static bool ReadTimeZoneData(const char *xmlPath);
     static std::string ComputeLocale(std::string &locale);
     icu::TimeZone* GetTimeZone();
@@ -126,10 +121,6 @@ private:
     static bool ValidateDataIntegrity(const std::vector<std::string> &pathList);
     static bool CheckLatitudeAndLongitude(const double x, const double y);
     static std::map<int, std::string> GetTimeZoneCategoryMap(const double x, const double y);
-    static bool InitTimezoneCategoryMap();
-    static const char *GetNumTimezoneCfgPath();
-    static bool ReadNumTimezoneConfigFile(const char* configPath);
-    static void AddNumTimezoneCategoryMap(std::string &curIndex, std::string &numStr, std::string &tzId);
     static void SetBestMatchLocale(const std::string& key, const std::string& value);
     static const char *GetDeviceCityDisplayNamePath();
 };

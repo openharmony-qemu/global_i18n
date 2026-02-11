@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_GLOBAL_OH_TIMEZONE_TEST_H
-#define OHOS_GLOBAL_OH_TIMEZONE_TEST_H
+#ifndef OHOS_GLOBAL_TIMEZONE_TEST_H
+#define OHOS_GLOBAL_TIMEZONE_TEST_H
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-class OHTimeZoneTest : public testing::Test {
+class TimeZoneTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
@@ -27,8 +27,8 @@ public:
     void TearDown();
 };
 
-int OHTimeZoneFuncTest001(void);
-int OHTimeZoneFuncTest002(void);
+int TimeZoneFuncTest001(void);
+int TimeZoneFuncTest002(void);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

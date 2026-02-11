@@ -17,14 +17,14 @@
  * @addtogroup i18n
  * @{
  *
- * @brief The error code in i18n.
+ * @brief Provides internationalization APIs for application localization, and relies on libohi18n.z.so when used.
  * @since 22
  */
 
 /**
- * @file i18n_errorcode.h
+ * @file timezone.h
  *
- * @brief The error code in i18n.
+ * @brief Provides the API for obtaining timezone offset transition information.
  *
  * @library libohi18n.so
  * @kit LocalizationKit
@@ -32,12 +32,12 @@
  * @since 22
  */
 
-#ifndef GLOBAL_OH_TIMEZONE_H
-#define GLOBAL_OH_TIMEZONE_H
+#ifndef GLOBAL_I18N_TIMEZONE_H
+#define GLOBAL_I18N_TIMEZONE_H
 
 #include <stddef.h>
 #include <stdint.h>
-#include "oh_errorcode.h"
+#include "errorcode.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -443,5 +443,5 @@ I18n_ErrorCode OH_i18n_GetStartInYear(AnnualTimeZoneRule* rule, int32_t year, Ti
 #ifdef __cplusplus
 };
 #endif
-#endif // GLOBAL_OH_TIMEZONE_H
+#endif // GLOBAL_I18N_TIMEZONE_H
 /** @} */
