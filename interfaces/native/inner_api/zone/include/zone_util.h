@@ -16,7 +16,6 @@
 #ifndef OHOS_GLOBAL_I18N_ZONE_UTIL_H
 #define OHOS_GLOBAL_I18N_ZONE_UTIL_H
 
-#include <mutex>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -146,13 +145,9 @@ public:
 private:
     static std::unordered_map<std::string, std::string> defaultMap;
     static bool icuInitialized;
-    static bool defaultMapInitialized;
-    static std::mutex defaultMapMutex;
     static void GetList(icu::StringEnumeration *strEnum, std::vector<std::string> &ret);
     static void GetString(icu::StringEnumeration *strEnum, std::string &ret);
     static bool Init();
-    bool InitDefaultMap();
-    bool ReadDefaultTimezoneConfigFile(const char* configPath);
     bool CheckFileExist();
     bool CheckSameDstOffset(std::vector<std::string> &zones, std::string &defaultTimezone,
         int64_t currentMillis);
@@ -165,12 +160,9 @@ private:
     void GetICUCountryZones(std::string &region, std::vector<std::string> &zones, std::string &defaultTimezone);
     CountryResult Match(std::vector<std::string> &zones, NITZData &nitzData, std::string &systemTimezone);
     static const char *GetTZLookupDataPath();
-    static const char *GetCountryCodeTimezoneCfgPath();
 
     static const char *COUNTRY_ZONE_DATA_PATH;
     static const char *DISTRO_COUNTRY_ZONE_DATA_PATH;
-    static const char *DEFAULT_ZONE_CONFIG_PATH;
-    static const char *DISTRO_DEFAULT_ZONE_CONFIG_PATH;
     static const char *DEFAULT_TIMEZONE;
     static const char *TIMEZONES_TAG;
     static const char *ID_TAG;
@@ -181,7 +173,6 @@ private:
     static const char *CODE_TAG;
     static const char *TIMEZONE_KEY;
     static constexpr int SYS_PARAM_LEN = 128;
-    static constexpr size_t READ_BUFFER_SIZE = 374;
     static const char *TZLOOKUP_FILE_PATH;
 };
 } // namespace I18n

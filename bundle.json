@@ -82,7 +82,7 @@
         },
         "build": {
             "sub_component": [
-                "//base/global/i18n/frameworks/zone:build_module",
+                "//base/global/i18n/frameworks/zone:zone_util",
                 "//base/global/i18n/frameworks/intl:build_module",
                 "//base/global/i18n/interfaces/js/innerkits/intl:build_module",
                 "//base/global/i18n/interfaces/js/kits:build_module",
