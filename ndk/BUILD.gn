@@ -28,7 +28,7 @@ ohos_shared_library("native_i18n") {
   ]
   remove_configs = [ "//build/config/compiler:no_rtti" ]
 
-  sources = [ "src/oh_timezone.cpp" ]
+  sources = [ "src/timezone.cpp" ]
   deps = [ "//base/global/i18n/frameworks/intl:intl_util" ]
   external_deps = [ 
     "c_utils:utils",

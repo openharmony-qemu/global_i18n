@@ -17,23 +17,23 @@
  * @addtogroup i18n
  * @{
  *
- * @brief The error code in i18n.
- * @since 21
+ * @brief Provides internationalization APIs for application localization, and relies on libohi18n.z.so when used.
+ * @since 22
  */
 
 /**
- * @file i18n_errorcode.h
+ * @file errorcode.h
  *
  * @brief The error code in i18n.
  *
  * @library libohi18n.so
  * @kit LocalizationKit
  * @syscap SystemCapability.Global.I18n
- * @since 21
+ * @since 22
  */
 
-#ifndef GLOBAL_OH_ERRORCODE_H
-#define GLOBAL_OH_ERRORCODE_H
+#ifndef GLOBAL_I18N_ERRORCODE_H
+#define GLOBAL_I18N_ERRORCODE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,6 +57,6 @@ typedef enum I18n_ErrorCode {
 #ifdef __cplusplus
 };
 #endif
-#endif // GLOBAL_OH_ERRORCODE_H
+#endif // GLOBAL_I18N_ERRORCODE_H
 
 /** @} */

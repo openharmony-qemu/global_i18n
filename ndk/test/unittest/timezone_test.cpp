@@ -14,36 +14,36 @@
  */
 
 #include <gtest/gtest.h>
-#include "oh_timezone.h"
-#include "oh_timezone_test.h"
+#include "timezone.h"
+#include "timezone_test.h"
 
 using testing::ext::TestSize;
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-void OHTimeZoneTest::SetUpTestCase(void)
+void TimeZoneTest::SetUpTestCase(void)
 {
 }
 
-void OHTimeZoneTest::TearDownTestCase(void)
+void TimeZoneTest::TearDownTestCase(void)
 {
 }
 
-void OHTimeZoneTest::SetUp(void)
+void TimeZoneTest::SetUp(void)
 {
 }
 
-void OHTimeZoneTest::TearDown(void)
+void TimeZoneTest::TearDown(void)
 {
 }
 
 /**
- * @tc.name: OHTimeZoneFuncTest001
+ * @tc.name: TimeZoneFuncTest001
  * @tc.desc: Test timezone native api
  * @tc.type: FUNC
  */
-HWTEST_F(OHTimeZoneTest, OHTimeZoneFuncTest001, TestSize.Level1)
+HWTEST_F(TimeZoneTest, TimeZoneFuncTest001, TestSize.Level1)
 {
     TimeZoneRules rules;
     I18n_ErrorCode errCode = OH_i18n_GetTimeZoneRules("Asia/Shanghai", &rules);
@@ -80,11 +80,11 @@ HWTEST_F(OHTimeZoneTest, OHTimeZoneFuncTest001, TestSize.Level1)
 }
 
 /**
- * @tc.name: OHTimeZoneFuncTest002
+ * @tc.name: TimeZoneFuncTest002
  * @tc.desc: Test timezone native api
  * @tc.type: FUNC
  */
-HWTEST_F(OHTimeZoneTest, OHTimeZoneFuncTest002, TestSize.Level1)
+HWTEST_F(TimeZoneTest, TimeZoneFuncTest002, TestSize.Level1)
 {
     TimeZoneRules rules;
     I18n_ErrorCode errCode = OH_i18n_GetTimeZoneRules("America/Santiago", &rules);

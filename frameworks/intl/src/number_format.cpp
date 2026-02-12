@@ -260,7 +260,13 @@ void NumberFormat::InitProperties(icu::number::UnlocalizedNumberFormatter &forma
     InitUseGroupingProperties(formatter);
     InitSignProperties(formatter);
     InitNotationProperties(formatter);
-    InitDigitsProperties(formatter);
+    InitIntegerDigits(formatter);
+    if (fromArkTs) {
+        HandleArktsRoundingProperties(formatter);
+    } else {
+        InitDigitsProperties(formatter);
+        SetRoundingProperties(formatter);
+    }
 }
 
 void NumberFormat::InitNumberPattern(icu::number::UnlocalizedNumberFormatter &formatter)
@@ -397,11 +403,6 @@ void NumberFormat::InitDigitsProperties(icu::number::UnlocalizedNumberFormatter 
             formatter = formatter.precision(icu::number::Precision::minSignificantDigits(minSignificantDigits));
         }
     } else {
-        int32_t minIntegerDigits = ConvertString2Int(minimumIntegerDigits, status);
-        if (status == 0 && minIntegerDigits > 1) {
-            formatter = formatter.integerWidth(icu::number::IntegerWidth::zeroFillTo(minIntegerDigits));
-        }
-
         int32_t minFdStatus = 0;
         int32_t minFractionDigits = ConvertString2Int(minimumFractionDigits, minFdStatus);
         int32_t maxFdStatus = 0;
@@ -418,8 +419,18 @@ void NumberFormat::InitDigitsProperties(icu::number::UnlocalizedNumberFormatter 
                 formatter.precision(icu::number::Precision::minMaxFraction(minFractionDigits, maxFractionDigits));
         }
     }
-    SetRoundingProperties(formatter);
-    HandleRoundingPriority(formatter);
+}
+
+void NumberFormat::InitIntegerDigits(icu::number::UnlocalizedNumberFormatter &formatter)
+{
+    if (!maximumSignificantDigits.empty() || !minimumSignificantDigits.empty()) {
+        return;
+    }
+    int32_t status = 0;
+    int32_t minIntegerDigits = ConvertString2Int(minimumIntegerDigits, status);
+    if (status == 0 && minIntegerDigits > 1) {
+        formatter = formatter.integerWidth(icu::number::IntegerWidth::zeroFillTo(minIntegerDigits));
+    }
 }
 
 void NumberFormat::SetRoundingProperties(icu::number::UnlocalizedNumberFormatter &formatter)
@@ -432,16 +443,7 @@ void NumberFormat::SetRoundingProperties(icu::number::UnlocalizedNumberFormatter
     if (!roundingModeStr.empty()) {
         formatter = formatter.roundingMode(roundingMode);
     }
-}
-
-void NumberFormat::HandleRoundingPriority(icu::number::UnlocalizedNumberFormatter &formatter)
-{
-    if (roundingPriorityStr.empty() && !fromArkTs) {
-        return;
-    }
-    bool setFractionDigits = !minimumFractionDigits.empty() || !maximumFractionDigits.empty();
-    bool setSignificantDigit = !minimumSignificantDigits.empty() || !maximumSignificantDigits.empty();
-    if (fromArkTs && !(setFractionDigits && setSignificantDigit)) {
+    if (roundingPriorityStr.empty()) {
         return;
     }
 
@@ -452,6 +454,30 @@ void NumberFormat::HandleRoundingPriority(icu::number::UnlocalizedNumberFormatte
     auto precision = icu::number::Precision::minMaxFraction(minFractionDigits, maxFractionDigits)
         .withSignificantDigits(minSigDigits, maxSigDigits, roundingPriority);
     formatter = formatter.precision(precision);
+}
+
+void NumberFormat::HandleArktsRoundingProperties(icu::number::UnlocalizedNumberFormatter &formatter)
+{
+    if (!roundingModeStr.empty()) {
+        formatter = formatter.roundingMode(roundingMode);
+    }
+    if (roundingIncrement != 1) {
+        int32_t maxFractionDigits = GetMaximumFractionDigitsValue();
+        double increment = pow(POW_BASE_NUMBER, -1.0 * maxFractionDigits) * roundingIncrement;
+        formatter = formatter.precision(icu::number::Precision::increment(increment));
+    } else {
+        if (roundingPriorityStr.empty()) {
+            InitDigitsProperties(formatter);
+            return;
+        }
+        int32_t minFractionDigits = GetMinimumFractionDigitsValue();
+        int32_t maxFractionDigits = GetMaximumFractionDigitsValue();
+        int32_t maxSigDigits = GetMaximumSignificantDigitsIntValue();
+        int32_t minSigDigits = GetMinimumSignificantDigitsIntValue();
+        auto precision = icu::number::Precision::minMaxFraction(minFractionDigits, maxFractionDigits)
+            .withSignificantDigits(minSigDigits, maxSigDigits, roundingPriority);
+        formatter = formatter.precision(precision);
+    }
 }
 
 int32_t NumberFormat::GetMinimumSignificantDigitsIntValue()
@@ -1110,18 +1136,12 @@ void NumberFormat::GetDigitsResolvedOptionsExt(std::map<std::string, std::string
     }
     if (!roundingModeStr.empty()) {
         result.insert(std::make_pair("roundingMode", roundingModeStr));
-    } else if (setDefault) {
-        result.insert(std::make_pair("roundingMode", "halfExpand"));
     }
     if (!roundingPriorityStr.empty()) {
         result.insert(std::make_pair("roundingPriority", roundingPriorityStr));
-    } else if (setDefault) {
-        result.insert(std::make_pair("roundingPriority", "auto"));
     }
     if (roundingIncrement != 1) {
         result.insert(std::make_pair("roundingIncrement", std::to_string(roundingIncrement)));
-    } else if (setDefault) {
-        result.insert(std::make_pair("roundingIncrement", "1"));
     }
 }
 
@@ -1466,6 +1486,11 @@ std::vector<std::string> NumberFormat::GetAvailableNumberSystems()
     }
     icu::UnicodeString temp;
     while ((temp = stringEnumeratePtr->next(nullptr, status)) != nullptr) {
+        if (U_FAILURE(status)) {
+            HILOG_ERROR_I18N("GetAvailableNumberSystems: Get next name failed");
+            result.clear();
+            return result;
+        }
         std::string numberSys;
         temp.toUTF8String(numberSys);
         result.push_back(numberSys);
