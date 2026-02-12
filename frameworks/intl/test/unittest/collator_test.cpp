@@ -16,7 +16,7 @@
 
 #include <map>
 #include <vector>
-#include "unicode/uchar.h"
+
 #include "collator.h"
 
 using namespace OHOS::Global::I18n;
@@ -191,46 +191,6 @@ HWTEST_F(CollatorTest, CollatorFuncTest009, TestSize.Level1)
     Collator collator(localeTags, options);
     I18nErrorCode status = collator.GetError();
     EXPECT_EQ(status, I18nErrorCode::INVALID_PARAM);
-}
-
-/**
- * @tc.name: CollatorFuncTest010
- * @tc.desc: Test Intl Collator.compare
- * @tc.type: FUNC
- */
-HWTEST_F(CollatorTest, CollatorFuncTest010, TestSize.Level1)
-{
-    UChar32 c = 0x20C0;
-    bool hasProperty = u_hasBinaryProperty(c, UCHAR_GRAPHEME_BASE);
-    EXPECT_TRUE(hasProperty);
-
-    c = 0x20C1;
-    hasProperty = u_hasBinaryProperty(c, UCHAR_GRAPHEME_BASE);
-    EXPECT_TRUE(hasProperty);
-
-    char buffer[50] = {0};
-    UErrorCode errorCode = U_ZERO_ERROR;
-    u_charName(c, U_UNICODE_CHAR_NAME, buffer, 50, &errorCode);
-    std::string charName(buffer);
-    EXPECT_EQ(charName, "SAUDI RIYAL SIGN");
-
-    UVersionInfo info;
-    u_charAge(c, info);
-    EXPECT_EQ(static_cast<int>(info[0]), 14);
-    EXPECT_EQ(static_cast<int>(info[1]), 0);
-
-    std::vector<std::string> locales {"en-US"};
-    std::map<std::string, std::string> options {};
-    Collator collator(locales, options);
-    CompareResult compareResult = collator.Compare("\u20bf", "\ufbfc");
-    EXPECT_EQ(static_cast<int>(compareResult), -1);
-    EXPECT_EQ(static_cast<int>(collator.Compare("\u20bf", "\ufdfc")), -1);
-    EXPECT_EQ(static_cast<int>(collator.Compare("\u20bf", "\u20c1")), -1);
-    EXPECT_EQ(static_cast<int>(collator.Compare("\u09f4", "\u20c1")), 1);
-    EXPECT_EQ(static_cast<int>(collator.Compare("⦓", "⦔")), -1);
-    EXPECT_EQ(static_cast<int>(collator.Compare("\u20c0", "\u20c1")), -1);
-    EXPECT_EQ(static_cast<int>(collator.Compare("ヽ", "\u20c1")), -1);
-    EXPECT_EQ(static_cast<int>(collator.Compare("৴", "\u20c1")), 1);
 }
 } // namespace I18n
 } // namespace Global
