@@ -53,14 +53,14 @@ ani_boolean I18nHolidayManagerAddon::IsHoliday(ani_env *env, ani_object object, 
 {
     I18nHolidayManagerAddon* obj = UnwrapAddon(env, object);
     if (obj == nullptr || obj->holidayManager_ == nullptr) {
-        HILOG_ERROR_I18N("18nHolidayManagerAddon::IsHoliday: Get HolidayManager object failed");
+        HILOG_ERROR_I18N("I18nHolidayManagerAddon::IsHoliday: Get HolidayManager object failed");
         return false;
     }
 
     bool res = false;
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(date, &isUndefined)) {
-        HILOG_ERROR_I18N("18nHolidayManagerAddon::IsHoliday: Check date reference is undefined failed");
+        HILOG_ERROR_I18N("I18nHolidayManagerAddon::IsHoliday: Check date reference is undefined failed");
         return false;
     }
     if (isUndefined) {
