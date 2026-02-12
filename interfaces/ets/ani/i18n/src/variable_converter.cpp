@@ -502,12 +502,20 @@ ani_object VariableConverter::CreateAniMap(ani_env* env,
         return nullptr;
     }
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(mapClass, "<ctor>", ":", &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(mapClass, "<ctor>",
+        "X{C{std.core.Iterable}C{std.core.Null}C{std.core.ReadonlyArray}}:", &ctor)) {
         HILOG_ERROR_I18N("CreateAniMap: Find method '<ctor>' failed");
         return nullptr;
     }
+
+    ani_ref undefinedArgument;
+    if (ANI_OK != env->GetUndefined(&undefinedArgument)) {
+        HILOG_ERROR_I18N("CreateAniMap: GetUndefined failed");
+        return nullptr;
+    }
+
     ani_object obj;
-    if (ANI_OK != env->Object_New(mapClass, ctor, &obj)) {
+    if (ANI_OK != env->Object_New(mapClass, ctor, &obj, undefinedArgument)) {
         HILOG_ERROR_I18N("CreateAniMap: New object 'std.core.Map' failed");
         return nullptr;
     }
