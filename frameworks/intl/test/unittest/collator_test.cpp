@@ -16,7 +16,7 @@
 
 #include <map>
 #include <vector>
-
+#include "unicode/uchar.h"
 #include "collator.h"
 
 using namespace OHOS::Global::I18n;

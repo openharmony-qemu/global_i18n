@@ -23,25 +23,6 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-template<typename Method, typename... Args>
-I18nErrorCode I18nServiceAbilityClient::CallI18nServiceMethod(Method method, const char* methodName, Args&&... args)
-{
-    I18nErrorCode err = I18nErrorCode::SUCCESS;
-    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
-    if (i18nServiceAbilityObj == nullptr) {
-        HILOG_ERROR_I18N("I18nServiceAbilityClient::%{public}s: Get proxy failed.", methodName);
-        return err;
-    }
-    int32_t code = 0;
-    ErrCode errCode = (i18nServiceAbilityObj->*method)(std::forward<Args>(args)..., code);
-    if (errCode != ERR_OK) {
-        HILOG_ERROR_I18N("I18nServiceAbilityClient::%{public}s: call i18n service failed, errCode is %{public}d.",
-            methodName, static_cast<int32_t>(errCode));
-        return I18nErrorCode::FAILED;
-    }
-    return static_cast<I18nErrorCode>(code);
-}
-
 sptr<II18nServiceAbility> I18nServiceAbilityClient::GetProxy(I18nErrorCode &err)
 {
     sptr<IRemoteObject> proxy = I18nServiceAbilityLoadManager::GetInstance()->GetI18nServiceAbility(I18N_SA_ID);
@@ -59,136 +40,439 @@ sptr<II18nServiceAbility> I18nServiceAbilityClient::GetProxy(I18nErrorCode &err)
 
 I18nErrorCode I18nServiceAbilityClient::SetSystemLanguage(const std::string &language)
 {
-    return CallI18nServiceMethod(&II18nServiceAbility::SetSystemLanguage, "SetSystemLanguage", language);
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetSystemLanguage: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->SetSystemLanguage(language, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetSystemLanguage: Set language failed, errCode is %{public}d.",
+            static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::SetSystemRegion(const std::string &region)
 {
-    return CallI18nServiceMethod(&II18nServiceAbility::SetSystemRegion, "SetSystemRegion", region);
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetSystemRegion: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->SetSystemRegion(region, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetSystemRegion: Set region failed, errCode is %{public}d.",
+            static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::SetSystemLocale(const std::string &locale)
 {
-    return CallI18nServiceMethod(&II18nServiceAbility::SetSystemLocale, "SetSystemLocale", locale);
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetSystemLocale: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->SetSystemLocale(locale, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetSystemLocale: Set locale failed, errCode is %{public}d.",
+            static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::Set24HourClock(const std::string &flag)
 {
-    return CallI18nServiceMethod(&II18nServiceAbility::Set24HourClock, "Set24HourClock", flag);
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::Set24HourClock: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->Set24HourClock(flag, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::Set24HourClock: Set 24HourClock failed, errCode is %{public}d.",
+            static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::SetUsingLocalDigit(bool flag)
 {
-    return CallI18nServiceMethod(&II18nServiceAbility::SetUsingLocalDigit, "SetUsingLocalDigit", flag);
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetUsingLocalDigit: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->SetUsingLocalDigit(flag, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetUsingLocalDigit: Set local digit failed, "
+            "errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::AddPreferredLanguage(const std::string &language, int32_t index)
 {
-    return CallI18nServiceMethod(&II18nServiceAbility::AddPreferredLanguage, "AddPreferredLanguage", language, index);
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::AddPreferredLanguage: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->AddPreferredLanguage(language, index, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::AddPreferredLanguage: Add preferred language failed, "
+            "errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::RemovePreferredLanguage(int32_t index)
 {
-    return CallI18nServiceMethod(&II18nServiceAbility::RemovePreferredLanguage, "RemovePreferredLanguage", index);
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::RemovePreferredLanguage: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->RemovePreferredLanguage(index, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::RemovePreferredLanguage: Remove preferred language failed, "
+            "errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::SetTemperatureType(TemperatureType type)
 {
-    return CallI18nServiceMethod(&II18nServiceAbility::SetTemperatureType, "SetTemperatureType", type);
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetTemperatureType: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->SetTemperatureType(static_cast<int32_t>(type), code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetTemperatureType: Set temperature type failed, "
+            "errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::SetFirstDayOfWeek(WeekDay type)
 {
-    return CallI18nServiceMethod(&II18nServiceAbility::SetFirstDayOfWeek, "SetFirstDayOfWeek", type);
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetFirstDayOfWeek: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->SetFirstDayOfWeek(static_cast<int32_t>(type), code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetFirstDayOfWeek: Set first day of week failed, "
+            "errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::GetSystemCollations(
     std::unordered_map<std::string, std::string>& systemCollations)
 {
-    return CallI18nServiceMethod(&II18nServiceAbility::GetSystemCollations, "GetSystemCollations", systemCollations);
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetSystemCollations: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->GetSystemCollations(systemCollations, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetSystemCollations: Get system collations failed, "
+            "errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::GetUsingCollation(std::string& usingCollation)
 {
-    return CallI18nServiceMethod(&II18nServiceAbility::GetUsingCollation, "GetUsingCollation", usingCollation);
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetUsingCollation: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->GetUsingCollation(usingCollation, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetUsingCollation: Get using collations failed, "
+            "errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::SetSystemCollation(const std::string& identifier)
 {
-    return CallI18nServiceMethod(&II18nServiceAbility::SetSystemCollation, "SetSystemCollation", identifier);
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetSystemCollation: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->SetSystemCollation(identifier, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetSystemCollation: Set system collations failed, "
+            "errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::GetSystemNumberingSystems(
     std::unordered_map<std::string, std::string>& systemNumberingSystems)
 {
-    return CallI18nServiceMethod(&II18nServiceAbility::GetSystemNumberingSystems, "GetSystemNumberingSystems",
-        systemNumberingSystems);
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetSystemNumberingSystems: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->GetSystemNumberingSystems(systemNumberingSystems, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetSystemNumberingSystems: Get system numbering systems failed, "
+            "errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::GetUsingNumberingSystem(std::string& usingNumberingSystem)
 {
-    return CallI18nServiceMethod(&II18nServiceAbility::GetUsingNumberingSystem, "GetUsingNumberingSystem",
-        usingNumberingSystem);
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetUsingNumberingSystem: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->GetUsingNumberingSystem(usingNumberingSystem, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetUsingNumberingSystem: Get using numbering system failed, "
+            "errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::SetSystemNumberingSystem(const std::string& identifier)
 {
-    return CallI18nServiceMethod(&II18nServiceAbility::SetSystemNumberingSystem, "SetSystemNumberingSystem",
-        identifier);
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetSystemNumberingSystem: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->SetSystemNumberingSystem(identifier, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetSystemNumberingSystem: Set system numbering system failed, "
+            "errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::GetSystemNumberPatterns(
     std::unordered_map<std::string, std::string>& systemNumberPatterns)
 {
-    return CallI18nServiceMethod(&II18nServiceAbility::GetSystemNumberPatterns, "GetSystemNumberPatterns",
-        systemNumberPatterns);
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetSystemNumberPatterns: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->GetSystemNumberPatterns(systemNumberPatterns, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetSystemNumberPatterns: Get system number patterns failed, "
+            "errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::GetUsingNumberPattern(std::string& usingNumberPattern)
 {
-    return CallI18nServiceMethod(&II18nServiceAbility::GetUsingNumberPattern, "GetUsingNumberPattern",
-        usingNumberPattern);
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetUsingNumberPattern: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->GetUsingNumberPattern(usingNumberPattern, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetUsingNumberPattern: Get using number pattern failed, "
+            "errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::SetSystemNumberPattern(const std::string& pattern)
 {
-    return CallI18nServiceMethod(&II18nServiceAbility::SetSystemNumberPattern, "SetSystemNumberPattern", pattern);
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetSystemNumberPattern: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->SetSystemNumberPattern(pattern, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetSystemNumberPattern: Set system number pattern failed, "
+            "errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::GetSystemMeasurements(
     std::unordered_map<std::string, std::string>& systemMeasurements)
 {
-    return CallI18nServiceMethod(&II18nServiceAbility::GetSystemMeasurements, "GetSystemMeasurements",
-        systemMeasurements);
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetSystemMeasurements: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->GetSystemMeasurements(systemMeasurements, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetSystemMeasurements: Get system measurements failed, "
+            "errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::GetUsingMeasurement(std::string& identifier)
 {
-    return CallI18nServiceMethod(&II18nServiceAbility::GetUsingMeasurement, "GetUsingMeasurement", identifier);
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetUsingMeasurement: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->GetUsingMeasurement(identifier, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetUsingMeasurement: Get using measurement failed, "
+            "errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::SetSystemMeasurement(const std::string& identifier)
 {
-    return CallI18nServiceMethod(&II18nServiceAbility::SetSystemMeasurement, "SetSystemMeasurement", identifier);
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetSystemMeasurement: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->SetSystemMeasurement(identifier, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetSystemMeasurement: Set system measurement failed, "
+            "errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::GetSystemNumericalDatePatterns(
     std::unordered_map<std::string, std::string>& numericalDatePatterns)
 {
-    return CallI18nServiceMethod(&II18nServiceAbility::GetSystemNumericalDatePatterns,
-        "GetSystemNumericalDatePatterns", numericalDatePatterns);
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetSystemNumericalDatePatterns: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->GetSystemNumericalDatePatterns(numericalDatePatterns, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetSystemNumericalDatePatterns: Get system numerical date pattern "
+            "failed, errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::GetUsingNumericalDatePattern(std::string& identifier)
 {
-    return CallI18nServiceMethod(&II18nServiceAbility::GetUsingNumericalDatePattern, "GetUsingNumericalDatePattern",
-        identifier);
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetUsingNumericalDatePattern: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->GetUsingNumericalDatePattern(identifier, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::GetUsingNumericalDatePattern: Get using numerical date pattern "
+            "failed, errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 I18nErrorCode I18nServiceAbilityClient::SetSystemNumericalDatePattern(const std::string& identifier)
 {
-    return CallI18nServiceMethod(&II18nServiceAbility::SetSystemNumericalDatePattern, "SetSystemNumericalDatePattern",
-        identifier);
+    I18nErrorCode err = I18nErrorCode::SUCCESS;
+    sptr<II18nServiceAbility> i18nServiceAbilityObj = GetProxy(err);
+    if (i18nServiceAbilityObj == nullptr) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetSystemNumericalDatePattern: Get proxy failed.");
+        return err;
+    }
+    int32_t code = 0;
+    ErrCode errCode = i18nServiceAbilityObj->SetSystemNumericalDatePattern(identifier, code);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR_I18N("I18nServiceAbilityClient::SetSystemNumericalDatePattern: Set system numerical date pattern "
+            "failed, errCode is %{public}d.", static_cast<int32_t>(errCode));
+        return I18nErrorCode::FAILED;
+    }
+    return static_cast<I18nErrorCode>(code);
 }
 
 std::string I18nServiceAbilityClient::GetLanguageFromUserId(int32_t userId)
