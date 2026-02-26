@@ -235,19 +235,6 @@ public:
 
 private:
     /**
-     * @brief Construct a new I18nServiceAbilityClient::CallI18nServiceMethod object
-     *
-     * @tparam Method Method type provided by I18nServiceAbility.
-     * @tparam Args Args type for I18nServiceAbility's method.
-     * @param method I18nServiceAbility's method pointer.
-     * @param methodName I18nServiceAbility's method name.
-     * @param args Args for I18nServiceAbility's method .
-     * @return I18nErrorCode
-     */
-    template<typename Method, typename... Args>
-    static I18nErrorCode CallI18nServiceMethod(Method method, const char* methodName, Args&&... args);
-
-    /**
      * @brief Get the proxy of i18n service to access service.
      *
      * @param err Indicates whether the acquisition was successful.
