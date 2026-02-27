@@ -38,6 +38,7 @@ private:
     static napi_value IsLetterAddon(napi_env env, napi_callback_info info);
     static napi_value IsLowerCaseAddon(napi_env env, napi_callback_info info);
     static napi_value IsUpperCaseAddon(napi_env env, napi_callback_info info);
+    static napi_value IsUTF8CodeAddon(napi_env env, napi_callback_info info);
     static napi_value GetTypeAddon(napi_env env, napi_callback_info info);
 
     static napi_value ObjectConstructor(napi_env env, napi_callback_info info);

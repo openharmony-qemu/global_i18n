@@ -23,6 +23,7 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
+const int32_t I18N_NAPI_ERROR = -1;
 // Common error code
 const int32_t I18N_NO_PERMISSION  = 201;          // The app doesn't have requested permission
 const int32_t I18N_NOT_SYSTEM_APP = 202;          // The app isn't a system app

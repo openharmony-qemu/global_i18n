@@ -31,6 +31,8 @@ public:
     static ani_boolean IsLetterAddon(ani_env *env, [[maybe_unused]] ani_object object, ani_string ch);
     static ani_boolean IsLowerCaseAddon(ani_env *env, [[maybe_unused]] ani_object object, ani_string ch);
     static ani_boolean IsUpperCaseAddon(ani_env *env, [[maybe_unused]] ani_object object, ani_string ch);
+    static ani_boolean IsUTF8CodeAddon(ani_env *env, [[maybe_unused]] ani_object object, ani_arraybuffer bytes,
+        ani_object confidence);
     static ani_string GetTypeAddon(ani_env *env, [[maybe_unused]] ani_object object, ani_string ch);
     static ani_status BindContextUnicode(ani_env *env);
 };

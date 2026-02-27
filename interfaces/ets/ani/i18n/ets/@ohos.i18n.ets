@@ -373,6 +373,10 @@ namespace i18n {
         native static isLetter(ch: string): boolean;
         native static isLowerCase(ch: string): boolean;
         native static isUpperCase(ch: string): boolean;
+        native static isUTF8CodeFromBuffer(bytes: ArrayBuffer, confidence?: int): boolean;
+        static isUTF8Code(bytes: Uint8Array, confidence?: int): boolean {
+            return Unicode.isUTF8CodeFromBuffer(bytes.buffer, confidence);
+        }
         native static getType(ch: string): string;
     }
 
