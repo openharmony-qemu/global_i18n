@@ -17,6 +17,8 @@
 
 #include <string>
 
+#include "i18n_types.h"
+
 namespace OHOS {
 namespace Global {
 namespace I18n {
@@ -28,6 +30,8 @@ bool IsIdeoGraphic(const std::string &character);
 bool IsLetter(const std::string &character);
 bool IsLowerCase(const std::string &character);
 bool IsUpperCase(const std::string &character);
+// default confidence is 80
+bool IsUTF8Code(const char* dataStream, size_t length, I18nErrorCode& errCode, int32_t confidence = 80);
 std::string GetType(const std::string &character);
 } // namespace I18n
 } // namespace Global

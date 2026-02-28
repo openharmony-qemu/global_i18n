@@ -427,6 +427,25 @@ HWTEST_F(IntlTest, IntlFuncTest0057, TestSize.Level1)
     EXPECT_TRUE(isLowerCase);
     bool isUpperCase = IsUpperCase("AbC");
     EXPECT_TRUE(isUpperCase);
+    I18nErrorCode errCode = I18nErrorCode::SUCCESS;
+    std::string text = "中文";
+    bool isUTF8Code = IsUTF8Code(text.c_str(), text.length(), errCode, 70);
+    EXPECT_TRUE(isUTF8Code);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    isUTF8Code = IsUTF8Code(text.c_str(), text.length(), errCode, 90);
+    EXPECT_FALSE(isUTF8Code);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    isUTF8Code = IsUTF8Code(text.c_str(), text.length(), errCode);
+    EXPECT_TRUE(isUTF8Code);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    isUTF8Code = IsUTF8Code("ABC \xEF\xBB\xBF\xE4\xB8\xAD", 10, errCode);
+    EXPECT_TRUE(isUTF8Code);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    isUTF8Code = IsUTF8Code("\xc4\xea\xcc\xe5", 4, errCode);
+    EXPECT_FALSE(isUTF8Code);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    isUTF8Code = IsUTF8Code(text.c_str(), text.length(), errCode, 110);
+    EXPECT_EQ(errCode, I18nErrorCode::INVALID_PARAM);
     std::string getType = GetType("$$%");
     EXPECT_EQ(getType, "U_CURRENCY_SYMBOL");
 }

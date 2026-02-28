@@ -133,25 +133,25 @@ double VariableConvertor::GetDouble(napi_env env, napi_value value, int32_t &cod
     return result;
 }
 
-int32_t VariableConvertor::GetInt(napi_env env, napi_value value, int32_t &code)
+int32_t VariableConvertor::GetInt32(napi_env env, napi_value value, int32_t& code)
 {
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_status status = napi_typeof(env, value, &valueType);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("VariableConvertor::GetInt: Get napi_value type failed");
-        code = 1;
+        code = I18N_NAPI_ERROR;
+        HILOG_ERROR_I18N("GetInt32: Get type failed.");
         return 0;
     }
     if (valueType != napi_valuetype::napi_number) {
-        HILOG_ERROR_I18N("VariableConvertor::GetInt: check napi_type_number failed");
-        code = 1;
+        code = I18N_NOT_FOUND;
+        HILOG_ERROR_I18N("GetInt32: Check type failed.");
         return 0;
     }
     int32_t result = 0;
     status = napi_get_value_int32(env, value, &result);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("VariableConvertor::GetInt: get int value failed");
-        code = 1;
+        code = I18N_NAPI_ERROR;
+        HILOG_ERROR_I18N("GetInt32: Get confidence failed");
         return 0;
     }
     return result;
@@ -512,6 +512,35 @@ napi_value VariableConvertor::CreateStyledString(napi_env env, const std::string
         return nullptr;
     }
     return styleString;
+}
+
+std::pair<uint8_t*, size_t> VariableConvertor::GetUint8Array(napi_env env, napi_value value, int32_t& code)
+{
+    bool isTypedArray = false;
+    napi_status status = napi_is_typedarray(env, value, &isTypedArray);
+    if (status != napi_ok) {
+        code = I18N_NAPI_ERROR;
+        HILOG_ERROR_I18N("VariableConvertor::IsUint8Array: napi_is_typedarray failed.");
+        return { nullptr, 0 };
+    }
+    if (!isTypedArray) {
+        code = I18N_NOT_FOUND;
+        return { nullptr, 0 };
+    }
+    napi_typedarray_type type;
+    size_t length = 0;
+    void* data = nullptr;
+    status = napi_get_typedarray_info(env, value, &type, &length, &data, nullptr, nullptr);
+    if (status != napi_ok) {
+        code = I18N_NAPI_ERROR;
+        HILOG_ERROR_I18N("VariableConvertor::IsUint8Array: napi_get_typedarray_info failed.");
+        return { nullptr, 0 };
+    }
+    if (type != napi_typedarray_type::napi_uint8_array) {
+        code = I18N_NOT_FOUND;
+        return { nullptr, 0 };
+    }
+    return { static_cast<uint8_t*>(data), length };
 }
 } // namespace I18n
 } // namespace Global

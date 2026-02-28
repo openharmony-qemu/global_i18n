@@ -90,11 +90,11 @@ napi_value ZoneOffsetTransitionAddon::I18nZoneOffsetTransitionConstructor(napi_e
     if (code != 0) {
         return nullptr;
     }
-    int32_t offsetBefore = VariableConvertor::GetInt(env, argv[1], code);
+    int32_t offsetBefore = VariableConvertor::GetInt32(env, argv[1], code);
     if (code != 0) {
         return nullptr;
     }
-    int32_t offsetAfter = VariableConvertor::GetInt(env, argv[2], code);
+    int32_t offsetAfter = VariableConvertor::GetInt32(env, argv[2], code);
     if (code != 0) {
         return nullptr;
     }

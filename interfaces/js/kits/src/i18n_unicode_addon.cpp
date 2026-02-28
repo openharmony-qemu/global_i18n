@@ -52,6 +52,7 @@ napi_value I18nUnicodeAddon::InitI18nUnicode(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("isLetter", IsLetterAddon),
         DECLARE_NAPI_STATIC_FUNCTION("isLowerCase", IsLowerCaseAddon),
         DECLARE_NAPI_STATIC_FUNCTION("isUpperCase", IsUpperCaseAddon),
+        DECLARE_NAPI_STATIC_FUNCTION("isUTF8Code", IsUTF8CodeAddon),
         DECLARE_NAPI_STATIC_FUNCTION("getType", GetTypeAddon),
     };
     napi_value constructor = nullptr;
@@ -380,6 +381,49 @@ napi_value I18nUnicodeAddon::IsUpperCaseAddon(napi_env env, napi_callback_info i
         return nullptr;
     }
     return result;
+}
+
+napi_value I18nUnicodeAddon::IsUTF8CodeAddon(napi_env env, napi_callback_info info)
+{
+    size_t argc = 2;
+    napi_value argv[2] = { 0 };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("I18nUnicodeAddon::IsUTF8CodeAddon: get cb info failed.");
+        return VariableConvertor::CreateBoolean(env, false);
+    }
+    if (argc < 1) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "text", "", true);
+        return VariableConvertor::CreateBoolean(env, false);
+    }
+    int32_t code = 0;
+    std::pair<uint8_t*, size_t> uint8Array = VariableConvertor::GetUint8Array(env, argv[0], code);
+    if (code != 0) {
+        if (code == I18N_NOT_FOUND) {
+            ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "text", "Uint8Array", true);
+        }
+        return VariableConvertor::CreateBoolean(env, false);
+    }
+    const char* dataStream = reinterpret_cast<char*>(uint8Array.first);
+
+    int32_t confidence = (argc > 1) ? VariableConvertor::GetInt32(env, argv[1], code) : 0;
+    if (code != 0) {
+        if (code == I18N_NOT_FOUND) {
+            ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "confidence", "number", true);
+        }
+        return VariableConvertor::CreateBoolean(env, false);
+    }
+
+    I18nErrorCode errCode = I18nErrorCode::SUCCESS;
+    bool isUTF8Code = (argc > 1) ? IsUTF8Code(dataStream, uint8Array.second, errCode, confidence) :
+        IsUTF8Code(dataStream, uint8Array.second, errCode);
+    if (errCode == I18nErrorCode::INVALID_PARAM) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID_NEW, "confidence", "a valid confidence", true);
+        return VariableConvertor::CreateBoolean(env, false);
+    }
+    return VariableConvertor::CreateBoolean(env, isUTF8Code);
 }
 
 napi_value I18nUnicodeAddon::GetTypeAddon(napi_env env, napi_callback_info info)

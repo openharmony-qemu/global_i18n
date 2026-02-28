@@ -36,7 +36,7 @@ public:
     static bool GetBoolOptionValue(napi_env env, napi_value &options, const std::string &optionName, bool &boolVal);
     static std::string GetString(napi_env env, napi_value value, int32_t &code);
     static double GetDouble(napi_env env, napi_value value, int32_t &code);
-    static int32_t GetInt(napi_env env, napi_value value, int32_t &code);
+    static int32_t GetInt32(napi_env env, napi_value value, int32_t &code);
     static bool GetStringArrayFromJsParam(napi_env env, napi_value &jsArray, const std::string& valueName,
         std::vector<std::string> &strArray);
 
@@ -53,6 +53,7 @@ public:
     static napi_value CreateMap(napi_env env, std::unordered_map<std::string, std::string>& ump);
     static bool GetDateTime(napi_env env, napi_value date, double& milliseconds);
     static napi_value CreateStyledString(napi_env env, const std::string& content, napi_value styleOption);
+    static std::pair<uint8_t*, size_t> GetUint8Array(napi_env env, napi_value value, int32_t& code);
 
 private:
     static napi_value GetBuiltinsLocaleConstructor(napi_env env);

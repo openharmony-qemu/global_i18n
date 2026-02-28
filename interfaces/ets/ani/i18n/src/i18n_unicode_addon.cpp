@@ -16,6 +16,7 @@
 #include "i18n_unicode_addon.h"
 
 #include "character.h"
+#include "error_util.h"
 #include "i18n_hilog.h"
 #include "variable_converter.h"
 
@@ -63,6 +64,36 @@ ani_boolean I18nUnicodeAddon::IsUpperCaseAddon(ani_env *env, [[maybe_unused]] an
     return IsUpperCase(VariableConverter::AniStrToString(env, ch));
 }
 
+ani_boolean I18nUnicodeAddon::IsUTF8CodeAddon(ani_env *env, [[maybe_unused]] ani_object object, ani_arraybuffer bytes,
+    ani_object confidence)
+{
+    ani_boolean isUndefined;
+    if (ANI_OK != env->Reference_IsUndefined(confidence, &isUndefined)) {
+        HILOG_ERROR_I18N("I18nUnicodeAddon::IsUTF8CodeAddon: Check confident reference is undefined failed.");
+        return false;
+    }
+    ani_int confidenceValue = 0;
+    bool IsSetConfidence = !isUndefined && (ANI_OK == env->Object_CallMethodByName_Int(confidence,
+        "toInt", ":i", &confidenceValue));
+
+    void* data = nullptr;
+    ani_size length = 0;
+    if (ANI_OK != env->ArrayBuffer_GetInfo(bytes, &data, &length)) {
+        HILOG_ERROR_I18N("I18nUnicodeAddon::IsUTF8CodeAddon: Get buffer data failed.");
+        return false;
+    }
+    const char* dataStream = reinterpret_cast<const char*>(data);
+    I18nErrorCode errCode = I18nErrorCode::SUCCESS;
+    bool isUTF8Code = IsSetConfidence ? IsUTF8Code(dataStream, length, errCode, confidenceValue) :
+        IsUTF8Code(dataStream, length, errCode);
+
+    if (errCode == I18nErrorCode::INVALID_PARAM) {
+        ErrorUtil::AniThrow(env, I18N_NOT_VALID_NEW, "confidence", "a valid confidence");
+        return false;
+    }
+    return isUTF8Code;
+}
+
 ani_string I18nUnicodeAddon::GetTypeAddon(ani_env *env, [[maybe_unused]] ani_object object, ani_string ch)
 {
     std::string type = GetType(VariableConverter::AniStrToString(env, ch));
@@ -87,6 +118,7 @@ ani_status I18nUnicodeAddon::BindContextUnicode(ani_env *env)
         ani_native_function { "isLetter", nullptr, reinterpret_cast<void *>(IsLetterAddon) },
         ani_native_function { "isLowerCase", nullptr, reinterpret_cast<void *>(IsLowerCaseAddon) },
         ani_native_function { "isUpperCase", nullptr, reinterpret_cast<void *>(IsUpperCaseAddon) },
+        ani_native_function { "isUTF8CodeFromBuffer", nullptr, reinterpret_cast<void *>(IsUTF8CodeAddon) },
         ani_native_function { "getType", nullptr, reinterpret_cast<void *>(GetTypeAddon) },
     };
 
