@@ -45,7 +45,8 @@ static const char CHAR_A = 'A';
 static const int32_t CHAR2INT_SIZE = 2;
 constexpr const char *TIMEZONE_LIST_CONFIG_PATH = "/system/etc/zoneinfo/timezone_list.cfg";
 constexpr const char *DISTRO_TIMEZONE_LIST_CONFIG = "/system/etc/tzdata_distro/timezone_list.cfg";
-static std::mutex validLocaleMutex;
+static std::mutex g_validLocaleMutex;
+static std::mutex g_availableIDsMutex;
 
 void Split(const string &src, const string &sep, vector<string> &dest)
 {
@@ -162,7 +163,7 @@ void GetAllValidLocalesTag(std::unordered_set<std::string>& allValidLocalesLangu
     if (init) {
         return;
     }
-    std::lock_guard<std::mutex> matchLocaleLock(validLocaleMutex);
+    std::lock_guard<std::mutex> matchLocaleLock(g_validLocaleMutex);
     if (init) {
         return;
     }
@@ -371,6 +372,7 @@ bool CheckSystemPermission()
 
 std::set<std::string> GetTimeZoneAvailableIDs()
 {
+    std::lock_guard<std::mutex> availableIDsLock(g_availableIDsMutex);
     if (availableIDs.size() != 0) {
         return availableIDs;
     }
