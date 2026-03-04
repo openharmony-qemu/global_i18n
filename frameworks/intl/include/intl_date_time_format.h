@@ -79,12 +79,13 @@ public:
     virtual ~IntlDateTimeFormat();
 
     std::string Format(double milliseconds);
-    std::vector<std::pair<std::string, std::string>> FormatToParts(double milliseconds, std::string& errMessage);
+    std::vector<std::unordered_map<std::string, std::string>> FormatToParts(double milliseconds,
+        std::string& errMessage);
     std::string FormatRange(double start, double end, std::string& errMessage);
     std::pair<std::string, std::vector<DateTimeFormatPart>> FormatToParts(double milliseconds);
-    std::vector<std::pair<std::string, std::string>> FormatRangeToParts(double start, double end,
+    std::vector<std::unordered_map<std::string, std::string>> FormatRangeToParts(double start, double end,
         std::string& errMessage);
-    void ResolvedOptions(std::unordered_map<std::string, std::string>& configs);
+    virtual void ResolvedOptions(std::unordered_map<std::string, std::string>& configs);
     static std::vector<std::string> SupportedLocalesOf(const std::vector<std::string>& requestLocales,
         const std::map<std::string, std::string>& configs, I18nErrorCode& status);
 
@@ -109,6 +110,16 @@ public:
     static const std::string TIME_STYLE_TAG;
     static const std::string HOUR_CYCLE_TAG;
     static const std::string FRACTIONAL_SECOND_DIGITS_TAG;
+    static const std::string PART_TYPE_TAG;
+    static const std::string PART_VALUE_TAG;
+    static const std::string PART_SOURCE_TAG;
+    static const std::string START_RANGE_SOURCE;
+    static const std::string END_RANGE_SOURCE;
+    static const std::string SHARED_SOURCE;
+
+protected:
+    std::shared_ptr<icu::SimpleDateFormat> icuSimpleDateFormat = nullptr;
+    icu::Locale icuLocale;
 
 private:
     bool ParseConfigs(const std::unordered_map<std::string, std::string>& configs,
@@ -139,7 +150,10 @@ private:
         const std::string& hc);
     static std::string ConvertUDateFormatHourCycleToString(UDateFormatHourCycle hc);
     static std::vector<CommonDateFormatPart> CreateDateIntervalParts(const icu::FormattedDateInterval& formatted,
-        icu::UnicodeString& formattedParts, std::string& errMessage);
+        icu::UnicodeString& formattedValue, std::string& errMessage,
+        std::vector<int32_t>& begin, std::vector<int32_t>& finish);
+    static std::string GetPartSource(const CommonDateFormatPart& part, const std::vector<int32_t>& begin,
+        const std::vector<int32_t>& finish);
     static bool IsValidTimeZoneName(const icu::TimeZone &tz);
 
     std::string localeMatcher = "best fit";
@@ -167,11 +181,9 @@ private:
     bool initSuccess = false;
     bool isIso8601 = false;
     std::string skeleton;
-    icu::Locale icuLocale;
     icu::DateTimePatternGenerator* icuDateTimePatternGenerator = nullptr;
     icu::TimeZone* icuTimeZone = nullptr;
     icu::Calendar* icuCalendar = nullptr;
-    std::shared_ptr<icu::SimpleDateFormat> icuSimpleDateFormat = nullptr;
     icu::DateIntervalFormat* dateIntervalFormat = nullptr;
     static bool icuInitialized;
     static bool Init();

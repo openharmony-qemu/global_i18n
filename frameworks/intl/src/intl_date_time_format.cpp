@@ -48,6 +48,12 @@ const std::string IntlDateTimeFormat::DATE_STYLE_TAG = "dateStyle";
 const std::string IntlDateTimeFormat::TIME_STYLE_TAG = "timeStyle";
 const std::string IntlDateTimeFormat::HOUR_CYCLE_TAG = "hourCycle";
 const std::string IntlDateTimeFormat::FRACTIONAL_SECOND_DIGITS_TAG = "fractionalSecondDigits";
+const std::string IntlDateTimeFormat::PART_TYPE_TAG = "type";
+const std::string IntlDateTimeFormat::PART_VALUE_TAG = "value";
+const std::string IntlDateTimeFormat::PART_SOURCE_TAG = "source";
+const std::string IntlDateTimeFormat::START_RANGE_SOURCE = "startRange";
+const std::string IntlDateTimeFormat::END_RANGE_SOURCE = "endRange";
+const std::string IntlDateTimeFormat::SHARED_SOURCE = "shared";
 const std::string DEFAULT_NUMBERING_SYSTEM = "latn";
 const size_t NUMBER_OF_PARAMETER = 2;
 const int32_t MAX_VALUE_OF_FRACTIONAL_SECOND_DIGITS = 3;
@@ -285,7 +291,7 @@ std::string IntlDateTimeFormat::Format(double milliseconds)
     return PseudoLocalizationProcessor(result);
 }
 
-std::vector<std::pair<std::string, std::string>> IntlDateTimeFormat::FormatToParts(double milliseconds,
+std::vector<std::unordered_map<std::string, std::string>> IntlDateTimeFormat::FormatToParts(double milliseconds,
     std::string& errMessage)
 {
     if (!initSuccess || icuSimpleDateFormat == nullptr) {
@@ -321,7 +327,7 @@ std::vector<std::pair<std::string, std::string>> IntlDateTimeFormat::FormatToPar
     if (preEdgePos < length) {
         parts.emplace_back(CommonDateFormatPart(-1, preEdgePos, length, index, true));
     }
-    std::vector<std::pair<std::string, std::string>> result(parts.size());
+    std::vector<std::unordered_map<std::string, std::string>> result(parts.size());
     for (size_t i = 0; i < parts.size(); ++i) {
         CommonDateFormatPart part = parts[i];
         std::string value;
@@ -333,7 +339,9 @@ std::vector<std::pair<std::string, std::string>> IntlDateTimeFormat::FormatToPar
         } else {
             type = DateTimeFormatPart::ConvertFieldIdToDateType(part.fField);
         }
-        result[i] = std::make_pair(type, value);
+
+        result[i].insert(std::make_pair(PART_TYPE_TAG, type));
+        result[i].insert(std::make_pair(PART_VALUE_TAG, value));
     }
     return result;
 }
@@ -389,7 +397,7 @@ std::string IntlDateTimeFormat::FormatRange(double start, double end, std::strin
     return PseudoLocalizationProcessor(result);
 }
 
-std::vector<std::pair<std::string, std::string>> IntlDateTimeFormat::FormatRangeToParts(double start,
+std::vector<std::unordered_map<std::string, std::string>> IntlDateTimeFormat::FormatRangeToParts(double start,
     double end, std::string& errMessage)
 {
     if (!initSuccess) {
@@ -412,11 +420,14 @@ std::vector<std::pair<std::string, std::string>> IntlDateTimeFormat::FormatRange
         return {};
     }
     icu::UnicodeString formattedParts;
-    std::vector<CommonDateFormatPart> parts = CreateDateIntervalParts(formatted, formattedParts, errMessage);
+    std::vector<int32_t> begin(NUMBER_OF_PARAMETER, 0);
+    std::vector<int32_t> finish(NUMBER_OF_PARAMETER, 0);
+    std::vector<CommonDateFormatPart> parts = CreateDateIntervalParts(formatted, formattedParts, errMessage,
+        begin, finish);
     if (!errMessage.empty()) {
         return {};
     }
-    std::vector<std::pair<std::string, std::string>> result(parts.size());
+    std::vector<std::unordered_map<std::string, std::string>> result(parts.size());
     for (size_t i = 0; i < parts.size(); ++i) {
         CommonDateFormatPart part = parts[i];
         std::string value;
@@ -428,9 +439,26 @@ std::vector<std::pair<std::string, std::string>> IntlDateTimeFormat::FormatRange
         } else {
             type = DateTimeFormatPart::ConvertFieldIdToDateType(part.fField);
         }
-        result[i] = std::make_pair(type, value);
+        std::string source = GetPartSource(part, begin, finish);
+
+        result[i].insert(std::make_pair(PART_TYPE_TAG, type));
+        result[i].insert(std::make_pair(PART_VALUE_TAG, value));
+        result[i].insert(std::make_pair(PART_SOURCE_TAG, source));
     }
     return result;
+}
+
+std::string IntlDateTimeFormat::GetPartSource(const CommonDateFormatPart& part, const std::vector<int32_t>& begin,
+    const std::vector<int32_t>& finish)
+{
+    if (begin[0]<= part.fBeginIndex && part.fBeginIndex <= finish[0] &&
+        begin[0]<= part.fEndIndex && part.fEndIndex <= finish[0]) {
+        return START_RANGE_SOURCE;
+    } else if (begin[1]<= part.fBeginIndex && part.fBeginIndex <= finish[1] &&
+        begin[1]<= part.fEndIndex && part.fEndIndex <= finish[1]) {
+        return END_RANGE_SOURCE;
+    }
+    return SHARED_SOURCE;
 }
 
 void IntlDateTimeFormat::ResolvedOptions(std::unordered_map<std::string, std::string>& configs)
@@ -1019,7 +1047,8 @@ std::string IntlDateTimeFormat::ConvertUDateFormatHourCycleToString(UDateFormatH
 }
 
 std::vector<CommonDateFormatPart> IntlDateTimeFormat::CreateDateIntervalParts(
-    const icu::FormattedDateInterval& formatted, icu::UnicodeString& formattedValue, std::string& errMessage)
+    const icu::FormattedDateInterval& formatted, icu::UnicodeString& formattedValue, std::string& errMessage,
+    std::vector<int32_t>& begin, std::vector<int32_t>& finish)
 {
     UErrorCode status = U_ZERO_ERROR;
     formattedValue = formatted.toTempString(status);
@@ -1029,8 +1058,6 @@ std::vector<CommonDateFormatPart> IntlDateTimeFormat::CreateDateIntervalParts(
     }
     int32_t index = 0;
     int32_t preEndPos = 0;
-    std::vector<int32_t> begin(NUMBER_OF_PARAMETER, 0);
-    std::vector<int32_t> end(NUMBER_OF_PARAMETER, 0);
     std::vector<CommonDateFormatPart> parts;
     icu::ConstrainedFieldPosition cfpos;
     while (formatted.nextPosition(cfpos, status) && U_SUCCESS(status)) {
@@ -1041,7 +1068,7 @@ std::vector<CommonDateFormatPart> IntlDateTimeFormat::CreateDateIntervalParts(
 
         if (fCategory == UFIELD_CATEGORY_DATE_INTERVAL_SPAN && (fField == 0 || fField == 1)) {
             begin[fField] = fStart;
-            end[fField] = fLimit;
+            finish[fField] = fLimit;
         }
         if (fCategory == UFIELD_CATEGORY_DATE) {
             if (preEndPos < fStart) {

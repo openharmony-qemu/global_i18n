@@ -13,17 +13,23 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_GLOBAL_I18N_INTL_DATE_TIME_FORMAT_TEST_H
-#define OHOS_GLOBAL_I18N_INTL_DATE_TIME_FORMAT_TEST_H
+#ifndef OHOS_GLOBAL_I18N_DATE_TIME_FORMAT_TEST_H
+#define OHOS_GLOBAL_I18N_DATE_TIME_FORMAT_TEST_H
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-int IntlDateTimeFormatFuncTest001(void);
-int IntlDateTimeFormatFuncTest002(void);
-int IntlDateTimeFormatFuncTest003(void);
-int IntlDateTimeFormatFuncTest004(void);
-int IntlDateTimeFormatFuncTest005(void);
+int DateTimeFormatFuncTest001(void);
+int DateTimeFormatFuncTest002(void);
+int DateTimeFormatFuncTest003(void);
+int DateTimeFormatFuncTest004(void);
+int DateTimeFormatFuncTest005(void);
+int DateTimeFormatFuncTest006(void);
+int DateTimeFormatFuncTest007(void);
+int DateTimeFormatFuncTest008(void);
+int DateTimeFormatFuncTest009(void);
+int DateTimeFormatFuncTest010(void);
+int DateTimeFormatFuncTest011(void);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

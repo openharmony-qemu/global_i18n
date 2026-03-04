@@ -721,6 +721,95 @@ namespace i18n {
         }
     }
 
+    export class SymbolDateTimeFormat extends Intl.DateTimeFormat {
+        static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
+
+        private nativeSymbolDateTimeFormat: long = 0;
+
+        constructor(context: long) {
+            if (this.nativeSymbolDateTimeFormat == 0) {
+                this.nativeSymbolDateTimeFormat = context;
+            }
+        }
+
+        constructor(locale?: Intl.Locale, options?: SymbolDateTimeFormatOptions) {
+            this.nativeSymbolDateTimeFormat = 
+                SymbolDateTimeFormat.create(locale, options).nativeSymbolDateTimeFormat;
+        }
+ 
+        native static create(locale?: Intl.Locale, options?: SymbolDateTimeFormatOptions): SymbolDateTimeFormat;
+        native formatImpl(date?: double): string;
+        native formatToPartsImpl(date?: double): Intl.DateTimeFormatPart[];
+        native formatRangeImpl(startDate: double, endDate: double): string;
+        native formatRangeToPartsImpl(startDate: double, endDate: double): Intl.DateTimeRangeFormatPart[];
+        native toString(): string;
+        native resolvedOptions(): i18n.ResolvedSymbolDateTimeFormatOptions;
+
+        format(date?: Date | double): string {
+            if (date instanceof Date) {
+                return this.formatImpl(date.getTime());
+            }
+            return this.formatImpl(date);
+        }
+
+        formatToParts(date?: Date | double): Intl.DateTimeFormatPart[] {
+            if (date instanceof Date) {
+                return this.formatToPartsImpl(date.getTime());
+            }
+            return this.formatToPartsImpl(date);
+        }
+        
+        formatRange(startDate: Date | double, endDate: Date | double): string {
+            let startDateTime: double = (startDate instanceof Date) ? startDate.getTime() : startDate;
+            let endDateTime: double = (endDate instanceof Date) ? endDate.getTime() : endDate;
+            return this.formatRangeImpl(startDateTime, endDateTime);
+        }
+
+        formatRangeToParts(startDate: Date | double, endDate: Date | double): Intl.DateTimeRangeFormatPart[] {
+            let startDateTime: double = (startDate instanceof Date) ? startDate.getTime() : startDate;
+            let endDateTime: double = (endDate instanceof Date) ? endDate.getTime() : endDate;
+            return this.formatRangeToPartsImpl(startDateTime, endDateTime);
+        }
+
+        static supportedLocalesOf(locales: string | Intl.Locale | ReadonlyArray<string | Intl.Locale>,
+            options?: Intl.DateTimeFormatOptions): string[] {
+            return Intl.DateTimeFormat.supportedLocalesOf(locales, options);
+        }
+
+    }
+
+    export interface SymbolDateTimeFormatOptions extends Intl.DateTimeFormatOptions {
+        amPMSymbol?: string[] | undefined;
+    }
+
+    export interface ResolvedSymbolDateTimeFormatOptions extends Intl.ResolvedDateTimeFormatOptions {
+        amPMSymbol?: string[];
+    }
+
+    export class ResolvedSymbolDateTimeFormatOptionsInner implements ResolvedSymbolDateTimeFormatOptions {
+        calendar: string;
+        dateStyle?: "full" | "long" | "medium" | "short";
+        day?: string;
+        dayPeriod?: "narrow" | "short" | "long";
+        era?: string;
+        formatMatcher?: "basic" | "best fit";
+        fractionalSecondDigits?: number;
+        hour12?: boolean;
+        hour?: string;
+        hourCycle?: "h11" | "h12" | "h23" | "h24";
+        locale: string;
+        minute?: string;
+        month?: string;
+        numberingSystem: string;
+        second?: string;
+        timeStyle?: "full" | "long" | "medium" | "short";
+        timeZone: string;
+        timeZoneName?: string;
+        weekday?: string;
+        year?: string;
+        amPMSymbol?: string[];
+    }
+
     loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n");
     export native function getCalendar(locale: string, type?: string): Calendar;
     export native function isRTL(locale: string): boolean;

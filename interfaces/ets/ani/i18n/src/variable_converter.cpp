@@ -29,6 +29,7 @@
 #include "simple_number_format_addon.h"
 #include "styled_date_time_format_addon.h"
 #include "styled_number_format_addon.h"
+#include "symbol_date_time_format_addon.h"
 #include "system_locale_manager_addon.h"
 #include "zone_rules_addon.h"
 #include "zone_offset_transition_addon.h"
@@ -589,3 +590,5 @@ template ani_object VariableConverter::CreateAniObject<NumberFormatAddon>(ani_en
 template ani_object VariableConverter::CreateAniObject<ZoneRulesAddon>(ani_env*, const char*, ZoneRulesAddon*);
 template ani_object VariableConverter::CreateAniObject<ZoneOffsetTransitionAddon>(
     ani_env*, const char*, ZoneOffsetTransitionAddon*);
+template ani_object VariableConverter::CreateAniObject<I18nSymbolDateTimeFormatAddon>(
+    ani_env*, const char*, I18nSymbolDateTimeFormatAddon*);

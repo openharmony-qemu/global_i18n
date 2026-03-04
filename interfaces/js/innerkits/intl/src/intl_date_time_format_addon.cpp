@@ -261,13 +261,12 @@ napi_value IntlDateTimeFormatAddon::FormatToParts(napi_env env, napi_callback_in
         return JSUtils::CreateEmptyArray(env);
     }
     std::string errMessage;
-    std::vector<std::pair<std::string, std::string>> formatResult =
-        obj->intlDateTimeFormat->FormatToParts(milliseconds, errMessage);
+    auto parts = obj->intlDateTimeFormat->FormatToParts(milliseconds, errMessage);
     if (!errMessage.empty()) {
         ErrorUtil::NapiThrowUndefined(env, errMessage);
         return nullptr;
     }
-    return CreateFormatPart(env, formatResult);
+    return CreateDateTimeFormatPart(env, parts);
 }
 
 napi_value IntlDateTimeFormatAddon::FormatRange(napi_env env, napi_callback_info info)
@@ -350,13 +349,12 @@ napi_value IntlDateTimeFormatAddon::FormatRangeToParts(napi_env env, napi_callba
         return JSUtils::CreateEmptyArray(env);
     }
     std::string errMessage;
-    std::vector<std::pair<std::string, std::string>> formatResult =
-        obj->intlDateTimeFormat->FormatRangeToParts(start, end, errMessage);
+    auto parts = obj->intlDateTimeFormat->FormatRangeToParts(start, end, errMessage);
     if (!errMessage.empty()) {
         ErrorUtil::NapiThrowUndefined(env, errMessage);
         return nullptr;
     }
-    return CreateFormatPart(env, formatResult);
+    return CreateDateTimeFormatPart(env, parts);
 }
 
 napi_value IntlDateTimeFormatAddon::ToString(napi_env env, napi_callback_info info)
@@ -455,50 +453,40 @@ bool IntlDateTimeFormatAddon::GetDateTime(napi_env env, napi_value time, double&
     return true;
 }
 
-napi_value IntlDateTimeFormatAddon::CreateFormatPart(napi_env env,
-    const std::vector<std::pair<std::string, std::string>>& formatResult)
+napi_value IntlDateTimeFormatAddon::CreateDateTimeFormatPart(napi_env env,
+    const std::vector<std::unordered_map<std::string, std::string>>& parts)
 {
-    size_t length = formatResult.size();
+    size_t length = parts.size();
     napi_value result = nullptr;
     napi_status status = napi_create_array_with_length(env, length, &result);
     if (status != napi_ok || result == nullptr) {
-        HILOG_ERROR_I18N("IntlDateTimeFormatAddon::CreateFormatPart: Create array failed.");
+        HILOG_ERROR_I18N("CreateDateTimeFormatPart: Create array failed.");
         return JSUtils::CreateEmptyArray(env);
     }
     size_t index = 0;
-    for (const auto& item : formatResult) {
+    for (const auto& part : parts) {
         napi_value object = nullptr;
         status = napi_create_object(env, &object);
         if (status != napi_ok || object == nullptr) {
-            HILOG_ERROR_I18N("IntlDateTimeFormatAddon::CreateFormatPart: Create object failed.");
+            HILOG_ERROR_I18N("CreateDateTimeFormatPart: Create object failed.");
             return JSUtils::CreateEmptyArray(env);
         }
-        napi_value type = nullptr;
-        status = napi_create_string_utf8(env, item.first.c_str(), NAPI_AUTO_LENGTH, &type);
-        if (status != napi_ok || type == nullptr) {
-            HILOG_ERROR_I18N("IntlDateTimeFormatAddon::CreateFormatPart: Create type failed.");
-            return JSUtils::CreateEmptyArray(env);
-        }
-        status = napi_set_named_property(env, object, "type", type);
-        if (status != napi_ok) {
-            HILOG_ERROR_I18N("IntlDateTimeFormatAddon::CreateFormatPart: Set property type failed.");
-            return JSUtils::CreateEmptyArray(env);
-        }
-        napi_value value = nullptr;
-        status = napi_create_string_utf8(env, item.second.c_str(), NAPI_AUTO_LENGTH, &value);
-        if (status != napi_ok || value == nullptr) {
-            HILOG_ERROR_I18N("IntlDateTimeFormatAddon::CreateFormatPart: Create type failed.");
-            return JSUtils::CreateEmptyArray(env);
-        }
-        status = napi_set_named_property(env, object, "value", value);
-        if (status != napi_ok) {
-            HILOG_ERROR_I18N("IntlDateTimeFormatAddon::CreateFormatPart: Set property type failed.");
-            return JSUtils::CreateEmptyArray(env);
+        for (const auto& item : part) {
+            napi_value value = nullptr;
+            status = napi_create_string_utf8(env, item.second.c_str(), NAPI_AUTO_LENGTH, &value);
+            if (status != napi_ok || value == nullptr) {
+                HILOG_ERROR_I18N("CreateDateTimeFormatPart: Create type failed.");
+                return JSUtils::CreateEmptyArray(env);
+            }
+            status = napi_set_named_property(env, object, item.first.c_str(), value);
+            if (status != napi_ok) {
+                HILOG_ERROR_I18N("CreateDateTimeFormatPart: Set property type failed.");
+                return JSUtils::CreateEmptyArray(env);
+            }
         }
         status = napi_set_element(env, result, index, object);
         if (status != napi_ok) {
-            HILOG_ERROR_I18N("IntlDateTimeFormatAddon::CreateFormatPart: Set element failed, index is %{public}zu.",
-                index);
+            HILOG_ERROR_I18N("CreateDateTimeFormatPart: Set element failed, index is %{public}zu.", index);
             return JSUtils::CreateEmptyArray(env);
         }
         index++;
@@ -512,7 +500,7 @@ napi_value IntlDateTimeFormatAddon::CreateResolvedOptions(napi_env env,
     napi_value object = nullptr;
     napi_status status = napi_create_object(env, &object);
     if (status != napi_ok || object == nullptr) {
-        HILOG_ERROR_I18N("IntlDateTimeFormatAddon::CreateFormatPart: Create object failed.");
+        HILOG_ERROR_I18N("IntlDateTimeFormatAddon::CreateResolvedOptions: Create object failed.");
         return JSUtils::CreateEmptyObject(env);
     }
 

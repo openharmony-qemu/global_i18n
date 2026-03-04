@@ -18,6 +18,7 @@
 #include "error_util.h"
 #include "i18n_hilog.h"
 #include "simple_date_time_format_addon.h"
+#include "symbol_date_time_format_addon.h"
 #include "variable_converter.h"
 
 namespace OHOS {
@@ -35,18 +36,7 @@ I18nStyledDateTimeFormatAddon* I18nStyledDateTimeFormatAddon::UnwrapAddon(ani_en
 
 bool I18nStyledDateTimeFormatAddon::InitStyledFormatContext(ani_env *env, ani_object dateTimeFormat)
 {
-    ani_class simpleDateTimeFormatClass;
-    if (ANI_OK != env->FindClass("@ohos.i18n.i18n.SimpleDateTimeFormat", &simpleDateTimeFormatClass)) {
-        HILOG_ERROR_I18N("InitStyledFormatContext Find class '@ohos.i18n.i18n.SimpleDateTimeFormat' failed");
-        return false;
-    }
-
-    ani_boolean isSimpleDateTimeFormat;
-    if (ANI_OK != env->Object_InstanceOf(dateTimeFormat, simpleDateTimeFormatClass, &isSimpleDateTimeFormat)) {
-        HILOG_ERROR_I18N("InitStyledFormatContext: Get Instance failed");
-        return false;
-    }
-    if (isSimpleDateTimeFormat) {
+    if (I18nSimpleDateTimeFormatAddon::IsSimpleDateTimeFormat(env, dateTimeFormat)) {
         I18nSimpleDateTimeFormatAddon* simpleDateTimeFormatAddon =
             I18nSimpleDateTimeFormatAddon::UnwrapAddon(env, dateTimeFormat);
         if (simpleDateTimeFormatAddon == nullptr) {
@@ -56,7 +46,18 @@ bool I18nStyledDateTimeFormatAddon::InitStyledFormatContext(ani_env *env, ani_ob
         styledDateTimeFormat_ = std::make_unique<StyledDateTimeFormat>(simpleDateTimeFormatAddon->GetDateTimeFormat(),
             nullptr);
         return styledDateTimeFormat_ != nullptr;
+    } else if (I18nSymbolDateTimeFormatAddon::IsSymbolDateTimeFormat(env, dateTimeFormat)) {
+        I18nSymbolDateTimeFormatAddon* symbolDateTimeFormatAddon =
+            I18nSymbolDateTimeFormatAddon::UnwrapAddon(env, dateTimeFormat);
+        if (symbolDateTimeFormatAddon == nullptr) {
+            HILOG_ERROR_I18N("InitStyledFormatContext: symbolDateTimeFormatAddon is nullptr.");
+            return false;
+        }
+        styledDateTimeFormat_ = std::make_unique<StyledDateTimeFormat>(nullptr,
+            symbolDateTimeFormatAddon->GetDateTimeFormat());
+        return styledDateTimeFormat_ != nullptr;
     }
+
     ErrorUtil::AniThrow(env, I18N_NOT_FOUND, "dateTimeFormat", "Intl.DateTimeFormat or SimpleDateTimeFormat");
     return false;
 }
