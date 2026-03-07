@@ -984,17 +984,17 @@ HWTEST_F(IntlTest, IntlFuncTest0073, TestSize.Level1)
     }
     EXPECT_EQ(formated, "0755 7645 3");
 
-    std::unique_ptr<PhoneNumberFormat> phoneNumFmt2 =
+    std::unique_ptr<PhoneNumberFormat> phoneNumFormat =
         std::make_unique<PhoneNumberFormat>("AD", options);
     formated = "";
     number = "7123945";
     for (char c : number) {
         if (c == '4') {
             formated = formated.substr(0, formated.length() - 1);
-            formated = phoneNumFmt->format(formated);
+            formated = phoneNumFormat->format(formated);
         }
         formated = formated + c;
-        formated = phoneNumFmt->format(formated);
+        formated = phoneNumFormat->format(formated);
     }
     EXPECT_EQ(formated, "712 345");
     PhoneNumberFormat::CloseDynamicHandler();
