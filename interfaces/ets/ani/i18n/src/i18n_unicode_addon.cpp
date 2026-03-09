@@ -64,40 +64,53 @@ ani_boolean I18nUnicodeAddon::IsUpperCaseAddon(ani_env *env, [[maybe_unused]] an
     return IsUpperCase(VariableConverter::AniStrToString(env, ch));
 }
 
-ani_boolean I18nUnicodeAddon::IsUTF8CodeAddon(ani_env *env, [[maybe_unused]] ani_object object, ani_arraybuffer bytes,
-    ani_object confidence)
+ani_object I18nUnicodeAddon::DetectEncodingAddon(ani_env *env, [[maybe_unused]] ani_object object,
+    ani_arraybuffer bytes)
 {
-    ani_boolean isUndefined;
-    if (ANI_OK != env->Reference_IsUndefined(confidence, &isUndefined)) {
-        HILOG_ERROR_I18N("I18nUnicodeAddon::IsUTF8CodeAddon: Check confident reference is undefined failed.");
-        return false;
-    }
-    ani_int confidenceValue = 0;
-    bool IsSetConfidence = !isUndefined && (ANI_OK == env->Object_CallMethodByName_Int(confidence,
-        "toInt", ":i", &confidenceValue));
-
     void* data = nullptr;
     ani_size length = 0;
     if (ANI_OK != env->ArrayBuffer_GetInfo(bytes, &data, &length)) {
-        HILOG_ERROR_I18N("I18nUnicodeAddon::IsUTF8CodeAddon: Get buffer data failed.");
-        return false;
+        HILOG_ERROR_I18N("I18nUnicodeAddon::DetectEncodingAddon: Get buffer data failed.");
+        return nullptr;
     }
     const char* dataStream = reinterpret_cast<const char*>(data);
-    I18nErrorCode errCode = I18nErrorCode::SUCCESS;
-    bool isUTF8Code = IsSetConfidence ? IsUTF8Code(dataStream, length, errCode, confidenceValue) :
-        IsUTF8Code(dataStream, length, errCode);
 
-    if (errCode == I18nErrorCode::INVALID_PARAM) {
-        ErrorUtil::AniThrow(env, I18N_NOT_VALID_NEW, "confidence", "a valid confidence");
-        return false;
-    }
-    return isUTF8Code;
+    auto encodingInfo = DetectEncoding(dataStream, length);
+    return CreateEncodingInfo(env, encodingInfo);
 }
 
 ani_string I18nUnicodeAddon::GetTypeAddon(ani_env *env, [[maybe_unused]] ani_object object, ani_string ch)
 {
     std::string type = GetType(VariableConverter::AniStrToString(env, ch));
     return VariableConverter::StringToAniStr(env, type);
+}
+
+ani_object I18nUnicodeAddon::CreateEncodingInfo(ani_env *env, const std::pair<std::string, int32_t>& encodingInfo)
+{
+    static const char *className = "@ohos.i18n.i18n.EncodingInfoInner";
+    ani_class cls;
+    if (ANI_OK != env->FindClass(className, &cls)) {
+        HILOG_ERROR_I18N("CreateEncodingInfo: Find class failed");
+        return nullptr;
+    }
+
+    ani_method ctor;
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
+        HILOG_ERROR_I18N("CreateEncodingInfo: Find method '<ctor>' failed");
+        return nullptr;
+    }
+
+    ani_object result;
+    if (ANI_OK != env->Object_New(cls, ctor, &result)) {
+        HILOG_ERROR_I18N("CreateEncodingInfo: Create object failed");
+        return nullptr;
+    }
+
+    VariableConverter::SetStringMember(env, result, "encodingName", encodingInfo.first);
+    if (ANI_OK != env->Object_SetPropertyByName_Int(result, "confidence", encodingInfo.second)) {
+        HILOG_ERROR_I18N("CreateEncodingInfo: Set property confidence failed.");
+    }
+    return result;
 }
 
 ani_status I18nUnicodeAddon::BindContextUnicode(ani_env *env)
@@ -118,7 +131,7 @@ ani_status I18nUnicodeAddon::BindContextUnicode(ani_env *env)
         ani_native_function { "isLetter", nullptr, reinterpret_cast<void *>(IsLetterAddon) },
         ani_native_function { "isLowerCase", nullptr, reinterpret_cast<void *>(IsLowerCaseAddon) },
         ani_native_function { "isUpperCase", nullptr, reinterpret_cast<void *>(IsUpperCaseAddon) },
-        ani_native_function { "isUTF8CodeFromBuffer", nullptr, reinterpret_cast<void *>(IsUTF8CodeAddon) },
+        ani_native_function { "detectEncodingFromBuffer", nullptr, reinterpret_cast<void *>(DetectEncodingAddon) },
         ani_native_function { "getType", nullptr, reinterpret_cast<void *>(GetTypeAddon) },
     };
 

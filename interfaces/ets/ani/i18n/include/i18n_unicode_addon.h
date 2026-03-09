@@ -16,6 +16,7 @@
 #ifndef I18N_UNICODE_ADDON_H
 #define I18N_UNICODE_ADDON_H
 
+#include <string>
 #include "ani.h"
 
 namespace OHOS {
@@ -23,6 +24,9 @@ namespace Global {
 namespace I18n {
 class I18nUnicodeAddon {
 public:
+    static ani_status BindContextUnicode(ani_env *env);
+
+private:
     static ani_boolean IsDigitAddon(ani_env *env, [[maybe_unused]] ani_object object, ani_string ch);
     static ani_boolean IsSpaceCharAddon(ani_env *env, [[maybe_unused]] ani_object object, ani_string ch);
     static ani_boolean IsWhitespaceAddon(ani_env *env, [[maybe_unused]] ani_object object, ani_string ch);
@@ -31,10 +35,9 @@ public:
     static ani_boolean IsLetterAddon(ani_env *env, [[maybe_unused]] ani_object object, ani_string ch);
     static ani_boolean IsLowerCaseAddon(ani_env *env, [[maybe_unused]] ani_object object, ani_string ch);
     static ani_boolean IsUpperCaseAddon(ani_env *env, [[maybe_unused]] ani_object object, ani_string ch);
-    static ani_boolean IsUTF8CodeAddon(ani_env *env, [[maybe_unused]] ani_object object, ani_arraybuffer bytes,
-        ani_object confidence);
+    static ani_object DetectEncodingAddon(ani_env *env, [[maybe_unused]] ani_object object, ani_arraybuffer bytes);
+    static ani_object CreateEncodingInfo(ani_env *env, const std::pair<std::string, int32_t>& encodingInfo);
     static ani_string GetTypeAddon(ani_env *env, [[maybe_unused]] ani_object object, ani_string ch);
-    static ani_status BindContextUnicode(ani_env *env);
 };
 } // namespace I18n
 } // namespace Global
