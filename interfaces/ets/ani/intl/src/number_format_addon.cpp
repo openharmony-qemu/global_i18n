@@ -76,7 +76,7 @@ ani_object NumberFormatAddon::NumberFormat_ResolvedOptions(ani_env *env, ani_obj
     }
 
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":", &ctor)) {
         HILOG_ERROR_I18N("NumberFormatAddon::NumberFormat_ResolvedOptions: Find method '<ctor>' failed");
         return nullptr;
     }
