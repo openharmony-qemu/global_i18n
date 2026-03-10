@@ -40,10 +40,6 @@ static std::set<UCharDirection> RTLDirectionSet = {
     U_RIGHT_TO_LEFT_ISOLATE
 };
 
-const std::string UTF8_NAME = "UTF-8";
-const int32_t MAX_CONFIDENCE = 100;
-const int32_t MIM_CONFIDENCE = 0;
-
 bool IsDigit(const std::string &character)
 {
     icu::UnicodeString unicodeString(character.c_str());
@@ -104,7 +100,7 @@ bool IsUpperCase(const std::string &character)
     return u_isupper(char32);
 }
 
-std::pair<std::string, int32_t> GetEncodingInfo(const char* dataStream, size_t length)
+std::pair<std::string, int32_t> DetectEncoding(const char* dataStream, size_t length)
 {
     std::pair<std::string, int32_t> encodingInfo { "", 0 };
     if (dataStream == nullptr) {
@@ -113,55 +109,37 @@ std::pair<std::string, int32_t> GetEncodingInfo(const char* dataStream, size_t l
     UErrorCode status = U_ZERO_ERROR;
     UCharsetDetector* csdet = ucsdet_open(&status);
     if (U_FAILURE(status) || csdet == nullptr) {
-        HILOG_ERROR_I18N("GetEncodingInfo: Open csdet failed, code %{public}s.", u_errorName(status));
+        HILOG_ERROR_I18N("DetectEncoding: Open csdet failed, code %{public}s.", u_errorName(status));
         return encodingInfo;
     }
     ucsdet_setText(csdet, dataStream, static_cast<int32_t>(length), &status);
     if (U_FAILURE(status)) {
         ucsdet_close(csdet);
-        HILOG_ERROR_I18N("GetEncodingInfo: Set text failed, code %{public}s.", u_errorName(status));
+        HILOG_ERROR_I18N("DetectEncoding: Set text failed, code %{public}s.", u_errorName(status));
         return encodingInfo;
     }
     const UCharsetMatch* match = ucsdet_detect(csdet, &status);
     if (U_FAILURE(status) || match == nullptr) {
         ucsdet_close(csdet);
-        HILOG_ERROR_I18N("GetEncodingInfo: Detect failed, code %{public}s.", u_errorName(status));
+        HILOG_ERROR_I18N("DetectEncoding: Detect failed, code %{public}s.", u_errorName(status));
         return encodingInfo;
     }
     const char* name = ucsdet_getName(match, &status);
     if (U_FAILURE(status) || name == nullptr) {
         ucsdet_close(csdet);
-        HILOG_ERROR_I18N("GetEncodingInfo: Get name failed, code %{public}s.", u_errorName(status));
+        HILOG_ERROR_I18N("DetectEncoding: Get name failed, code %{public}s.", u_errorName(status));
         return encodingInfo;
     }
     encodingInfo.first = name;
     int32_t confidence = ucsdet_getConfidence(match, &status);
     if (U_FAILURE(status)) {
         ucsdet_close(csdet);
-        HILOG_ERROR_I18N("GetEncodingInfo: Get confidence failed, code %{public}s.", u_errorName(status));
+        HILOG_ERROR_I18N("DetectEncoding: Get confidence failed, code %{public}s.", u_errorName(status));
         return encodingInfo;
     }
     encodingInfo.second = confidence;
     ucsdet_close(csdet);
     return encodingInfo;
-}
-
-bool IsValidConfidence(int32_t confidence)
-{
-    return (confidence <= MAX_CONFIDENCE) && (confidence >= MIM_CONFIDENCE);
-}
-
-bool IsUTF8Code(const char* dataStream, size_t length, I18nErrorCode& errCode, int32_t confidence)
-{
-    if (!IsValidConfidence(confidence)) {
-        errCode = I18nErrorCode::INVALID_PARAM;
-        return false;
-    }
-    auto encodingInfo = GetEncodingInfo(dataStream, length);
-    if (encodingInfo.first != UTF8_NAME || encodingInfo.second < confidence) {
-        return false;
-    }
-    return true;
 }
 
 std::map<UCharCategory, std::string> categoryMap = {

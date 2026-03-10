@@ -362,6 +362,16 @@ namespace i18n {
         native getIndex(text: string): string;
     }
 
+    export interface EncodingInfo {
+        encodingName: string;
+        confidence: int;
+    }
+
+    export class EncodingInfoInner implements EncodingInfo {
+        encodingName: string;
+        confidence: int;
+    }
+
     export class Unicode {
         static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
 
@@ -373,9 +383,9 @@ namespace i18n {
         native static isLetter(ch: string): boolean;
         native static isLowerCase(ch: string): boolean;
         native static isUpperCase(ch: string): boolean;
-        native static isUTF8CodeFromBuffer(bytes: ArrayBuffer, confidence?: int): boolean;
-        static isUTF8Code(bytes: Uint8Array, confidence?: int): boolean {
-            return Unicode.isUTF8CodeFromBuffer(bytes.buffer, confidence);
+        native static detectEncodingFromBuffer(bytes: ArrayBuffer): EncodingInfo;
+        static detectEncoding(bytes: Uint8Array): EncodingInfo {
+            return Unicode.detectEncodingFromBuffer(bytes.buffer);
         }
         native static getType(ch: string): string;
     }

@@ -52,7 +52,7 @@ napi_value I18nUnicodeAddon::InitI18nUnicode(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("isLetter", IsLetterAddon),
         DECLARE_NAPI_STATIC_FUNCTION("isLowerCase", IsLowerCaseAddon),
         DECLARE_NAPI_STATIC_FUNCTION("isUpperCase", IsUpperCaseAddon),
-        DECLARE_NAPI_STATIC_FUNCTION("isUTF8Code", IsUTF8CodeAddon),
+        DECLARE_NAPI_STATIC_FUNCTION("detectEncoding", DetectEncodingAddon),
         DECLARE_NAPI_STATIC_FUNCTION("getType", GetTypeAddon),
     };
     napi_value constructor = nullptr;
@@ -383,47 +383,31 @@ napi_value I18nUnicodeAddon::IsUpperCaseAddon(napi_env env, napi_callback_info i
     return result;
 }
 
-napi_value I18nUnicodeAddon::IsUTF8CodeAddon(napi_env env, napi_callback_info info)
+napi_value I18nUnicodeAddon::DetectEncodingAddon(napi_env env, napi_callback_info info)
 {
-    size_t argc = 2;
-    napi_value argv[2] = { 0 };
-    napi_value thisVar = nullptr;
-    void *data = nullptr;
-    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    size_t argc = 1;
+    napi_value argv[1] = { 0 };
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("I18nUnicodeAddon::IsUTF8CodeAddon: get cb info failed.");
-        return VariableConvertor::CreateBoolean(env, false);
+        HILOG_ERROR_I18N("I18nUnicodeAddon::DetectEncodingAddon: get cb info failed.");
+        return nullptr;
     }
     if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "text", "", true);
-        return VariableConvertor::CreateBoolean(env, false);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "bytes", "", true);
+        return nullptr;
     }
     int32_t code = 0;
     std::pair<uint8_t*, size_t> uint8Array = VariableConvertor::GetUint8Array(env, argv[0], code);
     if (code != 0) {
         if (code == I18N_NOT_FOUND) {
-            ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "text", "Uint8Array", true);
+            ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "bytes", "Uint8Array", true);
         }
-        return VariableConvertor::CreateBoolean(env, false);
+        return nullptr;
     }
     const char* dataStream = reinterpret_cast<char*>(uint8Array.first);
 
-    int32_t confidence = (argc > 1) ? VariableConvertor::GetInt32(env, argv[1], code) : 0;
-    if (code != 0) {
-        if (code == I18N_NOT_FOUND) {
-            ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "confidence", "number", true);
-        }
-        return VariableConvertor::CreateBoolean(env, false);
-    }
-
-    I18nErrorCode errCode = I18nErrorCode::SUCCESS;
-    bool isUTF8Code = (argc > 1) ? IsUTF8Code(dataStream, uint8Array.second, errCode, confidence) :
-        IsUTF8Code(dataStream, uint8Array.second, errCode);
-    if (errCode == I18nErrorCode::INVALID_PARAM) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID_NEW, "confidence", "a valid confidence", true);
-        return VariableConvertor::CreateBoolean(env, false);
-    }
-    return VariableConvertor::CreateBoolean(env, isUTF8Code);
+    auto encodingInfo = DetectEncoding(dataStream, uint8Array.second);
+    return CreateEncodingInfo(env, encodingInfo);
 }
 
 napi_value I18nUnicodeAddon::GetTypeAddon(napi_env env, napi_callback_info info)
@@ -456,6 +440,29 @@ napi_value I18nUnicodeAddon::GetTypeAddon(napi_env env, napi_callback_info info)
     status = napi_create_string_utf8(env, type.c_str(), NAPI_AUTO_LENGTH, &result);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("GetTypeAddon: Create getType string value failed");
+        return nullptr;
+    }
+    return result;
+}
+
+napi_value I18nUnicodeAddon::CreateEncodingInfo(napi_env env, const std::pair<std::string, int32_t>& encodingInfo)
+{
+    napi_value result;
+    napi_status status = napi_create_object(env, &result);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("I18nUnicodeAddon::CreateEncodingInfo: Create object failed.");
+        return nullptr;
+    }
+    status = napi_set_named_property(env, result, "encodingName",
+        VariableConvertor::CreateString(env, encodingInfo.first));
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("I18nUnicodeAddon::CreateEncodingInfo: Set encodingName failed.");
+        return nullptr;
+    }
+    status = napi_set_named_property(env, result, "confidence",
+        VariableConvertor::CreateNumber(env, encodingInfo.second));
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("I18nUnicodeAddon::CreateEncodingInfo: Set confidence failed.");
         return nullptr;
     }
     return result;
