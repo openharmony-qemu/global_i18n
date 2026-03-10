@@ -28,6 +28,7 @@ using namespace OHOS::Global::I18n;
 constexpr uint32_t HOUR_FLAG = 4;
 constexpr uint32_t MINUTE_FLAG = 2;
 constexpr uint32_t SECOND_FLAG = 1;
+static std::mutex g_fieldsMapMutex;
 std::unordered_map<std::string, UCalendarDateFields> g_fieldsMap {
     { "era", UCAL_ERA },
     { "year", UCAL_YEAR },
@@ -253,7 +254,12 @@ int32_t FfiOHOSCalendarGet(int64_t id, const char* field)
         return 0;
     }
     std::string fieldName(field);
-    return instance->Get(g_fieldsMap[fieldName]);
+    UCalendarDateFields dateField;
+    {
+        std::lock_guard<std::mutex> lock(g_fieldsMapMutex);
+        dateField = g_fieldsMap[fieldName];
+    }
+    return instance->Get(dateField);
 }
 
 char* FfiOHOSCalendarGetDisplayName(int64_t id, const char* locale)
@@ -295,7 +301,12 @@ void FfiOHOSCalendarAdd(int64_t id, const char* field, int32_t amount, int32_t* 
     if (g_fieldsInFunctionAdd.find(fieldStr) == g_fieldsInFunctionAdd.end()) {
         *errcode = I18N_NOT_VALID;
     }
-    instance->Add(g_fieldsMap[fieldStr], amount);
+    UCalendarDateFields dateField;
+    {
+        std::lock_guard<std::mutex> lock(g_fieldsMapMutex);
+        dateField = g_fieldsMap[fieldStr];
+    }
+    instance->Add(dateField, amount);
 }
 
 double FfiOHOSCalendarGetTimeInMillis(int64_t id)
