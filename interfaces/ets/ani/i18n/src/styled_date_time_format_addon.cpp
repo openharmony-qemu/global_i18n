@@ -193,7 +193,7 @@ static ani_object CreateStyledFormatResult(ani_env *env, const std::pair<std::st
     }
 
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":", &ctor)) {
         HILOG_ERROR_I18N("CreateStyledFormatResult: Find method '<ctor>' failed");
         return nullptr;
     }
@@ -227,7 +227,7 @@ ani_object I18nStyledDateTimeFormatAddon::FormatToPats(ani_env *env, ani_object 
     }
 
     ani_method getms;
-    if (ANI_OK != env->Class_FindMethod(cls, "valueOf", nullptr, &getms)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "valueOf", ":l", &getms)) {
         HILOG_ERROR_I18N("I18nSimpleDateTimeFormatAddon::Format: Find method 'valueOf' failed");
         return nullptr;
     }

@@ -55,7 +55,7 @@ static ani_object CreateLocaleItem(ani_env *env, LocaleItem localeItem)
     }
 
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":", &ctor)) {
         HILOG_ERROR_I18N("CreateLocaleItem: Find method '<ctor>' failed");
         return nullptr;
     }
@@ -230,7 +230,7 @@ static ani_object CreateTimeZoneCityItem(ani_env *env, TimeZoneCityItem item)
     }
 
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":", &ctor)) {
         HILOG_ERROR_I18N("CreateTimeZoneCityItem: Find method '<ctor>' failed");
         return nullptr;
     }

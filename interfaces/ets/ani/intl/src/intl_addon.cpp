@@ -43,7 +43,7 @@ ani_string IntlAddon::DateTimeFormat_Format(ani_env *env, ani_object object, ani
     }
 
     ani_method getms;
-    if (ANI_OK != env->Class_FindMethod(cls, "valueOf", nullptr, &getms)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "valueOf", ":l", &getms)) {
         HILOG_ERROR_I18N("IntlAddon::DateTimeFormat_Format: Find method 'valueOf' failed");
         return nullptr;
     }
@@ -75,7 +75,7 @@ ani_string IntlAddon::DateTimeFormat_FormatRange(ani_env *env, ani_object object
     }
 
     ani_method getms;
-    if (ANI_OK != env->Class_FindMethod(cls, "valueOf", nullptr, &getms)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "valueOf", ":l", &getms)) {
         HILOG_ERROR_I18N("IntlAddon::DateTimeFormat_FormatRange: Find method 'valueOf' failed");
         return nullptr;
     }
@@ -121,7 +121,7 @@ ani_object IntlAddon::DateTimeFormat_ResolvedOptions(ani_env *env, ani_object ob
     }
 
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":", &ctor)) {
         HILOG_ERROR_I18N("IntlAddon::DateTimeFormat_ResolvedOptions: Find method '<ctor>' failed");
         return nullptr;
     }
@@ -179,7 +179,7 @@ ani_object IntlAddon::Collator_ResolvedOptions(ani_env *env, ani_object object)
     }
 
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":", &ctor)) {
         HILOG_ERROR_I18N("IntlAddon::Collator_ResolvedOptions: Find method '<ctor>' failed");
         return nullptr;
     }

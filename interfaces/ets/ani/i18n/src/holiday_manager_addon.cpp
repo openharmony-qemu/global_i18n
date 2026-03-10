@@ -88,7 +88,7 @@ static ani_object CreateHolidayLocalName(ani_env *env, HolidayLocalName localNam
     }
 
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":", &ctor)) {
         HILOG_ERROR_I18N("CreateHolidayLocalName: Find method '<ctor>' failed");
         return nullptr;
     }
@@ -150,7 +150,7 @@ static ani_object CreateHolidayInfoItem(ani_env *env, HolidayInfoItem item)
     }
 
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":", &ctor)) {
         HILOG_ERROR_I18N("CreateHolidayInfoItem: Find method '<ctor>' failed");
         return nullptr;
     }
