@@ -95,7 +95,7 @@ ani_object I18nUnicodeAddon::CreateEncodingInfo(ani_env *env, const std::pair<st
     }
 
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":", &ctor)) {
         HILOG_ERROR_I18N("CreateEncodingInfo: Find method '<ctor>' failed");
         return nullptr;
     }
