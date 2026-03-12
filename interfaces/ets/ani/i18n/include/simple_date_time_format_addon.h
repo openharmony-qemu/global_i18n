@@ -29,6 +29,8 @@ public:
     static ani_object GetSimpleDateTimeFormatBySkeleton(ani_env *env, ani_string skeleton, ani_object locale);
     static ani_string Format(ani_env *env, ani_object object, ani_object date);
     static ani_status BindContextSimpleDateTimeFormat(ani_env *env);
+    static bool IsSimpleDateTimeFormat(ani_env *env, ani_object dateTimeFormat);
+
     std::shared_ptr<SimpleDateTimeFormat> GetDateTimeFormat();
 
 private:

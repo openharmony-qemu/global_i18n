@@ -170,6 +170,23 @@ ani_status I18nSimpleDateTimeFormatAddon::BindContextSimpleDateTimeFormat(ani_en
     return ANI_OK;
 }
 
+bool I18nSimpleDateTimeFormatAddon::IsSimpleDateTimeFormat(ani_env *env, ani_object dateTimeFormat)
+{
+    static const char *className = "@ohos.i18n.i18n.SimpleDateTimeFormat";
+    ani_class cls;
+    if (ANI_OK != env->FindClass(className, &cls)) {
+        HILOG_ERROR_I18N("I18nSimpleDateTimeFormatAddon::IsSimpleDateTimeFormat: Find class failed.");
+        return false;
+    }
+
+    ani_boolean isSimpleDateTimeFormat;
+    if (ANI_OK != env->Object_InstanceOf(dateTimeFormat, cls, &isSimpleDateTimeFormat)) {
+        HILOG_ERROR_I18N("I18nSimpleDateTimeFormatAddon::IsSimpleDateTimeFormat: Get Instance failed");
+        return false;
+    }
+    return isSimpleDateTimeFormat;
+}
+
 std::shared_ptr<SimpleDateTimeFormat> I18nSimpleDateTimeFormatAddon::GetDateTimeFormat()
 {
     return simpleDateTimeFormat_;

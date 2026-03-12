@@ -50,6 +50,7 @@ napi_value JSUtils::CreateEmptyObject(napi_env env)
     napi_status status = napi_create_object(env, &object);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("JSUtils::CreateEmptyObject: Create empty object failed.");
+        return nullptr;
     }
     return object;
 }

@@ -86,10 +86,11 @@ napi_value StyledDateTimeFormatAddon::constructor(napi_env env, napi_callback_in
 
     IntlDateTimeFormatAddon* intlFormat = nullptr;
     SimpleDateTimeFormatAddon* simpleFormat = nullptr;
-    ParseDateTimeFormat(env, argv[0], &intlFormat, &simpleFormat);
-    if (!intlFormat && !simpleFormat) {
+    SymbolDateTimeFormatAddon* symbolFormat = nullptr;
+    ParseDateTimeFormat(env, argv[0], &intlFormat, &simpleFormat, &symbolFormat);
+    if (!intlFormat && !simpleFormat && !symbolFormat) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "dateTimeFormat",
-            "SimpleDateTimeFormat or Intl.DateTimeFormat", true);
+            "SimpleDateTimeFormat, Intl.DateTimeFormat or i18n.SymbolDateTimeFormat", true);
         return nullptr;
     }
 
@@ -99,7 +100,7 @@ napi_value StyledDateTimeFormatAddon::constructor(napi_env env, napi_callback_in
         HILOG_ERROR_I18N("StyledDateTimeFormatAddon::constructor: napi_wrap error.");
         return nullptr;
     }
-    if (!obj->InitStyledFormatContext(env, argv[1], intlFormat, simpleFormat)) {
+    if (!obj->InitStyledFormatContext(env, argv[1], intlFormat, simpleFormat, symbolFormat)) {
         return nullptr;
     }
     obj.release();
@@ -107,7 +108,8 @@ napi_value StyledDateTimeFormatAddon::constructor(napi_env env, napi_callback_in
 }
 
 void StyledDateTimeFormatAddon::ParseDateTimeFormat(napi_env env, napi_value value,
-    IntlDateTimeFormatAddon** intlFormat, SimpleDateTimeFormatAddon** simpleFormat)
+    IntlDateTimeFormatAddon** intlFormat, SimpleDateTimeFormatAddon** simpleFormat,
+    SymbolDateTimeFormatAddon** symbolFormat)
 {
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_status status = napi_typeof(env, value, &valueType);
@@ -131,16 +133,25 @@ void StyledDateTimeFormatAddon::ParseDateTimeFormat(napi_env env, napi_value val
             *simpleFormat = nullptr;
             HILOG_ERROR_I18N("StyledDateTimeFormatAddon::ParseDateTimeFormat: simpleFormat unwrap failed.");
         }
+    } else if (SymbolDateTimeFormatAddon::IsSymbolDateTimeFormat(env, value)) {
+        status = SymbolDateTimeFormatAddon::UnwrapSymbolDateTimeFormat(env, value, symbolFormat);
+        if (status != napi_ok && symbolFormat != nullptr) {
+            *symbolFormat = nullptr;
+            HILOG_ERROR_I18N("StyledDateTimeFormatAddon::ParseDateTimeFormat: symbolFormat unwrap failed.");
+        }
     }
 }
 
 bool StyledDateTimeFormatAddon::InitStyledFormatContext(napi_env env, napi_value options,
-    IntlDateTimeFormatAddon* intlFormat, SimpleDateTimeFormatAddon* simpleFormat)
+    IntlDateTimeFormatAddon* intlFormat, SimpleDateTimeFormatAddon* simpleFormat,
+    SymbolDateTimeFormatAddon* symbolFormat)
 {
     if (intlFormat) {
         styledDateTimeFormat_ = std::make_unique<StyledDateTimeFormat>(nullptr, intlFormat->GetDateTimeFormat());
     } else if (simpleFormat) {
         styledDateTimeFormat_ = std::make_unique<StyledDateTimeFormat>(simpleFormat->GetDateTimeFormat(), nullptr);
+    } else if (symbolFormat) {
+        styledDateTimeFormat_ = std::make_unique<StyledDateTimeFormat>(nullptr, symbolFormat->GetDateTimeFormat());
     }
 
     ParseOptions(env, options);

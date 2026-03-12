@@ -126,3 +126,36 @@ void ErrorUtil::AniThrow(ani_env *env, int32_t errCode, const std::string &value
         return;
     }
 }
+
+void ErrorUtil::AniThrowUndefined(ani_env *env, const std::string &errMessage)
+{
+    if (env == nullptr) {
+        HILOG_ERROR_I18N("ErrorUtil::AniThrowUndefined: null env.");
+        return;
+    }
+    ani_status status = ANI_ERROR;
+    ani_class cls {};
+    if ((status = env->FindClass("@ohos.base.BusinessError", &cls)) != ANI_OK) {
+        HILOG_ERROR_I18N("ErrorUtil::AniThrowUndefined: FindClass failed %{public}d", status);
+        return;
+    }
+    ani_method method {};
+    if ((status = env->Class_FindMethod(cls, "<ctor>", "iC{escompat.Error}:", &method)) != ANI_OK) {
+        HILOG_ERROR_I18N("ErrorUtil::AniThrowUndefined: Class_FindMethod failed %{public}d", status);
+        return;
+    }
+    ani_object error = WrapAniError(env, errMessage);
+    if (error == nullptr) {
+        HILOG_ERROR_I18N("ErrorUtil::AniThrowUndefined: error is null");
+        return;
+    }
+    ani_object obj = nullptr;
+    if ((status = env->Object_New(cls, method, &obj, nullptr, error)) != ANI_OK) {
+        HILOG_ERROR_I18N("ErrorUtil::AniThrowUndefined: Object_New failed %{public}d", status);
+        return;
+    }
+    if (ANI_OK != env->ThrowError(static_cast<ani_error>(error))) {
+        HILOG_ERROR_I18N("ErrorUtil::AniThrowUndefined: Throw error failed");
+        return;
+    }
+}

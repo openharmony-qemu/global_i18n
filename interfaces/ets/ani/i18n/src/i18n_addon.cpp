@@ -32,6 +32,7 @@
 #include "simple_number_format_addon.h"
 #include "styled_date_time_format_addon.h"
 #include "styled_number_format_addon.h"
+#include "symbol_date_time_format_addon.h"
 #include "system_locale_manager_addon.h"
 #include "variable_converter.h"
 #include "zone_offset_transition_addon.h"
@@ -838,6 +839,10 @@ ani_status BindContext(ani_env *env)
 
     status = AdvancedMeasureFormatAddon::BindContextAdvancedMeasureFormat(env);
     if (status != ANI_OK) {
+        return status;
+    }
+
+    if (I18nSymbolDateTimeFormatAddon::BindContextSymbolDateTimeFormat(env) != ANI_OK) {
         return status;
     }
 

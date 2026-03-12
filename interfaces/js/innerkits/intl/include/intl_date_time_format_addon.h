@@ -32,6 +32,10 @@ public:
     static bool IsIntlDateTimeFormat(napi_env env, napi_value argv);
     static napi_status UnwrapIntlDateTimeFormat(napi_env env, napi_value value,
         IntlDateTimeFormatAddon** dateTimeFormat);
+    static napi_value CreateDateTimeFormatPart(napi_env env,
+        const std::vector<std::unordered_map<std::string, std::string>>& parts);
+    static napi_value CreateResolvedOptions(napi_env env, const std::unordered_map<std::string, std::string>& configs);
+    static napi_value SupportedLocalesOf(napi_env env, napi_callback_info info);
 
 private:
     static void Destructor(napi_env env, void* nativeObject, void* hint);
@@ -47,12 +51,7 @@ private:
     static napi_value FormatRangeToParts(napi_env env, napi_callback_info info);
     static napi_value ToString(napi_env env, napi_callback_info info);
     static napi_value ResolvedOptions(napi_env env, napi_callback_info info);
-    static napi_value SupportedLocalesOf(napi_env env, napi_callback_info info);
-
     static bool GetDateTime(napi_env env, napi_value time, double& milliseconds);
-    static napi_value CreateFormatPart(napi_env env,
-        const std::vector<std::pair<std::string, std::string>>& formatResult);
-    static napi_value CreateResolvedOptions(napi_env env, const std::unordered_map<std::string, std::string>& configs);
 
     static constexpr napi_type_tag TYPE_TAG = { 0xd4d19fabc19f4cc0, 0x8294da532c5c4104 };
 

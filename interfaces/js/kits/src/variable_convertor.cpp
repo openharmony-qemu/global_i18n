@@ -542,6 +542,17 @@ std::pair<uint8_t*, size_t> VariableConvertor::GetUint8Array(napi_env env, napi_
     }
     return { static_cast<uint8_t*>(data), length };
 }
+
+bool VariableConvertor::IsUndefined(napi_env env, napi_value value)
+{
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    napi_status status = napi_typeof(env, value, &valueType);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("VariableConvertor::IsUndefined: Get type failed.");
+        return false;
+    }
+    return valueType == napi_valuetype::napi_undefined;
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
