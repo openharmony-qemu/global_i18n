@@ -53,14 +53,17 @@ struct FormatPartParam {
     std::string napiType;
 };
 
+typedef std::vector<std::unordered_map<std::string, std::string>> NumberFormatParts;
+
 class NumberFormat {
 public:
     NumberFormat(const std::vector<std::string> &localeTags, std::map<std::string, std::string> &configs);
     NumberFormat(const std::vector<std::string> &localeTags,
-        std::map<std::string, std::string> &configs, bool flag);
+        std::map<std::string, std::string> &configs, std::string& errMessage);
     virtual ~NumberFormat();
     std::string Format(double number);
     std::string FormatBigInt(const std::string &number);
+    std::string FormatLong(int64_t number);
     bool IsRelativeTimeFormat(double number);
     icu::number::FormattedNumber FormatToFormattedNumber(double number);
     icu::FormattedRelativeDateTime FormatToFormattedRelativeDateTime(double number);
@@ -81,9 +84,8 @@ public:
     void SetUnitUsage(const std::string& value);
     void FormatToParts(std::vector<std::vector<std::string>> &result);
     void FormatToParts(double number, std::vector<std::vector<std::string>> &result);
-    void FormatBigIntToParts(std::string &number, std::vector<std::vector<std::string>> &result);
-    void FormatRangeToParts(const double &first, const double &second,
-        std::vector<std::vector<std::string>> &result);
+    void FormatBigIntToParts(const std::string &number, std::vector<std::vector<std::string>> &result);
+    void FormatRangeToParts(double first, double second, std::vector<std::vector<std::string>> &result);
     static std::vector<std::string> SupportedLocalesOf(const std::vector<std::string> &requestLocales,
         const std::map<std::string, std::string> &configs, I18nErrorCode &status);
     static std::string GetIcuDefaultLocale();
@@ -91,8 +93,26 @@ public:
     static std::string GetNumberPatternSample(const std::string& localeTag,
         const std::pair<std::string, std::string>& numberPattern);
 
-private:
+    static const std::string PART_TYPE_TAG;
+    static const std::string PART_VALUE_TAG;
+    static const std::string PART_SOURCE_TAG;
+
+protected:
+    icu::number::FormattedNumber FormatDoubleToFormattedNumber(double number);
+    icu::number::FormattedNumber FormatDecimalToFormattedNumber(const std::string &number);
+    std::string FormatFormattableRange(icu::Formattable first, icu::Formattable second);
+    NumberFormatParts FormatFormattableRangeToParts(icu::Formattable first, icu::Formattable second);
+    static NumberFormatParts ParseNumberFormatPart(const icu::FormattedValue& formatted,
+        bool calculateSources);
+
+    icu::number::LocalizedNumberFormatter numberFormat;
+    icu::number::UnlocalizedNumberFormatter styleFormatter;
+    icu::number::UnlocalizedNumberFormatter styleRangeFormatter;
     icu::Locale locale;
+    icu::DecimalFormatSymbols* numberFormatSymbol = nullptr;
+
+private:
+    
     std::string currency;
     std::string currencySign = "standard";
     std::string currencyDisplayString;
@@ -127,8 +147,6 @@ private:
     bool fromArkTs = false;
     std::unique_ptr<LocaleInfo> localeInfo = nullptr;
     std::unique_ptr<RelativeTimeFormat> relativeTimeFormat = nullptr;
-    icu::number::LocalizedNumberFormatter numberFormat;
-    icu::number::UnlocalizedNumberFormatter styleFormatter;
     icu::number::Notation notation = icu::number::Notation::simple();
     UNumberRoundingPriority roundingPriority = UNumberRoundingPriority::UNUM_ROUNDING_PRIORITY_STRICT;
     UNumberFormatRoundingMode roundingMode = UNumberFormatRoundingMode::UNUM_ROUND_HALFUP;
@@ -167,6 +185,10 @@ private:
     static std::string CheckRoundingOptions(std::map<std::string, std::string> &options, int32_t &code);
     static std::string GetCurrencyFromConfig(const std::string& currency);
     static std::vector<std::string> GetAvailableNumberSystems();
+    static NumberFormatParts CreateNumberFormatPart(const std::vector<std::tuple<int32_t, int32_t, int32_t>>& spans,
+        const icu::UnicodeString& formattedString, const std::pair<int32_t, int32_t>& startRangeSource,
+        const std::pair<int32_t, int32_t>& endRangeSource, bool calculateSources);
+    static std::string GetFieldType(int32_t field, int32_t start, const icu::UnicodeString& text);
 
     void CreateRelativeTimeFormat(const std::string& locale);
     void ParseConfigs(std::map<std::string, std::string> &configs);
@@ -204,7 +226,7 @@ private:
     void AddFormatParts(std::string typeString, std::vector<std::vector<std::string>> &result,
         icu::UnicodeString &formatResult, int32_t start, int32_t end);
     std::string GetSubString(icu::UnicodeString &formatResult, int32_t start, int32_t end);
-    icu::number::FormattedNumber FormatDecimalToFormattedNumber(const std::string &number);
+    icu::number::FormattedNumber FormatLongToFormattedNumber(int64_t number);
     void FormattedNumberParts(icu::number::FormattedNumber &formattedNumber,
         std::vector<std::vector<std::string>> &result, const std::string &napiType, const double &number);
     void FindAllFormatParts(icu::FormattedValue &formattedNumber, std::vector<std::vector<std::string>> &result,
@@ -213,8 +235,6 @@ private:
         const double &first, const double &second, icu::UnicodeString &formatResult);
     void SetEveryFormatPartItem(icu::ConstrainedFieldPosition &cfpo, icu::UnicodeString &formatResult,
         std::vector<std::vector<std::string>> &result, FormatPartParam &param);
-    void FormatableRangeToParts(double first, double second,
-        std::vector<std::vector<std::string>> &result);
     double GetBigIntFieldType(const std::string &bigintStr);
     void DealWithUnitUsage(bool isFormatRange, double& firstNumber, double& secondNumber);
     bool DealWithUnitConvert(double& finalNumber, std::string& finalUnit);

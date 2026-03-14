@@ -62,6 +62,7 @@ ohos_shared_library("i18n") {
     "src/styled_date_time_format_addon.cpp",
     "src/styled_number_format_addon.cpp",
     "src/symbol_date_time_format_addon.cpp",
+    "src/symbol_number_format_addon.cpp",
     "src/system_locale_manager_addon.cpp",
     "src/variable_convertor.cpp",
     "src/zone_offset_transition_addon.cpp",

@@ -36,12 +36,23 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
+const std::string NumberFormat::PART_TYPE_TAG = "type";
+const std::string NumberFormat::PART_VALUE_TAG = "value";
+const std::string NumberFormat::PART_SOURCE_TAG = "source";
 const char* NumberFormat::DEVICE_TYPE_NAME = "const.product.devicetype";
 std::mutex NumberFormat::numToCurrencyMutex;
 bool NumberFormat::initISO4217 = false;
 std::unordered_map<std::string, std::string> NumberFormat::numToCurrency = {};
 bool NumberFormat::icuInitialized = NumberFormat::Init();
 static const double DEFAULT_SAMPLE_NUMBER = 12345.67;
+constexpr int32_t INTL_NUMBER_RANGE_START = 0;
+constexpr int32_t INTL_NUMBER_RANGE_END = 1;
+const std::string START_RANGE_SOURCE = "startRange";
+const std::string END_RANGE_SOURCE = "endRange";
+const std::string SHARED_SOURCE = "shared";
+const std::string LITERAL_TYPE = "literal";
+const std::string PLUS_SIGN_TYPE = "plusSign";
+const std::string MINUS_SIGN_TYPE = "minusSign";
 
 std::unordered_map<std::string, UNumberUnitWidth> NumberFormat::unitStyle = {
     { "long", UNumberUnitWidth::UNUM_UNIT_WIDTH_FULL_NAME },
@@ -158,6 +169,22 @@ static std::unordered_set<std::string> UNIT_USAGE_TEMPERATURE = {
     "temperature-weather"
 };
 
+static std::unordered_map<UNumberFormatFields, std::string> NUMBER_FORMAT_FIELD_TO_TYPE = {
+    { UNUM_INTEGER_FIELD, "integer" },
+    { UNUM_FRACTION_FIELD, "fraction" },
+    { UNUM_DECIMAL_SEPARATOR_FIELD, "DECIMAL_SEPARATOR_FIELD" },
+    { UNUM_EXPONENT_SYMBOL_FIELD, "exponentSeparator" },
+    { UNUM_EXPONENT_SIGN_FIELD, "exponentMinusSign" },
+    { UNUM_EXPONENT_FIELD, "exponentInteger" },
+    { UNUM_GROUPING_SEPARATOR_FIELD, "group" },
+    { UNUM_CURRENCY_FIELD, "currency" },
+    { UNUM_PERCENT_FIELD, "percentSign" },
+    { UNUM_PERMILL_FIELD, "perMille" },
+    { UNUM_COMPACT_FIELD, "compact" },
+    { UNUM_MEASURE_UNIT_FIELD, "unit" },
+    { UNUM_APPROXIMATELY_SIGN_FIELD, "approximatelySign" }
+};
+
 NumberFormat::NumberFormat(const std::vector<std::string> &localeTags, std::map<std::string, std::string> &configs)
 {
     SetDefaultStyle();
@@ -167,9 +194,18 @@ NumberFormat::NumberFormat(const std::vector<std::string> &localeTags, std::map<
 }
 
 NumberFormat::NumberFormat(const std::vector<std::string> &localeTags,
-    std::map<std::string, std::string> &configs, bool flag)
+    std::map<std::string, std::string> &configs, std::string& errMessage)
 {
-    fromArkTs = flag;
+    fromArkTs = true;
+    errMessage = LocaleHelper::CheckParamLocales(localeTags);
+    if (!errMessage.empty()) {
+        return;
+    }
+    int32_t code = 0;
+    errMessage = NumberFormat::CheckNumberFormatOptions(configs, code);
+    if (code != 0) {
+        return;
+    }
     ResolveLocaleTags(localeTags, configs);
     std::string defaultLocale = LocaleHelper::DefaultLocale();
     CreateNumberFormatWithDefaultLocale(defaultLocale, configs);
@@ -234,14 +270,17 @@ void NumberFormat::CreateNumberFormatWithDefaultLocale(const std::string &system
 
 NumberFormat::~NumberFormat()
 {
+    if (numberFormatSymbol != nullptr) {
+        delete numberFormatSymbol;
+    }
 }
 
 void NumberFormat::InitNumberFormat()
 {
-    icu::number::UnlocalizedNumberFormatter tempFormatter = icu::number::NumberFormatter::with();
-    InitProperties(tempFormatter);
-    styleFormatter = tempFormatter;
-    numberFormat = tempFormatter.locale(locale);
+    styleFormatter = icu::number::NumberFormatter::with();
+    InitProperties(styleFormatter);
+    styleRangeFormatter = styleFormatter;
+    numberFormat = styleFormatter.locale(locale);
 }
 
 void NumberFormat::CreateRelativeTimeFormat(const std::string& locale)
@@ -277,24 +316,22 @@ void NumberFormat::InitNumberPattern(icu::number::UnlocalizedNumberFormatter &fo
         HILOG_ERROR_I18N("NumberFormat::InitNumberPattern: Create icu::Locale failed.");
         return;
     }
-    icu::DecimalFormatSymbols* decimalFormatSymbols = new icu::DecimalFormatSymbols(icuLocale, status);
-    if (U_FAILURE(status) || decimalFormatSymbols == nullptr) {
-        delete decimalFormatSymbols;
+    numberFormatSymbol = new icu::DecimalFormatSymbols(icuLocale, status);
+    if (U_FAILURE(status) || numberFormatSymbol == nullptr) {
         HILOG_ERROR_I18N("NumberFormat::InitNumberPattern: Create icu::DecimalFormatSymbols failed.");
         return;
     }
     if (groupingSymbol.empty()) {
         formatter = formatter.grouping(UNumberGroupingStrategy::UNUM_GROUPING_OFF);
     } else {
-        decimalFormatSymbols->setSymbol(icu::DecimalFormatSymbols::ENumberFormatSymbol::kGroupingSeparatorSymbol,
+        numberFormatSymbol->setSymbol(icu::DecimalFormatSymbols::ENumberFormatSymbol::kGroupingSeparatorSymbol,
             groupingSymbol.c_str());
     }
     if (!decimalSymbol.empty()) {
-        decimalFormatSymbols->setSymbol(icu::DecimalFormatSymbols::ENumberFormatSymbol::kDecimalSeparatorSymbol,
+        numberFormatSymbol->setSymbol(icu::DecimalFormatSymbols::ENumberFormatSymbol::kDecimalSeparatorSymbol,
             decimalSymbol.c_str());
     }
-    formatter = formatter.symbols(*decimalFormatSymbols);
-    delete decimalFormatSymbols;
+    formatter = formatter.symbols(*numberFormatSymbol);
 }
 
 void NumberFormat::InitCurrencyProperties(icu::number::UnlocalizedNumberFormatter &formatter)
@@ -669,7 +706,7 @@ void NumberFormat::SetUnit(std::string &preferredUnit)
     for (icu::MeasureUnit curUnit : unitArray) {
         if (!strcmp(curUnit.getSubtype(), preferredUnit.c_str())) {
             numberFormat = numberFormat.unit(curUnit);
-            styleFormatter = styleFormatter.unit(curUnit);
+            styleRangeFormatter = styleRangeFormatter.unit(curUnit);
         }
     }
 }
@@ -706,6 +743,18 @@ std::string NumberFormat::FormatBigInt(const std::string &number)
     return PseudoLocalizationProcessor(result);
 }
 
+std::string NumberFormat::FormatLong(int64_t number)
+{
+    std::string result;
+    icu::number::FormattedNumber formattedNumber = FormatLongToFormattedNumber(number);
+    UErrorCode status = U_ZERO_ERROR;
+    icu::UnicodeString formatResult = formattedNumber.toString(status);
+    if (U_SUCCESS(status)) {
+        formatResult.toUTF8String(result);
+    }
+    return PseudoLocalizationProcessor(result);
+}
+
 void NumberFormat::FormatToParts(std::vector<std::vector<std::string>> &result)
 {
     double number = uprv_getNaN();
@@ -713,7 +762,7 @@ void NumberFormat::FormatToParts(std::vector<std::vector<std::string>> &result)
     FormattedNumberParts(formattedNumber, result, "nan", number);
 }
 
-void NumberFormat::FormatBigIntToParts(std::string &number, std::vector<std::vector<std::string>> &result)
+void NumberFormat::FormatBigIntToParts(const std::string &number, std::vector<std::vector<std::string>> &result)
 {
     icu::number::FormattedNumber formattedNumber = FormatDecimalToFormattedNumber(number);
     double numDouble = GetBigIntFieldType(number);
@@ -901,6 +950,20 @@ bool NumberFormat::IsRelativeTimeFormat(double number, std::string &unitForConve
     return false;
 }
 
+icu::number::FormattedNumber NumberFormat::FormatDoubleToFormattedNumber(double number)
+{
+    if (!createSuccess) {
+        return {};
+    }
+    UErrorCode status = U_ZERO_ERROR;
+    icu::number::FormattedNumber formattedNumber = numberFormat.formatDouble(number, status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("NumberFormat::FormatDoubleToFormattedNumber: formatDouble failed.");
+        return {};
+    }
+    return formattedNumber;
+}
+
 icu::number::FormattedNumber NumberFormat::FormatDecimalToFormattedNumber(const std::string &number)
 {
     if (!createSuccess) {
@@ -911,6 +974,20 @@ icu::number::FormattedNumber NumberFormat::FormatDecimalToFormattedNumber(const 
         numberFormat.formatDecimal(icu::StringPiece(number), status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("FormatDecimalToFormattedNumber: format %{public}s failed.", number.c_str());
+        return {};
+    }
+    return formattedNumber;
+}
+
+icu::number::FormattedNumber NumberFormat::FormatLongToFormattedNumber(int64_t number)
+{
+    if (!createSuccess) {
+        return {};
+    }
+    UErrorCode status = U_ZERO_ERROR;
+    icu::number::FormattedNumber formattedNumber = numberFormat.formatInt(number, status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("FormatLongToFormattedNumber: formatInt failed.");
         return {};
     }
     return formattedNumber;
@@ -958,7 +1035,7 @@ std::string NumberFormat::FormatRange(double start, double end)
     }
     NumberFormat::DealWithUnitUsage(true, start, end);
     icu::number::LocalizedNumberRangeFormatter tempNumberRangeFormat = icu::number::NumberRangeFormatter::with()
-        .numberFormatterBoth(styleFormatter)
+        .numberFormatterBoth(styleRangeFormatter)
         .locale(locale);
     UErrorCode status = U_ZERO_ERROR;
     icu::number::FormattedNumberRange numberRange = tempNumberRangeFormat.formatFormattableRange(start, end, status);
@@ -978,12 +1055,17 @@ std::string NumberFormat::FormatRange(double start, double end)
 
 std::string NumberFormat::FormatJsRange(double first, double second)
 {
+    return FormatFormattableRange(icu::Formattable(first), icu::Formattable(second));
+}
+
+std::string NumberFormat::FormatFormattableRange(icu::Formattable first, icu::Formattable second)
+{
     if (!createSuccess) {
         HILOG_ERROR_I18N("FormatRange: init numberRangeFormat failed.");
         return PseudoLocalizationProcessor("");
     }
     icu::number::LocalizedNumberRangeFormatter tempNumberRangeFormat = icu::number::NumberRangeFormatter::with()
-        .numberFormatterBoth(styleFormatter)
+        .numberFormatterBoth(styleRangeFormatter)
         .locale(locale);
     UErrorCode status = U_ZERO_ERROR;
     icu::number::FormattedNumberRange numberRange =
@@ -1002,13 +1084,7 @@ std::string NumberFormat::FormatJsRange(double first, double second)
     return PseudoLocalizationProcessor(result);
 }
 
-void NumberFormat::FormatRangeToParts(const double &first, const double &second,
-    std::vector<std::vector<std::string>> &result)
-{
-    FormatableRangeToParts(first, second, result);
-}
-
-void NumberFormat::FormatableRangeToParts(double first, double second,
+void NumberFormat::FormatRangeToParts(double first, double second,
     std::vector<std::vector<std::string>> &result)
 {
     if (!createSuccess) {
@@ -1016,7 +1092,7 @@ void NumberFormat::FormatableRangeToParts(double first, double second,
         return;
     }
     icu::number::LocalizedNumberRangeFormatter tempNumberRangeFormat = icu::number::NumberRangeFormatter::with()
-        .numberFormatterBoth(styleFormatter)
+        .numberFormatterBoth(styleRangeFormatter)
         .locale(locale);
     UErrorCode status = U_ZERO_ERROR;
     icu::number::FormattedNumberRange numberRange =
@@ -1031,6 +1107,122 @@ void NumberFormat::FormatableRangeToParts(double first, double second,
         return;
     }
     FindAllFormatParts(numberRange, result, first, second, res);
+}
+
+NumberFormatParts NumberFormat::FormatFormattableRangeToParts(icu::Formattable first, icu::Formattable second)
+{
+    if (!createSuccess) {
+        HILOG_ERROR_I18N("NumberFormat::FormatFormattableRangeToParts: Init failed.");
+        return {};
+    }
+    icu::number::LocalizedNumberRangeFormatter tempNumberRangeFormat = icu::number::NumberRangeFormatter::with()
+        .numberFormatterBoth(styleRangeFormatter)
+        .locale(locale);
+    UErrorCode status = U_ZERO_ERROR;
+    icu::number::FormattedNumberRange numberRange =
+        tempNumberRangeFormat.formatFormattableRange(first, second, status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("NumberFormat::FormatFormattableRangeToParts: formatFormattableRange failed.");
+        return {};
+    }
+    return ParseNumberFormatPart(numberRange, true);
+}
+
+NumberFormatParts NumberFormat::ParseNumberFormatPart(const icu::FormattedValue& formatted,
+    bool calculateSources)
+{
+    UErrorCode status = U_ZERO_ERROR;
+    icu::UnicodeString formattedString = formatted.toString(status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("NumberFormat::ParseNumberFormatPart: formatted toString failed.");
+        return {};
+    }
+
+    std::pair<int32_t, int32_t> startRangeSource = std::make_pair(0, 0);
+    std::pair<int32_t, int32_t> endRangeSource = std::make_pair(0, 0);
+
+    std::vector<std::tuple<int32_t, int32_t, int32_t>> spans;
+    spans.emplace_back(std::make_tuple(-1, 0, formattedString.length()));
+
+    icu::ConstrainedFieldPosition cfpos;
+    while (formatted.nextPosition(cfpos, status) != 0) {
+        if (U_FAILURE(status)) {
+            HILOG_ERROR_I18N("NumberFormat::ParseNumberFormatPart: nextPosition failed.");
+            return {};
+        }
+        int32_t cat = cfpos.getCategory();
+        int32_t field = cfpos.getField();
+        int32_t start = cfpos.getStart();
+        int32_t limit = cfpos.getLimit();
+        if (cat == UFIELD_CATEGORY_NUMBER_RANGE_SPAN) {
+            if (field == INTL_NUMBER_RANGE_START) {
+                startRangeSource.first = start;
+                startRangeSource.second = limit;
+            } else if (field == INTL_NUMBER_RANGE_END) {
+                endRangeSource.first = start;
+                endRangeSource.second = limit;
+            }
+        } else {
+            spans.emplace_back(field, start, limit);
+        }
+    }
+    return CreateNumberFormatPart(spans, formattedString, startRangeSource, endRangeSource, calculateSources);
+}
+
+NumberFormatParts NumberFormat::CreateNumberFormatPart(const std::vector<std::tuple<int32_t, int32_t, int32_t>>& spans,
+    const icu::UnicodeString& formattedString, const std::pair<int32_t, int32_t>& startRangeSource,
+    const std::pair<int32_t, int32_t>& endRangeSource, bool calculateSources)
+{
+    NumberFormatParts parts(spans.size());
+    auto contains = [](std::pair<int32_t, int32_t> gold, std::pair<int32_t, int32_t> request) {
+        return gold.first <= request.first && gold.second >= request.second;
+    };
+    for (size_t i = 0; i < spans.size(); i++) {
+        auto [field, start, limit] = spans[i];
+        std::unordered_map<std::string, std::string> part;
+
+        std::string type = GetFieldType(field, start, formattedString);
+        part.insert(std::make_pair(PART_TYPE_TAG, type));
+
+        icu::UnicodeString sub;
+        formattedString.extractBetween(start, limit, sub);
+        std::string value;
+        sub.toUTF8String(value);
+        part.insert(std::make_pair(PART_VALUE_TAG, value));
+
+        if (calculateSources) {
+            std::string source = SHARED_SOURCE;
+            auto request = std::make_pair(start, limit);
+            if (contains(startRangeSource, request)) {
+                source = START_RANGE_SOURCE;
+            } else if (contains(endRangeSource, request)) {
+                source = END_RANGE_SOURCE;
+            }
+            part.insert(std::make_pair(PART_SOURCE_TAG, source));
+        }
+        parts[i] = part;
+    }
+    return parts;
+}
+
+std::string NumberFormat::GetFieldType(int32_t field, int32_t start, const icu::UnicodeString& text)
+{
+    if (field == -1) {
+        return LITERAL_TYPE;
+    }
+    UNumberFormatFields numberFormatField = static_cast<UNumberFormatFields>(field);
+    auto iter = NUMBER_FORMAT_FIELD_TO_TYPE.find(numberFormatField);
+    if (iter != NUMBER_FORMAT_FIELD_TO_TYPE.end()) {
+        return iter->second;
+    }
+    if (numberFormatField != UNUM_SIGN_FIELD) {
+        HILOG_ERROR_I18N("NumberFormat::GetFieldType: Invalid field %{public}d.", field);
+        return "";
+    }
+    if (text.charAt(start) == '+') {
+        return PLUS_SIGN_TYPE;
+    }
+    return MINUS_SIGN_TYPE;
 }
 
 void NumberFormat::GetResolvedOptions(std::map<std::string, std::string> &map, bool setDefault)
@@ -1219,8 +1411,8 @@ void NumberFormat::SetPrecisionWithByte(double number, const std::string& finalU
     }
     if (FractionDigits != -1) {
         numberFormat = numberFormat.precision(icu::number::Precision::minMaxFraction(FractionDigits, FractionDigits));
-        styleFormatter =
-            styleFormatter.precision(icu::number::Precision::minMaxFraction(FractionDigits, FractionDigits));
+        styleRangeFormatter =
+            styleRangeFormatter.precision(icu::number::Precision::minMaxFraction(FractionDigits, FractionDigits));
     }
 }
 

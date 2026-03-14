@@ -32,7 +32,7 @@ public:
     static bool IsIntlDateTimeFormat(napi_env env, napi_value argv);
     static napi_status UnwrapIntlDateTimeFormat(napi_env env, napi_value value,
         IntlDateTimeFormatAddon** dateTimeFormat);
-    static napi_value CreateDateTimeFormatPart(napi_env env,
+    static napi_value CreateFormatPart(napi_env env,
         const std::vector<std::unordered_map<std::string, std::string>>& parts);
     static napi_value CreateResolvedOptions(napi_env env, const std::unordered_map<std::string, std::string>& configs);
     static napi_value SupportedLocalesOf(napi_env env, napi_callback_info info);

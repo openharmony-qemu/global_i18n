@@ -133,11 +133,6 @@ bool IntlNumberFormatAddon::HandleArguments(napi_env env, napi_value argVal, siz
         localeTags.push_back(defaultLocale);
         return true;
     }
-    std::string checkResult = LocaleHelper::CheckParamLocales(localeArray);
-    if (!checkResult.empty()) {
-        ErrorUtil::NapiThrowUndefined(env, checkResult);
-        return false;
-    }
     localeTags.assign(localeArray.begin(), localeArray.end());
     return true;
 }
@@ -145,13 +140,12 @@ bool IntlNumberFormatAddon::HandleArguments(napi_env env, napi_value argVal, siz
 bool IntlNumberFormatAddon::InitNumberFormatContext(napi_env env,
     const std::vector<std::string> &localeTags, std::map<std::string, std::string> &map)
 {
-    int32_t code = 0;
-    std::string message = NumberFormat::CheckNumberFormatOptions(map, code);
-    if (code != 0) {
-        ErrorUtil::NapiThrowUndefined(env, message);
+    std::string errMessage;
+    numberfmt_ = std::make_shared<NumberFormat>(localeTags, map, errMessage);
+    if (!errMessage.empty()) {
+        ErrorUtil::NapiThrowUndefined(env, errMessage);
         return false;
     }
-    numberfmt_ = std::make_shared<NumberFormat>(localeTags, map, true);
     return numberfmt_ != nullptr;
 }
 

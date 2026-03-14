@@ -820,6 +820,137 @@ namespace i18n {
         amPMSymbol?: string[];
     }
 
+    export class SymbolNumberFormat extends Intl.NumberFormat {
+        static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
+
+        private nativeSymbolNumberFormat: long = 0;
+
+        constructor(context: long) {
+            if (this.nativeSymbolNumberFormat == 0) {
+                this.nativeSymbolNumberFormat = context;
+            }
+        }
+
+        constructor(locale?: Intl.Locale, options?: SymbolNumberFormatOptions) {
+            this.nativeSymbolNumberFormat =
+                SymbolNumberFormat.create(locale, options).nativeSymbolNumberFormat;
+        }
+
+        native static create(locale?: Intl.Locale, options?: SymbolNumberFormatOptions): SymbolNumberFormat;
+
+        native formatDoubleImpl(value: double): string;
+        native formatLongImpl(value: long): string;
+        native formatDecStrImpl(value: string): string;
+
+        native formatToPartsDoubleImpl(value: double): Intl.NumberFormatPart[];
+        native formatToPartsDecStrImpl(value: string): Intl.NumberFormatPart[];
+
+        native formatRangeDoubleDoubleImpl(start: double, end: double): string;
+        native formatRangeDoubleDecStrImpl(start: double, end: string): string;
+        native formatRangeDecStrDoubleImpl(start: string, end: double): string;
+        native formatRangeDecStrDecStrImpl(start: string, end: string): string;
+
+        native formatToRangePartsDoubleDoubleImpl(start: double, end: double): Intl.NumberRangeFormatPart[];
+        native formatToRangePartsDoubleDecStrImpl(start: double, end: string): Intl.NumberRangeFormatPart[];
+        native formatToRangePartsDecStrDoubleImpl(start: string, end: double): Intl.NumberRangeFormatPart[];
+        native formatToRangePartsDecStrDecStrImpl(start: string, end: string): Intl.NumberRangeFormatPart[];
+    
+        native toString(): string;
+        native resolvedOptions(): i18n.ResolvedSymbolNumberFormatOptions;
+
+        format(value: number | bigint | long): string {
+            if (value instanceof BigInt) {
+                return this.formatDecStrImpl(value.toString());
+            } else if (value instanceof Long) {
+                return this.formatLongImpl(value as long);
+            }
+            return this.formatDoubleImpl(value);
+        }
+
+        formatToParts(value: double | bigint): Intl.NumberFormatPart[] {
+            if (value instanceof BigInt) {
+                return this.formatToPartsDecStrImpl(value.toString());
+            }
+            return this.formatToPartsDoubleImpl(value as double);
+        }
+
+        formatRange(start: double | bigint, end: double | bigint): string {
+            let isStartBigInt: boolean = (start instanceof BigInt);
+            let isEndBigInt: boolean = (end instanceof BigInt);
+
+            if (!isStartBigInt && !isEndBigInt) {
+                return this.formatRangeDoubleDoubleImpl(start as double, end as double);
+            } else if (!isStartBigInt && isEndBigInt) {
+                return this.formatRangeDoubleDecStrImpl(start as double, (end as BigInt).toString());
+            } else if (isStartBigInt && !isEndBigInt) {
+                return this.formatRangeDecStrDoubleImpl((start as BigInt).toString(), end as double);
+            }
+            return this.formatRangeDecStrDecStrImpl((start as BigInt).toString(), (end as BigInt).toString());
+        }
+
+        formatRangeToParts(start: number | bigint, end: number | bigint): Intl.NumberRangeFormatPart[] {
+            let isStartBigInt: boolean = (start instanceof BigInt);
+            let isEndBigInt: boolean = (end instanceof BigInt);
+
+            if (!isStartBigInt && !isEndBigInt) {
+                return this.formatToRangePartsDoubleDoubleImpl(start as double, end as double);
+            } else if (!isStartBigInt && isEndBigInt) {
+                return this.formatToRangePartsDoubleDecStrImpl(start as double, (end as BigInt).toString());
+            } else if (isStartBigInt && !isEndBigInt) {
+                return this.formatToRangePartsDecStrDoubleImpl((start as BigInt).toString(), end as double);
+            }
+            return this.formatToRangePartsDecStrDecStrImpl((start as BigInt).toString(), (end as BigInt).toString());
+        }
+
+        static supportedLocalesOf(locales: string | string[], options?: Intl.NumberFormatOptions): string[] {
+            return Intl.NumberFormat.supportedLocalesOf(locales, options);
+        }
+    }
+
+    export interface SymbolNumberFormatOptions extends Intl.NumberFormatOptions {
+        groupingSeparator?: string | undefined;
+        infinity?: string | undefined;
+        plusSign?: string | undefined;
+        minusSign?: string | undefined;
+        nan?: string | undefined;
+        zero?: string | undefined;
+    }
+
+    export interface ResolvedSymbolNumberFormatOptions extends Intl.ResolvedNumberFormatOptions {
+        groupingSeparator?: string;
+        infinity?: string;
+        plusSign?: string;
+        minusSign?: string;
+        nan?: string;
+        zero?: string;
+    }
+
+    export class ResolvedSymbolNumberFormatOptionsInner implements ResolvedSymbolNumberFormatOptions {
+        compactDisplay?: "short" | "long";
+        currencySign?: "standard" | "accounting";
+        currency?: string;
+        currencyDisplay?: "code" | "symbol" | "narrowSymbol" | "name";
+        locale: Intl.BCP47LanguageTag;
+        maximumFractionDigits: number;
+        maximumSignificantDigits?: number;
+        minimumFractionDigits: number;
+        minimumIntegerDigits: number;
+        minimumSignificantDigits?: number;
+        notation?: "standard" | "scientific" | "engineering" | "compact";
+        numberingSystem: string;
+        signDisplay?: "auto" | "never" | "always" | "exceptZero";
+        style: "decimal" | "percent" | "currency" | "unit";
+        unit?: string;
+        unitDisplay?: "short" | "long" | "narrow";
+        useGrouping: boolean;
+        groupingSeparator?: string;
+        infinity?: string;
+        plusSign?: string;
+        minusSign?: string;
+        nan?: string;
+        zero?: string;
+    }
+
     loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n");
     export native function getCalendar(locale: string, type?: string): Calendar;
     export native function isRTL(locale: string): boolean;

@@ -234,7 +234,7 @@ napi_value SymbolDateTimeFormatAddon::FormatToParts(napi_env env, napi_callback_
         ErrorUtil::NapiThrowUndefined(env, errMessage);
         return nullptr;
     }
-    return IntlDateTimeFormatAddon::CreateDateTimeFormatPart(env, parts);
+    return IntlDateTimeFormatAddon::CreateFormatPart(env, parts);
 }
 
 napi_value SymbolDateTimeFormatAddon::FormatRange(napi_env env, napi_callback_info info)
@@ -317,7 +317,7 @@ napi_value SymbolDateTimeFormatAddon::FormatRangeToParts(napi_env env, napi_call
         ErrorUtil::NapiThrowUndefined(env, errMessage);
         return nullptr;
     }
-    return IntlDateTimeFormatAddon::CreateDateTimeFormatPart(env, parts);
+    return IntlDateTimeFormatAddon::CreateFormatPart(env, parts);
 }
 
 napi_value SymbolDateTimeFormatAddon::ToString(napi_env env, napi_callback_info info)

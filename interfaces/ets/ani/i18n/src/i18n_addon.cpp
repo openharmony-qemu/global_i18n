@@ -33,6 +33,7 @@
 #include "styled_date_time_format_addon.h"
 #include "styled_number_format_addon.h"
 #include "symbol_date_time_format_addon.h"
+#include "symbol_number_format_addon.h"
 #include "system_locale_manager_addon.h"
 #include "variable_converter.h"
 #include "zone_offset_transition_addon.h"
@@ -790,65 +791,30 @@ ani_status I18nAddon::BindContextNamespace(ani_env *env)
     return ANI_OK;
 }
 
+const std::vector<ani_status(*)(ani_env*)> BIND_CONTEXT_FUNCTION = {
+    I18nTransliteratorAddon::BindContextTransliterator,
+    I18nNormalizerAddon::BindContextNormalizer,
+    I18nSysLocaleMgrAddon::BindContextSysLocaleMgr,
+    I18nHolidayManagerAddon::BindContextHolidayManager,
+    I18nEntityRecognizerAddon::BindContextEntityRecognizer,
+    I18nSimpleDateTimeFormatAddon::BindContextSimpleDateTimeFormat,
+    I18nSimpleNumberFormatAddon::BindContextSimpleNumberFormat,
+    I18nStyledNumberFormatAddon::BindContextStyledNumberFormat,
+    I18nStyledDateTimeFormatAddon::BindContextStyledDateTimeFormat,
+    AdvancedMeasureFormatAddon::BindContextAdvancedMeasureFormat,
+    I18nSymbolDateTimeFormatAddon::BindContextSymbolDateTimeFormat,
+    I18nSymbolNumberFormatAddon::BindContextSymbolNumberFormat,
+    I18nAddon::BindContextNamespace
+};
+
 ani_status BindContext(ani_env *env)
 {
-    auto status = I18nTransliteratorAddon::BindContextTransliterator(env);
-    if (status != ANI_OK) {
-        return status;
-    }
-
-    status = I18nNormalizerAddon::BindContextNormalizer(env);
-    if (status != ANI_OK) {
-        return status;
-    }
-
-    status = I18nSysLocaleMgrAddon::BindContextSysLocaleMgr(env);
-    if (status != ANI_OK) {
-        return status;
-    }
-
-    status = I18nHolidayManagerAddon::BindContextHolidayManager(env);
-    if (status != ANI_OK) {
-        return status;
-    }
-
-    status = I18nEntityRecognizerAddon::BindContextEntityRecognizer(env);
-    if (status != ANI_OK) {
-        return status;
-    }
-
-    status = I18nSimpleDateTimeFormatAddon::BindContextSimpleDateTimeFormat(env);
-    if (status != ANI_OK) {
-        return status;
-    }
-
-    status = I18nSimpleNumberFormatAddon::BindContextSimpleNumberFormat(env);
-    if (status != ANI_OK) {
-        return status;
-    }
-
-    status = I18nStyledNumberFormatAddon::BindContextStyledNumberFormat(env);
-    if (status != ANI_OK) {
-        return status;
-    }
-
-    status = I18nStyledDateTimeFormatAddon::BindContextStyledDateTimeFormat(env);
-    if (status != ANI_OK) {
-        return status;
-    }
-
-    status = AdvancedMeasureFormatAddon::BindContextAdvancedMeasureFormat(env);
-    if (status != ANI_OK) {
-        return status;
-    }
-
-    if (I18nSymbolDateTimeFormatAddon::BindContextSymbolDateTimeFormat(env) != ANI_OK) {
-        return status;
-    }
-
-    status = I18nAddon::BindContextNamespace(env);
-    if (status != ANI_OK) {
-        return status;
+    ani_status status;
+    for (auto func : BIND_CONTEXT_FUNCTION) {
+        status = func(env);
+        if (status != ANI_OK) {
+            return status;
+        }
     }
     return status;
 }

@@ -149,6 +149,7 @@ ohos_shared_library("intl_util") {
       "src/styled_date_time_format.cpp",
       "src/styled_number_format.cpp",
       "src/symbol_date_time_format.cpp",
+      "src/symbol_number_format.cpp",
       "src/system_locale_manager.cpp",
       "src/taboo.cpp",
       "src/taboo_utils.cpp",
