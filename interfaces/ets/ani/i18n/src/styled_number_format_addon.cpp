@@ -54,18 +54,7 @@ I18nStyledNumberFormatAddon* I18nStyledNumberFormatAddon::UnwrapAddon(ani_env *e
 
 bool I18nStyledNumberFormatAddon::InitStyledNumberFormatContent(ani_env *env, ani_object numberFormat)
 {
-    ani_class simpleNumberFormatClass;
-    if (ANI_OK != env->FindClass("@ohos.i18n.i18n.SimpleNumberFormat", &simpleNumberFormatClass)) {
-        HILOG_ERROR_I18N("InitStyledNumberFormatContent Find class '@ohos.i18n.i18n.SimpleNumberFormat' failed");
-        return false;
-    }
-
-    ani_boolean isSimpleNumberFormat;
-    if (ANI_OK != env->Object_InstanceOf(numberFormat, simpleNumberFormatClass, &isSimpleNumberFormat)) {
-        HILOG_ERROR_I18N("InitStyledNumberFormatContent: Get Instance failed");
-        return false;
-    }
-    if (isSimpleNumberFormat) {
+    if (I18nSimpleNumberFormatAddon::IsSimpleNumberFormat(env, numberFormat)) {
         I18nSimpleNumberFormatAddon* simpleNumberFormatAddon =
             I18nSimpleNumberFormatAddon::UnwrapAddon(env, numberFormat);
         if (simpleNumberFormatAddon == nullptr) {
