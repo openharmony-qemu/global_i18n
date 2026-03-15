@@ -92,8 +92,8 @@ std::map<std::string, std::string> I18nSymbolNumberFormatAddon::ParseOptions(ani
 
     std::string valueString;
     std::unordered_set<std::string> keyOfTypeString = { "currency", "currencySign", "currencyDisplay", "unit",
-        "unitDisplay", "compactDisplay", "signDisplay", "localeMatcher", "style", "numberingSystem", "notation",
-        "unitUsage", "roundingPriority", "roundingMode", "groupingSeparator", "infinity", "plusSign", "minusSign",
+        "unitDisplay", "compactDisplay", "signDisplay", "localeMatcher", "style", "notation",
+        "groupingSeparator", "infinity", "plusSign", "minusSign",
         "nan", "zero" };
 
     for (const auto& key : keyOfTypeString) {
@@ -109,7 +109,7 @@ std::map<std::string, std::string> I18nSymbolNumberFormatAddon::ParseOptions(ani
 
     int valueNumber = 0;
     std::unordered_set<std::string> keyOfTypeNumber = { "minimumIntegerDigits", "minimumFractionDigits",
-        "maximumFractionDigits", "minimumSignificantDigits", "maximumSignificantDigits", "roundingIncrement" };
+        "maximumFractionDigits", "minimumSignificantDigits", "maximumSignificantDigits" };
     for (const auto& key : keyOfTypeNumber) {
         if (VariableConverter::GetNumberMember(env, options, key, valueNumber)) {
             result.insert(std::make_pair(key, std::to_string(valueNumber)));
@@ -324,7 +324,7 @@ ani_object I18nSymbolNumberFormatAddon::CreateNumberFormatPartArray(ani_env *env
 ani_object I18nSymbolNumberFormatAddon::CreateNumberFormatPart(ani_env *env,
     const std::unordered_map<std::string, std::string> &part)
 {
-    static const char *className = "std.core.Intl.NumberFormatPartImpl";
+    static const char *className = "std.core.Intl.NumberFormatPart";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("CreateNumberFormatPart: Find class failed");
@@ -358,7 +358,7 @@ ani_object I18nSymbolNumberFormatAddon::CreateNumberFormatPart(ani_env *env,
 ani_object I18nSymbolNumberFormatAddon::CreateNumberRangeFormatPart(ani_env *env,
     const std::unordered_map<std::string, std::string> &part)
 {
-    static const char *className = "std.core.Intl.NumberRangeFormatPartImpl";
+    static const char *className = "std.core.Intl.NumberRangeFormatPart";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         HILOG_ERROR_I18N("CreateNumberRangeFormatPart: Find class failed");
@@ -415,13 +415,14 @@ ani_object I18nSymbolNumberFormatAddon::CreateResolvedOptions(ani_env *env,
         return nullptr;
     }
     std::unordered_set<std::string> keyOfTypeNumber = { "minimumIntegerDigits", "minimumFractionDigits",
-        "maximumFractionDigits", "minimumSignificantDigits", "maximumSignificantDigits", "roundingIncrement" };
-
+        "maximumFractionDigits", "minimumSignificantDigits", "maximumSignificantDigits" };
+    
     for (const auto& option : options) {
         if (keyOfTypeNumber.find(option.first) != keyOfTypeNumber.end()) {
-            VariableConverter::SetNumberMember(env, resolvedOptions, option.first, std::atoi(option.second.c_str()));
+            VariableConverter::SetObjectNumberMember(env, resolvedOptions, option.first,
+                std::atoi(option.second.c_str()));
         } else if (option.first == "useGrouping") {
-            VariableConverter::SetBooleanMember(env, resolvedOptions, option.first, option.second);
+            VariableConverter::SetObjectBooleanMember(env, resolvedOptions, option.first, option.second == "true");
         } else {
             VariableConverter::SetStringMember(env, resolvedOptions, option.first, option.second);
         }
