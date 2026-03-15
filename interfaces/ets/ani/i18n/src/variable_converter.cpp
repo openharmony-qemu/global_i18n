@@ -536,6 +536,23 @@ ani_object VariableConverter::CreateAniMap(ani_env* env,
     return obj;
 }
 
+void VariableConverter::SetObjectBooleanMember(ani_env *env, ani_object obj,
+    const std::string &name, ani_boolean value)
+{
+    if (ANI_OK != env->Object_SetPropertyByName_Boolean(obj, name.c_str(), value)) {
+        HILOG_ERROR_I18N("VariableConverter::SetObjectBooleanMember: Set property %{public}s failed", name.c_str());
+        return;
+    }
+}
+
+void VariableConverter::SetObjectNumberMember(ani_env *env, ani_object obj, const std::string &name, ani_int value)
+{
+    if (ANI_OK != env->Object_SetPropertyByName_Double(obj, name.c_str(), value)) {
+        HILOG_ERROR_I18N("VariableConverter::SetObjectNumberMember: Set property %{public}s failed", name.c_str());
+        return;
+    }
+}
+
 template<typename T>
 ani_object VariableConverter::CreateAniObject(ani_env* env, const char* className, T* ptr)
 {
