@@ -44,6 +44,8 @@ int NumberFormatFuncTest0069(void);
 int NumberFormatFuncTest0070(void);
 int NumberFormatFuncTest0071(void);
 int NumberFormatFuncTest0072(void);
+int NumberFormatFuncTest0073(void);
+int NumberFormatFuncTest0074(void);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
