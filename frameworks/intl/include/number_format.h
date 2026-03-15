@@ -101,8 +101,9 @@ protected:
     icu::number::FormattedNumber FormatDoubleToFormattedNumber(double number);
     icu::number::FormattedNumber FormatDecimalToFormattedNumber(const std::string &number);
     std::string FormatFormattableRange(icu::Formattable first, icu::Formattable second);
-    NumberFormatParts FormatFormattableRangeToParts(icu::Formattable first, icu::Formattable second);
-    static NumberFormatParts ParseNumberFormatPart(const icu::FormattedValue& formatted,
+    NumberFormatParts FormatFormattableRangeToParts(icu::Formattable first, icu::Formattable second,
+        const std::string& plusSgin);
+    static NumberFormatParts ParseNumberFormatPart(const icu::FormattedValue& formatted, const std::string& plusSgin,
         bool calculateSources);
 
     icu::number::LocalizedNumberFormatter numberFormat;
@@ -186,9 +187,9 @@ private:
     static std::string GetCurrencyFromConfig(const std::string& currency);
     static std::vector<std::string> GetAvailableNumberSystems();
     static NumberFormatParts CreateNumberFormatPart(const std::vector<std::tuple<int32_t, int32_t, int32_t>>& spans,
-        const icu::UnicodeString& formattedString, const std::pair<int32_t, int32_t>& startRangeSource,
-        const std::pair<int32_t, int32_t>& endRangeSource, bool calculateSources);
-    static std::string GetFieldType(int32_t field, int32_t start, const icu::UnicodeString& text);
+        const std::pair< std::pair<int32_t, int32_t>, std::pair<int32_t, int32_t>>& rangeSource,
+        const icu::UnicodeString& formattedString, const std::string& plusSgin, bool calculateSources);
+    static std::string GetFieldType(int32_t field, const icu::UnicodeString& text, const std::string& plusSgin);
 
     void CreateRelativeTimeFormat(const std::string& locale);
     void ParseConfigs(std::map<std::string, std::string> &configs);
