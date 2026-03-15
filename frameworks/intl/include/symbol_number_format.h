@@ -50,6 +50,8 @@ private:
     void SetNumberSymbols(const std::map<std::string, std::string>& options);
     void ResolvedNumberSymbols(std::map<std::string, std::string>& options);
     icu::Formattable StrToFormattable(const std::string& value);
+
+    std::string pulsSign;
 };
 } // namespace I18n
 } // namespace Global
