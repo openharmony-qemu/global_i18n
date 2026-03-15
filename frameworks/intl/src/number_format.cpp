@@ -53,6 +53,7 @@ const std::string SHARED_SOURCE = "shared";
 const std::string LITERAL_TYPE = "literal";
 const std::string PLUS_SIGN_TYPE = "plusSign";
 const std::string MINUS_SIGN_TYPE = "minusSign";
+constexpr int32_t END_INDEX = 2;
 
 std::unordered_map<std::string, UNumberUnitWidth> NumberFormat::unitStyle = {
     { "long", UNumberUnitWidth::UNUM_UNIT_WIDTH_FULL_NAME },
@@ -1109,7 +1110,8 @@ void NumberFormat::FormatRangeToParts(double first, double second,
     FindAllFormatParts(numberRange, result, first, second, res);
 }
 
-NumberFormatParts NumberFormat::FormatFormattableRangeToParts(icu::Formattable first, icu::Formattable second)
+NumberFormatParts NumberFormat::FormatFormattableRangeToParts(icu::Formattable first, icu::Formattable second,
+    const std::string& plusSgin)
 {
     if (!createSuccess) {
         HILOG_ERROR_I18N("NumberFormat::FormatFormattableRangeToParts: Init failed.");
@@ -1125,10 +1127,88 @@ NumberFormatParts NumberFormat::FormatFormattableRangeToParts(icu::Formattable f
         HILOG_ERROR_I18N("NumberFormat::FormatFormattableRangeToParts: formatFormattableRange failed.");
         return {};
     }
-    return ParseNumberFormatPart(numberRange, true);
+    return ParseNumberFormatPart(numberRange, plusSgin, true);
 }
 
-NumberFormatParts NumberFormat::ParseNumberFormatPart(const icu::FormattedValue& formatted,
+bool ProcessSpansUntilNextSegment(
+    std::vector<std::tuple<int32_t, int32_t, int32_t>>& result,
+    std::tuple<int32_t, int32_t, int32_t>& currentActiveSpan,
+    const std::pair<std::vector<std::tuple<int32_t, int32_t, int32_t>>, int32_t>& spansInfo,
+    int32_t& currentPosition,
+    std::vector<size_t>& activeSpanIndexStack
+)
+{
+    auto spans = spansInfo.first;
+    auto nextSegmentStartPosition = spansInfo.second;
+    while (std::get<END_INDEX>(currentActiveSpan) < nextSegmentStartPosition) {
+        if (currentPosition < std::get<END_INDEX>(currentActiveSpan)) {
+            result.emplace_back(std::make_tuple(std::get<0>(currentActiveSpan), currentPosition,
+                std::get<END_INDEX>(currentActiveSpan)));
+            currentPosition = std::get<END_INDEX>(currentActiveSpan);
+        }
+        activeSpanIndexStack.pop_back();
+        if (activeSpanIndexStack.empty()) {
+            return true;
+        }
+        currentActiveSpan = spans.at(activeSpanIndexStack.back());
+    }
+    if (currentPosition < nextSegmentStartPosition) {
+        result.emplace_back(std::make_tuple(std::get<0>(currentActiveSpan), currentPosition, nextSegmentStartPosition));
+        currentPosition = nextSegmentStartPosition;
+    }
+    return false;
+}
+
+std::vector<std::tuple<int32_t, int32_t, int32_t>> ProcessSpans(
+    std::vector<std::tuple<int32_t, int32_t, int32_t>>& spans)
+{
+    if (spans.size() <= 1) {
+        return spans;
+    }
+    std::sort(spans.begin(), spans.end(), [](const auto &a, const auto &b) {
+        const auto [aField, aStart, aLimit] = a;
+        const auto [bField, bStart, bLimit] = b;
+        if (aStart < bStart) {
+            return true;
+        }
+        if (aStart > bStart) {
+            return false;
+        }
+        if (aLimit < bLimit) {
+            return false;
+        }
+        if (aLimit > bLimit) {
+            return true;
+        }
+        return aField < bField;
+    });
+    std::vector<std::tuple<int32_t, int32_t, int32_t>> result;
+    size_t nextSpanIndex = 1;
+    const int32_t totalStringLength = std::get<2>(spans[0]);
+    int32_t currentPosition = 0;
+    std::vector<size_t> activeSpanIndexStack = { 0 };
+    auto currentActiveSpan = spans[0];
+    while (currentPosition < totalStringLength) {
+        // Determine where the next segment starts
+        int32_t nextSegmentStartPosition =
+            (nextSpanIndex < spans.size()) ? std::get<1>(spans[nextSpanIndex]) : totalStringLength;
+        if (currentPosition < nextSegmentStartPosition) {
+            std::pair<std::vector<std::tuple<int32_t, int32_t, int32_t>>, int32_t> spansInfo =
+                std::make_pair(spans, nextSegmentStartPosition);
+            if (ProcessSpansUntilNextSegment(result, currentActiveSpan, spansInfo, currentPosition,
+                activeSpanIndexStack)) {
+                return result;
+            }
+        }
+        if (nextSpanIndex < spans.size()) {
+            activeSpanIndexStack.push_back(nextSpanIndex++);
+            currentActiveSpan = spans.at(activeSpanIndexStack.back());
+        }
+    }
+    return result;
+}
+
+NumberFormatParts NumberFormat::ParseNumberFormatPart(const icu::FormattedValue& formatted, const std::string& plusSgin,
     bool calculateSources)
 {
     UErrorCode status = U_ZERO_ERROR;
@@ -1140,7 +1220,6 @@ NumberFormatParts NumberFormat::ParseNumberFormatPart(const icu::FormattedValue&
 
     std::pair<int32_t, int32_t> startRangeSource = std::make_pair(0, 0);
     std::pair<int32_t, int32_t> endRangeSource = std::make_pair(0, 0);
-
     std::vector<std::tuple<int32_t, int32_t, int32_t>> spans;
     spans.emplace_back(std::make_tuple(-1, 0, formattedString.length()));
 
@@ -1166,26 +1245,31 @@ NumberFormatParts NumberFormat::ParseNumberFormatPart(const icu::FormattedValue&
             spans.emplace_back(field, start, limit);
         }
     }
-    return CreateNumberFormatPart(spans, formattedString, startRangeSource, endRangeSource, calculateSources);
+    std::pair<std::pair<int32_t, int32_t>, std::pair<int32_t, int32_t>> rangeSource =
+        std::make_pair(startRangeSource, endRangeSource);
+    auto processedSpans = ProcessSpans(spans);
+    return CreateNumberFormatPart(processedSpans, rangeSource, formattedString, plusSgin, calculateSources);
 }
 
 NumberFormatParts NumberFormat::CreateNumberFormatPart(const std::vector<std::tuple<int32_t, int32_t, int32_t>>& spans,
-    const icu::UnicodeString& formattedString, const std::pair<int32_t, int32_t>& startRangeSource,
-    const std::pair<int32_t, int32_t>& endRangeSource, bool calculateSources)
+    const std::pair< std::pair<int32_t, int32_t>, std::pair<int32_t, int32_t>>& rangeSource,
+    const icu::UnicodeString& formattedString, const std::string& plusSgin, bool calculateSources)
 {
     NumberFormatParts parts(spans.size());
     auto contains = [](std::pair<int32_t, int32_t> gold, std::pair<int32_t, int32_t> request) {
         return gold.first <= request.first && gold.second >= request.second;
     };
+    auto startRangeSource = rangeSource.first;
+    auto endRangeSource = rangeSource.second;
     for (size_t i = 0; i < spans.size(); i++) {
         auto [field, start, limit] = spans[i];
         std::unordered_map<std::string, std::string> part;
-
-        std::string type = GetFieldType(field, start, formattedString);
-        part.insert(std::make_pair(PART_TYPE_TAG, type));
-
+        
         icu::UnicodeString sub;
         formattedString.extractBetween(start, limit, sub);
+        std::string type = GetFieldType(field, sub, plusSgin);
+        part.insert(std::make_pair(PART_TYPE_TAG, type));
+
         std::string value;
         sub.toUTF8String(value);
         part.insert(std::make_pair(PART_VALUE_TAG, value));
@@ -1205,7 +1289,7 @@ NumberFormatParts NumberFormat::CreateNumberFormatPart(const std::vector<std::tu
     return parts;
 }
 
-std::string NumberFormat::GetFieldType(int32_t field, int32_t start, const icu::UnicodeString& text)
+std::string NumberFormat::GetFieldType(int32_t field, const icu::UnicodeString& text, const std::string& plusSgin)
 {
     if (field == -1) {
         return LITERAL_TYPE;
@@ -1219,7 +1303,7 @@ std::string NumberFormat::GetFieldType(int32_t field, int32_t start, const icu::
         HILOG_ERROR_I18N("NumberFormat::GetFieldType: Invalid field %{public}d.", field);
         return "";
     }
-    if (text.charAt(start) == '+') {
+    if (text.compare(plusSgin.c_str()) == 0) {
         return PLUS_SIGN_TYPE;
     }
     return MINUS_SIGN_TYPE;
