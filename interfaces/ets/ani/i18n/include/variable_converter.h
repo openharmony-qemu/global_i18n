@@ -43,6 +43,8 @@ public:
     static ani_int GetDateInt(ani_env *env, ani_object date, const std::string &method);
     static std::vector<std::string> GetLocaleTags(ani_env *env, ani_object locale);
     static ani_object CreateAniMap(ani_env* env, const std::unordered_map<std::string, std::string> &map);
+    static void SetObjectBooleanMember(ani_env *env, ani_object obj, const std::string &name, ani_boolean value);
+    static void SetObjectNumberMember(ani_env *env, ani_object obj, const std::string &name, ani_int value);
     template<typename T>
     static ani_object CreateAniObject(ani_env* env, const char* className, T* ptr);
 };
