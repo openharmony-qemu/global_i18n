@@ -28,6 +28,7 @@ public:
     static ani_object GetSimpleNumberFormatBySkeleton(ani_env *env, ani_string skeleton, ani_object locale);
     static ani_string Format(ani_env *env, ani_object object, ani_double value);
     static ani_status BindContextSimpleNumberFormat(ani_env *env);
+    static bool IsSimpleNumberFormat(ani_env *env, ani_object numberFormat);
 
     std::shared_ptr<SimpleNumberFormat> CopySimpleNumberFormat()
     {
