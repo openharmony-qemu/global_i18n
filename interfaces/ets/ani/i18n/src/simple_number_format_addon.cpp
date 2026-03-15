@@ -105,3 +105,20 @@ ani_status I18nSimpleNumberFormatAddon::BindContextSimpleNumberFormat(ani_env *e
 
     return ANI_OK;
 }
+
+bool I18nSimpleNumberFormatAddon::IsSimpleNumberFormat(ani_env *env, ani_object numberFormat)
+{
+    static const char *className = "@ohos.i18n.i18n.SimpleNumberFormat";
+    ani_class cls;
+    if (ANI_OK != env->FindClass(className, &cls)) {
+        HILOG_ERROR_I18N("I18nSimpleNumberFormatAddon::IsSimpleNumberFormat: Find class failed.");
+        return false;
+    }
+
+    ani_boolean isSimpleNumberFormat;
+    if (ANI_OK != env->Object_InstanceOf(numberFormat, cls, &isSimpleNumberFormat)) {
+        HILOG_ERROR_I18N("I18nSimpleDateTimeFormatAddon::IsSimpleDateTimeFormat: Get Instance failed");
+        return false;
+    }
+    return isSimpleNumberFormat;
+}
