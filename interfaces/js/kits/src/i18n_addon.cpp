@@ -36,6 +36,7 @@
 #include "styled_date_time_format_addon.h"
 #include "styled_number_format_addon.h"
 #include "symbol_date_time_format_addon.h"
+#include "symbol_number_format_addon.h"
 #include "system_locale_manager_addon.h"
 #include "unicode/datefmt.h"
 #include "unicode/locid.h"
@@ -1954,6 +1955,7 @@ napi_value Init(napi_env env, napi_value exports)
     val = StyledDateTimeFormatAddon::InitStyledDateTimeFormat(env, val);
     val = AdvancedMeasureFormatAddon::InitAdvancedMeasureFormat(env, val);
     val = SymbolDateTimeFormatAddon::InitSymbolDateTimeFormat(env, val);
+    val = SymbolNumberFormatAddon::InitSymbolNumberFormat(env, val);
     return val;
 }
 

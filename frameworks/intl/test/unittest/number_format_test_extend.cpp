@@ -19,6 +19,7 @@
 #include "locale_config.h"
 #include "number_format.h"
 #include "simple_number_format.h"
+#include "symbol_number_format.h"
 #include "unicode/locid.h"
 #include "parameter.h"
 
@@ -741,12 +742,13 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0068, TestSize.Level1)
         { "numeric", "auto" },
         { "localeMatcher", "best fit" }
     };
-    std::unique_ptr<NumberFormat> numberFormat = std::make_unique<NumberFormat>(locales, options, true);
+    std::string errMessage;
+    int32_t code = 0;
+    std::unique_ptr<NumberFormat> numberFormat = std::make_unique<NumberFormat>(locales, options, errMessage, code);
     ASSERT_TRUE(numberFormat != nullptr);
     map<std::string, std::string> resultMap;
     numberFormat->GetResolvedOptions(resultMap);
     EXPECT_EQ(resultMap.at("numberingSystem"), "arab");
-    int32_t code = 0;
     map<std::string, std::string> optionsMap = {
         { "currency", "###" },
     };
@@ -786,7 +788,10 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0070, TestSize.Level1)
         { "style", "unit" },
         { "unit", "fahrenheit" }
     };
-    std::shared_ptr<NumberFormat> numberFormat = std::make_shared<NumberFormat>(locales, numberFormatOptions, true);
+    std::string errMessage;
+    int32_t code = 0;
+    std::shared_ptr<NumberFormat> numberFormat =
+        std::make_shared<NumberFormat>(locales, numberFormatOptions, errMessage, code);
     AdvancedMeasureFormatOptions advancedMeasureOptions;
     advancedMeasureOptions.unitUsage = UnitUsage::TEMPERATURE_PERSON;
     auto advancedMeasureFormat = std::make_unique<AdvancedMeasureFormat>(numberFormat, advancedMeasureOptions);
@@ -806,7 +811,10 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0071, TestSize.Level1)
         { "style", "unit" },
         { "unit", "byte" }
     };
-    std::shared_ptr<NumberFormat> numberFormat = std::make_shared<NumberFormat>(locales, numberFormatOptions, true);
+    std::string errMessage;
+    int32_t code = 0;
+    std::shared_ptr<NumberFormat> numberFormat =
+        std::make_shared<NumberFormat>(locales, numberFormatOptions, errMessage, code);
     AdvancedMeasureFormatOptions advancedMeasureOptions;
     advancedMeasureOptions.unitUsage = UnitUsage::SIZE_SHORTFILE_BYTE;
     auto advancedMeasureFormat = std::make_unique<AdvancedMeasureFormat>(numberFormat, advancedMeasureOptions);
@@ -826,12 +834,110 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0072, TestSize.Level1)
         { "style", "unit" },
         { "unit", "day" }
     };
-    std::shared_ptr<NumberFormat> numberFormat = std::make_shared<NumberFormat>(locales, numberFormatOptions, true);
+    std::string errMessage;
+    int32_t code = 0;
+    std::shared_ptr<NumberFormat> numberFormat =
+        std::make_shared<NumberFormat>(locales, numberFormatOptions, errMessage, code);
     AdvancedMeasureFormatOptions advancedMeasureOptions;
     advancedMeasureOptions.unitUsage = UnitUsage::ELAPSED_TIME_SECOND;
     auto advancedMeasureFormat = std::make_unique<AdvancedMeasureFormat>(numberFormat, advancedMeasureOptions);
     std::string result = advancedMeasureFormat->FormatNumber(3);
     EXPECT_EQ(result, "3天前");
+}
+
+/**
+ * @tc.name: NumberFormatFuncTest0073
+ * @tc.desc: Test SymbolNumberFormat
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0073, TestSize.Level1)
+{
+    std::vector<std::string> locales { "en" };
+    std::map<std::string, std::string> options = {
+        { "style", "unit" },
+        { "unit", "day" },
+        { "groupingSeparator", "/" },
+        { "infinity", "INF" },
+        { "plusSign", "++" },
+        { "minusSign", "--" },
+        { "nan", "N" },
+        { "zero", "zero" }
+    };
+    std::string errMessage;
+    int32_t code = 0;
+    std::shared_ptr<SymbolNumberFormat> symbolNumberFormat = std::make_shared<SymbolNumberFormat>(locales,
+        options, errMessage, code);
+    EXPECT_EQ(errMessage, "");
+    double valueDouble = 123456.5;
+    std::string result = symbolNumberFormat->Format(valueDouble);
+    EXPECT_EQ(result, "123/456.5 days");
+    std::string valueBigint = "123456";
+    result = symbolNumberFormat->FormatBigInt(valueBigint);
+    EXPECT_EQ(result, "123/456 days");
+    int64_t valueLong = -123456789;
+    result = symbolNumberFormat->FormatLong(valueLong);
+    EXPECT_EQ(result, "--123/456/789 days");
+    result = symbolNumberFormat->Format(uprv_getNaN());
+    EXPECT_EQ(result, "N days");
+    NumberFormatParts parts = symbolNumberFormat->FormatToPartsDouble(valueDouble);
+    EXPECT_EQ(parts.size(), 7);
+    parts = symbolNumberFormat->FormatToPartsDecStr(valueBigint);
+    EXPECT_EQ(parts.size(), 5);
+    std::map<std::string, std::string> resolvedOptions;
+    symbolNumberFormat->ResolvedOptions(resolvedOptions);
+    EXPECT_EQ(resolvedOptions["style"], "unit");
+    EXPECT_EQ(resolvedOptions["unit"], "day");
+    EXPECT_EQ(resolvedOptions["groupingSeparator"], "/");
+    EXPECT_EQ(resolvedOptions["infinity"], "INF");
+    EXPECT_EQ(resolvedOptions["plusSign"], "++");
+    EXPECT_EQ(resolvedOptions["minusSign"], "--");
+    EXPECT_EQ(resolvedOptions["nan"], "N");
+    EXPECT_EQ(resolvedOptions["zero"], "zero");
+}
+
+/**
+ * @tc.name: NumberFormatFuncTest0074
+ * @tc.desc: Test SymbolNumberFormat
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0074, TestSize.Level1)
+{
+    std::vector<std::string> locales { "en" };
+    std::map<std::string, std::string> options = {
+        { "style", "unit" },
+        { "unit", "day" },
+        { "groupingSeparator", "/" },
+        { "infinity", "INF" },
+        { "plusSign", "++" },
+        { "minusSign", "--" },
+        { "nan", "N" },
+        { "zero", "zero" }
+    };
+    std::string errMessage;
+    int32_t code = 0;
+    std::shared_ptr<SymbolNumberFormat> symbolNumberFormat = std::make_shared<SymbolNumberFormat>(locales,
+        options, errMessage, code);
+    EXPECT_EQ(errMessage, "");
+    double startDouble = 1234;
+    double endDouble = 45670;
+    std::string startBigint = "1234";
+    std::string endBigint = "45670";
+    std::string result = symbolNumberFormat->FormatRangeDoubleDouble(startDouble, endDouble);
+    EXPECT_EQ(result, "1/234–45/67zero days");
+    result = symbolNumberFormat->FormatRangeDoubleDecStr(startDouble, endBigint);
+    EXPECT_EQ(result, "1/234–45/67zero days");
+    result = symbolNumberFormat->FormatRangeDecStrDouble(startBigint, endDouble);
+    EXPECT_EQ(result, "1/234–45/67zero days");
+    result = symbolNumberFormat->FormatRangeDecStrDecStr(startBigint, endBigint);
+    EXPECT_EQ(result, "1/234–45/67zero days");
+    NumberFormatParts parts = symbolNumberFormat->FormatToRangePartsDoubleDouble(startDouble, endDouble);
+    size_t length = parts.size();
+    parts = symbolNumberFormat->FormatToRangePartsDoubleDecStr(startDouble, endBigint);
+    EXPECT_EQ(parts.size(), length);
+    parts = symbolNumberFormat->FormatToRangePartsDecStrDouble(startBigint, endDouble);
+    EXPECT_EQ(parts.size(), length);
+    parts = symbolNumberFormat->FormatToRangePartsDecStrDecStr(startBigint, endBigint);
+    EXPECT_EQ(parts.size(), length);
 }
 } // namespace I18n
 } // namespace Global

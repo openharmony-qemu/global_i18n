@@ -30,6 +30,7 @@
 #include "styled_date_time_format_addon.h"
 #include "styled_number_format_addon.h"
 #include "symbol_date_time_format_addon.h"
+#include "symbol_number_format_addon.h"
 #include "system_locale_manager_addon.h"
 #include "zone_rules_addon.h"
 #include "zone_offset_transition_addon.h"
@@ -535,6 +536,23 @@ ani_object VariableConverter::CreateAniMap(ani_env* env,
     return obj;
 }
 
+void VariableConverter::SetObjectBooleanMember(ani_env *env, ani_object obj,
+    const std::string &name, ani_boolean value)
+{
+    if (ANI_OK != env->Object_SetPropertyByName_Boolean(obj, name.c_str(), value)) {
+        HILOG_ERROR_I18N("VariableConverter::SetObjectBooleanMember: Set property %{public}s failed", name.c_str());
+        return;
+    }
+}
+
+void VariableConverter::SetObjectNumberMember(ani_env *env, ani_object obj, const std::string &name, ani_int value)
+{
+    if (ANI_OK != env->Object_SetPropertyByName_Double(obj, name.c_str(), value)) {
+        HILOG_ERROR_I18N("VariableConverter::SetObjectNumberMember: Set property %{public}s failed", name.c_str());
+        return;
+    }
+}
+
 template<typename T>
 ani_object VariableConverter::CreateAniObject(ani_env* env, const char* className, T* ptr)
 {
@@ -592,3 +610,5 @@ template ani_object VariableConverter::CreateAniObject<ZoneOffsetTransitionAddon
     ani_env*, const char*, ZoneOffsetTransitionAddon*);
 template ani_object VariableConverter::CreateAniObject<I18nSymbolDateTimeFormatAddon>(
     ani_env*, const char*, I18nSymbolDateTimeFormatAddon*);
+template ani_object VariableConverter::CreateAniObject<I18nSymbolNumberFormatAddon>(
+    ani_env*, const char*, I18nSymbolNumberFormatAddon*);

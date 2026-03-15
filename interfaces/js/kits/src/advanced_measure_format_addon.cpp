@@ -114,8 +114,13 @@ bool AdvancedMeasureFormatAddon::InitContext(napi_env env, std::shared_ptr<Numbe
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "numberFormat", "Intl.NumberFormat", true);
         return false;
     }
-    auto nativeNumberFormat =
-        std::make_shared<NumberFormat>(std::vector<std::string>{ iter->second }, numberFormatOptions);
+    std::string errMessage;
+    int32_t code = 0;
+    auto nativeNumberFormat = std::make_shared<NumberFormat>(std::vector<std::string>{ iter->second },
+        numberFormatOptions, errMessage, code);
+    if (!errMessage.empty() || code != 0) {
+        return false;
+    }
     advancedMeasureFormat_ = std::make_shared<AdvancedMeasureFormat>(nativeNumberFormat, options);
     return advancedMeasureFormat_ != nullptr;
 }

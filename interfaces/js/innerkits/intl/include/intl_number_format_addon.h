@@ -33,6 +33,7 @@ public:
     static void Destructor(napi_env env, void *nativeObject, void *hint);
     static napi_value InitIntlNumberFormat(napi_env env, napi_value exports);
     static napi_status UnwrapIntlNumberFormat(napi_env env, napi_value value, IntlNumberFormatAddon** numberFormat);
+    static napi_value SupportedLocalesOf(napi_env env, napi_callback_info info);
 
     std::shared_ptr<NumberFormat> GetNumberFormat();
 
@@ -46,7 +47,6 @@ private:
     static napi_value FormatRangeToParts(napi_env env, napi_callback_info info);
     static napi_value FormatToParts(napi_env env, napi_callback_info info);
     static napi_value ToString(napi_env env, napi_callback_info info);
-    static napi_value SupportedLocalesOf(napi_env env, napi_callback_info info);
     static napi_value GetFormatToPartsInner(napi_env env, napi_value param, napi_valuetype &valueType,
         napi_value &thisVar);
     static napi_value FormatWithDiffParamType(napi_env env, napi_value param, napi_valuetype &valueType,
