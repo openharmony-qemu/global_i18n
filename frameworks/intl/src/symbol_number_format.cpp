@@ -49,6 +49,10 @@ SymbolNumberFormat::SymbolNumberFormat(const std::vector<std::string>& localeTag
     SetNumberSymbols(options);
     styleRangeFormatter = styleFormatter;
     numberFormat = styleFormatter.locale(locale);
+    std::map<std::string, std::string> symbols;
+    ResolvedNumberSymbols(symbols);
+    auto iter = symbols.find(PLUS_SYMBOL_TAG);
+    pulsSign = (iter == symbols.end()) ? "+" : iter->second;
 }
 
 SymbolNumberFormat::~SymbolNumberFormat() {}
@@ -56,13 +60,13 @@ SymbolNumberFormat::~SymbolNumberFormat() {}
 NumberFormatParts SymbolNumberFormat::FormatToPartsDouble(double value)
 {
     icu::number::FormattedNumber formatted = FormatDoubleToFormattedNumber(value);
-    return ParseNumberFormatPart(formatted, false);
+    return ParseNumberFormatPart(formatted, pulsSign, false);
 }
 
 NumberFormatParts SymbolNumberFormat::FormatToPartsDecStr(const std::string& value)
 {
     icu::number::FormattedNumber formatted = FormatDecimalToFormattedNumber(value);
-    return ParseNumberFormatPart(formatted, false);
+    return ParseNumberFormatPart(formatted, pulsSign, false);
 }
 
 std::string SymbolNumberFormat::FormatRangeDoubleDouble(double start, double end)
@@ -87,22 +91,22 @@ std::string SymbolNumberFormat::FormatRangeDecStrDecStr(const std::string& start
 
 NumberFormatParts SymbolNumberFormat::FormatToRangePartsDoubleDouble(double start, double end)
 {
-    return FormatFormattableRangeToParts(icu::Formattable(start), icu::Formattable(end));
+    return FormatFormattableRangeToParts(icu::Formattable(start), icu::Formattable(end), pulsSign);
 }
 
 NumberFormatParts SymbolNumberFormat::FormatToRangePartsDoubleDecStr(double start, const std::string& end)
 {
-    return FormatFormattableRangeToParts(icu::Formattable(start), StrToFormattable(end));
+    return FormatFormattableRangeToParts(icu::Formattable(start), StrToFormattable(end), pulsSign);
 }
 
 NumberFormatParts SymbolNumberFormat::FormatToRangePartsDecStrDouble(const std::string& start, double end)
 {
-    return FormatFormattableRangeToParts(StrToFormattable(start), icu::Formattable(end));
+    return FormatFormattableRangeToParts(StrToFormattable(start), icu::Formattable(end), pulsSign);
 }
 
 NumberFormatParts SymbolNumberFormat::FormatToRangePartsDecStrDecStr(const std::string& start, const std::string& end)
 {
-    return FormatFormattableRangeToParts(StrToFormattable(start), StrToFormattable(end));
+    return FormatFormattableRangeToParts(StrToFormattable(start), StrToFormattable(end), pulsSign);
 }
 
 void SymbolNumberFormat::ResolvedOptions(std::map<std::string, std::string>& options)
