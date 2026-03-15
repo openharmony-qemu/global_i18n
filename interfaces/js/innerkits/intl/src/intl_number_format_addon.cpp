@@ -141,8 +141,9 @@ bool IntlNumberFormatAddon::InitNumberFormatContext(napi_env env,
     const std::vector<std::string> &localeTags, std::map<std::string, std::string> &map)
 {
     std::string errMessage;
-    numberfmt_ = std::make_shared<NumberFormat>(localeTags, map, errMessage);
-    if (!errMessage.empty()) {
+    int32_t code = 0;
+    numberfmt_ = std::make_shared<NumberFormat>(localeTags, map, errMessage, code);
+    if (!errMessage.empty() || code != 0) {
         ErrorUtil::NapiThrowUndefined(env, errMessage);
         return false;
     }

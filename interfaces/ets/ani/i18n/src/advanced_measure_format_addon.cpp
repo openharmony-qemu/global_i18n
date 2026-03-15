@@ -56,9 +56,13 @@ bool AdvancedMeasureFormatAddon::InitContext(ani_env *env, ani_object numberForm
         ErrorUtil::AniThrow(env, I18N_NOT_FOUND, "numberFormat", "Intl.NumberFormat");
         return false;
     }
-    auto nativeNumberFormat =
-        std::make_shared<NumberFormat>(std::vector<std::string>{ iter->second }, numberFormatOptions);
-
+    std::string errMessage;
+    int32_t code = 0;
+    auto nativeNumberFormat = std::make_shared<NumberFormat>(std::vector<std::string>{ iter->second },
+        numberFormatOptions, errMessage, code);
+    if (!errMessage.empty() || code != 0) {
+        return false;
+    }
     AdvancedMeasureFormatOptions advancedMeasureOptions = ParseAdvancedMeasureOptions(env, options);
     advancedMeasureFormat_ = std::make_shared<AdvancedMeasureFormat>(nativeNumberFormat, advancedMeasureOptions);
     return advancedMeasureFormat_ != nullptr;

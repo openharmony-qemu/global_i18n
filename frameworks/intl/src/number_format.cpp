@@ -195,14 +195,13 @@ NumberFormat::NumberFormat(const std::vector<std::string> &localeTags, std::map<
 }
 
 NumberFormat::NumberFormat(const std::vector<std::string> &localeTags,
-    std::map<std::string, std::string> &configs, std::string& errMessage)
+    std::map<std::string, std::string> &configs, std::string& errMessage, int32_t& code)
 {
     fromArkTs = true;
     errMessage = LocaleHelper::CheckParamLocales(localeTags);
     if (!errMessage.empty()) {
         return;
     }
-    int32_t code = 0;
     errMessage = NumberFormat::CheckNumberFormatOptions(configs, code);
     if (code != 0) {
         return;

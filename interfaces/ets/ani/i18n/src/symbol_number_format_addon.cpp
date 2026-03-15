@@ -67,9 +67,10 @@ bool I18nSymbolNumberFormatAddon::InitContext(ani_env *env, ani_object locale, a
     auto symbolOptions = I18nSymbolNumberFormatAddon::ParseOptions(env, options);
 
     std::string errMessage;
+    int32_t code = 0;
     symbolNumberFormat_ =
-        std::make_shared<SymbolNumberFormat>(std::vector<std::string>{ localeTag }, symbolOptions, errMessage);
-    if (!errMessage.empty()) {
+        std::make_shared<SymbolNumberFormat>(std::vector<std::string>{ localeTag }, symbolOptions, errMessage, code);
+    if (!errMessage.empty() || code != 0) {
         ErrorUtil::AniThrowUndefined(env, errMessage);
         return false;
     }

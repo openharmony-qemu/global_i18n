@@ -115,9 +115,10 @@ bool AdvancedMeasureFormatAddon::InitContext(napi_env env, std::shared_ptr<Numbe
         return false;
     }
     std::string errMessage;
-    auto nativeNumberFormat =
-        std::make_shared<NumberFormat>(std::vector<std::string>{ iter->second }, numberFormatOptions, errMessage);
-    if (!errMessage.empty()) {
+    int32_t code = 0;
+    auto nativeNumberFormat = std::make_shared<NumberFormat>(std::vector<std::string>{ iter->second },
+        numberFormatOptions, errMessage, code);
+    if (!errMessage.empty() || code != 0) {
         return false;
     }
     advancedMeasureFormat_ = std::make_shared<AdvancedMeasureFormat>(nativeNumberFormat, options);

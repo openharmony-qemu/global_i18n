@@ -858,7 +858,15 @@ namespace i18n {
         native toString(): string;
         native resolvedOptions(): i18n.ResolvedSymbolNumberFormatOptions;
 
-        format(value: number | bigint | long): string {
+        format(value: double): string {
+            return this.formatDoubleImpl(value);
+        }
+
+        format(value: long): string {
+            return this.formatDoubleImpl(value);
+        }
+        
+        format(value: double | bigint | long): string {
             if (value instanceof BigInt) {
                 return this.formatDecStrImpl(value.toString());
             } else if (value instanceof Long) {

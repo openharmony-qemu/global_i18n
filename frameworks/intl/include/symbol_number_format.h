@@ -23,7 +23,7 @@ namespace I18n {
 class SymbolNumberFormat : public NumberFormat {
 public:
     SymbolNumberFormat(const std::vector<std::string>& localeTags,
-        std::map<std::string, std::string>& configs, std::string& errMessage);
+        std::map<std::string, std::string>& configs, std::string& errMessage, int32_t& code);
     ~SymbolNumberFormat();
 
     NumberFormatParts FormatToPartsDouble(double value);

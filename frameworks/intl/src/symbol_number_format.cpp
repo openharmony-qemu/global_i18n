@@ -40,10 +40,10 @@ static const std::unordered_map<std::string, icu::DecimalFormatSymbols::ENumberF
 };
 
 SymbolNumberFormat::SymbolNumberFormat(const std::vector<std::string>& localeTags,
-    std::map<std::string, std::string>& options, std::string& errMessage)
-    : NumberFormat(localeTags, options, errMessage)
+    std::map<std::string, std::string>& options, std::string& errMessage, int32_t& code)
+    : NumberFormat(localeTags, options, errMessage, code)
 {
-    if (!errMessage.empty()) {
+    if (!errMessage.empty() || code != 0) {
         return;
     }
     SetNumberSymbols(options);

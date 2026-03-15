@@ -171,9 +171,10 @@ bool SymbolNumberFormatAddon::InitSymbolFormatContext(napi_env env, const std::v
     std::map<std::string, std::string>& options)
 {
     std::string errMessage;
-    symbolNumberFormat_ = std::make_shared<SymbolNumberFormat>(localeTags, options, errMessage);
-    if (!errMessage.empty()) {
-        HILOG_ERROR_I18N("SymbolNumberFormatAddon::InitSymbolFormatContext: %{public}s", errMessage.c_str());
+    int32_t code = 0;
+    symbolNumberFormat_ = std::make_shared<SymbolNumberFormat>(localeTags, options, errMessage, code);
+    if (!errMessage.empty() || code != 0) {
+        ErrorUtil::NapiThrowUndefined(env, errMessage);
         return false;
     }
     return true;

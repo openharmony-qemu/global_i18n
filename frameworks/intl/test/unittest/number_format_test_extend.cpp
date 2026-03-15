@@ -743,12 +743,12 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0068, TestSize.Level1)
         { "localeMatcher", "best fit" }
     };
     std::string errMessage;
-    std::unique_ptr<NumberFormat> numberFormat = std::make_unique<NumberFormat>(locales, options, errMessage);
+    int32_t code = 0;
+    std::unique_ptr<NumberFormat> numberFormat = std::make_unique<NumberFormat>(locales, options, errMessage, code);
     ASSERT_TRUE(numberFormat != nullptr);
     map<std::string, std::string> resultMap;
     numberFormat->GetResolvedOptions(resultMap);
     EXPECT_EQ(resultMap.at("numberingSystem"), "arab");
-    int32_t code = 0;
     map<std::string, std::string> optionsMap = {
         { "currency", "###" },
     };
@@ -789,7 +789,9 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0070, TestSize.Level1)
         { "unit", "fahrenheit" }
     };
     std::string errMessage;
-    std::shared_ptr<NumberFormat> numberFormat = std::make_shared<NumberFormat>(locales, numberFormatOptions, errMessage);
+    int32_t code = 0;
+    std::shared_ptr<NumberFormat> numberFormat =
+        std::make_shared<NumberFormat>(locales, numberFormatOptions, errMessage, code);
     AdvancedMeasureFormatOptions advancedMeasureOptions;
     advancedMeasureOptions.unitUsage = UnitUsage::TEMPERATURE_PERSON;
     auto advancedMeasureFormat = std::make_unique<AdvancedMeasureFormat>(numberFormat, advancedMeasureOptions);
@@ -810,7 +812,9 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0071, TestSize.Level1)
         { "unit", "byte" }
     };
     std::string errMessage;
-    std::shared_ptr<NumberFormat> numberFormat = std::make_shared<NumberFormat>(locales, numberFormatOptions, errMessage);
+    int32_t code = 0;
+    std::shared_ptr<NumberFormat> numberFormat =
+        std::make_shared<NumberFormat>(locales, numberFormatOptions, errMessage, code);
     AdvancedMeasureFormatOptions advancedMeasureOptions;
     advancedMeasureOptions.unitUsage = UnitUsage::SIZE_SHORTFILE_BYTE;
     auto advancedMeasureFormat = std::make_unique<AdvancedMeasureFormat>(numberFormat, advancedMeasureOptions);
@@ -831,7 +835,9 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0072, TestSize.Level1)
         { "unit", "day" }
     };
     std::string errMessage;
-    std::shared_ptr<NumberFormat> numberFormat = std::make_shared<NumberFormat>(locales, numberFormatOptions, errMessage);
+    int32_t code = 0;
+    std::shared_ptr<NumberFormat> numberFormat =
+        std::make_shared<NumberFormat>(locales, numberFormatOptions, errMessage, code);
     AdvancedMeasureFormatOptions advancedMeasureOptions;
     advancedMeasureOptions.unitUsage = UnitUsage::ELAPSED_TIME_SECOND;
     auto advancedMeasureFormat = std::make_unique<AdvancedMeasureFormat>(numberFormat, advancedMeasureOptions);
@@ -858,8 +864,9 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0073, TestSize.Level1)
         { "zero", "zero" }
     };
     std::string errMessage;
+    int32_t code = 0;
     std::shared_ptr<SymbolNumberFormat> symbolNumberFormat = std::make_shared<SymbolNumberFormat>(locales,
-        options, errMessage);
+        options, errMessage, code);
     EXPECT_EQ(errMessage, "");
     double valueDouble = 123456.5;
     std::string result = symbolNumberFormat->Format(valueDouble);
@@ -907,8 +914,9 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0074, TestSize.Level1)
         { "zero", "zero" }
     };
     std::string errMessage;
+    int32_t code = 0;
     std::shared_ptr<SymbolNumberFormat> symbolNumberFormat = std::make_shared<SymbolNumberFormat>(locales,
-        options, errMessage);
+        options, errMessage, code);
     EXPECT_EQ(errMessage, "");
     double startDouble = 1234;
     double endDouble = 45670;
