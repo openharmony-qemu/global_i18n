@@ -240,7 +240,7 @@ HWTEST_F(CollatorTest, CollatorFuncTest010, TestSize.Level1)
  */
 HWTEST_F(CollatorTest, CollatorFuncTest011, TestSize.Level1)
 {
-    std::vector<std::string> localeTags = {"zh-u-co-pinyin"};
+    std::vector<std::string> localeTags = {"zh-Hans-CN"};
     std::map<std::string, std::string> options = {};
     Collator collator(localeTags, options);
     CompareResult biluCompResult = collator.Compare("秘鲁", "丹麦");
