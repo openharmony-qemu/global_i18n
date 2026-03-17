@@ -1625,9 +1625,11 @@ I18nErrorCode LocaleConfig::SetSystemLocale(const std::string &localeTag, int32_
     }
     std::string localeCode = LocaleEncode(localeTag);
     HILOG_INFO_I18N("LocaleConfig::SetSystemLocale: set locale %{public}s.", localeCode.c_str());
+    bool oldHourClock = Is24HourClock();
     if (SetParameter(LOCALE_KEY.c_str(), localeTag.data()) != 0) {
         return I18nErrorCode::UPDATE_SYSTEM_LOCALE_FAILED;
     }
+    bool newHourClock = Is24HourClock();
     std::string systemLanguage = GetSystemLanguage();
     std::string effectiveLanguage = ComputeEffectiveLanguage(localeTag, systemLanguage);
 #ifdef SUPPORT_MULTI_USER
@@ -1635,7 +1637,10 @@ I18nErrorCode LocaleConfig::SetSystemLocale(const std::string &localeTag, int32_
     MultiUsers::SaveLocale(localId, localeTag);
 #endif
 #ifdef SUPPORT_GRAPHICS
-    UpdateConfigurationLocaleAndLanguage(localeTag, effectiveLanguage, userId);
+    UpdateConfiguration(localeTag, effectiveLanguage, oldHourClock, newHourClock, userId);
+    if (oldHourClock != newHourClock) {
+        PublishCommonEvent(EventFwk::CommonEventSupport::COMMON_EVENT_TIME_CHANGED, userId);
+    }
     return PublishCommonEvent(EventFwk::CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED, userId);
 #else
     return I18nErrorCode::SUCCESS;
@@ -2271,11 +2276,11 @@ std::pair<std::string, std::string> LocaleConfig::HexToNumberPattern(const std::
 }
 
 #ifdef SUPPORT_GRAPHICS
-void LocaleConfig::UpdateConfigurationLocaleAndLanguage(const std::string& locale, const std::string& language,
-    int32_t userId)
+void LocaleConfig::UpdateConfiguration(const std::string& locale, const std::string& language, bool oldHourClock,
+    bool newHourClock, int32_t userId)
 {
     if (locale.empty() && language.empty()) {
-        HILOG_ERROR_I18N("LocaleConfig::UpdateConfigurationLocaleAndLanguage: locale and language are empty.");
+        HILOG_ERROR_I18N("LocaleConfig::UpdateConfiguration: locale and language are empty.");
         return;
     }
     AppExecFwk::Configuration configuration;
@@ -2285,19 +2290,23 @@ void LocaleConfig::UpdateConfigurationLocaleAndLanguage(const std::string& local
     if (!language.empty()) {
         configuration.AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE, language);
     }
+    if (oldHourClock != newHourClock) {
+        configuration.AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_HOUR, newHourClock ? "true" : "false");
+    }
+
     auto appMgrClient = std::make_unique<AppExecFwk::AppMgrClient>();
     if (appMgrClient == nullptr) {
-        HILOG_ERROR_I18N("LocaleConfig::UpdateConfigurationLocaleAndLanguage: Get appMgrClient failed.");
+        HILOG_ERROR_I18N("LocaleConfig::UpdateConfiguration: Get appMgrClient failed.");
         return;
     }
 
     AppExecFwk::AppMgrResultCode status = appMgrClient->UpdateConfiguration(configuration, userId);
     if (status != AppExecFwk::AppMgrResultCode::RESULT_OK) {
-        HILOG_ERROR_I18N("LocaleConfig::UpdateConfigurationLocaleAndLanguage: Update configuration "
+        HILOG_ERROR_I18N("LocaleConfig::UpdateConfiguration: Update configuration "
             "userId %{public}d failed.", userId);
         return;
     }
-    HILOG_INFO_I18N("LocaleConfig::UpdateConfigurationLocaleAndLanguage: update userId %{public}d, locale %{public}s, "
+    HILOG_INFO_I18N("LocaleConfig::UpdateConfiguration: update userId %{public}d, locale %{public}s, "
         "language %{public}s.", userId, locale.c_str(), language.c_str());
 }
 

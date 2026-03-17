@@ -373,10 +373,12 @@ private:
      *
      * @param locale Indicats update locale.
      * @param language Indicates update language.
+     * @param oldHourClock Indicats the 24-hour time format before the locale is switched.
+     * @param newHourClock Indicats the 24-hour time format after the locale is switched.
      * @param userId Indicats update user id.
      */
-    static void UpdateConfigurationLocaleAndLanguage(const std::string& locale, const std::string& language,
-        int32_t userId);
+    static void UpdateConfiguration(const std::string& locale, const std::string& language, bool oldHourClock,
+        bool newHourClock, int32_t userId);
 
     /**
      * @brief Provided for updating i18n configuration include is24Hour.

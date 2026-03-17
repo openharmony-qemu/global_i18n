@@ -435,7 +435,7 @@ I18nErrorCode MultiUsers::PublishCommonEvent(int32_t userId)
     }
 
     OHOS::AAFwk::Want is24HourChangeWant;
-    is24HourChangeWant.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED);
+    is24HourChangeWant.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_TIME_CHANGED);
     OHOS::EventFwk::CommonEventData is24HourChangeEvent(is24HourChangeWant);
     is24HourChangeEvent.SetData(LocaleConfig::HOUR_EVENT_DATA);
     if (!OHOS::EventFwk::CommonEventManager::PublishCommonEventAsUser(is24HourChangeEvent, userId)) {
