@@ -232,6 +232,24 @@ HWTEST_F(CollatorTest, CollatorFuncTest010, TestSize.Level1)
     EXPECT_EQ(static_cast<int>(collator.Compare("ヽ", "\u20c1")), -1);
     EXPECT_EQ(static_cast<int>(collator.Compare("৴", "\u20c1")), 1);
 }
+
+/**
+ * @tc.name: CollatorFuncTest011
+ * @tc.desc: Test Intl Collator.Compare
+ * @tc.type: FUNC
+ */
+HWTEST_F(CollatorTest, CollatorFuncTest011, TestSize.Level1)
+{
+    std::vector<std::string> localeTags = {"zh-u-co-pinyin"};
+    std::map<std::string, std::string> options = {};
+    Collator collator(localeTags, options);
+    CompareResult biluCompResult = collator.Compare("秘鲁", "丹麦");
+    EXPECT_EQ(biluCompResult, CompareResult::SMALLER);
+    CompareResult changshaCompResult = collator.Compare("长沙", "福州");
+    EXPECT_EQ(changshaCompResult, CompareResult::SMALLER);
+    CompareResult changchunCompResult = collator.Compare("长春", "福州");
+    EXPECT_EQ(changchunCompResult, CompareResult::SMALLER);
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
