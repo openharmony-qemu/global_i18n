@@ -273,6 +273,7 @@ namespace i18n {
         native static getThreeLetterLanguage(locale: string): string;
         native static getThreeLetterRegion(locale: string): string;
         native static getUnicodeWrappedFilePath(path: string, delimiter?: string, locale?: Intl.Locale): string;
+        native static setUnicodeWrappedBidiDirection(text: string, direction: string): string;
     }
 
     export class PhoneNumberFormat {

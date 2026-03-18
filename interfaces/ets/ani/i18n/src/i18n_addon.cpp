@@ -614,6 +614,14 @@ ani_string I18nAddon::GetUnicodeWrappedFilePath(ani_env *env, [[maybe_unused]] a
     return VariableConverter::StringToAniStr(env, result);
 }
 
+ani_string I18nAddon::SetUnicodeWrappedBidiDirection(ani_env *env, [[maybe_unused]] ani_object object,
+    ani_string text, ani_string direction)
+{
+    std::string result = LocaleConfig::SetUnicodeWrappedBidiDirection(
+        VariableConverter::AniStrToString(env, text), VariableConverter::AniStrToString(env, direction));
+    return VariableConverter::StringToAniStr(env, result);
+}
+
 ani_boolean I18nAddon::IsRTL(ani_env *env, ani_string locale)
 {
     return LocaleConfig::IsRTL(VariableConverter::AniStrToString(env, locale));
@@ -751,6 +759,8 @@ ani_status I18nAddon::BindContextI18NUtil(ani_env *env)
         ani_native_function { "getThreeLetterRegion", nullptr, reinterpret_cast<void *>(GetThreeLetterRegion) },
         ani_native_function { "getUnicodeWrappedFilePath", nullptr,
             reinterpret_cast<void *>(GetUnicodeWrappedFilePath) },
+        ani_native_function { "setUnicodeWrappedBidiDirection", nullptr,
+            reinterpret_cast<void *>(SetUnicodeWrappedBidiDirection) },
     };
 
     if (ANI_OK != env->Class_BindStaticNativeMethods(cls, methods.data(), methods.size())) {

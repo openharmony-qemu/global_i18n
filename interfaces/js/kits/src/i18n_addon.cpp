@@ -56,6 +56,7 @@ namespace I18n {
 static thread_local ThreadReference* g_brkConstructor = nullptr;
 static thread_local ThreadReference* g_indexUtilConstructor = nullptr;
 static thread_local ThreadReference* g_transConstructor = nullptr;
+static const size_t ARGUMENT_SIZE = 2;
 
 std::unordered_map<std::string, int32_t> I18nAddon::EnumTemperatureType {
     { "CELSIUS", 1 },
@@ -129,7 +130,8 @@ napi_value I18nAddon::InitI18nUtil(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getBestMatchLocale", GetBestMatchLocale),
         DECLARE_NAPI_STATIC_FUNCTION("getThreeLetterLanguage", GetThreeLetterLanguage),
         DECLARE_NAPI_STATIC_FUNCTION("getThreeLetterRegion", GetThreeLetterRegion),
-        DECLARE_NAPI_STATIC_FUNCTION("getUnicodeWrappedFilePath", GetUnicodeWrappedFilePath)
+        DECLARE_NAPI_STATIC_FUNCTION("getUnicodeWrappedFilePath", GetUnicodeWrappedFilePath),
+        DECLARE_NAPI_STATIC_FUNCTION("setUnicodeWrappedBidiDirection", SetUnicodeWrappedBidiDirection)
     };
     napi_value constructor = nullptr;
     napi_status status = napi_define_class(env, "I18NUtil", NAPI_AUTO_LENGTH, JSUtils::DefaultConstructor, nullptr,
@@ -886,6 +888,59 @@ char I18nAddon::GetDelimiter(napi_env env, napi_value argVal)
         return '\0';
     }
     return result.at(0);
+}
+
+napi_value I18nAddon::SetUnicodeWrappedBidiDirection(napi_env env, napi_callback_info info)
+{
+    size_t argc = 2;
+    napi_value argv[2] = { 0 };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
+    if (argc != ARGUMENT_SIZE) {
+        ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, "text or direction", true);
+        return nullptr;
+    }
+
+    napi_valuetype firstValueType = napi_valuetype::napi_undefined;
+    status = napi_typeof(env, argv[0], &firstValueType);
+    if (status != napi_ok) {
+        return nullptr;
+    }
+    if (firstValueType != napi_valuetype::napi_string) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "text", "string", true);
+        return nullptr;
+    }
+    napi_valuetype secondValueType = napi_valuetype::napi_undefined;
+    status = napi_typeof(env, argv[1], &secondValueType);
+    if (status != napi_ok) {
+        return nullptr;
+    }
+    if (secondValueType != napi_valuetype::napi_string) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "direction", "string", true);
+        return nullptr;
+    }
+
+    int32_t code = 0;
+    std::string text = VariableConvertor::GetString(env, argv[0], code);
+    if (code) {
+        return nullptr;
+    }
+    std::string direction = VariableConvertor::GetString(env, argv[1], code);
+    if (code) {
+        return nullptr;
+    }
+    std::string resStr = LocaleConfig::SetUnicodeWrappedBidiDirection(text, direction);
+    napi_value result = nullptr;
+    status = napi_create_string_utf8(env, resStr.c_str(), NAPI_AUTO_LENGTH, &result);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("SetUnicodeWrappedBidiDirection: Create string value failed");
+        return nullptr;
+    }
+    return result;
 }
 
 napi_value I18nAddon::InitPhoneNumberFormat(napi_env env, napi_value exports)

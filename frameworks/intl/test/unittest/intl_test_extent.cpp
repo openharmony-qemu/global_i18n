@@ -2050,6 +2050,27 @@ HWTEST_F(IntlTest, IntlFuncTest00104, TestSize.Level1)
     isValid = DateTimeFormat::IsValidPatternNumber("0021");
     EXPECT_EQ(isValid, false);
 }
+
+/**
+ * @tc.name: IntlFuncTest00105
+ * @tc.desc: Test SetUnicodeWrappedBidiDirection
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest00105, TestSize.Level1)
+{
+    std::string text = "012-3456789";
+    std::string direction = "LTR";
+    std::string res = LocaleConfig::SetUnicodeWrappedBidiDirection(text, direction);
+    EXPECT_EQ(res, "\u2066" + text + "\u2069");
+    text = "rtl text";
+    direction = "RTL";
+    res = LocaleConfig::SetUnicodeWrappedBidiDirection(text, direction);
+    EXPECT_EQ(res, "\u2067" + text + "\u2069");
+    text = "text";
+    direction = "ltr";
+    res = LocaleConfig::SetUnicodeWrappedBidiDirection(text, direction);
+    EXPECT_EQ(res, text);
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
