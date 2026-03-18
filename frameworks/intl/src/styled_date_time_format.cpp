@@ -33,15 +33,20 @@ const std::unordered_set<std::string> SUPPORT_TYPES_OF_TEXT_STYLE = {
     "dayPeriod"
 };
 
-StyledDateTimeFormat::StyledDateTimeFormat(std::shared_ptr<SimpleDateTimeFormat> simpleFormatter,
-    std::shared_ptr<IntlDateTimeFormat> intlFormatter) : simpleFormatter(simpleFormatter), intlFormatter(intlFormatter)
+const std::unordered_set<DateTimeFormatType> StyledDateTimeFormat::SUPPORT_DATE_TIME_FORMAT_TYPE = {
+    DateTimeFormatType::BUILTINS_DATE_TIME_FORMAT,
+    DateTimeFormatType::SIMPLE_DATE_TIME_FORMAT,
+    DateTimeFormatType::SYMBOL_DATE_TIME_FORMAT
+};
+
+StyledDateTimeFormat::StyledDateTimeFormat(std::shared_ptr<SimpleDateTimeFormat> Formatter)
+    : simpleFormatter(Formatter), status(InitStatus::INIT_SIMPLE)
 {
-    if (simpleFormatter != nullptr) {
-        status = InitStatus::INIT_SIMPLE;
-    }
-    if (intlFormatter != nullptr) {
-        status = InitStatus::INIT_INTL;
-    }
+}
+
+StyledDateTimeFormat::StyledDateTimeFormat(std::shared_ptr<IntlDateTimeFormat> Formatter)
+    : intlFormatter(Formatter), status(InitStatus::INIT_INTL)
+{
 }
 
 std::pair<std::string, std::vector<DateTimeFormatPart>> StyledDateTimeFormat::Format(double milliseconds)

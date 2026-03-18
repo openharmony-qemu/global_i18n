@@ -16,11 +16,8 @@
 #ifndef OHOS_GLOBAL_I18N_STYLED_NUMBER_FORMAT_ADDON_H
 #define OHOS_GLOBAL_I18N_STYLED_NUMBER_FORMAT_ADDON_H
 
-#include <map>
 #include <string>
 #include "ani.h"
-#include "number_format.h"
-#include "simple_number_format_addon.h"
 #include "styled_number_format.h"
 
 namespace OHOS {
@@ -33,14 +30,11 @@ public:
     static ani_string GetFormattedNumber(ani_env *env, ani_object object, ani_double value);
     static ani_object GetStyle(ani_env *env, ani_object object, ani_double value);
     static ani_status BindContextStyledNumberFormat(ani_env *env);
-    static std::map<std::string, std::string> ParseIntlOptions(ani_env *env, ani_object obj);
-
+ 
 private:
     bool InitStyledNumberFormatContent(ani_env *env, ani_object numberFormat);
 
-    static const std::unordered_map<std::string, std::string> PROPERTY_NAME_TO_KEY;
     std::unique_ptr<StyledNumberFormat> styledNumberFormat_ = nullptr;
-    std::shared_ptr<NumberFormat> numberFormat_ = nullptr;
 };
 } // namespace I18n
 } // namespace Global

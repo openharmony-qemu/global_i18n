@@ -39,6 +39,25 @@
 using namespace OHOS;
 using namespace Global;
 using namespace I18n;
+const std::unordered_map<std::string, std::string> BUILTINS_NUMBER_FORMAT_PROPERTY_TO_KEY = {
+    { "_locale", "locale" },
+    { "_compactDisplay", "compactDisplay" },
+    { "_currencySign", "currencySign" },
+    { "_currency", "currency" },
+    { "_currencyDisplay", "currencyDisplay" },
+    { "minFracStr", "minimumFractionDigits" },
+    { "maxFracStr", "maximumFractionDigits" },
+    { "minSignStr", "minimumSignificantDigits" },
+    { "maxSignStr", "maximumSignificantDigits" },
+    { "minIntStr", "minimumIntegerDigits" },
+    { "_notation", "notation" },
+    { "_numberingSystem", "numberingSystem" },
+    { "_signDisplay", "signDisplay" },
+    { "_style", "style" },
+    { "_unit", "unit" },
+    { "_unitDisplay", "unitDisplay" },
+    { "useGroupingStr", "useGrouping" },
+};
 
 std::string VariableConverter::AniStrToString(ani_env *env, ani_ref aniStr)
 {
@@ -551,6 +570,110 @@ void VariableConverter::SetObjectNumberMember(ani_env *env, ani_object obj, cons
         HILOG_ERROR_I18N("VariableConverter::SetObjectNumberMember: Set property %{public}s failed", name.c_str());
         return;
     }
+}
+
+std::map<std::string, std::string> VariableConverter::ParseIntlOptions(ani_env *env, ani_object numberFormat)
+{
+    std::map<std::string, std::string> options = {};
+    ani_ref optionsRef = nullptr;
+    auto status = env->Object_GetFieldByName_Ref(numberFormat, "options", &optionsRef);
+    if (status != ANI_OK) {
+        HILOG_ERROR_I18N("VariableConverter::ParseIntlOptions: Get options failed");
+        return options;
+    }
+    ani_object optionsObj = static_cast<ani_object>(optionsRef);
+    if (!optionsObj) {
+        HILOG_ERROR_I18N("VariableConverter::ParseIntlOptions: Static to object failed");
+        return options;
+    }
+
+    for (auto iter = BUILTINS_NUMBER_FORMAT_PROPERTY_TO_KEY.begin();
+        iter != BUILTINS_NUMBER_FORMAT_PROPERTY_TO_KEY.end(); iter++) {
+        std::string property = "";
+        if (!VariableConverter::GetStringMember(env, optionsObj, iter->first, property)) {
+            continue;
+        }
+        if (property.empty()) {
+            continue;
+        }
+        options[iter->second] = property;
+    }
+    return options;
+}
+
+std::shared_ptr<NumberFormat> VariableConverter::UnWrapIntlDateTimeFormat(ani_env *env, ani_object numberFormat)
+{
+    auto options = VariableConverter::ParseIntlOptions(env, numberFormat);
+    auto iter = options.find("locale");
+    std::vector<std::string> localeTags;
+    if (iter != options.end()) {
+        localeTags.emplace_back(iter->second);
+    }
+    std::string errMessage;
+    int32_t code = 0;
+    auto nativeNumberFormat = std::make_shared<NumberFormat>(localeTags, options, errMessage, code);
+    if (!errMessage.empty() || code != 0) {
+        HILOG_ERROR_I18N("VariableConverter::UnWrapIntlDateTimeFormat: errMessage %{public}s, code %{public}d",
+            errMessage.c_str(), code);
+        return nullptr;
+    }
+    return nativeNumberFormat;
+}
+
+bool VariableConverter::IsIntlNumberFormat(ani_env *env, ani_object numberFormat)
+{
+    static const char *className = "std.core.Intl.NumberFormat";
+    ani_class cls;
+    if (ANI_OK != env->FindClass(className, &cls)) {
+        HILOG_ERROR_I18N("VariableConverter::IsIntlNumberFormat: Find class failed");
+        return false;
+    }
+    ani_boolean isIntlNumberFormat;
+    if (ANI_OK != env->Object_InstanceOf(numberFormat, cls, &isIntlNumberFormat)) {
+        HILOG_ERROR_I18N(" VariableConverter::IsIntlNumberFormat: Get Instance failed");
+        return false;
+    }
+    return isIntlNumberFormat;
+}
+
+NumberFormatType VariableConverter::GetNumberFormatType(ani_env *env, ani_object value)
+{
+    if (I18nSimpleNumberFormatAddon::IsSimpleNumberFormat(env, value)) {
+        return NumberFormatType::SIMPLE_NUMBER_FORMAT;
+    } else if (I18nSymbolNumberFormatAddon::IsSymbolNumberFormat(env, value)) {
+        return NumberFormatType::SYMBOL_NUMBER_FORMAT;
+    } else if (VariableConverter::IsIntlNumberFormat(env, value)) {
+        return NumberFormatType::BUILTINS_NUMBER_FORMAT;
+    }
+    return NumberFormatType::INVALID;
+}
+
+bool VariableConverter::IsIntlDateTimeFormat(ani_env *env, ani_object dateTimeFormat)
+{
+    static const char *className = "std.core.Intl.DateTimeFormat";
+    ani_class cls;
+    if (ANI_OK != env->FindClass(className, &cls)) {
+        HILOG_ERROR_I18N("VariableConverter::IsIntlDateTimeFormat: Find class failed");
+        return false;
+    }
+    ani_boolean isIntlDateTimeFormat;
+    if (ANI_OK != env->Object_InstanceOf(dateTimeFormat, cls, &isIntlDateTimeFormat)) {
+        HILOG_ERROR_I18N(" VariableConverter::IsIntlDateTimeFormat: Get Instance failed");
+        return false;
+    }
+    return isIntlDateTimeFormat;
+}
+
+DateTimeFormatType VariableConverter::GetDateTimeFormatType(ani_env *env, ani_object value)
+{
+    if (I18nSimpleDateTimeFormatAddon::IsSimpleDateTimeFormat(env, value)) {
+        return DateTimeFormatType::SIMPLE_DATE_TIME_FORMAT;
+    } else if (I18nSymbolDateTimeFormatAddon::IsSymbolDateTimeFormat(env, value)) {
+        return DateTimeFormatType::SYMBOL_DATE_TIME_FORMAT;
+    } else if (VariableConverter::IsIntlDateTimeFormat(env, value)) {
+        return DateTimeFormatType::BUILTINS_DATE_TIME_FORMAT;
+    }
+    return DateTimeFormatType::INVALID;
 }
 
 template<typename T>

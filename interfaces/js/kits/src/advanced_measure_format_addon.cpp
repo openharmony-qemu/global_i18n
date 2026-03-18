@@ -18,6 +18,7 @@
 #include "intl_number_format_addon.h"
 #include "js_lifecycle_managers.h"
 #include "js_utils.h"
+#include "symbol_number_format_addon.h"
 #include "variable_convertor.h"
 
 
@@ -77,13 +78,13 @@ napi_value AdvancedMeasureFormatAddon::Constructor(napi_env env, napi_callback_i
         return nullptr;
     }
 
-    IntlNumberFormatAddon* intlNumberFormatAddon = nullptr;
-    status = IntlNumberFormatAddon::UnwrapIntlNumberFormat(env, argv[0], &intlNumberFormatAddon);
-    if (status != napi_ok || intlNumberFormatAddon == nullptr) {
-        HILOG_ERROR_I18N("AdvancedMeasureFormatAddon::Constructor: Unwrap IntlNumberFormatAddon failed.");
+    NumberFormatType type = VariableConvertor::GetNumberFormatType(env, argv[0]);
+    if (AdvancedMeasureFormat::SUPPORT_NUMBER_FORMAT_TYPE.find(type) ==
+        AdvancedMeasureFormat::SUPPORT_NUMBER_FORMAT_TYPE.end()) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "numberFormat",
+            "Intl.NumberFormator or SymbolNumberFormat", true);
         return nullptr;
     }
-
     AdvancedMeasureFormatOptions options = ParseOptions(env, argv[1]);
 
     std::unique_ptr<AdvancedMeasureFormatAddon> obj = std::make_unique<AdvancedMeasureFormatAddon>();
@@ -92,7 +93,7 @@ napi_value AdvancedMeasureFormatAddon::Constructor(napi_env env, napi_callback_i
         HILOG_ERROR_I18N("AdvancedMeasureFormatAddon::Constructor: Wrap AdvancedMeasureFormatAddon failed.");
         return nullptr;
     }
-    if (!obj->InitContext(env, intlNumberFormatAddon->GetNumberFormat(), options)) {
+    if (!obj->InitContext(env, argv[0], type, options)) {
         HILOG_ERROR_I18N("AdvancedMeasureFormatAddon::Constructor: Init context failed.");
         return nullptr;
     }
@@ -100,28 +101,34 @@ napi_value AdvancedMeasureFormatAddon::Constructor(napi_env env, napi_callback_i
     return thisVar;
 }
 
-bool AdvancedMeasureFormatAddon::InitContext(napi_env env, std::shared_ptr<NumberFormat> numberFormat,
+bool AdvancedMeasureFormatAddon::InitContext(napi_env env, napi_value numberFormat, NumberFormatType type,
     AdvancedMeasureFormatOptions options)
 {
-    if (numberFormat == nullptr) {
-        HILOG_ERROR_I18N("AdvancedMeasureFormatAddon::InitContext: numberFormat is nullptr.");
-        return false;
+    switch (type) {
+        case NumberFormatType::BUILTINS_NUMBER_FORMAT: {
+            IntlNumberFormatAddon* numberFormataddon = nullptr;
+            if (IntlNumberFormatAddon::UnwrapNumberFormat(env, numberFormat, &numberFormataddon) != napi_ok ||
+                numberFormataddon == nullptr) {
+                return false;
+            }
+            advancedMeasureFormat_ = std::make_shared<AdvancedMeasureFormat>(numberFormataddon->GetNumberFormat(),
+                options);
+            break;
+        }
+        case NumberFormatType::SYMBOL_NUMBER_FORMAT: {
+            SymbolNumberFormatAddon* numberFormataddon = nullptr;
+            if (SymbolNumberFormatAddon::UnwrapNumberFormat(env, numberFormat, &numberFormataddon) != napi_ok ||
+                numberFormataddon == nullptr) {
+                return false;
+            }
+            advancedMeasureFormat_ = std::make_shared<AdvancedMeasureFormat>(numberFormataddon->GetNumberFormat(),
+                options);
+            break;
+        }
+        default:
+            HILOG_ERROR_I18N("AdvancedMeasureFormatAddon::InitContext: Invalid type");
     }
-    std::map<std::string, std::string> numberFormatOptions;
-    numberFormat->GetResolvedOptions(numberFormatOptions, true);
-    auto iter = numberFormatOptions.find("locale");
-    if (iter == numberFormatOptions.end()) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "numberFormat", "Intl.NumberFormat", true);
-        return false;
-    }
-    std::string errMessage;
-    int32_t code = 0;
-    auto nativeNumberFormat = std::make_shared<NumberFormat>(std::vector<std::string>{ iter->second },
-        numberFormatOptions, errMessage, code);
-    if (!errMessage.empty() || code != 0) {
-        return false;
-    }
-    advancedMeasureFormat_ = std::make_shared<AdvancedMeasureFormat>(nativeNumberFormat, options);
+
     return advancedMeasureFormat_ != nullptr;
 }
 

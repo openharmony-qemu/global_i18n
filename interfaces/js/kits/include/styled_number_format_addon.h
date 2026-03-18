@@ -21,12 +21,7 @@
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
-#include "simple_number_format.h"
-#include "simple_number_format_addon.h"
 #include "styled_number_format.h"
-#include "number_format.h"
-#include "number_format_addon.h"
-#include "intl_number_format_addon.h"
 
 namespace OHOS {
 namespace Global {
@@ -46,15 +41,9 @@ private:
         const std::unordered_map<std::string, napi_ref> &styledNumberFormatOptions);
     static napi_value CreateStyleOption(napi_env env, StyledNumberFormat::NumberPart numberPart,
         napi_ref textStyleRef);
-    static void GetNumberFmtOrSimpleNumberFmt(napi_env env, napi_value arg,
-        IntlNumberFormatAddon **intlNumberFormatAddon, SimpleNumberFormatAddon **simpleNumberFormatAddon,
-        NumberFormatAddon **numberFormatAddon);
-    static bool IsNumberFormatInstance(napi_env env, napi_value arg, const std::string &moduleName);
-    static bool IsIntlNumberFormatInstance(napi_env env, napi_value arg);
     static void SetNamedProperty(napi_env env, napi_value &option, const std::string& name, napi_value &property);
 
-    bool InitStyledNumberFormatContent(napi_env env, IntlNumberFormatAddon* intlNumberFormatAddon,
-        SimpleNumberFormatAddon* simpleNumberFormatAddon, NumberFormatAddon *numberFormatAddon,
+    bool InitStyledNumberFormatContent(napi_env env, napi_value numberFormat, NumberFormatType type,
         napi_value options);
     void SetTextStyle(napi_env env, napi_value options, const std::string &optionName);
 

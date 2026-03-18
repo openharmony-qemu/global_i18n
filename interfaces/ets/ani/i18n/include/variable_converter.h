@@ -16,9 +16,12 @@
 #ifndef OHOS_GLOBAL_I18N_VARIABLE_CONVERTER_H
 #define OHOS_GLOBAL_I18N_VARIABLE_CONVERTER_H
 
+#include <map>
 #include <string>
 #include <vector>
 #include "ani.h"
+#include "i18n_types.h"
+#include "number_format.h"
 
 namespace OHOS {
 namespace Global {
@@ -45,6 +48,12 @@ public:
     static ani_object CreateAniMap(ani_env* env, const std::unordered_map<std::string, std::string> &map);
     static void SetObjectBooleanMember(ani_env *env, ani_object obj, const std::string &name, ani_boolean value);
     static void SetObjectNumberMember(ani_env *env, ani_object obj, const std::string &name, ani_int value);
+    static std::map<std::string, std::string> ParseIntlOptions(ani_env *env, ani_object numberFormat);
+    static std::shared_ptr<NumberFormat> UnWrapIntlDateTimeFormat(ani_env *env, ani_object numberFormat);
+    static bool IsIntlNumberFormat(ani_env *env, ani_object obj);
+    static NumberFormatType GetNumberFormatType(ani_env *env, ani_object value);
+    static bool IsIntlDateTimeFormat(ani_env *env, ani_object dateTimeFormat);
+    static DateTimeFormatType GetDateTimeFormatType(ani_env *env, ani_object value);
     template<typename T>
     static ani_object CreateAniObject(ani_env* env, const char* className, T* ptr);
 };

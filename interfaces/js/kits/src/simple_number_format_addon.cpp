@@ -220,13 +220,34 @@ std::unique_ptr<SimpleNumberFormat> SimpleNumberFormatAddon::InitSimpleNumberFor
     return nullptr;
 }
 
-napi_status SimpleNumberFormatAddon::UnwrapSimpleNumberFormat(napi_env env, napi_value value,
+napi_status SimpleNumberFormatAddon::UnwrapNumberFormat(napi_env env, napi_value value,
     SimpleNumberFormatAddon** numberFormat)
 {
     return napi_unwrap_s(env, value, &TYPE_TAG, reinterpret_cast<void **>(numberFormat));
 }
 
-std::shared_ptr<SimpleNumberFormat> SimpleNumberFormatAddon::CopySimpleNumberFormat()
+bool SimpleNumberFormatAddon::IsSimpleNumberFormat(napi_env env, napi_value value)
+{
+    if (g_SimpleNumberFormatConstructor == nullptr) {
+        HILOG_ERROR_I18N("SimpleNumberFormatAddon::IsSimpleNumberFormat: g_SimpleNumberFormatConstructor is nullptr.");
+        return false;
+    }
+    napi_value constructor = nullptr;
+    if (!g_SimpleNumberFormatConstructor->GetReferenceValue(env, &constructor)) {
+        HILOG_ERROR_I18N("SimpleNumberFormatAddon::IsSimpleNumberFormat: Failed to create reference.");
+        return false;
+    }
+
+    bool isSimpleNumberFormat = false;
+    napi_status status = napi_instanceof(env, value, constructor, &isSimpleNumberFormat);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("SimpleNumberFormatAddon::IsSimpleNumberFormat: Failed to get instance of argv.");
+        return false;
+    }
+    return isSimpleNumberFormat;
+}
+
+std::shared_ptr<SimpleNumberFormat> SimpleNumberFormatAddon::GetNumberFormat()
 {
     return simpleNumberFormat_;
 }

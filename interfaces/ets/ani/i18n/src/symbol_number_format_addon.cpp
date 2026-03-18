@@ -485,6 +485,28 @@ ani_status I18nSymbolNumberFormatAddon::BindContextSymbolNumberFormat(ani_env *e
     }
     return ANI_OK;
 }
+
+bool I18nSymbolNumberFormatAddon::IsSymbolNumberFormat(ani_env *env, ani_object numberFormat)
+{
+    static const char *className = "@ohos.i18n.i18n.SymbolNumberFormat";
+    ani_class cls;
+    if (ANI_OK != env->FindClass(className, &cls)) {
+        HILOG_ERROR_I18N("I18nSymbolNumberFormatAddon::IsSymbolNumberFormat: Find class failed.");
+        return false;
+    }
+
+    ani_boolean isSymbolNumberFormat;
+    if (ANI_OK != env->Object_InstanceOf(numberFormat, cls, &isSymbolNumberFormat)) {
+        HILOG_ERROR_I18N("I18nSymbolNumberFormatAddon::IsSymbolNumberFormat: Get Instance failed");
+        return false;
+    }
+    return isSymbolNumberFormat;
+}
+
+std::shared_ptr<SymbolNumberFormat> I18nSymbolNumberFormatAddon::GetNumberFormat()
+{
+    return symbolNumberFormat_;
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

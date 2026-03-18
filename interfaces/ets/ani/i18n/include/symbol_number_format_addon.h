@@ -26,6 +26,8 @@ class I18nSymbolNumberFormatAddon {
 public:
     static I18nSymbolNumberFormatAddon* UnwrapAddon(ani_env *env, ani_object object);
     static ani_status BindContextSymbolNumberFormat(ani_env *env);
+    static bool IsSymbolNumberFormat(ani_env *env, ani_object numberFormat);
+    std::shared_ptr<SymbolNumberFormat> GetNumberFormat();
 
 private:
     bool InitContext(ani_env *env, ani_object locale, ani_object options);

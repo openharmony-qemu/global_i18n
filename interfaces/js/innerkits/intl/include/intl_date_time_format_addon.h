@@ -30,7 +30,7 @@ public:
     std::shared_ptr<IntlDateTimeFormat> GetDateTimeFormat();
     static napi_value InitIntlDateTimeFormat(napi_env env, napi_value exports);
     static bool IsIntlDateTimeFormat(napi_env env, napi_value argv);
-    static napi_status UnwrapIntlDateTimeFormat(napi_env env, napi_value value,
+    static napi_status UnwrapDateTimeFormat(napi_env env, napi_value value,
         IntlDateTimeFormatAddon** dateTimeFormat);
     static napi_value CreateFormatPart(napi_env env,
         const std::vector<std::unordered_map<std::string, std::string>>& parts);

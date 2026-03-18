@@ -55,6 +55,10 @@ public:
     static napi_value CreateStyledString(napi_env env, const std::string& content, napi_value styleOption);
     static std::pair<uint8_t*, size_t> GetUint8Array(napi_env env, napi_value value, int32_t& code);
     static bool IsUndefined(napi_env env, napi_value value);
+    static DateType GetDateType(napi_env env, napi_value date);
+    static bool GetTimeFromDate(napi_env env, napi_value date, DateType type, double& milliseconds);
+    static NumberFormatType GetNumberFormatType(napi_env env, napi_value value);
+    static DateTimeFormatType GetDateTimeFormatType(napi_env env, napi_value value);
 
 private:
     static napi_value GetBuiltinsLocaleConstructor(napi_env env);

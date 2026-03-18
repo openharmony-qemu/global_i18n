@@ -33,7 +33,7 @@ public:
     static napi_value InitSymbolDateTimeFormat(napi_env env, napi_value exports);
     std::shared_ptr<SymbolDateTimeFormat> GetDateTimeFormat();
     static bool IsSymbolDateTimeFormat(napi_env env, napi_value argv);
-    static napi_status UnwrapSymbolDateTimeFormat(napi_env env, napi_value value,
+    static napi_status UnwrapDateTimeFormat(napi_env env, napi_value value,
         SymbolDateTimeFormatAddon** dateTimeFormat);
 
 private:

@@ -1928,7 +1928,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0039, TestSize.Level1)
                                     { "signDisplay", "always" } };
     std::shared_ptr<NumberFormat> numFmt = std::make_shared<NumberFormat>(locales, options);
     ASSERT_TRUE(numFmt != nullptr);
-    StyledNumberFormat styledNumFmt(true, numFmt, nullptr);
+    StyledNumberFormat styledNumFmt(numFmt);
     string out = styledNumFmt.Format(123456.789);
     EXPECT_EQ(out, expects);
 }
@@ -1955,7 +1955,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0040, TestSize.Level1)
                                     { "signDisplay", "always" } };
     std::shared_ptr<NumberFormat> numFmt = std::make_shared<NumberFormat>(locales, options);
     ASSERT_TRUE(numFmt != nullptr);
-    StyledNumberFormat styledNumFmt(true, numFmt, nullptr);
+    StyledNumberFormat styledNumFmt(numFmt);
     std::vector<StyledNumberFormat::NumberPart> out = styledNumFmt.ParseToParts(123456.789);
     EXPECT_EQ(out.size(), 5);
     EXPECT_EQ(out[0].part_name, "integer");
@@ -1979,7 +1979,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0041, TestSize.Level1)
     std::shared_ptr<SimpleNumberFormat> formatter = std::make_shared<SimpleNumberFormat>(skeleton, localeInfo, err);
     EXPECT_EQ(err, I18nErrorCode::SUCCESS);
     ASSERT_TRUE(formatter != nullptr);
-    StyledNumberFormat styledNumFmt(false, nullptr, formatter);
+    StyledNumberFormat styledNumFmt(formatter);
     std::string result = styledNumFmt.Format(10);
     EXPECT_EQ(result, "10%");
 }
@@ -1998,7 +1998,7 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0042, TestSize.Level1)
                                     { "unitUsage", "elapsed-time-second" } };
     std::shared_ptr<NumberFormat> numFmt = std::make_shared<NumberFormat>(locales, options);
     ASSERT_TRUE(numFmt != nullptr);
-    StyledNumberFormat styledNumFmt(true, numFmt, nullptr);
+    StyledNumberFormat styledNumFmt(numFmt);
     if (NumberFormatTest::deviceType == "wearable" || NumberFormatTest::deviceType == "liteWearable" ||
         NumberFormatTest::deviceType == "watch") {
         EXPECT_EQ(styledNumFmt.Format(1234.5678), "20 hr. ago");

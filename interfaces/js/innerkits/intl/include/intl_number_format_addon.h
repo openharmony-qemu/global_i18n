@@ -32,8 +32,9 @@ public:
     ~IntlNumberFormatAddon();
     static void Destructor(napi_env env, void *nativeObject, void *hint);
     static napi_value InitIntlNumberFormat(napi_env env, napi_value exports);
-    static napi_status UnwrapIntlNumberFormat(napi_env env, napi_value value, IntlNumberFormatAddon** numberFormat);
+    static napi_status UnwrapNumberFormat(napi_env env, napi_value value, IntlNumberFormatAddon** numberFormat);
     static napi_value SupportedLocalesOf(napi_env env, napi_callback_info info);
+    static bool IsIntlNumberFormat(napi_env env, napi_value value);
 
     std::shared_ptr<NumberFormat> GetNumberFormat();
 

@@ -30,7 +30,7 @@ public:
     static ani_status BindContextSimpleNumberFormat(ani_env *env);
     static bool IsSimpleNumberFormat(ani_env *env, ani_object numberFormat);
 
-    std::shared_ptr<SimpleNumberFormat> CopySimpleNumberFormat()
+    std::shared_ptr<SimpleNumberFormat> GetNumberFormat()
     {
         return simpleNumberFormat_;
     }

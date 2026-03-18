@@ -19,6 +19,7 @@
 #include "locale_config.h"
 #include "number_format.h"
 #include "simple_number_format.h"
+#include "styled_number_format.h"
 #include "symbol_number_format.h"
 #include "unicode/locid.h"
 #include "parameter.h"
@@ -938,6 +939,33 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0074, TestSize.Level1)
     EXPECT_EQ(parts.size(), length);
     parts = symbolNumberFormat->FormatToRangePartsDecStrDecStr(startBigint, endBigint);
     EXPECT_EQ(parts.size(), length);
+}
+
+/**
+ * @tc.name: NumberFormatFuncTest0075
+ * @tc.desc: Test SymbolNumberFormat
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0075, TestSize.Level1)
+{
+    std::vector<std::string> locales { "en" };
+    std::map<std::string, std::string> options = {
+        { "style", "unit" },
+        { "unit", "day" },
+        { "groupingSeparator", "/" },
+        { "infinity", "INF" },
+        { "plusSign", "++" },
+        { "minusSign", "--" },
+        { "nan", "N" },
+        { "zero", "zero" }
+    };
+    std::string errMessage;
+    int32_t code = 0;
+    std::shared_ptr<SymbolNumberFormat> symbolNumberFormat = std::make_shared<SymbolNumberFormat>(locales,
+        options, errMessage, code);
+    EXPECT_EQ(errMessage, "");
+    StyledNumberFormat formatter(symbolNumberFormat);
+    EXPECT_EQ(formatter.Format(-123456), "--123/456 days");
 }
 } // namespace I18n
 } // namespace Global

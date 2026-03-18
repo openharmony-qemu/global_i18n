@@ -34,12 +34,14 @@ public:
         INIT_INTL
     };
 
-    StyledDateTimeFormat(std::shared_ptr<SimpleDateTimeFormat> simpleFormatter,
-        std::shared_ptr<IntlDateTimeFormat> intlFormatter);
+    StyledDateTimeFormat(std::shared_ptr<SimpleDateTimeFormat> Formatter);
+    StyledDateTimeFormat(std::shared_ptr<IntlDateTimeFormat> Formatter);
 
     std::pair<std::string, std::vector<DateTimeFormatPart>> Format(double date);
 
     static std::unordered_set<std::string> GetSupportedTypes();
+
+    static const std::unordered_set<DateTimeFormatType> SUPPORT_DATE_TIME_FORMAT_TYPE;
 
 private:
     std::shared_ptr<SimpleDateTimeFormat> simpleFormatter;

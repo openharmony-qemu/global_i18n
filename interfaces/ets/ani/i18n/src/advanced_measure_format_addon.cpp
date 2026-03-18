@@ -17,6 +17,7 @@
 #include "error_util.h"
 #include "i18n_hilog.h"
 #include "styled_number_format_addon.h"
+#include "symbol_number_format_addon.h"
 #include "variable_converter.h"
 
 namespace OHOS {
@@ -49,18 +50,28 @@ ani_object AdvancedMeasureFormatAddon::Create(ani_env *env, [[maybe_unused]] ani
 
 bool AdvancedMeasureFormatAddon::InitContext(ani_env *env, ani_object numberFormat, ani_object options)
 {
-    std::map<std::string, std::string> numberFormatOptions =
-        I18nStyledNumberFormatAddon::ParseIntlOptions(env, numberFormat);
-    auto iter = numberFormatOptions.find("locale");
-    if (iter == numberFormatOptions.end()) {
-        ErrorUtil::AniThrow(env, I18N_NOT_FOUND, "numberFormat", "Intl.NumberFormat");
+    NumberFormatType type = VariableConverter::GetNumberFormatType(env, numberFormat);
+    if (AdvancedMeasureFormat::SUPPORT_NUMBER_FORMAT_TYPE.find(type) ==
+        AdvancedMeasureFormat::SUPPORT_NUMBER_FORMAT_TYPE.end()) {
+        ErrorUtil::AniThrow(env, I18N_NOT_FOUND, "numberFormat", "Intl.NumberFormator or SymbolNumberFormat");
         return false;
     }
-    std::string errMessage;
-    int32_t code = 0;
-    auto nativeNumberFormat = std::make_shared<NumberFormat>(std::vector<std::string>{ iter->second },
-        numberFormatOptions, errMessage, code);
-    if (!errMessage.empty() || code != 0) {
+    std::shared_ptr<NumberFormat> nativeNumberFormat = nullptr;
+    switch (type) {
+        case NumberFormatType::BUILTINS_NUMBER_FORMAT:
+            nativeNumberFormat = VariableConverter::UnWrapIntlDateTimeFormat(env, numberFormat);
+            break;
+        case NumberFormatType::SYMBOL_NUMBER_FORMAT: {
+            I18nSymbolNumberFormatAddon* numberFormatAddon =
+                I18nSymbolNumberFormatAddon::UnwrapAddon(env, numberFormat);
+            nativeNumberFormat = numberFormatAddon ? numberFormatAddon->GetNumberFormat() : nullptr;
+            break;
+        }
+        default:
+            HILOG_ERROR_I18N("AdvancedMeasureFormatAddon::InitContext: type error");
+    }
+    if (nativeNumberFormat == nullptr) {
+        HILOG_ERROR_I18N("AdvancedMeasureFormatAddon::InitContext: Unwrap numberFormat failed");
         return false;
     }
     AdvancedMeasureFormatOptions advancedMeasureOptions = ParseAdvancedMeasureOptions(env, options);

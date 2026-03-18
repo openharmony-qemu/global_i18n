@@ -17,6 +17,7 @@
 
 #include <memory>
 #include <string>
+#include <unordered_set>
 
 #include "number_format.h"
 
@@ -59,6 +60,8 @@ public:
     ~AdvancedMeasureFormat();
 
     std::string FormatNumber(double value);
+
+    static const std::unordered_set<NumberFormatType> SUPPORT_NUMBER_FORMAT_TYPE;
 
 private:
     void InitContext();

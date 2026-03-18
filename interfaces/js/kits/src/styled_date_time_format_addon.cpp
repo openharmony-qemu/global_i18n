@@ -55,7 +55,7 @@ napi_value StyledDateTimeFormatAddon::InitStyledDateTimeFormat(napi_env env, nap
         DECLARE_NAPI_FUNCTION("format", Format)
     };
     napi_value styledConstructor = nullptr;
-    napi_status status = napi_define_class(env, "StyledDateTimeFormat", NAPI_AUTO_LENGTH, constructor, nullptr,
+    napi_status status = napi_define_class(env, "StyledDateTimeFormat", NAPI_AUTO_LENGTH, Constructor, nullptr,
         sizeof(properties) / sizeof(napi_property_descriptor), properties, &styledConstructor);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("InitStyledDateTimeFormat: Define class StyledDateTimeFormat failed.");
@@ -69,7 +69,7 @@ napi_value StyledDateTimeFormatAddon::InitStyledDateTimeFormat(napi_env env, nap
     return exports;
 }
 
-napi_value StyledDateTimeFormatAddon::constructor(napi_env env, napi_callback_info info)
+napi_value StyledDateTimeFormatAddon::Constructor(napi_env env, napi_callback_info info)
 {
     size_t argc = 2;
     napi_value argv[2] = { nullptr };
@@ -77,81 +77,67 @@ napi_value StyledDateTimeFormatAddon::constructor(napi_env env, napi_callback_in
     void *data = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("StyledDateTimeFormatAddon::constructor: Get callback info error.");
+        HILOG_ERROR_I18N("StyledDateTimeFormatAddon::Constructor: Get callback info error.");
         return nullptr;
     } else if (argc < 1) {
         ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, "dateTimeFormat", true);
         return nullptr;
     }
 
-    IntlDateTimeFormatAddon* intlFormat = nullptr;
-    SimpleDateTimeFormatAddon* simpleFormat = nullptr;
-    SymbolDateTimeFormatAddon* symbolFormat = nullptr;
-    ParseDateTimeFormat(env, argv[0], &intlFormat, &simpleFormat, &symbolFormat);
-    if (!intlFormat && !simpleFormat && !symbolFormat) {
+    DateTimeFormatType type = VariableConvertor::GetDateTimeFormatType(env, argv[0]);
+    if (StyledDateTimeFormat::SUPPORT_DATE_TIME_FORMAT_TYPE.find(type) ==
+        StyledDateTimeFormat::SUPPORT_DATE_TIME_FORMAT_TYPE.end()) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "dateTimeFormat",
-            "SimpleDateTimeFormat, Intl.DateTimeFormat or i18n.SymbolDateTimeFormat", true);
+            "Intl.DateTimeFormat, SimpleDateTimeFormat or SymbolDateTimeFormat", true);
         return nullptr;
     }
 
     std::unique_ptr<StyledDateTimeFormatAddon> obj = std::make_unique<StyledDateTimeFormatAddon>();
     status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj.get()), Destructor, nullptr, &TYPE_TAG, nullptr);
     if (status != napi_ok) {
-        HILOG_ERROR_I18N("StyledDateTimeFormatAddon::constructor: napi_wrap error.");
+        HILOG_ERROR_I18N("StyledDateTimeFormatAddon::Constructor: napi_wrap error.");
         return nullptr;
     }
-    if (!obj->InitStyledFormatContext(env, argv[1], intlFormat, simpleFormat, symbolFormat)) {
+    if (!obj->InitStyledFormatContext(env, argv[0], type, argv[1])) {
         return nullptr;
     }
     obj.release();
     return thisVar;
 }
 
-void StyledDateTimeFormatAddon::ParseDateTimeFormat(napi_env env, napi_value value,
-    IntlDateTimeFormatAddon** intlFormat, SimpleDateTimeFormatAddon** simpleFormat,
-    SymbolDateTimeFormatAddon** symbolFormat)
+bool StyledDateTimeFormatAddon::InitStyledFormatContext(napi_env env, napi_value dateFormat, DateTimeFormatType type,
+    napi_value options)
 {
-    napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_status status = napi_typeof(env, value, &valueType);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("StyledDateTimeFormatAddon::ParseDateTimeFormat: Failed to get type.");
-        return;
-    } else if (valueType != napi_valuetype::napi_object) {
-        HILOG_ERROR_I18N("StyledDateTimeFormatAddon::ParseDateTimeFormat: Check value failed.");
-        return;
-    }
-
-    if (IntlDateTimeFormatAddon::IsIntlDateTimeFormat(env, value)) {
-        status = IntlDateTimeFormatAddon::UnwrapIntlDateTimeFormat(env, value, intlFormat);
-        if (status != napi_ok && intlFormat != nullptr) {
-            *intlFormat = nullptr;
-            HILOG_ERROR_I18N("StyledDateTimeFormatAddon::ParseDateTimeFormat: intlFormat unwrap failed.");
+    switch (type) {
+        case DateTimeFormatType::BUILTINS_DATE_TIME_FORMAT: {
+            IntlDateTimeFormatAddon* dateFormataddon = nullptr;
+            if (IntlDateTimeFormatAddon::UnwrapDateTimeFormat(env, dateFormat, &dateFormataddon) != napi_ok ||
+                dateFormataddon == nullptr) {
+                return false;
+            }
+            styledDateTimeFormat_ = std::make_unique<StyledDateTimeFormat>(dateFormataddon->GetDateTimeFormat());
+            break;
         }
-    } else if (SimpleDateTimeFormatAddon::IsSimpleDateTimeFormat(env, value)) {
-        status = SimpleDateTimeFormatAddon::UnwrapSimpleDateTimeFormat(env, value, simpleFormat);
-        if (status != napi_ok && simpleFormat != nullptr) {
-            *simpleFormat = nullptr;
-            HILOG_ERROR_I18N("StyledDateTimeFormatAddon::ParseDateTimeFormat: simpleFormat unwrap failed.");
+        case DateTimeFormatType::SIMPLE_DATE_TIME_FORMAT: {
+            SimpleDateTimeFormatAddon* dateFormataddon = nullptr;
+            if (SimpleDateTimeFormatAddon::UnwrapDateTimeFormat(env, dateFormat, &dateFormataddon) != napi_ok ||
+                dateFormataddon == nullptr) {
+                return false;
+            }
+            styledDateTimeFormat_ = std::make_unique<StyledDateTimeFormat>(dateFormataddon->GetDateTimeFormat());
+            break;
         }
-    } else if (SymbolDateTimeFormatAddon::IsSymbolDateTimeFormat(env, value)) {
-        status = SymbolDateTimeFormatAddon::UnwrapSymbolDateTimeFormat(env, value, symbolFormat);
-        if (status != napi_ok && symbolFormat != nullptr) {
-            *symbolFormat = nullptr;
-            HILOG_ERROR_I18N("StyledDateTimeFormatAddon::ParseDateTimeFormat: symbolFormat unwrap failed.");
+        case DateTimeFormatType::SYMBOL_DATE_TIME_FORMAT: {
+            SymbolDateTimeFormatAddon* dateFormataddon = nullptr;
+            if (SymbolDateTimeFormatAddon::UnwrapDateTimeFormat(env, dateFormat, &dateFormataddon) != napi_ok ||
+                dateFormataddon == nullptr) {
+                return false;
+            }
+            styledDateTimeFormat_ = std::make_unique<StyledDateTimeFormat>(dateFormataddon->GetDateTimeFormat());
+            break;
         }
-    }
-}
-
-bool StyledDateTimeFormatAddon::InitStyledFormatContext(napi_env env, napi_value options,
-    IntlDateTimeFormatAddon* intlFormat, SimpleDateTimeFormatAddon* simpleFormat,
-    SymbolDateTimeFormatAddon* symbolFormat)
-{
-    if (intlFormat) {
-        styledDateTimeFormat_ = std::make_unique<StyledDateTimeFormat>(nullptr, intlFormat->GetDateTimeFormat());
-    } else if (simpleFormat) {
-        styledDateTimeFormat_ = std::make_unique<StyledDateTimeFormat>(simpleFormat->GetDateTimeFormat(), nullptr);
-    } else if (symbolFormat) {
-        styledDateTimeFormat_ = std::make_unique<StyledDateTimeFormat>(nullptr, symbolFormat->GetDateTimeFormat());
+        default:
+            HILOG_ERROR_I18N("InitStyledFormatContext: Invalid type");
     }
 
     ParseOptions(env, options);

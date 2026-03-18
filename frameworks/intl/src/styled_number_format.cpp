@@ -22,9 +22,20 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-StyledNumberFormat::StyledNumberFormat(bool isNumberFormat, std::shared_ptr<NumberFormat> numberFormat,
-    std::shared_ptr<SimpleNumberFormat> simpleNumberFormat)
-    : isNumberFormat(isNumberFormat), numberFormat(numberFormat), simpleNumberFormat(simpleNumberFormat)
+const std::unordered_set<NumberFormatType> StyledNumberFormat::SUPPORT_NUMBER_FORMAT_TYPE = {
+    NumberFormatType::NUMBER_FORMAT,
+    NumberFormatType::BUILTINS_NUMBER_FORMAT,
+    NumberFormatType::SIMPLE_NUMBER_FORMAT,
+    NumberFormatType::SYMBOL_NUMBER_FORMAT,
+};
+
+StyledNumberFormat::StyledNumberFormat(std::shared_ptr<SimpleNumberFormat> simpleNumberFormat)
+    : isNumberFormat(false), simpleNumberFormat(simpleNumberFormat)
+{
+}
+
+StyledNumberFormat::StyledNumberFormat(std::shared_ptr<NumberFormat> numberFormat)
+    : isNumberFormat(true), numberFormat(numberFormat)
 {
 }
 

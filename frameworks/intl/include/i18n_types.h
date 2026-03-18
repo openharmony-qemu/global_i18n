@@ -91,6 +91,29 @@ struct ErrorMessage {
     ErrorType type = ErrorType::NO_ERROR;
     std::string message = "";
 };
+
+enum class NumberFormatType {
+    INVALID = 0,
+    NUMBER_FORMAT = 1,
+    BUILTINS_NUMBER_FORMAT = 2,
+    SIMPLE_NUMBER_FORMAT = 3,
+    SYMBOL_NUMBER_FORMAT = 4,
+};
+
+enum class DateTimeFormatType {
+    INVALID = 0,
+    Date_Time_FORMAT = 1,
+    BUILTINS_DATE_TIME_FORMAT = 2,
+    SIMPLE_DATE_TIME_FORMAT = 3,
+    SYMBOL_DATE_TIME_FORMAT = 4,
+};
+
+enum class DateType {
+    INVALID = 0,
+    DATE_OBJECT = 1,
+    NUMBER = 2,
+    BIGINT = 3,
+};
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

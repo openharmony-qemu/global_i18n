@@ -245,7 +245,30 @@ napi_status NumberFormatAddon::UnwrapNumberFormat(napi_env env, napi_value value
     return napi_unwrap_s(env, value, &TYPE_TAG, reinterpret_cast<void **>(numberFormat));
 }
 
-std::shared_ptr<NumberFormat> NumberFormatAddon::CopyNumberFormat()
+bool NumberFormatAddon::IsNumberFormat(napi_env env, napi_value value)
+{
+    napi_value intlModule;
+    napi_status status = napi_load_module(env, "@ohos.intl", &intlModule);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("NumberFormatAddon::IsNumberFormat: Failed to get module");
+        return false;
+    }
+    napi_value constructor = nullptr;
+    status = napi_get_named_property(env, intlModule, "NumberFormat", &constructor);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("NumberFormatAddon::IsNumberFormat: get constructor failed");
+        return false;
+    }
+    bool isNumberFormat = true;
+    status = napi_instanceof(env, value, constructor, &isNumberFormat);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("NumberFormatAddon::IsNumberFormat: napi_instanceof failed");
+        return false;
+    }
+    return isNumberFormat;
+}
+
+std::shared_ptr<NumberFormat> NumberFormatAddon::GetNumberFormat()
 {
     return numberfmt_;
 }

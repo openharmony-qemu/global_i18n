@@ -515,10 +515,39 @@ napi_value IntlNumberFormatAddon::SetNumberFormatParts(napi_env env, napi_status
     return result;
 }
 
-napi_status IntlNumberFormatAddon::UnwrapIntlNumberFormat(napi_env env, napi_value value,
+napi_status IntlNumberFormatAddon::UnwrapNumberFormat(napi_env env, napi_value value,
     IntlNumberFormatAddon** numberFormat)
 {
     return napi_unwrap_s(env, value, &TYPE_TAG, reinterpret_cast<void **>(numberFormat));
+}
+
+bool IntlNumberFormatAddon::IsIntlNumberFormat(napi_env env, napi_value value)
+{
+    napi_value global = nullptr;
+    napi_status status = napi_get_global(env, &global);
+    if (status != napi_ok || global == nullptr) {
+        HILOG_ERROR_I18N("IntlNumberFormatAddon::IsIntlNumberFormat: get global obj failed");
+        return false;
+    }
+    napi_value intlModule;
+    status = napi_get_named_property(env, global, "Intl", &intlModule);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("IntlNumberFormatAddon::IsIntlNumberFormat: Get Intl module failed");
+        return false;
+    }
+    napi_value constructor = nullptr;
+    status = napi_get_named_property(env, intlModule, "NumberFormat", &constructor);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("IntlNumberFormatAddon::IsIntlNumberFormat: get NumberFormat constructor failed");
+        return false;
+    }
+    bool isIntlNumberFormat = true;
+    status = napi_instanceof(env, value, constructor, &isIntlNumberFormat);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("IntlNumberFormatAddon::IsIntlNumberFormat: napi_instanceof failed");
+        return false;
+    }
+    return isIntlNumberFormat;
 }
 
 std::shared_ptr<NumberFormat> IntlNumberFormatAddon::GetNumberFormat()
