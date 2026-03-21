@@ -191,9 +191,21 @@ void I18nSystemAddon::SetSystemLanguage(ani_env *env, [[maybe_unused]] ani_objec
 {
     I18nErrorCode err = I18nServiceAbilityClient::SetSystemLanguage(VariableConverter::AniStrToString(env, language));
     HILOG_INFO_I18N("I18nSystemAddon::SetSystemLanguage with code %{public}d", static_cast<int32_t>(err));
-    bool success = err == I18nErrorCode::SUCCESS;
-    if (!success) {
-        ErrorUtil::AniThrow(env, I18N_NO_PERMISSION, "", "");
+    if (err == I18nErrorCode::SUCCESS) {
+        return;
+    }
+    switch (err) {
+        case I18nErrorCode::NOT_SYSTEM_APP:
+            ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
+            break;
+        case I18nErrorCode::NO_PERMISSION:
+            ErrorUtil::AniThrow(env, I18N_NO_PERMISSION, "", "");
+            break;
+        case I18nErrorCode::INVALID_LANGUAGE_TAG:
+            ErrorUtil::AniThrow(env, I18N_NOT_VALID, "language", "a valid language");
+            break;
+        default:
+            HILOG_ERROR_I18N("SetSystemLanguage: Update language failed.");
     }
 }
 
@@ -207,9 +219,21 @@ void I18nSystemAddon::SetSystemRegion(ani_env *env, [[maybe_unused]] ani_object 
 {
     I18nErrorCode err = I18nServiceAbilityClient::SetSystemRegion(VariableConverter::AniStrToString(env, region));
     HILOG_INFO_I18N("I18nSystemAddon::SetSystemRegion with code %{public}d", static_cast<int32_t>(err));
-    bool success = err == I18nErrorCode::SUCCESS;
-    if (!success) {
-        ErrorUtil::AniThrow(env, I18N_NO_PERMISSION, "", "");
+    if (err == I18nErrorCode::SUCCESS) {
+        return;
+    }
+    switch (err) {
+        case I18nErrorCode::NOT_SYSTEM_APP:
+            ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
+            break;
+        case I18nErrorCode::NO_PERMISSION:
+            ErrorUtil::AniThrow(env, I18N_NO_PERMISSION, "", "");
+            break;
+        case I18nErrorCode::INVALID_REGION_TAG:
+            ErrorUtil::AniThrow(env, I18N_NOT_VALID, "region", "a valid region");
+            break;
+        default:
+            HILOG_ERROR_I18N("SetSystemRegion: Update region failed.");
     }
 }
 
@@ -222,9 +246,22 @@ ani_string I18nSystemAddon::GetSystemLocale(ani_env *env, [[maybe_unused]] ani_o
 void I18nSystemAddon::SetSystemLocale(ani_env *env, [[maybe_unused]] ani_object object, ani_string locale)
 {
     I18nErrorCode err = I18nServiceAbilityClient::SetSystemLocale(VariableConverter::AniStrToString(env, locale));
-    bool success = err == I18nErrorCode::SUCCESS;
-    if (!success) {
-        ErrorUtil::AniThrow(env, I18N_NO_PERMISSION, "", "");
+    HILOG_INFO_I18N("I18nSystemAddon::SetSystemLocale with code %{public}d", static_cast<int32_t>(err));
+    if (err == I18nErrorCode::SUCCESS) {
+        return;
+    }
+    switch (err) {
+        case I18nErrorCode::NOT_SYSTEM_APP:
+            ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
+            break;
+        case I18nErrorCode::NO_PERMISSION:
+            ErrorUtil::AniThrow(env, I18N_NO_PERMISSION, "", "");
+            break;
+        case I18nErrorCode::INVALID_LOCALE_TAG:
+            ErrorUtil::AniThrow(env, I18N_NOT_VALID, "locale", "a valid locale");
+            break;
+        default:
+            HILOG_ERROR_I18N("SetSystemLocale: Update locale failed.");
     }
 }
 
@@ -239,9 +276,18 @@ void I18nSystemAddon::Set24HourClock([[maybe_unused]] ani_env *env, [[maybe_unus
     std::string optionStr = option ? "true" : "false";
     I18nErrorCode err = I18nServiceAbilityClient::Set24HourClock(optionStr);
     HILOG_INFO_I18N("I18nSystemAddon::Set24HourClock with code %{public}d", static_cast<int32_t>(err));
-    bool success = err == I18nErrorCode::SUCCESS;
-    if (!success) {
-        ErrorUtil::AniThrow(env, I18N_NO_PERMISSION, "", "");
+    if (err == I18nErrorCode::SUCCESS) {
+        return;
+    }
+    switch (err) {
+        case I18nErrorCode::NOT_SYSTEM_APP:
+            ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
+            break;
+        case I18nErrorCode::NO_PERMISSION:
+            ErrorUtil::AniThrow(env, I18N_NO_PERMISSION, "", "");
+            break;
+        default:
+            HILOG_ERROR_I18N("Set24HourClock: Update 24HourClock failed.");
     }
 }
 
@@ -263,11 +309,21 @@ void I18nSystemAddon::AddPreferredLanguage(ani_env *env, [[maybe_unused]] ani_ob
     I18nErrorCode err = I18nServiceAbilityClient::AddPreferredLanguage(
         VariableConverter::AniStrToString(env, language), index);
     HILOG_INFO_I18N("I18nSystemAddon::AddPreferredLanguage with code %{public}d", static_cast<int32_t>(err));
-    if (err == I18nErrorCode::NO_PERMISSION) {
-        ErrorUtil::AniThrow(env, I18N_NO_PERMISSION, "", "");
+    if (err == I18nErrorCode::SUCCESS) {
+        return;
     }
-    if (err != I18nErrorCode::SUCCESS) {
-        ErrorUtil::AniThrow(env, I18N_NOT_VALID, "language", "a valid language");
+    switch (err) {
+        case I18nErrorCode::NOT_SYSTEM_APP:
+            ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
+            break;
+        case I18nErrorCode::NO_PERMISSION:
+            ErrorUtil::AniThrow(env, I18N_NO_PERMISSION, "", "");
+            break;
+        case I18nErrorCode::INVALID_LANGUAGE_TAG:
+            ErrorUtil::AniThrow(env, I18N_NOT_VALID, "language", "a valid language");
+            break;
+        default:
+            HILOG_ERROR_I18N("AddPreferredLanguage: Update preferrd language failed.");
     }
 }
 
@@ -281,9 +337,18 @@ void I18nSystemAddon::RemovePreferredLanguage([[maybe_unused]] ani_env *env, [[m
     }
 
     I18nErrorCode err = I18nServiceAbilityClient::RemovePreferredLanguage(index);
-    bool success = err == I18nErrorCode::SUCCESS;
-    if (!success) {
-        ErrorUtil::AniThrow(env, I18N_NO_PERMISSION, "", "");
+    if (err == I18nErrorCode::SUCCESS) {
+        return;
+    }
+    switch (err) {
+        case I18nErrorCode::NOT_SYSTEM_APP:
+            ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
+            break;
+        case I18nErrorCode::NO_PERMISSION:
+            ErrorUtil::AniThrow(env, I18N_NO_PERMISSION, "", "");
+            break;
+        default:
+            HILOG_ERROR_I18N("RemovePreferredLanguage: Remove preferrd language failed.");
     }
 }
 
@@ -334,9 +399,18 @@ void I18nSystemAddon::SetUsingLocalDigit([[maybe_unused]] ani_env *env, [[maybe_
 {
     I18nErrorCode err = I18nServiceAbilityClient::SetUsingLocalDigit(flag);
     HILOG_INFO_I18N("I18nSystemAddon::SetUsingLocalDigit with code %{public}d", static_cast<int32_t>(err));
-    bool res = err == I18nErrorCode::SUCCESS;
-    if (!res) {
-        ErrorUtil::AniThrow(env, I18N_NO_PERMISSION, "", "");
+    if (err == I18nErrorCode::SUCCESS) {
+        return;
+    }
+    switch (err) {
+        case I18nErrorCode::NOT_SYSTEM_APP:
+            ErrorUtil::AniThrow(env, I18N_NOT_SYSTEM_APP, "", "");
+            break;
+        case I18nErrorCode::NO_PERMISSION:
+            ErrorUtil::AniThrow(env, I18N_NO_PERMISSION, "", "");
+            break;
+        default:
+            HILOG_ERROR_I18N("SetUsingLocalDigit: Set using local digit failed.");
     }
 }
 

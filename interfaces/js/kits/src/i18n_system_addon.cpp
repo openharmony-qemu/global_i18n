@@ -787,11 +787,8 @@ napi_value I18nSystemAddon::Set24HourClockImpl(napi_env env, napi_callback_info 
                 case I18nErrorCode::NO_PERMISSION:
                     ErrorUtil::NapiThrow(env, I18N_NO_PERMISSION, "", "", true);
                     break;
-                case I18nErrorCode::INVALID_24_HOUR_CLOCK_TAG:
-                    ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "option", "true or false", true);
-                    break;
                 default:
-                    HILOG_ERROR_I18N("SetSystemRegionImpl: Update 24HourClock failed.");
+                    HILOG_ERROR_I18N("Set24HourClockImpl: Update 24HourClock failed.");
             }
         }
         return nullptr;
