@@ -64,6 +64,7 @@
                 "icu",
                 "init",
                 "ipc",
+                "jsoncpp",
                 "libphonenumber",
                 "libpng",
                 "libxml2",

@@ -184,6 +184,7 @@ ohos_shared_library("intl_util") {
       ":zh_datetime_xml",
     ]
     external_deps += [
+      "ability_base:session_info",
       "access_token:libaccesstoken_sdk",
       "access_token:libtokenid_sdk",
       "c_utils:utils",
@@ -191,6 +192,7 @@ ohos_shared_library("intl_util") {
       "icu:icundk",
       "init:libbegetutil",
       "ipc:ipc_core",
+      "jsoncpp:jsoncpp",
       "libphonenumber:phonenumber_standard",
       "libpng:libpng",
       "libxml2:libxml2",
