@@ -233,12 +233,12 @@ ani_object I18nStyledDateTimeFormatAddon::FormatToPats(ani_env *env, ani_object 
         return nullptr;
     }
 
-    ani_double milliseconds;
-    if (ANI_OK != env->Object_CallMethod_Double(date, getms, &milliseconds)) {
+    ani_long milliseconds;
+    if (ANI_OK != env->Object_CallMethod_Long(date, getms, &milliseconds)) {
         HILOG_ERROR_I18N("I18nSimpleDateTimeFormatAddon::Format: Call method 'valueOf' failed");
         return nullptr;
     }
-    auto formatResult = ptr->styledDateTimeFormat_->Format(milliseconds);
+    auto formatResult = ptr->styledDateTimeFormat_->Format(static_cast<double>(milliseconds));
     return CreateStyledFormatResult(env, formatResult);
 }
 } // namespace I18n
