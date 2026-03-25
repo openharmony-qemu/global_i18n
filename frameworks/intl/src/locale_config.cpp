@@ -2792,6 +2792,22 @@ icu::Locale LocaleConfigExt::GetSystemIcuLocale()
     }
     return locale;
 }
+
+std::string LocaleConfig::SetUnicodeWrappedBidiDirection(const std::string& text, const std::string& direction)
+{
+    if (direction != "RTL" && direction != "LTR") {
+        HILOG_ERROR_I18N("LocaleConfig::SetUnicodeWrappedBidiDirection %{public}s is not valid direction.",
+            direction.c_str());
+        return text;
+    }
+    static const std::unordered_map<std::string, std::pair<std::string, std::string>> directionMarkers = {
+        {"RTL", {"\u2067", "\u2069"}}, // RIGHT-TO-LEFT ISOLATE and POP DIRECTIONAL ISOLATE
+        {"LTR", {"\u2066", "\u2069"}} // LEFT-TO-RIGHT ISOLATE and POP DIRECTIONAL ISOLATE
+    };
+    const auto &markers = directionMarkers.at(direction);
+    std::string result = markers.first + text + markers.second;
+    return result;
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

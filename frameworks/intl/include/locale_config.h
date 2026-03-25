@@ -273,6 +273,7 @@ public:
     static std::string GetMeasurementFromLocale(const std::string& localeTag);
     static std::string GetPatternNumberFromLocale(const std::string& locale);
     static TemperatureType GetTemperatureTypeFromLocale(const std::string& localeTag);
+    static std::string SetUnicodeWrappedBidiDirection(const std::string& text, const std::string& direction);
     static const std::string HOUR_EVENT_DATA;
     static const std::string LANGUAGE_KEY;
     static const std::string LOCALE_KEY;

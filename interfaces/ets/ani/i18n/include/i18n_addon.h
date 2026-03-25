@@ -94,6 +94,8 @@ public:
         ani_string path, ani_string delimiter, ani_object locale);
     static ani_status BindContextI18NUtil(ani_env *env);
     static ani_status BindContextNamespace(ani_env *env);
+    static ani_string SetUnicodeWrappedBidiDirection(ani_env *env, [[maybe_unused]] ani_object object,
+        ani_string text, ani_string direction);
 };
 } // namespace I18n
 } // namespace Global
