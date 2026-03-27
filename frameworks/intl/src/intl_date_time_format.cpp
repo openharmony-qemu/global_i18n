@@ -19,6 +19,7 @@
 #include "ohos/init_data.h"
 #include "unicode/gregocal.h"
 #include "i18n_hilog.h"
+#include "i18n_timezone.h"
 #include "locale_config.h"
 #include "locale_helper.h"
 #include "locale_info.h"
@@ -619,7 +620,12 @@ bool IntlDateTimeFormat::InitIcuTimeZone(const std::unordered_map<std::string, s
     }
 
     if (timeZone.empty()) {
-        icuTimeZone = icu::TimeZone::createDefault();
+        std::string appTimeZoneID = I18nTimeZone::GetAppDefaultTimeZoneID();
+        if (!appTimeZoneID.empty()) {
+            icuTimeZone = icu::TimeZone::createTimeZone(appTimeZoneID.c_str());
+        } else {
+            icuTimeZone = icu::TimeZone::createDefault();
+        }
         if (icuTimeZone == nullptr) {
             HILOG_ERROR_I18N("IntlDateTimeFormat::InitIcuTimeZone: Create default time zone.");
             return false;

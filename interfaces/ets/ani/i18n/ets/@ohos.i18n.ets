@@ -442,6 +442,8 @@ namespace i18n {
         native static getCityDisplayName(cityID: string, locale: string): string;
         native static getTimezoneFromCity(cityID: string): TimeZone;
         native static getTimezonesByLocation(longitude: double, latitude: double): Array<TimeZone>;
+        native static setAppDefaultTimeZoneById(zoneID: string): void;
+        native static getAppDefaultTimeZone(): TimeZone;
     }
 
     export class Transliterator {

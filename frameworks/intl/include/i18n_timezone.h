@@ -53,6 +53,9 @@ public:
     static std::map<std::string, std::string> FindCityDisplayNameMap(std::string &locale);
     static std::string GetLocaleBaseName(std::string &locale);
     static std::string GetTimezoneIdByCityId(const std::string &cityId);
+    static I18nErrorCode SetAppDefaultTimeZoneById(const std::string& zoneID);
+    static std::unique_ptr<I18nTimeZone> GetAppDefaultTimeZone();
+    static std::string GetAppDefaultTimeZoneID();
 
 private:
     static const char *TIMEZONE_KEY;
@@ -93,6 +96,7 @@ private:
     static std::mutex initSupportedLocalesMutex;
     static std::mutex cityDisplayNameMutex;
     static std::string cityDisplayNameCacheLocale;
+    static std::string appDefaultTimeZoneID;
     static bool initAvailableZoneInfo;
     static bool initSupportedLocales;
     static bool ReadTimeZoneData(const char *xmlPath);

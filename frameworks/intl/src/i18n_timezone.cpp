@@ -71,6 +71,7 @@ std::unordered_set<std::string> I18nTimeZone::availableZoneCityIDs {};
 std::unordered_map<std::string, std::string> I18nTimeZone::city2TimeZoneID {};
 std::unordered_map<std::string, std::string> I18nTimeZone::cityDisplayNameCache {};
 std::string I18nTimeZone::cityDisplayNameCacheLocale = "";
+std::string I18nTimeZone::appDefaultTimeZoneID = "";
 std::map<std::string, std::string> I18nTimeZone::BEST_MATCH_LOCALE {};
 std::mutex I18nTimeZone::matchLocaleMutex;
 std::mutex I18nTimeZone::initZoneInfoMutex;
@@ -602,6 +603,11 @@ I18nTimeZone::I18nTimeZone(std::string &id, bool isZoneID)
 {
     if (isZoneID) {
         if (id.empty()) {
+            if (!appDefaultTimeZoneID.empty()) {
+                icu::UnicodeString unicodeZoneID(appDefaultTimeZoneID.data(), appDefaultTimeZoneID.length());
+                timezone = icu::TimeZone::createTimeZone(unicodeZoneID);
+                return;
+            }
             std::string systemTimezone = ReadSystemParameter(TIMEZONE_KEY, SYS_PARAM_LEN);
             if (systemTimezone.empty()) {
                 HILOG_ERROR_I18N("I18nTimeZone::I18nTimeZone: Read system time zone failed.");
@@ -616,6 +622,11 @@ I18nTimeZone::I18nTimeZone(std::string &id, bool isZoneID)
     } else {
         GetAvailableZoneCityIDs();
         if (city2TimeZoneID.find(id) == city2TimeZoneID.end()) {
+            if (!appDefaultTimeZoneID.empty()) {
+                icu::UnicodeString unicodeZoneID(appDefaultTimeZoneID.data(), appDefaultTimeZoneID.length());
+                timezone = icu::TimeZone::createTimeZone(unicodeZoneID);
+                return;
+            }
             timezone = icu::TimeZone::createDefault();
         } else {
             std::string timezoneID = city2TimeZoneID.at(id);
@@ -1419,6 +1430,34 @@ const char *I18nTimeZone::GetDeviceCityDisplayNamePath()
     } else {
         return "";
     }
+}
+
+I18nErrorCode I18nTimeZone::SetAppDefaultTimeZoneById(const std::string& zoneID)
+{
+    std::set<std::string> availableIDs = GetAvailableIDs();
+    if (availableIDs.find(zoneID) == availableIDs.end()) {
+        HILOG_ERROR_I18N("SetAppDefaultTimeZoneById: invalid zoneID.");
+        return I18nErrorCode::INVALID_PARAM;
+    }
+    appDefaultTimeZoneID = zoneID;
+    return I18nErrorCode::SUCCESS;
+}
+
+std::unique_ptr<I18nTimeZone> I18nTimeZone::GetAppDefaultTimeZone()
+{
+    std::string timeZoneStr;
+    if (appDefaultTimeZoneID.empty()) {
+        timeZoneStr = LocaleConfig::GetSystemTimezone();
+    } else {
+        timeZoneStr = appDefaultTimeZoneID;
+    }
+    std::unique_ptr<I18nTimeZone> i18nTimeZone = CreateInstance(timeZoneStr, true);
+    return i18nTimeZone;
+}
+
+std::string I18nTimeZone::GetAppDefaultTimeZoneID()
+{
+    return appDefaultTimeZoneID;
 }
 }
 }
