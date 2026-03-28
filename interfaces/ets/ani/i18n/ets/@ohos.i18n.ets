@@ -804,7 +804,7 @@ namespace i18n {
         dayPeriod?: "narrow" | "short" | "long";
         era?: string;
         formatMatcher?: "basic" | "best fit";
-        fractionalSecondDigits?: number;
+        fractionalSecondDigits?: int;
         hour12?: boolean;
         hour?: string;
         hourCycle?: "h11" | "h12" | "h23" | "h24";
@@ -940,11 +940,11 @@ namespace i18n {
         currency?: string;
         currencyDisplay?: "code" | "symbol" | "narrowSymbol" | "name";
         locale: Intl.BCP47LanguageTag;
-        maximumFractionDigits: number;
-        maximumSignificantDigits?: number;
-        minimumFractionDigits: number;
-        minimumIntegerDigits: number;
-        minimumSignificantDigits?: number;
+        maximumFractionDigits: int;
+        maximumSignificantDigits?: int;
+        minimumFractionDigits: int;
+        minimumIntegerDigits: int;
+        minimumSignificantDigits?: int;
         notation?: "standard" | "scientific" | "engineering" | "compact";
         numberingSystem: string;
         signDisplay?: "auto" | "never" | "always" | "exceptZero";
