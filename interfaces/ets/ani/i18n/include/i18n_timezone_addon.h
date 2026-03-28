@@ -39,6 +39,8 @@ public:
         ani_double longitude, ani_double latitude);
     static ani_object GetZoneRules(ani_env *env, [[maybe_unused]] ani_object object);
     static ani_status BindContextTimeZone(ani_env *env);
+    static void SetAppDefaultTimeZoneById(ani_env *env, [[maybe_unused]] ani_object object, ani_string zoneID);
+    static ani_object GetAppDefaultTimeZone(ani_env *env, [[maybe_unused]] ani_object object);
 
 private:
     std::unique_ptr<I18nTimeZone> timezone_ = nullptr;

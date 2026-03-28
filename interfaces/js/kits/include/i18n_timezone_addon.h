@@ -40,6 +40,8 @@ private:
     static napi_value GetTimezonesByLocation(napi_env env, napi_callback_info info);
     static bool CheckLongitudeTypeAndScope(napi_env env, napi_value argv, double &x);
     static bool CheckLatitudeTypeAndScope(napi_env env, napi_value argv, double &y);
+    static napi_value SetAppDefaultTimeZoneById(napi_env env, napi_callback_info info);
+    static napi_value GetAppDefaultTimeZone(napi_env env, napi_callback_info info);
 
     static napi_value GetID(napi_env env, napi_callback_info info);
     static napi_value GetTimeZoneDisplayName(napi_env env, napi_callback_info info);

@@ -101,7 +101,9 @@ napi_value I18nTimeZoneAddon::InitTimeZone(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getAvailableZoneCityIDs", GetAvailableZoneCityIDs),
         DECLARE_NAPI_STATIC_FUNCTION("getCityDisplayName", GetCityDisplayName),
         DECLARE_NAPI_STATIC_FUNCTION("getTimezoneFromCity", GetTimezoneFromCity),
-        DECLARE_NAPI_STATIC_FUNCTION("getTimezonesByLocation", GetTimezonesByLocation)
+        DECLARE_NAPI_STATIC_FUNCTION("getTimezonesByLocation", GetTimezonesByLocation),
+        DECLARE_NAPI_STATIC_FUNCTION("setAppDefaultTimeZoneById", SetAppDefaultTimeZoneById),
+        DECLARE_NAPI_STATIC_FUNCTION("getAppDefaultTimeZone", GetAppDefaultTimeZone)
     };
     napi_value constructor = nullptr;
     napi_status status = napi_define_class(env, "I18nTimeZone", NAPI_AUTO_LENGTH, JSUtils::DefaultConstructor, nullptr,
@@ -352,6 +354,58 @@ bool I18nTimeZoneAddon::CheckLatitudeTypeAndScope(napi_env env, napi_value argv,
         return false;
     }
     return true;
+}
+
+napi_value I18nTimeZoneAddon::SetAppDefaultTimeZoneById(napi_env env, napi_callback_info info)
+{
+    size_t argc = 1;
+    napi_value argv[1] = { nullptr };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("SetAppDefaultTimeZoneById: Failed to get callback info");
+        return nullptr;
+    }
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("SetAppDefaultTimeZoneById: Failed to get parameter type");
+        return nullptr;
+    }
+    if (valueType != napi_valuetype::napi_string) {
+        HILOG_ERROR_I18N("SetAppDefaultTimeZoneById: Invalid parameter type");
+        return nullptr;
+    }
+    int32_t code = 0;
+    std::string zoneID = VariableConvertor::GetString(env, argv[0], code);
+    if (code != 0) {
+        HILOG_ERROR_I18N("SetAppDefaultTimeZoneById: Failed to convert zoneID to string");
+        return nullptr;
+    }
+    I18nErrorCode err = I18nTimeZone::SetAppDefaultTimeZoneById(zoneID);
+    if (err != I18nErrorCode::SUCCESS) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID_NEW, "zoneID", "a valid zoneID supported by the system", true);
+        return nullptr;
+    }
+    napi_value result = nullptr;
+    NAPI_CALL(env, napi_get_undefined(env, &result));
+    return result;
+}
+
+napi_value I18nTimeZoneAddon::GetAppDefaultTimeZone(napi_env env, napi_callback_info info)
+{
+    std::unique_ptr<I18nTimeZone> appTimeZone = I18nTimeZone::GetAppDefaultTimeZone();
+    std::string id = appTimeZone->GetID();
+    napi_value timezoneId = nullptr;
+    napi_status status = napi_create_string_utf8(env, id.c_str(), NAPI_AUTO_LENGTH, &timezoneId);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("GetAppDefaultTimeZone: Failed to convert time zone ID");
+        return nullptr;
+    }
+    napi_value argTimeZoneId[1] = { timezoneId };
+    napi_value timezone = StaticGetTimeZone(env, argTimeZoneId, true);
+    return timezone;
 }
 
 napi_value I18nTimeZoneAddon::GetID(napi_env env, napi_callback_info info)

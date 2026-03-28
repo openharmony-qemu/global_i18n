@@ -14,6 +14,7 @@
  */
 
 #include "i18n_hilog.h"
+#include "i18n_timezone.h"
 #include "locale_config.h"
 #include "ohos/init_data.h"
 #include "unicode/datefmt.h"
@@ -92,8 +93,11 @@ std::string SimpleDateTimeFormat::Format(int64_t milliseconds)
         HILOG_ERROR_I18N("SimpleDateTimeFormat::Format: init failed.");
         return PseudoLocalizationProcessor("");
     }
-    std::string systemTimeZone = LocaleConfig::GetSystemTimezone();
-    auto timeZone = std::unique_ptr<icu::TimeZone>(icu::TimeZone::createTimeZone(systemTimeZone.c_str()));
+    std::string timeZoneID = I18nTimeZone::GetAppDefaultTimeZoneID();
+    if (timeZoneID.empty()) {
+        timeZoneID = LocaleConfig::GetSystemTimezone();
+    }
+    auto timeZone = std::unique_ptr<icu::TimeZone>(icu::TimeZone::createTimeZone(timeZoneID.c_str()));
     UErrorCode status = U_ZERO_ERROR;
     UDate date = static_cast<UDate>(milliseconds);
     icu::UnicodeString formatResult;
@@ -128,8 +132,11 @@ std::pair<std::string, std::vector<DateTimeFormatPart>> SimpleDateTimeFormat::Fo
         HILOG_ERROR_I18N("SimpleDateTimeFormat::FormatToParts: init failed.");
         return {};
     }
-    std::string systemTimeZone = LocaleConfig::GetSystemTimezone();
-    auto timeZone = std::unique_ptr<icu::TimeZone>(icu::TimeZone::createTimeZone(systemTimeZone.c_str()));
+    std::string timeZoneID = I18nTimeZone::GetAppDefaultTimeZoneID();
+    if (timeZoneID.empty()) {
+        timeZoneID = LocaleConfig::GetSystemTimezone();
+    }
+    auto timeZone = std::unique_ptr<icu::TimeZone>(icu::TimeZone::createTimeZone(timeZoneID.c_str()));
     UDate date = static_cast<UDate>(milliseconds);
     icu::UnicodeString formatResult;
     std::vector<DateTimeFormatPart> formatParts;

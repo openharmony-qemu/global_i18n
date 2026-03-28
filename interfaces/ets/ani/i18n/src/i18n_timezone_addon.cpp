@@ -15,6 +15,7 @@
 
 #include "i18n_timezone_addon.h"
 
+#include "error_util.h"
 #include "i18n_hilog.h"
 #include "variable_converter.h"
 #include "zone_rules_addon.h"
@@ -235,6 +236,26 @@ ani_object I18nTimeZoneAddon::GetZoneRules(ani_env *env, ani_object object)
     return ZoneRulesAddon::GetZoneRulesObject(env, object, tzid);
 }
 
+void I18nTimeZoneAddon::SetAppDefaultTimeZoneById(ani_env *env, [[maybe_unused]] ani_object object, ani_string zoneID)
+{
+    std::string zoneIDStr = VariableConverter::AniStrToString(env, zoneID);
+    I18nErrorCode err = I18nTimeZone::SetAppDefaultTimeZoneById(zoneIDStr);
+    if (err != I18nErrorCode::SUCCESS) {
+        ErrorUtil::AniThrow(env, I18N_NOT_VALID_NEW, "zoneID", "a valid zoneID supported by the system");
+    }
+}
+
+ani_object I18nTimeZoneAddon::GetAppDefaultTimeZone(ani_env *env, [[maybe_unused]] ani_object object)
+{
+    std::unique_ptr<I18nTimeZoneAddon> obj = std::make_unique<I18nTimeZoneAddon>();
+    obj->timezone_ = I18nTimeZone::GetAppDefaultTimeZone();
+
+    static const char* className = "@ohos.i18n.i18n.TimeZone";
+    ani_object timeZone_object = VariableConverter::CreateAniObject(env, className, obj.get());
+    obj.release();
+    return timeZone_object;
+}
+
 ani_status I18nTimeZoneAddon::BindContextTimeZone(ani_env *env)
 {
     static const char *className = "@ohos.i18n.i18n.TimeZone";
@@ -267,6 +288,10 @@ ani_status I18nTimeZoneAddon::BindContextTimeZone(ani_env *env)
             reinterpret_cast<void *>(I18nTimeZoneAddon::GetTimezoneFromCity) },
         ani_native_function { "getTimezonesByLocation", nullptr,
             reinterpret_cast<void *>(I18nTimeZoneAddon::GetTimezonesByLocation) },
+        ani_native_function { "setAppDefaultTimeZoneById", nullptr,
+            reinterpret_cast<void *>(I18nTimeZoneAddon::SetAppDefaultTimeZoneById) },
+        ani_native_function { "getAppDefaultTimeZone", nullptr,
+            reinterpret_cast<void *>(I18nTimeZoneAddon::GetAppDefaultTimeZone) },
     };
     if (ANI_OK != env->Class_BindStaticNativeMethods(cls, staticMethods.data(), staticMethods.size())) {
         HILOG_ERROR_I18N("BindContextTimeZone: Cannot bind native methods to '%{public}s'", className);

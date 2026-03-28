@@ -1939,6 +1939,32 @@ HWTEST_F(I18nTest, I18nFuncTest074, TestSize.Level1)
     LocaleConfig::SetSystemLanguage(systemLanguage);
     LocaleConfig::SetSystemLocale(systemLocale);
 }
+
+/**
+ * @tc.name: I18nFuncTest075
+ * @tc.desc: Test I18n app default timeZone
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest075, TestSize.Level1)
+{
+    std::string systemTimeZone = LocaleConfig::GetSystemTimezone();
+    std::unique_ptr<I18nTimeZone> i18nTimeZone = I18nTimeZone::GetAppDefaultTimeZone();
+    std::string appTimeZoneID = i18nTimeZone->GetID();
+    EXPECT_EQ(appTimeZoneID, systemTimeZone);
+
+    std::string timeZoneID = "A/a";
+    I18nErrorCode err = I18nTimeZone::SetAppDefaultTimeZoneById(timeZoneID);
+    EXPECT_EQ(err, I18nErrorCode::INVALID_PARAM);
+    std::string defaultTimeZoneID = I18nTimeZone::GetAppDefaultTimeZoneID();
+    EXPECT_EQ(defaultTimeZoneID, "");
+
+    timeZoneID = "Europe/London";
+    err = I18nTimeZone::SetAppDefaultTimeZoneById(timeZoneID);
+    EXPECT_EQ(err, I18nErrorCode::SUCCESS);
+    i18nTimeZone = I18nTimeZone::GetAppDefaultTimeZone();
+    appTimeZoneID = i18nTimeZone->GetID();
+    EXPECT_EQ(appTimeZoneID, timeZoneID);
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
