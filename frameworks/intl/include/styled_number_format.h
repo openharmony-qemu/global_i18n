@@ -16,6 +16,7 @@
 #ifndef OHOS_GLOBAL_I18N_STYLED_NUMBER_FORMAT_H
 #define OHOS_GLOBAL_I18N_STYLED_NUMBER_FORMAT_H
 
+#include <unordered_set>
 #include <vector>
 
 #include "number_format.h"
@@ -33,10 +34,12 @@ public:
         size_t length;
     };
 
-    StyledNumberFormat(bool isNumberFormat, std::shared_ptr<NumberFormat> numberFormat,
-        std::shared_ptr<SimpleNumberFormat> simpleNumberFormat);
+    StyledNumberFormat(std::shared_ptr<SimpleNumberFormat> simpleNumberFormat);
+    StyledNumberFormat(std::shared_ptr<NumberFormat> numberFormat);
     std::string Format(double number);
     std::vector<StyledNumberFormat::NumberPart> ParseToParts(double number);
+
+    static const std::unordered_set<NumberFormatType> SUPPORT_NUMBER_FORMAT_TYPE;
 
 private:
     std::vector<StyledNumberFormat::NumberPart> ParseToParts(icu::number::FormattedNumber &formattedValue);
@@ -45,8 +48,8 @@ private:
         std::vector<StyledNumberFormat::NumberPart> &result);
 
     bool isNumberFormat;
-    std::shared_ptr<NumberFormat> numberFormat;
-    std::shared_ptr<SimpleNumberFormat> simpleNumberFormat;
+    std::shared_ptr<NumberFormat> numberFormat = nullptr;
+    std::shared_ptr<SimpleNumberFormat> simpleNumberFormat = nullptr;
 };
 } // namespace I18n
 } // namespace Global

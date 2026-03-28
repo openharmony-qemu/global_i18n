@@ -33,7 +33,7 @@ public:
     static napi_value GetSimpleDateTimeFormatBySkeleton(napi_env env, napi_callback_info info);
     static napi_value GetSimpleDateTimeFormatByPattern(napi_env env, napi_callback_info info);
     static bool IsSimpleDateTimeFormat(napi_env env, napi_value argv);
-    static napi_status UnwrapSimpleDateTimeFormat(napi_env env, napi_value value,
+    static napi_status UnwrapDateTimeFormat(napi_env env, napi_value value,
         SimpleDateTimeFormatAddon** dateTimeFormat);
 
 private:

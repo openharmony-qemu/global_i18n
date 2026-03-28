@@ -36,30 +36,41 @@ I18nStyledDateTimeFormatAddon* I18nStyledDateTimeFormatAddon::UnwrapAddon(ani_en
 
 bool I18nStyledDateTimeFormatAddon::InitStyledFormatContext(ani_env *env, ani_object dateTimeFormat)
 {
-    if (I18nSimpleDateTimeFormatAddon::IsSimpleDateTimeFormat(env, dateTimeFormat)) {
-        I18nSimpleDateTimeFormatAddon* simpleDateTimeFormatAddon =
-            I18nSimpleDateTimeFormatAddon::UnwrapAddon(env, dateTimeFormat);
-        if (simpleDateTimeFormatAddon == nullptr) {
-            HILOG_ERROR_I18N("InitStyledFormatContext: simpleDateTimeFormatAddon is nullptr.");
-            return false;
-        }
-        styledDateTimeFormat_ = std::make_unique<StyledDateTimeFormat>(simpleDateTimeFormatAddon->GetDateTimeFormat(),
-            nullptr);
-        return styledDateTimeFormat_ != nullptr;
-    } else if (I18nSymbolDateTimeFormatAddon::IsSymbolDateTimeFormat(env, dateTimeFormat)) {
-        I18nSymbolDateTimeFormatAddon* symbolDateTimeFormatAddon =
-            I18nSymbolDateTimeFormatAddon::UnwrapAddon(env, dateTimeFormat);
-        if (symbolDateTimeFormatAddon == nullptr) {
-            HILOG_ERROR_I18N("InitStyledFormatContext: symbolDateTimeFormatAddon is nullptr.");
-            return false;
-        }
-        styledDateTimeFormat_ = std::make_unique<StyledDateTimeFormat>(nullptr,
-            symbolDateTimeFormatAddon->GetDateTimeFormat());
-        return styledDateTimeFormat_ != nullptr;
+    DateTimeFormatType type = VariableConverter::GetDateTimeFormatType(env, dateTimeFormat);
+    if (StyledDateTimeFormat::SUPPORT_DATE_TIME_FORMAT_TYPE.find(type) ==
+        StyledDateTimeFormat::SUPPORT_DATE_TIME_FORMAT_TYPE.end()) {
+        ErrorUtil::AniThrow(env, I18N_NOT_FOUND, "dateTimeFormat",
+            "Intl.DateTimeFormat, SimpleDateTimeFormat or SymbolDateTimeFormat");
+        return false;
     }
-
-    ErrorUtil::AniThrow(env, I18N_NOT_FOUND, "dateTimeFormat", "Intl.DateTimeFormat or SimpleDateTimeFormat");
-    return false;
+    switch (type) {
+        case DateTimeFormatType::SIMPLE_DATE_TIME_FORMAT: {
+            I18nSimpleDateTimeFormatAddon* dateTimeFormatAddon =
+                I18nSimpleDateTimeFormatAddon::UnwrapAddon(env, dateTimeFormat);
+            if (dateTimeFormatAddon == nullptr) {
+                HILOG_ERROR_I18N("InitStyledFormatContext: simpleDateTimeFormatAddon is nullptr.");
+                return false;
+            }
+            styledDateTimeFormat_ =
+                std::make_unique<StyledDateTimeFormat>(dateTimeFormatAddon->GetDateTimeFormat());
+            break;
+        }
+        case DateTimeFormatType::SYMBOL_DATE_TIME_FORMAT: {
+            I18nSymbolDateTimeFormatAddon* dateTimeFormatAddon =
+                I18nSymbolDateTimeFormatAddon::UnwrapAddon(env, dateTimeFormat);
+            if (dateTimeFormatAddon == nullptr) {
+                HILOG_ERROR_I18N("InitStyledFormatContext: symbolDateTimeFormatAddon is nullptr.");
+                return false;
+            }
+            styledDateTimeFormat_ =
+                std::make_unique<StyledDateTimeFormat>(dateTimeFormatAddon->GetDateTimeFormat());
+            break;
+        }
+        default:
+            HILOG_ERROR_I18N("InitStyledFormatContext: Invalid type.");
+    }
+ 
+    return styledDateTimeFormat_ != nullptr;
 }
 
 ani_object I18nStyledDateTimeFormatAddon::Create(ani_env *env, [[maybe_unused]] ani_object object,

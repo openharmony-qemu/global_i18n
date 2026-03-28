@@ -58,7 +58,7 @@ public:
     static napi_value InitSymbolNumberFormat(napi_env env, napi_value exports);
     std::shared_ptr<SymbolNumberFormat> GetNumberFormat();
     static bool IsSymbolNumberFormat(napi_env env, napi_value argv);
-    static napi_status UnwrapSymbolNumberFormat(napi_env env, napi_value value,
+    static napi_status UnwrapNumberFormat(napi_env env, napi_value value,
         SymbolNumberFormatAddon** numberFormat);
 
 private:

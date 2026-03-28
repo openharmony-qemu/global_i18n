@@ -15,7 +15,14 @@
 
 #include "error_util.h"
 #include "i18n_hilog.h"
+#include "intl_date_time_format_addon.h"
+#include "intl_number_format_addon.h"
 #include "locale_info_addon.h"
+#include "number_format_addon.h"
+#include "simple_date_time_format_addon.h"
+#include "simple_number_format_addon.h"
+#include "symbol_date_time_format_addon.h"
+#include "symbol_number_format_addon.h"
 #include "variable_convertor.h"
 
 namespace OHOS {
@@ -552,6 +559,104 @@ bool VariableConvertor::IsUndefined(napi_env env, napi_value value)
         return false;
     }
     return valueType == napi_valuetype::napi_undefined;
+}
+
+DateType VariableConvertor::GetDateType(napi_env env, napi_value date)
+{
+    bool isDate = false;
+    napi_status status = napi_is_date(env, date, &isDate);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("VariableConvertor::GetDateType: Failed to call napi_is_date.");
+        return DateType::INVALID;
+    }
+    if (isDate) {
+        return DateType::DATE_OBJECT;
+    }
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    status = napi_typeof(env, date, &valueType);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("VariableConvertor::GetDateType: Get type failed.");
+        return DateType::INVALID;
+    }
+    if (valueType == napi_valuetype::napi_number) {
+        return DateType::NUMBER;
+    } else if (valueType == napi_valuetype::napi_bigint) {
+        return DateType::BIGINT;
+    }
+    return DateType::INVALID;
+}
+
+bool VariableConvertor::GetTimeFromDate(napi_env env, napi_value date, DateType type, double& milliseconds)
+{
+    napi_status status = napi_ok;
+    switch (type) {
+        case DateType::DATE_OBJECT:
+            status = napi_get_date_value(env, date, &milliseconds);
+            break;
+        case DateType::NUMBER:
+            status = napi_get_value_double(env, date, &milliseconds);
+            break;
+        case DateType::BIGINT: {
+            int64_t ms = 0;
+            bool lossless = false;
+            status = napi_get_value_bigint_int64(env, date, &ms, &lossless);
+            milliseconds = static_cast<double>(ms);
+            break;
+        }
+        default:
+            HILOG_ERROR_I18N("VariableConvertor::GetTimeFromDate: Invalid type.");
+            return false;
+    }
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("VariableConvertor::GetTimeFromDate: Get milliseconds failed.");
+        return false;
+    }
+    return true;
+}
+
+NumberFormatType VariableConvertor::GetNumberFormatType(napi_env env, napi_value value)
+{
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    napi_status status = napi_typeof(env, value, &valueType);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("VariableConvertor::GetNumberFormatType: Get type failed.");
+        return NumberFormatType::INVALID;
+    } else if (valueType != napi_valuetype::napi_object) {
+        HILOG_ERROR_I18N("VariableConvertor::GetNumberFormatType: Type != object.");
+        return NumberFormatType::INVALID;
+    }
+    if (IntlNumberFormatAddon::IsIntlNumberFormat(env, value)) {
+        return NumberFormatType::BUILTINS_NUMBER_FORMAT;
+    } else if (NumberFormatAddon::IsNumberFormat(env, value)) {
+        return NumberFormatType::NUMBER_FORMAT;
+    } else if (SimpleNumberFormatAddon::IsSimpleNumberFormat(env, value)) {
+        return NumberFormatType::SIMPLE_NUMBER_FORMAT;
+    } else if (SymbolNumberFormatAddon::IsSymbolNumberFormat(env, value)) {
+        return NumberFormatType::SYMBOL_NUMBER_FORMAT;
+    }
+    return NumberFormatType::INVALID;
+}
+
+DateTimeFormatType VariableConvertor::GetDateTimeFormatType(napi_env env, napi_value value)
+{
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    napi_status status = napi_typeof(env, value, &valueType);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("VariableConvertor::GetDateTimeFormatType: Get type failed.");
+        return DateTimeFormatType::INVALID;
+    } else if (valueType != napi_valuetype::napi_object) {
+        HILOG_ERROR_I18N("VariableConvertor::GetDateTimeFormatType: Type != object.");
+        return DateTimeFormatType::INVALID;
+    }
+
+    if (IntlDateTimeFormatAddon::IsIntlDateTimeFormat(env, value)) {
+        return DateTimeFormatType::BUILTINS_DATE_TIME_FORMAT;
+    } else if (SimpleDateTimeFormatAddon::IsSimpleDateTimeFormat(env, value)) {
+        return DateTimeFormatType::SIMPLE_DATE_TIME_FORMAT;
+    } else if (SymbolDateTimeFormatAddon::IsSymbolDateTimeFormat(env, value)) {
+        return DateTimeFormatType::SYMBOL_DATE_TIME_FORMAT;
+    }
+    return DateTimeFormatType::INVALID;
 }
 } // namespace I18n
 } // namespace Global

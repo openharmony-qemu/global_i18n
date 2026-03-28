@@ -30,10 +30,11 @@ public:
     static void Destructor(napi_env env, void *nativeObject, void *hint);
     static napi_value InitSimpleNumberFormat(napi_env env, napi_value exports);
     static napi_value GetSimpleNumberFormatBySkeleton(napi_env env, napi_callback_info info);
-    static napi_status UnwrapSimpleNumberFormat(napi_env env, napi_value value,
+    static napi_status UnwrapNumberFormat(napi_env env, napi_value value,
         SimpleNumberFormatAddon** numberFormat);
+    static bool IsSimpleNumberFormat(napi_env env, napi_value value);
 
-    std::shared_ptr<SimpleNumberFormat> CopySimpleNumberFormat();
+    std::shared_ptr<SimpleNumberFormat> GetNumberFormat();
 
 private:
     static napi_value Format(napi_env env, napi_callback_info info);

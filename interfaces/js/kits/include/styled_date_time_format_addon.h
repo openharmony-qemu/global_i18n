@@ -38,17 +38,13 @@ public:
     static napi_value InitStyledDateTimeFormat(napi_env env, napi_value exports);
 
 private:
-    bool InitStyledFormatContext(napi_env env, napi_value options,
-        IntlDateTimeFormatAddon* intlFormat, SimpleDateTimeFormatAddon* simpleFormat,
-        SymbolDateTimeFormatAddon* symbolFormat);
+    bool InitStyledFormatContext(napi_env env, napi_value dateFormat, DateTimeFormatType type,
+        napi_value options);
     void ParseOptions(napi_env env, napi_value options);
     void ParseOption(napi_env env, napi_value options, const std::string& optionName);
 
     static napi_value Format(napi_env env, napi_callback_info info);
-    static napi_value constructor(napi_env env, napi_callback_info info);
-    static void ParseDateTimeFormat(napi_env env, napi_value value,
-        IntlDateTimeFormatAddon** intlFormat, SimpleDateTimeFormatAddon** simpleFormat,
-        SymbolDateTimeFormatAddon** symbolFormat);
+    static napi_value Constructor(napi_env env, napi_callback_info info);
     static napi_value CreateStyleOptions(napi_env env, const std::vector<DateTimeFormatPart>& parts,
         const std::unordered_map<std::string, napi_ref>& styledOptions);
     static napi_value CreateStyleOption(napi_env env, const DateTimeFormatPart& part, napi_ref textStyleRef);

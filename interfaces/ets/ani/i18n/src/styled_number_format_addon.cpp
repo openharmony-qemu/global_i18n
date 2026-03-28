@@ -18,30 +18,12 @@
 #include "error_util.h"
 #include "i18n_hilog.h"
 #include "variable_converter.h"
+#include "simple_number_format_addon.h"
+#include "symbol_number_format_addon.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-const std::unordered_map<std::string, std::string> I18nStyledNumberFormatAddon::PROPERTY_NAME_TO_KEY = {
-    { "_locale", "locale" },
-    { "_compactDisplay", "compactDisplay" },
-    { "_currencySign", "currencySign" },
-    { "_currency", "currency" },
-    { "_currencyDisplay", "currencyDisplay" },
-    { "minFracStr", "minimumFractionDigits" },
-    { "maxFracStr", "maximumFractionDigits" },
-    { "minSignStr", "minimumSignificantDigits" },
-    { "maxSignStr", "maximumSignificantDigits" },
-    { "minIntStr", "minimumIntegerDigits" },
-    { "_notation", "notation" },
-    { "_numberingSystem", "numberingSystem" },
-    { "_signDisplay", "signDisplay" },
-    { "_style", "style" },
-    { "_unit", "unit" },
-    { "_unitDisplay", "unitDisplay" },
-    { "useGroupingStr", "useGrouping" },
-};
-
 I18nStyledNumberFormatAddon* I18nStyledNumberFormatAddon::UnwrapAddon(ani_env *env, ani_object object)
 {
     ani_long ptr;
@@ -54,29 +36,43 @@ I18nStyledNumberFormatAddon* I18nStyledNumberFormatAddon::UnwrapAddon(ani_env *e
 
 bool I18nStyledNumberFormatAddon::InitStyledNumberFormatContent(ani_env *env, ani_object numberFormat)
 {
-    if (I18nSimpleNumberFormatAddon::IsSimpleNumberFormat(env, numberFormat)) {
-        I18nSimpleNumberFormatAddon* simpleNumberFormatAddon =
-            I18nSimpleNumberFormatAddon::UnwrapAddon(env, numberFormat);
-        if (simpleNumberFormatAddon == nullptr) {
-            HILOG_ERROR_I18N("InitStyledNumberFormatContent: simpleNumberFormatAddon is nullptr");
-            return false;
+    NumberFormatType type = VariableConverter::GetNumberFormatType(env, numberFormat);
+    if (StyledNumberFormat::SUPPORT_NUMBER_FORMAT_TYPE.find(type) ==
+        StyledNumberFormat::SUPPORT_NUMBER_FORMAT_TYPE.end()) {
+        ErrorUtil::AniThrow(env, I18N_NOT_FOUND, "numberFormat",
+            "Intl.NumberFormator, SimpleNumberFormat or SymbolNumberFormat");
+        return false;
+    }
+    switch (type) {
+        case NumberFormatType::BUILTINS_NUMBER_FORMAT: {
+            auto nativeNumberFormat = VariableConverter::UnWrapIntlDateTimeFormat(env, numberFormat);
+            if (nativeNumberFormat == nullptr) {
+                return false;
+            }
+            styledNumberFormat_ = std::make_unique<StyledNumberFormat>(nativeNumberFormat);
+            break;
         }
-        styledNumberFormat_ = std::make_unique<StyledNumberFormat>(false, nullptr,
-            simpleNumberFormatAddon->CopySimpleNumberFormat());
-        return styledNumberFormat_ != nullptr;
+        case NumberFormatType::SIMPLE_NUMBER_FORMAT: {
+            I18nSimpleNumberFormatAddon* NumberFormatAddon =
+                I18nSimpleNumberFormatAddon::UnwrapAddon(env, numberFormat);
+            if (NumberFormatAddon == nullptr) {
+                return false;
+            }
+            styledNumberFormat_ = std::make_unique<StyledNumberFormat>(NumberFormatAddon->GetNumberFormat());
+            break;
+        }
+        case NumberFormatType::SYMBOL_NUMBER_FORMAT: {
+            I18nSymbolNumberFormatAddon* NumberFormatAddon =
+                I18nSymbolNumberFormatAddon::UnwrapAddon(env, numberFormat);
+            if (NumberFormatAddon == nullptr) {
+                return false;
+            }
+            styledNumberFormat_ = std::make_unique<StyledNumberFormat>(NumberFormatAddon->GetNumberFormat());
+            break;
+        }
+        default:
+            HILOG_ERROR_I18N("I18nStyledNumberFormatAddon::InitStyledNumberFormatContent: type error");
     }
-    std::map<std::string, std::string> options = ParseIntlOptions(env, numberFormat);
-    auto iter = options.find("locale");
-    if (iter == options.end()) {
-        ErrorUtil::AniThrow(env, I18N_NOT_FOUND, "numberFormat", "Intl.NumberFormat or SimpleNumberFormat");
-        return false;
-    }
-    numberFormat_ = std::make_shared<NumberFormat>(std::vector<std::string>{iter->second}, options);
-    if (!numberFormat_) {
-        HILOG_ERROR_I18N("InitStyledNumberFormatContent: Create NumberFormat failed");
-        return false;
-    }
-    styledNumberFormat_ = std::make_unique<StyledNumberFormat>(true, numberFormat_, nullptr);
     return styledNumberFormat_ != nullptr;
 }
 
@@ -176,34 +172,6 @@ ani_object I18nStyledNumberFormatAddon::GetStyle(ani_env *env, ani_object object
     }
     std::vector<StyledNumberFormat::NumberPart> numberParts = obj->styledNumberFormat_->ParseToParts(value);
     return CreateStyledPartArray(env, numberParts);
-}
-
-std::map<std::string, std::string> I18nStyledNumberFormatAddon::ParseIntlOptions(ani_env *env, ani_object obj)
-{
-    std::map<std::string, std::string> options = {};
-    ani_ref optionsRef = nullptr;
-    auto status = env->Object_GetFieldByName_Ref(obj, "options", &optionsRef);
-    if (status != ANI_OK) {
-        HILOG_ERROR_I18N("I18nStyledNumberFormatAddon::ParseIntlOptions: Get options failed");
-        return options;
-    }
-    ani_object optionsObj = static_cast<ani_object>(optionsRef);
-    if (!optionsObj) {
-        HILOG_ERROR_I18N("I18nStyledNumberFormatAddon::ParseIntlOptions: Static to object failed");
-        return options;
-    }
-
-    for (auto iter = PROPERTY_NAME_TO_KEY.begin(); iter != PROPERTY_NAME_TO_KEY.end(); iter++) {
-        std::string property = "";
-        if (!VariableConverter::GetStringMember(env, optionsObj, iter->first, property)) {
-            continue;
-        }
-        if (property.empty()) {
-            continue;
-        }
-        options[iter->second] = property;
-    }
-    return options;
 }
 
 ani_status I18nStyledNumberFormatAddon::BindContextStyledNumberFormat(ani_env *env)

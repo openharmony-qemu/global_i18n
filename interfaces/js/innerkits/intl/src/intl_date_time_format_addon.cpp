@@ -555,7 +555,7 @@ bool IntlDateTimeFormatAddon::IsIntlDateTimeFormat(napi_env env, napi_value argv
     return isIntlDateTimeFormat;
 }
 
-napi_status IntlDateTimeFormatAddon::UnwrapIntlDateTimeFormat(napi_env env, napi_value value,
+napi_status IntlDateTimeFormatAddon::UnwrapDateTimeFormat(napi_env env, napi_value value,
     IntlDateTimeFormatAddon** dateTimeFormat)
 {
     return napi_unwrap_s(env, value, &TYPE_TAG, reinterpret_cast<void **>(dateTimeFormat));

@@ -59,7 +59,6 @@ napi_value SymbolDateTimeFormatAddon::InitSymbolDateTimeFormat(napi_env env, nap
         DECLARE_NAPI_FUNCTION("formatRangeToParts", FormatRangeToParts),
         DECLARE_NAPI_FUNCTION("toString", ToString),
         DECLARE_NAPI_FUNCTION("resolvedOptions", ResolvedOptions),
-        DECLARE_NAPI_STATIC_FUNCTION("supportedLocalesOf", IntlDateTimeFormatAddon::SupportedLocalesOf),
     };
     napi_value symbolConstructor = nullptr;
     napi_status status = napi_define_class(env, "SymbolDateTimeFormat", NAPI_AUTO_LENGTH, Constructor, nullptr,
@@ -185,8 +184,16 @@ napi_value SymbolDateTimeFormatAddon::Format(napi_env env, napi_callback_info in
         HILOG_ERROR_I18N("SymbolDateTimeFormatAddon::Format: get cb info failed.");
         return VariableConvertor::CreateString(env, "");
     }
+    DateType type = DateType::INVALID;
+    if (argc >= 1) {
+        type = VariableConvertor::GetDateType(env, argv[0]);
+        if (type != DateType::DATE_OBJECT && type != DateType::NUMBER) {
+            ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "date", "Date or number", true);
+            return nullptr;
+        }
+    }
     double milliseconds = 0;
-    if (argc < 1 || !VariableConvertor::GetDateTime(env, argv[0], milliseconds)) {
+    if (argc < 1 || !VariableConvertor::GetTimeFromDate(env, argv[0], type, milliseconds)) {
         std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch()
         );
@@ -214,8 +221,16 @@ napi_value SymbolDateTimeFormatAddon::FormatToParts(napi_env env, napi_callback_
         HILOG_ERROR_I18N("SymbolDateTimeFormatAddon::FormatToParts: get cb info failed.");
         return VariableConvertor::CreateString(env, "");
     }
+    DateType type = DateType::INVALID;
+    if (argc >= 1) {
+        type = VariableConvertor::GetDateType(env, argv[0]);
+        if (type != DateType::DATE_OBJECT && type != DateType::NUMBER) {
+            ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "date", "Date or number", true);
+            return nullptr;
+        }
+    }
     double milliseconds = 0;
-    if (argc < 1 || !VariableConvertor::GetDateTime(env, argv[0], milliseconds)) {
+    if (argc < 1 || !VariableConvertor::GetTimeFromDate(env, argv[0], type, milliseconds)) {
         std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch()
         );
@@ -248,21 +263,28 @@ napi_value SymbolDateTimeFormatAddon::FormatRange(napi_env env, napi_callback_in
         return VariableConvertor::CreateString(env, "");
     }
     if (argc <= 1) {
-        ErrorUtil::NapiThrowUndefined(env, "startDate or endDate is undefined");
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "startDate or endDate", "", true);
         return VariableConvertor::CreateString(env, "");
     }
-
-    double start = 0;
-    if (!VariableConvertor::GetDateTime(env, argv[0], start)) {
-        HILOG_ERROR_I18N("SymbolDateTimeFormatAddon::FormatRange: get date time from argv[0] failed.");
+    DateType startDateType = VariableConvertor::GetDateType(env, argv[0]);
+    if (startDateType != DateType::DATE_OBJECT && startDateType != DateType::NUMBER &&
+        startDateType != DateType::BIGINT) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "startDate", "Date, number or bigint", true);
+        return nullptr;
+    }
+    DateType endDateType = VariableConvertor::GetDateType(env, argv[1]);
+    if (endDateType != DateType::DATE_OBJECT && endDateType != DateType::NUMBER &&
+        endDateType != DateType::BIGINT) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "endDate", "Date, number or bigint", true);
+        return nullptr;
+    }
+    double startDate = 0;
+    double endDate = 0;
+    if (!VariableConvertor::GetTimeFromDate(env, argv[0], startDateType, startDate) ||
+        !VariableConvertor::GetTimeFromDate(env, argv[1], endDateType, endDate)) {
+        HILOG_ERROR_I18N("SymbolDateTimeFormatAddon::FormatRange: Get time failed.");
         return VariableConvertor::CreateString(env, "");
     }
-    double end = 0;
-    if (!VariableConvertor::GetDateTime(env, argv[1], end)) {
-        HILOG_ERROR_I18N("SymbolDateTimeFormatAddon::FormatRange: get date time from argv[1] failed.");
-        return VariableConvertor::CreateString(env, "");
-    }
-
     SymbolDateTimeFormatAddon* obj = nullptr;
     status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->symbolDateTimeFormat_) {
@@ -270,7 +292,7 @@ napi_value SymbolDateTimeFormatAddon::FormatRange(napi_env env, napi_callback_in
         return VariableConvertor::CreateString(env, "");
     }
     std::string errMessage;
-    std::string result = obj->symbolDateTimeFormat_->FormatRange(start, end, errMessage);
+    std::string result = obj->symbolDateTimeFormat_->FormatRange(startDate, endDate, errMessage);
     if (!errMessage.empty()) {
         ErrorUtil::NapiThrowUndefined(env, errMessage);
         return nullptr;
@@ -290,21 +312,28 @@ napi_value SymbolDateTimeFormatAddon::FormatRangeToParts(napi_env env, napi_call
         return JSUtils::CreateEmptyArray(env);
     }
     if (argc <= 1) {
-        ErrorUtil::NapiThrowUndefined(env, "startDate or endDate is undefined");
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "startDate or endDate", "", true);
+        return JSUtils::CreateEmptyArray(env);
+    }
+    DateType startDateType = VariableConvertor::GetDateType(env, argv[0]);
+    if (startDateType != DateType::DATE_OBJECT && startDateType != DateType::NUMBER &&
+        startDateType != DateType::BIGINT) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "startDate", "Date, number or bigint", true);
         return nullptr;
     }
-
-    double start = 0;
-    if (!VariableConvertor::GetDateTime(env, argv[0], start)) {
-        HILOG_ERROR_I18N("SymbolDateTimeFormatAddon::FormatRangeToParts: get date time from argv[0] failed.");
+    DateType endDateType = VariableConvertor::GetDateType(env, argv[1]);
+    if (endDateType != DateType::DATE_OBJECT && endDateType != DateType::NUMBER &&
+        endDateType != DateType::BIGINT) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "endDate", "Date, number or bigint", true);
+        return nullptr;
+    }
+    double startDate = 0;
+    double endDate = 0;
+    if (!VariableConvertor::GetTimeFromDate(env, argv[0], startDateType, startDate) ||
+        !VariableConvertor::GetTimeFromDate(env, argv[1], endDateType, endDate)) {
+        HILOG_ERROR_I18N("SymbolDateTimeFormatAddon::FormatRangeToParts: Get time failed.");
         return JSUtils::CreateEmptyArray(env);
     }
-    double end = 0;
-    if (!VariableConvertor::GetDateTime(env, argv[1], end)) {
-        HILOG_ERROR_I18N("SymbolDateTimeFormatAddon::FormatRangeToParts: get date time from argv[1] failed.");
-        return JSUtils::CreateEmptyArray(env);
-    }
-
     SymbolDateTimeFormatAddon* obj = nullptr;
     status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->symbolDateTimeFormat_) {
@@ -312,7 +341,7 @@ napi_value SymbolDateTimeFormatAddon::FormatRangeToParts(napi_env env, napi_call
         return JSUtils::CreateEmptyArray(env);
     }
     std::string errMessage;
-    auto parts = obj->symbolDateTimeFormat_->FormatRangeToParts(start, end, errMessage);
+    auto parts = obj->symbolDateTimeFormat_->FormatRangeToParts(startDate, endDate, errMessage);
     if (!errMessage.empty()) {
         ErrorUtil::NapiThrowUndefined(env, errMessage);
         return nullptr;
@@ -434,7 +463,7 @@ bool SymbolDateTimeFormatAddon::IsSymbolDateTimeFormat(napi_env env, napi_value 
     return isSymbolDateTimeFormat;
 }
 
-napi_status SymbolDateTimeFormatAddon::UnwrapSymbolDateTimeFormat(napi_env env, napi_value value,
+napi_status SymbolDateTimeFormatAddon::UnwrapDateTimeFormat(napi_env env, napi_value value,
     SymbolDateTimeFormatAddon** dateTimeFormat)
 {
     return napi_unwrap_s(env, value, &TYPE_TAG, reinterpret_cast<void **>(dateTimeFormat));

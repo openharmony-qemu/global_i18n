@@ -312,7 +312,7 @@ bool SimpleDateTimeFormatAddon::IsSimpleDateTimeFormat(napi_env env, napi_value 
     return isSimpleDateTimeFormat;
 }
 
-napi_status SimpleDateTimeFormatAddon::UnwrapSimpleDateTimeFormat(napi_env env, napi_value value,
+napi_status SimpleDateTimeFormatAddon::UnwrapDateTimeFormat(napi_env env, napi_value value,
     SimpleDateTimeFormatAddon** dateTimeFormat)
 {
     return napi_unwrap_s(env, value, &TYPE_TAG, reinterpret_cast<void **>(dateTimeFormat));

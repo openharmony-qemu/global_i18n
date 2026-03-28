@@ -33,8 +33,9 @@ public:
     static void Destructor(napi_env env, void *nativeObject, void *hint);
     static napi_value InitNumberFormat(napi_env env, napi_value exports);
     static napi_status UnwrapNumberFormat(napi_env env, napi_value value, NumberFormatAddon** numberFormat);
+    static bool IsNumberFormat(napi_env env, napi_value value);
 
-    std::shared_ptr<NumberFormat> CopyNumberFormat();
+    std::shared_ptr<NumberFormat> GetNumberFormat();
 
 private:
     static napi_value NumberFormatConstructor(napi_env env, napi_callback_info info);

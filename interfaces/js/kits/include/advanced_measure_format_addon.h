@@ -31,7 +31,8 @@ public:
     static napi_value InitAdvancedMeasureFormat(napi_env env, napi_value exports);
 
 private:
-    bool InitContext(napi_env env, std::shared_ptr<NumberFormat> numberFormat, AdvancedMeasureFormatOptions options);
+    bool InitContext(napi_env env, napi_value numberFormat, NumberFormatType type,
+        AdvancedMeasureFormatOptions options);
 
     static napi_value Constructor(napi_env env, napi_callback_info info);
     static AdvancedMeasureFormatOptions ParseOptions(napi_env env, napi_value object);

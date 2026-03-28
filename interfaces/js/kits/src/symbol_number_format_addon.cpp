@@ -62,7 +62,6 @@ napi_value SymbolNumberFormatAddon::InitSymbolNumberFormat(napi_env env, napi_va
         DECLARE_NAPI_FUNCTION("formatRangeToParts", FormatRangeToParts),
         DECLARE_NAPI_FUNCTION("toString", ToString),
         DECLARE_NAPI_FUNCTION("resolvedOptions", ResolvedOptions),
-        DECLARE_NAPI_STATIC_FUNCTION("supportedLocalesOf", IntlNumberFormatAddon::SupportedLocalesOf),
     };
     napi_value symbolConstructor = nullptr;
     napi_status status = napi_define_class(env, "SymbolNumberFormat", NAPI_AUTO_LENGTH, Constructor, nullptr,
@@ -274,7 +273,7 @@ napi_value SymbolNumberFormatAddon::FormatRange(napi_env env, napi_callback_info
     NumberDataType endRangeType;
     NumberData endRangeData = ParseNumberData(env, argv[1], endRangeType);
     if (startRangeType != NumberDataType::NUMBER_TYPE || endRangeType != NumberDataType::NUMBER_TYPE) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "startRange or endRange", "a valid number", true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "startRange or endRange", "number", true);
         return VariableConvertor::CreateString(env, "");
     }
 
@@ -309,7 +308,7 @@ napi_value SymbolNumberFormatAddon::FormatRangeToParts(napi_env env, napi_callba
     NumberDataType endRangeType;
     NumberData endRangeData = ParseNumberData(env, argv[1], endRangeType);
     if (startRangeType != NumberDataType::NUMBER_TYPE || endRangeType != NumberDataType::NUMBER_TYPE) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "startRange or endRange", "a valid number", true);
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "startRange or endRange", "number", true);
         return VariableConvertor::CreateString(env, "");
     }
 
@@ -461,7 +460,7 @@ bool SymbolNumberFormatAddon::IsSymbolNumberFormat(napi_env env, napi_value argv
     return isSymbolNumberFormat;
 }
 
-napi_status SymbolNumberFormatAddon::UnwrapSymbolNumberFormat(napi_env env, napi_value value,
+napi_status SymbolNumberFormatAddon::UnwrapNumberFormat(napi_env env, napi_value value,
     SymbolNumberFormatAddon** numberFormat)
 {
     return napi_unwrap_s(env, value, &TYPE_TAG, reinterpret_cast<void **>(numberFormat));

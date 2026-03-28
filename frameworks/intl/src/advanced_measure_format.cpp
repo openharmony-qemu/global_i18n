@@ -45,6 +45,11 @@ const std::unordered_map<UnitUsage, std::string> UNIT_USAGE_CONVERT = {
     { UnitUsage::SIZE_SHORTFILE_BYTE, "size-shortfile-byte" },
 };
 
+const std::unordered_set<NumberFormatType> AdvancedMeasureFormat::SUPPORT_NUMBER_FORMAT_TYPE = {
+    NumberFormatType::BUILTINS_NUMBER_FORMAT,
+    NumberFormatType::SYMBOL_NUMBER_FORMAT,
+};
+
 AdvancedMeasureFormat::AdvancedMeasureFormat(std::shared_ptr<NumberFormat> numberFormat,
     const AdvancedMeasureFormatOptions& options)
 {

@@ -259,7 +259,7 @@ HWTEST_F(DateTimeFormatTest, DateTimeFormatFuncTest007, TestSize.Level1)
     EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
     
     std::shared_ptr<StyledDateTimeFormat> formatter
-        = std::make_shared<StyledDateTimeFormat>(simpleFormatter, nullptr);
+        = std::make_shared<StyledDateTimeFormat>(simpleFormatter);
     double date = 1761984846000;
     std::pair<std::string, std::vector<DateTimeFormatPart>> result = formatter->Format(date);
     EXPECT_EQ(result.first, "2025年11月14146下午GMT+8周六公元");
@@ -295,7 +295,7 @@ HWTEST_F(DateTimeFormatTest, DateTimeFormatFuncTest008, TestSize.Level1)
     EXPECT_EQ(errMessage, "");
     
     std::shared_ptr<StyledDateTimeFormat> formatter
-        = std::make_shared<StyledDateTimeFormat>(nullptr, intlDateFormatter);
+        = std::make_shared<StyledDateTimeFormat>(intlDateFormatter);
     double date = 1761984846000;
     std::pair<std::string, std::vector<DateTimeFormatPart>> result = formatter->Format(date);
     EXPECT_EQ(result.first, "Saturday 1 November 2025 at 16:14:06 Central Standard Time");
@@ -412,7 +412,7 @@ HWTEST_F(DateTimeFormatTest, DateTimeFormatFuncTest011, TestSize.Level1)
     EXPECT_EQ(errMessage, "");
     
     std::shared_ptr<StyledDateTimeFormat> formatter
-        = std::make_shared<StyledDateTimeFormat>(nullptr, symbolDateFormatter);
+        = std::make_shared<StyledDateTimeFormat>(symbolDateFormatter);
     double date = 1761984846000;
     std::pair<std::string, std::vector<DateTimeFormatPart>> result = formatter->Format(date);
     EXPECT_EQ(result.first, "04:14:06\xE2\x80\xAF** Central Standard Time");
