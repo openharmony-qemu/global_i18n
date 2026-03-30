@@ -276,6 +276,12 @@ int8_t LocaleMatcher::CompareRegion(const LocaleInfo *current, const LocaleInfo 
         (current == nullptr) ? nullptr : current->GetRegion().c_str());
     uint64_t otherEncodedLocale = LocaleUtil::EncodeLocale(request->GetLanguage().c_str(), nullptr,
         (other == nullptr) ? nullptr : other->GetRegion().c_str());
+    if (currentEncodedLocale == 0x6573000000005553) { // if currentEncodedLocale == es-US
+        currentEncodedLocale = 0x6573000000009029; // currentEncodedLocale = es-419
+    }
+    if (otherEncodedLocale == 0x6573000000005553) { // if otherMatchDistance == es-US
+        otherEncodedLocale = 0x6573000000009029; // otherMatchDistance = es-419
+    }
     int8_t currentMatchDistance = SearchTrackPathDistance(requestEncodedTrackPath, LocaleMatcher::TRACKPATH_ARRAY_SIZE,
         currentEncodedLocale);
     int8_t otherMatchDistance = SearchTrackPathDistance(requestEncodedTrackPath, LocaleMatcher::TRACKPATH_ARRAY_SIZE,
