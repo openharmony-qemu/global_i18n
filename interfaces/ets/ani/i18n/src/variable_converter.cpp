@@ -16,6 +16,7 @@
 #include "variable_converter.h"
 
 #include "advanced_measure_format_addon.h"
+#include "chinese_calendar_addon.h"
 #include "entity_recognizer_addon.h"
 #include "holiday_manager_addon.h"
 #include "i18n_addon.h"
@@ -735,3 +736,5 @@ template ani_object VariableConverter::CreateAniObject<I18nSymbolDateTimeFormatA
     ani_env*, const char*, I18nSymbolDateTimeFormatAddon*);
 template ani_object VariableConverter::CreateAniObject<I18nSymbolNumberFormatAddon>(
     ani_env*, const char*, I18nSymbolNumberFormatAddon*);
+template ani_object VariableConverter::CreateAniObject<ChineseCalendarAddon>(
+    ani_env*, const char*, ChineseCalendarAddon*);

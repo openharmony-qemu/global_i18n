@@ -27,36 +27,7 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 static thread_local ThreadReference* g_constructor = nullptr;
-static std::unordered_map<std::string, UCalendarDateFields> g_fieldsMap {
-    { "era", UCAL_ERA },
-    { "year", UCAL_YEAR },
-    { "month", UCAL_MONTH },
-    { "week_of_year", UCAL_WEEK_OF_YEAR },
-    { "week_of_month", UCAL_WEEK_OF_MONTH },
-    { "date", UCAL_DATE },
-    { "day_of_year", UCAL_DAY_OF_YEAR },
-    { "day_of_week", UCAL_DAY_OF_WEEK },
-    { "day_of_week_in_month", UCAL_DAY_OF_WEEK_IN_MONTH },
-    { "ap_pm", UCAL_AM_PM },
-    { "hour", UCAL_HOUR },
-    { "hour_of_day", UCAL_HOUR_OF_DAY },
-    { "minute", UCAL_MINUTE },
-    { "second", UCAL_SECOND },
-    { "millisecond", UCAL_MILLISECOND },
-    { "zone_offset", UCAL_ZONE_OFFSET },
-    { "dst_offset", UCAL_DST_OFFSET },
-    { "year_woy", UCAL_YEAR_WOY },
-    { "dow_local", UCAL_DOW_LOCAL },
-    { "extended_year", UCAL_EXTENDED_YEAR },
-    { "julian_day", UCAL_JULIAN_DAY },
-    { "milliseconds_in_day", UCAL_MILLISECONDS_IN_DAY },
-    { "is_leap_month", UCAL_IS_LEAP_MONTH },
-};
-static std::unordered_set<std::string> g_fieldsInFunctionAdd {
-    "year", "month", "date", "hour", "minute", "second", "millisecond",
-    "week_of_year", "week_of_month", "day_of_year", "day_of_week",
-    "day_of_week_in_month", "hour_of_day", "milliseconds_in_day",
-};
+
 static std::unordered_map<std::string, CalendarType> g_typeMap {
     { "buddhist", CalendarType::BUDDHIST },
     { "chinese", CalendarType::CHINESE },
@@ -537,7 +508,7 @@ napi_value I18nCalendarAddon::Get(napi_env env, napi_callback_info info)
         return nullptr;
     }
     std::string field(buf.data());
-    if (g_fieldsMap.find(field) == g_fieldsMap.end()) {
+    if (I18nCalendar::FIELDS_MAP.find(field) == I18nCalendar::FIELDS_MAP.end()) {
         HILOG_ERROR_I18N("Invalid field");
         return nullptr;
     }
@@ -547,7 +518,7 @@ napi_value I18nCalendarAddon::Get(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("Get: Get calendar object failed");
         return nullptr;
     }
-    int32_t value = obj->calendar_->Get(g_fieldsMap[field]);
+    int32_t value = obj->calendar_->Get(I18nCalendar::FIELDS_MAP[field]);
     napi_value result = nullptr;
     status = napi_create_int32(env, value, &result);
     if (status != napi_ok) {
@@ -604,7 +575,7 @@ napi_value I18nCalendarAddon::Add(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("Add: Get calendar object failed");
         return nullptr;
     }
-    obj->calendar_->Add(g_fieldsMap[field], amount);
+    obj->calendar_->Add(I18nCalendar::FIELDS_MAP[field], amount);
     return nullptr;
 }
 
@@ -837,7 +808,7 @@ std::string I18nCalendarAddon::GetAddField(napi_env &env, napi_value &value, int
         HILOG_ERROR_I18N("GetAddField: can't get string from js array param.");
         return field;
     }
-    if (g_fieldsInFunctionAdd.find(field) == g_fieldsInFunctionAdd.end()) {
+    if (I18nCalendar::FIELDS_IN_FUNCTION_ADD.find(field) == I18nCalendar::FIELDS_IN_FUNCTION_ADD.end()) {
         code = 1;
         HILOG_ERROR_I18N("Parameter rangs do not match");
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "field", "a valid field", true);
@@ -890,7 +861,6 @@ void I18nCalendarAddon::SetMilliseconds(napi_env env, napi_value value)
         calendar_->SetTime(milliseconds);
     }
 }
-
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

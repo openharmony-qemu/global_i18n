@@ -118,6 +118,7 @@ ohos_shared_library("intl_util") {
       "parameter_upgrade/src/upgrade_utils.cpp",
       "src/advanced_measure_format.cpp",
       "src/character.cpp",
+      "src/chinese_calendar.cpp",
       "src/collator.cpp",
       "src/date_time_format.cpp",
       "src/date_time_format_part.cpp",

@@ -49,6 +49,7 @@ ohos_shared_library("i18n") {
   sources = [
     "src/advanced_measure_format_addon.cpp",
     "src/api_version.cpp",
+    "src/chinese_calendar_addon.cpp",
     "src/entity_recognizer_addon.cpp",
     "src/holiday_manager_addon.cpp",
     "src/i18n_addon.cpp",

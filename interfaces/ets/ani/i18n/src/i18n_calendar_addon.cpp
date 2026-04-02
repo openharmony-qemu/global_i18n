@@ -24,39 +24,6 @@
 using namespace OHOS;
 using namespace Global;
 using namespace I18n;
-
-static std::unordered_map<std::string, UCalendarDateFields> g_fieldsMap {
-    { "era", UCAL_ERA },
-    { "year", UCAL_YEAR },
-    { "month", UCAL_MONTH },
-    { "week_of_year", UCAL_WEEK_OF_YEAR },
-    { "week_of_month", UCAL_WEEK_OF_MONTH },
-    { "date", UCAL_DATE },
-    { "day_of_year", UCAL_DAY_OF_YEAR },
-    { "day_of_week", UCAL_DAY_OF_WEEK },
-    { "day_of_week_in_month", UCAL_DAY_OF_WEEK_IN_MONTH },
-    { "am_pm", UCAL_AM_PM },
-    { "hour", UCAL_HOUR },
-    { "hour_of_day", UCAL_HOUR_OF_DAY },
-    { "minute", UCAL_MINUTE },
-    { "second", UCAL_SECOND },
-    { "millisecond", UCAL_MILLISECOND },
-    { "zone_offset", UCAL_ZONE_OFFSET },
-    { "dst_offset", UCAL_DST_OFFSET },
-    { "year_woy", UCAL_YEAR_WOY },
-    { "dow_local", UCAL_DOW_LOCAL },
-    { "extended_year", UCAL_EXTENDED_YEAR },
-    { "julian_day", UCAL_JULIAN_DAY },
-    { "milliseconds_in_day", UCAL_MILLISECONDS_IN_DAY },
-    { "is_leap_month", UCAL_IS_LEAP_MONTH },
-};
-
-static std::unordered_set<std::string> g_fieldsInFunctionAdd {
-    "year", "month", "date", "hour", "minute", "second", "millisecond",
-    "week_of_year", "week_of_month", "day_of_year", "day_of_week",
-    "day_of_week_in_month", "hour_of_day", "milliseconds_in_day",
-};
-
 static std::unordered_map<std::string, CalendarType> g_typeMap {
     { "buddhist", CalendarType::BUDDHIST },
     { "chinese", CalendarType::CHINESE },
@@ -243,7 +210,7 @@ void I18nCalendarAddon::SetMinimalDaysInFirstWeek(ani_env *env, ani_object objec
 ani_int I18nCalendarAddon::Get(ani_env *env, ani_object object, ani_string field)
 {
     std::string str = VariableConverter::AniStrToString(env, field);
-    if (g_fieldsMap.find(str) == g_fieldsMap.end()) {
+    if (I18nCalendar::FIELDS_MAP.find(str) == I18nCalendar::FIELDS_MAP.end()) {
         HILOG_ERROR_I18N("I18nCalendarAddon::Get: Invalid field %{public}s", str.c_str());
         return -1;
     }
@@ -253,7 +220,7 @@ ani_int I18nCalendarAddon::Get(ani_env *env, ani_object object, ani_string field
         HILOG_ERROR_I18N("I18nCalendarAddon::Get: Get calendar object failed");
         return -1;
     }
-    return obj->calendar_->Get(g_fieldsMap[str]);
+    return obj->calendar_->Get(I18nCalendar::FIELDS_MAP[str]);
 }
 
 ani_string I18nCalendarAddon::GetDisplayName(ani_env *env, ani_object object, ani_string locale)
@@ -298,7 +265,7 @@ ani_boolean I18nCalendarAddon::IsWeekend(ani_env *env, ani_object object, ani_ob
 void I18nCalendarAddon::Add(ani_env *env, ani_object object, ani_string field, ani_int amount)
 {
     std::string str = VariableConverter::AniStrToString(env, field);
-    if (g_fieldsInFunctionAdd.find(str) == g_fieldsInFunctionAdd.end()) {
+    if (I18nCalendar::FIELDS_IN_FUNCTION_ADD.find(str) == I18nCalendar::FIELDS_IN_FUNCTION_ADD.end()) {
         HILOG_ERROR_I18N("I18nCalendarAddon::Add: Parameter range do not match");
         ErrorUtil::AniThrow(env, I18N_NOT_VALID, "field", "a valid field");
         return;
@@ -309,7 +276,7 @@ void I18nCalendarAddon::Add(ani_env *env, ani_object object, ani_string field, a
         HILOG_ERROR_I18N("I18nCalendarAddon::Add: Get calendar object failed");
         return;
     }
-    obj->calendar_->Add(g_fieldsMap[str], amount);
+    obj->calendar_->Add(I18nCalendar::FIELDS_MAP[str], amount);
 }
 
 ani_long I18nCalendarAddon::GetTimeInMillis(ani_env *env, ani_object object)
