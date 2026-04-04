@@ -782,7 +782,8 @@ ani_status I18nAddon::BindContextNamespace(ani_env *env)
     }
     std::array methods = {
         ani_native_function { "getCalendar", nullptr, reinterpret_cast<void *>(I18nCalendarAddon::GetCalendar) },
-        ani_native_function { "getChineseCalendar", nullptr, reinterpret_cast<void *>(ChineseCalendarAddon::GetChineseCalendar) },
+        ani_native_function { "getChineseCalendar", nullptr,
+            reinterpret_cast<void *>(ChineseCalendarAddon::GetChineseCalendar) },
         ani_native_function { "isRTL", nullptr, reinterpret_cast<void *>(I18nAddon::IsRTL) },
         ani_native_function { "getLineInstance", nullptr,
             reinterpret_cast<void *>(I18nBreakIteratorAddon::GetLineInstance) },
