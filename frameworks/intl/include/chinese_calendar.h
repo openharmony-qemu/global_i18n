@@ -19,6 +19,7 @@
 #include <string>
 
 #include "i18n_calendar.h"
+#include "i18n_types.h"
 #include "unicode/calendar.h"
 #include "unicode/ucal.h"
 #include "unicode/utypes.h"
@@ -28,26 +29,27 @@ namespace Global {
 namespace I18n {
 
 struct ChineseCalendarTime {
-
-    int32_t year = 0;
+    int32_t gregorianYear = 0;
+    int32_t cyclicalYear = 0;
     int32_t month = 0;
-    int32_t day = 0;
+    int32_t date = 0;
     int32_t hour = 0;
     int32_t minute = 0;
     int32_t second = 0;
     bool isLeapMonth = false;
-    static const std::unordered_map<std::string, std::string ChineseCalendarTime::*> MEMBER_NAME_MAP;
+    static const std::unordered_map<std::string, int32_t ChineseCalendarTime::*> MEMBER_NAME_MAP;
 };
 
 class ChineseCalendar : public I18nCalendar {
 public:
-    explicit ChineseCalendar(std::string localeTag);
+    explicit ChineseCalendar(const std::string& localeTag);
     ~ChineseCalendar();
-    void SetChineseCalendarTime(const ChineseCalendarTime& time);
-    static bool CheckLeapMonth(int32_t year, int32_t month);
+    void SetChineseCalendarTime(const ChineseCalendarTime& time, I18nErrorCode& errCode);
+    static bool CheckLeapMonth(int32_t gregorianYear, int32_t cyclicalYear, int32_t month, I18nErrorCode& errCode);
 
 private:
-    void InitChineseCalendar();
+    static int32_t ParseEra(int32_t gregorianYear, int32_t cyclicalYear, I18nErrorCode& errCode);
+    static bool IsValidYear(int32_t gregorianYear, int32_t cyclicalYear);
 };
 } // namespace I18n
 } // namespace Global
