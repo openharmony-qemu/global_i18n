@@ -13,10 +13,11 @@
  * limitations under the License.
  */
 
-#include <unordered_map>
 #include <unordered_set>
 #include "chinese_calendar_addon.h"
+#include "error_util.h"
 #include "i18n_hilog.h"
+#include "locale_config.h"
 #include "js_lifecycle_managers.h"
 #include "js_utils.h"
 #include "variable_convertor.h"
@@ -127,7 +128,7 @@ napi_value ChineseCalendarAddon::Constructor(napi_env env, napi_callback_info in
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "Intl.Locale", true);
         return nullptr;
     }
-    std::string localeTag = (argc > 0) ? VariableConvertor::ParseBuiltinsLocale(env, locale) : "";
+    std::string localeTag = (argc > 0) ? VariableConvertor::ParseBuiltinsLocale(env, argv[0]) : "";
     if (localeTag.empty()) {
         localeTag = LocaleConfig::GetEffectiveLocale();
     }
@@ -149,7 +150,7 @@ napi_value ChineseCalendarAddon::Constructor(napi_env env, napi_callback_info in
 
 bool ChineseCalendarAddon::InitContext(napi_env env, const std::string& localeTag)
 {
-    chineseCalendar_ = std::make_shared<ChineseCalendar>(localeTags);
+    chineseCalendar_ = std::make_shared<ChineseCalendar>(localeTag);
     return true;
 }
 
@@ -175,7 +176,11 @@ napi_value ChineseCalendarAddon::SetChineseCalendarTime(napi_env env, napi_callb
         HILOG_ERROR_I18N("SetChineseCalendarTime: unwrap ChineseCalendarAddon failed.");
         return nullptr;
     }
-    obj->chineseCalendar_->SetChineseCalendarTime(time);
+    I18nErrorCode errCode = I18nErrorCode::SUCCESS;
+    obj->chineseCalendar_->SetChineseCalendarTime(time, errCode);
+    if (errCode != I18nErrorCode::SUCCESS) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID_NEW, "gregorianYear or cyclicalYear", "a valid value", true);
+    }
     return nullptr;
 }
 
@@ -193,7 +198,8 @@ ChineseCalendarTime ChineseCalendarAddon::ParseChineseCalendarTime(napi_env env,
         return time;
     }
 
-    std::unordered_set<std::string> keyOfTypeNumber = { "year", "month", "day", "hour", "minute", "second" };
+    std::unordered_set<std::string> keyOfTypeNumber
+        = { "gregorianYear", "cyclicalYear", "month", "date", "hour", "minute", "second" };
     std::string valueOfKey;
     for (const auto& key : keyOfTypeNumber) {
         if (!JSUtils::GetPropertyFormObject(env, value, key, napi_number, valueOfKey)) {
@@ -201,13 +207,14 @@ ChineseCalendarTime ChineseCalendarAddon::ParseChineseCalendarTime(napi_env env,
         }
         auto iter = ChineseCalendarTime::MEMBER_NAME_MAP.find(key);
         if (iter != ChineseCalendarTime::MEMBER_NAME_MAP.end()) {
-            time.*(iter->second) = valueOfKey;
+            time.*(iter->second) = std::atoi(valueOfKey.c_str());
         }
     }
-    bool isLeapMonth = false;
+    std::string isLeapMonth;
     if (JSUtils::GetPropertyFormObject(env, value, "isLeapMonth", napi_boolean, isLeapMonth)) {
-        time.isLeapMonth = isLeapMonth;
+        time.isLeapMonth = (isLeapMonth == "true");
     }
+    return time;
 }
 
 napi_value ChineseCalendarAddon::SetTime(napi_env env, napi_callback_info info)
@@ -245,6 +252,7 @@ napi_value ChineseCalendarAddon::SetTime(napi_env env, napi_callback_info info)
         milliseconds = ms.count();
     }
     obj->chineseCalendar_->SetTime(milliseconds);
+    return nullptr;
 }
 
 napi_value ChineseCalendarAddon::Set(napi_env env, napi_callback_info info)
@@ -258,7 +266,7 @@ napi_value ChineseCalendarAddon::Set(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("ChineseCalendarAddon::Set: napi_get_cb_info failed");
         return nullptr;
     }
-    if (argc < 3) {
+    if (argc < 3) { // 3 mandatory parameters
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "date", "", true);
         return nullptr;
     }
@@ -280,7 +288,7 @@ napi_value ChineseCalendarAddon::Set(napi_env env, napi_callback_info info)
     obj->chineseCalendar_->Set(param[0], param[1], param[2]); // 0/1/2 is the index of year/month/day
     obj->chineseCalendar_->Set(UCAL_HOUR_OF_DAY, param[3]); // 3 is the index of hour
     obj->chineseCalendar_->Set(UCAL_MINUTE, param[4]); // 4 is the index of minute
-    obj->chineseCalendar_->Set(UCAL_SECOND, param[5]); // 3 is the index of second
+    obj->chineseCalendar_->Set(UCAL_SECOND, param[5]); // 5 is the index of second
     return nullptr;
 }
 
@@ -326,7 +334,7 @@ napi_value ChineseCalendarAddon::SetTimeZone(napi_env env, napi_callback_info in
     }
     if (valueType != napi_valuetype::napi_string) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "timezone", "string", true);
-        return nullptr
+        return nullptr;
     }
 
     int32_t code = 0;
@@ -508,7 +516,7 @@ napi_value ChineseCalendarAddon::Get(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("ChineseCalendarAddon::Get: Invalid field %{public}s", field.c_str());
         return VariableConvertor::CreateNumber(env, 0);
     }
-    int32_t value = obj->chineseCalendar_->Get(I18nCalendar::FIELDS_MAP[field]);
+    int32_t value = obj->chineseCalendar_->Get(I18nCalendar::FIELDS_MAP.at(field));
     return VariableConvertor::CreateNumber(env, value);
 }
 
@@ -517,12 +525,11 @@ napi_value ChineseCalendarAddon::Add(napi_env env, napi_callback_info info)
     size_t argc = 2;
     napi_value argv[2] = { nullptr };
     napi_value thisVar = nullptr;
-    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (status != napi_ok) {
+    if (napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr) != napi_ok) {
         HILOG_ERROR_I18N("ChineseCalendarAddon::Add: napi_get_cb_info failed");
         return nullptr;
     }
-    if (argc < 2) {
+    if (argc < 2) { // parameter number is 2
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "field or amount", "", true);
         return nullptr;
     }
@@ -531,23 +538,20 @@ napi_value ChineseCalendarAddon::Add(napi_env env, napi_callback_info info)
     if (napi_typeof(env, argv[0], &valueType) != napi_ok) {
         HILOG_ERROR_I18N("ChineseCalendarAddon::Add: Get field type failed");
         return nullptr;
-    }
-    if (valueType != napi_valuetype::napi_string) {
+    } else if (valueType != napi_valuetype::napi_string) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "field", "string", true);
         return nullptr;
     }
     int32_t code = 0;
     std::string field = VariableConvertor::GetString(env, argv[0], code);
     if (code != 0) {
-        HILOG_ERROR_I18N("ChineseCalendarAddon::Add: Get field failed");
         return nullptr;
     }
 
     if (napi_typeof(env, argv[1], &valueType) != napi_ok) {
         HILOG_ERROR_I18N("ChineseCalendarAddon::Add: Get amount type failed");
         return nullptr;
-    }
-    if (valueType != napi_valuetype::napi_number) {
+    } else if (valueType != napi_valuetype::napi_number) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "amount", "number", true);
         return nullptr;
     }
@@ -557,14 +561,14 @@ napi_value ChineseCalendarAddon::Add(napi_env env, napi_callback_info info)
         return nullptr;
     }
     ChineseCalendarAddon *obj = nullptr;
-    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
+    napi_status status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->chineseCalendar_) {
         HILOG_ERROR_I18N("ChineseCalendarAddon::Add: unwrap failed");
         return nullptr;
     }
     if (I18nCalendar::FIELDS_IN_FUNCTION_ADD.find(field) != I18nCalendar::FIELDS_IN_FUNCTION_ADD.end() &&
         I18nCalendar::FIELDS_MAP.find(field) != I18nCalendar::FIELDS_MAP.end()) {
-        obj->chineseCalendar_->Add(I18nCalendar::FIELDS_MAP[field], amount);
+        obj->chineseCalendar_->Add(I18nCalendar::FIELDS_MAP.at(field), amount);
     }
     return nullptr;
 }
@@ -690,6 +694,7 @@ napi_value ChineseCalendarAddon::CompareDays(napi_env env, napi_callback_info in
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "date", "Date", true);
         return VariableConvertor::CreateNumber(env, 0);
     }
+    double milliseconds;
     if (!VariableConvertor::GetTimeFromDate(env, argv[0], type, milliseconds)) {
         std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch()
@@ -705,38 +710,47 @@ napi_value ChineseCalendarAddon::CompareDays(napi_env env, napi_callback_info in
     }
 
     int32_t days = obj->chineseCalendar_->CompareDays(milliseconds);
-    VariableConvertor::CreateNumber(env, days);
+    return VariableConvertor::CreateNumber(env, days);
 }
 
 napi_value ChineseCalendarAddon::CheckLeapMonth(napi_env env, napi_callback_info info)
 {
-    size_t argc = 2;
-    napi_value argv[2] = { 0 };
+    size_t argc = 3;
+    napi_value argv[3] = { 0 };
     napi_status status = napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("CheckLeapMonth: napi_get_cb_info failed");
         return VariableConvertor::CreateBoolean(env, false);
     }
-    if (argc < 2) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "year or month", "", true);
+    if (argc < 3) { // parameter number is 3
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "gregorianYear, cyclicalYear or month", "", true);
         return VariableConvertor::CreateBoolean(env, false);
     }
 
-    int32_t year = 0;
-    if (napi_get_value_int32(env, argv[0], &year) != napi_ok) {
-        HILOG_ERROR_I18N("CheckLeapMonth: get year failed");
+    int32_t gregorianYear = 0;
+    if (napi_get_value_int32(env, argv[0], &gregorianYear) != napi_ok) {
+        HILOG_ERROR_I18N("CheckLeapMonth: get gregorianYear failed");
         return VariableConvertor::CreateBoolean(env, false);
     }
+    int32_t cyclicalYear = 0;
+    if (napi_get_value_int32(env, argv[1], &cyclicalYear) != napi_ok) {
+        HILOG_ERROR_I18N("CheckLeapMonth: get cyclicalYear failed");
+        return VariableConvertor::CreateBoolean(env, false);
+    }
+
     int32_t month = 0;
-    if (napi_get_value_int32(env, argv[1], &month) != napi_ok) {
+    if (napi_get_value_int32(env, argv[2], &month) != napi_ok) { // 2 is month index
         HILOG_ERROR_I18N("CheckLeapMonth: get month failed");
         return VariableConvertor::CreateBoolean(env, false);
     }
-
-    bool isLeapMonth = ChineseCalendar::CheckLeapMonth(year, month);
+    I18nErrorCode errCode = I18nErrorCode::SUCCESS;
+    bool isLeapMonth = ChineseCalendar::CheckLeapMonth(gregorianYear, cyclicalYear, month, errCode);
+    if (errCode != I18nErrorCode::SUCCESS) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID_NEW, "gregorianYear or cyclicalYear", "a valid value", true);
+        return VariableConvertor::CreateBoolean(env, false);
+    }
     return VariableConvertor::CreateBoolean(env, isLeapMonth);
 }
-
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
