@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,11 +13,14 @@
  * limitations under the License.
  */
 
-#include "chinese_calendar_addon.h"
-#include <unordered_map>
 #include <unordered_set>
+
+#include "error_util.h"
+#include "locale_config.h"
 #include "i18n_hilog.h"
 #include "variable_converter.h"
+
+#include "chinese_calendar_addon.h"
 
 using namespace OHOS;
 using namespace Global;
@@ -32,19 +35,35 @@ ChineseCalendarAddon* ChineseCalendarAddon::UnwrapAddon(ani_env *env, ani_object
     return reinterpret_cast<ChineseCalendarAddon*>(ptr);
 }
 
-ani_object ChineseCalendarAddon::GetChineseCalendar(ani_env *env, ani_string locale)
+ani_object ChineseCalendarAddon::GetChineseCalendar(ani_env *env, ani_object locale)
 {
+    ani_boolean isUndefined;
+    if (ANI_OK != env->Reference_IsUndefined(locale, &isUndefined)) {
+        HILOG_ERROR_I18N("GetChineseCalendar: Check locale reference is undefined failed");
+        return nullptr;
+    }
+
+    std::string localeTag = isUndefined ? LocaleConfig::GetEffectiveLocale() :
+        VariableConverter::GetLocaleTagFromBuiltinLocale(env, locale);
+
     std::unique_ptr<ChineseCalendarAddon> obj = std::make_unique<ChineseCalendarAddon>();
-    obj->chineseCalendar_ = std::make_unique<ChineseCalendar>(VariableConverter::AniStrToString(env, locale));
+    obj->chineseCalendar_ = std::make_unique<ChineseCalendar>(localeTag);
     static const char* className = "@ohos.i18n.i18n.ChineseCalendar";
     ani_object calendarObject = VariableConverter::CreateAniObject(env, className, obj.get());
     obj.release();
     return calendarObject;
 }
 
-ani_boolean ChineseCalendarAddon::CheckLeapMonth(ani_env *env, ani_int year, ani_int month)
+ani_boolean ChineseCalendarAddon::CheckLeapMonth(ani_env *env, ani_object object, ani_int gregorianYear,
+    ani_int cyclicalYear, ani_int month)
 {
-    return ChineseCalendar::CheckLeapMonth(static_cast<int32_t>(year), static_cast<int32_t>(month));
+    I18nErrorCode errCode = I18nErrorCode::SUCCESS;
+    bool result = ChineseCalendar::CheckLeapMonth(gregorianYear, cyclicalYear, month, errCode);
+    if (errCode != I18nErrorCode::SUCCESS) {
+        ErrorUtil::AniThrow(env, I18N_NOT_VALID_NEW, "gregorianYear or cyclicalYear", "a valid value");
+        return false;
+    }
+    return result;
 }
 
 void ChineseCalendarAddon::SetChineseCalendarTime(ani_env *env, ani_object object, ani_object chineseCalendarTime)
@@ -57,25 +76,38 @@ void ChineseCalendarAddon::SetChineseCalendarTime(ani_env *env, ani_object objec
 
     ChineseCalendarTime time;
 
-    std::unordered_set<std::string> keyOfTypeNumber = { "year", "month", "day", "hour", "minute", "second" };
-    std::string valueOfKey;
+    std::unordered_set<std::string> keyOfTypeNumber = { "gregorianYear", "cyclicalYear", "month", "date" };
+    int32_t valueNumber;
     for (const auto& key : keyOfTypeNumber) {
-        ani_int value = 0;;
-        if (ANI_OK != env->Object_GetFieldByName_Int(chineseCalendarTime, key, &value)) {
+        if (ANI_OK != env->Object_GetPropertyByName_Int(chineseCalendarTime, key.c_str(), &valueNumber)) {
             continue;
         }
         auto iter = ChineseCalendarTime::MEMBER_NAME_MAP.find(key);
         if (iter != ChineseCalendarTime::MEMBER_NAME_MAP.end()) {
-            time.*(iter->second) = value;
+            time.*(iter->second) = valueNumber;
         }
     }
 
-    ani_boolean isLeapMonth = false;
-    if (ANI_OK != env->Object_GetFieldByName_Boolean(chineseCalendarTime, "isLeapMonth", &time.isLeapMonth)) {
-        time.isLeapMonth = false;
+    keyOfTypeNumber = { "hour", "minute", "second" };
+    for (const auto& key : keyOfTypeNumber) {
+        if (!VariableConverter::GetNumberMember(env, chineseCalendarTime, key, valueNumber)) {
+            continue;
+        }
+        auto iter = ChineseCalendarTime::MEMBER_NAME_MAP.find(key);
+        if (iter != ChineseCalendarTime::MEMBER_NAME_MAP.end()) {
+            time.*(iter->second) = valueNumber;
+        }
     }
 
-    obj->chineseCalendar_->SetChineseCalendarTime(time);
+    bool isLeapMonth = false;
+    if (VariableConverter::GetBooleanMember(env, chineseCalendarTime, "isLeapMonth", isLeapMonth)) {
+        time.isLeapMonth = isLeapMonth;
+    }
+    I18nErrorCode errCode = I18nErrorCode::SUCCESS;
+    obj->chineseCalendar_->SetChineseCalendarTime(time, errCode);
+    if (errCode != I18nErrorCode::SUCCESS) {
+        ErrorUtil::AniThrow(env, I18N_NOT_VALID_NEW, "gregorianYear or cyclicalYear", "a valid value");
+    }
 }
 
 void ChineseCalendarAddon::SetTimeByDate(ani_env *env, ani_object object, ani_object date)
@@ -85,14 +117,8 @@ void ChineseCalendarAddon::SetTimeByDate(ani_env *env, ani_object object, ani_ob
         HILOG_ERROR_I18N("ChineseCalendarAddon::SetTimeByDate: Get calendar object failed");
         return;
     }
-    double milliseconds;
-    if (ANI_OK != env->Object_CallMethodByName_Double(date, "toDouble", ":d", &milliseconds)) {
-         std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::system_clock::now().time_since_epoch()
-        );
-        milliseconds = ms.count();
-    }
-    obj->chineseCalendar_->SetTime(millisecond);
+    ani_long milliseconds = VariableConverter::GetDateValue(env, date, "valueOf");
+    obj->chineseCalendar_->SetTime(milliseconds);
 }
 
 void ChineseCalendarAddon::SetTime(ani_env *env, ani_object object, ani_double time)
@@ -223,7 +249,7 @@ ani_int ChineseCalendarAddon::Get(ani_env *env, ani_object object, ani_string fi
         HILOG_ERROR_I18N("ChineseCalendarAddon::Get: Get calendar object failed");
         return -1;
     }
-    return obj->chineseCalendar_->Get(I18nCalendar::FIELDS_MAP[str]);
+    return obj->chineseCalendar_->Get(I18nCalendar::FIELDS_MAP.at(str));
 }
 
 ani_string ChineseCalendarAddon::GetDisplayName(ani_env *env, ani_object object, ani_string locale)
@@ -253,15 +279,9 @@ ani_boolean ChineseCalendarAddon::IsWeekend(ani_env *env, ani_object object, ani
     if (isUndefined) {
         return obj->chineseCalendar_->IsWeekend();
     }
-    double milliseconds;
-    if (ANI_OK != env->Object_CallMethodByName_Double(date, "toDouble", ":d", &milliseconds)) {
-        std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::system_clock::now().time_since_epoch()
-        );
-        milliseconds = ms.count();
-    }
+    ani_long milliseconds = VariableConverter::GetDateValue(env, date, "valueOf");
     UErrorCode error = U_ZERO_ERROR;
-    return obj->chineseCalendar_->IsWeekend(millisecond, error);
+    return obj->chineseCalendar_->IsWeekend(static_cast<double>(milliseconds), error);
 }
 
 void ChineseCalendarAddon::Add(ani_env *env, ani_object object, ani_string field, ani_int amount)
@@ -277,7 +297,7 @@ void ChineseCalendarAddon::Add(ani_env *env, ani_object object, ani_string field
         HILOG_ERROR_I18N("ChineseCalendarAddon::Add: Get calendar object failed");
         return;
     }
-    obj->chineseCalendar_->Add(I18nCalendar::FIELDS_MAP[str], amount);
+    obj->chineseCalendar_->Add(I18nCalendar::FIELDS_MAP.at(str), amount);
 }
 
 ani_long ChineseCalendarAddon::GetTimeInMillis(ani_env *env, ani_object object)
@@ -297,14 +317,8 @@ ani_int ChineseCalendarAddon::CompareDays(ani_env *env, ani_object object, ani_o
         HILOG_ERROR_I18N("ChineseCalendarAddon::CompareDays: Get calendar object failed");
         return 0;
     }
-    double milliseconds;
-    if (ANI_OK != env->Object_CallMethodByName_Double(date, "toDouble", ":d", &milliseconds)) {
-        std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::system_clock::now().time_since_epoch()
-        );
-        milliseconds = ms.count();
-    }
-    return obj->chineseCalendar_->CompareDays(millisecond);
+    ani_long milliseconds = VariableConverter::GetDateValue(env, date, "valueOf");
+    return obj->chineseCalendar_->CompareDays(milliseconds);
 }
 
 ani_status ChineseCalendarAddon::BindContextChineseCalendar(ani_env *env)
@@ -334,7 +348,8 @@ ani_status ChineseCalendarAddon::BindContextChineseCalendar(ani_env *env)
         ani_native_function { "setMinimalDaysInFirstWeek", nullptr,
             reinterpret_cast<void *>(ChineseCalendarAddon::SetMinimalDaysInFirstWeek) },
         ani_native_function { "get", nullptr, reinterpret_cast<void *>(ChineseCalendarAddon::Get) },
-        ani_native_function { "getDisplayName", nullptr, reinterpret_cast<void *>(ChineseCalendarAddon::GetDisplayName) },
+        ani_native_function { "getDisplayName",
+            nullptr, reinterpret_cast<void *>(ChineseCalendarAddon::GetDisplayName) },
         ani_native_function { "isWeekend", nullptr, reinterpret_cast<void *>(ChineseCalendarAddon::IsWeekend) },
         ani_native_function { "add", nullptr, reinterpret_cast<void *>(ChineseCalendarAddon::Add) },
         ani_native_function { "getTimeInMillis", nullptr,
