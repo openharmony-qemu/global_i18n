@@ -14,6 +14,7 @@
  */
 #include "lunar_calendar_test.h"
 
+#include "chinese_calendar.h"
 #include "i18n_calendar.h"
 #include "lunar_calendar.h"
 
@@ -109,6 +110,53 @@ HWTEST_F(LunarCalendarTest, LunarCalendarTest0001, TestSize.Level1)
             }
         }
     }
+}
+
+/**
+ * @tc.name: LunarCalendarTest0002
+ * @tc.desc: Test Intl Chinese Calendar
+ * @tc.type: FUNC
+ */
+HWTEST_F(LunarCalendarTest, LunarCalendarTest0002, TestSize.Level1)
+{
+    std::string locale = "zh-Hans-CN";
+    std::unique_ptr<ChineseCalendar> calendar = std::make_unique<ChineseCalendar>(locale);
+    ChineseCalendarTime time;
+    time.gregorianYear = 2025;
+    time.cyclicalYear = 0;
+    time.month = 5;
+    time.date = 2;
+    I18nErrorCode errCode = I18nErrorCode::SUCCESS;
+    calendar->SetChineseCalendarTime(time, errCode);
+    EXPECT_EQ(errCode, I18nErrorCode::INVALID_PARAM);
+    time.cyclicalYear = 42;
+    errCode = I18nErrorCode::SUCCESS;
+    calendar->SetChineseCalendarTime(time, errCode);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    calendar->Set(UCAL_IS_LEAP_MONTH, 1);
+    calendar->SetTimeZone("Asia/Shanghai");
+    EXPECT_EQ(calendar->GetTimeZone(), "Asia/Shanghai");
+    EXPECT_EQ(calendar->Get(UCAL_ERA), 78);
+    calendar->Add(UCAL_DATE, 2);
+    EXPECT_EQ(calendar->Get(UCAL_DATE), 4);
+    calendar->SetMinimalDaysInFirstWeek(4);
+    EXPECT_EQ(calendar->GetMinimalDaysInFirstWeek(), 4);
+    calendar->SetFirstDayOfWeek(5);
+    EXPECT_EQ(calendar->GetFirstDayOfWeek(), 5);
+    EXPECT_EQ(calendar->GetDisplayName(locale), "农历");
+    EXPECT_EQ(calendar->IsWeekend(), false);
+    UErrorCode status;
+    EXPECT_EQ(calendar->IsWeekend(1753459200586, status), true);
+    EXPECT_EQ(calendar->CompareDays(1753459100586), -3);
+
+    bool isLeapMonth = ChineseCalendar::CheckLeapMonth(2025, 42, 5, errCode);
+    EXPECT_EQ(isLeapMonth, true);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    isLeapMonth = ChineseCalendar::CheckLeapMonth(2025, 42, 6, errCode);
+    EXPECT_EQ(isLeapMonth, false);
+    EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
+    isLeapMonth = ChineseCalendar::CheckLeapMonth(2101, 42, 6, errCode);
+    EXPECT_EQ(errCode, I18nErrorCode::INVALID_PARAM);
 }
 } // namespace I18n
 } // namespace Global
