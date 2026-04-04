@@ -220,7 +220,7 @@ ani_int I18nCalendarAddon::Get(ani_env *env, ani_object object, ani_string field
         HILOG_ERROR_I18N("I18nCalendarAddon::Get: Get calendar object failed");
         return -1;
     }
-    return obj->calendar_->Get(I18nCalendar::FIELDS_MAP[str]);
+    return obj->calendar_->Get(I18nCalendar::FIELDS_MAP.at(str));
 }
 
 ani_string I18nCalendarAddon::GetDisplayName(ani_env *env, ani_object object, ani_string locale)
@@ -276,7 +276,7 @@ void I18nCalendarAddon::Add(ani_env *env, ani_object object, ani_string field, a
         HILOG_ERROR_I18N("I18nCalendarAddon::Add: Get calendar object failed");
         return;
     }
-    obj->calendar_->Add(I18nCalendar::FIELDS_MAP[str], amount);
+    obj->calendar_->Add(I18nCalendar::FIELDS_MAP.at(str), amount);
 }
 
 ani_long I18nCalendarAddon::GetTimeInMillis(ani_env *env, ani_object object)
