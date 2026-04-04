@@ -518,7 +518,7 @@ napi_value I18nCalendarAddon::Get(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("Get: Get calendar object failed");
         return nullptr;
     }
-    int32_t value = obj->calendar_->Get(I18nCalendar::FIELDS_MAP[field]);
+    int32_t value = obj->calendar_->Get(I18nCalendar::FIELDS_MAP.at(field));
     napi_value result = nullptr;
     status = napi_create_int32(env, value, &result);
     if (status != napi_ok) {
@@ -575,7 +575,7 @@ napi_value I18nCalendarAddon::Add(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("Add: Get calendar object failed");
         return nullptr;
     }
-    obj->calendar_->Add(I18nCalendar::FIELDS_MAP[field], amount);
+    obj->calendar_->Add(I18nCalendar::FIELDS_MAP.at(field), amount);
     return nullptr;
 }
 
