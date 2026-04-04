@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,8 +25,9 @@ namespace I18n {
 class ChineseCalendarAddon {
 public:
     static ChineseCalendarAddon* UnwrapAddon(ani_env *env, ani_object object);
-    static ani_object GetChineseCalendar(ani_env *env, ani_string locale);
-    static ani_boolean CheckLeapMonth(ani_env *env, ani_int year, ani_int month);
+    static ani_object GetChineseCalendar(ani_env *env, ani_object locale);
+    static ani_boolean CheckLeapMonth(ani_env *env, ani_object object, ani_int gregorianYear, ani_int cyclicalYear,
+        ani_int month);
     static void SetChineseCalendarTime(ani_env *env, ani_object object, ani_object chineseCalendarTime);
     static void SetTimeByDate(ani_env *env, ani_object object, ani_object date);
     static void SetTime(ani_env *env, ani_object object, ani_double time);
