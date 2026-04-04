@@ -510,12 +510,12 @@ void GetPreferredUnit(const string &region, const string &usage, vector<string> 
 void ComputeFactorValue(const string &unit, const string &measSys, vector<double> &factors)
 {
     string unitKey = unit + "-" + measSys;
-    if (CONVERT_FACTORS.count(unitKey) > 0) {
+    if (CONVERT_FACTORS.count(unitKey) > 0 && factors.size() >= FACTOR_SIZE) {
         factors[0] = CONVERT_FACTORS.at(unitKey)[0];
         factors[1] = CONVERT_FACTORS.at(unitKey)[1];
         return;
     }
-    if (CONVERT_FACTORS.count(unit) > 0) {
+    if (CONVERT_FACTORS.count(unit) > 0 && factors.size() >= FACTOR_SIZE) {
         factors[0] = CONVERT_FACTORS.at(unit)[0];
         factors[1] = CONVERT_FACTORS.at(unit)[1];
     }
