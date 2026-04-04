@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -54,7 +54,7 @@ private:
 
     static constexpr napi_type_tag TYPE_TAG = { 0x8b76a3b1c9ca49c2, 0xbffcec846bf0c633 };
 
-    std::unique_ptr<ChineseCalendar> chineseCalendar_ = nullptr;
+    std::shared_ptr<ChineseCalendar> chineseCalendar_ = nullptr;
 };
 } // namespace I18n
 } // namespace Global
