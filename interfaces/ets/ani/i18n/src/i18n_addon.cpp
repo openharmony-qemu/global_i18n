@@ -16,6 +16,7 @@
 #include <i18n_addon.h>
 
 #include "advanced_measure_format_addon.h"
+#include "chinese_calendar_addon.h"
 #include "date_time_sequence.h"
 #include "entity_recognizer_addon.h"
 #include "error_util.h"
@@ -781,6 +782,8 @@ ani_status I18nAddon::BindContextNamespace(ani_env *env)
     }
     std::array methods = {
         ani_native_function { "getCalendar", nullptr, reinterpret_cast<void *>(I18nCalendarAddon::GetCalendar) },
+        ani_native_function { "getChineseCalendar", nullptr,
+            reinterpret_cast<void *>(ChineseCalendarAddon::GetChineseCalendar) },
         ani_native_function { "isRTL", nullptr, reinterpret_cast<void *>(I18nAddon::IsRTL) },
         ani_native_function { "getLineInstance", nullptr,
             reinterpret_cast<void *>(I18nBreakIteratorAddon::GetLineInstance) },
@@ -862,6 +865,11 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
     }
 
     status = I18nCalendarAddon::BindContextCalendar(env);
+    if (status != ANI_OK) {
+        return status;
+    }
+
+    status = ChineseCalendarAddon::BindContextChineseCalendar(env);
     if (status != ANI_OK) {
         return status;
     }

@@ -325,6 +325,48 @@ namespace i18n {
         native compareDays(date: Date): int;
     }
 
+    export interface ChineseCalendarTime {
+        gregorianYear: int;
+        cyclicalYear: int;
+        month: int;
+        date: int;
+        hour?: int;
+        minute?: int;
+        second?: int;
+        isLeapMonth?: boolean;
+    }
+
+    export class ChineseCalendar extends Calendar {
+        static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
+
+        private nativeChineseCalendar: long = 0;
+
+        constructor(context: long) {
+            super(context);
+            if (this.nativeChineseCalendar == 0) {
+                this.nativeChineseCalendar = context;
+            }
+        }
+
+        native setChineseCalendarTime(chineseCalendarTime: ChineseCalendarTime): void;
+        native setTime(date: Date): void;
+        native setTime(time: double): void;
+        native set(year: int, month: int, date: int, hour?: int, minute?: int, second?: int): void;
+        native setTimeZone(timezone: string): void;
+        native getTimeZone(): string;
+        native getFirstDayOfWeek(): int;
+        native setFirstDayOfWeek(value: int): void;
+        native getMinimalDaysInFirstWeek(): int;
+        native setMinimalDaysInFirstWeek(value: int): void;
+        native get(field: string): int;
+        native getDisplayName(locale: string): string;
+        native isWeekend(date?: Date): boolean;
+        native add(field: string, amount: int): void;
+        native getTimeInMillis(): long;
+        native compareDays(date: Date): int;
+        native static checkLeapMonth(gregorianYear: int, cyclicalYear: int, month: int): boolean;
+    }
+
     export class BreakIterator {
         static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
 
@@ -964,6 +1006,7 @@ namespace i18n {
 
     loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n");
     export native function getCalendar(locale: string, type?: string): Calendar;
+    export native function getChineseCalendar(locale?: Intl.Locale): ChineseCalendar;
     export native function isRTL(locale: string): boolean;
     export native function getLineInstance(locale: string): BreakIterator;
     export native function getInstance(locale?: string): IndexUtil;

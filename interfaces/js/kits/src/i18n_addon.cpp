@@ -16,6 +16,7 @@
 #include <vector>
 
 #include "advanced_measure_format_addon.h"
+#include "chinese_calendar_addon.h"
 #include "error_util.h"
 #include "i18n_hilog.h"
 #include "holiday_manager_addon.h"
@@ -158,6 +159,7 @@ napi_value I18nAddon::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getSystemRegion", I18nSystemAddon::GetSystemRegion),
         DECLARE_NAPI_FUNCTION("getSystemLocale", I18nSystemAddon::GetSystemLocale),
         DECLARE_NAPI_FUNCTION("getCalendar", I18nCalendarAddon::GetCalendar),
+        DECLARE_NAPI_FUNCTION("getChineseCalendar", ChineseCalendarAddon::GetChineseCalendar),
         DECLARE_NAPI_FUNCTION("isRTL", IsRTL),
         DECLARE_NAPI_FUNCTION("getLineInstance", GetLineInstance),
         DECLARE_NAPI_FUNCTION("getInstance", GetIndexUtil),
@@ -1990,6 +1992,7 @@ napi_value Init(napi_env env, napi_value exports)
     val = I18nAddon::InitPhoneNumberFormat(env, val);
     val = I18nAddon::InitI18nBreakIterator(env, val);
     val = I18nCalendarAddon::InitI18nCalendar(env, val);
+    val = ChineseCalendarAddon::InitChineseCalendar(env, val);
     val = I18nAddon::InitI18nIndexUtil(env, val);
     val = I18nAddon::InitI18nUtil(env, val);
     val = I18nTimeZoneAddon::InitI18nTimeZone(env, val);

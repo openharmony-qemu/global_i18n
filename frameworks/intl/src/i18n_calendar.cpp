@@ -41,6 +41,38 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
+const std::unordered_map<std::string, UCalendarDateFields> I18nCalendar::FIELDS_MAP {
+    { "era", UCAL_ERA },
+    { "year", UCAL_YEAR },
+    { "month", UCAL_MONTH },
+    { "week_of_year", UCAL_WEEK_OF_YEAR },
+    { "week_of_month", UCAL_WEEK_OF_MONTH },
+    { "date", UCAL_DATE },
+    { "day_of_year", UCAL_DAY_OF_YEAR },
+    { "day_of_week", UCAL_DAY_OF_WEEK },
+    { "day_of_week_in_month", UCAL_DAY_OF_WEEK_IN_MONTH },
+    { "am_pm", UCAL_AM_PM },
+    { "hour", UCAL_HOUR },
+    { "hour_of_day", UCAL_HOUR_OF_DAY },
+    { "minute", UCAL_MINUTE },
+    { "second", UCAL_SECOND },
+    { "millisecond", UCAL_MILLISECOND },
+    { "zone_offset", UCAL_ZONE_OFFSET },
+    { "dst_offset", UCAL_DST_OFFSET },
+    { "year_woy", UCAL_YEAR_WOY },
+    { "dow_local", UCAL_DOW_LOCAL },
+    { "extended_year", UCAL_EXTENDED_YEAR },
+    { "julian_day", UCAL_JULIAN_DAY },
+    { "milliseconds_in_day", UCAL_MILLISECONDS_IN_DAY },
+    { "is_leap_month", UCAL_IS_LEAP_MONTH },
+};
+
+const std::unordered_set<std::string> I18nCalendar::FIELDS_IN_FUNCTION_ADD {
+    "year", "month", "date", "hour", "minute", "second", "millisecond",
+    "week_of_year", "week_of_month", "day_of_year", "day_of_week",
+    "day_of_week_in_month", "hour_of_day", "milliseconds_in_day",
+};
+
 static std::unordered_map<WeekDay, UCalendarDaysOfWeek> WEEK_DAY_TO_ICU {
     { WeekDay::MON, UCalendarDaysOfWeek::UCAL_MONDAY },
     { WeekDay::TUE, UCalendarDaysOfWeek::UCAL_TUESDAY },

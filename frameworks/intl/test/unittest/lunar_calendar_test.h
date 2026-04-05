@@ -31,6 +31,7 @@ public:
 };
 
 int LunarCalendarTest0001(void);
+int LunarCalendarTest0002(void);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

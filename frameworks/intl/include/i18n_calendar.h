@@ -18,6 +18,8 @@
 #include <cmath>
 #include <cstdint>
 #include <mutex>
+#include <unordered_map>
+#include <unordered_set>
 
 #include "iosfwd"
 #include "unicode/locid.h"
@@ -66,9 +68,12 @@ public:
     std::string GetDisplayName(std::string &displayLocaleTag);
     int32_t CompareDays(UDate date);
 
+    static const std::unordered_map<std::string, UCalendarDateFields> FIELDS_MAP;
+    static const std::unordered_set<std::string> FIELDS_IN_FUNCTION_ADD;
+
 protected:
     virtual icu::Calendar* GetIcuCalendar() const;
-  
+
 private:
     icu::Calendar *calendar_;
     std::mutex zoneMutex;
