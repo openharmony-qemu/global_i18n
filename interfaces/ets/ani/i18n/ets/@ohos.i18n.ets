@@ -579,6 +579,41 @@ namespace i18n {
         native findEntityInfo(text: string): Array<EntityInfoItem>;
     }
 
+    export interface ISO8601DateTimeFormatOptions {
+        dateFormat?: "calendar" | "ordinal" | "week";
+        timePrecision?: "dateOnly" | "hours" | "minutes" | "seconds" | "milliSeconds";
+        separatorStyle?: "extended" | "basic";
+        timeZone?: string;
+        displayTimeZone?: boolean;
+    }
+
+    export class ISO8601DateTimeFormatOptionsInner implements ISO8601DateTimeFormatOptions {
+        dateFormat?: "calendar" | "ordinal" | "week";
+        timePrecision?: "dateOnly" | "hours" | "minutes" | "seconds" | "milliSeconds";
+        separatorStyle?: "extended" | "basic";
+        timeZone?: string;
+        displayTimeZone?: boolean;
+    }
+
+    export class ISO8601DateTimeFormat {
+        static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
+
+        private nativeISO8601DateTimeFormat: long = 0;
+
+        constructor(context: long) {
+            if (this.nativeISO8601DateTimeFormat == 0) {
+                this.nativeISO8601DateTimeFormat = context;
+            }
+        }
+
+        constructor(options?: ISO8601DateTimeFormatOptions) {
+            this.nativeISO8601DateTimeFormat = ISO8601DateTimeFormat.create(options).nativeISO8601DateTimeFormat;
+        }
+
+        native static create(options?: ISO8601DateTimeFormatOptions): ISO8601DateTimeFormat;
+        native format(date: Date): string;
+    }
+
     export class SimpleDateTimeFormat {
         static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
 

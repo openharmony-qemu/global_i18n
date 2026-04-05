@@ -27,6 +27,7 @@
 #include "i18n_system_addon.h"
 #include "i18n_timezone_addon.h"
 #include "i18n_unicode_addon.h"
+#include "iso8601_date_time_format_addon.h"
 #include "locale_config.h"
 #include "locale_matcher.h"
 #include "simple_date_time_format_addon.h"
@@ -893,6 +894,12 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
     if (status != ANI_OK) {
         return status;
     }
+
+    status = I18nISO8601DateTimeFormatAddon::BindContextISO8601DateTimeFormat(env);
+    if (status != ANI_OK) {
+        return status;
+    }
+
     status = BindZoneContext(env);
     if (status != ANI_OK) {
         return status;

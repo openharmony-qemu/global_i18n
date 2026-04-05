@@ -132,6 +132,7 @@ ohos_shared_library("intl_util") {
       "src/index_util.cpp",
       "src/intl_date_time_format.cpp",
       "src/intl_plural_rules.cpp",
+      "src/iso8601_date_time_format.cpp",
       "src/locale_compare.cpp",
       "src/locale_config.cpp",
       "src/locale_data.cpp",

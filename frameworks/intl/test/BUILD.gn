@@ -32,6 +32,7 @@ ohos_unittest("intl_test") {
     "unittest/intl_plural_rules_test.cpp",
     "unittest/intl_test.cpp",
     "unittest/intl_test_extent.cpp",
+    "unittest/iso8601_date_time_format_test.cpp",
     "unittest/lunar_calendar_test.cpp",
     "unittest/locale_config_test.cpp",
     "unittest/mock/src/generate_ics_file.cpp",
