@@ -25,6 +25,7 @@
 #include "i18n_normalizer_addon.h"
 #include "i18n_timezone_addon.h"
 #include "intl_addon.h"
+#include "iso8601_date_time_format_addon.h"
 #include "number_format_addon.h"
 #include "simple_date_time_format_addon.h"
 #include "simple_number_format_addon.h"
@@ -738,3 +739,5 @@ template ani_object VariableConverter::CreateAniObject<I18nSymbolNumberFormatAdd
     ani_env*, const char*, I18nSymbolNumberFormatAddon*);
 template ani_object VariableConverter::CreateAniObject<ChineseCalendarAddon>(
     ani_env*, const char*, ChineseCalendarAddon*);
+template ani_object VariableConverter::CreateAniObject<ISO8601DateTimeFormatAddon>(
+    ani_env*, const char*, ISO8601DateTimeFormatAddon*);

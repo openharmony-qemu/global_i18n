@@ -26,6 +26,7 @@
 #include "i18n_system_addon.h"
 #include "i18n_timezone_addon.h"
 #include "i18n_unicode_addon.h"
+#include "iso8601_date_time_format_addon.h"
 #include "js_lifecycle_managers.h"
 #include "js_utils.h"
 #include "locale_config.h"
@@ -2007,6 +2008,7 @@ napi_value Init(napi_env env, napi_value exports)
     val = EntityRecognizerAddon::InitEntityRecognizer(env, val);
     val = SimpleNumberFormatAddon::InitSimpleNumberFormat(env, val);
     val = SimpleDateTimeFormatAddon::InitSimpleDateTimeFormat(env, val);
+    val = ISO8601DateTimeFormatAddon::InitISO8601DateTimeFormat(env, val);
     val = StyledNumberFormatAddon::InitStyledNumberFormat(env, val);
     val = ZoneRulesAddon::InitI18nZoneRules(env, val);
     val = ZoneOffsetTransitionAddon::InitZoneOffsetTransition(env, val);
