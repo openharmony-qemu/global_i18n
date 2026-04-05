@@ -895,7 +895,7 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
         return status;
     }
 
-    status = I18nISO8601DateTimeFormatAddon::BindContextISO8601DateTimeFormat(env);
+    status = ISO8601DateTimeFormatAddon::BindContextISO8601DateTimeFormat(env);
     if (status != ANI_OK) {
         return status;
     }
