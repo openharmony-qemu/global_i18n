@@ -29,6 +29,9 @@ public:
 };
 
 int TranslitTest0001(void);
+int TranslitTest0002(void);
+int TranslitTest0003(void);
+int TranslitTest0004(void);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
