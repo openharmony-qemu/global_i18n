@@ -33,24 +33,27 @@ ISO8601DateTimeFormatAddon* ISO8601DateTimeFormatAddon::UnwrapAddon(ani_env *env
     return reinterpret_cast<ISO8601DateTimeFormatAddon*>(ptr);
 }
 
-std::string ISO8601DateTimeFormatAddon::ParseTimezone(ani_env *env, ani_ref ref)
+std::string ISO8601DateTimeFormatAddon::ParseTimezone(ani_env *env, ani_object timeZone)
 {
+    if (timeZone == nullptr) {
+        return "UTC";
+    }
     ani_class cls;
-    if (ANI_OK != env->FindClass("ohos.i18n.i18n.TimeZone", &cls)) {
+    if (ANI_OK != env->FindClass("@ohos.i18n.i18n.TimeZone", &cls)) {
         HILOG_ERROR_I18N("ParseTimezone: Find class 'TimeZone' failed");
-        return nullptr;
+        return "UTC";
     }
 
     ani_method getms;
     if (ANI_OK != env->Class_FindMethod(cls, "getID", ":C{std.core.String}", &getms)) {
         HILOG_ERROR_I18N("ParseTimezone: Find method 'getID' failed");
-        return nullptr;
+        return "UTC";
     }
 
     ani_ref id;
-    if (ANI_OK != env->Object_CallMethod_Ref(static_cast<ani_object>(ref), getms, &id)) {
+    if (ANI_OK != env->Object_CallMethod_Ref(timeZone, getms, &id)) {
         HILOG_ERROR_I18N("ParseTimezone: Call method 'getID' failed");
-        return nullptr;
+        return "UTC";
     }
     return VariableConverter::AniStrToString(env, id);
 }
@@ -67,7 +70,7 @@ ani_object ISO8601DateTimeFormatAddon::Create(ani_env *env, [[maybe_unused]] ani
     std::string dateFormat = "calendar";
     std::string timePrecision = "dateOnly";
     std::string separatorStyle = "extended";
-    std::string timeZone = "";
+    std::string timeZone = "UTC";
     bool displayTimeZone = false;
 
     if (!isUndefined) {
@@ -75,13 +78,11 @@ ani_object ISO8601DateTimeFormatAddon::Create(ani_env *env, [[maybe_unused]] ani
         VariableConverter::GetStringMember(env, options, "dateFormat", dateFormat);
         VariableConverter::GetStringMember(env, options, "timePrecision", timePrecision);
         VariableConverter::GetStringMember(env, options, "separatorStyle", separatorStyle);
-        VariableConverter::GetStringMember(env, options, "timeZone", timeZone);
+        ani_object timeZoneValue;
+        VariableConverter::GetObjectMember(env, options, "timeZone", timeZoneValue);
+        timeZone = ParseTimezone(env, timeZoneValue);
 
-        // Get displayTimeZone
-        ani_boolean displayTimeZoneBool;
-        if (ANI_OK == env->Object_GetFieldByName_Boolean(options, "displayTimeZone", &displayTimeZoneBool)) {
-            displayTimeZone = displayTimeZoneBool;
-        }
+        VariableConverter::GetBooleanMember(env, options, "displayTimeZone",  displayTimeZone);
     }
 
     // Convert string values to enum
