@@ -30,7 +30,7 @@ public:
     static ani_status BindContextISO8601DateTimeFormat(ani_env *env);
 
 private:
-    static std::string ParseTimezone(ani_env *env, ani_ref ref);
+    static std::string ParseTimezone(ani_env *env, ani_object timeZone);
     std::shared_ptr<ISO8601DateTimeFormat> iso8601DateTimeFormat_ = nullptr;
 };
 } // namespace I18n

@@ -38,6 +38,7 @@ public:
     static void SetStringMember(ani_env *env, ani_object obj, const std::string &name, const std::string &value);
     static bool GetStringMember(ani_env *env, ani_object options, const std::string &name, std::string &value);
     static bool GetEnumIndexMember(ani_env *env, ani_object options, const std::string &name, int32_t &value);
+    static bool GetObjectMember(ani_env *env, ani_object options, const std::string &name, ani_object &value);
     static std::string GetLocaleTagFromBuiltinLocale(ani_env *env, ani_object obj);
     static ani_object CreateArray(ani_env *env, const std::vector<std::string> &strs);
     static bool ParseStringArray(ani_env *env, ani_object obj, std::vector<std::string> &strs);

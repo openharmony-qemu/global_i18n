@@ -38,6 +38,31 @@ void ISO8601DateTimeFormatAddon::Destructor(napi_env env, void *nativeObject, vo
     nativeObject = nullptr;
 }
 
+std::string ParseTimezone(napi_env env, napi_value timeZone)
+{
+    napi_valuetype timeZoneType;
+    if (napi_typeof(env, timeZone, &timeZoneType) != napi_ok || timeZoneType != napi_object) {
+        HILOG_ERROR_I18N("ParseTimezone: Type error");
+        return "UTC";
+    }
+    napi_value getIDFunction = nullptr;
+    if (napi_get_named_property(env, timeZone, "getID", &getIDFunction) != napi_ok) {
+        HILOG_ERROR_I18N("ParseTimezone: Get function failed");
+        return "UTC";
+    }
+    napi_value timeZoneID = nullptr;
+    if (napi_call_function(env, timeZone, getIDFunction, 0, nullptr, &timeZoneID) != napi_ok) {
+        HILOG_ERROR_I18N("ParseTimezone: Call function failed");
+        return "UTC";
+    }
+    int32_t code = 0;
+    std::string result = VariableConvertor::GetString(env, timeZoneID, code);
+    if (code != 0) {
+        return "UTC";
+    }
+    return result;
+}
+
 napi_value ISO8601DateTimeFormatAddon::ISO8601DateTimeFormatConstructor(napi_env env, napi_callback_info info)
 {
     size_t argc = 1;
@@ -90,8 +115,7 @@ napi_value ISO8601DateTimeFormatAddon::ISO8601DateTimeFormatConstructor(napi_env
             // Get timeZone
             napi_value timeZoneValue;
             if (napi_get_named_property(env, argv[0], "timeZone", &timeZoneValue) == napi_ok) {
-                int32_t code = 0;
-                timeZone = VariableConvertor::GetString(env, timeZoneValue, code);
+                timeZone = ParseTimezone(env, timeZoneValue);
             }
 
             // Get displayTimeZone

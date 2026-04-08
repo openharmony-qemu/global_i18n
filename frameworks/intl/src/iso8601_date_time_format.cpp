@@ -84,7 +84,7 @@ std::string ISO8601DateTimeFormat::BuildPattern() const
         pattern += GetTimePrecisionPattern();
     }
 
-    if (displayTimeZone_) {
+    if (displayTimeZone_ && timePrecision_ != TimePrecision::DATE_ONLY) {
         pattern += GetTimeZonePattern();
     }
 
@@ -146,7 +146,7 @@ std::string ISO8601DateTimeFormat::GetTimePrecisionPattern() const
             if (separatorStyle_ == SeparatorStyle::EXTENDED) {
                 return "'T'HH:mm:ss.SSS";
             } else {
-                return "'T'HHmmssSSS";
+                return "'T'HHmmss.SSS";
             }
         default:
             return "";

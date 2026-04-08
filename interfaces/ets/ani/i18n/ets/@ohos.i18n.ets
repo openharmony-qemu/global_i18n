@@ -583,7 +583,7 @@ namespace i18n {
         dateFormat?: "calendar" | "ordinal" | "week";
         timePrecision?: "dateOnly" | "hours" | "minutes" | "seconds" | "milliSeconds";
         separatorStyle?: "extended" | "basic";
-        timeZone?: string;
+        timeZone?: TimeZone;
         displayTimeZone?: boolean;
     }
 
@@ -591,7 +591,7 @@ namespace i18n {
         dateFormat?: "calendar" | "ordinal" | "week";
         timePrecision?: "dateOnly" | "hours" | "minutes" | "seconds" | "milliSeconds";
         separatorStyle?: "extended" | "basic";
-        timeZone?: string;
+        timeZone?: TimeZone;
         displayTimeZone?: boolean;
     }
 
