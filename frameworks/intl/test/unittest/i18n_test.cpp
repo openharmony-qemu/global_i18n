@@ -602,6 +602,8 @@ HWTEST_F(I18nTest, I18nFuncTest015, TestSize.Level1)
     std::string localeTag = "en-Latn-US";
     std::string displayName = timezone3.GetDisplayName(localeTag);
     EXPECT_EQ(timezoneId, "Pacific/Auckland");
+    EXPECT_EQ(timezone3.IsDaylightSavingTime(1783566442000), false);
+    EXPECT_EQ(timezone3.IsDaylightSavingTime(1767928042000), true);
 
     std::string fakeId = "fake city id";
     std::string cityDisplayName = I18nTimeZone::GetCityDisplayName(fakeId, localeTag);

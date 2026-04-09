@@ -236,6 +236,18 @@ ani_object I18nTimeZoneAddon::GetZoneRules(ani_env *env, ani_object object)
     return ZoneRulesAddon::GetZoneRulesObject(env, object, tzid);
 }
 
+ani_boolean I18nTimeZoneAddon::IsDaylightSavingTime(ani_env *env, ani_object object, ani_object date)
+{
+    I18nTimeZoneAddon* obj = UnwrapAddon(env, object);
+    if (obj == nullptr || obj->timezone_ == nullptr) {
+        HILOG_ERROR_I18N("IsDaylightSavingTime: Failed to unwrap addon or get timezone object");
+        return false;
+    }
+
+    int64_t milliseconds = VariableConverter::GetDateValue(env, date, "valueOf");
+    return obj->timezone_->IsDaylightSavingTime(static_cast<double>(milliseconds));
+}
+
 void I18nTimeZoneAddon::SetAppDefaultTimeZoneById(ani_env *env, [[maybe_unused]] ani_object object, ani_string zoneID)
 {
     std::string zoneIDStr = VariableConverter::AniStrToString(env, zoneID);
@@ -271,6 +283,8 @@ ani_status I18nTimeZoneAddon::BindContextTimeZone(ani_env *env)
         ani_native_function { "getRawOffset", nullptr, reinterpret_cast<void *>(I18nTimeZoneAddon::GetRawOffset) },
         ani_native_function { "getOffset", nullptr, reinterpret_cast<void *>(I18nTimeZoneAddon::GetOffset) },
         ani_native_function { "getZoneRules", nullptr, reinterpret_cast<void *>(I18nTimeZoneAddon::GetZoneRules) },
+        ani_native_function { "isDaylightSavingTime", nullptr,
+            reinterpret_cast<void *>(I18nTimeZoneAddon::IsDaylightSavingTime) },
     };
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
         HILOG_ERROR_I18N("BindContextTimeZone: Cannot bind native methods to '%{public}s'", className);

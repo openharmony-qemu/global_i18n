@@ -479,6 +479,7 @@ namespace i18n {
         native getRawOffset(): int;
         native getOffset(date?: double): int;
         native getZoneRules(): ZoneRules;
+        native isDaylightSavingTime(date: Date): boolean;
         native static getAvailableIDs(): Array<string>;
         native static getAvailableZoneCityIDs(): Array<string>;
         native static getCityDisplayName(cityID: string, locale: string): string;
