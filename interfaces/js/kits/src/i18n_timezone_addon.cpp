@@ -396,6 +396,10 @@ napi_value I18nTimeZoneAddon::SetAppDefaultTimeZoneById(napi_env env, napi_callb
 napi_value I18nTimeZoneAddon::GetAppDefaultTimeZone(napi_env env, napi_callback_info info)
 {
     std::unique_ptr<I18nTimeZone> appTimeZone = I18nTimeZone::GetAppDefaultTimeZone();
+    if (!appTimeZone) {
+        HILOG_ERROR_I18N("GetAppDefaultTimeZone: Get TimeZone object failed");
+        return nullptr;
+    }
     std::string id = appTimeZone->GetID();
     napi_value timezoneId = nullptr;
     napi_status status = napi_create_string_utf8(env, id.c_str(), NAPI_AUTO_LENGTH, &timezoneId);
