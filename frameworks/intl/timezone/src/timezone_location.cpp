@@ -76,7 +76,8 @@ std::vector<Point> TimeZoneLocation::GetPointVect(int32_t* points, size_t size)
     return result;
 }
 
-bool TimeZoneLocation::IsPointOnSegment(const Point& p, const Point& before, const Point& after) {
+bool TimeZoneLocation::IsPointOnSegment(const Point& p, const Point& before, const Point& after)
+{
     const double eps = 1e-9;
     double cross = (after.x - before.x) * (p.y - before.y) - (after.y - before.y) * (p.x - before.x);
     if (std::fabs(cross) > eps) {
@@ -89,8 +90,8 @@ bool TimeZoneLocation::IsPointOnSegment(const Point& p, const Point& before, con
     return Geq(p.x, minX) && Leq(p.x, maxX) && Geq(p.y, minY) && Leq(p.y, maxY);
 }
 
-//
-bool TimeZoneLocation::IsPointInPolygon(const Point& p, const std::vector<Point>& polygon) {
+bool TimeZoneLocation::IsPointInPolygon(const Point& p, const std::vector<Point>& polygon)
+{
     int32_t polygonSize = static_cast<int32_t>(polygon.size());
     if (polygonSize < MIN_POLYGON_POINTS_COUNT) {
         return false;
