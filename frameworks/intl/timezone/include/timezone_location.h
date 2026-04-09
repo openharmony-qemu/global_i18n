@@ -38,6 +38,11 @@ struct OceanZone {
     double right;
 };
 
+struct Point {
+    double x;
+    double y;
+};
+
 enum class ParseJsonStrResult { INVALID, OBJECT, ARRAY };
 
 class TimeZoneLocation {
@@ -58,11 +63,12 @@ private:
     static const int JSONITEM_BEGIN_OFFSET = 4;
     static const size_t LOOP_STEP = 2;
     static const int32_t MAX_LOOKUP_STR_SIZE = 10485760;
+    static const int32_t MIN_POLYGON_POINTS_COUNT = 4;
     static const char *TIMEZONE_LOCATION_PATH;
     static const std::vector<OceanZone> OCEAN_ZONES;
 
-    std::vector<std::pair<double, double>> GetPointVect(int32_t* points, size_t size);
-    bool IsPointInPolygon(const std::vector<std::pair<double, double>>& polygon, double px, double py);
+    std::vector<Point> GetPointVect(int32_t* points, size_t size);
+    bool IsPointInPolygon(const Point& p, const std::vector<Point>& polygon);
     std::vector<std::string> GetTimezoneAtSea(double lon);
     bool IsPointInMultiPolygon(const std::vector<int32_t>& pointsInPolygon,
         const double& lon, const double& lat, FILE* file);
@@ -82,6 +88,7 @@ private:
         int32_t tzIndexCount, FILE* datFile, const std::vector<std::string>& tzidNames);
     void ReadJsonArray(const std::string& jsonArrayStr,
         const std::vector<std::string>& tzidNames, std::vector<std::string>& tzidList);
+    bool IsPointOnSegment(const Point& p, const Point& before, const Point& after);
 };
 } // namespace I18n
 } // namespace Global
