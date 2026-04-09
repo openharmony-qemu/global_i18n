@@ -21,7 +21,6 @@
 #include "unicode/utypes.h"
 #include "unicode/translit.h"
 #include "ohos/init_data.h"
-#include "timezone_location.h"
 
 using namespace OHOS::Global::I18n;
 using testing::ext::TestSize;
@@ -274,123 +273,6 @@ HWTEST_F(TranslitTest, TranslitTest0001, TestSize.Level1)
         EXPECT_EQ(result, expect);
     }
     delete trans;
-}
-
-/**
- * @tc.name: TranslitTest0001
- * @tc.desc: Test icu::Transliterator
- * @tc.type: FUNC
- */
-HWTEST_F(TranslitTest, TranslitTest0002, TestSize.Level1)
-{
-    std::unique_ptr<TimeZoneLocation> tzLoc = std::make_unique<TimeZoneLocation>();
-    tzLoc->GetTimezoneByLocation(106.58314, 22.46933);
-    tzLoc->GetTimezoneByLocation(106.7917876, 22.82248);
-    tzLoc->GetTimezoneByLocation(106.726289, 22.85502);
-    tzLoc->GetTimezoneByLocation(106.8472477, 22.83867);
-    tzLoc->GetTimezoneByLocation(126.897702, 41.798380);
-    printf("==================zhongguo yindu=========== \r\n");
-    tzLoc->GetTimezoneByLocation(92.36, 27.11);
-    tzLoc->GetTimezoneByLocation(93.80, 27.26);
-    tzLoc->GetTimezoneByLocation(95.57, 28.90);
-    tzLoc->GetTimezoneByLocation(95.91, 28.78);
-    tzLoc->GetTimezoneByLocation(97.03, 28.75);
-    printf("==================zhongguo budan=========== \r\n");
-    tzLoc->GetTimezoneByLocation(89.00, 27.51);
-    tzLoc->GetTimezoneByLocation(90.82, 28.05);
-    tzLoc->GetTimezoneByLocation(88.90, 27.47);
-    printf("==================nanhai=========== \r\n");
-    tzLoc->GetTimezoneByLocation(117.74, 15.18);
-    tzLoc->GetTimezoneByLocation(116.57, 9.73);
-    tzLoc->GetTimezoneByLocation(113.83, 7.38);
-    printf("==================nan tong jiao=========== \r\n");
-    tzLoc->GetTimezoneByLocation(113.240785, 6.33258);
-    printf("==================diaoyudao=========== \r\n");
-    tzLoc->GetTimezoneByLocation(123.47, 25.74);
-    tzLoc->GetTimezoneByLocation(123.54, 25.72);
-    printf("==================Urumqi=========== \r\n");
-    tzLoc->GetTimezoneByLocation(87.7, 43.8);
-    printf("==================xindeli=========== \r\n");
-    tzLoc->GetTimezoneByLocation(77.12, 28.36);
-    printf("==================jierjisisitan=========== \r\n");
-    tzLoc->GetTimezoneByLocation(72.16912, 41.1918);
-    printf("==================yuenan=========== \r\n");
-    tzLoc->GetTimezoneByLocation(106.726064, 22.852934);
-    tzLoc->GetTimezoneByLocation(106.643796, 22.869609);
-    tzLoc->GetTimezoneByLocation(106.747336, 22.671182);
-    tzLoc->GetTimezoneByLocation(104.200664, 19.169076);
-    tzLoc->GetTimezoneByLocation(105.87491, 11.29094);
-}
-
-/**
- * @tc.name: TranslitTest0001
- * @tc.desc: Test icu::Transliterator
- * @tc.type: FUNC
- */
-HWTEST_F(TranslitTest, TranslitTest0003, TestSize.Level1)
-{
-    std::unique_ptr<TimeZoneLocation> tzLoc = std::make_unique<TimeZoneLocation>();
-    printf("==================yelushaleng=========== \r\n");
-    tzLoc->GetTimezoneByLocation(35.14, 31.96);
-    tzLoc->GetTimezoneByLocation(35.20, 31.80);
-    tzLoc->GetTimezoneByLocation(35.35, 32.35);
-    tzLoc->GetTimezoneByLocation(34.10, 44.94);
-    tzLoc->GetTimezoneByLocation(33.52, 44.61);
-    tzLoc->GetTimezoneByLocation(-13.19, 27.15);
-    tzLoc->GetTimezoneByLocation(21.15, 42.65);
-    tzLoc->GetTimezoneByLocation(21.43, 42.00);
-    tzLoc->GetTimezoneByLocation(37.80, 48.01);
-    tzLoc->GetTimezoneByLocation(39.30, 48.57);
-    tzLoc->GetTimezoneByLocation(-59.79, -51.72);
-    tzLoc->GetTimezoneByLocation(147.79, 45.08);
-    tzLoc->GetTimezoneByLocation(131.86, 37.24);
-    tzLoc->GetTimezoneByLocation(33.34, 35.20);
-    tzLoc->GetTimezoneByLocation(32.81, 34.77);
-    printf("================dongsha qundao=========== \r\n");
-    tzLoc->GetTimezoneByLocation(116.81, 20.68);
-    tzLoc->GetTimezoneByLocation(116.802329, 20.664739);
-    tzLoc->GetTimezoneByLocation(116.897086, 20.662169);
-    //边界点
-    tzLoc->GetTimezoneByLocation(116.685503, 20.85476);
-    printf("================@@@@@@@@=========== \r\n");
-    tzLoc->GetTimezoneByLocation(114.236781, 11.525819);
-    tzLoc->GetTimezoneByLocation(114.441625, 11.346657);
-    tzLoc->GetTimezoneByLocation(114.817913, 11.08117);
-    tzLoc->GetTimezoneByLocation(115.598432, 10.734287);
-    tzLoc->GetTimezoneByLocation(114.686137, 10.584087);
-    tzLoc->GetTimezoneByLocation(114.346505, 10.326766);
-    tzLoc->GetTimezoneByLocation(114.061329, 10.087432);
-    tzLoc->GetTimezoneByLocation(114.552484, 10.101774);
-    tzLoc->GetTimezoneByLocation(114.203021, 8.912868);
-    tzLoc->GetTimezoneByLocation(114.453052, 8.856799);
-    tzLoc->GetTimezoneByLocation(111.471754, 8.666755);
-    tzLoc->GetTimezoneByLocation(113.095773, 8.227688);
-    tzLoc->GetTimezoneByLocation(114.247267, 7.535228);
-}
-
-/**
- * @tc.name: TranslitTest0004
- * @tc.desc: Test icu::Transliterator
- * @tc.type: FUNC
- */
-HWTEST_F(TranslitTest, TranslitTest0004, TestSize.Level1)
-{
-    std::unique_ptr<TimeZoneLocation> tzLoc = std::make_unique<TimeZoneLocation>();
-    printf("================$$$$$$$$$=========== \r\n");
-    tzLoc->GetTimezoneByLocation(122.893295, 24.248673);
-    tzLoc->GetTimezoneByLocation(124.454892, 24.776871);
-    printf("================zhoubian shiqu=========== \r\n");
-    tzLoc->GetTimezoneByLocation(127.150348, 40.984974);
-    tzLoc->GetTimezoneByLocation(134.274421, 45.171298);
-    tzLoc->GetTimezoneByLocation(128.134032, 53.553832);
-    tzLoc->GetTimezoneByLocation(117.155382, 51.463265);
-    tzLoc->GetTimezoneByLocation(106.099319, 45.34427);
-    tzLoc->GetTimezoneByLocation(90.737938, 48.422181);
-    tzLoc->GetTimezoneByLocation(87.479194, 50.141346);
-    tzLoc->GetTimezoneByLocation(80.892381, 47.443379);
-    tzLoc->GetTimezoneByLocation(76.194132, 41.301241);
-    tzLoc->GetTimezoneByLocation(74.341692, 38.200328);
-    tzLoc->GetTimezoneByLocation(72.765399, 35.498675);
 }
 } // namespace I18n
 } // namespace Global

@@ -32,6 +32,10 @@ public:
 
 int TimeZoneLocationTest0001(void);
 int TimeZoneLocationTest0002(void);
+int TimeZoneLocationTest0003(void);
+int TimeZoneLocationTest0004(void);
+int TimeZoneLocationTest0005(void);
+int TimeZoneLocationTest0006(void);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
