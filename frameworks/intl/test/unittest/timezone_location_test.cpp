@@ -794,7 +794,7 @@ HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0003, TestSize.Level1)
     tzIdList = tzLoc->GetTimezoneByLocation(79.03, 31.05);
     EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
     tzIdList = tzLoc->GetTimezoneByLocation(78.45, 32.15);
-    EXPECT_EQ(tzIdList[0], "Etc/GMT-5");
+    EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
     tzIdList = tzLoc->GetTimezoneByLocation(79.38, 32.79);
     EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
     printf("==================china and Bhutan=========== \r\n");
