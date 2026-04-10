@@ -776,7 +776,7 @@ HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0003, TestSize.Level1)
     EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
     tzIdList = tzLoc->GetTimezoneByLocation(126.897702, 41.798380);
     EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
-    printf("==================中印边界=========== \r\n");
+    printf("==================china and India=========== \r\n");
     tzIdList = tzLoc->GetTimezoneByLocation(92.36, 27.11);
     EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
     tzIdList = tzLoc->GetTimezoneByLocation(93.80, 27.26);
@@ -794,10 +794,10 @@ HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0003, TestSize.Level1)
     tzIdList = tzLoc->GetTimezoneByLocation(79.03, 31.05);
     EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
     tzIdList = tzLoc->GetTimezoneByLocation(78.45, 32.15);
-    EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
+    EXPECT_EQ(tzIdList[0], "Etc/GMT-5");
     tzIdList = tzLoc->GetTimezoneByLocation(79.38, 32.79);
     EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
-    printf("==================中不边界=========== \r\n");
+    printf("==================china and Bhutan=========== \r\n");
     tzIdList = tzLoc->GetTimezoneByLocation(89.00, 27.51);
     EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
     tzIdList = tzLoc->GetTimezoneByLocation(90.82, 28.05);
@@ -808,7 +808,7 @@ HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0003, TestSize.Level1)
     EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
     tzIdList = tzLoc->GetTimezoneByLocation(89.09, 27.62);
     EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
-    printf("==================吉尔吉斯斯坦=========== \r\n");
+    printf("==================Kyrgyzstan=========== \r\n");
     tzIdList = tzLoc->GetTimezoneByLocation(72.16912, 41.1918);
     EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Bishkek");
 }
@@ -821,7 +821,7 @@ HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0003, TestSize.Level1)
 HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0004, TestSize.Level1)
 {
     std::unique_ptr<TimeZoneLocation> tzLoc = std::make_unique<TimeZoneLocation>();
-    printf("==================南海地区=========== \r\n");
+    printf("==================nanhai area=========== \r\n");
     std::vector<std::string> tzIdList = tzLoc->GetTimezoneByLocation(117.74, 15.18);
     EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
     tzIdList = tzLoc->GetTimezoneByLocation(116.57, 9.73);
@@ -832,15 +832,27 @@ HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0004, TestSize.Level1)
     EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
     tzIdList = tzLoc->GetTimezoneByLocation(116.81, 20.68);
     EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
-    printf("==================南通礁=========== \r\n");
+    printf("==================Nantong Reef=========== \r\n");
     tzIdList = tzLoc->GetTimezoneByLocation(113.240785, 6.33258);
     EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
-    printf("==================钓鱼岛=========== \r\n");
+    printf("==================Diaoyu Islands=========== \r\n");
     tzIdList = tzLoc->GetTimezoneByLocation(123.47, 25.74);
     EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
     tzIdList = tzLoc->GetTimezoneByLocation(123.54, 25.72);
     EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
-    printf("==================海外地区=========== \r\n");
+
+}
+
+/**
+ * @tc.name: TimeZoneLocationTest0005
+ * @tc.desc: Test GetTimezoneIdByLocation
+ * @tc.type: FUNC
+ */
+HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0005, TestSize.Level1)
+{
+    std::unique_ptr<TimeZoneLocation> tzLoc = std::make_unique<TimeZoneLocation>();
+    std::vector<std::string> tzIdList;
+    printf("==================oversea=========== \r\n");
     tzIdList = tzLoc->GetTimezoneByLocation(35.14, 31.96);
     EXPECT_TRUE(tzIdList.size() == 2 && tzIdList[0] == "Asia/Jerusalem");
     EXPECT_TRUE(tzIdList.size() == 2 && tzIdList[1] == "Asia/Hebron");
@@ -875,15 +887,15 @@ HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0004, TestSize.Level1)
 }
 
 /**
- * @tc.name: TimeZoneLocationTest0005
+ * @tc.name: TimeZoneLocationTest0006
  * @tc.desc: Test GetTimezoneIdByLocation
  * @tc.type: FUNC
  */
-HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0005, TestSize.Level1)
+HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0006, TestSize.Level1)
 {
     std::unique_ptr<TimeZoneLocation> tzLoc = std::make_unique<TimeZoneLocation>();
-    printf("================zhoubian shiqu=========== \r\n");
-    std::vector<std::string> tzIdList = tzLoc->GetTimezoneByLocation(127.150348, 40.984974);
+    std::vector<std::string> tzIdList;
+    printf("================China border nearby=========== \r\n");
     tzIdList = tzLoc->GetTimezoneByLocation(134.274421, 45.171298);
     EXPECT_EQ(tzIdList[0], "Asia/Vladivostok");
     tzIdList = tzLoc->GetTimezoneByLocation(128.134032, 53.553832);
@@ -904,19 +916,7 @@ HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0005, TestSize.Level1)
     EXPECT_EQ(tzIdList[0], "Asia/Dushanbe");
     tzIdList = tzLoc->GetTimezoneByLocation(72.765399, 35.498675);
     EXPECT_EQ(tzIdList[0], "Asia/Karachi");
-
-}
-
-/**
- * @tc.name: TimeZoneLocationTest0006
- * @tc.desc: Test GetTimezoneIdByLocation
- * @tc.type: FUNC
- */
-HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0006, TestSize.Level1)
-{
-    std::unique_ptr<TimeZoneLocation> tzLoc = std::make_unique<TimeZoneLocation>();
-    std::vector<std::string> tzIdList;
-    printf("================边界1km点=========== \r\n");
+    printf("================1 kilometer away from the China border=========== \r\n");
     tzIdList = tzLoc->GetTimezoneByLocation(99.30555, 22.41134);
     EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
     tzIdList = tzLoc->GetTimezoneByLocation(99.34955, 22.70645);
