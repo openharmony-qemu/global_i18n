@@ -30,6 +30,7 @@ public:
     static ani_string GetDisplayName(ani_env *env, ani_object object, ani_string locale, ani_object isDST);
     static ani_int GetRawOffset(ani_env *env, ani_object object);
     static ani_int GetOffset(ani_env *env, ani_object object, ani_object date);
+    static ani_boolean IsDaylightSavingTime(ani_env *env, ani_object object, ani_object date);
     static ani_object GetAvailableIDs(ani_env *env, [[maybe_unused]] ani_object object);
     static ani_object GetAvailableZoneCityIDs(ani_env *env, [[maybe_unused]] ani_object object);
     static ani_object GetCityDisplayName(ani_env *env, [[maybe_unused]] ani_object object,

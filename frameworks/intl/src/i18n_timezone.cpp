@@ -743,6 +743,22 @@ std::string I18nTimeZone::GetDisplayName(
     return PseudoLocalizationProcessor(GetDisplayNameByTaboo(localeStr, result));
 }
 
+bool I18nTimeZone::IsDaylightSavingTime(double date)
+{
+    if (timezone == nullptr) {
+        HILOG_ERROR_I18N("I18nTimeZone::IsDaylightSavingTime: timezone is nullptr");
+        return false;
+    }
+    UErrorCode status = U_ZERO_ERROR;
+    UBool result = timezone->inDaylightTime(date, status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("I18nTimeZone::IsDaylightSavingTime: inDaylightTime failed, code is %{public}s",
+            u_errorName(status));
+        return false;
+    }
+    return static_cast<bool>(result);
+}
+
 std::string I18nTimeZone::GetDisplayNameByTaboo(
     const std::string& localeStr, const std::string& result)
 {

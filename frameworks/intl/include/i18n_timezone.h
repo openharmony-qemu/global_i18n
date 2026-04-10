@@ -44,6 +44,7 @@ public:
     std::string GetDisplayName(bool isDST);
     std::string GetDisplayName(std::string localeStr);
     std::string GetDisplayName(std::string localeStr, bool isDST);
+    bool IsDaylightSavingTime(double date);
     virtual std::string GetDisplayNameByTaboo(const std::string& localeStr, const std::string& result);
     static std::unique_ptr<I18nTimeZone> CreateInstance(std::string &id, bool isZoneID);
     static std::set<std::string> GetAvailableIDs();

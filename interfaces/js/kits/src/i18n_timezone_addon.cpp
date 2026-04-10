@@ -72,6 +72,7 @@ napi_value I18nTimeZoneAddon::InitI18nTimeZone(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getRawOffset", GetRawOffset),
         DECLARE_NAPI_FUNCTION("getOffset", GetOffset),
         DECLARE_NAPI_FUNCTION("getZoneRules", GetZoneRules),
+        DECLARE_NAPI_FUNCTION("isDaylightSavingTime", IsDaylightSavingTime),
     };
     napi_value constructor = nullptr;
     napi_status status = napi_define_class(env, "TimeZone", NAPI_AUTO_LENGTH, I18nTimeZoneConstructor, nullptr,
@@ -574,6 +575,46 @@ napi_value I18nTimeZoneAddon::GetZoneRules(napi_env env, napi_callback_info info
     }
     std::string tzid = obj->timezone_->GetID();
     return ZoneRulesAddon::GetZoneRulesObject(env, tzid);
+}
+
+napi_value I18nTimeZoneAddon::IsDaylightSavingTime(napi_env env, napi_callback_info info)
+{
+    size_t argc = 1;
+    napi_value argv[1] = { nullptr };
+    napi_value thisVar = nullptr;
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("IsDaylightSavingTime: napi_get_cb_info failed");
+        return VariableConvertor::CreateBoolean(env, false);
+    }
+    if (argc < 1) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "date", "", true);
+        return VariableConvertor::CreateBoolean(env, false);
+    }
+    bool isDate = false;
+    status = napi_is_date(env, argv[0], &isDate);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("IsDaylightSavingTime: napi_is_date failed");
+        return VariableConvertor::CreateBoolean(env, false);
+    }
+    if (!isDate) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "date", "Date", true);
+        return VariableConvertor::CreateBoolean(env, false);
+    }
+    double date = 0;
+    status = napi_get_date_value(env, argv[0], &date);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("IsDaylightSavingTime: napi_get_date_value failed");
+        return VariableConvertor::CreateBoolean(env, false);
+    }
+    I18nTimeZoneAddon *obj = nullptr;
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
+    if (status != napi_ok || !obj || !obj->timezone_) {
+        HILOG_ERROR_I18N("IsDaylightSavingTime: Get TimeZone object failed");
+        return nullptr;
+    }
+    bool result = obj->timezone_->IsDaylightSavingTime(date);
+    return VariableConvertor::CreateBoolean(env, result);
 }
 
 napi_value I18nTimeZoneAddon::StaticGetTimeZone(napi_env env, napi_value *argv, bool isZoneID)
