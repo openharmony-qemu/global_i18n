@@ -90,6 +90,8 @@ public:
         ani_string locale, ani_object localeList);
     static ani_string GetThreeLetterLanguage(ani_env *env, [[maybe_unused]] ani_object object, ani_string locale);
     static ani_string GetThreeLetterRegion(ani_env *env, [[maybe_unused]] ani_object object, ani_string locale);
+    static ani_string ConvertCanonicalLocaleIdentifier(ani_env *env, [[maybe_unused]] ani_object object,
+        ani_string locale);
     static ani_string GetUnicodeWrappedFilePath(ani_env *env, [[maybe_unused]] ani_object object,
         ani_string path, ani_string delimiter, ani_object locale);
     static ani_status BindContextI18NUtil(ani_env *env);
