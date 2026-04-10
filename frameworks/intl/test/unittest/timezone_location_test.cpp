@@ -840,7 +840,6 @@ HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0004, TestSize.Level1)
     EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
     tzIdList = tzLoc->GetTimezoneByLocation(123.54, 25.72);
     EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
-
 }
 
 /**
