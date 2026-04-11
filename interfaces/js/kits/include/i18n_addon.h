@@ -101,6 +101,8 @@ private:
         const char delimiter, std::string& errorCode);
     static char GetDelimiter(napi_env env, napi_value argVal);
 
+    static napi_value ConvertCanonicalLocaleIdentifier(napi_env env, napi_callback_info info);
+
     static int GetParamOfGetTimePeriodName(napi_env env, napi_callback_info info, std::string &tag, int32_t &hour);
 
     static napi_value ObjectConstructor(napi_env env, napi_callback_info info);

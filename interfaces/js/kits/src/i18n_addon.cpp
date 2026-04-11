@@ -133,7 +133,8 @@ napi_value I18nAddon::InitI18nUtil(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getThreeLetterLanguage", GetThreeLetterLanguage),
         DECLARE_NAPI_STATIC_FUNCTION("getThreeLetterRegion", GetThreeLetterRegion),
         DECLARE_NAPI_STATIC_FUNCTION("getUnicodeWrappedFilePath", GetUnicodeWrappedFilePath),
-        DECLARE_NAPI_STATIC_FUNCTION("setUnicodeWrappedBidiDirection", SetUnicodeWrappedBidiDirection)
+        DECLARE_NAPI_STATIC_FUNCTION("setUnicodeWrappedBidiDirection", SetUnicodeWrappedBidiDirection),
+        DECLARE_NAPI_STATIC_FUNCTION("convertCanonicalLocaleIdentifier", ConvertCanonicalLocaleIdentifier)
     };
     napi_value constructor = nullptr;
     napi_status status = napi_define_class(env, "I18NUtil", NAPI_AUTO_LENGTH, JSUtils::DefaultConstructor, nullptr,
@@ -564,6 +565,42 @@ napi_value I18nAddon::GetThreeLetterRegion(napi_env env, napi_callback_info info
         return nullptr;
     }
     return result;
+}
+
+napi_value I18nAddon::ConvertCanonicalLocaleIdentifier(napi_env env, napi_callback_info info)
+{
+    size_t argc = 1;
+    napi_value argv[1] = { nullptr };
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("ConvertCanonicalLocaleIdentifier: napi_get_cb_info failed");
+        return nullptr;
+    }
+    if (argc < 1) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "", true);
+        return nullptr;
+    }
+
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("ConvertCanonicalLocaleIdentifier: napi_typeof failed");
+        return nullptr;
+    }
+    if (valueType != napi_valuetype::napi_string) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "string", true);
+        return nullptr;
+    }
+
+    int32_t code = 0;
+    std::string localeTag = VariableConvertor::GetString(env, argv[0], code);
+    if (code != 0) {
+        HILOG_ERROR_I18N("ConvertCanonicalLocaleIdentifier: GetString failed");
+        return nullptr;
+    }
+
+    std::string canonicalLocale = OHOS::Global::I18n::ConvertCanonicalLocaleIdentifier(localeTag);
+    return VariableConvertor::CreateString(env, canonicalLocale);
 }
 
 napi_value I18nAddon::InitI18nTransliterator(napi_env env, napi_value exports)

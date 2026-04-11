@@ -1967,6 +1967,31 @@ HWTEST_F(I18nTest, I18nFuncTest075, TestSize.Level1)
     appTimeZoneID = i18nTimeZone->GetID();
     EXPECT_EQ(appTimeZoneID, timeZoneID);
 }
+
+/**
+ * @tc.name: I18nFuncTest076
+ * @tc.desc: Test I18n ConvertCanonicalLocaleIdentifier
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest076, TestSize.Level1)
+{
+    std::string canonicalLocale = ConvertCanonicalLocaleIdentifier("zh-CN");
+    EXPECT_EQ(canonicalLocale, "zh-CN");
+    canonicalLocale = ConvertCanonicalLocaleIdentifier("en-US");
+    EXPECT_EQ(canonicalLocale, "en-US");
+    canonicalLocale = ConvertCanonicalLocaleIdentifier("ZH-cn");
+    EXPECT_EQ(canonicalLocale, "zh-CN");
+    canonicalLocale = ConvertCanonicalLocaleIdentifier("EN-us");
+    EXPECT_EQ(canonicalLocale, "en-US");
+    canonicalLocale = ConvertCanonicalLocaleIdentifier("zh");
+    EXPECT_EQ(canonicalLocale, "zh");
+    canonicalLocale = ConvertCanonicalLocaleIdentifier("en");
+    EXPECT_EQ(canonicalLocale, "en");
+    canonicalLocale = ConvertCanonicalLocaleIdentifier("zh_cn");
+    EXPECT_EQ(canonicalLocale, "");
+    canonicalLocale = ConvertCanonicalLocaleIdentifier("");
+    EXPECT_EQ(canonicalLocale, "");
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

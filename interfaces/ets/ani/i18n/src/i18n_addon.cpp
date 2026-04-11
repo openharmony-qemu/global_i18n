@@ -577,6 +577,14 @@ ani_string I18nAddon::GetThreeLetterRegion(ani_env *env, [[maybe_unused]] ani_ob
     return VariableConverter::StringToAniStr(env, country);
 }
 
+ani_string I18nAddon::ConvertCanonicalLocaleIdentifier(ani_env *env, [[maybe_unused]] ani_object object,
+    ani_string locale)
+{
+    std::string canonicalLocale =
+       OHOS::Global::I18n::ConvertCanonicalLocaleIdentifier(VariableConverter::AniStrToString(env, locale));
+    return VariableConverter::StringToAniStr(env, canonicalLocale);
+}
+
 ani_string I18nAddon::GetUnicodeWrappedFilePath(ani_env *env, [[maybe_unused]] ani_object object,
     ani_string path, ani_string delimiter, ani_object locale)
 {
@@ -759,6 +767,8 @@ ani_status I18nAddon::BindContextI18NUtil(ani_env *env)
         ani_native_function { "getBestMatchLocale", nullptr, reinterpret_cast<void *>(GetBestMatchLocale) },
         ani_native_function { "getThreeLetterLanguage", nullptr, reinterpret_cast<void *>(GetThreeLetterLanguage) },
         ani_native_function { "getThreeLetterRegion", nullptr, reinterpret_cast<void *>(GetThreeLetterRegion) },
+        ani_native_function { "convertCanonicalLocaleIdentifier", nullptr,
+            reinterpret_cast<void *>(ConvertCanonicalLocaleIdentifier) },
         ani_native_function { "getUnicodeWrappedFilePath", nullptr,
             reinterpret_cast<void *>(GetUnicodeWrappedFilePath) },
         ani_native_function { "setUnicodeWrappedBidiDirection", nullptr,

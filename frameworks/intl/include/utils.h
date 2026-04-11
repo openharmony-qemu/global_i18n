@@ -42,6 +42,7 @@ std::string StrReplaceAll(const std::string& str,
     const std::string& target, const std::string& replace);
 std::string GetISO3Language(const std::string& language);
 std::string GetISO3Country(const std::string& country);
+std::string ConvertCanonicalLocaleIdentifier(const std::string& locale);
 std::string trim(std::string &s);
 bool FileExist(const std::string& path);
 bool FileCopy(const std::string& srcPath, const std::string& dstPath);

@@ -245,6 +245,39 @@ std::string GetISO3Country(const string& country)
     return locale.getISO3Country();
 }
 
+std::string ConvertCanonicalLocaleIdentifier(const std::string& locale)
+{
+    if (locale.empty()) {
+        return "";
+    }
+    UErrorCode status = U_ZERO_ERROR;
+    icu::Locale formalLocale = icu::Locale::forLanguageTag(locale.c_str(), status);
+    if (U_FAILURE(status) || formalLocale.isBogus()) {
+        HILOG_ERROR_I18N("ConvertCanonicalLocaleIdentifier: forLanguageTag failed, code is %{public}s",
+            u_errorName(status));
+        return "";
+    }
+    formalLocale = icu::LocaleBuilder().setLocale(formalLocale).build(status);
+    if (U_FAILURE(status) || formalLocale.isBogus()) {
+        HILOG_ERROR_I18N("ConvertCanonicalLocaleIdentifier: Rebuild locale failed, code is %{public}s",
+            u_errorName(status));
+        return "";
+    }
+    formalLocale.canonicalize(status);
+    if (U_FAILURE(status) || formalLocale.isBogus()) {
+        HILOG_ERROR_I18N("ConvertCanonicalLocaleIdentifier: canonicalize failed, code is %{public}s",
+            u_errorName(status));
+        return "";
+    }
+    std::string languageTag = formalLocale.toLanguageTag<std::string>(status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("ConvertCanonicalLocaleIdentifier: toLanguageTag failed, code is %{public}s",
+            u_errorName(status));
+        return "";
+    }
+    return languageTag;
+}
+
 bool FileExist(const std::string& path)
 {
     bool status = false;
