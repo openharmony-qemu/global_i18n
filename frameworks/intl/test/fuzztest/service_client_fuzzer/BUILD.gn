@@ -44,7 +44,7 @@ ohos_fuzztest("ServiceClientFuzzTest") {
     "ability_base:base",
     "ability_base:want",
     "ability_runtime:ability_manager",
-    "access_token:libacesstoken_sdk",
+    "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "c_utils:utils",
