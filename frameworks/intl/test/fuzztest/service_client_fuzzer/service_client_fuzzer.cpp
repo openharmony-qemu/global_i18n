@@ -27,6 +27,15 @@
 #include "service_client_fuzzer.h"
 
 namespace OHOS {
+    const static int32_t UID = 3013;
+    const static std::vector<TemperatureType> TEMPERATURE_TYPE_VECT = {
+        TemperatureType::CELSIUS,
+        TemperatureType::FAHRENHEIT,
+        TemperatureType::KELVIN};
+    const static std::vector<WeekDay> WEEK_DAY_VECT = {
+        WeekDay::MON, WeekDay::TUE, WeekDay::WED, WeekDay::THU
+        WeekDay::FRI, WeekDay::SAT, WeekDay::SUN};
+
     void AddChangeNativeTokenTypeAndPermission()
     {
         const char* permissions[] = {
@@ -52,31 +61,7 @@ namespace OHOS {
         seteuid(0);
         int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
         printf("ReloadNativeTokenInfo result is %d \r\n", ret);
-        setuid(3013);
-    }
-
-    TemperatureType GetTemperatureTypeByIndex(size_t index)
-    {
-        switch (index) {
-            case 1: return TemperatureType::CELSIUS;
-            case 2: return TemperatureType::FAHRENHEIT;
-            case 3: return TemperatureType::KELVIN;
-            default: throw std::out_of_range("Index out of range");
-        }
-    }
-
-    WeekDay GetWeekDayByIndex(size_t index)
-    {
-        switch (index) {
-            case 1: return WeekDay::MON;
-            case 2: return WeekDay::TUE;
-            case 3: return WeekDay::WED;
-            case 4: return WeekDay::THU;
-            case 5: return WeekDay::FRI;
-            case 6: return WeekDay::SAT;
-            case 7: return WeekDay::SUN;
-            default: throw std::out_of_range("Index out of range");
-        }
+        setuid(UID);
     }
 
     void DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
@@ -113,10 +98,11 @@ namespace OHOS {
         I18nServiceAbilityClient::GetUsingMeasurement(input);
         I18nServiceAbilityClient::GetSystemNumericalDatePatterns(mapValue);
         I18nServiceAbilityClient::GetUsingNumericalDatePattern(input);
-        size_t temperatureType = provider.ConsumeIntegralInRange<size_t>(1, 3);
-        I18nServiceAbilityClient::SetTemperatureType(GetTemperatureTypeByIndex(temperatureType));
-        size_t weekDay = provider.ConsumeIntegralInRange<size_t>(1, 7);
-        I18nServiceAbilityClient::SetFirstDayOfWeek(GetWeekDayByIndex(weekDay));
+        size_t temperatureType = provider.ConsumeIntegralInRange<size_t>(0, 2);
+
+        I18nServiceAbilityClient::SetTemperatureType(TEMPERATURE_TYPE_VECT[temperatureType]);
+        size_t weekDay = provider.ConsumeIntegralInRange<size_t>(0, 6);
+        I18nServiceAbilityClient::SetFirstDayOfWeek(WEEK_DAY_VECT[weekDay]);
         std::unque_ptr<HolidayManager> holidayManager = std::make_unique<HolidayManager>(input.c_str());
     }
 }
