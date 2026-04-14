@@ -28,13 +28,16 @@
 
 namespace OHOS {
     const static int32_t UID = 3013;
+    const static size_t MOD = 2;
     const static std::vector<TemperatureType> TEMPERATURE_TYPE_VECT = {
         TemperatureType::CELSIUS,
         TemperatureType::FAHRENHEIT,
-        TemperatureType::KELVIN};
+        TemperatureType::KELVIN
+    };
     const static std::vector<WeekDay> WEEK_DAY_VECT = {
         WeekDay::MON, WeekDay::TUE, WeekDay::WED, WeekDay::THU
-        WeekDay::FRI, WeekDay::SAT, WeekDay::SUN};
+        WeekDay::FRI, WeekDay::SAT, WeekDay::SUN
+    };
 
     void AddChangeNativeTokenTypeAndPermission()
     {
@@ -81,7 +84,7 @@ namespace OHOS {
         I18nServiceAbilityClient::SetSystemMeasurement(input);
         I18nServiceAbilityClient::SetSystemNumericalDatePattern(input);
 
-        I18nServiceAbilityClient::SetUsingLocalDigit(newSize % 2 == 0);
+        I18nServiceAbilityClient::SetUsingLocalDigit(newSize % MOD == 0);
         int32_t intValue = static_cast<int32_t>(newSize);
         I18nServiceAbilityClient::AddPreferredLanguage(input, intValue);
         I18nServiceAbilityClient::RemovePreferredLanguage(intValue);
