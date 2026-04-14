@@ -36,7 +36,7 @@ ohos_fuzztest("ServiceClientFuzzTest") {
 
   deps = [
     "../../../../intl:intl_util",
-    "../../../../services:i18n_sa_client",
+    "../../../../../services:i18n_sa_client",
   ]
 
   external_deps = [
