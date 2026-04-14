@@ -27,8 +27,8 @@
 #include "service_client_fuzzer.h"
 
 namespace OHOS {
-    const static int32_t UID = 3013;
-    const static size_t MOD = 2;
+    static constexpr int32_t UID = 3013;
+    static constexpr size_t MOD = 2;
     const static std::vector<TemperatureType> TEMPERATURE_TYPE_VECT = {
         TemperatureType::CELSIUS,
         TemperatureType::FAHRENHEIT,
