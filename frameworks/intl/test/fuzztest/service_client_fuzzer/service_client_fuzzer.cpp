@@ -112,7 +112,7 @@ namespace OHOS {
         I18nServiceAbilityClient::SetTemperatureType(TEMPERATURE_TYPE_VECT[temperatureType]);
         size_t weekDay = provider.ConsumeIntegralInRange<size_t>(0, 6);
         I18nServiceAbilityClient::SetFirstDayOfWeek(WEEK_DAY_VECT[weekDay]);
-        std::unique_ptr<HolidayManager> holidayManager = std::make_unique<HolidayManager>(input);
+        std::unique_ptr<HolidayManager> holidayManager = std::make_unique<HolidayManager>(input.c_str());
     }
 }
 
