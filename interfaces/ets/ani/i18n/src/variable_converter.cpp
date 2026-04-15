@@ -241,10 +241,6 @@ bool VariableConverter::GetNumberMember(ani_env *env, ani_object options, const 
 
 void VariableConverter::SetStringMember(ani_env *env, ani_object obj, const std::string &name, const std::string &value)
 {
-    if (value.empty()) {
-        return;
-    }
-
     if (ANI_OK != env->Object_SetPropertyByName_Ref(obj, name.c_str(), VariableConverter::StringToAniStr(env, value))) {
         HILOG_ERROR_I18N("VariableConverter::SetStringMember: Set property '%{public}s' failed", name.c_str());
         return;
