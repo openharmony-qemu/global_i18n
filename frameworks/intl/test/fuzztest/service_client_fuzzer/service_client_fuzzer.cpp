@@ -17,6 +17,7 @@
 #include <cstdint>
 #include <string>
 #include <unordered_map>
+#include <unistd.h>
 #include <fuzzer/FuzzedDataProvider.h>
 #include "i18n_service_ability_client.h"
 #include "i18n_types.h"
@@ -29,14 +30,19 @@
 namespace OHOS {
     static constexpr int32_t UID = 3013;
     static constexpr size_t MOD = 2;
-    const static std::vector<TemperatureType> TEMPERATURE_TYPE_VECT = {
-        TemperatureType::CELSIUS,
-        TemperatureType::FAHRENHEIT,
-        TemperatureType::KELVIN
+    const static std::vector<Global::I18n::TemperatureType> TEMPERATURE_TYPE_VECT = {
+        Global::I18n::TemperatureType::CELSIUS,
+        Global::I18n::TemperatureType::FAHRENHEIT,
+        Global::I18n::TemperatureType::KELVIN
     };
-    const static std::vector<WeekDay> WEEK_DAY_VECT = {
-        WeekDay::MON, WeekDay::TUE, WeekDay::WED, WeekDay::THU
-        WeekDay::FRI, WeekDay::SAT, WeekDay::SUN
+    const static std::vector<Global::I18n::WeekDay> WEEK_DAY_VECT = {
+        Global::I18n::WeekDay::MON,
+        Global::I18n::WeekDay::TUE,
+        Global::I18n::WeekDay::WED,
+        Global::I18n::WeekDay::THU,
+        Global::I18n::WeekDay::FRI,
+        Global::I18n::WeekDay::SAT,
+        Global::I18n::WeekDay::SUN
     };
 
     void AddChangeNativeTokenTypeAndPermission()
@@ -55,10 +61,10 @@ namespace OHOS {
         };
         infoInstance.processName = "ServiceClientFuzzTest";
         uint64_t tokenId = GetAccessTokenId(&infoInstance);
-        printf("Get tokenid is %lu \r\n", tokenId);
+        printf("Get tokenid is %llu \r\n", tokenId);
         int32_t setSelfErrorCode = SetSelfTokenID(tokenId);
         if (setSelfErrorCode != 0) {
-            printf("SetSelfTokenID() Failed, return code is %lu \r\n", setSelfErrorCode);
+            printf("SetSelfTokenID() Failed, return code is %d \r\n", setSelfErrorCode);
             return;
         }
         seteuid(0);
@@ -106,14 +112,14 @@ namespace OHOS {
         I18nServiceAbilityClient::SetTemperatureType(TEMPERATURE_TYPE_VECT[temperatureType]);
         size_t weekDay = provider.ConsumeIntegralInRange<size_t>(0, 6);
         I18nServiceAbilityClient::SetFirstDayOfWeek(WEEK_DAY_VECT[weekDay]);
-        std::unque_ptr<HolidayManager> holidayManager = std::make_unique<HolidayManager>(input.c_str());
+        std::unique_ptr<HolidayManager> holidayManager = std::make_unique<HolidayManager>(input);
     }
 }
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    AddChangeNativeTokenTypeAndPermission();
+    OHOS::AddChangeNativeTokenTypeAndPermission();
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }
