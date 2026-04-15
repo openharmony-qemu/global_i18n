@@ -68,10 +68,10 @@ ani_object ISO8601DateTimeFormatAddon::Create(ani_env *env, [[maybe_unused]] ani
 
     // Default values
     std::string dateFormat = "calendar";
-    std::string timePrecision = "dateOnly";
+    std::string timePrecision = "seconds";
     std::string separatorStyle = "extended";
     std::string timeZone = "UTC";
-    bool displayTimeZone = false;
+    bool displayTimeZone = true;
 
     if (!isUndefined) {
         // Get dateFormat, timePrecision, separatorStyle, timeZone
