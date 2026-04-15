@@ -77,10 +77,10 @@ napi_value ISO8601DateTimeFormatAddon::ISO8601DateTimeFormatConstructor(napi_env
 
     // Default values
     std::string dateFormat = "calendar";
-    std::string timePrecision = "dateOnly";
+    std::string timePrecision = "seconds";
     std::string separatorStyle = "extended";
-    std::string timeZone = "";
-    bool displayTimeZone = false;
+    std::string timeZone = "UTC";
+    bool displayTimeZone = true;
 
     // Parse options if provided
     if (argc > 0) {
