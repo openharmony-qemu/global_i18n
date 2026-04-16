@@ -18,7 +18,7 @@
 
 #include <cstdio>
 #include <unistd.h>
-#include <nlohmann/json.hpp>
+
 #include <unordered_map>
 #include "utils.h"
 #include <chrono>
@@ -295,21 +295,37 @@ std::vector<std::string> TimeZoneLocation::ReadPolygonData(const double lon, con
     const std::vector<std::string>& tzidNames)
 {
     std::vector<std::string> tzidList;
-    if (jsonObjectStr.empty() || !nlohmann::json::accept(jsonObjectStr)) {
+    if (jsonObjectStr.empty()) {
         HILOG_ERROR_I18N("ReadPolygonData: %{public}s is empty or invalid", jsonObjectStr.c_str());
         return tzidList;
     }
-    nlohmann::json curTzData = nlohmann::json::parse(jsonObjectStr);
-    if (!curTzData.contains("pos")) {
+    size_t posStart = jsonObjectStr.find("\"pos\"");
+    if (posStart == std::string::npos) {
         HILOG_ERROR_I18N("ReadPolygonData: json string:%{public}s does not contain 'pos'",
             jsonObjectStr.c_str());
         return tzidList;
     }
-    if (!curTzData["pos"].is_number_integer()) {
-        HILOG_ERROR_I18N("ReadPolygonData: pos's value is not integer");
+    size_t posColon = jsonObjectStr.find(":", posStart);
+    if (posColon == std::string::npos) {
+        HILOG_ERROR_I18N("ReadPolygonData: json string:%{public}s has invalid format",
+            jsonObjectStr.c_str());
         return tzidList;
     }
-    int pos = curTzData["pos"].get<int>();
+    size_t posEnd = jsonObjectStr.find(",", posColon);
+    if (posEnd == std::string::npos || posEnd <= posColon) {
+        HILOG_ERROR_I18N("ReadPolygonData: json string:%{public}s has invalid format",
+            jsonObjectStr.c_str());
+        return tzidList;
+    }
+    std::string posString = jsonObjectStr.substr(posColon + 1, posEnd - posColon - 1);
+    posString = trim(posString);
+    ConvertString2Int(posString);
+    int32_t status = 0;
+    int32_t pos = ConvertString2Int(posString, status);
+    if (status < 0) {
+        HILOG_ERROR_I18N("ReadPolygonData: convert %{public}s to int failed", posString.c_str());
+        return tzidList;
+    }
     if (fseek(datFile, pos, SEEK_CUR) != 0) {
         HILOG_ERROR_I18N("ReadPolygonData: seek to position:%{public}d failed", pos);
         return tzidList;
@@ -389,12 +405,7 @@ void TimeZoneLocation::ReadDatFile(FILE* datFile, const double lon, const double
             break;
         } else if (std::get<0>(parseResult) == ParseJsonStrResult::ARRAY) {
             std::string jsonArrayStr = std::get<1>(parseResult);
-            nlohmann::json curTzData = nlohmann::json::parse(jsonArrayStr);
-            for (nlohmann::json::iterator it = curTzData.begin(); it != curTzData.end(); ++it) {
-                int tzidIndex = (*it).get<int>();
-                std::string tzid = tzidNames[tzidIndex];
-                tzidList.push_back(tzid);
-            }
+            ReadJsonArray(jsonArrayStr, tzidNames, tzidList);
             break;
         }
         quadData.midLat = (quadData.top + quadData.bottom) / DIVISOR_FOR_MEDIAN;
@@ -405,18 +416,27 @@ void TimeZoneLocation::ReadDatFile(FILE* datFile, const double lon, const double
 void TimeZoneLocation::ReadJsonArray(const std::string& jsonArrayStr,
     const std::vector<std::string>& tzidNames, std::vector<std::string>& tzidList)
 {
-    if (jsonArrayStr.empty() || !nlohmann::json::accept(jsonArrayStr)) {
+    if (jsonArrayStr.empty()) {
         HILOG_ERROR_I18N("ReadJsonArray: JsonArray string: %{public}s is empty or invalid",
             jsonArrayStr.c_str());
         return;
     }
-    nlohmann::json curTzData = nlohmann::json::parse(jsonArrayStr);
-    for (nlohmann::json::iterator it = curTzData.begin(); it != curTzData.end(); ++it) {
-        if (!(*it).is_number_integer()) {
-            HILOG_ERROR_I18N("ReadJsonArray: one of JsonArray's element is not integer");
+    std::string content = jsonArrayStr;
+    content = StrReplaceAll(content, "[", "");
+    content = StrReplaceAll(content, "]", "");
+    std::vector<std::string> tzidIndexList;
+    Split(content, ",", tzidIndexList);
+    for (size_t i = 0; i < tzidIndexList.size(); ++i) {
+        int32_t status = 0;
+        int32_t tzidIndex = ConvertString2Int(tzidIndexList[i], status);
+        if (status < 0) {
+            HILOG_ERROR_I18N("ReadJsonArray: convert %{public}s to int failed", tzidIndexList[i].c_str());
             return;
         }
-        int tzidIndex = (*it).get<int>();
+        if (tzidIndex < 0 || tzidIndex > static_cast<int32_t>(tzidNames.size() - 1)) {
+            HILOG_ERROR_I18N("ReadJsonArray: tzidIndex: %{public}d out of range", tzidIndex);
+            return;
+        }
         std::string tzid = tzidNames[tzidIndex];
         tzidList.push_back(tzid);
     }

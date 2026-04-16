@@ -195,7 +195,6 @@ ohos_shared_library("intl_util") {
       "icu:icundk",
       "init:libbegetutil",
       "ipc:ipc_core",
-      "json:nlohmann_json_static",
       "jsoncpp:jsoncpp",
       "libphonenumber:phonenumber_standard",
       "libpng:libpng",
