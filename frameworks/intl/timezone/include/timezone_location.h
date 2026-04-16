@@ -76,15 +76,13 @@ private:
     bool MatchNextKey(char* str, int len, int& curPos, std::string prefix, std::string nextKey);
     std::tuple<ParseJsonStrResult, std::string> GetJsonObjectFromPosition(
         const char* lookupStr, int pos, int len);
-    std::vector<std::string> ReadPolygonData(const double lon, const double lat,
-        FILE* datFile, const std::string& jsonObjectStr,
-        const std::vector<std::string>& tzidNames);
-    bool IsEqual(double a, double b);
+    std::vector<std::string> ReadPolygonData(double lon, double lat, FILE* datFile,
+        const std::string& jsonObjectStr, const std::vector<std::string>& tzidNames);
     void CloseFile(FILE* datFile);
     bool GetAllTimezoneId(std::vector<std::string>& tzidNames, FILE* datFile, int32_t indexCount);
-    void ReadDatFile(FILE* datFile, const double lon, const double lat, std::vector<std::string> tzidNames,
+    void ReadDatFile(FILE* datFile, double lon, double lat, std::vector<std::string> tzidNames,
         std::vector<std::string>& tzidList);
-    std::vector<std::string> GetTimezoneIdList(const double lon, const double lat,
+    std::vector<std::string> GetTimezoneIdList(double lon, double lat,
         int32_t tzIndexCount, FILE* datFile, const std::vector<std::string>& tzidNames);
     void ReadJsonArray(const std::string& jsonArrayStr,
         const std::vector<std::string>& tzidNames, std::vector<std::string>& tzidList);

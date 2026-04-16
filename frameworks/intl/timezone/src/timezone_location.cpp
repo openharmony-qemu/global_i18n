@@ -193,13 +193,6 @@ std::string TimeZoneLocation::NextSquare(QueryData& quadData, double lon, double
     }
 }
 
-bool TimeZoneLocation::IsEqual(double a, double b)
-{
-    const double eps = 1e-6;
-    double d = a - b;
-    return d < eps && -d < eps;
-}
-
 bool TimeZoneLocation::MatchNextKey(char* str, int len, int& curPos,
     std::string prefix, std::string nextKey)
 {
@@ -254,13 +247,13 @@ std::tuple<ParseJsonStrResult, std::string> TimeZoneLocation::GetJsonObjectFromP
     return std::make_tuple(ParseJsonStrResult::INVALID, "");
 }
 
-std::vector<std::string> TimeZoneLocation::GetTimezoneIdList(const double lon, const double lat,
+std::vector<std::string> TimeZoneLocation::GetTimezoneIdList(double lon, double lat,
     int32_t tzIndexCount, FILE* datFile,
     const std::vector<std::string>& tzidNames)
 {
     std::vector<std::string> tzidVect;
     for (int i = 0; i < tzIndexCount; ++i) {
-        int32_t tzIndex ;
+        int32_t tzIndex;
         if (fread(&tzIndex, sizeof(int32_t), 1, datFile) != 1) {
             HILOG_ERROR_I18N("GetTimezoneIdList: read tzid Index failed");
             return tzidVect;
@@ -290,7 +283,7 @@ std::vector<std::string> TimeZoneLocation::GetTimezoneIdList(const double lon, c
     return tzidVect;
 }
 
-std::vector<std::string> TimeZoneLocation::ReadPolygonData(const double lon, const double lat,
+std::vector<std::string> TimeZoneLocation::ReadPolygonData(double lon, double lat,
     FILE* datFile, const std::string& jsonObjectStr,
     const std::vector<std::string>& tzidNames)
 {
@@ -312,14 +305,13 @@ std::vector<std::string> TimeZoneLocation::ReadPolygonData(const double lon, con
         return tzidList;
     }
     size_t posEnd = jsonObjectStr.find(",", posColon);
-    if (posEnd == std::string::npos || posEnd <= posColon) {
+    if (posEnd == std::string::npos || posEnd <= posColon + 1) {
         HILOG_ERROR_I18N("ReadPolygonData: json string:%{public}s has invalid format",
             jsonObjectStr.c_str());
         return tzidList;
     }
     std::string posString = jsonObjectStr.substr(posColon + 1, posEnd - posColon - 1);
     posString = trim(posString);
-    ConvertString2Int(posString);
     int32_t status = 0;
     int32_t pos = ConvertString2Int(posString, status);
     if (status < 0) {
@@ -367,7 +359,7 @@ bool TimeZoneLocation::GetAllTimezoneId(std::vector<std::string>& tzidNames, FIL
     return true;
 }
 
-void TimeZoneLocation::ReadDatFile(FILE* datFile, const double lon, const double lat,
+void TimeZoneLocation::ReadDatFile(FILE* datFile, double lon, double lat,
     std::vector<std::string> tzidNames, std::vector<std::string>& tzidList)
 {
     int32_t lookupSize;
