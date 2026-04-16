@@ -156,6 +156,7 @@ ohos_shared_library("intl_util") {
       "src/taboo.cpp",
       "src/taboo_utils.cpp",
       "src/utils.cpp",
+      "timezone/src/timezone_location.cpp",
       "timezone/src/zone_offset_transition.cpp",
       "timezone/src/zone_rules.cpp",
     ]
@@ -194,6 +195,7 @@ ohos_shared_library("intl_util") {
       "icu:icundk",
       "init:libbegetutil",
       "ipc:ipc_core",
+      "json:nlohmann_json_static",
       "jsoncpp:jsoncpp",
       "libphonenumber:phonenumber_standard",
       "libpng:libpng",
