@@ -292,18 +292,14 @@ std::vector<std::string> TimeZoneLocation::ReadPolygonData(double lon, double la
         HILOG_ERROR_I18N("ReadPolygonData: %{public}s is empty or invalid", jsonObjectStr.c_str());
         return tzidList;
     }
-    size_t posStart = jsonObjectStr.find("\"pos\"");
+    const char* keyPos = "\"pos\":";
+    size_t posStart = jsonObjectStr.find(keyPos);
     if (posStart == std::string::npos) {
         HILOG_ERROR_I18N("ReadPolygonData: json string:%{public}s does not contain 'pos'",
             jsonObjectStr.c_str());
         return tzidList;
     }
-    size_t posColon = jsonObjectStr.find(":", posStart);
-    if (posColon == std::string::npos) {
-        HILOG_ERROR_I18N("ReadPolygonData: json string:%{public}s has invalid format",
-            jsonObjectStr.c_str());
-        return tzidList;
-    }
+    size_t posColon = posStart + strlen(keyPos);
     size_t posEnd = jsonObjectStr.find(",", posColon);
     if (posEnd == std::string::npos || posEnd <= posColon + 1) {
         HILOG_ERROR_I18N("ReadPolygonData: json string:%{public}s has invalid format",
