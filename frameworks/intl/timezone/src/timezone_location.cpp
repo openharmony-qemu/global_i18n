@@ -411,7 +411,7 @@ void TimeZoneLocation::ReadJsonArray(const std::string& jsonArrayStr,
             jsonArrayStr.c_str());
         return;
     }
-    std::string content = jsonArrayStr;
+    std::string content = std::string(jsonArrayStr);
     content = StrReplaceAll(content, "[", "");
     content = StrReplaceAll(content, "]", "");
     HILOG_ERROR_I18N("zdd--11 content: %{public}s ,", content.c_str());
