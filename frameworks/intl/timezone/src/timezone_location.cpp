@@ -298,17 +298,14 @@ std::vector<std::string> TimeZoneLocation::ReadPolygonData(double lon, double la
             jsonObjectStr.c_str());
         return tzidList;
     }
-    HILOG_ERROR_I18N("zdd--aa jsonObjectStr: %{public}s", jsonObjectStr.c_str());
     size_t posColon = posStart + strlen(keyPos);
     size_t posEnd = jsonObjectStr.find(",", posColon);
-    HILOG_ERROR_I18N("zdd--bb posEnd: %{public}zu ,posColon:%{public}zu", posEnd, posColon);
     if (posEnd == std::string::npos || posEnd <= posColon + 1) {
         HILOG_ERROR_I18N("ReadPolygonData: json string:%{public}s has invalid format",
             jsonObjectStr.c_str());
         return tzidList;
     }
     std::string posString = jsonObjectStr.substr(posColon + 1, posEnd - posColon - 1);
-    HILOG_ERROR_I18N("zdd--cc posString: %{public}s", posString.c_str());
     posString = trim(posString);
     int32_t status = 0;
     int32_t pos = ConvertString2Int(posString, status);
@@ -420,13 +417,12 @@ void TimeZoneLocation::ReadJsonArray(const std::string& jsonArrayStr,
     if (pos != std::string::npos) {
         content.replace(pos, 1, "");
     }
-    HILOG_ERROR_I18N("zdd--11 content: %{public}s ,", content.c_str());
     std::vector<std::string> tzidIndexList;
     Split(content, ",", tzidIndexList);
     for (size_t i = 0; i < tzidIndexList.size(); ++i) {
         int32_t status = 0;
-        int32_t tzidIndex = ConvertString2Int(tzidIndexList[i], status);
-        HILOG_ERROR_I18N("zdd--22 content: %{public}s ,", tzidIndexList[i].c_str());
+        std::string tzidIndexStr = trim(tzidIndexList[i]);
+        int32_t tzidIndex = ConvertString2Int(tzidIndexStr, status);
         if (status < 0) {
             HILOG_ERROR_I18N("ReadJsonArray: convert %{public}s to int failed", tzidIndexList[i].c_str());
             return;
@@ -436,7 +432,6 @@ void TimeZoneLocation::ReadJsonArray(const std::string& jsonArrayStr,
             return;
         }
         std::string tzid = tzidNames[tzidIndex];
-        HILOG_ERROR_I18N("zdd--33 tzid: %{public}s ,tzidIndex:%{public}d", tzidIndexList[i].c_str(), tzidIndex);
         tzidList.push_back(tzid);
     }
 }
