@@ -103,7 +103,7 @@ bool IsUpperCase(const std::string &character)
 std::pair<std::string, int32_t> DetectEncoding(const char* dataStream, size_t length)
 {
     std::pair<std::string, int32_t> encodingInfo { "", 0 };
-    if (dataStream == nullptr) {
+    if (dataStream == nullptr || length == 0) {
         return encodingInfo;
     }
     UErrorCode status = U_ZERO_ERROR;
