@@ -414,11 +414,11 @@ void TimeZoneLocation::ReadJsonArray(const std::string& jsonArrayStr,
     std::string content = std::string(jsonArrayStr);
     std::string::size_type pos = content.find("[");
     if (pos != std::string::npos) {
-        content.replace("[", pos, "");
+        content.replace(pos, 1, "");
     }
     pos = content.find("]");
     if (pos != std::string::npos) {
-        content.replace("]", pos, "");
+        content.replace(pos, 1, "");
     }
     HILOG_ERROR_I18N("zdd--11 content: %{public}s ,", content.c_str());
     std::vector<std::string> tzidIndexList;
