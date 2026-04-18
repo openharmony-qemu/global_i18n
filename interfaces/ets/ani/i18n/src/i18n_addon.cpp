@@ -568,12 +568,20 @@ ani_string I18nAddon::GetBestMatchLocale(ani_env *env, [[maybe_unused]] ani_obje
 ani_string I18nAddon::GetThreeLetterLanguage(ani_env *env, [[maybe_unused]] ani_object object, ani_string locale)
 {
     std::string language = GetISO3Language(VariableConverter::AniStrToString(env, locale));
+    if (language.empty()) {
+        ErrorUtil::AniThrow(env, I18N_NOT_VALID, "locale", "a valid locale");
+        VariableConverter::StringToAniStr(env, "");
+    }
     return VariableConverter::StringToAniStr(env, language);
 }
 
 ani_string I18nAddon::GetThreeLetterRegion(ani_env *env, [[maybe_unused]] ani_object object, ani_string locale)
 {
     std::string country = GetISO3Country(VariableConverter::AniStrToString(env, locale));
+    if (country.empty()) {
+        ErrorUtil::AniThrow(env, I18N_NOT_VALID, "locale", "a valid locale");
+        VariableConverter::StringToAniStr(env, "");
+    }
     return VariableConverter::StringToAniStr(env, country);
 }
 
