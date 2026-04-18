@@ -134,13 +134,13 @@ napi_value ISO8601DateTimeFormatAddon::ISO8601DateTimeFormatConstructor(napi_env
         dateFormatEnum = ISO8601DateTimeFormat::DateFormat::WEEK;
     }
 
-    ISO8601DateTimeFormat::TimePrecision timePrecisionEnum = ISO8601DateTimeFormat::TimePrecision::DATE_ONLY;
-    if (timePrecision == "hours") {
+    ISO8601DateTimeFormat::TimePrecision timePrecisionEnum = ISO8601DateTimeFormat::TimePrecision::SECONDS;
+    if (timePrecision == "dateOnly") {
+        timePrecisionEnum = ISO8601DateTimeFormat::TimePrecision::DATE_ONLY;
+    } else if (timePrecision == "hours") {
         timePrecisionEnum = ISO8601DateTimeFormat::TimePrecision::HOURS;
     } else if (timePrecision == "minutes") {
         timePrecisionEnum = ISO8601DateTimeFormat::TimePrecision::MINUTES;
-    } else if (timePrecision == "seconds") {
-        timePrecisionEnum = ISO8601DateTimeFormat::TimePrecision::SECONDS;
     } else if (timePrecision == "milliSeconds") {
         timePrecisionEnum = ISO8601DateTimeFormat::TimePrecision::MILLISECONDS;
     }
