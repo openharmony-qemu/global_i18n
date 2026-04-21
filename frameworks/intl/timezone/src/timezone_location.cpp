@@ -347,7 +347,7 @@ bool TimeZoneLocation::GetAllTimezoneId(std::vector<std::string>& tzidNames, FIL
 }
 
 void TimeZoneLocation::ReadDatFile(FILE* datFile, double lon, double lat,
-    std::vector<std::string> tzidNames, std::vector<std::string>& tzidList)
+    const std::vector<std::string>& tzidNames, std::vector<std::string>& tzidList)
 {
     int32_t lookupSize;
     if (fread(&lookupSize,  sizeof(int32_t), 1, datFile) != 1) {

@@ -80,8 +80,8 @@ private:
         const std::string& jsonObjectStr, const std::vector<std::string>& tzidNames);
     void CloseFile(FILE* datFile);
     bool GetAllTimezoneId(std::vector<std::string>& tzidNames, FILE* datFile, int32_t indexCount);
-    void ReadDatFile(FILE* datFile, double lon, double lat, std::vector<std::string> tzidNames,
-        std::vector<std::string>& tzidList);
+    void ReadDatFile(FILE* datFile, double lon, double lat,
+        const std::vector<std::string>& tzidNames, std::vector<std::string>& tzidList);
     std::vector<std::string> GetTimezoneIdList(double lon, double lat,
         int32_t tzIndexCount, FILE* datFile, const std::vector<std::string>& tzidNames);
     void ReadJsonArray(const std::string& jsonArrayStr,
