@@ -18,10 +18,10 @@
 
 #include <cstdio>
 #include <unistd.h>
-#include <nlohmann/json.hpp>
 #include <unordered_map>
 #include "utils.h"
 #include <chrono>
+#include "cJSON.h"
 
 namespace OHOS {
 namespace Global {
@@ -193,13 +193,6 @@ std::string TimeZoneLocation::NextSquare(QueryData& quadData, double lon, double
     }
 }
 
-bool TimeZoneLocation::IsEqual(double a, double b)
-{
-    const double eps = 1e-6;
-    double d = a - b;
-    return d < eps && -d < eps;
-}
-
 bool TimeZoneLocation::MatchNextKey(char* str, int len, int& curPos,
     std::string prefix, std::string nextKey)
 {
@@ -254,13 +247,13 @@ std::tuple<ParseJsonStrResult, std::string> TimeZoneLocation::GetJsonObjectFromP
     return std::make_tuple(ParseJsonStrResult::INVALID, "");
 }
 
-std::vector<std::string> TimeZoneLocation::GetTimezoneIdList(const double lon, const double lat,
+std::vector<std::string> TimeZoneLocation::GetTimezoneIdList(double lon, double lat,
     int32_t tzIndexCount, FILE* datFile,
     const std::vector<std::string>& tzidNames)
 {
     std::vector<std::string> tzidVect;
     for (int i = 0; i < tzIndexCount; ++i) {
-        int32_t tzIndex ;
+        int32_t tzIndex;
         if (fread(&tzIndex, sizeof(int32_t), 1, datFile) != 1) {
             HILOG_ERROR_I18N("GetTimezoneIdList: read tzid Index failed");
             return tzidVect;
@@ -290,26 +283,28 @@ std::vector<std::string> TimeZoneLocation::GetTimezoneIdList(const double lon, c
     return tzidVect;
 }
 
-std::vector<std::string> TimeZoneLocation::ReadPolygonData(const double lon, const double lat,
+std::vector<std::string> TimeZoneLocation::ReadPolygonData(double lon, double lat,
     FILE* datFile, const std::string& jsonObjectStr,
     const std::vector<std::string>& tzidNames)
 {
     std::vector<std::string> tzidList;
-    if (jsonObjectStr.empty() || !nlohmann::json::accept(jsonObjectStr)) {
+    if (jsonObjectStr.empty()) {
         HILOG_ERROR_I18N("ReadPolygonData: %{public}s is empty or invalid", jsonObjectStr.c_str());
         return tzidList;
     }
-    nlohmann::json curTzData = nlohmann::json::parse(jsonObjectStr);
-    if (!curTzData.contains("pos")) {
-        HILOG_ERROR_I18N("ReadPolygonData: json string:%{public}s does not contain 'pos'",
-            jsonObjectStr.c_str());
+    cJSON *jsonObject = cJSON_Parse(jsonObjectStr.c_str());
+    if (jsonObject == nullptr) {
+        HILOG_ERROR_I18N("ReadPolygonData: parse json string failed");
         return tzidList;
     }
-    if (!curTzData["pos"].is_number_integer()) {
-        HILOG_ERROR_I18N("ReadPolygonData: pos's value is not integer");
+    cJSON *posPtr = cJSON_GetObjectItemCaseSensitive(jsonObject, "pos");
+    if (!cJSON_IsNumber(posPtr)) {
+        HILOG_ERROR_I18N("ReadPolygonData: pos is not number");
+        cJSON_Delete(jsonObject);
         return tzidList;
     }
-    int pos = curTzData["pos"].get<int>();
+    int32_t pos = posPtr->valueint;
+    cJSON_Delete(jsonObject);
     if (fseek(datFile, pos, SEEK_CUR) != 0) {
         HILOG_ERROR_I18N("ReadPolygonData: seek to position:%{public}d failed", pos);
         return tzidList;
@@ -351,8 +346,8 @@ bool TimeZoneLocation::GetAllTimezoneId(std::vector<std::string>& tzidNames, FIL
     return true;
 }
 
-void TimeZoneLocation::ReadDatFile(FILE* datFile, const double lon, const double lat,
-    std::vector<std::string> tzidNames, std::vector<std::string>& tzidList)
+void TimeZoneLocation::ReadDatFile(FILE* datFile, double lon, double lat,
+    const std::vector<std::string>& tzidNames, std::vector<std::string>& tzidList)
 {
     int32_t lookupSize;
     if (fread(&lookupSize,  sizeof(int32_t), 1, datFile) != 1) {
@@ -389,12 +384,7 @@ void TimeZoneLocation::ReadDatFile(FILE* datFile, const double lon, const double
             break;
         } else if (std::get<0>(parseResult) == ParseJsonStrResult::ARRAY) {
             std::string jsonArrayStr = std::get<1>(parseResult);
-            nlohmann::json curTzData = nlohmann::json::parse(jsonArrayStr);
-            for (nlohmann::json::iterator it = curTzData.begin(); it != curTzData.end(); ++it) {
-                int tzidIndex = (*it).get<int>();
-                std::string tzid = tzidNames[tzidIndex];
-                tzidList.push_back(tzid);
-            }
+            ReadJsonArray(jsonArrayStr, tzidNames, tzidList);
             break;
         }
         quadData.midLat = (quadData.top + quadData.bottom) / DIVISOR_FOR_MEDIAN;
@@ -405,21 +395,39 @@ void TimeZoneLocation::ReadDatFile(FILE* datFile, const double lon, const double
 void TimeZoneLocation::ReadJsonArray(const std::string& jsonArrayStr,
     const std::vector<std::string>& tzidNames, std::vector<std::string>& tzidList)
 {
-    if (jsonArrayStr.empty() || !nlohmann::json::accept(jsonArrayStr)) {
+    if (jsonArrayStr.empty()) {
         HILOG_ERROR_I18N("ReadJsonArray: JsonArray string: %{public}s is empty or invalid",
             jsonArrayStr.c_str());
         return;
     }
-    nlohmann::json curTzData = nlohmann::json::parse(jsonArrayStr);
-    for (nlohmann::json::iterator it = curTzData.begin(); it != curTzData.end(); ++it) {
-        if (!(*it).is_number_integer()) {
-            HILOG_ERROR_I18N("ReadJsonArray: one of JsonArray's element is not integer");
+    cJSON *jsonArray = cJSON_Parse(jsonArrayStr.c_str());
+    if (jsonArray == nullptr) {
+        HILOG_ERROR_I18N("ReadJsonArray: parse json array string failed");
+        return;
+    }
+    if (!cJSON_IsArray(jsonArray)) {
+        HILOG_ERROR_I18N("ReadJsonArray: %{public}s is not json array string", jsonArrayStr.c_str());
+        cJSON_Delete(jsonArray);
+        return;
+    }
+    int arraySize = cJSON_GetArraySize(jsonArray);
+    for (int i = 0; i < arraySize; i++) {
+        cJSON *item = cJSON_GetArrayItem(jsonArray, i);
+        if (item == nullptr || !cJSON_IsNumber(item)) {
+            HILOG_ERROR_I18N("ReadJsonArray: jsonarray item:%{public}d invalid", i);
+            cJSON_Delete(jsonArray);
             return;
         }
-        int tzidIndex = (*it).get<int>();
+        int32_t tzidIndex = item->valueint;
+        if (tzidIndex < 0 || tzidIndex > static_cast<int32_t>(tzidNames.size() - 1)) {
+            HILOG_ERROR_I18N("ReadJsonArray: tzidIndex: %{public}d out of range", tzidIndex);
+            cJSON_Delete(jsonArray);
+            return;
+        }
         std::string tzid = tzidNames[tzidIndex];
         tzidList.push_back(tzid);
     }
+    cJSON_Delete(jsonArray);
 }
 
 std::vector<std::string> TimeZoneLocation::GetTimezoneByLocation(
