@@ -71,7 +71,7 @@ private:
     bool IsPointInPolygon(const Point& p, const std::vector<Point>& polygon);
     std::vector<std::string> GetTimezoneAtSea(double lon);
     bool IsPointInMultiPolygon(const std::vector<int32_t>& pointsInPolygon,
-        const double& lon, const double& lat, FILE* file);
+        double lon, double lat, FILE* file);
     std::string NextSquare(QueryData& quadData, double lon, double lat);
     bool MatchNextKey(char* str, int len, int& curPos, std::string prefix, std::string nextKey);
     std::tuple<ParseJsonStrResult, std::string> GetJsonObjectFromPosition(

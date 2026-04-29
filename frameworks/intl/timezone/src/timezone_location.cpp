@@ -96,14 +96,14 @@ bool TimeZoneLocation::IsPointInPolygon(const Point& p, const std::vector<Point>
     if (polygonSize < MIN_POLYGON_POINTS_COUNT) {
         return false;
     }
-    for (int i = 0; i < polygonSize; ++i) {
+    for (size_t i = 0; i < polygon.size(); ++i) {
         if (IsPointOnSegment(p, polygon[i], polygon[(i + 1) % polygonSize])) {
             return true;
         }
     }
     bool inside = false;
-    int j = polygonSize - 1;
-    for (int i = 0; i < polygonSize; ++i) {
+    size_t j = polygon.size() - 1;
+    for (size_t i = 0; i < polygon.size(); ++i) {
         double x0 = polygon[i].x;
         double y0 = polygon[i].y;
         double x1 = polygon[j].x;
@@ -136,12 +136,11 @@ std::vector<std::string> TimeZoneLocation::GetTimezoneAtSea(double lon)
     return vect;
 }
 
-bool TimeZoneLocation::IsPointInMultiPolygon(const std::vector<int32_t>& pointsInPolygon, const double& lon,
-    const double& lat, FILE* file)
+bool TimeZoneLocation::IsPointInMultiPolygon(const std::vector<int32_t>& pointsInPolygon, double lon,
+    double lat, FILE* file)
 {
     bool flag = false;
-    int32_t length = static_cast<int32_t>(pointsInPolygon.size());
-    for (int32_t k = 0; k < length; ++k) {
+    for (size_t k = 0; k < pointsInPolygon.size(); ++k) {
         if (flag) {
             if (fseek(file, pointsInPolygon[k] * POINT_BYTE_SIZE, SEEK_CUR) != 0) {
                 HILOG_ERROR_I18N("IsPointInMultiPolygon: seek failed");
@@ -197,7 +196,7 @@ bool TimeZoneLocation::MatchNextKey(char* str, int len, int& curPos,
     std::string prefix, std::string nextKey)
 {
     std::string key = prefix;
-    int length = static_cast<int>(key.size());
+    size_t length = key.size();
     while (curPos < len) {
         curPos += 1;
         if (curPos >= len) {
@@ -277,7 +276,7 @@ std::vector<std::string> TimeZoneLocation::GetTimezoneIdList(double lon, double 
             pointsInPolygon.push_back(pointCount);
         }
         if (IsPointInMultiPolygon(pointsInPolygon, lon, lat, datFile)) {
-            tzidVect.push_back(tzidNames[tzIndex]);
+            tzidVect.push_back(tzidNames[static_cast<size_t>(tzIndex)]);
         }
     }
     return tzidVect;
@@ -424,7 +423,7 @@ void TimeZoneLocation::ReadJsonArray(const std::string& jsonArrayStr,
             cJSON_Delete(jsonArray);
             return;
         }
-        std::string tzid = tzidNames[tzidIndex];
+        std::string tzid = tzidNames[static_cast<size_t>(tzidIndex)];
         tzidList.push_back(tzid);
     }
     cJSON_Delete(jsonArray);

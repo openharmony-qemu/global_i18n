@@ -133,7 +133,7 @@ std::vector<std::tuple<double, double, std::vector<std::string>>> TimeZoneLocati
     { -130.0, 30.0, { "Etc/GMT+9" } },
     { -130.0, 40.0, { "Etc/GMT+9" } },
     { -130.0, 50.0, { "Etc/GMT+9" } },
-    { -130.0, 60.0, { "America/Vancouver" } },
+    { -130.0, 60.0, { "America/Whitehorse" } },
     { -130.0, 70.0, { "America/Inuvik" } },
     { -130.0, 80.0, { "Etc/GMT+9" } },
     { -120.0, -90.0, { "Antarctica/McMurdo" } },
