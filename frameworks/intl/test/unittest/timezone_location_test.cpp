@@ -204,7 +204,7 @@ std::vector<std::tuple<double, double, std::vector<std::string>>> TimeZoneLocati
     { -90.0, 20.0, { "America/Merida" } },
     { -90.0, 30.0, { "America/Chicago" } },
     { -90.0, 40.0, { "America/Chicago" } },
-    { -90.0, 50.0, { "America/Winnipeg" } },
+    { -90.0, 50.0, { "America/Winnipeg", "America/Toronto" } },
     { -90.0, 60.0, { "America/Rankin_Inlet" } },
     { -90.0, 70.0, { "America/Cambridge_Bay" } },
     { -90.0, 80.0, { "America/Rankin_Inlet" } },
@@ -708,7 +708,7 @@ HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0001, TestSize.Level1)
         vector<std::string> tz = I18nTimeZone::GetTimezoneIdByLocation(longitude, latitude);
         EXPECT_EQ(tz.size(), expects.size());
         if (tz.size() != expects.size()) {
-            printf("size not equals at line: %d\r\n", (index+30));
+            printf("size not equals at line: %d\r\n", (index+31));
         }
         for (unsigned int i = 0; i < tz.size(); i++) {
             EXPECT_EQ(tz[i], expects[i]);
