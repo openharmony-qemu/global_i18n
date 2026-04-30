@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -277,7 +277,7 @@ napi_value ChineseCalendarAddon::Set(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("ChineseCalendarAddon::SetTime: unwrap failed");
         return nullptr;
     }
-    
+
     for (size_t i = 0; i < argc; i++) {
         if (napi_get_value_int32(env, argv[i], &(param[i])) != napi_ok) {
             HILOG_ERROR_I18N("ChineseCalendarAddon::SetTime: Get int failed");
@@ -629,12 +629,7 @@ napi_value ChineseCalendarAddon::GetTimeInMillis(napi_env env, napi_callback_inf
         HILOG_ERROR_I18N("ChineseCalendarAddon::GetTimeInMillis: unwrap failed");
         return nullptr;
     }
-    napi_value result = nullptr;
-    if (napi_create_int64(env, obj->chineseCalendar_->GetTimeInMillis(), &result) != napi_ok) {
-        HILOG_ERROR_I18N("ChineseCalendarAddon::GetTimeInMillis: napi_create_int64 failed");
-        return nullptr;
-    }
-    return result;
+    return VariableConvertor::CreateInt64Value(env, obj->chineseCalendar_->GetTimeInMillis());
 }
 
 napi_value ChineseCalendarAddon::IsWeekend(napi_env env, napi_callback_info info)

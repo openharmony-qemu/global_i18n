@@ -30,6 +30,10 @@ int DateTimeFormatFuncTest008(void);
 int DateTimeFormatFuncTest009(void);
 int DateTimeFormatFuncTest010(void);
 int DateTimeFormatFuncTest011(void);
+int DateTimeFormatFuncTest012(void);
+int DateTimeFormatFuncTest013(void);
+int DateTimeFormatFuncTest014(void);
+int DateTimeFormatFuncTest015(void);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

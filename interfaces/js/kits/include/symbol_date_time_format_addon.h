@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,13 @@ private:
     static napi_value FormatRangeToParts(napi_env env, napi_callback_info info);
     static napi_value ToString(napi_env env, napi_callback_info info);
     static napi_value ResolvedOptions(napi_env env, napi_callback_info info);
+    static napi_value Parse(napi_env env, napi_callback_info info);
+
+    static bool GetParseParams(napi_env env, napi_callback_info info, std::string& text,
+        bool& lenientMode, napi_value& thisVar);
+    static bool UnwrapParseObject(napi_env env, napi_value thisVar, SymbolDateTimeFormatAddon*& obj);
+    static bool HandleParseResult(napi_env env, I18nErrorCode errCode);
+
     static void ParseAmPmSymbol(napi_env env, napi_value optionsValue,
         std::unordered_map<std::string, std::string>& options);
     static napi_value ResolvedAmPmSymbol(napi_env env, std::unordered_map<std::string, std::string>& options);

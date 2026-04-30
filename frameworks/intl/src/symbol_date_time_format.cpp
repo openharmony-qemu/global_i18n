@@ -18,6 +18,7 @@
 #include "i18n_hilog.h"
 #include "locale_config.h"
 #include "unicode/dtfmtsym.h"
+#include "unicode/parsepos.h"
 
 namespace OHOS {
 namespace Global {
@@ -99,6 +100,35 @@ void SymbolDateTimeFormat::ResolvedAmPmSymbols(std::unordered_map<std::string, s
     }
     options.insert(std::make_pair(AM_SYMBOL_TAG, amPmSymbols[0]));
     options.insert(std::make_pair(PM_SYMBOL_TAG, amPmSymbols[1]));
+}
+
+double SymbolDateTimeFormat::Parse(const std::string& text, bool lenientMode, I18nErrorCode& status)
+{
+    // System error - not caused by input, return FAILED
+    if (icuSimpleDateFormat == nullptr) {
+        HILOG_ERROR_I18N("SymbolDateTimeFormat::Parse: icuSimpleDateFormat is nullptr.");
+        status = I18nErrorCode::FAILED;
+        return 0;
+    }
+    // Input error - caused by bad input, return INVALID_PARAM
+    if (text.empty()) {
+        HILOG_ERROR_I18N("SymbolDateTimeFormat::Parse: text is empty.");
+        status = I18nErrorCode::INVALID_PARAM;
+        return 0;
+    }
+    icuSimpleDateFormat->setLenient(lenientMode);
+    icu::UnicodeString unicodeText = icu::UnicodeString::fromUTF8(text);
+    icu::ParsePosition parsePos(0);
+    UDate date = icuSimpleDateFormat->parse(unicodeText, parsePos);
+    // Input error - parse failure caused by invalid input
+    if (parsePos.getErrorIndex() != -1) {
+        HILOG_ERROR_I18N("SymbolDateTimeFormat::Parse: Parse failed for %{public}s, error index: %{public}d.",
+            text.c_str(), parsePos.getErrorIndex());
+        status = I18nErrorCode::INVALID_PARAM;
+        return 0;
+    }
+    status = I18nErrorCode::SUCCESS;
+    return date;
 }
 } // namespace I18n
 } // namespace Global
