@@ -16,6 +16,7 @@
 #define OHOS_GLOBAL_I18N_SYMBOL_DATE_TIME_FORMAT_H
 
 #include "intl_date_time_format.h"
+#include "i18n_types.h"
 
 namespace OHOS {
 namespace Global {
@@ -26,7 +27,8 @@ public:
         const std::unordered_map<std::string, std::string>& configs, std::string& errMessage);
     ~SymbolDateTimeFormat();
     void ResolvedOptions(std::unordered_map<std::string, std::string>& options) override;
- 
+    double Parse(const std::string& text, bool lenientMode, I18nErrorCode& status);
+
     static const std::string AM_SYMBOL_TAG;
     static const std::string PM_SYMBOL_TAG;
     static constexpr int32_t AM_PM_SYMBOLS_LEN = 2;

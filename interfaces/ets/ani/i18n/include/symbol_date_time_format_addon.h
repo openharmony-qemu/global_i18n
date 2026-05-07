@@ -44,6 +44,7 @@ private:
         ani_double endDate);
     static ani_string ToString(ani_env *env, [[maybe_unused]] ani_object object);
     static ani_object ResolvedOptions(ani_env *env, ani_object object);
+    static ani_long Parse(ani_env *env, ani_object object, ani_string text, ani_boolean lenientMode);
     static void ParseAmPmSymbol(ani_env *env, ani_object options,
         std::unordered_map<std::string, std::string>& result);
     static ani_array CreateDateTimeFormatPartArray(ani_env *env,

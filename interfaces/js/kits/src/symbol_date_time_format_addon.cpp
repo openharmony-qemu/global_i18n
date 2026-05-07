@@ -15,6 +15,7 @@
 
 #include "symbol_date_time_format_addon.h"
 
+#include <cstdint>
 #include <unordered_set>
 #include "error_util.h"
 #include "i18n_hilog.h"
@@ -27,6 +28,10 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
+constexpr int32_t PARSE_PARAM_COUNT = 2;
+constexpr int32_t TEXT_PARAM_INDEX = 0;
+constexpr int32_t LENIENT_MODE_PARAM_INDEX = 1;
+
 static thread_local ThreadReference* g_SymbolDateTimeFormatConstructor = nullptr;
 SymbolDateTimeFormatAddon::SymbolDateTimeFormatAddon()
 {
@@ -59,6 +64,7 @@ napi_value SymbolDateTimeFormatAddon::InitSymbolDateTimeFormat(napi_env env, nap
         DECLARE_NAPI_FUNCTION("formatRangeToParts", FormatRangeToParts),
         DECLARE_NAPI_FUNCTION("toString", ToString),
         DECLARE_NAPI_FUNCTION("resolvedOptions", ResolvedOptions),
+        DECLARE_NAPI_FUNCTION("parse", Parse),
     };
     napi_value symbolConstructor = nullptr;
     napi_status status = napi_define_class(env, "SymbolDateTimeFormat", NAPI_AUTO_LENGTH, Constructor, nullptr,
@@ -467,6 +473,97 @@ napi_status SymbolDateTimeFormatAddon::UnwrapDateTimeFormat(napi_env env, napi_v
     SymbolDateTimeFormatAddon** dateTimeFormat)
 {
     return napi_unwrap_s(env, value, &TYPE_TAG, reinterpret_cast<void **>(dateTimeFormat));
+}
+
+bool SymbolDateTimeFormatAddon::GetParseParams(napi_env env, napi_callback_info info,
+    std::string& text, bool& lenientMode, napi_value& thisVar)
+{
+    size_t argc = PARSE_PARAM_COUNT;
+    napi_value argv[PARSE_PARAM_COUNT] = { nullptr };
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("GetParseParams: napi_get_cb_info failed, status: %{public}d", status);
+        return false;
+    }
+    if (argc < PARSE_PARAM_COUNT) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "text or lenientMode", "", true);
+        return false;
+    }
+    napi_valuetype valueType = napi_undefined;
+    status = napi_typeof(env, argv[TEXT_PARAM_INDEX], &valueType);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("GetParseParams: napi_typeof text failed, status: %{public}d", status);
+        return false;
+    }
+    if (valueType != napi_string) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "text", "string", true);
+        return false;
+    }
+    int32_t code = 0;
+    text = VariableConvertor::GetString(env, argv[TEXT_PARAM_INDEX], code);
+    if (code != 0) {
+        HILOG_ERROR_I18N("GetParseParams: GetString failed, code: %{public}d", code);
+        return false;
+    }
+    status = napi_typeof(env, argv[LENIENT_MODE_PARAM_INDEX], &valueType);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("GetParseParams: napi_typeof lenientMode failed, status: %{public}d", status);
+        return false;
+    }
+    if (valueType != napi_boolean) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "lenientMode", "boolean", true);
+        return false;
+    }
+    status = napi_get_value_bool(env, argv[LENIENT_MODE_PARAM_INDEX], &lenientMode);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("GetParseParams: napi_get_value_bool failed, status: %{public}d", status);
+        return false;
+    }
+    return true;
+}
+
+bool SymbolDateTimeFormatAddon::UnwrapParseObject(napi_env env, napi_value thisVar,
+    SymbolDateTimeFormatAddon*& obj)
+{
+    napi_status status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
+    if (status != napi_ok || !obj || !obj->symbolDateTimeFormat_) {
+        HILOG_ERROR_I18N("UnwrapParseObject: unwrap failed, status: %{public}d", status);
+        return false;
+    }
+    return true;
+}
+
+bool SymbolDateTimeFormatAddon::HandleParseResult(napi_env env, I18nErrorCode errCode)
+{
+    if (errCode == I18nErrorCode::FAILED) {
+        HILOG_ERROR_I18N("HandleParseResult: Framework returned FAILED (system error).");
+        return false;
+    }
+    if (errCode == I18nErrorCode::INVALID_PARAM) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID_NEW, "text", "a valid localized date string", true);
+        return false;
+    }
+    return true;
+}
+
+napi_value SymbolDateTimeFormatAddon::Parse(napi_env env, napi_callback_info info)
+{
+    std::string text;
+    bool lenientMode = false;
+    napi_value thisVar = nullptr;
+    if (!GetParseParams(env, info, text, lenientMode, thisVar)) {
+        return VariableConvertor::CreateInt64Value(env, 0);
+    }
+    SymbolDateTimeFormatAddon* obj = nullptr;
+    if (!UnwrapParseObject(env, thisVar, obj)) {
+        return VariableConvertor::CreateInt64Value(env, 0);
+    }
+    I18nErrorCode errCode = I18nErrorCode::SUCCESS;
+    double result = obj->symbolDateTimeFormat_->Parse(text, lenientMode, errCode);
+    if (!HandleParseResult(env, errCode)) {
+        return VariableConvertor::CreateInt64Value(env, 0);
+    }
+    return VariableConvertor::CreateInt64Value(env, static_cast<int64_t>(result));
 }
 } // namespace I18n
 } // namespace Global
