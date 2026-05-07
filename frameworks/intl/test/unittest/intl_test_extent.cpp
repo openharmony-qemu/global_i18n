@@ -524,6 +524,7 @@ HWTEST_F(IntlTest, IntlFuncTest0060, TestSize.Level1)
 {
     IcsFileWriter icsFileWriter;
     std::string path = icsFileWriter.GenerateFile();
+    EXPECT_TRUE(FileExist(path));
     HolidayManager *holiday_manager = new HolidayManager(path.c_str());
     std::map<std::string, std::vector<HolidayInfoItem>> holidayDataMap;
     std::vector<HolidayInfoItem> infoList;
