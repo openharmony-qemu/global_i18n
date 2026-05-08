@@ -49,13 +49,38 @@ SymbolNumberFormat::SymbolNumberFormat(const std::vector<std::string>& localeTag
     SetNumberSymbols(options);
     styleRangeFormatter = styleFormatter;
     numberFormat = styleFormatter.locale(locale);
+    
+    UErrorCode icuStatus = U_ZERO_ERROR;
+    icu::Format* format = numberFormat.toFormat(icuStatus);
+    if (U_FAILURE(icuStatus) || format == nullptr) {
+        HILOG_ERROR_I18N("SymbolNumberFormat: toFormat() failed, error: %{public}s.",
+            u_errorName(icuStatus));
+        if (format != nullptr) {
+            delete format;
+        }
+        return;
+    }
+    
+    numberFormatForParse_ = dynamic_cast<icu::NumberFormat*>(format);
+    if (numberFormatForParse_ == nullptr) {
+        HILOG_ERROR_I18N("SymbolNumberFormat: toFormat() returned non-NumberFormat object.");
+        delete format;
+        return;
+    }
+    
     std::map<std::string, std::string> symbols;
     ResolvedNumberSymbols(symbols);
     auto iter = symbols.find(PLUS_SYMBOL_TAG);
     pulsSign = (iter == symbols.end()) ? "+" : iter->second;
 }
 
-SymbolNumberFormat::~SymbolNumberFormat() {}
+SymbolNumberFormat::~SymbolNumberFormat()
+{
+    if (numberFormatForParse_ != nullptr) {
+        delete numberFormatForParse_;
+        numberFormatForParse_ = nullptr;
+    }
+}
 
 NumberFormatParts SymbolNumberFormat::FormatToPartsDouble(double value)
 {
@@ -159,6 +184,36 @@ icu::Formattable SymbolNumberFormat::StrToFormattable(const std::string& value)
         return icu::Formattable();
     }
     return result;
+}
+
+double SymbolNumberFormat::Parse(const std::string& text, bool lenientMode, I18nErrorCode& status) {
+    if (numberFormatForParse_ == nullptr) {
+        HILOG_ERROR_I18N("SymbolNumberFormat::Parse: numberFormatForParse_ is nullptr.");
+        status = I18nErrorCode::FAILED;
+        return 0;
+    }
+    
+    if (text.empty()) {
+        HILOG_ERROR_I18N("SymbolNumberFormat::Parse: text is empty.");
+        status = I18nErrorCode::INVALID_PARAM;
+        return 0;
+    }
+    
+    numberFormatForParse_->setLenient(lenientMode);
+    icu::UnicodeString unicodeText = icu::UnicodeString::fromUTF8(text);
+    icu::ParsePosition parsePos(0);
+    icu::Formattable formattable;
+    numberFormatForParse_->parse(unicodeText, formattable, parsePos);
+    
+    if (parsePos.getErrorIndex() != -1) {
+        HILOG_ERROR_I18N("SymbolNumberFormat::Parse: Parse failed for %{public}s, error index: %{public}d.",
+            text.c_str(), parsePos.getErrorIndex());
+        status = I18nErrorCode::INVALID_PARAM;
+        return 0;
+    }
+    
+    status = I18nErrorCode::SUCCESS;
+    return formattable.getDouble();
 }
 } // namespace I18n
 } // namespace Global

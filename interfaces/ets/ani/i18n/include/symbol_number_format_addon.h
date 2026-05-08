@@ -50,6 +50,7 @@ private:
     static ani_object FormatToRangePartsDecStrDecStrImpl(ani_env *env, ani_object object,
         ani_string start, ani_string end);
     static ani_object ResolvedOptions(ani_env *env, ani_object object);
+    static ani_double Parse(ani_env *env, ani_object object, ani_string text, ani_boolean lenientMode);
     static ani_string ToString(ani_env *env, ani_object object);
     static std::map<std::string, std::string> ParseOptions(ani_env *env, ani_object options);
     static ani_object CreateNumberFormatPartArray(ani_env *env, const NumberFormatParts &parts,

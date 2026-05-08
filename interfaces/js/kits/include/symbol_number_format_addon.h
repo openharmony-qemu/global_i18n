@@ -73,6 +73,12 @@ private:
     static napi_value FormatRangeToParts(napi_env env, napi_callback_info info);
     static napi_value ToString(napi_env env, napi_callback_info info);
     static napi_value ResolvedOptions(napi_env env, napi_callback_info info);
+    static napi_value Parse(napi_env env, napi_callback_info info);
+    static bool GetParseParams(napi_env env, napi_callback_info info,
+        std::string& text, bool& lenientMode, napi_value& thisVar);
+    static bool UnwrapParseObject(napi_env env, napi_value thisVar,
+        SymbolNumberFormatAddon*& obj);
+    static bool HandleParseResult(napi_env env, I18nErrorCode errCode);
     static NumberData ParseNumberData(napi_env env, napi_value value, NumberDataType& type);
     static napi_value CreateResolvedOptions(napi_env env,
         const std::map<std::string, std::string>& options);
