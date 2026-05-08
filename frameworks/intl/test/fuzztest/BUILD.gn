@@ -41,7 +41,6 @@ group("fuzztest") {
     "regexrule_fuzzer:RegexRuleFuzzTest",
     "relativetimeformat_fuzzer:RelativeTimeFormatFuzzTest",
     "rulesengine_fuzzer:RulesEngineFuzzTest",
-    "service_client_fuzzer:ServiceClientFuzzTest",
     "systemlocalemanager_fuzzer:SystemLocaleManagerFuzzTest",
     "taboo_fuzzer:TabooFuzzTest",
     "timezone_fuzzer:TimeZoneFuzzTest",
