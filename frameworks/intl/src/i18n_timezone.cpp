@@ -1158,8 +1158,37 @@ std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, c
     if (!CheckLatitudeAndLongitude(x, y)) {
         return tzIdList;
     }
-    std::unique_ptr<TimeZoneLocation> tzLocation = std::make_unique<TimeZoneLocation>();
-    tzIdList = tzLocation->GetTimezoneByLocation(x, y);
+    std::map<int, std::string> categoryMap = GetTimeZoneCategoryMap(x, y);
+    std::vector<std::string> filePaths = FindTzData();
+    size_t fileCount = filePaths.size();
+    if (fileCount < 1) {
+        return tzIdList;
+    }
+    std::string preferredPath = GetPreferredPath(x, filePaths);
+    if (preferredPath.empty()) {
+        return tzIdList;
+    }
+    uint32_t width = 0;
+    uint32_t height = 0;
+    std::tie(width, height) = GetTzDataWidth(filePaths);
+    double calculateX = y * width / (TZ_X_PLUS * 1.0) + width / (TZ_HALF_OF_SIZE * 1.0);
+    double calculateY = x * ((height * fileCount) / (TZ_X_PLUS * TZ_HALF_OF_SIZE * 1.0)) +
+                        (height * fileCount) / (TZ_HALF_OF_SIZE * 1.0);
+    uint16_t fixedX = static_cast<uint16_t>(calculateX);
+    uint16_t fixedY = static_cast<uint16_t>(calculateY);
+    if (ParamExceedScope(fixedX, fixedY, width, height * fileCount)) {
+        HILOG_ERROR_I18N("invalid width:%{public}d or height: %{public}d", fixedX, fixedY);
+        return tzIdList;
+    }
+    uint16_t actualHeight = fileCount > 1 ? (fixedY % height) : fixedY;
+    std::vector<int> pixel = GetColorData(fixedX, fixedY, actualHeight, preferredPath);
+    for (size_t i = 0; i < pixel.size(); i++) {
+        //255 is invalid pixel value required
+        if (pixel[i] != TZ_MAX_PIXEL_VALUE && categoryMap.find(pixel[i]) != categoryMap.end()) {
+            std::string zdId = categoryMap[pixel[i]];
+            tzIdList.push_back(zdId);
+        }
+    }
 #endif
     return tzIdList;
 }

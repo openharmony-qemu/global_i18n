@@ -19,18 +19,10 @@ group("binary_files") {
   if (!i18n_ext_part_exists) {
     deps += [ ":tz_pixel_dat" ]
   }
-  deps += [ ":timezone_location_dat" ]
 }
 
 ohos_prebuilt_etc("tz_pixel_dat") {
   source = "./timezone/tz_2025001-000360.dat"
-  module_install_dir = "usr/ohos_timezone/"
-  part_name = "i18n"
-  subsystem_name = "global"
-}
-
-ohos_prebuilt_etc("timezone_location_dat") {
-  source = "./timezone/timezone_location.dat"
   module_install_dir = "usr/ohos_timezone/"
   part_name = "i18n"
   subsystem_name = "global"
