@@ -19,7 +19,6 @@ group("binary_files") {
   if (!i18n_ext_part_exists) {
     deps += [ ":tz_pixel_dat" ]
   }
-  deps += [ ":timezone_location_dat" ]
 }
 
 ohos_prebuilt_etc("tz_pixel_dat") {
