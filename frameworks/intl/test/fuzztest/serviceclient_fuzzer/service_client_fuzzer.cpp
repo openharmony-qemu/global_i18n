@@ -25,11 +25,11 @@
 #include "token_setproc.h"
 #include "nativetoken_kit.h"
 #include "service_client_fuzzer.h"
+#include "preferred_language.h"
 #include <chrono>
 #include <thread>
 
 namespace OHOS {
-    static constexpr uint64_t SELF_TOKEN_ID = GetSelfTokenID();
     static constexpr int32_t UID = 3013;
     static constexpr size_t MOD = 2;
     static constexpr size_t DELAY_SECONDS = 3;
@@ -64,7 +64,7 @@ namespace OHOS {
         };
         infoInstance.processName = "ServiceClientFuzzTest";
         uint64_t tokenId = GetAccessTokenId(&infoInstance);
-        printf("Get tokenid is %lu \r\n", tokenId);
+        printf("Get tokenid is %llu \r\n", tokenId);
         int32_t setSelfErrorCode = SetSelfTokenID(tokenId);
         if (setSelfErrorCode != 0) {
             printf("SetSelfTokenID() Failed, return code is %d \r\n", setSelfErrorCode);
@@ -78,7 +78,7 @@ namespace OHOS {
 
     void RemoveNativeTokenTypeAndPermission()
     {
-        SetSelfTokenID(SELF_TOKEN_ID);
+        SetSelfTokenID(GetSelfTokenID());
         seteuid(0);
         OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
         seteuid(UID);
