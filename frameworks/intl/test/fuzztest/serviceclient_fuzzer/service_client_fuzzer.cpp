@@ -64,11 +64,10 @@ namespace OHOS {
         };
         infoInstance.processName = "ServiceClientFuzzTest";
         uint64_t tokenId = GetAccessTokenId(&infoInstance);
-        printf("Get tokenid is %llu \r\n", tokenId);
+        printf("Get tokenid is %s \r\n", std::to_string(tokenId).c_str());
         int32_t setSelfErrorCode = SetSelfTokenID(tokenId);
         if (setSelfErrorCode != 0) {
             printf("SetSelfTokenID() Failed, return code is %d \r\n", setSelfErrorCode);
-            return;
         }
         seteuid(0);
         int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
