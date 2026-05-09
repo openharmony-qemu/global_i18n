@@ -24,7 +24,10 @@ ohos_fuzztest("ServiceClientFuzzTest") {
 
   fuzz_config_file = "."
 
-  include_dirs = [ "../../../include" ]
+  include_dirs = [
+    "../../../../intl/include",
+    "../../../../../services/include",
+  ]
   cflags = [
     "-g",
     "-O0",
