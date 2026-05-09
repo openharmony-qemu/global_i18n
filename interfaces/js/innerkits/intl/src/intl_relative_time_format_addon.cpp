@@ -16,6 +16,7 @@
 
 #include <cmath>
 #include "error_util.h"
+#include "histogram_helper.h"
 #include "i18n_hilog.h"
 #include "i18n_types.h"
 #include "js_lifecycle_managers.h"
@@ -84,6 +85,7 @@ napi_value IntlRelativeTimeFormatAddon::InitIntlRelativeTimeFormat(napi_env env,
 
 napi_value IntlRelativeTimeFormatAddon::RelativeTimeFormatConstructor(napi_env env, napi_callback_info info)
 {
+    ApiMetrics metrics;
     size_t argc = 2;
     napi_value argv[2] = { nullptr };
     napi_value thisVar = nullptr;
@@ -125,6 +127,8 @@ napi_value IntlRelativeTimeFormatAddon::RelativeTimeFormatConstructor(napi_env e
         HILOG_ERROR_I18N("Init RelativeTimeFormat failed");
         return nullptr;
     }
+    metrics.RecordTime("ArkTS.Intl.RelativeTimeFormat.Time");
+    ApiMetrics::RecordBoolean("ArkTS.Intl.RelativeTimeFormat.Count", true);
     return thisVar;
 }
 
@@ -253,6 +257,7 @@ napi_value IntlRelativeTimeFormatAddon::Format(napi_env env, napi_callback_info 
         return JSUtils::CreateEmptyString(env);
     }
     std::string value = obj->relativetimefmt_->Format(number, unit);
+    ApiMetrics::RecordBoolean("ArkTS.Intl.RelativeTimeFormat.format.Count", true);
     return JSUtils::CreateString(env, value);
 }
 
@@ -332,6 +337,7 @@ napi_value IntlRelativeTimeFormatAddon::GetFormatToPartsInner(napi_env env, doub
     }
     std::vector<std::vector<std::string>> relativeTimeParts;
     obj->relativetimefmt_->FormatToParts(number, unit, relativeTimeParts);
+    ApiMetrics::RecordBoolean("ArkTS.Intl.RelativeTimeFormat.formatToParts.Count", true);
     return SetNumberFormatParts(env, relativeTimeParts);
 }
 

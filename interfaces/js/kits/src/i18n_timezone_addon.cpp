@@ -14,6 +14,7 @@
  */
 #include "character.h"
 #include "error_util.h"
+#include "histogram_helper.h"
 #include "i18n_hilog.h"
 #include "i18n_timezone_addon.h"
 #include "js_lifecycle_managers.h"
@@ -41,6 +42,7 @@ void I18nTimeZoneAddon::Destructor(napi_env env, void *nativeObject, void *hint)
 
 napi_value I18nTimeZoneAddon::GetI18nTimeZone(napi_env env, napi_callback_info info)
 {
+    ApiMetrics metrics;
     size_t argc = 1;
     napi_value argv[1] = { nullptr };
     napi_value thisVar = nullptr;
@@ -56,7 +58,10 @@ napi_value I18nTimeZoneAddon::GetI18nTimeZone(napi_env env, napi_callback_info i
             return nullptr;
         }
     }
-    return StaticGetTimeZone(env, argv, true);
+    napi_value result = StaticGetTimeZone(env, argv, true);
+    metrics.RecordTime("LocalizationKit.i18n.getTimeZone.Time");
+    metrics.RecordBoolean("LocalizationKit.i18n.getTimeZone.Count", true);
+    return result;
 }
 
 napi_value I18nTimeZoneAddon::InitI18nTimeZone(napi_env env, napi_value exports)
@@ -197,6 +202,7 @@ napi_value I18nTimeZoneAddon::GetAvailableTimezoneIDs(napi_env env, napi_callbac
         }
         ++index;
     }
+    ApiMetrics::RecordBoolean("LocalizationKit.i18n.TimeZone.getAvailableIDs.Count", true);
     return result;
 }
 
@@ -224,6 +230,7 @@ napi_value I18nTimeZoneAddon::GetAvailableZoneCityIDs(napi_env env, napi_callbac
         }
         ++index;
     }
+    ApiMetrics::RecordBoolean("LocalizationKit.i18n.TimeZone.getAvailableZoneCityIDs.Count", true);
     return result;
 }
 
@@ -264,6 +271,7 @@ napi_value I18nTimeZoneAddon::GetCityDisplayName(napi_env env, napi_callback_inf
     if (status != napi_ok) {
         return nullptr;
     }
+    ApiMetrics::RecordBoolean("LocalizationKit.i18n.TimeZone.getCityDisplayName.Count", true);
     return result;
 }
 
@@ -277,7 +285,9 @@ napi_value I18nTimeZoneAddon::GetTimezoneFromCity(napi_env env, napi_callback_in
     if (status != napi_ok) {
         return nullptr;
     }
-    return StaticGetTimeZone(env, argv, false);
+    napi_value result = StaticGetTimeZone(env, argv, false);
+    ApiMetrics::RecordBoolean("LocalizationKit.i18n.TimeZone.getTimezoneFromCity.Count", true);
+    return result;
 }
 
 napi_value I18nTimeZoneAddon::GetTimezonesByLocation(napi_env env, napi_callback_info info)
@@ -323,7 +333,7 @@ napi_value I18nTimeZoneAddon::GetTimezonesByLocation(napi_env env, napi_callback
             return nullptr;
         }
     }
-
+    ApiMetrics::RecordBoolean("LocalizationKit.i18n.TimeZone.getTimezonesByLocation.Count", true);
     return timezoneList;
 }
 
@@ -391,6 +401,7 @@ napi_value I18nTimeZoneAddon::SetAppDefaultTimeZoneById(napi_env env, napi_callb
     }
     napi_value result = nullptr;
     NAPI_CALL(env, napi_get_undefined(env, &result));
+    ApiMetrics::RecordBoolean("LocalizationKit.i18n.TimeZone.setAppDefaultTimeZoneById.Count", true);
     return result;
 }
 
@@ -410,6 +421,7 @@ napi_value I18nTimeZoneAddon::GetAppDefaultTimeZone(napi_env env, napi_callback_
     }
     napi_value argTimeZoneId[1] = { timezoneId };
     napi_value timezone = StaticGetTimeZone(env, argTimeZoneId, true);
+    ApiMetrics::RecordBoolean("LocalizationKit.i18n.TimeZone.getAppDefaultTimeZone.Count", true);
     return timezone;
 }
 
@@ -436,6 +448,7 @@ napi_value I18nTimeZoneAddon::GetID(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("GetID: Create result failed");
         return nullptr;
     }
+    ApiMetrics::RecordBoolean("LocalizationKit.i18n.TimeZone.getID.Count", true);
     return value;
 }
 
@@ -481,6 +494,7 @@ napi_value I18nTimeZoneAddon::GetTimeZoneDisplayName(napi_env env, napi_callback
         HILOG_ERROR_I18N("GetTimeZoneDisplayName: Create result failed");
         return nullptr;
     }
+    ApiMetrics::RecordBoolean("LocalizationKit.i18n.TimeZone.getDisplayName.Count", true);
     return value;
 }
 
@@ -507,6 +521,7 @@ napi_value I18nTimeZoneAddon::GetRawOffset(napi_env env, napi_callback_info info
         HILOG_ERROR_I18N("GetRawOffset: Create result failed");
         return nullptr;
     }
+    ApiMetrics::RecordBoolean("LocalizationKit.i18n.TimeZone.getRawOffset.Count", true);
     return value;
 }
 
@@ -557,6 +572,7 @@ napi_value I18nTimeZoneAddon::GetOffset(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("GetOffset: Create result failed");
         return nullptr;
     }
+    ApiMetrics::RecordBoolean("LocalizationKit.i18n.TimeZone.getOffset.Count", true);
     return value;
 }
 
@@ -578,7 +594,9 @@ napi_value I18nTimeZoneAddon::GetZoneRules(napi_env env, napi_callback_info info
         return nullptr;
     }
     std::string tzid = obj->timezone_->GetID();
-    return ZoneRulesAddon::GetZoneRulesObject(env, tzid);
+    napi_value result = ZoneRulesAddon::GetZoneRulesObject(env, tzid);
+    ApiMetrics::RecordBoolean("LocalizationKit.i18n.TimeZone.getZoneRules.Count", true);
+    return result;
 }
 
 napi_value I18nTimeZoneAddon::IsDaylightSavingTime(napi_env env, napi_callback_info info)
@@ -618,7 +636,9 @@ napi_value I18nTimeZoneAddon::IsDaylightSavingTime(napi_env env, napi_callback_i
         return nullptr;
     }
     bool result = obj->timezone_->IsDaylightSavingTime(date);
-    return VariableConvertor::CreateBoolean(env, result);
+    napi_value ret = VariableConvertor::CreateBoolean(env, result);
+    ApiMetrics::RecordBoolean("LocalizationKit.i18n.TimeZone.isDaylightSavingTime.Count", true);
+    return ret;
 }
 
 napi_value I18nTimeZoneAddon::StaticGetTimeZone(napi_env env, napi_value *argv, bool isZoneID)

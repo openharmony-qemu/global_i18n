@@ -74,6 +74,13 @@ ohos_shared_library("intl_napi") {
     "libphonenumber:phonenumber_standard",
     "napi:ace_napi",
   ]
+
+  defines = []
+  if (defined(global_i18n_support_api_metrics) && global_i18n_support_api_metrics) {
+    external_deps += [ "api_metrics:histogrammanager" ]
+    defines += [ "GLOBAL_I18N_METRICS_ENABLE" ]
+  }
+
   install_images = [ system_base_dir ]
   relative_install_dir = "platformsdk"
   subsystem_name = "global"

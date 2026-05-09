@@ -14,6 +14,7 @@
  */
 
 #include "intl_plural_rules_addon.h"
+#include "histogram_helper.h"
 #include "i18n_hilog.h"
 #include "js_lifecycle_managers.h"
 #include "js_utils.h"
@@ -62,6 +63,7 @@ napi_value IntlPluralRulesAddon::InitIntlPluralRules(napi_env env, napi_value ex
 
 napi_value IntlPluralRulesAddon::IntlPluralRulesConstructor(napi_env env, napi_callback_info info)
 {
+    ApiMetrics metrics;
     size_t argc = 2;
     napi_value argv[2] = { nullptr };
     napi_value thisVar = nullptr;
@@ -72,16 +74,7 @@ napi_value IntlPluralRulesAddon::IntlPluralRulesConstructor(napi_env env, napi_c
         return nullptr;
     }
 
-    napi_value new_target;
-    status = napi_get_new_target(env, info, &new_target);
-    if (status == napi_pending_exception || new_target == nullptr) {
-        HILOG_ERROR_I18N("IntlPluralRulesConstructor: newTarget is undefined.");
-        napi_value exception;
-        napi_get_and_clear_last_exception(env, &exception);
-        napi_throw_type_error(env, nullptr, "newTarget is undefined");
-        return nullptr;
-    } else if (status != napi_ok) {
-        HILOG_ERROR_I18N("IntlPluralRulesConstructor: get newTarget failed.");
+    if (!CheckNewTarget(env, info)) {
         return nullptr;
     }
 
@@ -110,7 +103,26 @@ napi_value IntlPluralRulesAddon::IntlPluralRulesConstructor(napi_env env, napi_c
         HILOG_ERROR_I18N("IntlPluralRulesConstructor: Init IntlPluralRules failed.");
         return nullptr;
     }
+    metrics.RecordTime("ArkTS.Intl.PluralRules.Time");
+    ApiMetrics::RecordBoolean("ArkTS.Intl.PluralRules.Count", true);
     return thisVar;
+}
+
+bool IntlPluralRulesAddon::CheckNewTarget(napi_env env, napi_callback_info info)
+{
+    napi_value new_target;
+    napi_status status = napi_get_new_target(env, info, &new_target);
+    if (status == napi_pending_exception || new_target == nullptr) {
+        HILOG_ERROR_I18N("IntlPluralRulesConstructor: newTarget is undefined.");
+        napi_value exception;
+        napi_get_and_clear_last_exception(env, &exception);
+        napi_throw_type_error(env, nullptr, "newTarget is undefined");
+        return false;
+    } else if (status != napi_ok) {
+        HILOG_ERROR_I18N("IntlPluralRulesConstructor: get newTarget failed.");
+        return false;
+    }
+    return true;
 }
 
 bool IntlPluralRulesAddon::InitIntlPluralRulesContext(napi_env env, const std::vector<std::string>& localeTags,
@@ -168,6 +180,7 @@ napi_value IntlPluralRulesAddon::Select(napi_env env, napi_callback_info info)
         napi_throw_range_error(env, nullptr, errorMessage.message.c_str());
         return nullptr;
     }
+    ApiMetrics::RecordBoolean("ArkTS.Intl.PluralRules.select.Count", true);
     return JSUtils::CreateString(env, formatedValue);
 }
 
