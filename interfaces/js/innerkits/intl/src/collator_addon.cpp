@@ -15,6 +15,7 @@
 #include "collator_addon.h"
 
 #include "error_util.h"
+#include "histogram_helper.h"
 #include "intl_addon.h"
 #include "i18n_hilog.h"
 #include "js_lifecycle_managers.h"
@@ -71,6 +72,7 @@ napi_value CollatorAddon::InitCollator(napi_env env, napi_value exports)
 
 napi_value CollatorAddon::CollatorConstructor(napi_env env, napi_callback_info info)
 {
+    ApiMetrics metrics;
     size_t argc = 2;
     napi_value argv[2] = { nullptr };
     napi_value thisVar = nullptr;
@@ -113,6 +115,8 @@ napi_value CollatorAddon::CollatorConstructor(napi_env env, napi_callback_info i
         HILOG_ERROR_I18N("CollatorConstructor: Init CollatorAddon failed");
         return nullptr;
     }
+    metrics.RecordTime("ArkTS.Intl.Collator.Time");
+    metrics.RecordBoolean("ArkTS.Intl.Collator.Count", true);
     return thisVar;
 }
 
@@ -228,6 +232,7 @@ napi_value CollatorAddon::CompareString(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("CompareString: Create compare result failed");
         return nullptr;
     }
+    ApiMetrics::RecordBoolean("ArkTS.Intl.Collator.compare.Count", true);
 
     return result;
 }

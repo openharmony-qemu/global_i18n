@@ -18,4 +18,10 @@ declare_args() {
   if (defined(global_parts_info.global_i18n_common_ext)) {
     i18n_ext_part_exists = true
   }
+
+  global_i18n_support_api_metrics = true
+  if (defined(global_parts_info) &&
+      !defined(global_parts_info.hiviewdfx_api_metrics)) {
+    global_i18n_support_api_metrics = false
+  }
 }

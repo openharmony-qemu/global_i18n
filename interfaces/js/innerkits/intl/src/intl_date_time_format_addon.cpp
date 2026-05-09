@@ -17,6 +17,7 @@
 #include <chrono>
 #include <unordered_set>
 #include "error_util.h"
+#include "histogram_helper.h"
 #include "i18n_hilog.h"
 #include "intl_date_time_format.h"
 #include "js_lifecycle_managers.h"
@@ -81,6 +82,7 @@ napi_value IntlDateTimeFormatAddon::InitIntlDateTimeFormat(napi_env env, napi_va
 
 napi_value IntlDateTimeFormatAddon::IntlDateTimeFormatConstructor(napi_env env, napi_callback_info info)
 {
+    ApiMetrics metrics;
     size_t argc = 2;
     napi_value argv[2] = { nullptr };
     napi_value thisVar = nullptr;
@@ -127,6 +129,8 @@ napi_value IntlDateTimeFormatAddon::IntlDateTimeFormatConstructor(napi_env env, 
         HILOG_ERROR_I18N("IntlDateTimeFormatAddon::IntlDateTimeFormatConstructor: Init IntlDateTimeFormat failed");
         return nullptr;
     }
+    metrics.RecordTime("ArkTS.Intl.DateTimeFormat.Time");
+    ApiMetrics::RecordBoolean("ArkTS.Intl.DateTimeFormat.Count", true);
     return thisVar;
 }
 
@@ -232,6 +236,7 @@ napi_value IntlDateTimeFormatAddon::Format(napi_env env, napi_callback_info info
         HILOG_ERROR_I18N("IntlDateTimeFormatAddon::::Format: Create string failed.");
         return JSUtils::CreateEmptyString(env);
     }
+    ApiMetrics::RecordBoolean("ArkTS.Intl.DateTimeFormat.format.Count", true);
     return result;
 }
 
@@ -266,6 +271,7 @@ napi_value IntlDateTimeFormatAddon::FormatToParts(napi_env env, napi_callback_in
         ErrorUtil::NapiThrowUndefined(env, errMessage);
         return nullptr;
     }
+    ApiMetrics::RecordBoolean("ArkTS.Intl.DateTimeFormat.formatToParts.Count", true);
     return CreateFormatPart(env, parts);
 }
 
@@ -313,6 +319,7 @@ napi_value IntlDateTimeFormatAddon::FormatRange(napi_env env, napi_callback_info
         HILOG_ERROR_I18N("IntlDateTimeFormatAddon::FormatRange: Create string failed.");
         return JSUtils::CreateEmptyString(env);
     }
+    ApiMetrics::RecordBoolean("ArkTS.Intl.DateTimeFormat.formatRange.Count", true);
     return result;
 }
 
@@ -354,6 +361,7 @@ napi_value IntlDateTimeFormatAddon::FormatRangeToParts(napi_env env, napi_callba
         ErrorUtil::NapiThrowUndefined(env, errMessage);
         return nullptr;
     }
+    ApiMetrics::RecordBoolean("ArkTS.Intl.DateTimeFormat.formatRangeToParts.Count", true);
     return CreateFormatPart(env, parts);
 }
 
