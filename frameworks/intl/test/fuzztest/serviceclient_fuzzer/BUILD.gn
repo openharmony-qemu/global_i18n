@@ -34,7 +34,7 @@ ohos_fuzztest("ServiceClientFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "service_client_fuzzer.cpp" ]
+  sources = [ "serviceclient_fuzzer.cpp" ]
   configs = []
 
   deps = [

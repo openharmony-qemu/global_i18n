@@ -24,7 +24,7 @@
 #include "accesstoken_kit.h"
 #include "token_setproc.h"
 #include "nativetoken_kit.h"
-#include "service_client_fuzzer.h"
+#include "serviceclient_fuzzer.h"
 #include <chrono>
 #include <thread>
 
