@@ -16,6 +16,6 @@
 #ifndef GLOBAL_I18N_SERVICE_CLIENT_FUZZER_H
 #define GLOBAL_I18N_SERVICE_CLIENT_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "service_client_fuzzer"
+#define FUZZ_PROJECT_NAME "serviceclient_fuzzer"
 
 #endif // GLOBAL_I18N_SERVICE_CLIENT_FUZZER_H
