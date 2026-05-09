@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -461,8 +461,6 @@ ani_status I18nSymbolDateTimeFormatAddon::BindContextSymbolDateTimeFormat(ani_en
             reinterpret_cast<void *>(I18nSymbolDateTimeFormatAddon::ToString) },
         ani_native_function { "resolvedOptions", nullptr,
             reinterpret_cast<void *>(I18nSymbolDateTimeFormatAddon::ResolvedOptions) },
-        ani_native_function { "parse", nullptr,
-            reinterpret_cast<void *>(I18nSymbolDateTimeFormatAddon::Parse) },
     };
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
         HILOG_ERROR_I18N("BindContextSymbolDateTimeFormat: Cannot bind native methods to '%{public}s'", className);
@@ -491,44 +489,6 @@ bool I18nSymbolDateTimeFormatAddon::IsSymbolDateTimeFormat(ani_env *env, ani_obj
 std::shared_ptr<SymbolDateTimeFormat> I18nSymbolDateTimeFormatAddon::GetDateTimeFormat()
 {
     return symbolDateTimeFormat_;
-}
-
-ani_long I18nSymbolDateTimeFormatAddon::Parse(ani_env *env, ani_object object, ani_string text,
-    ani_boolean lenientMode)
-{
-    // Step 1: Unwrap object - ANI internal failure: log only
-    I18nSymbolDateTimeFormatAddon* obj = UnwrapAddon(env, object);
-    if (obj == nullptr) {
-        HILOG_ERROR_I18N("I18nSymbolDateTimeFormatAddon::Parse: UnwrapAddon failed.");
-        return 0;
-    }
-    if (obj->symbolDateTimeFormat_ == nullptr) {
-        HILOG_ERROR_I18N("I18nSymbolDateTimeFormatAddon::Parse: symbolDateTimeFormat_ is nullptr.");
-        return 0;
-    }
-
-    // Step 2: Convert text - ANI internal failure: log only
-    std::string textStr = VariableConverter::AniStrToString(env, text);
-
-    // Step 3: Call framework and handle different error codes
-    I18nErrorCode status = I18nErrorCode::SUCCESS;
-    double result = obj->symbolDateTimeFormat_->Parse(textStr, lenientMode, status);
-
-    // System error (FAILED) - log only, NO error code thrown
-    if (status == I18nErrorCode::FAILED) {
-        HILOG_ERROR_I18N("I18nSymbolDateTimeFormatAddon::Parse: Framework returned FAILED (system error).");
-        return 0;
-    }
-
-    // Input error (INVALID_PARAM) - throw declared error code 8900001
-    if (status == I18nErrorCode::INVALID_PARAM) {
-        ErrorUtil::AniThrow(env, I18N_NOT_VALID_NEW, "text", "a valid localized date string");
-        return 0;
-    }
-
-    // Step 4: Return value type conversion - interface defines 'long'
-    // Framework returns double (UDate), convert to ani_long per interface definition
-    return static_cast<ani_long>(result);
 }
 } // namespace I18n
 } // namespace Global

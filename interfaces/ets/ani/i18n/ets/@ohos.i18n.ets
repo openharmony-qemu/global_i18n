@@ -836,7 +836,6 @@ namespace i18n {
         native formatRangeToPartsImpl(startDate: double, endDate: double): Intl.DateTimeRangeFormatPart[];
         native toString(): string;
         native resolvedOptions(): i18n.ResolvedSymbolDateTimeFormatOptions;
-        native parse(text: string, lenientMode: boolean): long;
 
         format(date?: Date | double): string {
             if (date instanceof Date) {

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -257,7 +257,7 @@ HWTEST_F(DateTimeFormatTest, DateTimeFormatFuncTest007, TestSize.Level1)
     std::shared_ptr<SimpleDateTimeFormat> simpleFormatter =
         std::make_shared<SimpleDateTimeFormat>("y'年'M'月'dhmsazEG", "zh-Hans-CN", true, errCode);
     EXPECT_EQ(errCode, I18nErrorCode::SUCCESS);
-
+    
     std::shared_ptr<StyledDateTimeFormat> formatter
         = std::make_shared<StyledDateTimeFormat>(simpleFormatter);
     double date = 1761984846000;
@@ -293,7 +293,7 @@ HWTEST_F(DateTimeFormatTest, DateTimeFormatFuncTest008, TestSize.Level1)
     std::shared_ptr<IntlDateTimeFormat> intlDateFormatter =
         std::make_shared<IntlDateTimeFormat>(localeTags, configs, errMessage);
     EXPECT_EQ(errMessage, "");
-
+    
     std::shared_ptr<StyledDateTimeFormat> formatter
         = std::make_shared<StyledDateTimeFormat>(intlDateFormatter);
     double date = 1761984846000;
@@ -339,7 +339,7 @@ HWTEST_F(DateTimeFormatTest, DateTimeFormatFuncTest009, TestSize.Level1)
     auto parts = symbolDateFormatter->FormatToParts(pmDate, errMessage);
     EXPECT_EQ(errMessage, "");
     EXPECT_EQ(parts.size(), 5);
-
+    
     std::unordered_map<std::string, std::string> options;
     symbolDateFormatter->ResolvedOptions(options);
     EXPECT_EQ(options["am"], "am");
@@ -410,7 +410,7 @@ HWTEST_F(DateTimeFormatTest, DateTimeFormatFuncTest011, TestSize.Level1)
     std::shared_ptr<SymbolDateTimeFormat> symbolDateFormatter =
         std::make_shared<SymbolDateTimeFormat>(localeTags, configs, errMessage);
     EXPECT_EQ(errMessage, "");
-
+    
     std::shared_ptr<StyledDateTimeFormat> formatter
         = std::make_shared<StyledDateTimeFormat>(symbolDateFormatter);
     double date = 1761984846000;
@@ -423,86 +423,6 @@ HWTEST_F(DateTimeFormatTest, DateTimeFormatFuncTest011, TestSize.Level1)
     EXPECT_EQ(result.second[1].GetPartName(), "literal");
     EXPECT_EQ(result.second[1].GetStart(), 2);
     EXPECT_EQ(result.second[1].GetLength(), 1);
-}
-
-/**
- * @tc.name: DateTimeFormatFuncTest012
- * @tc.desc: Test SymbolDateTimeFormat Parse with valid date string
- * @tc.type: FUNC
- */
-HWTEST_F(DateTimeFormatTest, DateTimeFormatFuncTest012, TestSize.Level1)
-{
-    std::vector<std::string> localeTags = { "zh-Hans-CN" };
-    std::unordered_map<std::string, std::string> configs;
-    std::string errMessage;
-    std::unique_ptr<SymbolDateTimeFormat> symbolDateTimeFormat =
-        std::make_unique<SymbolDateTimeFormat>(localeTags, configs, errMessage);
-    EXPECT_EQ(errMessage, "");
-
-    I18nErrorCode status = I18nErrorCode::SUCCESS;
-    double result = symbolDateTimeFormat->Parse("1970/1/12", false, status);
-    EXPECT_EQ(status, I18nErrorCode::SUCCESS);
-    EXPECT_NEAR(result, 921600000, 1000);
-}
-
-/**
- * @tc.name: DateTimeFormatFuncTest013
- * @tc.desc: Test SymbolDateTimeFormat Parse with invalid date string
- * @tc.type: FUNC
- */
-HWTEST_F(DateTimeFormatTest, DateTimeFormatFuncTest013, TestSize.Level1)
-{
-    std::vector<std::string> localeTags = { "zh-Hans-CN" };
-    std::unordered_map<std::string, std::string> configs;
-    std::string errMessage;
-    std::unique_ptr<SymbolDateTimeFormat> symbolDateTimeFormat =
-        std::make_unique<SymbolDateTimeFormat>(localeTags, configs, errMessage);
-    EXPECT_EQ(errMessage, "");
-
-    I18nErrorCode status = I18nErrorCode::SUCCESS;
-    double result = symbolDateTimeFormat->Parse("invalid-date", false, status);
-    EXPECT_EQ(status, I18nErrorCode::INVALID_PARAM);
-    EXPECT_EQ(result, 0);
-}
-
-/**
- * @tc.name: DateTimeFormatFuncTest014
- * @tc.desc: Test SymbolDateTimeFormat Parse with lenient mode
- * @tc.type: FUNC
- */
-HWTEST_F(DateTimeFormatTest, DateTimeFormatFuncTest014, TestSize.Level1)
-{
-    std::vector<std::string> localeTags = { "en-US" };
-    std::unordered_map<std::string, std::string> configs;
-    std::string errMessage;
-    std::unique_ptr<SymbolDateTimeFormat> symbolDateTimeFormat =
-        std::make_unique<SymbolDateTimeFormat>(localeTags, configs, errMessage);
-    EXPECT_EQ(errMessage, "");
-
-    I18nErrorCode status = I18nErrorCode::SUCCESS;
-    double result = symbolDateTimeFormat->Parse("1/12/70", true, status);
-    EXPECT_EQ(status, I18nErrorCode::SUCCESS);
-    EXPECT_NEAR(result, 921600000, 1000);
-}
-
-/**
- * @tc.name: DateTimeFormatFuncTest015
- * @tc.desc: Test SymbolDateTimeFormat Parse with empty string
- * @tc.type: FUNC
- */
-HWTEST_F(DateTimeFormatTest, DateTimeFormatFuncTest015, TestSize.Level1)
-{
-    std::vector<std::string> localeTags = { "zh-Hans-CN" };
-    std::unordered_map<std::string, std::string> configs;
-    std::string errMessage;
-    std::unique_ptr<SymbolDateTimeFormat> symbolDateTimeFormat =
-        std::make_unique<SymbolDateTimeFormat>(localeTags, configs, errMessage);
-    EXPECT_EQ(errMessage, "");
-
-    I18nErrorCode status = I18nErrorCode::SUCCESS;
-    double result = symbolDateTimeFormat->Parse("", false, status);
-    EXPECT_EQ(status, I18nErrorCode::INVALID_PARAM);
-    EXPECT_EQ(result, 0);
 }
 } // namespace I18n
 } // namespace Global
