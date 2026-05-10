@@ -19,6 +19,7 @@
 #include "number_format.h"
 #include "simple_number_format.h"
 #include "styled_number_format.h"
+#include "symbol_number_format.h"
 #include "unicode/locid.h"
 #include "utils.h"
 

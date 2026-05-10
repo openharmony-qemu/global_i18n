@@ -940,6 +940,7 @@ namespace i18n {
     
         native toString(): string;
         native resolvedOptions(): i18n.ResolvedSymbolNumberFormatOptions;
+        native parse(text: string, lenientMode: boolean): double;
 
         format(value: double): string {
             return this.formatDoubleImpl(value);

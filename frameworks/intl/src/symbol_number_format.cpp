@@ -53,9 +53,21 @@ SymbolNumberFormat::SymbolNumberFormat(const std::vector<std::string>& localeTag
     ResolvedNumberSymbols(symbols);
     auto iter = symbols.find(PLUS_SYMBOL_TAG);
     pulsSign = (iter == symbols.end()) ? "+" : iter->second;
+    UErrorCode icuStatus = U_ZERO_ERROR;
+    numberFormatForParse_ = icu::NumberFormat::createInstance(locale, UNumberFormatStyle::UNUM_DECIMAL, icuStatus);
+    if (U_FAILURE(icuStatus) || numberFormatForParse_ == nullptr) {
+        HILOG_ERROR_I18N("SymbolNumberFormat: Create numberFormatForParse_, code is %{public}s.",
+            u_errorName(icuStatus));
+    }
 }
 
-SymbolNumberFormat::~SymbolNumberFormat() {}
+SymbolNumberFormat::~SymbolNumberFormat()
+{
+    if (numberFormatForParse_ != nullptr) {
+        delete numberFormatForParse_;
+        numberFormatForParse_ = nullptr;
+    }
+}
 
 NumberFormatParts SymbolNumberFormat::FormatToPartsDouble(double value)
 {
@@ -158,6 +170,51 @@ icu::Formattable SymbolNumberFormat::StrToFormattable(const std::string& value)
         HILOG_ERROR_I18N("SymbolNumberFormat::StrToFormattable: Create icu::Formattable failed.");
         return icu::Formattable();
     }
+    return result;
+}
+
+double SymbolNumberFormat::Parse(const std::string& text, bool lenientMode, I18nErrorCode& status)
+{
+    if (numberFormatForParse_ == nullptr) {
+        HILOG_ERROR_I18N("SymbolNumberFormat::Parse: numberFormatForParse_ is nullptr.");
+        return 0;
+    }
+    if (text.empty()) {
+        HILOG_ERROR_I18N("SymbolNumberFormat::Parse: text is empty.");
+        status = I18nErrorCode::INVALID_PARAM;
+        return 0;
+    }
+    numberFormatForParse_->setLenient(lenientMode);
+    icu::UnicodeString unicodeText = icu::UnicodeString::fromUTF8(text);
+    icu::ParsePosition parsePos(0);
+    icu::Formattable formattable;
+    numberFormatForParse_->parse(unicodeText, formattable, parsePos);
+    if (parsePos.getErrorIndex() != -1) {
+        HILOG_ERROR_I18N("SymbolNumberFormat::Parse: Parse failed for %{public}s, error index: %{public}d.",
+            text.c_str(), parsePos.getErrorIndex());
+        status = I18nErrorCode::INVALID_PARAM;
+        return 0;
+    }
+    if (!formattable.isNumeric()) {
+        HILOG_ERROR_I18N("SymbolNumberFormat::Parse: formattable is not numeric.");
+        return 0;
+    }
+    auto type = formattable.getType();
+    double result = 0;
+    switch (type) {
+        case icu::Formattable::Type::kLong:
+            result = static_cast<double>(formattable.getLong());
+            break;
+        case icu::Formattable::Type::kInt64 :
+            result = static_cast<double>(formattable.getInt64());
+            break;
+        case icu::Formattable::Type::kDouble:
+            result = static_cast<double>(formattable.getDouble());
+            break;
+        default:
+            HILOG_ERROR_I18N("SymbolNumberFormat::Parse: Get data failed.");
+    }
+    status = I18nErrorCode::SUCCESS;
     return result;
 }
 } // namespace I18n

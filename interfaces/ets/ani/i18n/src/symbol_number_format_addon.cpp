@@ -288,6 +288,32 @@ ani_object I18nSymbolNumberFormatAddon::ResolvedOptions(ani_env *env, ani_object
     return CreateResolvedOptions(env, options);
 }
 
+ani_double I18nSymbolNumberFormatAddon::Parse(ani_env *env, ani_object object, ani_string text,
+    ani_boolean lenientMode)
+{
+    I18nSymbolNumberFormatAddon* obj = UnwrapAddon(env, object);
+    if (obj == nullptr) {
+        HILOG_ERROR_I18N("I18nSymbolNumberFormatAddon::Parse: UnwrapAddon failed.");
+        return 0;
+    }
+    if (obj->symbolNumberFormat_ == nullptr) {
+        HILOG_ERROR_I18N("I18nSymbolNumberFormatAddon::Parse: symbolNumberFormat_ is nullptr.");
+        return 0;
+    }
+    std::string textStr = VariableConverter::AniStrToString(env, text);
+    I18nErrorCode status = I18nErrorCode::SUCCESS;
+    double result = obj->symbolNumberFormat_->Parse(textStr, lenientMode, status);
+    if (status == I18nErrorCode::FAILED) {
+        HILOG_ERROR_I18N("I18nSymbolNumberFormatAddon::Parse: Framework returned FAILED (system error).");
+        return 0;
+    }
+    if (status == I18nErrorCode::INVALID_PARAM) {
+        ErrorUtil::AniThrow(env, I18N_NOT_VALID_NEW, "text", "a valid localized number string");
+        return 0;
+    }
+    return result;
+}
+
 ani_string I18nSymbolNumberFormatAddon::ToString(ani_env *env, [[maybe_unused]] ani_object object)
 {
     return VariableConverter::StringToAniStr(env, "[object i18n.SymbolNumberFormat]");
@@ -469,6 +495,7 @@ ani_status I18nSymbolNumberFormatAddon::BindContextSymbolNumberFormat(ani_env *e
             reinterpret_cast<void *>(I18nSymbolNumberFormatAddon::FormatToRangePartsDecStrDecStrImpl) },
         ani_native_function { "resolvedOptions", nullptr,
             reinterpret_cast<void *>(I18nSymbolNumberFormatAddon::ResolvedOptions) },
+        ani_native_function { "parse", nullptr, reinterpret_cast<void *>(I18nSymbolNumberFormatAddon::Parse) },
         ani_native_function { "toString", nullptr, reinterpret_cast<void *>(I18nSymbolNumberFormatAddon::ToString) },
     };
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {

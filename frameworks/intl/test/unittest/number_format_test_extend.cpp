@@ -967,6 +967,90 @@ HWTEST_F(NumberFormatTest, NumberFormatFuncTest0075, TestSize.Level1)
     StyledNumberFormat formatter(symbolNumberFormat);
     EXPECT_EQ(formatter.Format(-123456), "--123/456 days");
 }
+
+/**
+ * @tc.name: NumberFormatFuncTest0076
+ * @tc.desc: Test SymbolNumberFormat.Parse with valid input
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0076, TestSize.Level1)
+{
+    string locale = "en-US";
+    vector<string> locales{locale};
+    map<string, string> options;
+    string errMessage;
+    int32_t code = 0;
+    std::unique_ptr<SymbolNumberFormat> formatter =
+        std::make_unique<SymbolNumberFormat>(locales, options, errMessage, code);
+    ASSERT_TRUE(formatter != nullptr);
+    I18nErrorCode status = I18nErrorCode::SUCCESS;
+    double result = formatter->Parse("123,456", false, status);
+    EXPECT_EQ(status, I18nErrorCode::SUCCESS);
+    EXPECT_EQ(result, 123456);
+}
+
+/**
+ * @tc.name: NumberFormatFuncTest0077
+ * @tc.desc: Test SymbolNumberFormat.Parse with lenientMode true
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0077, TestSize.Level1)
+{
+    string locale = "en-US";
+    vector<string> locales{locale};
+    map<string, string> options;
+    string errMessage;
+    int32_t code = 0;
+    std::unique_ptr<SymbolNumberFormat> formatter =
+        std::make_unique<SymbolNumberFormat>(locales, options, errMessage, code);
+    ASSERT_TRUE(formatter != nullptr);
+    I18nErrorCode status = I18nErrorCode::SUCCESS;
+    double result = formatter->Parse("1,23,456", true, status);
+    EXPECT_EQ(status, I18nErrorCode::SUCCESS);
+    EXPECT_EQ(result, 123456);
+}
+
+/**
+ * @tc.name: NumberFormatFuncTest0078
+ * @tc.desc: Test SymbolNumberFormat.Parse with empty string
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0078, TestSize.Level1)
+{
+    string locale = "en-US";
+    vector<string> locales{locale};
+    map<string, string> options;
+    string errMessage;
+    int32_t code = 0;
+    std::unique_ptr<SymbolNumberFormat> formatter =
+        std::make_unique<SymbolNumberFormat>(locales, options, errMessage, code);
+    ASSERT_TRUE(formatter != nullptr);
+    I18nErrorCode status = I18nErrorCode::SUCCESS;
+    double result = formatter->Parse("", false, status);
+    EXPECT_EQ(status, I18nErrorCode::INVALID_PARAM);
+    EXPECT_EQ(result, 0);
+}
+
+/**
+ * @tc.name: NumberFormatFuncTest0079
+ * @tc.desc: Test SymbolNumberFormat.Parse with invalid format and lenientMode false
+ * @tc.type: FUNC
+ */
+HWTEST_F(NumberFormatTest, NumberFormatFuncTest0079, TestSize.Level1)
+{
+    string locale = "en-US";
+    vector<string> locales{locale};
+    map<string, string> options;
+    string errMessage;
+    int32_t code = 0;
+    std::unique_ptr<SymbolNumberFormat> formatter =
+        std::make_unique<SymbolNumberFormat>(locales, options, errMessage, code);
+    ASSERT_TRUE(formatter != nullptr);
+    I18nErrorCode status = I18nErrorCode::SUCCESS;
+    double result = formatter->Parse("1,23,456", false, status);
+    EXPECT_EQ(status, I18nErrorCode::INVALID_PARAM);
+    EXPECT_EQ(result, 0);
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

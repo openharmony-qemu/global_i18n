@@ -60,6 +60,7 @@ napi_value SymbolNumberFormatAddon::InitSymbolNumberFormat(napi_env env, napi_va
         DECLARE_NAPI_FUNCTION("formatToParts", FormatToParts),
         DECLARE_NAPI_FUNCTION("formatRange", FormatRange),
         DECLARE_NAPI_FUNCTION("formatRangeToParts", FormatRangeToParts),
+        DECLARE_NAPI_FUNCTION("parse", Parse),
         DECLARE_NAPI_FUNCTION("toString", ToString),
         DECLARE_NAPI_FUNCTION("resolvedOptions", ResolvedOptions),
     };
@@ -464,6 +465,111 @@ napi_status SymbolNumberFormatAddon::UnwrapNumberFormat(napi_env env, napi_value
     SymbolNumberFormatAddon** numberFormat)
 {
     return napi_unwrap_s(env, value, &TYPE_TAG, reinterpret_cast<void **>(numberFormat));
+}
+
+namespace {
+constexpr int32_t MIN_PARSE_PARAMS = 2;  // text and lenientMode
+}
+
+bool SymbolNumberFormatAddon::GetParseParams(napi_env env, napi_callback_info info,
+    std::string& text, bool& lenientMode, napi_value& thisVar)
+{
+    size_t argc = MIN_PARSE_PARAMS;
+    napi_value argv[MIN_PARSE_PARAMS] = { nullptr };
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("GetParseParams: napi_get_cb_info failed, status: %{public}d", status);
+        return false;
+    }
+    if (argc < MIN_PARSE_PARAMS) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "text or lenientMode", "", true);
+        return false;
+    }
+    
+    napi_valuetype valueType = napi_undefined;
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("GetParseParams: napi_typeof text failed, status: %{public}d", status);
+        return false;
+    }
+    if (valueType != napi_string) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "text", "string", true);
+        return false;
+    }
+    
+    int32_t code = 0;
+    text = VariableConvertor::GetString(env, argv[0], code);
+    if (code != 0) {
+        HILOG_ERROR_I18N("GetParseParams: GetString failed, code: %{public}d", code);
+        return false;
+    }
+    
+    status = napi_typeof(env, argv[1], &valueType);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("GetParseParams: napi_typeof lenientMode failed, status: %{public}d", status);
+        return false;
+    }
+    if (valueType != napi_boolean) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "lenientMode", "boolean", true);
+        return false;
+    }
+    
+    status = napi_get_value_bool(env, argv[1], &lenientMode);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("GetParseParams: napi_get_value_bool failed, status: %{public}d", status);
+        return false;
+    }
+    
+    return true;
+}
+
+bool SymbolNumberFormatAddon::UnwrapParseObject(napi_env env, napi_value thisVar,
+    SymbolNumberFormatAddon*& obj)
+{
+    napi_status status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
+    if (status != napi_ok || !obj || !obj->symbolNumberFormat_) {
+        HILOG_ERROR_I18N("UnwrapParseObject: unwrap failed, status: %{public}d", status);
+        return false;
+    }
+    return true;
+}
+
+bool SymbolNumberFormatAddon::HandleParseResult(napi_env env, I18nErrorCode errCode)
+{
+    if (errCode == I18nErrorCode::FAILED) {
+        HILOG_ERROR_I18N("HandleParseResult: Framework returned FAILED (system error).");
+        return false;
+    }
+    if (errCode == I18nErrorCode::INVALID_PARAM) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_VALID_NEW, "text", "a valid localized number string", true);
+        return false;
+    }
+    return true;
+}
+
+napi_value SymbolNumberFormatAddon::Parse(napi_env env, napi_callback_info info)
+{
+    std::string text;
+    bool lenientMode = false;
+    napi_value thisVar = nullptr;
+    
+    if (!GetParseParams(env, info, text, lenientMode, thisVar)) {
+        return VariableConvertor::CreateDoubleValue(env, 0);
+    }
+    
+    SymbolNumberFormatAddon* obj = nullptr;
+    if (!UnwrapParseObject(env, thisVar, obj)) {
+        return VariableConvertor::CreateDoubleValue(env, 0);
+    }
+    
+    I18nErrorCode errCode = I18nErrorCode::SUCCESS;
+    double result = obj->symbolNumberFormat_->Parse(text, lenientMode, errCode);
+    
+    if (!HandleParseResult(env, errCode)) {
+        return VariableConvertor::CreateDoubleValue(env, 0);
+    }
+    
+    return VariableConvertor::CreateDoubleValue(env, result);
 }
 } // namespace I18n
 } // namespace Global

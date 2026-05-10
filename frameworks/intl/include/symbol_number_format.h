@@ -38,6 +38,7 @@ public:
     NumberFormatParts FormatToRangePartsDecStrDecStr(const std::string& start, const std::string& end);
 
     void ResolvedOptions(std::map<std::string, std::string>& options);
+    double Parse(const std::string& text, bool lenientMode, I18nErrorCode& status);
 
     static const std::string GROUPING_SYMBOL_TAG;
     static const std::string INFINITY_SYMBOL_TAG;
@@ -52,6 +53,7 @@ private:
     icu::Formattable StrToFormattable(const std::string& value);
 
     std::string pulsSign;
+    icu::NumberFormat* numberFormatForParse_ = nullptr;
 };
 } // namespace I18n
 } // namespace Global
