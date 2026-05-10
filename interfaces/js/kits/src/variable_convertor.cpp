@@ -254,6 +254,17 @@ napi_value VariableConvertor::CreateInt64Value(napi_env env, int64_t value)
     return result;
 }
 
+napi_value VariableConvertor::CreateDoubleValue(napi_env env, double value)
+{
+    napi_value result = nullptr;
+    napi_status status = napi_create_double(env, value, &result);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("VariableConvertor::CreateDoubleValue: napi_create_double failed, status: %{public}d", status);
+        return nullptr;
+    }
+    return result;
+}
+
 napi_value VariableConvertor::CreateBoolean(napi_env env, bool flag)
 {
     napi_value result = nullptr;
