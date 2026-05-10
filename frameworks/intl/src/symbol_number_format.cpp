@@ -173,7 +173,8 @@ icu::Formattable SymbolNumberFormat::StrToFormattable(const std::string& value)
     return result;
 }
 
-double SymbolNumberFormat::Parse(const std::string& text, bool lenientMode, I18nErrorCode& status) {
+double SymbolNumberFormat::Parse(const std::string& text, bool lenientMode, I18nErrorCode& status)
+{
     if (numberFormatForParse_ == nullptr) {
         HILOG_ERROR_I18N("SymbolNumberFormat::Parse: numberFormatForParse_ is nullptr.");
         return 0;
