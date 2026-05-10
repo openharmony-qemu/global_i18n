@@ -60,6 +60,7 @@ napi_value SymbolNumberFormatAddon::InitSymbolNumberFormat(napi_env env, napi_va
         DECLARE_NAPI_FUNCTION("formatToParts", FormatToParts),
         DECLARE_NAPI_FUNCTION("formatRange", FormatRange),
         DECLARE_NAPI_FUNCTION("formatRangeToParts", FormatRangeToParts),
+        DECLARE_NAPI_FUNCTION("parse", Parse),
         DECLARE_NAPI_FUNCTION("toString", ToString),
         DECLARE_NAPI_FUNCTION("resolvedOptions", ResolvedOptions),
     };
