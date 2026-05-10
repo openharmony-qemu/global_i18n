@@ -44,6 +44,7 @@ public:
     static napi_value CreateString(napi_env env, const std::string &str);
     static napi_value CreateNumber(napi_env env, const int32_t &num);
     static napi_value CreateInt64Value(napi_env env, int64_t value);
+    static napi_value CreateDoubleValue(napi_env env, double value);
     static napi_value CreateBoolean(napi_env env, bool flag);
     static void VerifyType(napi_env env, const std::string& valueName, napi_valuetype napiType, napi_value argv);
     static napi_status SetEnumValue(napi_env env, napi_value enumObj, const std::string& enumName, int32_t enumVal);
