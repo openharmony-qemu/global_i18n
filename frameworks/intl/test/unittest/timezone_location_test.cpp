@@ -17,7 +17,6 @@
 #include <sys/stat.h>
 #include "i18n_timezone.h"
 #include "timezone_location_test.h"
-#include "timezone_location.h"
 
 using namespace OHOS::Global::I18n;
 using testing::ext::TestSize;
@@ -711,6 +710,10 @@ HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0001, TestSize.Level1)
             printf("size not equals at line: %d\r\n", (index+31));
         }
         for (unsigned int i = 0; i < tz.size(); i++) {
+            if (i >= expects.size()) {
+                printf("at line: %d, tzid: %s, tzSize:%d\r\n", (index+31), tz[i].c_str(), tz.size());
+                break;
+            }
             EXPECT_EQ(tz[i], expects[i]);
             if (tz[i] != expects[i]) {
                 printf("at line: %d\r\n", (index+31));
@@ -766,51 +769,52 @@ HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0002, TestSize.Level1)
  */
 HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0003, TestSize.Level1)
 {
-    std::unique_ptr<TimeZoneLocation> tzLoc = std::make_unique<TimeZoneLocation>();
-    std::vector<std::string> tzIdList = tzLoc->GetTimezoneByLocation(106.58314, 22.46933);
-    tzLoc->GetTimezoneByLocation(106.7917876, 22.82248);
-    EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
-    tzIdList = tzLoc->GetTimezoneByLocation(106.726289, 22.85502);
-    EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
-    tzIdList = tzLoc->GetTimezoneByLocation(106.8472477, 22.83867);
-    EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
-    tzIdList = tzLoc->GetTimezoneByLocation(126.897702, 41.798380);
-    EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
+    std::vector<std::string> tzIdList = I18nTimeZone::GetTimezoneIdByLocation(106.58314, 22.46933);
+    EXPECT_EQ(tzIdList.size(), 1);
+    EXPECT_EQ(tzIdList[0], "Asia/Bangkok");
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(106.7917876, 22.82248);
+    EXPECT_EQ(tzIdList.size(), 1);
+    EXPECT_EQ(tzIdList[0], "Asia/Bangkok");
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(106.726289, 22.85502);
+    EXPECT_EQ(tzIdList.size(), 1);
+    EXPECT_EQ(tzIdList[0], "Asia/Bangkok");
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(106.8472477, 22.83867);
+    EXPECT_EQ(tzIdList.size(), 1);
+    EXPECT_EQ(tzIdList[0], "Asia/Bangkok");
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(126.897702, 41.798380);
+    EXPECT_EQ(tzIdList.size(), 1);
+    EXPECT_EQ(tzIdList[0], "Asia/Pyongyang");
     printf("==================china and India=========== \r\n");
-    tzIdList = tzLoc->GetTimezoneByLocation(92.36, 27.11);
-    EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
-    tzIdList = tzLoc->GetTimezoneByLocation(93.80, 27.26);
-    EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
-    tzIdList = tzLoc->GetTimezoneByLocation(95.57, 28.90);
-    EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
-    tzIdList = tzLoc->GetTimezoneByLocation(95.91, 28.78);
-    EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
-    tzIdList = tzLoc->GetTimezoneByLocation(97.03, 28.75);
-    EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
-    tzIdList = tzLoc->GetTimezoneByLocation(80.15, 30.66);
-    EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
-    tzIdList = tzLoc->GetTimezoneByLocation(79.83, 30.90);
-    EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
-    tzIdList = tzLoc->GetTimezoneByLocation(79.03, 31.05);
-    EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
-    tzIdList = tzLoc->GetTimezoneByLocation(78.45, 32.15);
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(92.36, 27.11);
+    EXPECT_EQ(tzIdList.size(), 1);
     EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
-    tzIdList = tzLoc->GetTimezoneByLocation(79.38, 32.79);
-    EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
-    printf("==================china and Bhutan=========== \r\n");
-    tzIdList = tzLoc->GetTimezoneByLocation(89.00, 27.51);
-    EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
-    tzIdList = tzLoc->GetTimezoneByLocation(90.82, 28.05);
-    EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
-    tzIdList = tzLoc->GetTimezoneByLocation(88.90, 27.47);
-    EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
-    tzIdList = tzLoc->GetTimezoneByLocation(91.66, 27.79);
-    EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
-    tzIdList = tzLoc->GetTimezoneByLocation(89.09, 27.62);
-    EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
-    printf("==================Kyrgyzstan=========== \r\n");
-    tzIdList = tzLoc->GetTimezoneByLocation(72.16912, 41.1918);
-    EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Bishkek");
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(93.80, 27.26);
+    EXPECT_EQ(tzIdList.size(), 1);
+    EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(95.57, 28.90);
+    EXPECT_EQ(tzIdList.size(), 1);
+    EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(95.91, 28.78);
+    EXPECT_EQ(tzIdList.size(), 1);
+    EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(97.03, 28.75);
+    EXPECT_EQ(tzIdList.size(), 1);
+    EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(80.15, 30.66);
+    EXPECT_EQ(tzIdList.size(), 1);
+    EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(79.83, 30.90);
+    EXPECT_EQ(tzIdList.size(), 1);
+    EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(79.03, 31.05);
+    EXPECT_EQ(tzIdList.size(), 1);
+    EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(78.45, 32.15);
+    EXPECT_EQ(tzIdList.size(), 1);
+    EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(79.38, 32.79);
+    EXPECT_EQ(tzIdList.size(), 1);
+    EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
 }
 
 /**
@@ -820,26 +824,53 @@ HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0003, TestSize.Level1)
  */
 HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0004, TestSize.Level1)
 {
-    std::unique_ptr<TimeZoneLocation> tzLoc = std::make_unique<TimeZoneLocation>();
-    printf("==================nanhai area=========== \r\n");
-    std::vector<std::string> tzIdList = tzLoc->GetTimezoneByLocation(117.74, 15.18);
-    EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
-    tzIdList = tzLoc->GetTimezoneByLocation(116.57, 9.73);
-    EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
-    tzIdList = tzLoc->GetTimezoneByLocation(113.83, 7.38);
-    EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
-    tzIdList = tzLoc->GetTimezoneByLocation(113.23, 6.33);
+    printf("==================china and Bhutan=========== \r\n");
+    std::vector<std::string> tzIdList = I18nTimeZone::GetTimezoneIdByLocation(89.00, 27.51);
+    EXPECT_EQ(tzIdList.size(), 1);
     EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
-    tzIdList = tzLoc->GetTimezoneByLocation(116.81, 20.68);
-    EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(90.82, 28.05);
+    EXPECT_EQ(tzIdList.size(), 1);
+    EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(88.90, 27.47);
+    EXPECT_EQ(tzIdList.size(), 1);
+    EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(91.66, 27.79);
+    EXPECT_EQ(tzIdList.size(), 1);
+    EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(89.09, 27.62);
+    EXPECT_EQ(tzIdList.size(), 1);
+    EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
+    printf("==================Kyrgyzstan=========== \r\n");
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(72.16912, 41.1918);
+    EXPECT_EQ(tzIdList.size(), 1);
+    EXPECT_EQ(tzIdList[0], "Asia/Tashkent");
+    printf("==================nanhai area=========== \r\n");
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(117.74, 15.18);
+    EXPECT_EQ(tzIdList.size(), 1);
+    EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(116.57, 9.73);
+    EXPECT_EQ(tzIdList.size(), 1);
+    EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(113.83, 7.38);
+    EXPECT_EQ(tzIdList.size(), 1);
+    EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(113.23, 6.33);
+    EXPECT_EQ(tzIdList.size(), 1);
+    EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(116.81, 20.68);
+    EXPECT_EQ(tzIdList.size(), 1);
+    EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
     printf("==================Nantong Reef=========== \r\n");
-    tzIdList = tzLoc->GetTimezoneByLocation(113.240785, 6.33258);
-    EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(113.240785, 6.33258);
+    EXPECT_EQ(tzIdList.size(), 1);
+    EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
     printf("==================Diaoyu Islands=========== \r\n");
-    tzIdList = tzLoc->GetTimezoneByLocation(123.47, 25.74);
-    EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
-    tzIdList = tzLoc->GetTimezoneByLocation(123.54, 25.72);
-    EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Shanghai");
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(123.47, 25.74);
+    EXPECT_EQ(tzIdList.size(), 1);
+    EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(123.54, 25.72);
+    EXPECT_EQ(tzIdList.size(), 1);
+    EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
 }
 
 /**
@@ -849,39 +880,38 @@ HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0004, TestSize.Level1)
  */
 HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0005, TestSize.Level1)
 {
-    std::unique_ptr<TimeZoneLocation> tzLoc = std::make_unique<TimeZoneLocation>();
     std::vector<std::string> tzIdList;
     printf("==================oversea=========== \r\n");
-    tzIdList = tzLoc->GetTimezoneByLocation(35.14, 31.96);
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(35.14, 31.96);
     EXPECT_TRUE(tzIdList.size() == 2 && tzIdList[0] == "Asia/Jerusalem");
     EXPECT_TRUE(tzIdList.size() == 2 && tzIdList[1] == "Asia/Hebron");
-    tzIdList = tzLoc->GetTimezoneByLocation(35.20, 31.80);
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(35.20, 31.80);
     EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Jerusalem");
-    tzIdList = tzLoc->GetTimezoneByLocation(35.35, 32.35);
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(35.35, 32.35);
     EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Hebron");
-    tzIdList = tzLoc->GetTimezoneByLocation(34.10, 44.94);
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(34.10, 44.94);
     EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Europe/Simferopol");
-    tzIdList = tzLoc->GetTimezoneByLocation(33.52, 44.61);
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(33.52, 44.61);
     EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Europe/Simferopol");
-    tzIdList = tzLoc->GetTimezoneByLocation(-13.19, 27.15);
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(-13.19, 27.15);
     EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Africa/El_Aaiun");
-    tzIdList = tzLoc->GetTimezoneByLocation(21.15, 42.65);
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(21.15, 42.65);
     EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Europe/Belgrade");
-    tzIdList = tzLoc->GetTimezoneByLocation(21.43, 42.00);
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(21.43, 42.00);
     EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Europe/Skopje");
-    tzIdList = tzLoc->GetTimezoneByLocation(37.80, 48.01);
-    EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Europe/Kyiv");
-    tzIdList = tzLoc->GetTimezoneByLocation(39.30, 48.57);
-    EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Europe/Kyiv");
-    tzIdList = tzLoc->GetTimezoneByLocation(-59.79, -51.72);
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(37.80, 48.01);
+    EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Europe/Kiev");
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(39.30, 48.57);
+    EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Europe/Kiev");
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(-59.79, -51.72);
     EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Atlantic/Stanley");
-    tzIdList = tzLoc->GetTimezoneByLocation(147.79, 45.08);
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(147.79, 45.08);
     EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Magadan");
-    tzIdList = tzLoc->GetTimezoneByLocation(131.86, 37.24);
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(131.86, 37.24);
     EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Seoul");
-    tzIdList = tzLoc->GetTimezoneByLocation(33.34, 35.20);
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(33.34, 35.20);
     EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Famagusta");
-    tzIdList = tzLoc->GetTimezoneByLocation(32.81, 34.77);
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(32.81, 34.77);
     EXPECT_TRUE(tzIdList.size() == 1 && tzIdList[0] == "Asia/Nicosia");
 }
 
@@ -892,37 +922,36 @@ HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0005, TestSize.Level1)
  */
 HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0006, TestSize.Level1)
 {
-    std::unique_ptr<TimeZoneLocation> tzLoc = std::make_unique<TimeZoneLocation>();
     std::vector<std::string> tzIdList;
     printf("================China border nearby=========== \r\n");
-    tzIdList = tzLoc->GetTimezoneByLocation(134.274421, 45.171298);
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(134.274421, 45.171298);
     EXPECT_EQ(tzIdList[0], "Asia/Vladivostok");
-    tzIdList = tzLoc->GetTimezoneByLocation(128.134032, 53.553832);
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(128.134032, 53.553832);
     EXPECT_EQ(tzIdList[0], "Asia/Yakutsk");
-    tzIdList = tzLoc->GetTimezoneByLocation(117.155382, 51.463265);
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(117.155382, 51.463265);
     EXPECT_EQ(tzIdList[0], "Asia/Chita");
-    tzIdList = tzLoc->GetTimezoneByLocation(106.099319, 45.34427);
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(106.099319, 45.34427);
     EXPECT_EQ(tzIdList[0], "Asia/Ulaanbaatar");
-    tzIdList = tzLoc->GetTimezoneByLocation(90.737938, 48.422181);
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(90.737938, 48.422181);
     EXPECT_EQ(tzIdList[0], "Asia/Hovd");
-    tzIdList = tzLoc->GetTimezoneByLocation(87.479194, 50.141346);
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(87.479194, 50.141346);
     EXPECT_EQ(tzIdList[0], "Asia/Barnaul");
-    tzIdList = tzLoc->GetTimezoneByLocation(80.892381, 47.443379);
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(80.892381, 47.443379);
     EXPECT_EQ(tzIdList[0], "Asia/Almaty");
-    tzIdList = tzLoc->GetTimezoneByLocation(76.194132, 41.301241);
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(76.194132, 41.301241);
     EXPECT_EQ(tzIdList[0], "Asia/Bishkek");
-    tzIdList = tzLoc->GetTimezoneByLocation(74.341692, 38.200328);
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(74.341692, 38.200328);
     EXPECT_EQ(tzIdList[0], "Asia/Dushanbe");
-    tzIdList = tzLoc->GetTimezoneByLocation(72.765399, 35.498675);
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(72.765399, 35.498675);
     EXPECT_EQ(tzIdList[0], "Asia/Karachi");
     printf("================1 kilometer away from the China border=========== \r\n");
-    tzIdList = tzLoc->GetTimezoneByLocation(99.30555, 22.41134);
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(99.30555, 22.41134);
     EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
-    tzIdList = tzLoc->GetTimezoneByLocation(99.34955, 22.70645);
-    EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
-    tzIdList = tzLoc->GetTimezoneByLocation(73.92596, 39.92811);
-    EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
-    tzIdList = tzLoc->GetTimezoneByLocation(74.43203, 40.13523);
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(99.34955, 22.70645);
+    EXPECT_EQ(tzIdList[0], "Asia/Yangon");
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(73.92596, 39.92811);
+    EXPECT_EQ(tzIdList[0], "Asia/Bishkek");
+    tzIdList = I18nTimeZone::GetTimezoneIdByLocation(74.43203, 40.13523);
     EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
 }
 } // namespace I18n
