@@ -15,6 +15,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 #include "locale_config.h"
 #include "date_rule_init.h"
 #include "date_time_filter.h"
@@ -29,26 +30,28 @@ namespace OHOS {
         if (size < 1) {
             return false;
         }
-        std::string input(reinterpret_cast<const char*>(data), size);
+        FuzzedDataProvider provider(data, size);
+        std::string input = provider.ConsumeRandomLengthString();
         DateTimeRule* dateTimeRule = new DateTimeRule(input);
         DateTimeFilter* dateTimeFilter = new DateTimeFilter(input, dateTimeRule);
         std::vector<MatchedDateTimeInfo> matches;
         MatchedDateTimeInfo* matchedDateTimeInfo = new MatchedDateTimeInfo();
         matches.push_back(*matchedDateTimeInfo);
-        MatchedDateTimeInfo* matchedDateTimeInfo2 = new MatchedDateTimeInfo(size, size, input);
+        size_t newSize = provider.ConsumeIntegral<size_t>();
+        MatchedDateTimeInfo* matchedDateTimeInfo2 = new MatchedDateTimeInfo(newSize, newSize, input);
         std::vector<MatchedDateTimeInfo> clearMatches;
         clearMatches.push_back(*matchedDateTimeInfo2);
         icu::UnicodeString hyphen(input.c_str());
         dateTimeFilter->Filter(hyphen, matches, clearMatches, clearMatches);
-        matchedDateTimeInfo->SetIsTimePeriod(size & 1);
+        matchedDateTimeInfo->SetIsTimePeriod(newSize & 1);
         matchedDateTimeInfo->IsTimePeriod();
-        matchedDateTimeInfo->SetBegin(size);
+        matchedDateTimeInfo->SetBegin(newSize);
         matchedDateTimeInfo->GetBegin();
-        matchedDateTimeInfo->SetEnd(size);
+        matchedDateTimeInfo->SetEnd(newSize);
         matchedDateTimeInfo->GetEnd();
         matchedDateTimeInfo->GetRegex();
         matchedDateTimeInfo->GetType();
-        matchedDateTimeInfo->SetType(size);
+        matchedDateTimeInfo->SetType(newSize);
         bool flag = *matchedDateTimeInfo < *matchedDateTimeInfo2;
         DateTimeMatched* dateTimeMatched = new DateTimeMatched(input);
         icu::UnicodeString message(input.c_str());

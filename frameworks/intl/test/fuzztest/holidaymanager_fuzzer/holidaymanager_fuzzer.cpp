@@ -15,6 +15,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 #include "holiday_manager.h"
 #include "holidaymanager_fuzzer.h"
 
@@ -25,22 +26,24 @@ namespace OHOS {
         if (size < 1) {
             return false;
         }
-        std::string input(reinterpret_cast<const char*>(data), size);
+        FuzzedDataProvider provider(data, size);
+        std::string input = provider.ConsumeRandomLengthString();
+        size_t newSize = provider.ConsumeIntegral<size_t>();
         HolidayManager* holidayManager = new HolidayManager(input.c_str());
 
         std::map<std::string, std::vector<HolidayInfoItem>> holidayDataMap;
         std::vector<HolidayInfoItem> infoList;
         std::vector<HolidayLocalName> localNameList1;
         localNameList1.push_back({input, input});
-        HolidayInfoItem item1 = {input, size, size, size, localNameList1};
+        HolidayInfoItem item1 = {input, newSize, newSize, newSize, localNameList1};
         infoList.push_back(item1);
         holidayDataMap.insert({input, infoList});
         holidayManager->SetHolidayData(holidayDataMap);
 
         holidayManager->IsHoliday();
-        holidayManager->IsHoliday(size, size, size);
+        holidayManager->IsHoliday(newSize, newSize, newSize);
         holidayManager->GetHolidayInfoItemArray();
-        holidayManager->GetHolidayInfoItemArray(size);
+        holidayManager->GetHolidayInfoItemArray(newSize);
         delete holidayManager;
         return true;
     }
