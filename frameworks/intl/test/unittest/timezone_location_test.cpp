@@ -815,7 +815,6 @@ HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0003, TestSize.Level1)
     tzIdList = I18nTimeZone::GetTimezoneIdByLocation(79.38, 32.79);
     EXPECT_EQ(tzIdList.size(), 1);
     EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
-
 }
 
 /**
