@@ -18,7 +18,6 @@
 #include "advanced_measure_format_addon.h"
 #include "chinese_calendar_addon.h"
 #include "error_util.h"
-#include "histogram_helper.h"
 #include "i18n_hilog.h"
 #include "holiday_manager_addon.h"
 #include "entity_recognizer_addon.h"
@@ -261,7 +260,6 @@ napi_value I18nAddon::UnitConvert(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("UnitConvert: Failed to create string item");
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.I18NUtil.unitConvert.Count", true);
     return result;
 }
 
@@ -294,7 +292,6 @@ napi_value I18nAddon::GetDateOrder(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("GetDateOrder Failed to create string item");
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.I18NUtil.getDateOrder.Count", true);
     return result;
 }
 
@@ -333,7 +330,6 @@ napi_value I18nAddon::GetTimePeriodName(napi_env env, napi_callback_info info)
     name.toUTF8String(result);
     delete formatter;
     delete calendar;
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.I18NUtil.getTimePeriodName.Count", true);
     return VariableConvertor::CreateString(env, result);
 }
 
@@ -480,7 +476,6 @@ napi_value I18nAddon::GetBestMatchLocale(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("Create format stirng failed.");
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.I18NUtil.getBestMatchLocale.Count", true);
     return result;
 }
 
@@ -525,7 +520,6 @@ napi_value I18nAddon::GetThreeLetterLanguage(napi_env env, napi_callback_info in
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "locale", "a valid locale", true);
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.I18NUtil.getThreeLetterLanguage.Count", true);
     return result;
 }
 
@@ -570,7 +564,6 @@ napi_value I18nAddon::GetThreeLetterRegion(napi_env env, napi_callback_info info
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "locale", "a valid locale", true);
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.I18NUtil.getThreeLetterRegion.Count", true);
     return result;
 }
 
@@ -607,7 +600,6 @@ napi_value I18nAddon::ConvertCanonicalLocaleIdentifier(napi_env env, napi_callba
     }
 
     std::string canonicalLocale = OHOS::Global::I18n::ConvertCanonicalLocaleIdentifier(localeTag);
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.I18NUtil.convertCanonicalLocaleIdentifier.Count", true);
     return VariableConvertor::CreateString(env, canonicalLocale);
 }
 
@@ -988,7 +980,6 @@ napi_value I18nAddon::SetUnicodeWrappedBidiDirection(napi_env env, napi_callback
         HILOG_ERROR_I18N("SetUnicodeWrappedBidiDirection: Create string value failed");
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.I18NUtil.setUnicodeWrappedBidiDirection.Count", true);
     return result;
 }
 
@@ -1370,7 +1361,6 @@ napi_value I18nAddon::InitBreakIterator(napi_env env, napi_value exports)
 
 napi_value I18nAddon::GetLineInstance(napi_env env, napi_callback_info info)
 {
-    ApiMetrics metrics;
     size_t argc = 1;
     napi_value argv[1] = { nullptr };
     napi_value thisVar = nullptr;
@@ -1397,8 +1387,6 @@ napi_value I18nAddon::GetLineInstance(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("GetLineInstance create instance failed");
         return nullptr;
     }
-    metrics.RecordTime("LocalizationKit.i18n.getLineInstance.Time");
-    metrics.RecordBoolean("LocalizationKit.i18n.getLineInstance.Count", true);
     return result;
 }
 
@@ -1425,7 +1413,6 @@ napi_value I18nAddon::Current(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("Current: Create int32_t value failed");
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.BreakIterator.current.Count", true);
     return result;
 }
 
@@ -1452,7 +1439,6 @@ napi_value I18nAddon::First(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("First: Create int32_t value failed");
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.BreakIterator.first.Count", true);
     return result;
 }
 
@@ -1479,7 +1465,6 @@ napi_value I18nAddon::Last(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("Last: Create int32_t value failed");
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.BreakIterator.last.Count", true);
     return result;
 }
 
@@ -1506,7 +1491,6 @@ napi_value I18nAddon::Previous(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("Previous: Create int32_t value failed");
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.BreakIterator.previous.Count", true);
     return result;
 }
 
@@ -1550,7 +1534,6 @@ napi_value I18nAddon::Next(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("Next: Create int32_t value failed");
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.BreakIterator.next.Count", true);
     return result;
 }
 
@@ -1595,7 +1578,6 @@ napi_value I18nAddon::SetText(napi_env env, napi_callback_info info)
         return nullptr;
     }
     obj->brkiter_->SetText(buf.data());
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.BreakIterator.setLineBreakText.Count", true);
     return nullptr;
 }
 
@@ -1623,7 +1605,6 @@ napi_value I18nAddon::GetText(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("GetText: Get field length failed");
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.BreakIterator.getLineBreakText.Count", true);
     return value;
 }
 
@@ -1668,7 +1649,6 @@ napi_value I18nAddon::Following(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("Following: Create int32_t value failed");
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.BreakIterator.following.Count", true);
     return result;
 }
 
@@ -1713,7 +1693,6 @@ napi_value I18nAddon::IsBoundary(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("IsBoundary: Create boolean failed");
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.BreakIterator.isBoundary.Count", true);
     return result;
 }
 

@@ -38,7 +38,6 @@ private:
     static napi_value ToString(napi_env env, napi_callback_info info);
     static napi_value SupportedLocalesOf(napi_env env, napi_callback_info info);
     static std::unordered_map<std::string, std::string> ParseConfigs(napi_env env, napi_value options);
-    static bool CheckNewTarget(napi_env env, napi_callback_info info);
 
     bool InitIntlPluralRulesContext(napi_env env, const std::vector<std::string>& localeTags,
         const std::unordered_map<std::string, std::string>& configs);

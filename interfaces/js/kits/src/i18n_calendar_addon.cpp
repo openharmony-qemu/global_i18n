@@ -17,7 +17,6 @@
 #include <unordered_set>
 
 #include "error_util.h"
-#include "histogram_helper.h"
 #include "i18n_hilog.h"
 #include "i18n_calendar_addon.h"
 #include "js_lifecycle_managers.h"
@@ -121,7 +120,6 @@ napi_value I18nCalendarAddon::InitCalendar(napi_env env, napi_value exports)
 
 napi_value I18nCalendarAddon::GetCalendar(napi_env env, napi_callback_info info)
 {
-    ApiMetrics metrics;
     size_t argc = 2; // retrieve 2 arguments
     napi_value argv[2] = { 0 };
     argv[0] = nullptr;
@@ -158,8 +156,6 @@ napi_value I18nCalendarAddon::GetCalendar(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("Get calendar create instance failed");
         return nullptr;
     }
-    metrics.RecordTime("LocalizationKit.i18n.getCalendar.Time");
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.getCalendar.Count", true);
     return result;
 }
 
@@ -235,15 +231,15 @@ napi_value I18nCalendarAddon::SetTime(napi_env env, napi_callback_info info)
     }
     if (type == napi_valuetype::napi_number) {
         obj->SetMilliseconds(env, argv[0]);
+        return nullptr;
     } else {
         napi_value val = GetDate(env, argv[0]);
         if (!val) {
             return nullptr;
         }
         obj->SetMilliseconds(env, val);
+        return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.Calendar.setTime.Count", true);
-    return nullptr;
 }
 
 napi_value I18nCalendarAddon::Set(napi_env env, napi_callback_info info)
@@ -290,7 +286,6 @@ napi_value I18nCalendarAddon::Set(napi_env env, napi_callback_info info)
     obj->SetField(env, argv[3], UCalendarDateFields::UCAL_HOUR_OF_DAY); // 3 is the index of hour
     obj->SetField(env, argv[4], UCalendarDateFields::UCAL_MINUTE); // 4 is the index of minute
     obj->SetField(env, argv[5], UCalendarDateFields::UCAL_SECOND); // 5 is the index of second
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.Calendar.set.Count", true);
     return nullptr;
 }
 
@@ -317,7 +312,6 @@ napi_value I18nCalendarAddon::GetTimeZone(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("Create timezone string failed");
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.Calendar.getTimeZone.Count", true);
     return result;
 }
 
@@ -361,7 +355,6 @@ napi_value I18nCalendarAddon::SetTimeZone(napi_env env, napi_callback_info info)
         return nullptr;
     }
     obj->calendar_->SetTimeZone(timezone);
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.Calendar.setTimeZone.Count", true);
     return nullptr;
 }
 
@@ -388,7 +381,6 @@ napi_value I18nCalendarAddon::GetFirstDayOfWeek(napi_env env, napi_callback_info
         HILOG_ERROR_I18N("GetFirstDayOfWeek: Create int32 failed");
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.Calendar.getFirstDayOfWeek.Count", true);
     return result;
 }
 
@@ -425,7 +417,6 @@ napi_value I18nCalendarAddon::SetFirstDayOfWeek(napi_env env, napi_callback_info
         return nullptr;
     }
     obj->calendar_->SetFirstDayOfWeek(value);
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.Calendar.setFirstDayOfWeek.Count", true);
     return nullptr;
 }
 
@@ -452,7 +443,6 @@ napi_value I18nCalendarAddon::GetMinimalDaysInFirstWeek(napi_env env, napi_callb
         HILOG_ERROR_I18N("GetMinimalDaysInFirstWeek: Create int32 failed");
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.Calendar.getMinimalDaysInFirstWeek.Count", true);
     return result;
 }
 
@@ -489,7 +479,6 @@ napi_value I18nCalendarAddon::SetMinimalDaysInFirstWeek(napi_env env, napi_callb
         return nullptr;
     }
     obj->calendar_->SetMinimalDaysInFirstWeek(value);
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.Calendar.setMinimalDaysInFirstWeek.Count", true);
     return nullptr;
 }
 
@@ -536,7 +525,6 @@ napi_value I18nCalendarAddon::Get(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("Get: Create int32 failed");
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.Calendar.get.Count", true);
     return result;
 }
 
@@ -588,7 +576,6 @@ napi_value I18nCalendarAddon::Add(napi_env env, napi_callback_info info)
         return nullptr;
     }
     obj->calendar_->Add(I18nCalendar::FIELDS_MAP.at(field), amount);
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.Calendar.add.Count", true);
     return nullptr;
 }
 
@@ -632,7 +619,6 @@ napi_value I18nCalendarAddon::GetDisplayName(napi_env env, napi_callback_info in
         HILOG_ERROR_I18N("Create calendar name string failed");
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.Calendar.getDisplayName.Count", true);
     return result;
 }
 
@@ -666,7 +652,6 @@ napi_value I18nCalendarAddon::GetTimeInMillis(napi_env env, napi_callback_info i
             return nullptr;
         }
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.Calendar.getTimeInMillis.Count", true);
     return result;
 }
 
@@ -689,9 +674,22 @@ napi_value I18nCalendarAddon::IsWeekend(napi_env env, napi_callback_info info)
     } else if (!VariableConvertor::CheckNapiIsNull(env, argv[0])) {
         isWeekEnd = obj->calendar_->IsWeekend();
     } else {
+        napi_value funcGetDateInfo = nullptr;
+        status = napi_get_named_property(env, argv[0], "valueOf", &funcGetDateInfo);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("Get method now failed");
+            return nullptr;
+        }
+        napi_value value = nullptr;
+        status = napi_call_function(env, argv[0], funcGetDateInfo, 0, nullptr, &value);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("IsWeekend: Get milliseconds failed");
+            return nullptr;
+        }
         double milliseconds = 0;
-        if (!VariableConvertor::GetDateTime(env, argv[0], milliseconds)) {
-            HILOG_ERROR_I18N("IsWeekend: get date time failed.");
+        status = napi_get_value_double(env, value, &milliseconds);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("IsWeekend: Retrieve milliseconds failed");
             return nullptr;
         }
         UErrorCode error = U_ZERO_ERROR;
@@ -706,7 +704,6 @@ napi_value I18nCalendarAddon::IsWeekend(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("Create boolean failed");
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.Calendar.isWeekend.Count", true);
     return result;
 }
 
@@ -744,7 +741,6 @@ napi_value I18nCalendarAddon::CompareDays(napi_env env, napi_callback_info info)
     if (status != napi_ok) {
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.Calendar.compareDays.Count", true);
     return result;
 }
 

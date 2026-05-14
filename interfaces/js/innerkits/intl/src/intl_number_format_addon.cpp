@@ -16,7 +16,6 @@
 
 #include <cmath>
 #include "error_util.h"
-#include "histogram_helper.h"
 #include "i18n_hilog.h"
 #include "js_lifecycle_managers.h"
 #include "js_utils.h"
@@ -78,7 +77,6 @@ napi_value IntlNumberFormatAddon::InitIntlNumberFormat(napi_env env, napi_value 
 
 napi_value IntlNumberFormatAddon::NumberFormatConstructor(napi_env env, napi_callback_info info)
 {
-    ApiMetrics metrics;
     size_t argc = 2;
     napi_value argv[2] = { nullptr };
     napi_value thisVar = nullptr;
@@ -117,8 +115,6 @@ napi_value IntlNumberFormatAddon::NumberFormatConstructor(napi_env env, napi_cal
         HILOG_ERROR_I18N("Init NumberFormat failed");
         return nullptr;
     }
-    metrics.RecordTime("ArkTS.Intl.NumberFormat.Time");
-    metrics.RecordBoolean("ArkTS.Intl.NumberFormat.Count", true);
     return thisVar;
 }
 
@@ -241,7 +237,6 @@ napi_value IntlNumberFormatAddon::FormatRangeNumber(napi_env env, napi_callback_
         HILOG_ERROR_I18N("FormatRangeNumber: create string js variable failed.");
         return JSUtils::CreateEmptyString(env);
     }
-    ApiMetrics::RecordBoolean("ArkTS.Intl.NumberFormat.formatRange.Count", true);
     return result;
 }
 
@@ -279,7 +274,6 @@ napi_value IntlNumberFormatAddon::FormatRangeToParts(napi_env env, napi_callback
     }
     std::vector<std::vector<std::string>> result;
     obj->numberfmt_->FormatRangeToParts(start, end, result);
-    ApiMetrics::RecordBoolean("ArkTS.Intl.NumberFormat.formatRangeToParts.Count", true);
     return SetNumberFormatParts(env, status, result);
 }
 
@@ -402,7 +396,6 @@ napi_value IntlNumberFormatAddon::FormatWithDiffParamType(napi_env env, napi_val
         }
         formatedValue = obj->numberfmt_->Format(paramValue);
     }
-    ApiMetrics::RecordBoolean("ArkTS.Intl.NumberFormat.format.Count", true);
     return JSUtils::CreateString(env, formatedValue);
 }
 
@@ -445,7 +438,6 @@ napi_value IntlNumberFormatAddon::GetFormatToPartsInner(napi_env env, napi_value
         }
         obj->numberfmt_->FormatToParts(paramValue, numberParts);
     }
-    ApiMetrics::RecordBoolean("ArkTS.Intl.NumberFormat.formatToParts.Count", true);
     return SetNumberFormatParts(env, status, numberParts);
 }
 
