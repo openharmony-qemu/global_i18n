@@ -15,7 +15,6 @@
 #include "displaynames_addon.h"
 
 #include "error_util.h"
-#include "histogram_helper.h"
 #include "intl_addon.h"
 #include "i18n_hilog.h"
 #include "js_lifecycle_managers.h"
@@ -71,7 +70,6 @@ napi_value DisplayNamesAddon::InitDisplayNames(napi_env env, napi_value exports)
 
 napi_value DisplayNamesAddon::DisplayNamesConstructor(napi_env env, napi_callback_info info)
 {
-    ApiMetrics metrics;
     size_t argc = 2;
     napi_value argv[2] = { nullptr };
     napi_value thisVar = nullptr;
@@ -107,8 +105,6 @@ napi_value DisplayNamesAddon::DisplayNamesConstructor(napi_env env, napi_callbac
     if (!obj->InitDisplayNamesContext(env, info, localeTags, map)) {
         return nullptr;
     }
-    metrics.RecordTime("ArkTS.Intl.DisplayNames.Time");
-    metrics.RecordBoolean("ArkTS.Intl.DisplayNames.Count", true);
     return thisVar;
 }
 
@@ -213,7 +209,6 @@ napi_value DisplayNamesAddon::Of(napi_env env, napi_callback_info info)
         ErrorUtil::NapiThrowUndefined(env, errorMessage);
         return JSUtils::CreateEmptyString(env);
     }
-    ApiMetrics::RecordBoolean("ArkTS.Intl.DisplayNames.of.Count", true);
     return JSUtils::CreateString(env, displayResult);
 }
 

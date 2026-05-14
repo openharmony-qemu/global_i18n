@@ -14,7 +14,6 @@
  */
 
 #include "error_util.h"
-#include "histogram_helper.h"
 #include "i18n_hilog.h"
 #include "js_lifecycle_managers.h"
 #include "js_utils.h"
@@ -198,7 +197,6 @@ napi_value I18nNormalizerAddon::Normalize(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("Create result failed");
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.Normalizer.normalize.Count", true);
     return result;
 }
 
@@ -232,7 +230,6 @@ napi_value I18nNormalizerAddon::CreateI18NNormalizerModeEnum(napi_env env)
 
 napi_value I18nNormalizerAddon::GetI18nNormalizerInstance(napi_env env, napi_callback_info info)
 {
-    ApiMetrics metrics;
     size_t argc = 1;
     napi_value argv[1] = { nullptr };
     napi_value thisVar = nullptr;
@@ -259,8 +256,6 @@ napi_value I18nNormalizerAddon::GetI18nNormalizerInstance(napi_env env, napi_cal
         HILOG_ERROR_I18N("create normalizer instance failed");
         return nullptr;
     }
-    metrics.RecordTime("LocalizationKit.Normalizer.getInstance.Time");
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.Normalizer.getInstance.Count", true);
     return result;
 }
 } // namespace I18n

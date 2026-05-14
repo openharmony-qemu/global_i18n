@@ -14,7 +14,6 @@
  */
 #include "character.h"
 #include "error_util.h"
-#include "histogram_helper.h"
 #include "i18n_hilog.h"
 #include "i18n_unicode_addon.h"
 #include "js_lifecycle_managers.h"
@@ -138,7 +137,6 @@ napi_value I18nUnicodeAddon::IsDigitAddon(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("IsDigitAddon: Create isDigit boolean value failed");
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.Unicode.isDigit.Count", true);
     return result;
 }
 
@@ -173,7 +171,6 @@ napi_value I18nUnicodeAddon::IsSpaceCharAddon(napi_env env, napi_callback_info i
         HILOG_ERROR_I18N("IsSpaceCharAddon: Create boolean value failed");
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.Unicode.isSpaceChar.Count", true);
     return result;
 }
 
@@ -208,7 +205,6 @@ napi_value I18nUnicodeAddon::IsWhiteSpaceAddon(napi_env env, napi_callback_info 
         HILOG_ERROR_I18N("IsWhiteSpaceAddon: Create boolean value failed");
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.Unicode.isWhitespace.Count", true);
     return result;
 }
 
@@ -244,7 +240,6 @@ napi_value I18nUnicodeAddon::IsRTLCharacterAddon(napi_env env, napi_callback_inf
         HILOG_ERROR_I18N("IsRTLCharacterAddon: Create boolean value failed");
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.Unicode.isRTL.Count", true);
     return result;
 }
 
@@ -280,7 +275,6 @@ napi_value I18nUnicodeAddon::IsIdeoGraphicAddon(napi_env env, napi_callback_info
         HILOG_ERROR_I18N("IsIdeoGraphicAddon: Create boolean value failed");
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.Unicode.isIdeograph.Count", true);
     return result;
 }
 
@@ -316,7 +310,6 @@ napi_value I18nUnicodeAddon::IsLetterAddon(napi_env env, napi_callback_info info
         HILOG_ERROR_I18N("IsLetterAddon: Create boolean value failed");
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.Unicode.isLetter.Count", true);
     return result;
 }
 
@@ -352,7 +345,6 @@ napi_value I18nUnicodeAddon::IsLowerCaseAddon(napi_env env, napi_callback_info i
         HILOG_ERROR_I18N("IsLowerCaseAddon: Create isLowerCase boolean value failed");
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.Unicode.isLowerCase.Count", true);
     return result;
 }
 
@@ -388,7 +380,6 @@ napi_value I18nUnicodeAddon::IsUpperCaseAddon(napi_env env, napi_callback_info i
         HILOG_ERROR_I18N("IsUpperCaseAddon: Create boolean value failed");
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.Unicode.isUpperCase.Count", true);
     return result;
 }
 
@@ -416,7 +407,6 @@ napi_value I18nUnicodeAddon::DetectEncodingAddon(napi_env env, napi_callback_inf
     const char* dataStream = reinterpret_cast<char*>(uint8Array.first);
 
     auto encodingInfo = DetectEncoding(dataStream, uint8Array.second);
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.Unicode.detectEncoding.Count", true);
     return CreateEncodingInfo(env, encodingInfo);
 }
 
@@ -452,7 +442,6 @@ napi_value I18nUnicodeAddon::GetTypeAddon(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("GetTypeAddon: Create getType string value failed");
         return nullptr;
     }
-    ApiMetrics::RecordBoolean("LocalizationKit.i18n.Unicode.getType.Count", true);
     return result;
 }
 

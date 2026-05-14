@@ -101,10 +101,6 @@ ohos_shared_library("i18n") {
     external_deps += [ "ability_base:configuration" ]
     defines += [ "SUPPORT_GRAPHICS" ]
   }
-  if (defined(global_i18n_support_api_metrics) && global_i18n_support_api_metrics) {
-    external_deps += [ "api_metrics:histogrammanager" ]
-    defines += [ "GLOBAL_I18N_METRICS_ENABLE" ]
-  }
   relative_install_dir = "module"
   subsystem_name = "global"
   part_name = "i18n"
