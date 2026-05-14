@@ -439,7 +439,7 @@ I18n_ErrorCode GetPrevStartFromAnnualTimeZoneRule(AnnualTimeZoneRule* rule, Time
 
 I18n_ErrorCode GetStartTimeAt(TimeArrayTimeZoneRule* rule, int32_t index, double* result)
 {
-    if (rule == nullptr) {
+    if (rule == nullptr || result == nullptr) {
         HILOG_ERROR_I18N("GetStartTimeAt: rule or query is nullptr.");
         return I18n_ErrorCode::ERROR_INVALID_PARAMETER;
     }

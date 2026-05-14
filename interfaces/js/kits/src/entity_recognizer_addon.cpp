@@ -160,6 +160,10 @@ napi_value EntityRecognizerAddon::FindEntityInfo(napi_env env, napi_callback_inf
 napi_value EntityRecognizerAddon::GetEntityInfoItem(napi_env env, std::vector<std::vector<int>>& entityInfo)
 {
     napi_value result = nullptr;
+    if (entityInfo.size() <= 1 || entityInfo[0].size() == 0 || entityInfo[1].size() == 0) {
+        HILOG_ERROR_I18N("EntityRecognizerAddon::GetEntityInfoItem: Invalid entityInfo.");
+        return nullptr;
+    }
     napi_status status = napi_create_array_with_length(env, entityInfo[0][0] + entityInfo[1][0], &result);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("create EntityInfo array failed.");

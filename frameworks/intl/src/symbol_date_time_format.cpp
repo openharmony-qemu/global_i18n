@@ -73,6 +73,10 @@ void SymbolDateTimeFormat::SetAmPmSymbols(std::unique_ptr<icu::DateFormatSymbols
 
 std::vector<std::string> SymbolDateTimeFormat::GetAmPmSymbols()
 {
+    if (icuSimpleDateFormat == nullptr) {
+        HILOG_ERROR_I18N("SymbolDateTimeFormat::GetAmPmSymbols: icuSimpleDateFormat is nullptr.");
+        return {};
+    }
     auto symbols = icuSimpleDateFormat->getDateFormatSymbols();
     if (symbols == nullptr) {
         HILOG_ERROR_I18N("SymbolDateTimeFormat::GetAmPmSymbols: getDateFormatSymbols failed.");
