@@ -27,7 +27,7 @@ namespace OHOS {
     bool DoSomethingTestWithMyAPI(const uint8_t* data, size_t size)
     {
         using namespace Global::I18n;
-        if (size < 1) {
+        if (data == nullptr || size < 1) {
             return false;
         }
         FuzzedDataProvider provider(data, size);
@@ -72,4 +72,3 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::DoSomethingTestWithMyAPI(data, size);
     return 0;
 }
-

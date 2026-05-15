@@ -85,6 +85,9 @@ namespace OHOS {
     void DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
         using namespace Global::I18n;
+        if (data == nullptr || size < 1) {
+            return;
+        }
         FuzzedDataProvider provider(data, size);
         std::string input = provider.ConsumeRandomLengthString();
         size_t newSize = provider.ConsumeIntegral<size_t>();

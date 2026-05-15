@@ -15,6 +15,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 #include "locale_config.h"
 #include "phone_number_matched.h"
 #include "regex_rule.h"
@@ -25,10 +26,12 @@ namespace OHOS {
     {
         using namespace Global::I18n;
         using namespace i18n::phonenumbers;
-        if (size < 1) {
+        if (data == nullptr || size < 1) {
             return false;
         }
-        std::string input(reinterpret_cast<const char*>(data), size);
+        FuzzedDataProvider provider(data, size);
+        std::string input = provider.ConsumeRandomLengthString();
+        size_t intVal = provider.ConsumeIntegral<size_t>();
         icu::UnicodeString regex(input.c_str());
         RegexRule* regexRule = new RegexRule(regex, input, input, input, input);
 
@@ -39,7 +42,7 @@ namespace OHOS {
         std::string country = LocaleConfig::GetSystemRegion();
         phoneNumberUtil->Parse(input, country, &phoneNumber);
 
-        PhoneNumberMatch* possibleNumber = new PhoneNumberMatch(size, input, phoneNumber);
+        PhoneNumberMatch* possibleNumber = new PhoneNumberMatch(intVal, input, phoneNumber);
         regexRule->Handle(possibleNumber, regex);
         regexRule->IsValid(possibleNumber, regex);
         regexRule->CountDigits(regex);
@@ -57,4 +60,3 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }
-

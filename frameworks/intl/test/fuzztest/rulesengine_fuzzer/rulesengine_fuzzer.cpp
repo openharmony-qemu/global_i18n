@@ -15,6 +15,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 #include "rules_engine.h"
 #include "rulesengine_fuzzer.h"
 
@@ -22,10 +23,11 @@ namespace OHOS {
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
         using namespace Global::I18n;
-        if (size < 1) {
+        if (data == nullptr || size < 1) {
             return false;
         }
-        std::string input(reinterpret_cast<const char*>(data), size);
+        FuzzedDataProvider provider(data, size);
+        std::string input = provider.ConsumeRandomLengthString();
         std::unordered_map<std::string, std::string> rulesMap;
         std::unordered_map<std::string, std::string> subRules;
         std::unordered_map<std::string, std::string> param;
@@ -55,4 +57,3 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }
-

@@ -16,22 +16,25 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include <fuzzer/FuzzedDataProvider.h>
 #include "i18n_types.h"
 #include "i18n_normalizer.h"
 #include "normalizer_fuzzer.h"
 
 namespace OHOS {
-    void DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
+    bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
         using namespace Global::I18n;
-        if (size < 1) {
-            return;
+        if (data == nullptr || size < 1) {
+            return false;
         }
-        std::string input(reinterpret_cast<const char*>(data), size);
+        FuzzedDataProvider provider(data, size);
+        std::string input = provider.ConsumeRandomLengthString();
 
         I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
         I18nNormalizer i18nNormalizer(I18nNormalizerMode::NFC, errorCode);
-        i18nNormalizer.Normalize(input.c_str(), size, errorCode);
+        i18nNormalizer.Normalize(input.c_str(), input.length(), errorCode);
+        return true;
     }
 }
 
@@ -42,4 +45,3 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }
-

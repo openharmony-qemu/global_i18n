@@ -16,16 +16,22 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include <fuzzer/FuzzedDataProvider.h>
 #include "character.h"
 #include "character_fuzzer.h"
 
 namespace OHOS {
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
+        if (data == nullptr || size < 1) {
+            return false;
+        }
+
+        FuzzedDataProvider provider(data, size);
         using namespace Global::I18n;
 
         bool result = false;
-        std::string input(reinterpret_cast<const char*>(data), size);
+        std::string input = provider.ConsumeRandomLengthString();
         result &= IsDigit(input);
         result &= IsSpaceChar(input);
         result &= IsWhiteSpace(input);
@@ -39,11 +45,8 @@ namespace OHOS {
     }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }
-

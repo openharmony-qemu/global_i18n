@@ -15,31 +15,24 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 #include "breakiterator_fuzzer.h"
 #include "i18n_break_iterator.h"
 
 namespace OHOS {
-    const int VALUE_NUMBER = 3;
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
-        using namespace Global::I18n;
-
-        if (size < sizeof(int32_t) * VALUE_NUMBER) {
+        if (data == nullptr || size < 1) {
             return false;
         }
 
-        uint32_t offset = 0;
+        FuzzedDataProvider provider(data, size);
+        using namespace Global::I18n;
 
-        std::string text(reinterpret_cast<const char*>(data + offset), size - sizeof(int32_t) * 3);
-        offset += size - sizeof(int32_t) * VALUE_NUMBER;
-
-        int32_t number = *(reinterpret_cast<const int32_t*>(data + offset));
-        offset += sizeof(int32_t);
-
-        int32_t next = *(reinterpret_cast<const int32_t*>(data + offset));
-        offset += sizeof(int32_t);
-
-        int32_t following = *(reinterpret_cast<const int32_t*>(data + offset));
+        std::string text = provider.ConsumeRandomLengthString();
+        int32_t number = provider.ConsumeIntegral<int32_t>();
+        int32_t next = provider.ConsumeIntegral<int32_t>();
+        int32_t following = provider.ConsumeIntegral<int32_t>();
 
         I18nBreakIterator iterator(text);
         iterator.SetText(text.c_str());
@@ -62,11 +55,8 @@ namespace OHOS {
     }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }
-

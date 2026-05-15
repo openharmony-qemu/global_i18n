@@ -15,48 +15,121 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <map>
+#include <string>
+#include <vector>
+#include <fuzzer/FuzzedDataProvider.h>
 #include "relative_time_format.h"
 #include "relativetimeformat_fuzzer.h"
 
 namespace OHOS {
-    const size_t FIRST_PARAM_OFFSET_SIZE = 8;
-    const size_t SECOND_PARAM_OFFSET_SIZE = 16;
+namespace Global {
+namespace I18n {
 
-    bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
+    void RelativeTimeFormatFuzzTest001(FuzzedDataProvider& provider)
     {
-        using namespace Global::I18n;
-        if (size < 1) {
-            return false;
-        }
-        uint32_t offset = 0;
-        std::string input(reinterpret_cast<const char*>(data), size);
+        std::string input = provider.ConsumeRandomLengthString();
         std::vector<std::string> localeTags(1, input);
         std::map<std::string, std::string> options;
         options[input] = input;
-        RelativeTimeFormat formatter(localeTags, options);
-        if (size >= FIRST_PARAM_OFFSET_SIZE) {
-            double number = *(reinterpret_cast<const double*>(data + offset));
-            formatter.Format(number, input);
-        }
 
-        if (size >= SECOND_PARAM_OFFSET_SIZE) {
-            std::vector<std::vector<std::string>> timeVector;
-            offset += sizeof(double);
-            double number2 = *(reinterpret_cast<const double*>(data + offset));
-            formatter.FormatToParts(number2, input, timeVector);
-        }
-    
+        RelativeTimeFormat formatter(localeTags, options);
+        formatter.Format(5, "second");
+        formatter.Format(10, "minute");
+        formatter.Format(2, "hour");
+        formatter.Format(3, "day");
+        formatter.Format(1, "week");
+        formatter.Format(6, "month");
+        formatter.Format(7, "quarter");
+        formatter.Format(8, "year");
         std::map<std::string, std::string> res;
         formatter.GetResolvedOptions(res);
+    }
+
+    void RelativeTimeFormatFuzzTest002(FuzzedDataProvider& provider)
+    {
+        std::string input = provider.ConsumeRandomLengthString();
+        std::vector<std::string> localeTags(1, input);
+        std::map<std::string, std::string> options;
+        options["style"] = "long";
+
+        RelativeTimeFormat formatter(localeTags, options);
+        double number = provider.ConsumeFloatingPoint<double>();
+        formatter.Format(number, input);
+    }
+
+    void RelativeTimeFormatFuzzTest003(FuzzedDataProvider& provider)
+    {
+        std::string input = provider.ConsumeRandomLengthString();
+        std::vector<std::string> localeTags(1, input);
+        std::map<std::string, std::string> options;
+        options["style"] = "short";
+
+        RelativeTimeFormat formatter(localeTags, options);
+        formatter.Format(1, "second");
+        formatter.Format(1, "minute");
+        formatter.Format(1, "hour");
+    }
+
+    void RelativeTimeFormatFuzzTest004(FuzzedDataProvider& provider)
+    {
+        std::string input = provider.ConsumeRandomLengthString();
+        std::vector<std::string> localeTags(1, input);
+        std::map<std::string, std::string> options;
+        options["style"] = "narrow";
+
+        RelativeTimeFormat formatter(localeTags, options);
+        formatter.Format(-5, "day");
+        formatter.Format(-10, "hour");
+    }
+
+    void RelativeTimeFormatFuzzTest005(FuzzedDataProvider& provider)
+    {
+        std::string input = provider.ConsumeRandomLengthString();
+        std::vector<std::string> localeTags(1, input);
+        std::map<std::string, std::string> options;
+        options["numeric"] = "auto";
+
+        RelativeTimeFormat formatter(localeTags, options);
+        std::vector<std::vector<std::string>> timeVector;
+        double number = provider.ConsumeFloatingPoint<double>();
+        formatter.FormatToParts(number, input, timeVector);
+    }
+
+    void RelativeTimeFormatFuzzTest006(FuzzedDataProvider& provider)
+    {
+        std::string input = provider.ConsumeRandomLengthString();
+        std::vector<std::string> localeTags(1, input);
+        std::map<std::string, std::string> options;
+        options["localeMatcher"] = "lookup";
+
+        RelativeTimeFormat formatter(localeTags, options);
+        formatter.Format(100, "second");
+        std::map<std::string, std::string> res;
+        formatter.GetResolvedOptions(res);
+    }
+
+    bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
+    {
+        if (data == nullptr || size < 1) {
+            return false;
+        }
+        FuzzedDataProvider provider(data, size);
+
+        RelativeTimeFormatFuzzTest001(provider);
+        RelativeTimeFormatFuzzTest002(provider);
+        RelativeTimeFormatFuzzTest003(provider);
+        RelativeTimeFormatFuzzTest004(provider);
+        RelativeTimeFormatFuzzTest005(provider);
+        RelativeTimeFormatFuzzTest006(provider);
         return true;
     }
 }
-
-/* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
-{
-    /* Run your code on data */
-    OHOS::DoSomethingInterestingWithMyAPI(data, size);
-    return 0;
+}
 }
 
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+{
+    OHOS::Global::I18n::DoSomethingInterestingWithMyAPI(data, size);
+    return 0;
+}
