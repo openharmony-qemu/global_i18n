@@ -15,6 +15,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 #include "matched_number_info.h"
 #include "phone_number_matched.h"
 #include "phone_number_rule.h"
@@ -24,10 +25,12 @@ namespace OHOS {
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
         using namespace Global::I18n;
-        if (size < 1) {
+        if (data == nullptr || size < 1) {
             return false;
         }
-        std::string input(reinterpret_cast<const char*>(data), size);
+        FuzzedDataProvider provider(data, size);
+        std::string input = provider.ConsumeRandomLengthString();
+        size_t intVal = provider.ConsumeIntegral<size_t>();
 
         PhoneNumberMatched* phoneNumberMatched = new PhoneNumberMatched(input);
         icu::UnicodeString message(input.c_str());
@@ -42,11 +45,11 @@ namespace OHOS {
         phoneNumberRule.GetFindRules();
         MatchedNumberInfo* matchedNumberInfo = new MatchedNumberInfo();
         icu::UnicodeString content(input.c_str());
-        MatchedNumberInfo* matchedNumberInfo2 = new MatchedNumberInfo(size, size, content);
+        MatchedNumberInfo* matchedNumberInfo2 = new MatchedNumberInfo(intVal, intVal, content);
 
-        matchedNumberInfo2->SetBegin(size);
+        matchedNumberInfo2->SetBegin(intVal);
         matchedNumberInfo2->GetBegin();
-        matchedNumberInfo2->SetEnd(size);
+        matchedNumberInfo2->SetEnd(intVal);
         matchedNumberInfo2->GetEnd();
         matchedNumberInfo2->SetContent(content);
         matchedNumberInfo2->GetContent();
@@ -65,4 +68,3 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }
-

@@ -16,30 +16,41 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include <unordered_set>
+#include <fuzzer/FuzzedDataProvider.h>
 #include "taboo.h"
 #include "taboo_utils.h"
 #include "taboo_fuzzer.h"
 
 namespace OHOS {
-    void DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
+    bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
+        if (data == nullptr || size < 1) {
+            return false;
+        }
+        FuzzedDataProvider provider(data, size);
         using namespace Global::I18n;
 
-        std::string input(reinterpret_cast<const char*>(data), size);
+        std::string input = provider.ConsumeRandomLengthString();
         TabooUtils* tabooUtils = TabooUtils::GetInstance();
         if (tabooUtils == nullptr) {
-            return;
+            return false;
         }
         tabooUtils->ReplaceCountryName(input, input, input);
         tabooUtils->ReplaceLanguageName(input, input, input);
+        tabooUtils->ReplaceTimeZoneName(input, input, input);
+        tabooUtils->ReplaceCityName(input, input, input);
+        tabooUtils->ReplacePhoneLocationName(input, input, input);
+        std::unordered_set<std::string> blockedCities = tabooUtils->GetBlockedCities();
+        std::unordered_set<std::string> blockedPhoneNumbers = tabooUtils->GetBlockedPhoneNumbers();
+        std::unordered_set<std::string> blockedLanguages = tabooUtils->GetBlockedLanguages();
+        std::unordered_set<std::string> blockedRegions = tabooUtils->GetBlockedRegions(input);
+        return true;
     }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }
-

@@ -15,28 +15,33 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <string>
+#include <fuzzer/FuzzedDataProvider.h>
 #include "locale_compare.h"
 #include "localecompare_fuzzer.h"
 
 namespace OHOS {
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
-        using namespace Global::I18n;
-        if (size < 1) {
+        if (data == nullptr || size < 1) {
             return false;
         }
-        std::string input(reinterpret_cast<const char*>(data), size);
-        std::string localeTag2 = std::to_string(size);
-        LocaleCompare::Compare(input, localeTag2);
+        FuzzedDataProvider provider(data, size);
+        using namespace Global::I18n;
+        std::string input = provider.ConsumeRandomLengthString();
+        std::string localeTag1 = provider.ConsumeRandomLengthString();
+        std::string localeTag2 = provider.ConsumeRandomLengthString();
+        LocaleCompare::Compare(localeTag1, localeTag2);
+        LocaleCompare::Compare(input, input);
+        LocaleCompare::Compare("", input);
+        LocaleCompare::Compare(input, "");
+        LocaleCompare::Compare("", "");
         return true;
     }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }
-

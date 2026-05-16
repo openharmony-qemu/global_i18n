@@ -17,36 +17,28 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <fuzzer/FuzzedDataProvider.h>
 #include "preferred_language.h"
 
 namespace OHOS {
-    const size_t FIRST_PARAM_OFFSET_SIZE = 4;
-    const size_t SECOND_PARAM_OFFSET_SIZE = 8;
-
-    void DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
+    bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
+        if (data == nullptr || size < 1) {
+            return false;
+        }
+        FuzzedDataProvider provider(data, size);
         using namespace Global::I18n;
-        std::string input(reinterpret_cast<const char*>(data), size);
-        if (size < FIRST_PARAM_OFFSET_SIZE) {
-            return;
-        }
-        uint32_t offset = 0;
-        int32_t index = *(reinterpret_cast<const int32_t*>(data + offset));
+        std::string input = provider.ConsumeRandomLengthString();
+        int32_t index = provider.ConsumeIntegral<int32_t>();
         PreferredLanguage::AddPreferredLanguage(input, index);
-        if (size < SECOND_PARAM_OFFSET_SIZE) {
-            return;
-        }
-        offset += sizeof(int32_t);
-        int32_t index2 = *(reinterpret_cast<const int32_t*>(data + offset));
+        int32_t index2 = provider.ConsumeIntegral<int32_t>();
         PreferredLanguage::RemovePreferredLanguage(index2);
+        return true;
     }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }
-

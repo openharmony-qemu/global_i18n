@@ -15,18 +15,20 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 #include "locale_config.h"
 #include "system_locale_manager.h"
 #include "systemlocalemanager_fuzzer.h"
 
 namespace OHOS {
-    void DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
+    bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
         using namespace Global::I18n;
-        if (size < 1) {
-            return;
+        if (data == nullptr || size < 1) {
+            return false;
         }
-        std::string input(reinterpret_cast<const char*>(data), size);
+        FuzzedDataProvider provider(data, size);
+        std::string input = provider.ConsumeRandomLengthString();
         std::vector<std::string> languages;
         languages.push_back(input);
 
@@ -38,6 +40,7 @@ namespace OHOS {
         systemLocaleManager->GetCountryInfoArray(languages, sortOptions, status);
         systemLocaleManager->GetTimezoneCityInfoArray(status);
         delete systemLocaleManager;
+        return true;
     }
 }
 
@@ -48,4 +51,3 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }
-

@@ -15,19 +15,19 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 #include "phone_number_format.h"
 #include "phonenumberformat_fuzzer.h"
 
 namespace OHOS {
-    const static size_t INPUT_DATA_LENGTH = 2;
-
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
-        using namespace Global::I18n;
-        if (size < INPUT_DATA_LENGTH) {
+        if (data == nullptr || size < 1) {
             return false;
         }
-        std::string input(reinterpret_cast<const char*>(data), INPUT_DATA_LENGTH);
+        FuzzedDataProvider provider(data, size);
+        using namespace Global::I18n;
+        std::string input = provider.ConsumeRandomLengthString();
         std::map<std::string, std::string> options;
         options[input] = input;
         PhoneNumberFormat formatter(input, options);
@@ -42,11 +42,8 @@ namespace OHOS {
     }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }
-

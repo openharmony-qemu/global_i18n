@@ -15,24 +15,26 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 #include <string>
 #include "date_time_format.h"
 #include "datetimeformat_fuzzer.h"
 
 namespace OHOS {
-    void DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
+namespace Global {
+namespace I18n {
+    void DateTimeFormatFuzzTest001(FuzzedDataProvider& provider)
     {
-        using namespace Global::I18n;
-
-        std::string input(reinterpret_cast<const char*>(data), size);
-
+        std::string input = provider.ConsumeRandomLengthString();
         std::vector<std::string> localeTags;
         localeTags.push_back(input);
         std::map<std::string, std::string> configs;
         configs[input] = input;
+        size_t sizeVal = provider.ConsumeIntegral<size_t>();
+
         DateTimeFormat dateTimeFormat(localeTags, configs);
-        dateTimeFormat.Format(size);
-        dateTimeFormat.FormatRange(size, size);
+        dateTimeFormat.Format(sizeVal);
+        dateTimeFormat.FormatRange(sizeVal, sizeVal);
         dateTimeFormat.GetResolvedOptions(configs);
         dateTimeFormat.GetDateStyle();
         dateTimeFormat.GetTimeStyle();
@@ -49,19 +51,58 @@ namespace OHOS {
         dateTimeFormat.GetHour();
         dateTimeFormat.GetMinute();
         dateTimeFormat.GetSecond();
+    }
+
+    void DateTimeFormatFuzzTest002(FuzzedDataProvider& provider)
+    {
+        std::string input = provider.ConsumeRandomLengthString();
+        std::vector<std::string> localeTags;
+        localeTags.push_back(input);
+        std::map<std::string, std::string> configs;
+        size_t sizeVal = provider.ConsumeIntegral<size_t>();
+
+        DateTimeFormat dateTimeFormat(localeTags, configs);
+        dateTimeFormat.Format(sizeVal);
+        dateTimeFormat.FormatRange(sizeVal, sizeVal);
+        dateTimeFormat.GetResolvedOptions(configs);
+    }
+
+    void DateTimeFormatFuzzTest003(FuzzedDataProvider& provider)
+    {
+        std::string input = provider.ConsumeRandomLengthString();
+        std::vector<std::string> localeTags;
+        localeTags.push_back(input);
+        std::map<std::string, std::string> configs;
+        configs["dateStyle"] = input;
+        configs["timeStyle"] = input;
+        size_t sizeVal = provider.ConsumeIntegral<size_t>();
+
+        DateTimeFormat dateTimeFormat(localeTags, configs);
         std::unique_ptr<DateTimeFormat> dtFormat =
-                DateTimeFormat::CreateInstance(localeTags, configs);
+            DateTimeFormat::CreateInstance(localeTags, configs);
         if (dtFormat != nullptr) {
-            dtFormat->Format(size);
+            dtFormat->Format(sizeVal);
         }
     }
+
+    bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
+    {
+        if (data == nullptr || size < 1) {
+            return false;
+        }
+
+        FuzzedDataProvider provider(data, size);
+        DateTimeFormatFuzzTest001(provider);
+        DateTimeFormatFuzzTest002(provider);
+        DateTimeFormatFuzzTest003(provider);
+        return true;
+    }
+}
+}
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
-    OHOS::DoSomethingInterestingWithMyAPI(data, size);
+    OHOS::Global::I18n::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }
-

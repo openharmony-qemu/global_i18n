@@ -16,15 +16,21 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include <fuzzer/FuzzedDataProvider.h>
 #include "locale_info.h"
 #include "localeinfo_fuzzer.h"
 
 namespace OHOS {
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
+        if (data == nullptr || size < 1) {
+            return false;
+        }
+
+        FuzzedDataProvider provider(data, size);
         using namespace Global::I18n;
 
-        std::string input(reinterpret_cast<const char*>(data), size);
+        std::string input = provider.ConsumeRandomLengthString();
         LocaleInfo *locale = new LocaleInfo(input);
         if (locale == nullptr) {
             return false;
@@ -50,11 +56,8 @@ namespace OHOS {
     }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }
-

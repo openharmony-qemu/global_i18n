@@ -15,35 +15,132 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <map>
 #include <string>
+#include <vector>
+#include <fuzzer/FuzzedDataProvider.h>
 #include "plural_rules.h"
 #include "pluralrules_fuzzer.h"
 
 namespace OHOS {
-    const size_t FIRST_PARAM_OFFSET_SIZE = 8;
+namespace Global {
+namespace I18n {
 
-    void DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
+    void PluralRulesFuzzTest001(FuzzedDataProvider& provider)
     {
-        using namespace Global::I18n;
-        uint32_t offset = 0;
-        std::string input(reinterpret_cast<const char*>(data), size);
+        std::string input = provider.ConsumeRandomLengthString();
         std::vector<std::string> localeTags;
         localeTags.push_back(input);
         std::map<std::string, std::string> options;
         options[input] = input;
+
         PluralRules pluralRules(localeTags, options);
-        if (size >= FIRST_PARAM_OFFSET_SIZE) {
-            double number = *(reinterpret_cast<const double*>(data + offset));
-            pluralRules.Select(number);
+        pluralRules.Select(12345.67);
+        pluralRules.Select(0);
+        pluralRules.Select(-1);
+    }
+
+    void PluralRulesFuzzTest002(FuzzedDataProvider& provider)
+    {
+        std::string input = provider.ConsumeRandomLengthString();
+        std::vector<std::string> localeTags;
+        localeTags.push_back(input);
+        std::map<std::string, std::string> options;
+        options["type"] = "cardinal";
+
+        PluralRules pluralRules(localeTags, options);
+        double number = provider.ConsumeFloatingPoint<double>();
+        pluralRules.Select(number);
+    }
+
+    void PluralRulesFuzzTest003(FuzzedDataProvider& provider)
+    {
+        std::string input = provider.ConsumeRandomLengthString();
+        std::vector<std::string> localeTags;
+        localeTags.push_back(input);
+        std::map<std::string, std::string> options;
+        options["type"] = "ordinal";
+
+        PluralRules pluralRules(localeTags, options);
+        pluralRules.Select(1);
+        pluralRules.Select(2);
+        pluralRules.Select(3);
+        pluralRules.Select(4);
+        pluralRules.Select(11);
+    }
+
+    void PluralRulesFuzzTest004(FuzzedDataProvider& provider)
+    {
+        std::string input = provider.ConsumeRandomLengthString();
+        std::vector<std::string> localeTags;
+        localeTags.push_back(input);
+        std::map<std::string, std::string> options;
+        options["minimumIntegerDigits"] = "5";
+
+        PluralRules pluralRules(localeTags, options);
+        pluralRules.Select(123);
+    }
+
+    void PluralRulesFuzzTest005(FuzzedDataProvider& provider)
+    {
+        std::string input = provider.ConsumeRandomLengthString();
+        std::vector<std::string> localeTags;
+        localeTags.push_back(input);
+        std::map<std::string, std::string> options;
+        options["minimumFractionDigits"] = "3";
+        options["maximumFractionDigits"] = "5";
+
+        PluralRules pluralRules(localeTags, options);
+        pluralRules.Select(123.456789);
+    }
+
+    void PluralRulesFuzzTest006(FuzzedDataProvider& provider)
+    {
+        std::string input = provider.ConsumeRandomLengthString();
+        std::vector<std::string> localeTags;
+        localeTags.push_back(input);
+        std::map<std::string, std::string> options;
+        options["minimumSignificantDigits"] = "3";
+        options["maximumSignificantDigits"] = "5";
+
+        PluralRules pluralRules(localeTags, options);
+        pluralRules.Select(123.456789);
+    }
+
+    void PluralRulesFuzzTest007(FuzzedDataProvider& provider)
+    {
+        std::string input = provider.ConsumeRandomLengthString();
+        std::vector<std::string> localeTags;
+        localeTags.push_back(input);
+        std::map<std::string, std::string> options;
+        options["localeMatcher"] = "lookup";
+
+        PluralRules pluralRules(localeTags, options);
+        pluralRules.Select(100);
+    }
+
+    bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
+    {
+        if (data == nullptr || size < 1) {
+            return false;
         }
+        FuzzedDataProvider provider(data, size);
+
+        PluralRulesFuzzTest001(provider);
+        PluralRulesFuzzTest002(provider);
+        PluralRulesFuzzTest003(provider);
+        PluralRulesFuzzTest004(provider);
+        PluralRulesFuzzTest005(provider);
+        PluralRulesFuzzTest006(provider);
+        PluralRulesFuzzTest007(provider);
+        return true;
     }
 }
-
-/* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
-{
-    /* Run your code on data */
-    OHOS::DoSomethingInterestingWithMyAPI(data, size);
-    return 0;
+}
 }
 
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+{
+    OHOS::Global::I18n::DoSomethingInterestingWithMyAPI(data, size);
+    return 0;
+}

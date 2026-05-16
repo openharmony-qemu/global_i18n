@@ -16,28 +16,33 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include <fuzzer/FuzzedDataProvider.h>
 #include "index_util.h"
 #include "indexutil_fuzzer.h"
 
 namespace OHOS {
-    void DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
+    bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
+        if (data == nullptr || size < 1) {
+            return false;
+        }
+
+        FuzzedDataProvider provider(data, size);
         using namespace Global::I18n;
 
-        std::string input(reinterpret_cast<const char*>(data), size);
+        std::string input = provider.ConsumeRandomLengthString();
 
         IndexUtil indexUtil(input);
         indexUtil.GetIndexList();
         indexUtil.AddLocale(input);
         indexUtil.GetIndex(input);
+
+        return true;
     }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }
-

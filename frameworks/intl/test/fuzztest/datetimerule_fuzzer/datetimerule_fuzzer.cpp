@@ -15,6 +15,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 #include "locale_config.h"
 #include "date_rule_init.h"
 #include "date_time_rule.h"
@@ -22,11 +23,12 @@
 namespace OHOS {
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
-        using namespace Global::I18n;
-        if (size < 1) {
+        if (data == nullptr || size < 1) {
             return false;
         }
-        std::string input(reinterpret_cast<const char*>(data), size);
+        FuzzedDataProvider provider(data, size);
+        using namespace Global::I18n;
+        std::string input = provider.ConsumeRandomLengthString();
 
         DateRuleInit* dateRuleInit = new DateRuleInit(input);
         icu::UnicodeString message(input.c_str());
@@ -58,11 +60,8 @@ namespace OHOS {
     }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }
-

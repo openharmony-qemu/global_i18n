@@ -16,52 +16,57 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include <fuzzer/FuzzedDataProvider.h>
 #include "i18n_calendar.h"
 #include "calendar_fuzzer.h"
 #include "unicode/ucal.h"
 #include "unicode/utypes.h"
 
 namespace OHOS {
-    const size_t FIRST_PARAM_OFFSET_SIZE = 8;
-    const size_t SECOND_PARAM_OFFSET_SIZE = 16;
-
-    void DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
+    bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
-        using namespace Global::I18n;
-
-        uint32_t offset = 0;
-        std::string input(reinterpret_cast<const char*>(data), size);
-        I18nCalendar calendar(input, CalendarType::GREGORY);
-        if (size >= FIRST_PARAM_OFFSET_SIZE) {
-            double number = *(reinterpret_cast<const double*>(data + offset));
-            calendar.SetTime(number);
+        if (data == nullptr || size < 1) {
+            return false;
         }
 
-        calendar.Set(size, size, size);
-        calendar.Set(UCalendarDateFields::UCAL_YEAR, size);
+        FuzzedDataProvider provider(data, size);
+        using namespace Global::I18n;
+
+        std::string input = provider.ConsumeRandomLengthString();
+        I18nCalendar calendar(input, CalendarType::GREGORY);
+
+        double number = provider.ConsumeFloatingPoint<double>();
+        calendar.SetTime(number);
+
+        int32_t param1 = provider.ConsumeIntegral<int32_t>();
+        int32_t param2 = provider.ConsumeIntegral<int32_t>();
+        int32_t param3 = provider.ConsumeIntegral<int32_t>();
+        calendar.Set(param1, param2, param3);
+
+        int32_t yearValue = provider.ConsumeIntegral<int32_t>();
+        calendar.Set(UCalendarDateFields::UCAL_YEAR, yearValue);
+
         calendar.GetTimeZone();
         calendar.SetTimeZone(input);
         calendar.GetTimeInMillis();
         calendar.GetMinimalDaysInFirstWeek();
         calendar.GetFirstDayOfWeek();
+
         UErrorCode status = U_ZERO_ERROR;
-        calendar.IsWeekend(size, status);
+        int32_t weekendParam = provider.ConsumeIntegral<int32_t>();
+        calendar.IsWeekend(weekendParam, status);
         calendar.IsWeekend();
         calendar.GetDisplayName(input);
-        if (size < SECOND_PARAM_OFFSET_SIZE) {
-            return;
-        }
-        offset += sizeof(double);
-        double compareDay = *(reinterpret_cast<const double*>(data + offset));
+
+        double compareDay = provider.ConsumeFloatingPoint<double>();
         calendar.CompareDays(compareDay);
+
+        return true;
     }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }
-
