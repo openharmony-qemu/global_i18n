@@ -46,7 +46,7 @@ bool UpgradeUtils::CheckIcuAdoptVersion(const std::string& adoptVersionsPath, co
 {
     std::unordered_set<std::string> adoptVersions = LoadAdoptVersions(adoptVersionsPath);
     for (const auto& adoptVersion : adoptVersions) {
-        std::string dataPath = icuVersionPath + ICU_DATA_FILE_PREFIX + adoptVersion + ICU_DATA_FILE_PREFIX;
+        std::string dataPath = icuVersionPath + ICU_DATA_FILE_PREFIX + adoptVersion + ICU_DATA_FILE_SUFFIX;
         HILOG_INFO_I18N("UpgradeUtils::CheckIcuAdoptVersion: check path %{public}s.", dataPath.c_str());
         if (FileExist(dataPath.c_str())) {
             return true;
