@@ -17,6 +17,7 @@
 
 #include <filesystem>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 namespace OHOS {
@@ -25,6 +26,7 @@ namespace I18n {
 class UpgradeUtils {
 public:
     static bool CheckIfUpdateNecessary(const std::string& updateVersionPath, const std::string& localVersionPath);
+    static bool CheckIcuAdoptVersion(const std::string& adoptVersionsPath, const std::string& localVersionPath);
     static bool CheckFileIntegrity(const std::string& cfgPath, const std::string& pubkeyPath,
         std::vector<std::string>& filesList);
     static bool CopyDataFile(const std::string& srcPath, const std::string& dstPath,
@@ -33,6 +35,7 @@ public:
 
 private:
     static std::string LoadFileVersion(const std::string& versionPath);
+    static std::unordered_set<std::string> LoadAdoptVersions(const std::string& adoptVersionsPath);
     static bool CompareVersion(const std::string& preVersion, const std::string& curVersion);
     static bool CopySingleFile(const std::filesystem::path& srcFile, const std::filesystem::path& dstFile);
     static bool EnsureDirectoryExists(const std::filesystem::path& dirPath);
