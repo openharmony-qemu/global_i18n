@@ -161,7 +161,7 @@ PluralRules::PluralRules(std::vector<std::string> &localeTags, std::map<std::str
 
 PluralRules::~PluralRules()
 {
-    if (!pluralRules) {
+    if (pluralRules) {
         delete pluralRules;
         pluralRules = nullptr;
     }

@@ -123,6 +123,8 @@ std::string ZoneUtil::GetDefaultZone(const std::string& country, int32_t offset)
     StringEnumeration *strEnum =
         TimeZone::createTimeZoneIDEnumeration(UCAL_ZONE_TYPE_ANY, country.c_str(), &offset, status);
     if (U_FAILURE(status)) {
+        delete strEnum;
+        strEnum = nullptr;
         return "";
     }
     string ret;
