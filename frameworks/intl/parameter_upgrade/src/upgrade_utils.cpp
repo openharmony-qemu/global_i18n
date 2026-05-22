@@ -26,6 +26,8 @@ const std::string UpgradeUtils::CERT_FILE = "CERT.ENC";
 const std::string UpgradeUtils::VERIFY_FILE = "CERT.SF";
 const std::string UpgradeUtils::MANIFEST_FILE = "MANIFEST.MF";
 const size_t UpgradeUtils::VERSION_SIZE = 4;
+const std::string ICU_DATA_FILE_PREFIX = "icudt";
+const std::string ICU_DATA_FILE_SUFFIX = "l.dat";
 
 bool UpgradeUtils::CheckIfUpdateNecessary(const std::string& updateVersionPath, const std::string& localVersionPath)
 {
@@ -38,6 +40,20 @@ bool UpgradeUtils::CheckIfUpdateNecessary(const std::string& updateVersionPath, 
         return false;
     }
     return CompareVersion(versionLocal, versionUpdate);
+}
+
+bool UpgradeUtils::CheckIcuAdoptVersion(const std::string& adoptVersionsPath, const std::string& icuVersionPath)
+{
+    std::unordered_set<std::string> adoptVersions = LoadAdoptVersions(adoptVersionsPath);
+    for (const auto& adoptVersion : adoptVersions) {
+        std::string dataPath = icuVersionPath + ICU_DATA_FILE_PREFIX + adoptVersion + ICU_DATA_FILE_SUFFIX;
+        HILOG_INFO_I18N("UpgradeUtils::CheckIcuAdoptVersion: check path %{public}s.", dataPath.c_str());
+        if (FileExist(dataPath.c_str())) {
+            return true;
+        }
+    }
+    HILOG_ERROR_I18N("UpgradeUtils::CheckIcuAdoptVersion: Icu version error.");
+    return false;
 }
 
 bool UpgradeUtils::CheckFileIntegrity(const std::string& cfgPath, const std::string& pubkeyPath,
@@ -138,6 +154,30 @@ std::string UpgradeUtils::LoadFileVersion(const std::string& versionPath)
         }
     }
     return version;
+}
+
+std::unordered_set<std::string> UpgradeUtils::LoadAdoptVersions(const std::string& adoptVersionsPath)
+{
+    std::unordered_set<std::string> adoptVersions;
+    char* path = realpath(adoptVersionsPath.c_str(), nullptr);
+    if (path == nullptr) {
+        HILOG_ERROR_I18N("UpgradeUtils::LoadAdoptVersions: realpath error: %{public}s.", strerror(errno));
+        return adoptVersions;
+    }
+    std::ifstream file(path);
+    free(path);
+    if (!file.is_open()) {
+        HILOG_ERROR_I18N("UpgradeUtils::LoadAdoptVersions: open adoptVersionsPath file failed.");
+        return adoptVersions;
+    }
+    std::string line;
+    while (std::getline(file, line)) {
+        if (line.empty()) {
+            continue;
+        }
+        adoptVersions.insert(line);
+    }
+    return adoptVersions;
 }
 
 // compare version
