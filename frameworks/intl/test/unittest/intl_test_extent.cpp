@@ -1486,7 +1486,7 @@ HWTEST_F(IntlTest, IntlFuncTest0088, TestSize.Level1)
     std::string adoptVersionsContent = "72";
     status = icsFileWriter.WriteFile(adoptVersionsContent, adoptVersionsPath);
     ASSERT_TRUE(status);
-    std::string icuVersionPath = "/data/log/"
+    std::string icuVersionPath = "/data/log/";
     bool isIcuAdoptVersion = UpgradeUtils::CheckIcuAdoptVersion(adoptVersionsPath, icuVersionPath);
     ASSERT_FALSE(isIcuAdoptVersion);
 }
