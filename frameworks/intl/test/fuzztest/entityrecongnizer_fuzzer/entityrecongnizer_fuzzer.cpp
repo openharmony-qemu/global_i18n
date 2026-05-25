@@ -298,29 +298,41 @@ namespace I18n {
 
     void PhoneNumberRuleFuzzTest004(FuzzedDataProvider& provider)
     {
-        std::string country = "CN";
-        PhoneNumberRule phoneNumberRule(country);
+        std::string input = provider.ConsumeRandomLengthString();
+        PhoneNumberRule phoneNumberRule(input);
+        phoneNumberRule.GetBorderRules();
+        input = "CN";
+        phoneNumberRule = PhoneNumberRule(input);
         phoneNumberRule.GetBorderRules();
     }
 
     void PhoneNumberRuleFuzzTest005(FuzzedDataProvider& provider)
     {
-        std::string country = "US";
-        PhoneNumberRule phoneNumberRule(country);
+        std::string input = provider.ConsumeRandomLengthString();
+        PhoneNumberRule phoneNumberRule(input);
+        phoneNumberRule.GetCodesRules();
+        input = "US";
+        phoneNumberRule = PhoneNumberRule(input);
         phoneNumberRule.GetCodesRules();
     }
 
     void PhoneNumberRuleFuzzTest006(FuzzedDataProvider& provider)
     {
-        std::string country = "GB";
-        PhoneNumberRule phoneNumberRule(country);
+        std::string input = provider.ConsumeRandomLengthString();
+        PhoneNumberRule phoneNumberRule(input);
+        phoneNumberRule.GetPositiveRules();
+        input = "GB";
+        phoneNumberRule = PhoneNumberRule(input);
         phoneNumberRule.GetPositiveRules();
     }
 
     void PhoneNumberRuleFuzzTest007(FuzzedDataProvider& provider)
     {
-        std::string country = "JP";
-        PhoneNumberRule phoneNumberRule(country);
+        std::string input = provider.ConsumeRandomLengthString();
+        PhoneNumberRule phoneNumberRule(input);
+        phoneNumberRule.GetNegativeRules();
+        input = "JP";
+        phoneNumberRule = PhoneNumberRule(input);
         phoneNumberRule.GetNegativeRules();
     }
 

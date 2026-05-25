@@ -40,7 +40,11 @@ namespace I18n {
 
     void LunarCalendarFuzzTest002(FuzzedDataProvider& provider)
     {
+        int32_t year = provider.ConsumeIntegral<int32_t>();
+        int32_t month = provider.ConsumeIntegral<int32_t>();
+        int32_t day = provider.ConsumeIntegral<int32_t>();
         LunarCalendar lunarCalendar;
+        lunarCalendar.SetGregorianDate(year, month, day);
         lunarCalendar.SetGregorianDate(2024, 1, 1);
         lunarCalendar.GetLunarYear();
         lunarCalendar.GetLunarMonth();
@@ -50,7 +54,11 @@ namespace I18n {
 
     void LunarCalendarFuzzTest003(FuzzedDataProvider& provider)
     {
+        int32_t year = provider.ConsumeIntegral<int32_t>();
+        int32_t month = provider.ConsumeIntegral<int32_t>();
+        int32_t day = provider.ConsumeIntegral<int32_t>();
         LunarCalendar lunarCalendar;
+        lunarCalendar.SetGregorianDate(year, month, day);
         lunarCalendar.SetGregorianDate(2024, 12, 31);
         lunarCalendar.GetLunarYear();
         lunarCalendar.GetLunarMonth();
@@ -60,7 +68,11 @@ namespace I18n {
 
     void LunarCalendarFuzzTest004(FuzzedDataProvider& provider)
     {
+        int32_t year = provider.ConsumeIntegral<int32_t>();
+        int32_t month = provider.ConsumeIntegral<int32_t>();
+        int32_t day = provider.ConsumeIntegral<int32_t>();
         LunarCalendar lunarCalendar;
+        lunarCalendar.SetGregorianDate(year, month, day);
         lunarCalendar.SetGregorianDate(1900, 1, 31);
         lunarCalendar.GetLunarYear();
         lunarCalendar.GetLunarMonth();
@@ -69,7 +81,11 @@ namespace I18n {
 
     void LunarCalendarFuzzTest005(FuzzedDataProvider& provider)
     {
+        int32_t year = provider.ConsumeIntegral<int32_t>();
+        int32_t month = provider.ConsumeIntegral<int32_t>();
+        int32_t day = provider.ConsumeIntegral<int32_t>();
         LunarCalendar lunarCalendar;
+        lunarCalendar.SetGregorianDate(year, month, day);
         lunarCalendar.SetGregorianDate(2100, 12, 31);
         lunarCalendar.GetLunarYear();
         lunarCalendar.GetLunarMonth();
@@ -78,18 +94,30 @@ namespace I18n {
 
     void LunarCalendarFuzzTest006(FuzzedDataProvider& provider)
     {
+        int32_t year = provider.ConsumeIntegral<int32_t>();
+        int32_t month = provider.ConsumeIntegral<int32_t>();
+        int32_t day = provider.ConsumeIntegral<int32_t>();
         LunarCalendar lunarCalendar;
+        lunarCalendar.SetGregorianDate(year, month, day);
         lunarCalendar.SetGregorianDate(1900, 1, 1);
-        LunarCalendar lunarCalendar2;
-        lunarCalendar2.SetGregorianDate(2100, 12, 31);
         lunarCalendar.GetLunarYear();
-        lunarCalendar2.GetLunarYear();
+        lunarCalendar.SetGregorianDate(2100, 12, 31);
+        lunarCalendar.GetLunarYear();
     }
 
     void LunarCalendarFuzzTest007(FuzzedDataProvider& provider)
     {
+        int32_t year = provider.ConsumeIntegral<int32_t>();
+        int32_t month = provider.ConsumeIntegral<int32_t>();
+        int32_t day = provider.ConsumeIntegral<int32_t>();
         LunarCalendar lunarCalendar;
-        bool result = lunarCalendar.SetGregorianDate(2020, 2, 29);
+        bool result = lunarCalendar.SetGregorianDate(year, month, day);
+        if (result) {
+            lunarCalendar.GetLunarYear();
+            lunarCalendar.GetLunarMonth();
+            lunarCalendar.GetLunarDay();
+        }
+        result = lunarCalendar.SetGregorianDate(2020, 2, 29);
         if (result) {
             lunarCalendar.GetLunarYear();
             lunarCalendar.GetLunarMonth();
@@ -99,13 +127,19 @@ namespace I18n {
 
     void LunarCalendarFuzzTest008(FuzzedDataProvider& provider)
     {
+        int32_t year = provider.ConsumeIntegral<int32_t>();
+        int32_t month = provider.ConsumeIntegral<int32_t>();
+        int32_t day = provider.ConsumeIntegral<int32_t>();
         LunarCalendar lunarCalendar;
+        lunarCalendar.SetGregorianDate(year, month, day);
+        lunarCalendar.GetLunarYear();
+        lunarCalendar.GetLunarMonth();
+        lunarCalendar.GetLunarDay();
         lunarCalendar.SetGregorianDate(2019, 2, 28);
         lunarCalendar.GetLunarYear();
         lunarCalendar.GetLunarMonth();
         lunarCalendar.GetLunarDay();
-        LunarCalendar lunarCalendar2;
-        lunarCalendar2.SetGregorianDate(2019, 2, 29);
+        lunarCalendar.SetGregorianDate(2019, 2, 29);
     }
 
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)

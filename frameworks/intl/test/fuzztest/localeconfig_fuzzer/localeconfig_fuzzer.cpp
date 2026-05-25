@@ -129,11 +129,15 @@ namespace I18n {
 
     void LocaleConfigFuzzTest011(FuzzedDataProvider& provider)
     {
+        std::string input = provider.ConsumeRandomLengthString();
+        LocaleConfig::IsValidTag(input);
         LocaleConfig::GetSystemLocaleInstanceTag();
     }
 
     void LocaleConfigFuzzTest012(FuzzedDataProvider& provider)
     {
+        std::string input = provider.ConsumeRandomLengthString();
+        LocaleConfig::SetSystemCollation(input);
         std::unordered_map<std::string, std::string> result;
         LocaleConfig::GetSystemCollations(result);
         std::string usingCollation;

@@ -71,6 +71,9 @@ namespace I18n {
 
     void TimezoneFuzzTest005(FuzzedDataProvider& provider)
     {
+        std::string input = provider.ConsumeRandomLengthString();
+        I18nTimeZone timezone(input, false);
+        timezone.GetID();
         I18nTimeZone::GetAvailableIDs();
         I18nTimeZone::GetAvailableZoneCityIDs();
     }
@@ -143,12 +146,17 @@ namespace I18n {
 
     void TimezoneFuzzTest015(FuzzedDataProvider& provider)
     {
+        std::string input = provider.ConsumeRandomLengthString();
+        I18nTimeZone::GetTimezoneIdByCityId(input);
         I18nTimeZone::GetTimezoneIdByCityId("Shanghai");
         I18nTimeZone::GetTimezoneIdByCityId("New_York");
     }
 
     void TimezoneFuzzTest016(FuzzedDataProvider& provider)
     {
+        double x = provider.ConsumeFloatingPoint<double>();
+        double y = provider.ConsumeFloatingPoint<double>();
+        I18nTimeZone::GetTimezoneIdByLocation(x, y);
         I18nTimeZone::GetTimezoneIdByLocation(0.0, 0.0);
         I18nTimeZone::GetTimezoneIdByLocation(116.4, 39.9);
         I18nTimeZone::GetTimezoneIdByLocation(-74.0, 40.7);
