@@ -206,14 +206,11 @@ ohos_shared_library("intl_util") {
       "os_account:os_account_innerkits",
       "preferences:native_preferences",
     ]
-    public_external_deps = []
     defines = []
     if (i18n_support_ui) {
-      public_external_deps += [
+      external_deps += [
         "ability_base:base",
         "ability_base:configuration",
-      ]
-      external_deps += [
         "ability_base:want",
         "ability_runtime:ability_manager",
         "ability_runtime:app_manager",
