@@ -63,11 +63,16 @@ namespace I18n {
 
     void SimpleDateTimeFormatFuzzTest005(FuzzedDataProvider& provider)
     {
+        std::string input = provider.ConsumeRandomLengthString();
+        double timestamp = provider.ConsumeFloatingPoint<double>();
         I18nErrorCode errCode = I18nErrorCode::SUCCESS;
-        SimpleDateTimeFormat format("yyyyMMddHHmmss", "en-US", false, errCode);
-        format.Format(0);
-        format.Format(-1);
-        format.Format(9999999999999);
+        SimpleDateTimeFormat format(input, input, false, errCode);
+        format.Format(timestamp);
+        errCode = I18nErrorCode::SUCCESS;
+        SimpleDateTimeFormat formatEn("yyyyMMddHHmmss", "en-US", false, errCode);
+        formatEn.Format(0);
+        formatEn.Format(-1);
+        formatEn.Format(9999999999999);
     }
 
     void SimpleDateTimeFormatFuzzTest006(FuzzedDataProvider& provider)

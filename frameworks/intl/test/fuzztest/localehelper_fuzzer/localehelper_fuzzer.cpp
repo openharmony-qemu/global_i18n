@@ -151,6 +151,8 @@ namespace I18n {
 
     void LocaleHelperFuzzTest017(FuzzedDataProvider& provider)
     {
+        std::string input = provider.ConsumeRandomLengthString();
+        LocaleHelper::IsUnicodeScriptSubtag(input);
         LocaleHelper::GetAvailableLocales();
     }
 
@@ -175,6 +177,8 @@ namespace I18n {
 
     void LocaleHelperFuzzTest020(FuzzedDataProvider& provider)
     {
+        std::string input = provider.ConsumeRandomLengthString();
+        LocaleHelper::IsValidOptionName(input, input);
         LocaleHelper::DefaultLocale();
     }
 
@@ -191,7 +195,11 @@ namespace I18n {
 
     void LocaleHelperFuzzTest022(FuzzedDataProvider& provider)
     {
+        std::string input = provider.ConsumeRandomLengthString();
         std::map<std::string, std::string> options;
+        options[input] = input;
+        LocaleHelper::ParseOptionWithoutCheck(options, input, input);
+        options.clear();
         options["calendar"] = "gregory";
         options["collation"] = "default";
         LocaleHelper::ParseOptionWithoutCheck(options, "calendar", "");
@@ -200,16 +208,24 @@ namespace I18n {
 
     void LocaleHelperFuzzTest023(FuzzedDataProvider& provider)
     {
+        std::string input = provider.ConsumeRandomLengthString();
         std::vector<std::string> locales;
+        locales.push_back(input);
+        I18nErrorCode status = I18nErrorCode::SUCCESS;
+        LocaleHelper::CanonicalizeLocaleList(locales, status);
+        locales.clear();
         locales.push_back("en-US");
         locales.push_back("zh-CN");
         locales.push_back("ja-JP");
-        I18nErrorCode status = I18nErrorCode::SUCCESS;
+        status = I18nErrorCode::SUCCESS;
         LocaleHelper::CanonicalizeLocaleList(locales, status);
     }
 
     void LocaleHelperFuzzTest024(FuzzedDataProvider& provider)
     {
+        std::string input = provider.ConsumeRandomLengthString();
+        LocaleHelper::IsUnicodeScriptSubtag(input);
+        LocaleHelper::IsUnicodeRegionSubtag(input);
         LocaleHelper::IsUnicodeScriptSubtag("Latn");
         LocaleHelper::IsUnicodeScriptSubtag("Hans");
         LocaleHelper::IsUnicodeRegionSubtag("US");
@@ -218,6 +234,9 @@ namespace I18n {
 
     void LocaleHelperFuzzTest025(FuzzedDataProvider& provider)
     {
+        std::string input = provider.ConsumeRandomLengthString();
+        LocaleHelper::IsWellFormedCurrencyCode(input);
+        LocaleHelper::IsWellFormedCalendarCode(input);
         LocaleHelper::IsWellFormedCurrencyCode("USD");
         LocaleHelper::IsWellFormedCurrencyCode("CNY");
         LocaleHelper::IsWellFormedCalendarCode("gregory");

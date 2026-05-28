@@ -124,10 +124,12 @@ namespace I18n {
 
     void MeasureDataFuzzTest013(FuzzedDataProvider& provider)
     {
+        std::string input = provider.ConsumeRandomLengthString();
         std::vector<std::string> units;
         units.push_back("kilometer");
         units.push_back("meter");
         units.push_back("centimeter");
+        GetDefaultPreferredUnit(input, input, units);
         GetDefaultPreferredUnit("US", "length", units);
         GetDefaultPreferredUnit("CN", "length", units);
         GetDefaultPreferredUnit("GB", "length", units);
@@ -155,6 +157,8 @@ namespace I18n {
 
     void MeasureDataFuzzTest016(FuzzedDataProvider& provider)
     {
+        std::string input = provider.ConsumeRandomLengthString();
+        ComputeSIPrefixValue(input);
         ComputeSIPrefixValue("kilo");
         ComputeSIPrefixValue("mega");
         ComputeSIPrefixValue("giga");
@@ -164,31 +168,40 @@ namespace I18n {
 
     void MeasureDataFuzzTest017(FuzzedDataProvider& provider)
     {
-        double number = 1024.0;
-        std::string unit1 = "byte";
-        std::string unit2 = "kilobyte";
-        std::string unit3 = "megabyte";
-        ConvertByte(number, unit1);
-        ConvertByte(number, unit2);
-        ConvertByte(number, unit3);
+        double number = provider.ConsumeFloatingPoint<double>();
+        std::string input = provider.ConsumeRandomLengthString();
+        ConvertByte(number, input);
+        number = 1024.0;
+        input = "byte";
+        ConvertByte(number, input);
+        input = "kilobyte";
+        ConvertByte(number, input);
+        input = "megabyte";
+        ConvertByte(number, input);
     }
 
     void MeasureDataFuzzTest018(FuzzedDataProvider& provider)
     {
-        double number = 365.0;
-        std::string unit1 = "day";
-        std::string unit2 = "week";
-        std::string unit3 = "month";
-        std::string unit4 = "year";
-        ConvertDate(number, unit1);
-        ConvertDate(number, unit2);
-        ConvertDate(number, unit3);
-        ConvertDate(number, unit4);
+        double number = provider.ConsumeFloatingPoint<double>();
+        std::string input = provider.ConsumeRandomLengthString();
+        ConvertDate(number, input);
+        number = 365.0;
+        input = "day";
+        ConvertDate(number, input);
+        input = "week";
+        ConvertDate(number, input);
+        input = "month";
+        ConvertDate(number, input);
+        input = "year";
+        ConvertDate(number, input);
     }
 
     void MeasureDataFuzzTest019(FuzzedDataProvider& provider)
     {
-        double value = 1000.0;
+        double value = provider.ConsumeFloatingPoint<double>();
+        std::string input = provider.ConsumeRandomLengthString();
+        Convert(value, input, input, input, input);
+        value = 1000.0;
         Convert(value, "meter", "metric", "kilometer", "metric");
         Convert(value, "kilometer", "metric", "mile", "imperial");
         Convert(value, "liter", "metric", "gallon", "imperial");
@@ -196,6 +209,8 @@ namespace I18n {
 
     void MeasureDataFuzzTest020(FuzzedDataProvider& provider)
     {
+        std::string input = provider.ConsumeRandomLengthString();
+        GetMask(input);
         GetMask("US");
         GetMask("CN");
         GetMask("GB");
@@ -215,7 +230,12 @@ namespace I18n {
 
     void MeasureDataFuzzTest022(FuzzedDataProvider& provider)
     {
+        double number = provider.ConsumeFloatingPoint<double>();
+        std::string input = provider.ConsumeRandomLengthString();
         std::vector<double> factors;
+        factors.push_back(number);
+        ComputeFactorValue(input, input, factors);
+        factors.clear();
         factors.push_back(1000.0);
         factors.push_back(1.0);
         ComputeFactorValue("kilometer", "metric", factors);
@@ -244,28 +264,34 @@ namespace I18n {
 
     void MeasureDataFuzzTest025(FuzzedDataProvider& provider)
     {
-        double value = 0.0;
-        std::string unit = "byte";
-        ConvertByte(value, unit);
-        
+        double value = provider.ConsumeFloatingPoint<double>();
+        std::string input = provider.ConsumeRandomLengthString();
+        ConvertByte(value, input);
+        value = 0.0;
+        input = "byte";
+        ConvertByte(value, input);
         value = -1024.0;
-        ConvertByte(value, unit);
-        
+        input = "byte";
+        ConvertByte(value, input);
         value = 1e15;
-        ConvertByte(value, unit);
+        input = "byte";
+        ConvertByte(value, input);
     }
 
     void MeasureDataFuzzTest026(FuzzedDataProvider& provider)
     {
-        double value = 0.0;
-        std::string unit = "day";
-        ConvertDate(value, unit);
-        
+        double value = provider.ConsumeFloatingPoint<double>();
+        std::string input = provider.ConsumeRandomLengthString();
+        ConvertDate(value, input);
+        value = 0.0;
+        input = "day";
+        ConvertDate(value, input);
         value = -365.0;
-        ConvertDate(value, unit);
-        
+        input = "day";
+        ConvertDate(value, input);
         value = 1e9;
-        ConvertDate(value, unit);
+        input = "day";
+        ConvertDate(value, input);
     }
 
     void MeasureDataFuzzTest027(FuzzedDataProvider& provider)

@@ -55,12 +55,19 @@ namespace I18n {
 
     void SimpleNumberFormatFuzzTest004(FuzzedDataProvider& provider)
     {
+        std::string input = provider.ConsumeRandomLengthString();
+        double number = provider.ConsumeFloatingPoint<double>();
         I18nErrorCode errCode = I18nErrorCode::SUCCESS;
-        SimpleNumberFormat format("", "zh-CN", errCode);
+        SimpleNumberFormat format(input, input, errCode);
         if (errCode == I18nErrorCode::SUCCESS) {
-            format.Format(0);
-            format.Format(-1);
-            format.Format(1000000);
+            format.Format(number);
+        }
+        errCode = I18nErrorCode::SUCCESS;
+        SimpleNumberFormat formatZh("", "zh-CN", errCode);
+        if (errCode == I18nErrorCode::SUCCESS) {
+            formatZh.Format(0);
+            formatZh.Format(-1);
+            formatZh.Format(1000000);
         }
     }
 
