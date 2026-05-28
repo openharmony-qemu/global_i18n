@@ -984,7 +984,7 @@ HWTEST_F(CustomizedDateTimeFormatTest, CustomizedDateTimeFormatTest0017, TestSiz
     auto sDateFormat375 = std::make_unique<SimpleDateTimeFormat>("hm", "zh-Hant", false, errCode);
     EXPECT_EQ(sDateFormat375->Format(timep*1000), "上午12:00");
     auto sDateFormat376 = std::make_unique<SimpleDateTimeFormat>("hms", "zh-Hant", false, errCode);
-    EXPECT_EQ(sDateFormat376->Format(timep*1000), "上午12:00:00");
+    EXPECT_EQ(sDateFormat376->Format(timep*1000), "上午 12:00:00");
     auto sDateFormat377 = std::make_unique<SimpleDateTimeFormat>("hmsv", "zh-Hant", false, errCode);
     EXPECT_EQ(sDateFormat377->Format(timep*1000), "上午12:00:00 [中國時間]");
     auto sDateFormat378 = std::make_unique<SimpleDateTimeFormat>("hmv", "zh-Hant", false, errCode);
