@@ -220,6 +220,7 @@ void I18nCalendar::SetTime(double value)
     icu::Calendar* icuCalendar = GetIcuCalendar();
     if (icuCalendar != nullptr) {
         UErrorCode status = U_ZERO_ERROR;
+        std::lock_guard<std::mutex> zoneLock(zoneMutex);
         icuCalendar->setTime(value, status);
         if (U_FAILURE(status)) {
             HILOG_ERROR_I18N("I18nCalendar::SetTime: icuCalendar setTime failed.");
@@ -307,6 +308,7 @@ void I18nCalendar::SetMinimalDaysInFirstWeek(int32_t value)
 {
     icu::Calendar* icuCalendar = GetIcuCalendar();
     if (icuCalendar != nullptr) {
+        std::lock_guard<std::mutex> zoneLock(zoneMutex);
         icuCalendar->setMinimalDaysInFirstWeek((uint8_t)value);
         return;
     }
@@ -319,6 +321,7 @@ void I18nCalendar::SetFirstDayOfWeek(int32_t value)
     }
     icu::Calendar* icuCalendar = GetIcuCalendar();
     if (icuCalendar != nullptr) {
+        std::lock_guard<std::mutex> zoneLock(zoneMutex);
         icuCalendar->setFirstDayOfWeek(UCalendarDaysOfWeek(value));
         return;
     }
@@ -344,6 +347,7 @@ int32_t I18nCalendar::GetMinimalDaysInFirstWeek(void)
 {
     icu::Calendar* icuCalendar = GetIcuCalendar();
     if (icuCalendar != nullptr) {
+        std::lock_guard<std::mutex> zoneLock(zoneMutex);
         return icuCalendar->getMinimalDaysInFirstWeek();
     }
     return 1;
@@ -353,6 +357,7 @@ int32_t I18nCalendar::GetFirstDayOfWeek(void)
 {
     icu::Calendar* icuCalendar = GetIcuCalendar();
     if (icuCalendar != nullptr) {
+        std::lock_guard<std::mutex> zoneLock(zoneMutex);
         return static_cast<int>(icuCalendar->getFirstDayOfWeek());
     }
     return UCAL_SUNDAY;
@@ -389,7 +394,11 @@ std::string I18nCalendar::GetDisplayName(std::string &displayLocaleTag)
     if (icuCalendar == nullptr) {
         return PseudoLocalizationProcessor("");
     }
-    const char *type = icuCalendar->getType();
+    const char *type = nullptr;
+    {
+        std::lock_guard<std::mutex> zoneLock(zoneMutex);
+        type = icuCalendar->getType();
+    }
     if (type == nullptr) {
         return PseudoLocalizationProcessor("");
     }

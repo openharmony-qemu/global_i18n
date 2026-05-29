@@ -73,10 +73,10 @@ public:
 
 protected:
     virtual icu::Calendar* GetIcuCalendar() const;
+    std::mutex zoneMutex;
 
 private:
     icu::Calendar *calendar_;
-    std::mutex zoneMutex;
     void InitCalendar(const icu::Locale &locale, CalendarType type);
     void InitCalendar2(const icu::Locale &locale, CalendarType type, UErrorCode &status);
     void InitFirstDayOfWeek(const std::string& localeTag);

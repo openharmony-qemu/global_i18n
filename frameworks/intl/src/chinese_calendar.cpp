@@ -62,7 +62,7 @@ void ChineseCalendar::SetChineseCalendarTime(const ChineseCalendarTime& time, I1
         HILOG_ERROR_I18N("SetChineseCalendarTime: icuCalendar is nullptr.");
         return;
     }
-
+    std::lock_guard<std::mutex> zoneLock(zoneMutex);
     icuCalendar->set(UCAL_ERA, era);
     icuCalendar->set(UCAL_YEAR, time.cyclicalYear);
     icuCalendar->set(UCAL_MONTH, time.month);
