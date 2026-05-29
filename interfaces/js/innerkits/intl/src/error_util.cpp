@@ -74,6 +74,27 @@ void ErrorUtil::NapiThrow(napi_env env, int32_t errCode, const std::string& valu
     napi_throw(env, error);
 }
 
+void ErrorUtil::NapiThrowBusinessError(napi_env env, int32_t errCode, const std::string& valueName,
+    const std::string& valueContent, bool throwError)
+{
+    if (!throwError) {
+        return;
+    }
+    auto iter = ErrorCodeToMsg.find(errCode);
+    std::string errMsg = iter != ErrorCodeToMsg.end() ? iter->second : "";
+    std::string allErrMsg;
+    if (errCode == I18N_NO_PERMISSION || errCode == I18N_NOT_SYSTEM_APP) {
+        allErrMsg = errMsg;
+    } else if (errCode == I18N_NOT_VALID || errCode == I18N_NOT_VALID_NEW) {
+        allErrMsg = errMsg + ", the " + valueName + " must be " + valueContent + ".";
+    } else if (valueContent.length() == 0) {
+        allErrMsg = errMsg + ", the " + valueName + " cannot be empty.";
+    } else {
+        allErrMsg = errMsg + ", the type of " + valueName + " must be " + valueContent + ".";
+    }
+    napi_throw_business_error(env, errCode, allErrMsg.c_str());
+}
+
 void ErrorUtil::NapiNotFoundError(napi_env env, int32_t errCode, const std::string& valueName,
     bool throwError)
 {
