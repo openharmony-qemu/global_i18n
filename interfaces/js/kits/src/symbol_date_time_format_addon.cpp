@@ -400,7 +400,8 @@ void SymbolDateTimeFormatAddon::ParseAmPmSymbol(napi_env env, napi_value options
         return;
     }
     if (symbol.size() < SymbolDateTimeFormat::AM_PM_SYMBOLS_LEN) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "amPMSymbol", "a string[] with two or more elements", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_VALID_NEW,
+            "amPMSymbol", "a string[] with two or more elements", true);
         return;
     }
     options.insert(std::make_pair(SymbolDateTimeFormat::AM_SYMBOL_TAG, symbol[0]));
