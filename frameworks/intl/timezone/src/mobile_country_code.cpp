@@ -31,7 +31,7 @@ extern "C" int GlobalI18nGetCountryCodeFromSimCard(char* res, const int resLengt
     std::set<std::string> resultSet;
     std::vector<size_t> soltIds = {0, 1};
     for (size_t i = 0; i < soltIds.size(); i++) {
-        Global_I18N_GetCountryCodeFromSimCardInner(resultSet, soltIds[i]);
+        GlobalI18nGetCountryCodeFromSimCardInner(resultSet, soltIds[i]);
     }
     std::string resultStr = "";
     for (size_t i = 0; i < resultSet.size(); i++) {
