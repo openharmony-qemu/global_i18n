@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "mobile_country_code.h"
 #include "i18n_hilog.h"
 #include <cctype>
 #include <cstdio>
@@ -24,6 +25,7 @@
 #include "core_service_client.h"
 #endif
 
+using namespace OHOS;
 
 extern "C" int GlobalI18nGetCountryCodeFromSimCard(char* res, const int resLength)
 {
@@ -33,11 +35,11 @@ extern "C" int GlobalI18nGetCountryCodeFromSimCard(char* res, const int resLengt
         GlobalI18nGetCountryCodeFromSimCardInner(resultSet, soltIds[i]);
     }
     std::string resultStr = "";
-    for (size_t i = 0; i < resultSet.size(); i++) {
-        if (i > 1) {
+    for (auto it = resultSet.begin(); it != resultSet.end(); ++it) {
+        if (it != resultSet.begin()) {
             resultStr += ",";
         }
-        resultStr += resultSet[i];
+        resultStr += *it;
     }
     return strcpy_s(res, resLength, resultStr.c_str());
 }
@@ -48,7 +50,7 @@ void GlobalI18nGetCountryCodeFromSimCardInner(std::set<std::string> &resultSet, 
     std::u16string countryCode;
     int32_t errorCode = DelayedRefSingleton<Telephony::CoreServiceClient>::GetInstance().GetISOCountryCodeForSim(
         soltId, countryCode);
-    HILOG_INFO_I18N("SystemLocaleManager: getCountryCodeForSim id:%{public}d, errorCode:%{public}d.",
+    HILOG_INFO_I18N("SystemLocaleManager: getCountryCodeForSim id:%{public}zu, errorCode:%{public}d.",
         soltId, errorCode);
     std::string result = Str16ToStr8(countryCode);
     if (result.empty()) {

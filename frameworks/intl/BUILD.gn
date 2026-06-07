@@ -255,7 +255,7 @@ ohos_shared_library("tz_bridge") {
   if (is_asan) {
     defines += [ "SUPPORT_ASAN" ]
   }
-  if (tel_core_service_enable) {
+  if (i18n_tel_core_service_enable) {
     external_deps += [ "core_service:tel_core_service_api" ]
     defines += [ "TEL_CORE_SERVICE_ENABLE" ]
   }
