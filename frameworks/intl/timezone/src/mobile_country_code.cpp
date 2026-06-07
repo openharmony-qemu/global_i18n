@@ -26,7 +26,7 @@
 #endif
 
 
-extern "C" int Global_I18N_GetCountryCodeFromSimCard(char* res, const int resLength)
+extern "C" int GlobalI18nGetCountryCodeFromSimCard(char* res, const int resLength)
 {
     std::set<std::string> resultSet;
     std::vector<size_t> soltIds = {0, 1};
@@ -43,7 +43,7 @@ extern "C" int Global_I18N_GetCountryCodeFromSimCard(char* res, const int resLen
     return strcpy_s(res, resLength, resultStr.c_str());
 }
 
-void Global_I18N_GetCountryCodeFromSimCardInner(std::set<std::string> &resultSet, size_t soltId)
+void GlobalI18nGetCountryCodeFromSimCardInner(std::set<std::string> &resultSet, size_t soltId)
 {
 #if defined(TEL_CORE_SERVICE_ENABLE)
     std::u16string countryCode;
