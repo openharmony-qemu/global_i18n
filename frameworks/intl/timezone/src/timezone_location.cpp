@@ -15,13 +15,16 @@
 #include "timezone_location.h"
 
 #include "i18n_hilog.h"
-
+#include <cctype>
 #include <cstdio>
 #include <unistd.h>
 #include <unordered_map>
 #include "utils.h"
 #include <chrono>
 #include "cJSON.h"
+#ifdef TEL_CORE_SERVICE_ENABLE
+#include "core_service_client.h"
+#endif
 
 namespace OHOS {
 namespace Global {

@@ -19,6 +19,7 @@ group("build_module") {
   deps = [
     ":intl_util",
     ":preferred_language",
+    ":tz_bridge",
     "./parameter_upgrade:libphonenumber_version_txt",
     "./parameter_upgrade:prefabrication_libphonenumber",
     "./parameter_upgrade:prefabrication_timezone",
@@ -224,6 +225,38 @@ ohos_shared_library("intl_util") {
     if (target_platform == "pc") {
       defines += [ "SUPPORT_MULTI_USER" ]
     }
+  }
+  install_images = [ system_base_dir ]
+  relative_install_dir = "platformsdk"
+  subsystem_name = "global"
+  innerapi_tags = [ "platformsdk" ]
+  part_name = "i18n"
+}
+
+ohos_shared_library("tz_bridge") {
+  branch_protector_ret = "pac_ret"
+  include_dirs = [ "//base/global/i18n/frameworks/intl/timezone/include" ]
+  sources = [ "timezone/src/mobile_country_code.cpp" ]
+  external_deps = [
+    "bounds_checking_function:libsec_shared",
+    "c_utils:utils",
+    "hilog:libhilog",
+  ]
+  cflags_cc = [
+    "-Wall",
+    "-fPIC",
+    "-frtti",
+  ]
+  deps = [":intl_util"]
+  remove_configs = [ "//build/config/compiler:no_rtti" ]
+  use_exceptions = true
+  defines = []
+  if (is_asan) {
+    defines += [ "SUPPORT_ASAN" ]
+  }
+  if (tel_core_service_enable) {
+    external_deps += [ "core_service:tel_core_service_api" ]
+    defines += [ "TEL_CORE_SERVICE_ENABLE" ]
   }
   install_images = [ system_base_dir ]
   relative_install_dir = "platformsdk"
