@@ -97,7 +97,7 @@ private:
     std::string GetCountryCodeFromSimCard();
     std::string GetCountryCodeFromNetwork();
     std::string GetCountryCodeFromVendorCountry();
-    char* GetPoliticalDataPath();
+    const char* GetPoliticalDataPath();
     std::vector<std::string> ReadPoliticalData(const std::string& datPath,
         const double lon, const double lat);
     std::vector<std::string> TraversePoliticalDataDirectory(const std::string& dataDir,

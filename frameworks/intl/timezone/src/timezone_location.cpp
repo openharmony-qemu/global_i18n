@@ -25,6 +25,7 @@
 #include <dlfcn.h>
 #include <iostream>
 #include <filesystem>
+#include <sys/stat.h>
 #include "locale_config.h"
 #ifdef TEL_CORE_SERVICE_ENABLE
 #include "core_service_client.h"
@@ -481,7 +482,7 @@ std::vector<std::string> TimeZoneLocation::GetPoliticalTimezone(
         if (!FileExist(newPath)) {
             continue;
         }
-        std::vector<std::string> result = TraversePoliticalDataDirectory(dataDir, lon, lat);
+        std::vector<std::string> result = TraversePoliticalDataDirectory(newPath, lon, lat);
         if (!result.empty()) {
             return result;
         }
@@ -632,7 +633,7 @@ std::string TimeZoneLocation::GetCountryCodeFromVendorCountry()
     return "";
 }
 
-char *TimeZoneLocation::GetPoliticalDataPath()
+const char *TimeZoneLocation::GetPoliticalDataPath()
 {
     if (access(DISTRO_POLITICAL_DATA_PATH, R_OK) != -1) {
         return DISTRO_POLITICAL_DATA_PATH;
