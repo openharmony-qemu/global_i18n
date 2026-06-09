@@ -636,7 +636,7 @@ char *TimeZoneLocation::GetPoliticalDataPath()
 {
     if (access(DISTRO_POLITICAL_DATA_PATH, R_OK) != -1) {
         return DISTRO_POLITICAL_DATA_PATH;
- 	}
+    }
     if (access(POLITICAL_DATA_PATH, R_OK) != -1) {
         return POLITICAL_DATA_PATH;
     }
