@@ -34,6 +34,23 @@ extern "C" int GlobalI18nGetCountryCodeFromSimCard(char* res, const int resLengt
     for (size_t i = 0; i < soltIds.size(); i++) {
         GlobalI18nGetCountryCodeFromSimCardInner(resultSet, soltIds[i]);
     }
+    std::string resultStr = GlobalI18nJoinString(resultSet);
+    return strcpy_s(res, resLength, resultStr.c_str());
+}
+
+extern "C" int GlobalI18nGetCountryCodeFromNetwork(char* res, const int resLength)
+{
+    std::set<std::string> resultSet;
+    std::vector<size_t> soltIds = {0, 1};
+    for (size_t i = 0; i < soltIds.size(); i++) {
+        GlobalI18nGetCountryCodeFromNetworkInner(resultSet, soltIds[i]);
+    }
+    std::string resultStr = GlobalI18nJoinString(resultSet);
+    return strcpy_s(res, resLength, resultStr.c_str());
+}
+
+std::string GlobalI18nJoinString(std::set<std::string> &resultSet)
+{
     std::string resultStr = "";
     for (auto it = resultSet.begin(); it != resultSet.end(); ++it) {
         if (it != resultSet.begin()) {
@@ -41,7 +58,7 @@ extern "C" int GlobalI18nGetCountryCodeFromSimCard(char* res, const int resLengt
         }
         resultStr += *it;
     }
-    return strcpy_s(res, resLength, resultStr.c_str());
+    return resultStr;
 }
 
 void GlobalI18nGetCountryCodeFromSimCardInner(std::set<std::string> &resultSet, size_t soltId)
@@ -50,7 +67,26 @@ void GlobalI18nGetCountryCodeFromSimCardInner(std::set<std::string> &resultSet, 
     std::u16string countryCode;
     int32_t errorCode = DelayedRefSingleton<Telephony::CoreServiceClient>::GetInstance().GetISOCountryCodeForSim(
         soltId, countryCode);
-    HILOG_INFO_I18N("SystemLocaleManager: getCountryCodeForSim id:%{public}zu, errorCode:%{public}d.",
+    HILOG_INFO_I18N("GlobalI18nGetCountryCodeFromSimCardInner id:%{public}zu, errorCode:%{public}d.",
+        soltId, errorCode);
+    std::string result = Str16ToStr8(countryCode);
+    if (result.empty()) {
+        return;
+    }
+    for (size_t i = 0; i < result.length(); ++i) {
+        result[i] = toupper(result[i]);
+    }
+    resultSet.insert(result);
+#endif
+}
+
+void GlobalI18nGetCountryCodeFromNetworkInner(std::set<std::string> &resultSet, size_t soltId)
+{
+#if defined(TEL_CORE_SERVICE_ENABLE)
+    std::u16string countryCode;
+    int32_t errorCode = DelayedRefSingleton<Telephony::CoreServiceClient>::GetInstance()
+        .GetIsoCountryCodeForNetwork(soltId, countryCode);
+    HILOG_INFO_I18N("GlobalI18nGetCountryCodeFromNetworkInner id:%{public}zu, errorCode:%{public}d.",
         soltId, errorCode);
     std::string result = Str16ToStr8(countryCode);
     if (result.empty()) {

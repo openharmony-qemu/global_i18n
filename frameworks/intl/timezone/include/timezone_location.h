@@ -23,6 +23,8 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
+using GetCountryCodeFunc = int (*)(const char*, const int);
+
 struct QueryData {
     double top;
     double bottom;
@@ -64,7 +66,11 @@ private:
     static const size_t LOOP_STEP = 2;
     static const int32_t MAX_LOOKUP_STR_SIZE = 10485760;
     static const int32_t MIN_POLYGON_POINTS_COUNT = 4;
+    static const int RECV_CHAR_LENGTH = 128;
     static const char *TIMEZONE_LOCATION_PATH;
+    static const char *POLITICAL_DATA_PATH;
+    static const char *DISTRO_POLITICAL_DATA_PATH;
+    static const std::string VENDOR_COUNTRY_KEY;
     static const std::vector<OceanZone> OCEAN_ZONES;
 
     std::vector<Point> GetPointVect(int32_t* points, size_t size);
@@ -87,6 +93,16 @@ private:
     void ReadJsonArray(const std::string& jsonArrayStr,
         const std::vector<std::string>& tzidNames, std::vector<std::string>& tzidList);
     bool IsPointOnSegment(const Point& p, const Point& before, const Point& after);
+    std::vector<std::string> GetCountryCode();
+    std::string GetCountryCodeFromSimCard();
+    std::string GetCountryCodeFromNetwork();
+    std::string GetCountryCodeFromVendorCountry();
+    char* GetPoliticalDataPath();
+    std::vector<std::string> ReadPoliticalData(const std::string& datPath,
+        const double lon, const double lat);
+    std::vector<std::string> TraversePoliticalDataDirectory(const std::string& dataDir,
+        const double lon, const double lat);
+    std::vector<std::string> GetPoliticalTimezone(const double lon, const double lat);
 };
 } // namespace I18n
 } // namespace Global
