@@ -476,7 +476,7 @@ std::vector<std::string> TimeZoneLocation::GetPoliticalTimezone(
     if (countryCodeVect.empty()) {
         return {};
     }
-    char* politicalDataPath = GetPoliticalDataPath();
+    const char* politicalDataPath = GetPoliticalDataPath();
     for (size_t i = 0 ; i < countryCodeVect.size(); i++) {
         std::string newPath = std::string(politicalDataPath) + "/" + countryCodeVect[i];
         if (!FileExist(newPath)) {
