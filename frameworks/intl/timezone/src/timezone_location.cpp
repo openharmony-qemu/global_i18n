@@ -36,7 +36,7 @@ namespace Global {
 namespace I18n {
 const char *TimeZoneLocation::TIMEZONE_LOCATION_PATH = "/system/usr/ohos_timezone/timezone_location.dat";
 const char *TimeZoneLocation::POLITICAL_DATA_PATH = "/system/usr/ohos_timezone/political_timezone";
-const char *TimeZoneLocation::DISTRO_POLITICAL_DATA_PATH = "/system/etc/tzdata_distro/political_timezone";
+const char *TimeZoneLocation::DISTRO_POLITICAL_DATA_PATH = "/system/etc/tzdata_distro/tz_political";
 const std::string TimeZoneLocation::VENDOR_COUNTRY_KEY = "const.cust.region";
 const std::vector<OceanZone> TimeZoneLocation::OCEAN_ZONES {
     {"Etc/GMT-12", 172.5, 180 },
@@ -477,7 +477,7 @@ std::vector<std::string> TimeZoneLocation::GetPoliticalTimezone(
         return {};
     }
     const char* politicalDataPath = GetPoliticalDataPath();
-    for (size_t i = 0 ; i < countryCodeVect.size(); i++) {
+    for (size_t i = 0; i < countryCodeVect.size(); i++) {
         std::string newPath = std::string(politicalDataPath) + "/" + countryCodeVect[i];
         if (!FileExist(newPath)) {
             continue;
@@ -638,10 +638,7 @@ const char *TimeZoneLocation::GetPoliticalDataPath()
     if (access(DISTRO_POLITICAL_DATA_PATH, R_OK) != -1) {
         return DISTRO_POLITICAL_DATA_PATH;
     }
-    if (access(POLITICAL_DATA_PATH, R_OK) != -1) {
-        return POLITICAL_DATA_PATH;
-    }
-    return {0};
+    return POLITICAL_DATA_PATH;
 }
 } // namespace I18n
 } // namespace Global
