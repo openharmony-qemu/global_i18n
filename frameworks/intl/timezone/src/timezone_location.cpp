@@ -37,6 +37,7 @@ namespace I18n {
 const char *TimeZoneLocation::TIMEZONE_LOCATION_PATH = "/system/usr/ohos_timezone/timezone_location.dat";
 const char *TimeZoneLocation::POLITICAL_DATA_PATH = "/system/usr/ohos_timezone/political_timezone";
 const char *TimeZoneLocation::DISTRO_POLITICAL_DATA_PATH = "/system/etc/tzdata_distro/tz_political";
+const char *TimeZoneLocation::TZ_BRIDGE_SO_NAME = "../libzone_util.z.so";
 const std::string TimeZoneLocation::VENDOR_COUNTRY_KEY = "const.cust.region";
 const std::vector<OceanZone> TimeZoneLocation::OCEAN_ZONES {
     {"Etc/GMT-12", 172.5, 180 },
@@ -516,7 +517,12 @@ std::vector<std::string> TimeZoneLocation::TraversePoliticalDataDirectory(
 std::vector<std::string> TimeZoneLocation::ReadPoliticalData(const std::string& datPath,
     const double lon, const double lat)
 {
-    FILE* datFile = fopen(datPath.c_str(), "rb");
+    std::string realDatPath = GetAbsoluteFilePath(datPath);
+    if (realDatPath.empty()) {
+        HILOG_ERROR_I18N("ReadPoliticalData: real dat path is empty");
+        return {};
+    }
+    FILE* datFile = fopen(realDatPath.c_str(), "rb");
     if (datFile == nullptr) {
         HILOG_ERROR_I18N("ReadPoliticalData: open dat file failed");
         return {};
@@ -581,7 +587,7 @@ std::vector<std::string> TimeZoneLocation::GetCountryCode()
 
 std::string TimeZoneLocation::GetCountryCodeFromSimCard()
 {
-    void* handler = dlopen("libtz_bridge.z.so", RTLD_NOW);
+    void* handler = dlopen(TZ_BRIDGE_SO_NAME, RTLD_NOW);
     if (handler == nullptr) {
         HILOG_ERROR_I18N("GetCountryCodeFromSimCard: open  failed");
         return "";
@@ -602,7 +608,7 @@ std::string TimeZoneLocation::GetCountryCodeFromSimCard()
 
 std::string TimeZoneLocation::GetCountryCodeFromNetwork()
 {
-    void* handler = dlopen("libtz_bridge.z.so", RTLD_NOW);
+    void* handler = dlopen(TZ_BRIDGE_SO_NAME, RTLD_NOW);
     if (handler == nullptr) {
         HILOG_ERROR_I18N("GetCountryCodeFromNetwork: open  failed");
         return "";
