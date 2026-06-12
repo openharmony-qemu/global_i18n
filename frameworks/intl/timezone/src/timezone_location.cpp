@@ -24,7 +24,6 @@
 #include "cJSON.h"
 #include <dlfcn.h>
 #include <iostream>
-#include <filesystem>
 #include <sys/stat.h>
 #include "locale_config.h"
 #ifdef TEL_CORE_SERVICE_ENABLE
@@ -514,31 +513,37 @@ std::vector<std::string> TimeZoneLocation::ReadPoliticalData(const std::string& 
         CloseFile(datFile);
         return {};
     }
-
     for (size_t k = 0; k < tzids.size(); k++) {
-        int32_t polygonCount;
-        if (fread(&polygonCount, sizeof(int32_t), 1, datFile) != 1) {
-            CloseFile(datFile);
-            HILOG_ERROR_I18N("ReadPoliticalData: read tz Index Length failed");
-            return {};
-        }
-        std::vector<int32_t> polygonPointsCountList;
-        for (int32_t i = 0; i < polygonCount; i++) {
-            int32_t polygonPointCount;
-            if (fread(&polygonPointCount, sizeof(int32_t), 1, datFile) != 1) {
-                CloseFile(datFile);
-                HILOG_ERROR_I18N("ReadPoliticalData: read polygon point count failed");
-                return {};
-            }
-            polygonPointsCountList.push_back(polygonPointCount);
-        }
-        if (IsPointInMultiPolygon(polygonPointsCountList, lon, lat, datFile)) {
+        if (MatchPoliticalDataBlock(datFile, lon, lat)) {
             CloseFile(datFile);
             return { tzids[k] };
         }
     }
     CloseFile(datFile);
     return {};
+}
+
+bool TimeZoneLocation::MatchPoliticalDataBlock(FILE* datFile,
+    const double lon, const double lat)
+{
+    int32_t polygonCount;
+    if (fread(&polygonCount, sizeof(int32_t), 1, datFile) != 1) {
+        HILOG_ERROR_I18N("ReadPoliticalData: read tz Index Length failed");
+        return false;
+    }
+    std::vector<int32_t> polygonPointsCountList;
+    for (int32_t i = 0; i < polygonCount; i++) {
+        int32_t polygonPointCount;
+        if (fread(&polygonPointCount, sizeof(int32_t), 1, datFile) != 1) {
+            HILOG_ERROR_I18N("ReadPoliticalData: read polygon point count failed");
+            return false;
+        }
+        polygonPointsCountList.push_back(polygonPointCount);
+    }
+    if (IsPointInMultiPolygon(polygonPointsCountList, lon, lat, datFile)) {
+        return true;
+    }
+    return false;
 }
 
 std::vector<std::string> TimeZoneLocation::GetCountryCode()

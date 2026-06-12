@@ -66,7 +66,7 @@ private:
     static const size_t LOOP_STEP = 2;
     static const int32_t MAX_LOOKUP_STR_SIZE = 10485760;
     static const int32_t MIN_POLYGON_POINTS_COUNT = 4;
-    static const int RECV_CHAR_LENGTH = 128;
+    static const int RECV_CHAR_LENGTH = 32;
     static const char *TIMEZONE_LOCATION_PATH;
     static const char *POLITICAL_DATA_PATH;
     static const char *DISTRO_POLITICAL_DATA_PATH;
@@ -101,6 +101,7 @@ private:
     const char* GetPoliticalDataPath();
     std::vector<std::string> ReadPoliticalData(const std::string& datPath,
         const double lon, const double lat);
+    bool MatchPoliticalDataBlock(FILE* datFile, const double lon, const double lat);
     std::vector<std::string> GetPoliticalTimezone(const double lon, const double lat);
 };
 } // namespace I18n
