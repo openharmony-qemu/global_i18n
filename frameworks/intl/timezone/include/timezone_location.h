@@ -70,7 +70,7 @@ private:
     static const char *TIMEZONE_LOCATION_PATH;
     static const char *POLITICAL_DATA_PATH;
     static const char *DISTRO_POLITICAL_DATA_PATH;
-    static const char *TZ_BRIDGE_SO_NAME;
+    static const char *DLOPEN_SO_NAME;
     static const std::string VENDOR_COUNTRY_KEY;
     static const std::vector<OceanZone> OCEAN_ZONES;
 
@@ -100,8 +100,6 @@ private:
     std::string GetCountryCodeFromVendorCountry();
     const char* GetPoliticalDataPath();
     std::vector<std::string> ReadPoliticalData(const std::string& datPath,
-        const double lon, const double lat);
-    std::vector<std::string> TraversePoliticalDataDirectory(const std::string& dataDir,
         const double lon, const double lat);
     std::vector<std::string> GetPoliticalTimezone(const double lon, const double lat);
 };
