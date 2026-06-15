@@ -39,6 +39,7 @@ int CollatorFuncTest007(void);
 int CollatorFuncTest008(void);
 int CollatorFuncTest009(void);
 int CollatorFuncTest010(void);
+int CollatorFuncTest011(void);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
