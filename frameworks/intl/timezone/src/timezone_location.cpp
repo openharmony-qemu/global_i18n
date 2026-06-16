@@ -565,7 +565,9 @@ std::vector<std::string> TimeZoneLocation::GetCountryCode()
         return vect;
     }
     std::string sysRegion = LocaleConfig::GetSystemRegion();
-    vect.push_back(sysRegion);
+    if (!sysRegion.empty()) {
+        vect.push_back(sysRegion);
+    }
     return vect;
 }
 

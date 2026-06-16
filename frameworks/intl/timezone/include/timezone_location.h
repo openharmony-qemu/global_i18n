@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
-using GetCountryCodeFunc = int (*)(const char*, const int);
+using GetCountryCodeFunc = int (*)(char*, const int);
 
 struct QueryData {
     double top;
