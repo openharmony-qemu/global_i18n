@@ -27,7 +27,7 @@
 
 using namespace OHOS;
 
-extern "C" int GlobalI18nGetCountryCodeFromSimCard(char* res, const int resLength)
+extern "C" int GlobalI18nGetCountryCodeFromSimCard(char* res, int resLength)
 {
     std::set<std::string> resultSet;
     std::vector<size_t> soltIds = {0, 1};
@@ -38,7 +38,7 @@ extern "C" int GlobalI18nGetCountryCodeFromSimCard(char* res, const int resLengt
     return strcpy_s(res, resLength, resultStr.c_str());
 }
 
-extern "C" int GlobalI18nGetCountryCodeFromNetwork(char* res, const int resLength)
+extern "C" int GlobalI18nGetCountryCodeFromNetwork(char* res, int resLength)
 {
     std::set<std::string> resultSet;
     std::vector<size_t> soltIds = {0, 1};

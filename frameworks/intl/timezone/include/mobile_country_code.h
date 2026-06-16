@@ -18,8 +18,8 @@
 #include <string>
 #include <set>
 
-extern "C" int GlobalI18nGetCountryCodeFromSimCard(char* res, const int resLength);
-extern "C" int GlobalI18nGetCountryCodeFromNetwork(char* res, const int resLength);
+extern "C" int GlobalI18nGetCountryCodeFromSimCard(char* res, int resLength);
+extern "C" int GlobalI18nGetCountryCodeFromNetwork(char* res, int resLength);
 void GlobalI18nGetCountryCodeFromSimCardInner(std::set<std::string> &resultSet, size_t soltId);
 void GlobalI18nGetCountryCodeFromNetworkInner(std::set<std::string> &resultSet, size_t soltId);
 std::string GlobalI18nJoinString(std::set<std::string> &resultSet);
