@@ -41,6 +41,7 @@ ohos_fuzztest("EntityRecongnizerFuzzTest") {
     "icu:shared_icuuc",
     "libphonenumber:phonenumber_standard",
     "libxml2:libxml2",
+    "protobuf:protobuf_lite",
   ]
 
   subsystem_name = "global"
