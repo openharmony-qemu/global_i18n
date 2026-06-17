@@ -50,6 +50,10 @@ ohos_shared_library("zone_util") {
     external_deps += [ "core_service:tel_core_service_api" ]
     defines += [ "TEL_CORE_SERVICE_ENABLE" ]
   }
+  if (i18n_tel_cellular_data_enable) {
+    external_deps += [ "cellular_data:tel_cellular_data_api" ]
+    defines += [ "TEL_CELLULAR_DATA_ENABLE" ]
+  }
   subsystem_name = "global"
   part_name = "i18n"
 }
