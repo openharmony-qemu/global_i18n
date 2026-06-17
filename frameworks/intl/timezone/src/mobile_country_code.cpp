@@ -82,7 +82,7 @@ std::string GetCountryCodeFromNetworkInner()
     int32_t errCode = DelayedRefSingleton<Telephony::CoreServiceClient>::GetInstance()
         .GetIsoCountryCodeForNetwork(slotId, countryCode);
     if (errCode != TELEPHONY_SUCCESS) {
-        HILOG_INFO_I18N("GetCountryCodeFromNetworkInner:: id:%{public}d, errCode:%{public}d.", slotId, errCode);
+        HILOG_ERROR_I18N("GetCountryCodeFromNetworkInner:: id:%{public}d, errCode:%{public}d.", slotId, errCode);
         return "";
     }
     std::string result = Str16ToStr8(countryCode);
