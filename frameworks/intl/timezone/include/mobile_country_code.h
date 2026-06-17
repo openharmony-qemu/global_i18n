@@ -20,6 +20,12 @@
 
 extern "C" int GlobalI18nGetCountryCodeFromSimCard(char* res, const int resLength);
 extern "C" int GlobalI18nGetCountryCodeFromNetwork(char* res, const int resLength);
-std::string GlobalI18nGetCountryCodeFromSimCardInner();
-std::string GlobalI18nGetCountryCodeFromNetworkInner();
+namespace OHOS {
+namespace Global {
+namespace I18n {
+    std::string GetCountryCodeFromSimCardInner();
+    std::string GetCountryCodeFromNetworkInner();
+}
+}
+}
 #endif

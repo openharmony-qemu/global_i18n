@@ -32,17 +32,20 @@ using namespace OHOS;
 
 extern "C" int GlobalI18nGetCountryCodeFromSimCard(char* res, const int resLength)
 {
-    std::string resultStr = GlobalI18nGetCountryCodeFromSimCardInner();
+    std::string resultStr = OHOS::Global::I18n::GetCountryCodeFromSimCardInner();
     return strcpy_s(res, resLength, resultStr.c_str());
 }
 
 extern "C" int GlobalI18nGetCountryCodeFromNetwork(char* res, const int resLength)
 {
-    std::string resultStr = GlobalI18nGetCountryCodeFromNetworkInner();
+    std::string resultStr = OHOS::Global::I18n::GetCountryCodeFromNetworkInner();
     return strcpy_s(res, resLength, resultStr.c_str());
 }
 
-std::string GlobalI18nGetCountryCodeFromSimCardInner()
+namespace OHOS {
+namespace Global {
+namespace I18n {
+std::string GetCountryCodeFromSimCardInner()
 {
 #if defined(TEL_CORE_SERVICE_ENABLE) && defined(TEL_CELLULAR_DATA_ENABLE)
     int32_t slotId = Telephony::CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
@@ -53,7 +56,7 @@ std::string GlobalI18nGetCountryCodeFromSimCardInner()
     int32_t errCode = DelayedRefSingleton<Telephony::CoreServiceClient>::GetInstance().GetISOCountryCodeForSim(
         slotId, countryCode);
     if (errCode != TELEPHONY_SUCCESS) {
-        HILOG_ERROR_I18N("GlobalI18nGetCountryCodeFromSimCardInner:: id:%{public}d, errCode:%{public}d.", slotId, errCode);
+        HILOG_ERROR_I18N("GetCountryCodeFromSimCardInner:: id:%{public}d, errCode:%{public}d.", slotId, errCode);
         return "";
     }
     std::string result = Str16ToStr8(countryCode);
@@ -68,7 +71,7 @@ std::string GlobalI18nGetCountryCodeFromSimCardInner()
     return "";
 }
 
-std::string GlobalI18nGetCountryCodeFromNetworkInner()
+std::string GetCountryCodeFromNetworkInner()
 {
 #if defined(TEL_CORE_SERVICE_ENABLE) && defined(TEL_CELLULAR_DATA_ENABLE)
     int32_t slotId = Telephony::CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
@@ -79,7 +82,7 @@ std::string GlobalI18nGetCountryCodeFromNetworkInner()
     int32_t errCode = DelayedRefSingleton<Telephony::CoreServiceClient>::GetInstance()
         .GetIsoCountryCodeForNetwork(slotId, countryCode);
     if (errCode != TELEPHONY_SUCCESS) {
-        HILOG_INFO_I18N("GlobalI18nGetCountryCodeFromNetworkInner:: id:%{public}d, errCode:%{public}d.", slotId, errCode);
+        HILOG_INFO_I18N("GetCountryCodeFromNetworkInner:: id:%{public}d, errCode:%{public}d.", slotId, errCode);
         return "";
     }
     std::string result = Str16ToStr8(countryCode);
@@ -92,4 +95,7 @@ std::string GlobalI18nGetCountryCodeFromNetworkInner()
     return result;
 #endif
     return "";
+}
+}
+}
 }
