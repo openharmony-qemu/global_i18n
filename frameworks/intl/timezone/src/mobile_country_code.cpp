@@ -55,7 +55,7 @@ std::string GetCountryCodeFromSimCardInner()
     std::u16string countryCode;
     int32_t errCode = DelayedRefSingleton<Telephony::CoreServiceClient>::GetInstance().GetISOCountryCodeForSim(
         slotId, countryCode);
-    if (errCode != TELEPHONY_SUCCESS) {
+    if (errCode != 0) {
         HILOG_ERROR_I18N("GetCountryCodeFromSimCardInner:: id:%{public}d, errCode:%{public}d.", slotId, errCode);
         return "";
     }
@@ -81,7 +81,7 @@ std::string GetCountryCodeFromNetworkInner()
     std::u16string countryCode;
     int32_t errCode = DelayedRefSingleton<Telephony::CoreServiceClient>::GetInstance()
         .GetIsoCountryCodeForNetwork(slotId, countryCode);
-    if (errCode != TELEPHONY_SUCCESS) {
+    if (errCode != 0) {
         HILOG_ERROR_I18N("GetCountryCodeFromNetworkInner:: id:%{public}d, errCode:%{public}d.", slotId, errCode);
         return "";
     }
