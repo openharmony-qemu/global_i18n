@@ -26,9 +26,6 @@
 #include <iostream>
 #include <sys/stat.h>
 #include "locale_config.h"
-#ifdef TEL_CORE_SERVICE_ENABLE
-#include "core_service_client.h"
-#endif
 
 namespace OHOS {
 namespace Global {
@@ -501,7 +498,7 @@ std::vector<std::string> TimeZoneLocation::ReadPoliticalData(const std::string& 
         return {};
     }
     int32_t indexCount;
-    if (fread(&indexCount,  sizeof(int32_t), 1, datFile) != 1) {
+    if (fread(&indexCount, sizeof(int32_t), 1, datFile) != 1) {
         HILOG_ERROR_I18N("ReadPoliticalData: read indexCount failed");
         CloseFile(datFile);
         return {};
