@@ -94,7 +94,7 @@ private:
     void ReadJsonArray(const std::string& jsonArrayStr,
         const std::vector<std::string>& tzidNames, std::vector<std::string>& tzidList);
     bool IsPointOnSegment(const Point& p, const Point& before, const Point& after);
-    std::vector<std::string> GetCountryCode();
+    std::string GetCountryCode();
     std::string GetCountryCodeFromSimCard();
     std::string GetCountryCodeFromNetwork();
     std::string GetCountryCodeFromVendorCountry();

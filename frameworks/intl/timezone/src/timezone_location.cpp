@@ -471,20 +471,18 @@ std::vector<std::string> TimeZoneLocation::GetTimezoneByLocation(
 
 std::vector<std::string> TimeZoneLocation::GetPoliticalTimezone(const double lon, const double lat)
 {
-    std::vector<std::string> countryCodeVect = GetCountryCode();
-    if (countryCodeVect.empty()) {
+    std::string countryCode = GetCountryCode();
+    if (countryCode.empty()) {
         return {};
     }
     const char* politicalDataPath = GetPoliticalDataPath();
-    for (size_t i = 0; i < countryCodeVect.size(); i++) {
-        std::string datPath = std::string(politicalDataPath) + "/" + countryCodeVect[i] + ".dat";
-        if (!FileExist(datPath)) {
-            continue;
-        }
-        std::vector<std::string> result = ReadPoliticalData(datPath, lon, lat);
-        if (!result.empty()) {
-            return result;
-        }
+    std::string datPath = std::string(politicalDataPath) + "/" + countryCode + ".dat";
+    if (!FileExist(datPath)) {
+        return {};
+    }
+    std::vector<std::string> result = ReadPoliticalData(datPath, lon, lat);
+    if (!result.empty()) {
+        return result;
     }
     return {};
 }
@@ -546,29 +544,25 @@ bool TimeZoneLocation::MatchPoliticalDataBlock(FILE* datFile,
     return false;
 }
 
-std::vector<std::string> TimeZoneLocation::GetCountryCode()
+std::string TimeZoneLocation::GetCountryCode()
 {
-    std::vector<std::string> vect;
     std::string simCardCountryCode = GetCountryCodeFromSimCard();
     if (!simCardCountryCode.empty()) {
-        Split(simCardCountryCode, ",", vect);
-        return vect;
+        return simCardCountryCode;
     }
     std::string networkCountryCode = GetCountryCodeFromNetwork();
     if (!networkCountryCode.empty()) {
-        Split(networkCountryCode, ",", vect);
-        return vect;
+        return networkCountryCode;
     }
     std::string vendorCountry = GetCountryCodeFromVendorCountry();
     if (!vendorCountry.empty()) {
-        vect.push_back(vendorCountry);
-        return vect;
+        return vendorCountry;
     }
     std::string sysRegion = LocaleConfig::GetSystemRegion();
     if (!sysRegion.empty()) {
-        vect.push_back(sysRegion);
+        return sysRegion;
     }
-    return vect;
+    return "";
 }
 
 std::string TimeZoneLocation::GetCountryCodeFromSimCard()
