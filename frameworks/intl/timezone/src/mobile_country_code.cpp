@@ -24,77 +24,64 @@
 #ifdef TEL_CORE_SERVICE_ENABLE
 #include "core_service_client.h"
 #endif
+#ifdef TEL_CELLULAR_DATA_ENABLE
+#include "cellular_data_client.h"
+#endif
 
 using namespace OHOS;
 
-extern "C" int GlobalI18nGetCountryCodeFromSimCard(char* res, int resLength)
+extern "C" int GlobalI18nGetCountryCodeFromSimCard(char* res, const int resLength)
 {
-    std::set<std::string> resultSet;
-    std::vector<size_t> soltIds = {0, 1};
-    for (size_t i = 0; i < soltIds.size(); i++) {
-        GlobalI18nGetCountryCodeFromSimCardInner(resultSet, soltIds[i]);
-    }
-    std::string resultStr = GlobalI18nJoinString(resultSet);
+    std::string resultStr = GlobalI18nGetCountryCodeFromSimCardInner();
     return strcpy_s(res, resLength, resultStr.c_str());
 }
 
-extern "C" int GlobalI18nGetCountryCodeFromNetwork(char* res, int resLength)
+extern "C" int GlobalI18nGetCountryCodeFromNetwork(char* res, const int resLength)
 {
-    std::set<std::string> resultSet;
-    std::vector<size_t> soltIds = {0, 1};
-    for (size_t i = 0; i < soltIds.size(); i++) {
-        GlobalI18nGetCountryCodeFromNetworkInner(resultSet, soltIds[i]);
-    }
-    std::string resultStr = GlobalI18nJoinString(resultSet);
+    std::string resultStr = GlobalI18nGetCountryCodeFromNetworkInner();
     return strcpy_s(res, resLength, resultStr.c_str());
 }
 
-std::string GlobalI18nJoinString(std::set<std::string> &resultSet)
+std::string GlobalI18nGetCountryCodeFromSimCardInner()
 {
-    std::string resultStr = "";
-    for (auto it = resultSet.begin(); it != resultSet.end(); ++it) {
-        if (it != resultSet.begin()) {
-            resultStr += ",";
-        }
-        resultStr += *it;
+#if defined(TEL_CORE_SERVICE_ENABLE) && defined(TEL_CELLULAR_DATA_ENABLE)
+    int32_t slotId = Telephony::CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
+    if (slotId < 0) {
+        return "";
     }
-    return resultStr;
-}
-
-void GlobalI18nGetCountryCodeFromSimCardInner(std::set<std::string> &resultSet, size_t soltId)
-{
-#if defined(TEL_CORE_SERVICE_ENABLE)
     std::u16string countryCode;
     int32_t errorCode = DelayedRefSingleton<Telephony::CoreServiceClient>::GetInstance().GetISOCountryCodeForSim(
-        soltId, countryCode);
-    HILOG_INFO_I18N("GlobalI18nGetCountryCodeFromSimCardInner id:%{public}zu, errorCode:%{public}d.",
-        soltId, errorCode);
+        slotId, countryCode);
     std::string result = Str16ToStr8(countryCode);
     if (result.empty()) {
-        return;
+        return "";
     }
     for (size_t i = 0; i < result.length(); ++i) {
         result[i] = toupper(result[i]);
     }
-    resultSet.insert(result);
+    return result;
 #endif
+    return "";
 }
 
-void GlobalI18nGetCountryCodeFromNetworkInner(std::set<std::string> &resultSet, size_t soltId)
+std::string GlobalI18nGetCountryCodeFromNetworkInner()
 {
-#if defined(TEL_CORE_SERVICE_ENABLE)
+#if defined(TEL_CORE_SERVICE_ENABLE) && defined(TEL_CELLULAR_DATA_ENABLE)
+    int32_t slotId = Telephony::CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
+    if (slotId < 0) {
+        return "";
+    }
     std::u16string countryCode;
     int32_t errorCode = DelayedRefSingleton<Telephony::CoreServiceClient>::GetInstance()
-        .GetIsoCountryCodeForNetwork(soltId, countryCode);
-    HILOG_INFO_I18N("GlobalI18nGetCountryCodeFromNetworkInner id:%{public}zu, errorCode:%{public}d.",
-        soltId, errorCode);
+        .GetIsoCountryCodeForNetwork(slotId, countryCode);
     std::string result = Str16ToStr8(countryCode);
     if (result.empty()) {
-        return;
+        return "";
     }
     for (size_t i = 0; i < result.length(); ++i) {
         result[i] = toupper(result[i]);
     }
-    resultSet.insert(result);
+    return result;
 #endif
+    return "";
 }
