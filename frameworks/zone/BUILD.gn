@@ -12,10 +12,12 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//base/global/i18n/i18n.gni")
 
 config("zone_util_public_configs") {
   include_dirs = [
     "//base/global/i18n/frameworks/intl/include",
+    "//base/global/i18n/frameworks/intl/timezone/include",
     "//base/global/i18n/interfaces/native/inner_api/zone/include",
   ]
 }
@@ -23,13 +25,19 @@ config("zone_util_public_configs") {
 ohos_shared_library("zone_util") {
   branch_protector_ret = "pac_ret"
   public_configs = [ ":zone_util_public_configs" ]
-  sources = [ "src/zone_util.cpp" ]
+  sources = [
+    "src/zone_util.cpp",
+    "../intl/timezone/src/mobile_country_code.cpp",
+  ]
   cflags_cc = [
     "-Wall",
     "-fPIC",
   ]
   deps = [ "//base/global/i18n/frameworks/intl:intl_util" ]
   external_deps = [
+    "bounds_checking_function:libsec_shared",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
     "icu:shared_icui18n",
     "icu:shared_icuuc",
@@ -38,6 +46,15 @@ ohos_shared_library("zone_util") {
     "libxml2:libxml2",
     "protobuf:protobuf_lite",
   ]
+  defines = []
+  if (i18n_tel_core_service_enable) {
+    external_deps += [ "core_service:tel_core_service_api" ]
+    defines += [ "TEL_CORE_SERVICE_ENABLE" ]
+  }
+  if (i18n_tel_cellular_data_enable) {
+    external_deps += [ "cellular_data:tel_cellular_data_api" ]
+    defines += [ "TEL_CELLULAR_DATA_ENABLE" ]
+  }
   subsystem_name = "global"
   part_name = "i18n"
 }
