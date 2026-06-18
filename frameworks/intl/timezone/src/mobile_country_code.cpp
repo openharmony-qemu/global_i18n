@@ -47,6 +47,7 @@ namespace Global {
 namespace I18n {
 std::string GetCountryCodeFromSimCardInner()
 {
+    std::string result;
 #if defined(TEL_CORE_SERVICE_ENABLE) && defined(TEL_CELLULAR_DATA_ENABLE)
     int32_t slotId = Telephony::CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
     if (slotId < 0) {
@@ -59,20 +60,20 @@ std::string GetCountryCodeFromSimCardInner()
         HILOG_ERROR_I18N("GetCountryCodeFromSimCardInner:: id:%{public}d, errCode:%{public}d.", slotId, errCode);
         return "";
     }
-    std::string result = Str16ToStr8(countryCode);
+    result = Str16ToStr8(countryCode);
     if (result.empty()) {
         return "";
     }
     for (size_t i = 0; i < result.length(); ++i) {
         result[i] = toupper(result[i]);
     }
-    return result;
 #endif
-    return "";
+    return result;
 }
 
 std::string GetCountryCodeFromNetworkInner()
 {
+    std::string result;
 #if defined(TEL_CORE_SERVICE_ENABLE) && defined(TEL_CELLULAR_DATA_ENABLE)
     int32_t slotId = Telephony::CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
     if (slotId < 0) {
@@ -85,16 +86,15 @@ std::string GetCountryCodeFromNetworkInner()
         HILOG_ERROR_I18N("GetCountryCodeFromNetworkInner:: id:%{public}d, errCode:%{public}d.", slotId, errCode);
         return "";
     }
-    std::string result = Str16ToStr8(countryCode);
+    result = Str16ToStr8(countryCode);
     if (result.empty()) {
         return "";
     }
     for (size_t i = 0; i < result.length(); ++i) {
         result[i] = toupper(result[i]);
     }
-    return result;
 #endif
-    return "";
+    return result;
 }
 }
 }
