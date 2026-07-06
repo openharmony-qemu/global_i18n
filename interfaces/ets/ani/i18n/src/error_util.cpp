@@ -54,13 +54,13 @@ ani_object ErrorUtil::WrapAniError(ani_env *env, const std::string &msg)
     }
 
     ani_class cls {};
-    if ((status = env->FindClass("std.core.Error", &cls)) != ANI_OK) {
-        HILOG_ERROR_I18N("ErrorUtil::WrapAniError: FindClass std.core.Error failed %{public}d", status);
+    if ((status = env->FindClass("escompat.Error", &cls)) != ANI_OK) {
+        HILOG_ERROR_I18N("ErrorUtil::WrapAniError: FindClass escompat.Error failed %{public}d", status);
         return nullptr;
     }
 
     ani_method method {};
-    if ((status = env->Class_FindMethod(cls, "<ctor>", "C{std.core.String}C{std.core.ErrorOptions}:", &method)) !=
+    if ((status = env->Class_FindMethod(cls, "<ctor>", "C{std.core.String}C{escompat.ErrorOptions}:", &method)) !=
         ANI_OK) {
         HILOG_ERROR_I18N("ErrorUtil::WrapAniError: Class_FindMethod failed %{public}d", status);
         return nullptr;
@@ -88,7 +88,7 @@ ani_object ErrorUtil::CreateError(ani_env *env, ani_int code, const std::string 
         HILOG_ERROR_I18N("ErrorUtil::CreateError: FindClass failed %{public}d", status);
         return nullptr;
     }
-    if ((status = env->Class_FindMethod(cls, "<ctor>", "iC{std.core.Error}:", &method)) != ANI_OK) {
+    if ((status = env->Class_FindMethod(cls, "<ctor>", "iC{escompat.Error}:", &method)) != ANI_OK) {
         HILOG_ERROR_I18N("ErrorUtil::CreateError: Class_FindMethod failed %{public}d", status);
         return nullptr;
     }
@@ -141,7 +141,7 @@ void ErrorUtil::AniThrowUndefined(ani_env *env, const std::string &errMessage)
         return;
     }
     ani_method method {};
-    if ((status = env->Class_FindMethod(cls, "<ctor>", "iC{std.core.Error}:", &method)) != ANI_OK) {
+    if ((status = env->Class_FindMethod(cls, "<ctor>", "iC{escompat.Error}:", &method)) != ANI_OK) {
         HILOG_ERROR_I18N("ErrorUtil::AniThrowUndefined: Class_FindMethod failed %{public}d", status);
         return;
     }
