@@ -154,7 +154,7 @@ std::string GetMccCodeFromNetwork(int32_t slotId)
 std::string ConvertMccCodeToCountryCode(const std::string& mccStr)
 {
     if (mccStr.length() < MCC_CODE_LENGTH) {
-        HILOG_ERROR_I18N("ConvertMccCodeToCountryCode: invalid code: %{public}s", mccStr);
+        HILOG_ERROR_I18N("ConvertMccCodeToCountryCode: invalid code: %{public}s", mccStr.c_str());
         return "";
     }
     std::string mccCode(mccStr);
