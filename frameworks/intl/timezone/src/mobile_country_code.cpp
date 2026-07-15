@@ -31,11 +31,11 @@
 using namespace OHOS::Global::I18n;
 extern "C" int GlobalI18nGetCountryCodeFromSimCard(char* res, const int resLength)
 {
-    std::string resultStr = GetTelephonyInfo(&GetCountryCodeFromSimCard);
-    for (size_t i = 0; i < resultStr.length(); ++i) {
-        resultStr[i] = toupper(resultStr[i]);
+    std::string countryCode = GetTelephonyInfo(&GetCountryCodeFromSimCard);
+    for (size_t i = 0; i < countryCode.length(); ++i) {
+        countryCode[i] = toupper(countryCode[i]);
     }
-    return strcpy_s(res, resLength, resultStr.c_str());
+    return strcpy_s(res, resLength, countryCode.c_str());
 }
 
 extern "C" int GlobalI18nGetCountryCodeFromNetwork(char* res, const int resLength)
