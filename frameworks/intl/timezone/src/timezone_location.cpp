@@ -34,6 +34,7 @@ const char *TimeZoneLocation::POLITICAL_DATA_PATH = "/system/usr/ohos_timezone/t
 const char *TimeZoneLocation::DISTRO_POLITICAL_DATA_PATH = "/system/etc/tzdata_distro/tz_political";
 const char *TimeZoneLocation::DLOPEN_SO_NAME = "libzone_util.z.so";
 const char *TimeZoneLocation::VENDOR_COUNTRY_KEY = "const.cust.region";
+
 const std::vector<OceanZone> TimeZoneLocation::OCEAN_ZONES {
     {"Etc/GMT-12", 172.5, 180 },
     {"Etc/GMT-11", 157.5, 172.5 },
