@@ -19,6 +19,7 @@
 #include <tuple>
 #include <map>
 #include <vector>
+#include "i18n_hilog.h"
 
 namespace OHOS {
 namespace Global {
@@ -71,7 +72,7 @@ private:
     static const char *POLITICAL_DATA_PATH;
     static const char *DISTRO_POLITICAL_DATA_PATH;
     static const char *DLOPEN_SO_NAME;
-    static const std::string VENDOR_COUNTRY_KEY;
+    static const char *VENDOR_COUNTRY_KEY;
     static const std::vector<OceanZone> OCEAN_ZONES;
 
     std::vector<Point> GetPointVect(int32_t* points, size_t size);
@@ -85,7 +86,6 @@ private:
         const char* lookupStr, int pos, int len);
     std::vector<std::string> ReadPolygonData(double lon, double lat, FILE* datFile,
         const std::string& jsonObjectStr, const std::vector<std::string>& tzidNames);
-    void CloseFile(FILE* datFile);
     bool GetAllTimezoneId(std::vector<std::string>& tzidNames, FILE* datFile, int32_t indexCount);
     void ReadDatFile(FILE* datFile, double lon, double lat,
         const std::vector<std::string>& tzidNames, std::vector<std::string>& tzidList);
@@ -95,14 +95,44 @@ private:
         const std::vector<std::string>& tzidNames, std::vector<std::string>& tzidList);
     bool IsPointOnSegment(const Point& p, const Point& before, const Point& after);
     std::string GetCountryCode();
-    std::string GetCountryCodeFromSimCard();
-    std::string GetCountryCodeFromNetwork();
+    std::string GetISOCountryCode(const char* symbol);
     std::string GetCountryCodeFromVendorCountry();
     const char* GetPoliticalDataPath();
     std::vector<std::string> ReadPoliticalData(const std::string& datPath,
         const double lon, const double lat);
     bool MatchPoliticalDataBlock(FILE* datFile, const double lon, const double lat);
     std::vector<std::string> GetPoliticalTimezone(const double lon, const double lat);
+};
+
+class TzLocationDatFile {
+public:
+    explicit TzLocationDatFile(const char* path)
+    {
+        file_ = fopen(path, "rb");
+        if (file_ == nullptr) {
+            HILOG_ERROR_I18N("TzLocationDatFile: open datFile failed");
+        }
+    }
+    ~TzLocationDatFile()
+    {
+        if (file_ == nullptr) {
+            HILOG_ERROR_I18N("~TzLocationDatFile: datFile is nullptr");
+            return;
+        }
+        if (fclose(file_) != 0) {
+            HILOG_ERROR_I18N("~TzLocationDatFile: close datFile failed");
+        }
+    }
+    FILE* get() const
+    {
+        return file_;
+    }
+    explicit operator bool() const
+    {
+        return file_ != nullptr;
+    }
+private:
+    FILE* file_;
 };
 } // namespace I18n
 } // namespace Global

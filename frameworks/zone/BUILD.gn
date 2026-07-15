@@ -37,7 +37,6 @@ ohos_shared_library("zone_util") {
   external_deps = [
     "bounds_checking_function:libsec_shared",
     "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
     "icu:shared_icui18n",
     "icu:shared_icuuc",

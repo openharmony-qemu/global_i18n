@@ -14,7 +14,6 @@
  */
 #include "timezone_location.h"
 
-#include "i18n_hilog.h"
 #include <cctype>
 #include <cstdio>
 #include <unistd.h>
@@ -31,10 +30,10 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 const char *TimeZoneLocation::TIMEZONE_LOCATION_PATH = "/system/usr/ohos_timezone/timezone_location.dat";
-const char *TimeZoneLocation::POLITICAL_DATA_PATH = "/system/usr/ohos_timezone/political_timezone";
+const char *TimeZoneLocation::POLITICAL_DATA_PATH = "/system/usr/ohos_timezone/tz_political";
 const char *TimeZoneLocation::DISTRO_POLITICAL_DATA_PATH = "/system/etc/tzdata_distro/tz_political";
 const char *TimeZoneLocation::DLOPEN_SO_NAME = "libzone_util.z.so";
-const std::string TimeZoneLocation::VENDOR_COUNTRY_KEY = "const.cust.region";
+const char *TimeZoneLocation::VENDOR_COUNTRY_KEY = "const.cust.region";
 const std::vector<OceanZone> TimeZoneLocation::OCEAN_ZONES {
     {"Etc/GMT-12", 172.5, 180 },
     {"Etc/GMT-11", 157.5, 172.5 },
@@ -328,17 +327,6 @@ std::vector<std::string> TimeZoneLocation::ReadPolygonData(double lon, double la
     return tzidList;
 }
 
-void TimeZoneLocation::CloseFile(FILE* datFile)
-{
-    if (datFile == nullptr) {
-        HILOG_ERROR_I18N("CloseFile: datFile is nullptr");
-        return;
-    }
-    if (fclose(datFile) != 0) {
-        HILOG_ERROR_I18N("CloseFile: close datFile failed");
-    }
-}
-
 bool TimeZoneLocation::GetAllTimezoneId(std::vector<std::string>& tzidNames, FILE* datFile,
     int32_t indexCount)
 {
@@ -445,24 +433,22 @@ std::vector<std::string> TimeZoneLocation::GetTimezoneByLocation(
         return politicalTzids;
     }
     std::vector<std::string> tzidList;
-    FILE* datFile = fopen(TIMEZONE_LOCATION_PATH, "rb");
-    if (datFile == nullptr) {
+    std::unique_ptr<TzLocationDatFile> datFile =
+        std::make_unique<TzLocationDatFile>(TIMEZONE_LOCATION_PATH);
+    if (!datFile) {
         HILOG_ERROR_I18N("GetTimezoneByLocation: open dat file failed");
         return tzidList;
     }
     int32_t indexCount;
-    if (fread(&indexCount,  sizeof(int32_t), 1, datFile) != 1) {
+    if (fread(&indexCount,  sizeof(int32_t), 1, datFile->get()) != 1) {
         HILOG_ERROR_I18N("GetTimezoneByLocation: read indexCount failed");
-        CloseFile(datFile);
         return tzidList;
     }
     std::vector<std::string> tzidNames;
-    if (!GetAllTimezoneId(tzidNames, datFile, indexCount)) {
-        CloseFile(datFile);
+    if (!GetAllTimezoneId(tzidNames, datFile->get(), indexCount)) {
         return tzidList;
     }
-    ReadDatFile(datFile, lon, lat, tzidNames, tzidList);
-    CloseFile(datFile);
+    ReadDatFile(datFile->get(), lon, lat, tzidNames, tzidList);
     return tzidList;
 }
 
@@ -492,29 +478,26 @@ std::vector<std::string> TimeZoneLocation::ReadPoliticalData(const std::string& 
         HILOG_ERROR_I18N("ReadPoliticalData: real dat path is empty");
         return {};
     }
-    FILE* datFile = fopen(realDatPath.c_str(), "rb");
-    if (datFile == nullptr) {
+    std::unique_ptr<TzLocationDatFile> datFile =
+        std::make_unique<TzLocationDatFile>(realDatPath.c_str());
+    if (!datFile) {
         HILOG_ERROR_I18N("ReadPoliticalData: open dat file failed");
         return {};
     }
     int32_t indexCount;
-    if (fread(&indexCount, sizeof(int32_t), 1, datFile) != 1) {
+    if (fread(&indexCount, sizeof(int32_t), 1, datFile->get()) != 1) {
         HILOG_ERROR_I18N("ReadPoliticalData: read indexCount failed");
-        CloseFile(datFile);
         return {};
     }
     std::vector<std::string> tzids;
-    if (!GetAllTimezoneId(tzids, datFile, indexCount)) {
-        CloseFile(datFile);
+    if (!GetAllTimezoneId(tzids, datFile->get(), indexCount)) {
         return {};
     }
     for (size_t k = 0; k < tzids.size(); k++) {
-        if (MatchPoliticalDataBlock(datFile, lon, lat)) {
-            CloseFile(datFile);
+        if (MatchPoliticalDataBlock(datFile->get(), lon, lat)) {
             return { tzids[k] };
         }
     }
-    CloseFile(datFile);
     return {};
 }
 
@@ -543,11 +526,11 @@ bool TimeZoneLocation::MatchPoliticalDataBlock(FILE* datFile,
 
 std::string TimeZoneLocation::GetCountryCode()
 {
-    std::string simCardCountryCode = GetCountryCodeFromSimCard();
+    std::string simCardCountryCode = GetISOCountryCode("GlobalI18nGetCountryCodeFromSimCard");
     if (!simCardCountryCode.empty()) {
         return simCardCountryCode;
     }
-    std::string networkCountryCode = GetCountryCodeFromNetwork();
+    std::string networkCountryCode = GetISOCountryCode("GlobalI18nGetCountryCodeFromNetwork");
     if (!networkCountryCode.empty()) {
         return networkCountryCode;
     }
@@ -562,51 +545,24 @@ std::string TimeZoneLocation::GetCountryCode()
     return "";
 }
 
-std::string TimeZoneLocation::GetCountryCodeFromSimCard()
+std::string TimeZoneLocation::GetISOCountryCode(const char* symbol)
 {
     void* handler = dlopen(DLOPEN_SO_NAME, RTLD_NOW);
     if (handler == nullptr) {
-        HILOG_ERROR_I18N("GetCountryCodeFromSimCard: open  failed");
+        HILOG_ERROR_I18N("open %{public}s failed", symbol);
+        return "";
+    }
+    GetCountryCodeFunc func = reinterpret_cast<GetCountryCodeFunc>(dlsym(handler, symbol));
+    if (!func) {
+        dlclose(handler);
+        HILOG_ERROR_I18N("find symbol %{public}s failed", symbol);
         return "";
     }
     char res[RECV_CHAR_LENGTH] = { 0 };
-    GetCountryCodeFunc func = reinterpret_cast<GetCountryCodeFunc>(
-        dlsym(handler, "GlobalI18nGetCountryCodeFromSimCard"));
-    if (!func) {
-        dlclose(handler);
-        HILOG_ERROR_I18N("GetCountryCodeFromSimCard: find symbol failed");
-        return "";
-    }
     int returnCode = func(res, RECV_CHAR_LENGTH);
     if (returnCode != 0) {
         dlclose(handler);
-        HILOG_ERROR_I18N("GetCountryCodeFromSimCard: call GetCountryCodeFunc result:%{public}d", returnCode);
-        return "";
-    }
-    dlclose(handler);
-    std::string result(res);
-    return result;
-}
-
-std::string TimeZoneLocation::GetCountryCodeFromNetwork()
-{
-    void* handler = dlopen(DLOPEN_SO_NAME, RTLD_NOW);
-    if (handler == nullptr) {
-        HILOG_ERROR_I18N("GetCountryCodeFromNetwork: open  failed");
-        return "";
-    }
-    char res[RECV_CHAR_LENGTH] = { 0 };
-    GetCountryCodeFunc func = reinterpret_cast<GetCountryCodeFunc>(
-        dlsym(handler, "GlobalI18nGetCountryCodeFromNetwork"));
-    if (!func) {
-        dlclose(handler);
-        HILOG_ERROR_I18N("GetCountryCodeFromNetwork: find symbol failed");
-        return "";
-    }
-    int returnCode = func(res, RECV_CHAR_LENGTH);
-    if (returnCode != 0) {
-        dlclose(handler);
-        HILOG_ERROR_I18N("GetCountryCodeFromNetwork: call GetCountryCodeFunc result:%{public}d", returnCode);
+        HILOG_ERROR_I18N("call %{public}s result:%{public}d", symbol, returnCode);
         return "";
     }
     dlclose(handler);
@@ -616,7 +572,7 @@ std::string TimeZoneLocation::GetCountryCodeFromNetwork()
 
 std::string TimeZoneLocation::GetCountryCodeFromVendorCountry()
 {
-    std::string vendorCountry = ReadSystemParameter(VENDOR_COUNTRY_KEY.c_str(), RECV_CHAR_LENGTH);
+    std::string vendorCountry = ReadSystemParameter(VENDOR_COUNTRY_KEY, RECV_CHAR_LENGTH);
     if (!vendorCountry.empty()) {
         for (size_t i = 0; i < vendorCountry.length(); ++i) {
             vendorCountry[i] = toupper(vendorCountry[i]);
