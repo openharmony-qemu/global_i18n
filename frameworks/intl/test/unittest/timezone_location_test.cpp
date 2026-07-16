@@ -159,7 +159,7 @@ std::vector<std::tuple<double, double, std::vector<std::string>>> TimeZoneLocati
     { -110.0, -60.0, { "Etc/GMT+7" } },
     { -110.0, -50.0, { "Etc/GMT+7" } },
     { -110.0, -40.0, { "Etc/GMT+7" } },
-    { -110.0, -30.0, { "Etc/GMT+7" } },
+    { -110.0, -30.0, { "Pacific/Easter" } },
     { -110.0, -20.0, { "Etc/GMT+7" } },
     { -110.0, -10.0, { "Etc/GMT+7" } },
     { -110.0, 0.0, { "Etc/GMT+7" } },
