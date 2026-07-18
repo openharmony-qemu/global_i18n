@@ -140,8 +140,7 @@ void FfiOHOSCalendarSetOfDay(int64_t id, int32_t hour, int32_t minute, int32_t s
         return;
     }
     std::time_t t = std::time(nullptr);
-    std::tm nowTm = {};
-    std::tm* now = std::localtime_r(&t, &nowTm);
+    std::tm* now = std::localtime(&t);
 
     int32_t currentHour = 0;
     int32_t currentMinute = 0;
