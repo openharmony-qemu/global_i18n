@@ -64,25 +64,43 @@ NumberFormatImpl::NumberFormatImpl(char *locale, CNumberOptions options, int64_t
     locale_list.push_back(locale_str);
     std::map<std::string, std::string> map = {};
     if (flag == 0) {
-        if (std::strlen(options.locale) != 0) {
+        if (options.locale != nullptr && std::strlen(options.locale) != 0) {
             map.insert(std::make_pair("locale", options.locale));
         }
-        if (std::strlen(options.currency) != 0) {
+        if (options.currency != nullptr && std::strlen(options.currency) != 0) {
             map.insert(std::make_pair("currency", options.currency));
         }
-        map.insert(std::make_pair("currencySign", options.currencySign));
-        map.insert(std::make_pair("currencyDisplay", options.currencyDisplay));
-        if (std::strlen(options.unit) != 0) {
+        if (options.currencySign != nullptr) {
+            map.insert(std::make_pair("currencySign", options.currencySign));
+        }
+        if (options.currencyDisplay != nullptr) {
+            map.insert(std::make_pair("currencyDisplay", options.currencyDisplay));
+        }
+        if (options.unit != nullptr && std::strlen(options.unit) != 0) {
             map.insert(std::make_pair("unit", options.unit));
         }
-        map.insert(std::make_pair("unitDisplay", options.unitDisplay));
-        map.insert(std::make_pair("unitUsage", options.unitUsage));
-        map.insert(std::make_pair("signDispaly", options.signDispaly));
-        map.insert(std::make_pair("compactDisplay", options.compactDisplay));
-        map.insert(std::make_pair("notation", options.notation));
-        map.insert(std::make_pair("localeMather", options.localeMather));
-        map.insert(std::make_pair("style", options.style));
-        if (std::strlen(options.numberingSystem) != 0) {
+        if (options.unitDisplay != nullptr) {
+            map.insert(std::make_pair("unitDisplay", options.unitDisplay));
+        }
+        if (options.unitUsage != nullptr) {
+            map.insert(std::make_pair("unitUsage", options.unitUsage));
+        }
+        if (options.signDispaly != nullptr) {
+            map.insert(std::make_pair("signDispaly", options.signDispaly));
+        }
+        if (options.compactDisplay != nullptr) {
+            map.insert(std::make_pair("compactDisplay", options.compactDisplay));
+        }
+        if (options.notation != nullptr) {
+            map.insert(std::make_pair("notation", options.notation));
+        }
+        if (options.localeMather != nullptr) {
+            map.insert(std::make_pair("localeMather", options.localeMather));
+        }
+        if (options.style != nullptr) {
+            map.insert(std::make_pair("style", options.style));
+        }
+        if (options.numberingSystem != nullptr && std::strlen(options.numberingSystem) != 0) {
             map.insert(std::make_pair("numberingSystem", options.numberingSystem));
         }
         std::string value = std::to_string(options.useGrouping) == "1" ? "true" : "false";
@@ -112,25 +130,43 @@ NumberFormatImpl::NumberFormatImpl(CArrString locale, CNumberOptions options, in
     std::vector<std::string> locale_list = ArrayStringToVectorString(locale);
     std::map<std::string, std::string> map = {};
     if (flag == 0) {
-        if (std::strlen(options.locale) != 0) {
+        if (options.locale != nullptr && std::strlen(options.locale) != 0) {
             map.insert(std::make_pair("locale", options.locale));
         }
-        if (std::strlen(options.currency) != 0) {
+        if (options.currency != nullptr && std::strlen(options.currency) != 0) {
             map.insert(std::make_pair("currency", options.currency));
         }
-        map.insert(std::make_pair("currencySign", options.currencySign));
-        map.insert(std::make_pair("currencyDisplay", options.currencyDisplay));
-        if (std::strlen(options.unit) != 0) {
+        if (options.currencySign != nullptr) {
+            map.insert(std::make_pair("currencySign", options.currencySign));
+        }
+        if (options.currencyDisplay != nullptr) {
+            map.insert(std::make_pair("currencyDisplay", options.currencyDisplay));
+        }
+        if (options.unit != nullptr && std::strlen(options.unit) != 0) {
             map.insert(std::make_pair("unit", options.unit));
         }
-        map.insert(std::make_pair("unitDisplay", options.unitDisplay));
-        map.insert(std::make_pair("unitUsage", options.unitUsage));
-        map.insert(std::make_pair("signDispaly", options.signDispaly));
-        map.insert(std::make_pair("compactDisplay", options.compactDisplay));
-        map.insert(std::make_pair("notation", options.notation));
-        map.insert(std::make_pair("localeMather", options.localeMather));
-        map.insert(std::make_pair("style", options.style));
-        if (std::strlen(options.numberingSystem) != 0) {
+        if (options.unitDisplay != nullptr) {
+            map.insert(std::make_pair("unitDisplay", options.unitDisplay));
+        }
+        if (options.unitUsage != nullptr) {
+            map.insert(std::make_pair("unitUsage", options.unitUsage));
+        }
+        if (options.signDispaly != nullptr) {
+            map.insert(std::make_pair("signDispaly", options.signDispaly));
+        }
+        if (options.compactDisplay != nullptr) {
+            map.insert(std::make_pair("compactDisplay", options.compactDisplay));
+        }
+        if (options.notation != nullptr) {
+            map.insert(std::make_pair("notation", options.notation));
+        }
+        if (options.localeMather != nullptr) {
+            map.insert(std::make_pair("localeMather", options.localeMather));
+        }
+        if (options.style != nullptr) {
+            map.insert(std::make_pair("style", options.style));
+        }
+        if (options.numberingSystem != nullptr && std::strlen(options.numberingSystem) != 0) {
             map.insert(std::make_pair("numberingSystem", options.numberingSystem));
         }
         std::string value = std::to_string(options.useGrouping) == "1" ? "true" : "false";
@@ -210,9 +246,15 @@ RelativeTimeFormatImpl::RelativeTimeFormatImpl(
     locale_list.push_back(locale_str);
     std::map<std::string, std::string> map = {};
     if (flag == 0) {
-        map.insert(std::make_pair("localeMatcher", options.localeMatcher));
-        map.insert(std::make_pair("numeric", options.numeric));
-        map.insert(std::make_pair("style", options.style));
+        if (options.localeMatcher != nullptr) {
+            map.insert(std::make_pair("localeMatcher", options.localeMatcher));
+        }
+        if (options.numeric != nullptr) {
+            map.insert(std::make_pair("numeric", options.numeric));
+        }
+        if (options.style != nullptr) {
+            map.insert(std::make_pair("style", options.style));
+        }
     }
     relativeTimeFmt_ = std::make_unique<RelativeTimeFormat>(locale_list, map);
     if (relativeTimeFmt_ == nullptr) {
@@ -229,9 +271,15 @@ RelativeTimeFormatImpl::RelativeTimeFormatImpl(
 
     std::map<std::string, std::string> map = {};
     if (flag == 0) {
-        map.insert(std::make_pair("localeMatcher", options.localeMatcher));
-        map.insert(std::make_pair("numeric", options.numeric));
-        map.insert(std::make_pair("style", options.style));
+        if (options.localeMatcher != nullptr) {
+            map.insert(std::make_pair("localeMatcher", options.localeMatcher));
+        }
+        if (options.numeric != nullptr) {
+            map.insert(std::make_pair("numeric", options.numeric));
+        }
+        if (options.style != nullptr) {
+            map.insert(std::make_pair("style", options.style));
+        }
     }
     relativeTimeFmt_ = std::make_unique<RelativeTimeFormat>(locale_list, map);
 
@@ -328,8 +376,12 @@ PluralRulesImpl::PluralRulesImpl(char *locale, CPluralRulesOptions options, int6
     locale_list.push_back(locale_str);
     std::map<std::string, std::string> map = {};
     if (flag == 0) {
-        map.insert(std::make_pair("localeMatcher", options.localeMatcher));
-        map.insert(std::make_pair("type", options.type));
+        if (options.localeMatcher != nullptr) {
+            map.insert(std::make_pair("localeMatcher", options.localeMatcher));
+        }
+        if (options.type != nullptr) {
+            map.insert(std::make_pair("type", options.type));
+        }
         map.insert(std::make_pair("minimumIntegerDigits", std::to_string(options.minimumIntegerDigits)));
         map.insert(std::make_pair("minimumFractionDigits", std::to_string(options.minimumFractionDigits)));
         map.insert(std::make_pair("maximumFractionDigits", std::to_string(options.maximumFractionDigits)));
@@ -351,8 +403,12 @@ PluralRulesImpl::PluralRulesImpl(CArrString locale, CPluralRulesOptions options,
 
     std::map<std::string, std::string> map = {};
     if (flag == 0) {
-        map.insert(std::make_pair("localeMatcher", options.localeMatcher));
-        map.insert(std::make_pair("type", options.type));
+        if (options.localeMatcher != nullptr) {
+            map.insert(std::make_pair("localeMatcher", options.localeMatcher));
+        }
+        if (options.type != nullptr) {
+            map.insert(std::make_pair("type", options.type));
+        }
         map.insert(std::make_pair("minimumIntegerDigits", std::to_string(options.minimumIntegerDigits)));
         map.insert(std::make_pair("minimumFractionDigits", std::to_string(options.minimumFractionDigits)));
         map.insert(std::make_pair("maximumFractionDigits", std::to_string(options.maximumFractionDigits)));
@@ -395,15 +451,25 @@ CollatorImpl::CollatorImpl(char *locale, CCollatorOptions options, int64_t flag,
     locale_list.push_back(locale_str);
     std::map<std::string, std::string> map = {};
     if (flag == 0) {
-        map.insert(std::make_pair("localeMatcher", options.localeMatcher));
-        map.insert(std::make_pair("usage", options.usage));
-        map.insert(std::make_pair("sensitivity", options.sensitivity));
+        if (options.localeMatcher != nullptr) {
+            map.insert(std::make_pair("localeMatcher", options.localeMatcher));
+        }
+        if (options.usage != nullptr) {
+            map.insert(std::make_pair("usage", options.usage));
+        }
+        if (options.sensitivity != nullptr) {
+            map.insert(std::make_pair("sensitivity", options.sensitivity));
+        }
         std::string ignore = std::to_string(options.ignorePunctuation) == "1" ? "true" : "false";
         map.insert(std::make_pair("ignorePunctuation", ignore));
-        map.insert(std::make_pair("collation", options.collation));
+        if (options.collation != nullptr) {
+            map.insert(std::make_pair("collation", options.collation));
+        }
         std::string num = std::to_string(options.numeric) == "1" ? "true" : "false";
         map.insert(std::make_pair("numeric", num));
-        map.insert(std::make_pair("caseFirst", options.caseFirst));
+        if (options.caseFirst != nullptr) {
+            map.insert(std::make_pair("caseFirst", options.caseFirst));
+        }
     }
     collator_ = std::make_unique<Collator>(locale_list, map);
 
@@ -420,15 +486,25 @@ CollatorImpl::CollatorImpl(CArrString locale, CCollatorOptions options, int64_t 
 
     std::map<std::string, std::string> map = {};
     if (flag == 0) {
-        map.insert(std::make_pair("localeMatcher", options.localeMatcher));
-        map.insert(std::make_pair("usage", options.usage));
-        map.insert(std::make_pair("sensitivity", options.sensitivity));
+        if (options.localeMatcher != nullptr) {
+            map.insert(std::make_pair("localeMatcher", options.localeMatcher));
+        }
+        if (options.usage != nullptr) {
+            map.insert(std::make_pair("usage", options.usage));
+        }
+        if (options.sensitivity != nullptr) {
+            map.insert(std::make_pair("sensitivity", options.sensitivity));
+        }
         std::string ignore = std::to_string(options.ignorePunctuation) == "1" ? "true" : "false";
         map.insert(std::make_pair("ignorePunctuation", ignore));
-        map.insert(std::make_pair("collation", options.collation));
+        if (options.collation != nullptr) {
+            map.insert(std::make_pair("collation", options.collation));
+        }
         std::string num = std::to_string(options.numeric) == "1" ? "true" : "false";
         map.insert(std::make_pair("numeric", num));
-        map.insert(std::make_pair("caseFirst", options.caseFirst));
+        if (options.caseFirst != nullptr) {
+            map.insert(std::make_pair("caseFirst", options.caseFirst));
+        }
     }
     collator_ = std::make_unique<Collator>(locale_list, map);
 
@@ -483,27 +559,27 @@ DateTimeFormatImpl::DateTimeFormatImpl(char *locale, CDateTimeOptions options, i
     locale_list.push_back(locale_str);
     std::map<std::string, std::string> map = {};
     if (flag == 0) {
-        if (std::strlen(options.locale) != 0) {
+        if (options.locale != nullptr && std::strlen(options.locale) != 0) {
             map.insert(std::make_pair("locale", options.locale));
         }
-        if (std::strlen(options.dateStyle) != 0) {
+        if (options.dateStyle != nullptr && std::strlen(options.dateStyle) != 0) {
             map.insert(std::make_pair("dateStyle", options.dateStyle));
         }
-        if (std::strlen(options.timeStyle) != 0) {
+        if (options.timeStyle != nullptr && std::strlen(options.timeStyle) != 0) {
             map.insert(std::make_pair("timeStyle", options.timeStyle));
         }
-        if (std::strlen(options.hourCycle) != 0) {
+        if (options.hourCycle != nullptr && std::strlen(options.hourCycle) != 0) {
             map.insert(std::make_pair("hourCycle", options.hourCycle));
         }
-        if (std::strlen(options.timeZone) != 0) {
+        if (options.timeZone != nullptr && std::strlen(options.timeZone) != 0) {
             map.insert(std::make_pair("timeZone", options.timeZone));
         }
-        if (std::strlen(options.numberingSystem) != 0) {
+        if (options.numberingSystem != nullptr && std::strlen(options.numberingSystem) != 0) {
             map.insert(std::make_pair("numberingSystem", options.numberingSystem));
         }
         std::string h12 = std::to_string(options.hour12) == "1" ? "true" : "false";
         map.insert(std::make_pair("hour12", h12));
-        if (std::strlen(options.weekday) != 0) {
+        if (options.weekday != nullptr && std::strlen(options.weekday) != 0) {
             map.insert(std::make_pair("weekday", options.weekday));
         }
         std::map<std::string, std::string> map1 = MapInsert(options);
@@ -521,37 +597,37 @@ DateTimeFormatImpl::DateTimeFormatImpl(char *locale, CDateTimeOptions options, i
 std::map<std::string, std::string> DateTimeFormatImpl::MapInsert(CDateTimeOptions options)
 {
     std::map<std::string, std::string> map = {};
-    if (std::strlen(options.era) != 0) {
+    if (options.era != nullptr && std::strlen(options.era) != 0) {
         map.insert(std::make_pair("era", options.era));
     }
-    if (std::strlen(options.year) != 0) {
+    if (options.year != nullptr && std::strlen(options.year) != 0) {
         map.insert(std::make_pair("year", options.year));
     }
-    if (std::strlen(options.month) != 0) {
+    if (options.month != nullptr && std::strlen(options.month) != 0) {
         map.insert(std::make_pair("month", options.month));
     }
-    if (std::strlen(options.day) != 0) {
+    if (options.day != nullptr && std::strlen(options.day) != 0) {
         map.insert(std::make_pair("day", options.day));
     }
-    if (std::strlen(options.hour) != 0) {
+    if (options.hour != nullptr && std::strlen(options.hour) != 0) {
         map.insert(std::make_pair("hour", options.hour));
     }
-    if (std::strlen(options.minute) != 0) {
+    if (options.minute != nullptr && std::strlen(options.minute) != 0) {
         map.insert(std::make_pair("minute", options.minute));
     }
-    if (std::strlen(options.second) != 0) {
+    if (options.second != nullptr && std::strlen(options.second) != 0) {
         map.insert(std::make_pair("second", options.second));
     }
-    if (std::strlen(options.timeZoneName) != 0) {
+    if (options.timeZoneName != nullptr && std::strlen(options.timeZoneName) != 0) {
         map.insert(std::make_pair("timeZoneName", options.timeZoneName));
     }
-    if (std::strlen(options.dayPeriod) != 0) {
+    if (options.dayPeriod != nullptr && std::strlen(options.dayPeriod) != 0) {
         map.insert(std::make_pair("dayPeriod", options.dayPeriod));
     }
-    if (std::strlen(options.localeMatcher) != 0) {
+    if (options.localeMatcher != nullptr && std::strlen(options.localeMatcher) != 0) {
         map.insert(std::make_pair("localeMatcher", options.localeMatcher));
     }
-    if (std::strlen(options.formatMatcher) != 0) {
+    if (options.formatMatcher != nullptr && std::strlen(options.formatMatcher) != 0) {
         map.insert(std::make_pair("formatMatcher", options.formatMatcher));
     }
     return map;
@@ -563,27 +639,27 @@ DateTimeFormatImpl::DateTimeFormatImpl(CArrString locale, CDateTimeOptions optio
 
     std::map<std::string, std::string> map = {};
     if (flag == 0) {
-        if (std::strlen(options.locale) != 0) {
+        if (options.locale != nullptr && std::strlen(options.locale) != 0) {
             map.insert(std::make_pair("locale", options.locale));
         }
-        if (std::strlen(options.dateStyle) != 0) {
+        if (options.dateStyle != nullptr && std::strlen(options.dateStyle) != 0) {
             map.insert(std::make_pair("dateStyle", options.dateStyle));
         }
-        if (std::strlen(options.timeStyle) != 0) {
+        if (options.timeStyle != nullptr && std::strlen(options.timeStyle) != 0) {
             map.insert(std::make_pair("timeStyle", options.timeStyle));
         }
-        if (std::strlen(options.hourCycle) != 0) {
+        if (options.hourCycle != nullptr && std::strlen(options.hourCycle) != 0) {
             map.insert(std::make_pair("hourCycle", options.hourCycle));
         }
-        if (std::strlen(options.timeZone) != 0) {
+        if (options.timeZone != nullptr && std::strlen(options.timeZone) != 0) {
             map.insert(std::make_pair("timeZone", options.timeZone));
         }
-        if (std::strlen(options.numberingSystem) != 0) {
+        if (options.numberingSystem != nullptr && std::strlen(options.numberingSystem) != 0) {
             map.insert(std::make_pair("numberingSystem", options.numberingSystem));
         }
         std::string h12 = std::to_string(options.hour12) == "1" ? "true" : "false";
         map.insert(std::make_pair("hour12", h12));
-        if (std::strlen(options.weekday) != 0) {
+        if (options.weekday != nullptr && std::strlen(options.weekday) != 0) {
             map.insert(std::make_pair("weekday", options.weekday));
         }
         std::map<std::string, std::string> map1 = MapInsert(options);
@@ -657,21 +733,21 @@ LocaleImpl::LocaleImpl(char *locale, CLocaleOptions options, int64_t flag, int32
 
     std::map<std::string, std::string> map = {};
     if (flag == 0) {
-        if (std::strlen(options.calendar) != 0) {
+        if (options.calendar != nullptr && std::strlen(options.calendar) != 0) {
             map.insert(std::make_pair("calendar", options.calendar));
         }
-        if (std::strlen(options.collation) != 0) {
+        if (options.collation != nullptr && std::strlen(options.collation) != 0) {
             map.insert(std::make_pair("collation", options.collation));
         }
-        if (std::strlen(options.hourCycle) != 0) {
+        if (options.hourCycle != nullptr && std::strlen(options.hourCycle) != 0) {
             map.insert(std::make_pair("hourCycle", options.hourCycle));
         }
-        if (std::strlen(options.numberingSystem) != 0) {
+        if (options.numberingSystem != nullptr && std::strlen(options.numberingSystem) != 0) {
             map.insert(std::make_pair("numberingSystem", options.numberingSystem));
         }
         std::string num = std::to_string(options.numeric) == "1" ? "true" : "false";
         map.insert(std::make_pair("numeric", num));
-        if (std::strlen(options.caseFirst) != 0) {
+        if (options.caseFirst != nullptr && std::strlen(options.caseFirst) != 0) {
             map.insert(std::make_pair("caseFirst", options.caseFirst));
         }
     }

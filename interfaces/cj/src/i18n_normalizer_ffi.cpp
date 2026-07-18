@@ -29,10 +29,6 @@ extern "C"
 {
     int64_t FfiI18nNormalizerConstructor(int32_t mode)
     {
-        if (mode < 1 || mode > 4) {
-            HILOG_ERROR_I18N("Invalid normalizer mode: %d", mode);
-            return -1;
-        }
         I18nNormalizerMode normalizerMode = I18nNormalizerMode(mode);
         I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
         std::unique_ptr<I18nNormalizer> normalizer_ = std::make_unique<I18nNormalizer>(normalizerMode, errorCode);
