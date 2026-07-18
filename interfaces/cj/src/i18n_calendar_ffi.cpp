@@ -140,7 +140,8 @@ void FfiOHOSCalendarSetOfDay(int64_t id, int32_t hour, int32_t minute, int32_t s
         return;
     }
     std::time_t t = std::time(nullptr);
-    std::tm* now = std::localtime(&t);
+    std::tm nowTm = {};
+    std::tm* now = std::localtime_r(&t, &nowTm);
 
     int32_t currentHour = 0;
     int32_t currentMinute = 0;
@@ -231,6 +232,10 @@ void FfiOHOSCalendarSetMinimalDaysInFirstWeek(int64_t id, int32_t minimalDays)
     auto instance = FFIData::GetData<CCalendar>(id);
     if (!instance) {
         HILOG_ERROR_I18N("The CCalendar instance is nullptr");
+        return;
+    }
+    if (minimalDays < 1 || minimalDays > 7) {
+        HILOG_ERROR_I18N("Invalid minimalDays: %d", minimalDays);
         return;
     }
     instance->SetMinimalDaysInFirstWeek(minimalDays);

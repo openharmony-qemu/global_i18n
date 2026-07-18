@@ -36,6 +36,7 @@ extern "C"
             = icu::Transliterator::createInstance(unistr, UTransDirection::UTRANS_FORWARD, status);
         if (U_FAILURE(status) || (trans == nullptr)) {
             HILOG_ERROR_I18N("Create icuTransliterator fail");
+            delete trans;
             return -1;
         }
         auto ffiTransliteratorInstance

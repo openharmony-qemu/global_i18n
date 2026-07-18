@@ -113,6 +113,8 @@ static int32_t HolidayInfo2Cj(const std::vector<HolidayInfoItem>& items, Holiday
             }
             free(info.baseName);
             free(arr.head);
+            arr.head = nullptr;
+            arr.size = 0;
             return HOLIDAY_OPT_FAILED;
         }
 
@@ -126,6 +128,10 @@ static int32_t HolidayInfo2Cj(const std::vector<HolidayInfoItem>& items, Holiday
 HolidayInfoItemArr FfiOHOSHolidayManagerGetHolidayInfoItemArray(int64_t id, int32_t year)
 {
     auto instance = FFIData::GetData<CHolidayManager>(id);
+    if (!instance) {
+        HILOG_ERROR_I18N("The CHolidayManager instance is nullptr");
+        return { 0, nullptr };
+    }
     std::vector<HolidayInfoItem> result;
     HolidayInfoItemArr infos = { 0, nullptr };
     if (year == -1) {

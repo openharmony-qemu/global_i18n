@@ -58,6 +58,12 @@ static int32_t EntityInfoItems2C(const std::vector<EntityInfoItem>& items, CEnti
             cItem.end = item.end;
 
             if (cItem.type == nullptr) {
+                for (int32_t j = 0; j < i; ++j) {
+                    free(arr.head[j].type);
+                }
+                free(arr.head);
+                arr.head = nullptr;
+                arr.size = 0;
                 return -1;
             }
 
