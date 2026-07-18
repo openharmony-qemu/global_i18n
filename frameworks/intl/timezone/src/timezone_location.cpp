@@ -30,6 +30,7 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 const char *TimeZoneLocation::TIMEZONE_LOCATION_PATH = "/system/usr/ohos_timezone/timezone_location.dat";
+const char *TimeZoneLocation::DISTRO_TIMEZONE_LOCATION_PATH = "/system/etc/tzdata_distro/timezone_location.dat";
 const char *TimeZoneLocation::POLITICAL_DATA_PATH = "/system/usr/ohos_timezone/tz_political";
 const char *TimeZoneLocation::DISTRO_POLITICAL_DATA_PATH = "/system/etc/tzdata_distro/tz_political";
 const char *TimeZoneLocation::DLOPEN_SO_NAME = "libzone_util.z.so";
@@ -434,14 +435,15 @@ std::vector<std::string> TimeZoneLocation::GetTimezoneByLocation(
         return politicalTzids;
     }
     std::vector<std::string> tzidList;
+    const char* timezoneLocationPath = GetTimeZoneLocationDataPath();
     std::unique_ptr<TzLocationDatFile> datFile =
-        std::make_unique<TzLocationDatFile>(TIMEZONE_LOCATION_PATH);
+        std::make_unique<TzLocationDatFile>(timezoneLocationPath);
     if (!datFile) {
         HILOG_ERROR_I18N("GetTimezoneByLocation: open dat file failed");
         return tzidList;
     }
     int32_t indexCount;
-    if (fread(&indexCount,  sizeof(int32_t), 1, datFile->get()) != 1) {
+    if (fread(&indexCount, sizeof(int32_t), 1, datFile->get()) != 1) {
         HILOG_ERROR_I18N("GetTimezoneByLocation: read indexCount failed");
         return tzidList;
     }
@@ -585,10 +587,20 @@ std::string TimeZoneLocation::GetCountryCodeFromVendorCountry()
 
 const char *TimeZoneLocation::GetPoliticalDataPath()
 {
-    if (access(DISTRO_POLITICAL_DATA_PATH, R_OK) != -1) {
+    struct stat s;
+    if (stat(DISTRO_POLITICAL_DATA_PATH, &s) != -1) {
         return DISTRO_POLITICAL_DATA_PATH;
     }
     return POLITICAL_DATA_PATH;
+}
+
+const char *TimeZoneLocation::GetTimeZoneLocationDataPath()
+{
+    struct stat s;
+    if (stat(DISTRO_TIMEZONE_LOCATION_PATH, &s) != -1) {
+        return DISTRO_TIMEZONE_LOCATION_PATH;
+    }
+    return TIMEZONE_LOCATION_PATH;
 }
 } // namespace I18n
 } // namespace Global

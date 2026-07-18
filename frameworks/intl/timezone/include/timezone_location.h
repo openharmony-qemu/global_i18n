@@ -69,6 +69,7 @@ private:
     static const int32_t MIN_POLYGON_POINTS_COUNT = 4;
     static const int RECV_CHAR_LENGTH = 32;
     static const char *TIMEZONE_LOCATION_PATH;
+    static const char *DISTRO_TIMEZONE_LOCATION_PATH;
     static const char *POLITICAL_DATA_PATH;
     static const char *DISTRO_POLITICAL_DATA_PATH;
     static const char *DLOPEN_SO_NAME;
@@ -98,6 +99,7 @@ private:
     std::string GetISOCountryCode(const char* symbol);
     std::string GetCountryCodeFromVendorCountry();
     const char* GetPoliticalDataPath();
+    const char* GetTimeZoneLocationDataPath();
     std::vector<std::string> ReadPoliticalData(const std::string& datPath,
         const double lon, const double lat);
     bool MatchPoliticalDataBlock(FILE* datFile, const double lon, const double lat);
