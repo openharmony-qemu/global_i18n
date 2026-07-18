@@ -395,25 +395,15 @@ CollatorImpl::CollatorImpl(char *locale, CCollatorOptions options, int64_t flag,
     locale_list.push_back(locale_str);
     std::map<std::string, std::string> map = {};
     if (flag == 0) {
-        if (options.localeMatcher != nullptr) {
-            map.insert(std::make_pair("localeMatcher", options.localeMatcher));
-        }
-        if (options.usage != nullptr) {
-            map.insert(std::make_pair("usage", options.usage));
-        }
-        if (options.sensitivity != nullptr) {
-            map.insert(std::make_pair("sensitivity", options.sensitivity));
-        }
+        map.insert(std::make_pair("localeMatcher", options.localeMatcher));
+        map.insert(std::make_pair("usage", options.usage));
+        map.insert(std::make_pair("sensitivity", options.sensitivity));
         std::string ignore = std::to_string(options.ignorePunctuation) == "1" ? "true" : "false";
         map.insert(std::make_pair("ignorePunctuation", ignore));
-        if (options.collation != nullptr) {
-            map.insert(std::make_pair("collation", options.collation));
-        }
+        map.insert(std::make_pair("collation", options.collation));
         std::string num = std::to_string(options.numeric) == "1" ? "true" : "false";
         map.insert(std::make_pair("numeric", num));
-        if (options.caseFirst != nullptr) {
-            map.insert(std::make_pair("caseFirst", options.caseFirst));
-        }
+        map.insert(std::make_pair("caseFirst", options.caseFirst));
     }
     collator_ = std::make_unique<Collator>(locale_list, map);
 
@@ -430,25 +420,15 @@ CollatorImpl::CollatorImpl(CArrString locale, CCollatorOptions options, int64_t 
 
     std::map<std::string, std::string> map = {};
     if (flag == 0) {
-        if (options.localeMatcher != nullptr) {
-            map.insert(std::make_pair("localeMatcher", options.localeMatcher));
-        }
-        if (options.usage != nullptr) {
-            map.insert(std::make_pair("usage", options.usage));
-        }
-        if (options.sensitivity != nullptr) {
-            map.insert(std::make_pair("sensitivity", options.sensitivity));
-        }
+        map.insert(std::make_pair("localeMatcher", options.localeMatcher));
+        map.insert(std::make_pair("usage", options.usage));
+        map.insert(std::make_pair("sensitivity", options.sensitivity));
         std::string ignore = std::to_string(options.ignorePunctuation) == "1" ? "true" : "false";
         map.insert(std::make_pair("ignorePunctuation", ignore));
-        if (options.collation != nullptr) {
-            map.insert(std::make_pair("collation", options.collation));
-        }
+        map.insert(std::make_pair("collation", options.collation));
         std::string num = std::to_string(options.numeric) == "1" ? "true" : "false";
         map.insert(std::make_pair("numeric", num));
-        if (options.caseFirst != nullptr) {
-            map.insert(std::make_pair("caseFirst", options.caseFirst));
-        }
+        map.insert(std::make_pair("caseFirst", options.caseFirst));
     }
     collator_ = std::make_unique<Collator>(locale_list, map);
 
