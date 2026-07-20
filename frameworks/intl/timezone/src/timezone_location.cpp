@@ -588,7 +588,7 @@ std::string TimeZoneLocation::GetCountryCodeFromVendorCountry()
 const char *TimeZoneLocation::GetPoliticalDataPath()
 {
     struct stat s;
-    if (stat(DISTRO_POLITICAL_DATA_PATH, &s) != -1) {
+    if (stat(DISTRO_POLITICAL_DATA_PATH, &s) == 0) {
         return DISTRO_POLITICAL_DATA_PATH;
     }
     return POLITICAL_DATA_PATH;
@@ -597,7 +597,7 @@ const char *TimeZoneLocation::GetPoliticalDataPath()
 const char *TimeZoneLocation::GetTimeZoneLocationDataPath()
 {
     struct stat s;
-    if (stat(DISTRO_TIMEZONE_LOCATION_PATH, &s) != -1) {
+    if (stat(DISTRO_TIMEZONE_LOCATION_PATH, &s) == 0) {
         return DISTRO_TIMEZONE_LOCATION_PATH;
     }
     return TIMEZONE_LOCATION_PATH;
