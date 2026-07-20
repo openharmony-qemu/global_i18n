@@ -1621,7 +1621,7 @@ std::string NumberFormat::GetCurrencyFromConfig(const std::string& currency)
     }
     bool isAlpha = true;
     for (auto c : currency) {
-        isAlpha = std::isalpha(c);
+        isAlpha = std::isalpha(static_cast<unsigned char>(c));
         if (!isAlpha) {
             break;
         }

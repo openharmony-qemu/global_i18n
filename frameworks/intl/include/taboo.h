@@ -63,7 +63,8 @@ private:
     void ParseBlockedLanguagesAndRegions(const std::string& key, const std::string& value);
     void ParseBlockedCities(const std::string& key, const std::string& value);
     void ParseBlockedPhoneNumbers(const std::string& key, const std::string& value);
-    void InitLocaleTabooData(const std::string& fallbackLanguage, const std::string& fileName);
+    std::unordered_map<std::string, std::string> GetTabooDataByLanguage(const std::string& fallbackLanguage,
+        const std::string& fileName);
     void InitFallBackSuffixes();
     // Indicates which regions support name replacement using taboo data.
     std::unordered_set<std::string> supportedRegions;

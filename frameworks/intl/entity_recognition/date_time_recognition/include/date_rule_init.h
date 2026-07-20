@@ -43,8 +43,8 @@ private:
         icu::UnicodeString& message);
 
     std::string locale;
-    DateTimeRule* dateTimeRule;
-    DateTimeFilter* filter;
+    DateTimeRule* dateTimeRule = nullptr;
+    DateTimeFilter* filter = nullptr;
     std::vector<RulesEngine> universalAndLocaleRules;
     std::unordered_map<std::string, RulesEngine> subDetectsMap;
     RulesEngine clearRulesEngine;

@@ -65,7 +65,7 @@ std::string GetCountryCodeFromSimCardInner()
         return "";
     }
     for (size_t i = 0; i < result.length(); ++i) {
-        result[i] = toupper(result[i]);
+        result[i] = toupper(static_cast<unsigned char>(result[i]));
     }
 #endif
     return result;

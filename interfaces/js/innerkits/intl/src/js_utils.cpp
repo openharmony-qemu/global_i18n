@@ -30,6 +30,7 @@ napi_value JSUtils::CreateEmptyString(napi_env env)
     napi_status status = napi_create_string_utf8(env, emptyStr.c_str(), NAPI_AUTO_LENGTH, &result);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("JSUtils: create empty string failed.");
+        return nullptr;
     }
     return result;
 }
@@ -175,9 +176,9 @@ void JSUtils::SetIntegerOptionProperties(napi_env env, napi_value &result, std::
     if (options.count(option) > 0) {
         std::string optionValue = options[option];
         napi_value optionJsValue = nullptr;
-        int32_t status = 0;
-        int64_t integerValue = ConvertString2Int(optionValue, status);
-        if (status != -1) {
+        int32_t code = 0;
+        int64_t integerValue = ConvertString2Int(optionValue, code);
+        if (code != -1) {
             status = napi_create_int64(env, integerValue, &optionJsValue);
             if (status != napi_ok) {
                 return;

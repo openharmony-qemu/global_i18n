@@ -700,7 +700,7 @@ napi_value ChineseCalendarAddon::CompareDays(napi_env env, napi_callback_info in
     ChineseCalendarAddon *obj = nullptr;
     status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->chineseCalendar_) {
-        HILOG_ERROR_I18N("ChineseCalendarAddon::IsWeekend: unwrap failed");
+        HILOG_ERROR_I18N("ChineseCalendarAddon::CompareDays: unwrap failed");
         return VariableConvertor::CreateNumber(env, 0);
     }
 

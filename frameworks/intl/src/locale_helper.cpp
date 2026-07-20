@@ -473,9 +473,6 @@ std::string LocaleHelper::CheckParamLocales(const std::vector<std::string> &loca
 
 std::string LocaleHelper::DefaultLocale()
 {
-    if (!defaultLocale.empty()) {
-        return defaultLocale;
-    }
     std::lock_guard<std::mutex> defaultLocaleLock(defaultLocaleMutex);
     if (!defaultLocale.empty()) {
         return defaultLocale;

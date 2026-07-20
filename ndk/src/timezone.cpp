@@ -307,7 +307,7 @@ icu::AnnualTimeZoneRule* CreateIcuAnnualRule(AnnualTimeZoneRule* rule)
 
 I18n_ErrorCode GetFirstStartFromTimeArrayTimeZoneRule(TimeArrayTimeZoneRule* rule, TimeZoneRuleQuery* query)
 {
-    if (rule == nullptr || query == nullptr) {
+    if (rule == nullptr || query == nullptr || rule->name == nullptr || rule->startTimes == nullptr) {
         HILOG_ERROR_I18N("GetFirstStartFromTimeArrayTimeZoneRule: rule or query is nullptr.");
         return I18n_ErrorCode::ERROR_INVALID_PARAMETER;
     }
@@ -323,7 +323,7 @@ I18n_ErrorCode GetFirstStartFromTimeArrayTimeZoneRule(TimeArrayTimeZoneRule* rul
 
 I18n_ErrorCode GetFirstStartFromAnnualTimeZoneRule(AnnualTimeZoneRule* rule, TimeZoneRuleQuery* query)
 {
-    if (rule == nullptr || query == nullptr) {
+    if (rule == nullptr || query == nullptr || rule->name == nullptr) {
         HILOG_ERROR_I18N("GetFirstStartFromAnnualTimeZoneRule: rule or query is nullptr.");
         return I18n_ErrorCode::ERROR_INVALID_PARAMETER;
     }
@@ -339,7 +339,7 @@ I18n_ErrorCode GetFirstStartFromAnnualTimeZoneRule(AnnualTimeZoneRule* rule, Tim
 
 I18n_ErrorCode GetFinalStartFromTimeArrayTimeZoneRule(TimeArrayTimeZoneRule* rule, TimeZoneRuleQuery* query)
 {
-    if (rule == nullptr || query == nullptr) {
+    if (rule == nullptr || query == nullptr || rule->name == nullptr || rule->startTimes == nullptr) {
         HILOG_ERROR_I18N("GetFinalStartFromTimeArrayTimeZoneRule: rule or query is nullptr.");
         return I18n_ErrorCode::ERROR_INVALID_PARAMETER;
     }
@@ -355,7 +355,7 @@ I18n_ErrorCode GetFinalStartFromTimeArrayTimeZoneRule(TimeArrayTimeZoneRule* rul
 
 I18n_ErrorCode GetFinalStartFromAnnualTimeZoneRule(AnnualTimeZoneRule* rule, TimeZoneRuleQuery* query)
 {
-    if (rule == nullptr || query == nullptr) {
+    if (rule == nullptr || query == nullptr || rule->name == nullptr) {
         HILOG_ERROR_I18N("GetFinalStartFromAnnualTimeZoneRule: rule or query is nullptr.");
         return I18n_ErrorCode::ERROR_INVALID_PARAMETER;
     }
@@ -371,7 +371,7 @@ I18n_ErrorCode GetFinalStartFromAnnualTimeZoneRule(AnnualTimeZoneRule* rule, Tim
 
 I18n_ErrorCode GetNextStartFromTimeArrayTimeZoneRule(TimeArrayTimeZoneRule* rule, TimeZoneRuleQuery* query)
 {
-    if (rule == nullptr || query == nullptr) {
+    if (rule == nullptr || query == nullptr || rule->name == nullptr || rule->startTimes == nullptr) {
         HILOG_ERROR_I18N("GetNextStartFromTimeArrayTimeZoneRule: rule or query is nullptr.");
         return I18n_ErrorCode::ERROR_INVALID_PARAMETER;
     }
@@ -388,7 +388,7 @@ I18n_ErrorCode GetNextStartFromTimeArrayTimeZoneRule(TimeArrayTimeZoneRule* rule
 
 I18n_ErrorCode GetNextStartFromAnnualTimeZoneRule(AnnualTimeZoneRule* rule, TimeZoneRuleQuery* query)
 {
-    if (rule == nullptr || query == nullptr) {
+    if (rule == nullptr || query == nullptr || rule->name == nullptr) {
         HILOG_ERROR_I18N("GetNextStartFromAnnualTimeZoneRule: rule or query is nullptr.");
         return I18n_ErrorCode::ERROR_INVALID_PARAMETER;
     }
@@ -405,7 +405,7 @@ I18n_ErrorCode GetNextStartFromAnnualTimeZoneRule(AnnualTimeZoneRule* rule, Time
 
 I18n_ErrorCode GetPrevStartFromTimeArrayTimeZoneRule(TimeArrayTimeZoneRule* rule, TimeZoneRuleQuery* query)
 {
-    if (rule == nullptr || query == nullptr) {
+    if (rule == nullptr || query == nullptr || rule->name == nullptr || rule->startTimes == nullptr) {
         HILOG_ERROR_I18N("GetPrevStartFromTimeArrayTimeZoneRule: rule or query is nullptr.");
         return I18n_ErrorCode::ERROR_INVALID_PARAMETER;
     }
@@ -422,7 +422,7 @@ I18n_ErrorCode GetPrevStartFromTimeArrayTimeZoneRule(TimeArrayTimeZoneRule* rule
 
 I18n_ErrorCode GetPrevStartFromAnnualTimeZoneRule(AnnualTimeZoneRule* rule, TimeZoneRuleQuery* query)
 {
-    if (rule == nullptr || query == nullptr) {
+    if (rule == nullptr || query == nullptr || rule->name == nullptr) {
         HILOG_ERROR_I18N("GetPrevStartFromAnnualTimeZoneRule: rule or query is nullptr.");
         return I18n_ErrorCode::ERROR_INVALID_PARAMETER;
     }
@@ -439,7 +439,7 @@ I18n_ErrorCode GetPrevStartFromAnnualTimeZoneRule(AnnualTimeZoneRule* rule, Time
 
 I18n_ErrorCode GetStartTimeAt(TimeArrayTimeZoneRule* rule, int32_t index, double* result)
 {
-    if (rule == nullptr || result == nullptr) {
+    if (rule == nullptr || result == nullptr || rule->name == nullptr || rule->startTimes == nullptr) {
         HILOG_ERROR_I18N("GetStartTimeAt: rule or query is nullptr.");
         return I18n_ErrorCode::ERROR_INVALID_PARAMETER;
     }
@@ -457,7 +457,7 @@ I18n_ErrorCode GetStartTimeAt(TimeArrayTimeZoneRule* rule, int32_t index, double
 
 I18n_ErrorCode GetStartInYear(AnnualTimeZoneRule* rule, int32_t year, TimeZoneRuleQuery* query)
 {
-    if (rule == nullptr || query == nullptr) {
+    if (rule == nullptr || query == nullptr || rule->name == nullptr) {
         HILOG_ERROR_I18N("GetStartInYear: rule or query is nullptr.");
         return I18n_ErrorCode::ERROR_INVALID_PARAMETER;
     }

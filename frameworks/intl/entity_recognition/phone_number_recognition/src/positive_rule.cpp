@@ -330,6 +330,8 @@ std::vector<MatchedNumberInfo> PositiveRule::HandlePossibleNumberWithPattern(Pho
     UErrorCode status = U_ZERO_ERROR;
     icu::RegexMatcher* mat = pattern->matcher(message, status);
     if (U_FAILURE(status) || mat == nullptr) {
+        delete pattern;
+        delete mat;
         HILOG_ERROR_I18N("PositiveRule::HandlePossibleNumberWithPattern: Pattern match failed.");
         return matchedList;
     }

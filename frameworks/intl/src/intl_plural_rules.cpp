@@ -183,9 +183,6 @@ bool IntlPluralRules::GetNextLocale(icu::StringEnumeration* locales, std::string
 
 std::set<std::string> IntlPluralRules::GetAvailableLocales()
 {
-    if (initAvailableLocales) {
-        return availableLocales;
-    }
     std::lock_guard<std::mutex> getLocalesLock(getLocalesMutex);
     if (initAvailableLocales) {
         return availableLocales;

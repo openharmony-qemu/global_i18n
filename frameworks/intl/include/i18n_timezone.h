@@ -96,6 +96,7 @@ private:
     static std::mutex initZoneInfoMutex;
     static std::mutex initSupportedLocalesMutex;
     static std::mutex cityDisplayNameMutex;
+    static std::mutex appDefaultTimeZoneIDMutex;
     static std::string cityDisplayNameCacheLocale;
     static std::string appDefaultTimeZoneID;
     static bool initAvailableZoneInfo;

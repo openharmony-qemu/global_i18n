@@ -16,6 +16,7 @@
 #define OHOS_GLOBAL_I18N_LOCALE_COMPARE_H
 
 #include <map>
+#include <mutex>
 #include <set>
 #include <string>
 #include "unicode/locid.h"
@@ -34,6 +35,10 @@ private:
         const std::string& localeTag2);
     static bool IsBaseNameRelation(const icu::Locale& locale1, const icu::Locale& locale2,
         const std::string& languageTag);
+    static bool CheckExtendedHantParent(const std::string& localeTag1,
+        const std::string& localeTag2);
+    static bool CheckExtendedLatnParent(const std::string& localeTag1,
+        const std::string& localeTag2);
     static std::string hantSegment;
     static std::string latnSegment;
     static std::string qaagSegment;
@@ -42,6 +47,8 @@ private:
     static std::map<std::string, std::string> latnParent;
     static std::map<std::string, std::string> extendedHantParent;
     static std::map<std::string, std::string> extendedLatnParent;
+    static std::mutex extendedHantParentMutex;
+    static std::mutex extendedLatnParentMutex;
 };
 } // namespace I18n
 } // namespace Global

@@ -121,7 +121,7 @@ void DateTimeSequence::ProcessNormal(char ch, int *order, size_t orderSize, int 
         return;
     }
     if (lengths[index] == 0) {
-        if (lengths[0] >= 3) { // 3 is the index of order
+        if (lengths[0] >= orderSize) {
             return;
         }
         order[lengths[0]] = static_cast<int>(adjust);

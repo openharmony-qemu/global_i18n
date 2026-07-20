@@ -1063,6 +1063,8 @@ void LocaleConfig::SetSupportedDialectLocales(const char* key, const char* value
 
 void LocaleConfig::ReadLangData(const char *langDataPath)
 {
+    std::lock_guard<std::mutex> localeDisplayLock(locale2DisplayNameMutex);
+    locale2DisplayName.clear();
     xmlKeepBlanksDefault(0);
     if (langDataPath == nullptr) {
         return;
@@ -1094,7 +1096,7 @@ void LocaleConfig::ReadLangData(const char *langDataPath)
             // 0 represents langid index, 1 represents displayname index
             const char* key = reinterpret_cast<const char *>(langContents[0]);
             const char* value = reinterpret_cast<const char *>(langContents[1]);
-            SetLocale2DisplayName(key, value);
+            locale2DisplayName.insert(std::make_pair<std::string, std::string>(key, value));
         }
         for (size_t i = 0; i < ELEMENT_NUM; i++) {
             if (langContents[i] != nullptr) {
@@ -1110,13 +1112,6 @@ void LocaleConfig::SetRegion2DisplayName(const char* key, const char* value)
 {
     std::lock_guard<std::mutex> regionDisplayLock(region2DisplayNameMutex);
     region2DisplayName.insert(
-        std::make_pair<std::string, std::string>(key, value));
-}
-
-void LocaleConfig::SetLocale2DisplayName(const char* key, const char* value)
-{
-    std::lock_guard<std::mutex> localeDisplayLock(locale2DisplayNameMutex);
-    locale2DisplayName.insert(
         std::make_pair<std::string, std::string>(key, value));
 }
 
@@ -1165,6 +1160,18 @@ void LocaleConfig::ReadRegionData(const char *regionDataPath)
     xmlFreeDoc(doc);
 }
 
+bool LocaleConfig::GetNameFromLocale2DisplayName(const std::string& locale, std::string& displayName)
+{
+    std::lock_guard<std::mutex> localeDisplayLock(locale2DisplayNameMutex);
+    auto iter = locale2DisplayName.find(locale);
+    if (iter == locale2DisplayName.end()) {
+        displayName = "";
+        return false;
+    }
+    displayName = iter->second;
+    return true;
+}
+
 string LocaleConfig::GetDisplayLanguageWithDialect(const std::string &localeStr, const std::string &displayLocale)
 {
     std::string finalLocale = ComputeLocale(displayLocale);
@@ -1173,12 +1180,12 @@ string LocaleConfig::GetDisplayLanguageWithDialect(const std::string &localeStr,
     }
     if (finalLocale.compare(currentDialectLocale) != 0) {
         std::string xmlPath = LANG_PATH + finalLocale + ".xml";
-        locale2DisplayName.clear();
         ReadLangData(xmlPath.c_str());
         currentDialectLocale = finalLocale;
     }
-    if (locale2DisplayName.find(localeStr) != locale2DisplayName.end()) {
-        return locale2DisplayName.at(localeStr);
+    std::string displayName;
+    if (GetNameFromLocale2DisplayName(localeStr, displayName)) {
+        return displayName;
     }
     std::map<std::string, std::string> configs = {};
     LocaleInfo locale(localeStr, configs);
@@ -1187,18 +1194,18 @@ string LocaleConfig::GetDisplayLanguageWithDialect(const std::string &localeStr,
     std::string region = locale.GetRegion();
     if (scripts.length() != 0) {
         std::string languageAndScripts = language + "-" + scripts;
-        if (locale2DisplayName.find(languageAndScripts) != locale2DisplayName.end()) {
-            return locale2DisplayName.at(languageAndScripts);
+        if (GetNameFromLocale2DisplayName(languageAndScripts, displayName)) {
+            return displayName;
         }
     }
     if (region.length() != 0) {
         std::string languageAndRegion = language + "-" + region;
-        if (locale2DisplayName.find(languageAndRegion) != locale2DisplayName.end()) {
-            return locale2DisplayName.at(languageAndRegion);
+        if (GetNameFromLocale2DisplayName(languageAndRegion, displayName)) {
+            return displayName;
         }
     }
-    if (locale2DisplayName.find(language) != locale2DisplayName.end()) {
-        return locale2DisplayName.at(language);
+    if (GetNameFromLocale2DisplayName(language, displayName)) {
+        return displayName;
     }
     return "";
 }

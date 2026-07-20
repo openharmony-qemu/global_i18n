@@ -182,7 +182,12 @@ std::string GetType(const std::string &character)
     icu::UnicodeString unicodeString(character.c_str());
     UChar32 char32 = unicodeString.char32At(0);
     int8_t category = u_charType(char32);
-    return categoryMap[UCharCategory(category)];
+    auto iter = categoryMap.find(UCharCategory(category));
+    if (iter == categoryMap.end()) {
+        HILOG_ERROR_I18N("GetType: Invalid category");
+        return "";
+    }
+    return iter->second;
 }
 } // namespace I18n
 } // namespace Global
