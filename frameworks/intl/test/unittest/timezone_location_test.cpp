@@ -711,7 +711,7 @@ HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0001, TestSize.Level1)
         }
         for (unsigned int i = 0; i < tz.size(); i++) {
             if (i >= expects.size()) {
-                printf("at line: %d, tzid: %s, tzSize:%d\r\n", (index+31), tz[i].c_str(), tz.size());
+                printf("at line: %d, tzid: %s, tzSize:%zd\r\n", (index+31), tz[i].c_str(), tz.size());
                 break;
             }
             EXPECT_EQ(tz[i], expects[i]);
