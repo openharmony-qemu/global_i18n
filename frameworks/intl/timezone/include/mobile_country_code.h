@@ -16,15 +16,18 @@
 #define GLOBAL_I18N_MOBILE_COUNTRY_CODE_H
 
 #include <string>
-#include <set>
 
 extern "C" int GlobalI18nGetCountryCodeFromSimCard(char* res, const int resLength);
 extern "C" int GlobalI18nGetCountryCodeFromNetwork(char* res, const int resLength);
+
 namespace OHOS {
 namespace Global {
 namespace I18n {
-    std::string GetCountryCodeFromSimCardInner();
-    std::string GetCountryCodeFromNetworkInner();
+using GetCountryCodeInnerFunc = std::string (*)(int32_t);
+std::string GetTelephonyInfo(GetCountryCodeInnerFunc func);
+std::string GetCountryCodeFromSimCard(int32_t slotId);
+std::string GetMccCodeFromNetwork(int32_t slotId);
+std::string ConvertMccCodeToCountryCode(const std::string& mccStr);
 }
 }
 }
