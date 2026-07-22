@@ -229,7 +229,7 @@ bool TimeZoneLocation::MatchNextKey(char* str, int len, int& curPos,
 std::tuple<ParseJsonStrResult, std::string> TimeZoneLocation::GetJsonObjectFromPosition(
     const char* lookupStr, int pos, int len)
 {
-    if (pos + JSONITEM_BEGIN_OFFSET >= len) {
+    if (pos + KEY_POS_O_OFFSET >= len) {
         return std::make_tuple(ParseJsonStrResult::INVALID, "");
     }
     if (lookupStr[pos + JSONITEM_BEGIN_OFFSET] == '[') {

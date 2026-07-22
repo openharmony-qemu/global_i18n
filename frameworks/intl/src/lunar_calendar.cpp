@@ -272,7 +272,7 @@ bool LunarCalendar::VerifyDate(int32_t year, int32_t month, int32_t day)
         validEndDay = isGregorianLeapYear ? validEndDay + 1 : validEndDay;
     }
 
-    if ((month < VALID_START_DAY) || (month > validEndDay)) {
+    if ((day < VALID_START_DAY) || (day > validEndDay)) {
         HILOG_ERROR_I18N("VerifyDate: %{public}d is an invalid day", day);
         return false;
     }
@@ -305,7 +305,7 @@ int32_t LunarCalendar::GetLunarYear()
 int32_t LunarCalendar::GetLunarMonth()
 {
     if (!isValidDate) {
-        HILOG_ERROR_I18N("GetLunarYear: invalid date");
+        HILOG_ERROR_I18N("GetLunarMonth: invalid date");
         return -1;
     }
     return lunarMonth;
@@ -314,7 +314,7 @@ int32_t LunarCalendar::GetLunarMonth()
 int32_t LunarCalendar::GetLunarDay()
 {
     if (!isValidDate) {
-        HILOG_ERROR_I18N("GetLunarYear: invalid date");
+        HILOG_ERROR_I18N("GetLunarDay: invalid date");
         return -1;
     }
     return lunarDay;

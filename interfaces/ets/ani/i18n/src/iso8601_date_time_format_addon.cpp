@@ -78,7 +78,7 @@ ani_object ISO8601DateTimeFormatAddon::Create(ani_env *env, [[maybe_unused]] ani
         VariableConverter::GetStringMember(env, options, "dateFormat", dateFormat);
         VariableConverter::GetStringMember(env, options, "timePrecision", timePrecision);
         VariableConverter::GetStringMember(env, options, "separatorStyle", separatorStyle);
-        ani_object timeZoneValue;
+        ani_object timeZoneValue = nullptr;
         VariableConverter::GetObjectMember(env, options, "timeZone", timeZoneValue);
         timeZone = ParseTimezone(env, timeZoneValue);
 

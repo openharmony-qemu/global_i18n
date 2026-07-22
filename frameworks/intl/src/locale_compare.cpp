@@ -128,6 +128,8 @@ std::map<std::string, std::string> LocaleCompare::latnParent {
 };
 std::map<std::string, std::string> LocaleCompare::extendedHantParent {};
 std::map<std::string, std::string> LocaleCompare::extendedLatnParent {};
+std::mutex LocaleCompare::extendedHantParentMutex;
+std::mutex LocaleCompare::extendedLatnParentMutex;
 
 int32_t LocaleCompare::Compare(const std::string& localeTag1, const std::string& localeTag2)
 {
@@ -202,22 +204,10 @@ bool LocaleCompare::IsSameEnglishScript(const std::string& scriptTag1, const std
     return false;
 }
 
-bool LocaleCompare::HasMapRelation(const std::string& languageTag, const std::string& localeTag1,
+bool LocaleCompare::CheckExtendedHantParent(const std::string& localeTag1,
     const std::string& localeTag2)
 {
-    if (scriptLocales.find(languageTag) == scriptLocales.end()) {
-        return false;
-    }
-    if (hantParent.find(localeTag1) != hantParent.end()) {
-        if (localeTag2.compare(hantParent[localeTag1]) == 0) {
-            return true;
-        }
-    }
-    if (latnParent.find(localeTag1) != latnParent.end()) {
-        if (localeTag2.compare(latnParent[localeTag1]) == 0) {
-            return true;
-        }
-    }
+    std::lock_guard<std::mutex> extendedHantParentLock(extendedHantParentMutex);
     if (extendedHantParent.size() == 0) {
         for (auto it = hantParent.begin(); it != hantParent.end(); ++it) {
             std::string key = it->first;
@@ -232,6 +222,13 @@ bool LocaleCompare::HasMapRelation(const std::string& languageTag, const std::st
             return true;
         }
     }
+    return false;
+}
+
+bool LocaleCompare::CheckExtendedLatnParent(const std::string& localeTag1,
+    const std::string& localeTag2)
+{
+    std::lock_guard<std::mutex> extendedLatnParentLock(extendedLatnParentMutex);
     if (extendedLatnParent.size() == 0) {
         for (auto it = latnParent.begin(); it != latnParent.end(); ++it) {
             std::string key = it->first;
@@ -248,6 +245,31 @@ bool LocaleCompare::HasMapRelation(const std::string& languageTag, const std::st
         if (localeTag2.compare(extendedLatnParent[localeTag1]) == 0) {
             return true;
         }
+    }
+    return false;
+}
+
+bool LocaleCompare::HasMapRelation(const std::string& languageTag, const std::string& localeTag1,
+    const std::string& localeTag2)
+{
+    if (scriptLocales.find(languageTag) == scriptLocales.end()) {
+        return false;
+    }
+    if (hantParent.find(localeTag1) != hantParent.end()) {
+        if (localeTag2.compare(hantParent[localeTag1]) == 0) {
+            return true;
+        }
+    }
+    if (latnParent.find(localeTag1) != latnParent.end()) {
+        if (localeTag2.compare(latnParent[localeTag1]) == 0) {
+            return true;
+        }
+    }
+    if (CheckExtendedHantParent(localeTag1, localeTag2)) {
+        return true;
+    }
+    if (CheckExtendedLatnParent(localeTag1, localeTag2)) {
+        return true;
     }
     return false;
 }

@@ -90,7 +90,7 @@ std::string ZoneUtil::GetDefaultZone(const std::string& country)
 {
     string temp(country);
     for (size_t i = 0; i < temp.size(); i++) {
-        temp[i] = (char)toupper(temp[i]);
+        temp[i] = (char)toupper(static_cast<unsigned char>(temp[i]));
     }
     if (defaultMap.find(temp) != defaultMap.end()) {
         return defaultMap[temp];

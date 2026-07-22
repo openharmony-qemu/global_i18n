@@ -253,8 +253,9 @@ std::vector<PhoneNumberMatch*> PhoneNumberMatched::FindNumbers(std::string& coun
     }
     UErrorCode status = U_ZERO_ERROR;
     icu::RegexMatcher* numberMatcher = numberPattern->matcher(filteredString, status);
-    if (numberMatcher == nullptr) {
+    if (U_FAILURE(status) || numberMatcher == nullptr) {
         HILOG_ERROR_I18N("numberPattern matcher failed.");
+        delete numberMatcher;
         delete numberPattern;
         return matchList;
     }

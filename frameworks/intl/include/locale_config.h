@@ -359,7 +359,6 @@ private:
     static void ReadRegionData(const char *regionDataPath);
     static void SetSupportedDialectLocales(const char* key, const char* value);
     static void SetRegion2DisplayName(const char* key, const char* value);
-    static void SetLocale2DisplayName(const char* key, const char* value);
     static bool Is24HourLocale(const std::string& systemLocale);
     static bool HasDesignator(const std::string& inFormat, const char designator);
     static void QueryUpgradeLocale();
@@ -451,6 +450,7 @@ private:
     static void ExtendLanguageWithScript(const std::string &languageStr);
     static __attribute__((destructor)) void CleanupXmlResources();
     static std::string GetPseudoDisplayLanguage(const std::string &language);
+    static bool GetNameFromLocale2DisplayName(const std::string& locale, std::string& displayName);
     static std::unordered_set<std::string> supportedLocales;
     static std::unordered_set<std::string> supportedLocalesV15;
     static std::unordered_set<std::string> supportedRegions;

@@ -37,6 +37,7 @@ void ReplaceIntlModule(napi_env env)
         HILOG_ERROR_I18N("ReplaceIntlModule: registerIntl is null");
     }
     if (!ret) {
+        dlclose(intlUtilHandle);
         HILOG_ERROR_I18N("ReplaceIntlModule: Register intl failed");
     }
 }

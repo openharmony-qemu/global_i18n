@@ -62,7 +62,7 @@ void VariableConvertor::GetOptionValue(napi_env env, napi_value options, const s
     napi_value optionValue = nullptr;
     napi_valuetype type = napi_undefined;
     napi_status status = napi_typeof(env, options, &type);
-    if (status != napi_ok && type != napi_object) {
+    if (status != napi_ok || type != napi_object) {
         HILOG_ERROR_I18N("GetOptionValue: Get option failed, option is not an object");
         return;
     }
