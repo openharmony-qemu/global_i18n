@@ -659,7 +659,7 @@ std::string DateTimeFormat::FormatRange(int64_t fromMilliseconds, int64_t toMill
 
 void DateTimeFormat::GetResolvedOptions(std::map<std::string, std::string> &map)
 {
-    if (!createSuccess || localeInfo == nullptr || dateFormat == nullptr) {
+    if (!createSuccess || localeInfo == nullptr || dateFormat == nullptr || calendar == nullptr) {
         return;
     }
     map.insert(std::make_pair("locale", localeTag));
@@ -697,7 +697,7 @@ void DateTimeFormat::GetResolvedOptions(std::map<std::string, std::string> &map)
     } else {
         UErrorCode status = U_ZERO_ERROR;
         auto numSys = std::unique_ptr<NumberingSystem>(NumberingSystem::createInstance(locale, status));
-        if (U_SUCCESS(status)) {
+        if (U_SUCCESS(status) && numSys != nullptr && numSys->getName() != nullptr) {
             map.insert(std::make_pair("numberingSystem", numSys->getName()));
         }
     }

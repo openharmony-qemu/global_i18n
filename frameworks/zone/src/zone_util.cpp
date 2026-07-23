@@ -411,6 +411,10 @@ void ZoneUtil::GetDefaultAndBoost(xmlNodePtr &value, std::string &defaultTimezon
 
 void ZoneUtil::GetTimezones(xmlNodePtr &value, std::vector<std::string> &zones)
 {
+    if (value == nullptr) {
+        HILOG_ERROR_I18N("ZoneUtil::GetTimezones: value is nullptr");
+        return;
+    }
     if (xmlStrcmp(value->name, reinterpret_cast<const xmlChar *>(TIMEZONES_TAG)) != 0) {
         HILOG_ERROR_I18N("ZoneUtil::GetTimezones invalid timezones_tag");
         return;
