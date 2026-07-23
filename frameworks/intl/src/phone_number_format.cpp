@@ -363,19 +363,16 @@ std::string PhoneNumberFormat::getPhoneLocationName(
 
 void PhoneNumberFormat::OpenHandler()
 {
+    std::lock_guard<std::mutex> phoneLock(phoneMutex);
     if (dynamicHandler == nullptr) {
-        HILOG_INFO_I18N("DynamicHandler init.");
-        std::lock_guard<std::mutex> phoneLock(phoneMutex);
-        if (dynamicHandler == nullptr) {
-            HILOG_INFO_I18N("DynamicHandler lock init.");
+        HILOG_INFO_I18N("DynamicHandler lock init.");
 #ifndef SUPPORT_ASAN
-            const char* geocodingSO = "libgeocoding.z.so";
+        const char* geocodingSO = "libgeocoding.z.so";
 #else
-            const char* geocodingSO = "system/asan/lib64/platformsdk/libgeocoding.z.so";
+        const char* geocodingSO = "system/asan/lib64/platformsdk/libgeocoding.z.so";
 #endif
-            HILOG_INFO_I18N("DynamicHandler lock init.");
-            dynamicHandler = dlopen(geocodingSO, RTLD_NOW);
-        }
+        HILOG_INFO_I18N("DynamicHandler lock init.");
+        dynamicHandler = dlopen(geocodingSO, RTLD_NOW);
     }
 }
 
