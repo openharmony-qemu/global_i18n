@@ -600,6 +600,15 @@ std::map<std::string, std::string> VariableConverter::ParseIntlOptions(ani_env *
         HILOG_ERROR_I18N("VariableConverter::ParseIntlOptions: Get options failed");
         return options;
     }
+
+    ani_boolean isUndefined;
+    if (ANI_OK != env->Reference_IsUndefined(optionsRef, &isUndefined)) {
+        HILOG_ERROR_I18N("VariableConverter::ParseIntlOptions: Check reference is undefined failed");
+        return options;
+    }
+    if (isUndefined) {
+        return options;
+    }
     ani_object optionsObj = static_cast<ani_object>(optionsRef);
     if (!optionsObj) {
         HILOG_ERROR_I18N("VariableConverter::ParseIntlOptions: Static to object failed");

@@ -272,6 +272,10 @@ PhoneNumberMatch* RegexRule::IsValidCode(PhoneNumberMatch* possibleNumber, icu::
 
 PhoneNumberMatch* RegexRule::IsValidRawstr(PhoneNumberMatch* possibleNumber, icu::UnicodeString& message)
 {
+    if (possibleNumber == nullptr) {
+        HILOG_ERROR_I18N("RegexRule::IsValidRawstr: possibleNumber is nullptr");
+        return nullptr;
+    }
     icu::UnicodeString number = possibleNumber->raw_string().c_str();
     // Processes the ;ext= extention number format
     int32_t ind = number.trim().indexOf(";ext=");

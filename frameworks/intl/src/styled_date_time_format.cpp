@@ -56,8 +56,16 @@ std::pair<std::string, std::vector<DateTimeFormatPart>> StyledDateTimeFormat::Fo
     }
     std::pair<std::string, std::vector<DateTimeFormatPart>> result;
     if (status == InitStatus::INIT_SIMPLE) {
+        if (simpleFormatter == nullptr) {
+            HILOG_ERROR_I18N("StyledDateTimeFormat::Format: simpleFormatter is nullptr");
+            return result;
+        }
         result = simpleFormatter->FormatToParts(milliseconds);
     } else {
+        if (intlFormatter == nullptr) {
+            HILOG_ERROR_I18N("StyledDateTimeFormat::Format: intlFormatter is nullptr");
+            return result;
+        }
         result = intlFormatter->FormatToParts(milliseconds);
     }
     return result;

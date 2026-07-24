@@ -100,8 +100,11 @@ std::vector<int> PhoneNumberMatched::DealWithoutFixed(icu::UnicodeString& messag
 // Filtering text using negative rules
 icu::UnicodeString PhoneNumberMatched::HandleNegativeRule(icu::UnicodeString& src)
 {
-    std::vector<NegativeRule*> rules = phoneNumberRule->GetNegativeRules();
     icu::UnicodeString ret = src;
+    if (phoneNumberRule == nullptr) {
+        return ret;
+    }
+    std::vector<NegativeRule*> rules = phoneNumberRule->GetNegativeRules();
     for (NegativeRule* rule : rules) {
         if (rule == nullptr) {
             continue;
