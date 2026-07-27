@@ -233,10 +233,6 @@ void FfiOHOSCalendarSetMinimalDaysInFirstWeek(int64_t id, int32_t minimalDays)
         HILOG_ERROR_I18N("The CCalendar instance is nullptr");
         return;
     }
-    if (minimalDays < 1 || minimalDays > 7) {
-        HILOG_ERROR_I18N("Invalid minimalDays: %d", minimalDays);
-        return;
-    }
     instance->SetMinimalDaysInFirstWeek(minimalDays);
 }
 

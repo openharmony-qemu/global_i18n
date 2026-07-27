@@ -40,38 +40,43 @@ CEntity::CEntity(std::string locale)
     }
 }
 
+static void FreeEntityInfoArr(CEntityInfoItemArr &arr, int32_t fromIndex)
+{
+    for (int32_t j = 0; j < fromIndex; ++j) {
+        free(arr.head[j].type);
+    }
+    free(arr.head);
+    arr.head = nullptr;
+    arr.size = 0;
+}
+
 static int32_t EntityInfoItems2C(const std::vector<EntityInfoItem>& items, CEntityInfoItemArr &arr)
 {
     int32_t size = static_cast<int32_t>(items.size());
-    if (size > 0) {
-        arr.head = static_cast<CEntityInfoItem*>(malloc(sizeof(CEntityInfoItem) * size));
-        if (arr.head == nullptr) {
-            return -1;
-        }
-        arr.size = size;
-
-        for (int32_t i = 0; i < size; ++i) {
-            const EntityInfoItem& item = items[i];
-            CEntityInfoItem cItem;
-            cItem.type = MallocCString(item.type);
-            cItem.begin = item.begin;
-            cItem.end = item.end;
-
-            if (cItem.type == nullptr) {
-                for (int32_t j = 0; j < i; ++j) {
-                    free(arr.head[j].type);
-                }
-                free(arr.head);
-                arr.head = nullptr;
-                arr.size = 0;
-                return -1;
-            }
-
-            arr.head[i] = cItem;
-        }
-    } else {
+    if (size <= 0) {
         arr.head = nullptr;
         arr.size = 0;
+        return 0;
+    }
+    arr.head = static_cast<CEntityInfoItem*>(malloc(sizeof(CEntityInfoItem) * size));
+    if (arr.head == nullptr) {
+        return -1;
+    }
+    arr.size = size;
+
+    for (int32_t i = 0; i < size; ++i) {
+        const EntityInfoItem& item = items[i];
+        CEntityInfoItem cItem;
+        cItem.type = MallocCString(item.type);
+        cItem.begin = item.begin;
+        cItem.end = item.end;
+
+        if (cItem.type == nullptr) {
+            FreeEntityInfoArr(arr, i);
+            return -1;
+        }
+
+        arr.head[i] = cItem;
     }
     return 0;
 }
