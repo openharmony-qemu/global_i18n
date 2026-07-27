@@ -220,7 +220,7 @@ void StyledNumberFormatAddon::SetTextStyle(napi_env env, napi_value options, con
     napi_value optionValue = nullptr;
     napi_valuetype type = napi_undefined;
     napi_status status = napi_typeof(env, options, &type);
-    if (status != napi_ok && type != napi_object) {
+    if (status != napi_ok || type != napi_object) {
         HILOG_ERROR_I18N("setTextStyle: option is not an object");
         return;
     }

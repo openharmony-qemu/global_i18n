@@ -50,7 +50,7 @@ static std::mutex g_availableIDsMutex;
 
 void Split(const string &src, const string &sep, vector<string> &dest)
 {
-    if (src.empty()) {
+    if (src.empty() || sep.empty()) {
         return;
     }
     string::size_type begin = 0;
@@ -160,9 +160,6 @@ bool IsValidLocaleTag(icu::Locale &locale)
 void GetAllValidLocalesTag(std::unordered_set<std::string>& allValidLocalesLanguageTag)
 {
     static bool init = false;
-    if (init) {
-        return;
-    }
     std::lock_guard<std::mutex> matchLocaleLock(g_validLocaleMutex);
     if (init) {
         return;

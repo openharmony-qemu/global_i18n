@@ -779,6 +779,7 @@ napi_value I18nAddon::GetAvailableIDs(napi_env env, napi_callback_info info)
     napi_value result = nullptr;
     status = napi_create_array(env, &result);
     if (status != napi_ok) {
+        delete strenum;
         return nullptr;
     }
     uint32_t i = 0;
@@ -1772,7 +1773,7 @@ napi_value I18nAddon::GetIndexUtil(napi_env env, napi_callback_info info)
         return nullptr;
     }
     napi_value constructor = nullptr;
-    if (!g_indexUtilConstructor->GetReferenceValue(env, &constructor)) {
+    if (g_indexUtilConstructor == nullptr || !g_indexUtilConstructor->GetReferenceValue(env, &constructor)) {
         HILOG_ERROR_I18N("Failed to create reference at GetIndexUtil");
         return nullptr;
     }

@@ -78,6 +78,7 @@ std::mutex I18nTimeZone::matchLocaleMutex;
 std::mutex I18nTimeZone::initZoneInfoMutex;
 std::mutex I18nTimeZone::initSupportedLocalesMutex;
 std::mutex I18nTimeZone::cityDisplayNameMutex;
+std::mutex I18nTimeZone::appDefaultTimeZoneIDMutex;
 bool I18nTimeZone::initAvailableZoneInfo = false;
 bool I18nTimeZone::initSupportedLocales = false;
 
@@ -604,8 +605,9 @@ I18nTimeZone::I18nTimeZone(std::string &id, bool isZoneID)
 {
     if (isZoneID) {
         if (id.empty()) {
-            if (!appDefaultTimeZoneID.empty()) {
-                icu::UnicodeString unicodeZoneID(appDefaultTimeZoneID.data(), appDefaultTimeZoneID.length());
+            std::string defaultTimeZoneID = I18nTimeZone::GetAppDefaultTimeZoneID();
+            if (!defaultTimeZoneID.empty()) {
+                icu::UnicodeString unicodeZoneID(defaultTimeZoneID.data(), defaultTimeZoneID.length());
                 timezone = icu::TimeZone::createTimeZone(unicodeZoneID);
                 return;
             }
@@ -623,8 +625,9 @@ I18nTimeZone::I18nTimeZone(std::string &id, bool isZoneID)
     } else {
         GetAvailableZoneCityIDs();
         if (city2TimeZoneID.find(id) == city2TimeZoneID.end()) {
-            if (!appDefaultTimeZoneID.empty()) {
-                icu::UnicodeString unicodeZoneID(appDefaultTimeZoneID.data(), appDefaultTimeZoneID.length());
+            std::string defaultTimeZoneID = I18nTimeZone::GetAppDefaultTimeZoneID();
+            if (!defaultTimeZoneID.empty()) {
+                icu::UnicodeString unicodeZoneID(defaultTimeZoneID.data(), defaultTimeZoneID.length());
                 timezone = icu::TimeZone::createTimeZone(unicodeZoneID);
                 return;
             }
@@ -1060,9 +1063,12 @@ bool I18nTimeZone::GetSupportedLocales()
 
 std::string I18nTimeZone::GetFallBack(std::string &requestLocaleStr)
 {
-    auto iter = BEST_MATCH_LOCALE.find(requestLocaleStr);
-    if (iter != BEST_MATCH_LOCALE.end()) {
-        return iter->second;
+    {
+        std::lock_guard<std::mutex> matchLocaleLock(matchLocaleMutex);
+        auto iter = BEST_MATCH_LOCALE.find(requestLocaleStr);
+        if (iter != BEST_MATCH_LOCALE.end()) {
+            return iter->second;
+        }
     }
     std::vector<LocaleInfo*> matchLocaleList;
     std::unique_ptr<LocaleInfo> requestLocale = std::make_unique<LocaleInfo>(requestLocaleStr);
@@ -1137,7 +1143,8 @@ std::string I18nTimeZone::GetLocaleBaseName(std::string &localeStr)
         HILOG_ERROR_I18N("create icu Locale for %{public}s failed", localeStr.c_str());
         return "";
     }
-    std::string requestLocaleStr = locale.getBaseName();
+    const char* baseName = locale.getBaseName();
+    std::string requestLocaleStr = (baseName == nullptr) ? "" : baseName;
     requestLocaleStr = StrReplaceAll(requestLocaleStr, "_", "-");
     return GetFallBack(requestLocaleStr);
 }
@@ -1456,6 +1463,7 @@ I18nErrorCode I18nTimeZone::SetAppDefaultTimeZoneById(const std::string& zoneID)
         HILOG_ERROR_I18N("SetAppDefaultTimeZoneById: invalid zoneID.");
         return I18nErrorCode::INVALID_PARAM;
     }
+    std::lock_guard<std::mutex> appDefaultTimeZoneIDLock(appDefaultTimeZoneIDMutex);
     appDefaultTimeZoneID = zoneID;
     return I18nErrorCode::SUCCESS;
 }
@@ -1463,10 +1471,11 @@ I18nErrorCode I18nTimeZone::SetAppDefaultTimeZoneById(const std::string& zoneID)
 std::unique_ptr<I18nTimeZone> I18nTimeZone::GetAppDefaultTimeZone()
 {
     std::string timeZoneStr;
-    if (appDefaultTimeZoneID.empty()) {
+    std::string defaultTimeZoneID = I18nTimeZone::GetAppDefaultTimeZoneID();
+    if (defaultTimeZoneID.empty()) {
         timeZoneStr = LocaleConfig::GetSystemTimezone();
     } else {
-        timeZoneStr = appDefaultTimeZoneID;
+        timeZoneStr = defaultTimeZoneID;
     }
     std::unique_ptr<I18nTimeZone> i18nTimeZone = CreateInstance(timeZoneStr, true);
     return i18nTimeZone;
@@ -1474,6 +1483,7 @@ std::unique_ptr<I18nTimeZone> I18nTimeZone::GetAppDefaultTimeZone()
 
 std::string I18nTimeZone::GetAppDefaultTimeZoneID()
 {
+    std::lock_guard<std::mutex> appDefaultTimeZoneIDLock(appDefaultTimeZoneIDMutex);
     return appDefaultTimeZoneID;
 }
 }

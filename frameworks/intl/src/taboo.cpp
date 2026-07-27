@@ -99,8 +99,7 @@ std::string Taboo::ReplaceCountryName(const std::string& region, const std::stri
     if (fallbackLanguage.empty()) {
         return name;
     }
-    InitLocaleTabooData(fallbackLanguage, fileName);
-    auto tabooData = localeTabooData[fallbackLanguage];
+    auto tabooData = GetTabooDataByLanguage(fallbackLanguage, fileName);
     std::string key = REGION_KEY + region;
     std::vector<std::string> fallbackRegionKeys = QueryKeyFallBack(key);
     for (auto& fallbackRegionKey : fallbackRegionKeys) {
@@ -127,8 +126,7 @@ std::string Taboo::ReplaceLanguageName(const std::string& language, const std::s
     if (fallbackLanguage.empty()) {
         return name;
     }
-    InitLocaleTabooData(fallbackLanguage, fileName);
-    auto tabooData = localeTabooData[fallbackLanguage];
+    auto tabooData = GetTabooDataByLanguage(fallbackLanguage, fileName);
     std::string key = LANGUAGE_KEY + language;
     std::vector<std::string> fallbackLanguageKeys = QueryKeyFallBack(key);
     for (const auto& fallbackLanguageKey : fallbackLanguageKeys) {
@@ -155,8 +153,7 @@ std::string Taboo::ReplaceTimeZoneName(const std::string& tzId, const std::strin
     if (fallbackLanguage.empty()) {
         return name;
     }
-    InitLocaleTabooData(fallbackLanguage, fileName);
-    auto tabooData = localeTabooData[fallbackLanguage];
+    auto tabooData = GetTabooDataByLanguage(fallbackLanguage, fileName);
     std::string key = TIME_ZONE_KEY + tzId;
     std::vector<std::string> fallbackTimeZoneKeys = QueryKeyFallBack(key);
     for (const auto& fallbackTimeZoneKey : fallbackTimeZoneKeys) {
@@ -183,8 +180,7 @@ std::string Taboo::ReplaceCityName(const std::string& cityId, const std::string&
     if (fallbackLanguage.empty()) {
         return name;
     }
-    InitLocaleTabooData(fallbackLanguage, fileName);
-    auto tabooData = localeTabooData[fallbackLanguage];
+    auto tabooData = GetTabooDataByLanguage(fallbackLanguage, fileName);
     std::string key = CITY_KEY + cityId;
     std::vector<std::string> fallbackCityKeys = QueryKeyFallBack(key);
     for (const auto& fallbackCityKey : fallbackCityKeys) {
@@ -218,8 +214,7 @@ std::string Taboo::ReplacePhoneLocationName(const std::string& phoneNumber, cons
     if (fallbackLanguage.empty()) {
         return name;
     }
-    InitLocaleTabooData(fallbackLanguage, fileName);
-    auto tabooData = localeTabooData[fallbackLanguage];
+    auto tabooData = GetTabooDataByLanguage(fallbackLanguage, fileName);
     std::string key = PHONE_NUMBER_KEY + prefix;
     std::vector<std::string> fallbackPhoneNunberKeys = QueryKeyFallBack(key);
     for (const auto& fallbackPhoneNunberKey : fallbackPhoneNunberKeys) {
@@ -505,19 +500,17 @@ void Taboo::ParseBlockedPhoneNumbers(const std::string& key, const std::string& 
     blockedPhoneNumbers[key] = blockedPhoneNumber;
 }
 
-void Taboo::InitLocaleTabooData(const std::string& fallbackLanguage, const std::string& fileName)
+std::unordered_map<std::string, std::string> Taboo::GetTabooDataByLanguage(const std::string& fallbackLanguage,
+    const std::string& fileName)
 {
-    if (initResourcesList.find(fallbackLanguage) != initResourcesList.end()) {
-        return;
-    }
     std::lock_guard<std::mutex> tabooLock(tabooMutex);
-    if (initResourcesList.find(fallbackLanguage) != initResourcesList.end()) {
-        return;
+    if (initResourcesList.find(fallbackLanguage) == initResourcesList.end()) {
+        localeTabooData[fallbackLanguage] = {};
+        std::string localeTabooDataFilePath = tabooDataPath + fileName + FILE_PATH_SPLITOR + TABOO_DATA_FILE;
+        ParseTabooData(localeTabooDataFilePath, DataFileType::DATA_FILE, fallbackLanguage);
+        initResourcesList.insert(fallbackLanguage);
     }
-    localeTabooData[fallbackLanguage] = {};
-    std::string localeTabooDataFilePath = tabooDataPath + fileName + FILE_PATH_SPLITOR + TABOO_DATA_FILE;
-    ParseTabooData(localeTabooDataFilePath, DataFileType::DATA_FILE, fallbackLanguage);
-    initResourcesList.insert(fallbackLanguage);
+    return localeTabooData[fallbackLanguage];
 }
 
 void Taboo::InitFallBackSuffixes()

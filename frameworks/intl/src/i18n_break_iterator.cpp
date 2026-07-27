@@ -106,7 +106,7 @@ int32_t I18nBreakIterator::Following(int32_t offset)
 void I18nBreakIterator::SetText(const char *text)
 {
     icu::BreakIterator* breakIter = GetBreakIterator();
-    if (breakIter != nullptr) {
+    if (breakIter != nullptr && text != nullptr) {
         ftext = text;
         breakIter->setText(ftext);
     }

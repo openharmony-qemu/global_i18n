@@ -269,7 +269,7 @@ void I18nSymbolDateTimeFormatAddon::ParseAmPmSymbol(ani_env *env, ani_object opt
         return;
     }
     if (symbol.size() < SymbolDateTimeFormat::AM_PM_SYMBOLS_LEN) {
-        ErrorUtil::AniThrow(env, I18N_NOT_VALID, "amPMSymbol", "a string[] with two or more elements");
+        ErrorUtil::AniThrow(env, I18N_NOT_VALID_NEW, "amPMSymbol", "a string[] with two or more elements");
         return;
     }
     result.insert(std::make_pair(SymbolDateTimeFormat::AM_SYMBOL_TAG, symbol[0]));

@@ -1198,13 +1198,13 @@ bool BindingIntlModules(napi_env env, napi_value &intlModule)
 
 bool RegisterIntl(napi_env env)
 {
-    OHOS::Global::I18n::HandleScope scope(env, "RegisterIntl");
-    if (!scope.IsOpen()) {
+    if (env == nullptr) {
+        HILOG_ERROR_I18N("RegisterIntl: env is null");
         return false;
     }
 
-    if (env == nullptr) {
-        HILOG_ERROR_I18N("RegisterIntl: env is null");
+    OHOS::Global::I18n::HandleScope scope(env, "RegisterIntl");
+    if (!scope.IsOpen()) {
         return false;
     }
 

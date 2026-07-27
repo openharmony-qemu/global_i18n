@@ -253,6 +253,9 @@ PhoneNumberMatch* RegexRule::IsValidCode(PhoneNumberMatch* possibleNumber, icu::
         return possibleNumber;
     }
     icu::UnicodeString number = possibleNumber->raw_string().c_str();
+    if (number.isEmpty()) {
+        return nullptr;
+    }
     // Processes the ;ext= extention number format
     int32_t ind = number.trim().indexOf(";ext=");
     if (ind != -1) {
@@ -269,6 +272,10 @@ PhoneNumberMatch* RegexRule::IsValidCode(PhoneNumberMatch* possibleNumber, icu::
 
 PhoneNumberMatch* RegexRule::IsValidRawstr(PhoneNumberMatch* possibleNumber, icu::UnicodeString& message)
 {
+    if (possibleNumber == nullptr) {
+        HILOG_ERROR_I18N("RegexRule::IsValidRawstr: possibleNumber is nullptr");
+        return nullptr;
+    }
     icu::UnicodeString number = possibleNumber->raw_string().c_str();
     // Processes the ;ext= extention number format
     int32_t ind = number.trim().indexOf(";ext=");
@@ -395,6 +402,8 @@ std::vector<MatchedNumberInfo> RegexRule::HandleSlant(PhoneNumberMatch* possible
     icu::UnicodeString number = possibleNumber->raw_string().c_str();
     icu::RegexMatcher* matcher = pattern->matcher(number, status);
     if (U_FAILURE(status) || matcher == nullptr) {
+        delete pattern;
+        delete matcher;
         HILOG_ERROR_I18N("RegexRule::HandleSlant: Pattern match failed.");
         return matchedNumberInfoList;
     }
@@ -531,6 +540,8 @@ std::vector<MatchedNumberInfo> RegexRule::HandlePossibleNumberWithPattern(PhoneN
     UErrorCode status = U_ZERO_ERROR;
     icu::RegexMatcher* mat = pattern->matcher(message, status);
     if (U_FAILURE(status) || mat == nullptr) {
+        delete pattern;
+        delete mat;
         HILOG_ERROR_I18N("RegexRule::HandlePossibleNumberWithPattern: Pattern match failed.");
         return matchedList;
     }
