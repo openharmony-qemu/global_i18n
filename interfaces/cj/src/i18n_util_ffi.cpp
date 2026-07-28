@@ -170,7 +170,7 @@ char* FfiI18nUtilGetTimePeriodName(int32_t hour, const char* locale, int32_t* er
         *errcode = I18N_NOT_VALID;
         return nullptr;
     }
-    icu::DateFormat* dateFormatter = icu::DateFormat::createDateInstance(icu::DateFormat::EStyle::kDefault, locale);
+    icu::DateFormat* dateFormatter = icu::DateFormat::createDateInstance(icu::DateFormat::EStyle::kDefault, localeIcu);
     if (dateFormatter == nullptr) {
         *errcode = I18N_NOT_VALID;
         return nullptr;
@@ -179,7 +179,7 @@ char* FfiI18nUtilGetTimePeriodName(int32_t hour, const char* locale, int32_t* er
     formatter->applyPattern("B");
     std::string temp;
     icu::UnicodeString name;
-    icu::Calendar *calendar = icu::Calendar::createInstance(locale, status);
+    icu::Calendar *calendar = icu::Calendar::createInstance(localeIcu, status);
     if (calendar == nullptr) {
         *errcode = I18N_NOT_VALID;
         delete formatter;

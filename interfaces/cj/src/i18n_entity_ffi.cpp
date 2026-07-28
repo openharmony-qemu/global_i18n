@@ -28,6 +28,11 @@ int64_t FfiOHOSEntityImplConstructor(char* locale, int32_t* errcode)
 {
     std::string localeStr(locale);
     auto instance = FFIData::Create<CEntity>(localeStr);
+    if (instance == nullptr) {
+        *errcode = I18N_NOT_VALID;
+        HILOG_ERROR_I18N("Create CEntity fail");
+        return -1;
+    }
     if (!instance->InitSuccess()) {
         *errcode = I18N_NOT_VALID;
         HILOG_ERROR_I18N("Create CEntity fail");
