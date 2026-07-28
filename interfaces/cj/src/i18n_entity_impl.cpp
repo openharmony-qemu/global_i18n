@@ -60,6 +60,7 @@ static int32_t EntityInfoItems2C(const std::vector<EntityInfoItem>& items, CEnti
     }
     arr.head = static_cast<CEntityInfoItem*>(malloc(sizeof(CEntityInfoItem) * size));
     if (arr.head == nullptr) {
+        arr.size = 0;
         return -1;
     }
     arr.size = size;
