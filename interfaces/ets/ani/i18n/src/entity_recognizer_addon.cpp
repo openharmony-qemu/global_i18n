@@ -65,7 +65,9 @@ ani_object I18nEntityRecognizerAddon::Create(ani_env *env, [[maybe_unused]] ani_
 
     static const char *className = "@ohos.i18n.i18n.EntityRecognizer";
     ani_object entityRecognizerObject = VariableConverter::CreateAniObject(env, className, obj.get());
-    obj.release();
+    if (entityRecognizerObject != nullptr) {
+        obj.release();
+    }
     return entityRecognizerObject;
 }
 

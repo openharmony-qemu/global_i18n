@@ -94,6 +94,7 @@ napi_value SystemLocaleManagerAddon::SystemLocaleManagerConstructor(napi_env env
     }
     if (!obj->InitSystemLocaleManagerContext(env, info)) {
         HILOG_ERROR_I18N("Init SystemLocaleManager failed");
+        obj.release();
         return nullptr;
     }
     obj.release();

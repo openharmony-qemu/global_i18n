@@ -102,6 +102,7 @@ napi_value NumberFormatAddon::NumberFormatConstructor(napi_env env, napi_callbac
     }
     if (!obj->InitNumberFormatContext(env, info, localeTags, map)) {
         HILOG_ERROR_I18N("Init NumberFormat failed");
+        obj.release();
         return nullptr;
     }
     obj.release();

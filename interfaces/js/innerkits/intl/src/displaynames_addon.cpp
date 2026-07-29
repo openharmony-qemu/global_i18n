@@ -103,6 +103,7 @@ napi_value DisplayNamesAddon::DisplayNamesConstructor(napi_env env, napi_callbac
         return nullptr;
     }
     if (!obj->InitDisplayNamesContext(env, info, localeTags, map)) {
+        delete obj;
         return nullptr;
     }
     return thisVar;

@@ -192,9 +192,11 @@ napi_value SimpleNumberFormatAddon::SimpleNumberFormatConstructor(napi_env env, 
         SimpleNumberFormatAddon::InitSimpleNumberFormatContext(env, locale, skeleton, errCode);
     if (errCode == I18nErrorCode::INVALID_NUMBER_FORMAT_SKELETON) {
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "skeleton", "a valid number format skeleton", true);
+        obj.release();
         return nullptr;
     } else if (!obj->simpleNumberFormat_ || errCode != I18nErrorCode::SUCCESS) {
         HILOG_ERROR_I18N("SimpleNumberFormatConstructor: Construct SimpleNumberFormat failed.");
+        obj.release();
         return nullptr;
     }
     obj.release();

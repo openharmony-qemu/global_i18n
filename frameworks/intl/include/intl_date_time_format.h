@@ -180,6 +180,7 @@ private:
     std::vector<std::string> skeletonOpts;
     bool initSuccess = false;
     bool isIso8601 = false;
+    bool isAdoptSuccess = false;
     std::string skeleton;
     icu::DateTimePatternGenerator* icuDateTimePatternGenerator = nullptr;
     icu::TimeZone* icuTimeZone = nullptr;

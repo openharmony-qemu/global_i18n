@@ -131,9 +131,6 @@ napi_value I18nNormalizerAddon::I18nNormalizerConstructor(napi_env env, napi_cal
     }
 
     std::unique_ptr<I18nNormalizerAddon> obj = std::make_unique<I18nNormalizerAddon>();
-    if (obj == nullptr) {
-        return nullptr;
-    }
     status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj.get()), I18nNormalizerAddon::Destructor, nullptr,
         &TYPE_TAG, nullptr);
     if (status != napi_ok) {
@@ -142,10 +139,10 @@ napi_value I18nNormalizerAddon::I18nNormalizerConstructor(napi_env env, napi_cal
     I18nNormalizerMode mode = I18nNormalizerMode(normalizerMode);
     I18nErrorCode errorCode = I18nErrorCode::SUCCESS;
     obj->normalizer_ = std::make_unique<I18nNormalizer>(mode, errorCode);
-    if (errorCode != I18nErrorCode::SUCCESS || !obj->normalizer_) {
+    obj.release();
+    if (errorCode != I18nErrorCode::SUCCESS) {
         return nullptr;
     }
-    obj.release();
     return thisVar;
 }
 

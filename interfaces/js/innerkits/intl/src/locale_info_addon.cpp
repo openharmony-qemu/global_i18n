@@ -129,6 +129,7 @@ napi_value LocaleInfoAddon::LocaleConstructor(napi_env env, napi_callback_info i
         return nullptr;
     }
     if (!obj->InitLocaleContext(env, info, localeTag, map)) {
+        obj.release();
         return nullptr;
     }
     obj.release();

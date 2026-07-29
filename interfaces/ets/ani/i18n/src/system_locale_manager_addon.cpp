@@ -41,7 +41,9 @@ ani_object I18nSysLocaleMgrAddon::Create(ani_env *env, [[maybe_unused]] ani_obje
 
     static const char *className = "@ohos.i18n.i18n.SystemLocaleManager";
     ani_object sysLocaleMgrObject = VariableConverter::CreateAniObject(env, className, obj.get());
-    obj.release();
+    if (sysLocaleMgrObject != nullptr) {
+        obj.release();
+    }
     return sysLocaleMgrObject;
 }
 

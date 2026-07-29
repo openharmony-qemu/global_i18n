@@ -89,7 +89,9 @@ ani_object I18nStyledDateTimeFormatAddon::Create(ani_env *env, [[maybe_unused]] 
 
     static const char *className = "@ohos.i18n.i18n.StyledDateTimeFormat";
     ani_object styledFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
-    obj.release();
+    if (styledFormatObject != nullptr) {
+        obj.release();
+    }
     return styledFormatObject;
 }
 

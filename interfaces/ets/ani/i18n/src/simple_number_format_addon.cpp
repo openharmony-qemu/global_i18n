@@ -66,7 +66,9 @@ ani_object I18nSimpleNumberFormatAddon::GetSimpleNumberFormatBySkeleton(ani_env 
 
     static const char *className = "@ohos.i18n.i18n.SimpleNumberFormat";
     ani_object simpleNumberFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
-    obj.release();
+    if (simpleNumberFormatObject != nullptr) {
+        obj.release();
+    }
     return simpleNumberFormatObject;
 }
 

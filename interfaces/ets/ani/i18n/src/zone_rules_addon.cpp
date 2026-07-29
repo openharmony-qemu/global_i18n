@@ -39,7 +39,9 @@ ani_object ZoneRulesAddon::GetZoneRulesObject(ani_env *env, ani_object object, s
     obj->zoneRules_ = std::make_unique<ZoneRules>(tzId);
     static const char* className = "@ohos.i18n.i18n.ZoneRules";
     ani_object zoneRulesObject = VariableConverter::CreateAniObject(env, className, obj.get());
-    obj.release();
+    if (zoneRulesObject != nullptr) {
+        obj.release();
+    }
     return zoneRulesObject;
 }
 

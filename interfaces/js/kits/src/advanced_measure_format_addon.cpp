@@ -95,6 +95,7 @@ napi_value AdvancedMeasureFormatAddon::Constructor(napi_env env, napi_callback_i
     }
     if (!obj->InitContext(env, argv[0], type, options)) {
         HILOG_ERROR_I18N("AdvancedMeasureFormatAddon::Constructor: Init context failed.");
+        obj.release();
         return nullptr;
     }
     obj.release();

@@ -310,9 +310,10 @@ napi_value I18nAddon::GetTimePeriodName(napi_env env, napi_callback_info info)
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "locale", "a valid locale", true);
         return nullptr;
     }
-    icu::SimpleDateFormat* formatter = dynamic_cast<icu::SimpleDateFormat*>
-        (icu::DateFormat::createDateInstance(icu::DateFormat::EStyle::kDefault, locale));
+    icu::DateFormat* dateFormatter = icu::DateFormat::createDateInstance(icu::DateFormat::EStyle::kDefault, locale);
+    icu::SimpleDateFormat* formatter = dynamic_cast<icu::SimpleDateFormat*>(dateFormatter);
     if (!formatter) {
+        delete dateFormatter;
         HILOG_ERROR_I18N("GetTimePeriodName Failed to create SimpleDateFormat");
         return VariableConvertor::CreateString(env, "");
     }
@@ -703,6 +704,7 @@ bool I18nAddon::InitTransliteratorContext(napi_env env, napi_callback_info info,
     icu::UnicodeString unistr = icu::UnicodeString::fromUTF8(idTag);
     icu::Transliterator *trans = icu::Transliterator::createInstance(unistr, UTransDirection::UTRANS_FORWARD, status);
     if (U_FAILURE(status) || (trans == nullptr)) {
+        delete trans;
         return false;
     }
     transliterator_ = std::unique_ptr<icu::Transliterator>(trans);
@@ -1049,9 +1051,6 @@ napi_value I18nAddon::PhoneNumberFormatConstructor(napi_env env, napi_callback_i
     VariableConvertor::GetOptionValue(env, argv[1], "type", typeStr);
     options.insert(std::make_pair("type", typeStr));
     std::unique_ptr<I18nAddon> obj = std::make_unique<I18nAddon>();
-    if (obj == nullptr) {
-        return nullptr;
-    }
     status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj.get()), I18nAddon::Destructor, nullptr,
         &TYPE_TAG, nullptr);
     if (status != napi_ok) {
@@ -1059,6 +1058,7 @@ napi_value I18nAddon::PhoneNumberFormatConstructor(napi_env env, napi_callback_i
         return nullptr;
     }
     if (!obj->InitPhoneNumberFormatContext(env, info, country.data(), options)) {
+        obj.release();
         return nullptr;
     }
     obj.release();
@@ -1297,6 +1297,7 @@ napi_value I18nAddon::I18nBreakIteratorConstructor(napi_env env, napi_callback_i
     obj->brkiter_ = std::make_unique<I18nBreakIterator>(localeTag);
     if (!obj->brkiter_) {
         HILOG_ERROR_I18N("Wrap BreakIterator failed");
+        obj.release();
         return nullptr;
     }
     obj.release();
@@ -1733,9 +1734,6 @@ napi_value I18nAddon::I18nIndexUtilConstructor(napi_env env, napi_callback_info 
         localeTag = localeBuf.data();
     }
     std::unique_ptr<I18nAddon> obj = std::make_unique<I18nAddon>();
-    if (obj == nullptr) {
-        return nullptr;
-    }
     status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj.get()), I18nAddon::Destructor, nullptr,
         &TYPE_TAG, nullptr);
     if (status != napi_ok) {
@@ -1743,6 +1741,7 @@ napi_value I18nAddon::I18nIndexUtilConstructor(napi_env env, napi_callback_info 
         return nullptr;
     }
     if (!obj->InitIndexUtilContext(env, info, localeTag)) {
+        obj.release();
         return nullptr;
     }
     obj.release();

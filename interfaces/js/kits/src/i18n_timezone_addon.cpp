@@ -157,9 +157,6 @@ napi_value I18nTimeZoneAddon::I18nTimeZoneConstructor(napi_env env, napi_callbac
         return nullptr;
     }
     std::unique_ptr<I18nTimeZoneAddon> obj = std::make_unique<I18nTimeZoneAddon>();
-    if (obj == nullptr) {
-        return nullptr;
-    }
     status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj.get()), I18nTimeZoneAddon::Destructor, nullptr,
         &TYPE_TAG, nullptr);
     if (status != napi_ok) {
@@ -167,6 +164,7 @@ napi_value I18nTimeZoneAddon::I18nTimeZoneConstructor(napi_env env, napi_callbac
     }
     obj->timezone_ = I18nTimeZone::CreateInstance(zoneID, isZoneID);
     if (!obj->timezone_) {
+        obj.release();
         return nullptr;
     }
     obj.release();

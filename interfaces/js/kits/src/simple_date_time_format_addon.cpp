@@ -238,10 +238,6 @@ napi_value SimpleDateTimeFormatAddon::SimpleDateTimeFormatConstructor(napi_env e
     }
 
     std::unique_ptr<SimpleDateTimeFormatAddon> obj = std::make_unique<SimpleDateTimeFormatAddon>();
-    if (obj == nullptr) {
-        HILOG_ERROR_I18N("SimpleDateTimeFormatConstructor: Cerate SimpleDateTimeFormatAddon failed.");
-        return nullptr;
-    }
     status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj.get()),
         SimpleDateTimeFormatAddon::Destructor, nullptr, &TYPE_TAG, nullptr);
     if (status != napi_ok) {
@@ -252,17 +248,18 @@ napi_value SimpleDateTimeFormatAddon::SimpleDateTimeFormatConstructor(napi_env e
     napi_value locale = (argc > SIZE_WITHOUR_LOCALE) ? argv[SIZE_WITH_LOCALE - 1] : nullptr;
     obj->simpleDateTimeFormat_ =
         SimpleDateTimeFormatAddon::InitSimpleDateTimeFormatContext(env, locale, skeleton, isBestPattern, errCode);
+    bool isSuccess = (obj->simpleDateTimeFormat_ != nullptr);
+    obj.release();
     if (errCode == I18nErrorCode::INVALID_DATE_TIME_FORMAT_SKELETON) {
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "skeleton", "a valid date time format skeleton", true);
         return nullptr;
     } else if (errCode == I18nErrorCode::INVALID_DATE_TIME_FORMAT_PATTERN) {
         ErrorUtil::NapiThrow(env, I18N_NOT_VALID, "pattern", "a valid date time format pattern", true);
         return nullptr;
-    } else if (!obj->simpleDateTimeFormat_ || errCode != I18nErrorCode::SUCCESS) {
+    } else if (!isSuccess || errCode != I18nErrorCode::SUCCESS) {
         HILOG_ERROR_I18N("SimpleDateTimeFormatConstructor: Construct SimpleDateTimeFormat failed.");
         return nullptr;
     }
-    obj.release();
     return thisVar;
 }
 

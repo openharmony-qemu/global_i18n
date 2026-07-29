@@ -107,6 +107,7 @@ napi_value StyledNumberFormatAddon::constructor(napi_env env, napi_callback_info
         return nullptr;
     }
     if (!obj->InitStyledNumberFormatContent(env, argv[0], type, argv[1])) {
+        obj.release();
         return nullptr;
     }
     obj.release();

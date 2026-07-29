@@ -44,7 +44,9 @@ ani_object I18nSymbolDateTimeFormatAddon::Create(ani_env *env, [[maybe_unused]] 
 
     static const char *className = "@ohos.i18n.i18n.SymbolDateTimeFormat";
     ani_object symbolDateTimeFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
-    obj.release();
+    if (symbolDateTimeFormatObject != nullptr) {
+        obj.release();
+    }
     return symbolDateTimeFormatObject;
 }
 
