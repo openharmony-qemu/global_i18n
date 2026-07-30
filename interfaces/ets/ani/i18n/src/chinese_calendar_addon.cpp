@@ -50,7 +50,9 @@ ani_object ChineseCalendarAddon::GetChineseCalendar(ani_env *env, ani_object loc
     obj->chineseCalendar_ = std::make_unique<ChineseCalendar>(localeTag);
     static const char* className = "@ohos.i18n.i18n.ChineseCalendar";
     ani_object calendarObject = VariableConverter::CreateAniObject(env, className, obj.get());
-    obj.release();
+    if (calendarObject != nullptr) {
+        obj.release();
+    }
     return calendarObject;
 }
 

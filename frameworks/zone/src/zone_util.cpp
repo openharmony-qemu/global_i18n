@@ -333,7 +333,6 @@ bool ZoneUtil::IsFindCountry(xmlDocPtr &doc, xmlNodePtr &cur, xmlNodePtr &value,
             continue;
         }
         if (xmlStrcmp(value->name, reinterpret_cast<const xmlChar*>(CODE_TAG)) != 0) {
-            xmlFreeDoc(doc);
             HILOG_ERROR_I18N("ZoneUtil::GetCountryZones invalid code_tag");
             return false;
         }

@@ -44,7 +44,9 @@ ani_object AdvancedMeasureFormatAddon::Create(ani_env *env, [[maybe_unused]] ani
 
     static const char *className = "@ohos.i18n.i18n.AdvancedMeasureFormat";
     ani_object advancedMeasureFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
-    obj.release();
+    if (advancedMeasureFormatObject != nullptr) {
+        obj.release();
+    }
     return advancedMeasureFormatObject;
 }
 

@@ -198,6 +198,7 @@ napi_value I18nCalendarAddon::I18nCalendarConstructor(napi_env env, napi_callbac
         return nullptr;
     }
     if (!obj->InitCalendarContext(env, info, localeTag, type)) {
+        obj.release();
         return nullptr;
     }
     obj.release();

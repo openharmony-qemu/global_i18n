@@ -57,7 +57,9 @@ ani_object I18nNormalizerAddon::GetInstance(ani_env *env, [[maybe_unused]] ani_o
 
     static const char* className = "@ohos.i18n.i18n.Normalizer";
     ani_object normalizerObject = VariableConverter::CreateAniObject(env, className, obj.get());
-    obj.release();
+    if (normalizerObject != nullptr) {
+        obj.release();
+    }
     return normalizerObject;
 }
 

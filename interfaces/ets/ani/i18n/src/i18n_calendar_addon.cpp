@@ -68,7 +68,9 @@ ani_object I18nCalendarAddon::GetCalendar(ani_env *env, ani_string locale, ani_s
     obj->calendar_ = std::make_unique<I18nCalendar>(VariableConverter::AniStrToString(env, locale), calendartype);
     static const char* className = "@ohos.i18n.i18n.Calendar";
     ani_object calendarObject = VariableConverter::CreateAniObject(env, className, obj.get());
-    obj.release();
+    if (calendarObject != nullptr) {
+        obj.release();
+    }
     return calendarObject;
 }
 

@@ -169,6 +169,7 @@ napi_value ISO8601DateTimeFormatAddon::ISO8601DateTimeFormatConstructor(napi_env
 
     if (!obj->iso8601DateTimeFormat_ || errCode != I18nErrorCode::SUCCESS) {
         HILOG_ERROR_I18N("ISO8601DateTimeFormatConstructor: Construct ISO8601DateTimeFormat failed.");
+        obj.release();
         return nullptr;
     }
 

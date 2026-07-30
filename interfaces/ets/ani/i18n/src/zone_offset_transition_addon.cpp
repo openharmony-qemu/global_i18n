@@ -47,7 +47,9 @@ ani_object ZoneOffsetTransitionAddon::GetZoneOffsetTransObject(ani_env *env,
     transObj->zoneOffsetTransition_ =
         std::make_unique<ZoneOffsetTransition>(milliseconds, offsetBefore, offsetAfter);
     ani_object zoneTransObject = VariableConverter::CreateAniObject(env, className, transObj.get());
-    transObj.release();
+    if (zoneTransObject != nullptr) {
+        transObj.release();
+    }
     return zoneTransObject;
 }
 

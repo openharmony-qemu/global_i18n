@@ -276,6 +276,10 @@ IntlDateTimeFormat::~IntlDateTimeFormat()
         delete dateIntervalFormat;
         dateIntervalFormat = nullptr;
     }
+
+    if (!isAdoptSuccess) {
+        delete icuCalendar;
+    }
 }
 
 std::string IntlDateTimeFormat::Format(double milliseconds)
@@ -831,6 +835,7 @@ bool IntlDateTimeFormat::InitIcuSimpleDateFormat(bool isExistComponents, std::st
     }
     if (IntlDateTimeFormat::InitIcuCalendar() && icuSimpleDateFormat != nullptr) {
         icuSimpleDateFormat->adoptCalendar(icuCalendar);
+        isAdoptSuccess = true;
     }
     std::string icuLocaleName = icuLocale.getName();
     if (icuLocaleName.find("calendar=iso8601") != std::string::npos) {

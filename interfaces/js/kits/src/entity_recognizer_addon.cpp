@@ -112,9 +112,6 @@ napi_value EntityRecognizerAddon::constructor(napi_env env, napi_callback_info i
         return nullptr;
     }
     obj->entityRecognizer_ = std::make_unique<EntityRecognizer>(locale);
-    if (!obj->entityRecognizer_) {
-        return nullptr;
-    }
     obj.release();
     return thisVar;
 }

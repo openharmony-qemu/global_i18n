@@ -70,7 +70,9 @@ ani_object I18nSimpleDateTimeFormatAddon::GetSimpleDateTimeFormatByPattern(ani_e
 
     static const char *className = "@ohos.i18n.i18n.SimpleDateTimeFormat";
     ani_object simpleDateTimeFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
-    obj.release();
+    if (simpleDateTimeFormatObject != nullptr) {
+        obj.release();
+    }
     return simpleDateTimeFormatObject;
 }
 
@@ -110,7 +112,9 @@ ani_object I18nSimpleDateTimeFormatAddon::GetSimpleDateTimeFormatBySkeleton(ani_
 
     static const char *className = "@ohos.i18n.i18n.SimpleDateTimeFormat";
     ani_object simpleDateTimeFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
-    obj.release();
+    if (simpleDateTimeFormatObject != nullptr) {
+        obj.release();
+    }
     return simpleDateTimeFormatObject;
 }
 

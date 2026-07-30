@@ -126,6 +126,7 @@ napi_value SymbolDateTimeFormatAddon::Constructor(napi_env env, napi_callback_in
         return nullptr;
     }
     if (!obj->InitSymbolFormatContext(env, localeTags, options)) {
+        obj.release();
         return nullptr;
     }
     obj.release();

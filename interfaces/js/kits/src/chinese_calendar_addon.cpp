@@ -142,6 +142,7 @@ napi_value ChineseCalendarAddon::Constructor(napi_env env, napi_callback_info in
     }
     if (!obj->InitContext(env, localeTag)) {
         HILOG_ERROR_I18N("ChineseCalendarAddon::Constructor: InitContext failed");
+        obj.release();
         return nullptr;
     }
     obj.release();

@@ -124,6 +124,7 @@ napi_value SymbolNumberFormatAddon::Constructor(napi_env env, napi_callback_info
         return nullptr;
     }
     if (!obj->InitSymbolFormatContext(env, localeTags, options)) {
+        obj.release();
         return nullptr;
     }
     obj.release();

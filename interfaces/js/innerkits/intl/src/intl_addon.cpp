@@ -208,6 +208,7 @@ napi_value IntlAddon::DateTimeFormatConstructor(napi_env env, napi_callback_info
     }
     if (!obj->InitDateTimeFormatContext(env, info, localeTags, map)) {
         HILOG_ERROR_I18N("DateTimeFormatConstructor: Init DateTimeFormat failed");
+        obj.release();
         return nullptr;
     }
     obj.release();
@@ -264,6 +265,7 @@ napi_value IntlAddon::RelativeTimeFormatConstructor(napi_env env, napi_callback_
     }
     if (!obj->InitRelativeTimeFormatContext(env, info, localeTags, map)) {
         HILOG_ERROR_I18N("Init RelativeTimeFormat failed");
+        obj.release();
         return nullptr;
     }
     obj.release();
@@ -628,6 +630,7 @@ napi_value IntlAddon::CollatorConstructor(napi_env env, napi_callback_info info)
     }
     if (!obj->InitCollatorContext(env, info, localeTags, map)) {
         HILOG_ERROR_I18N("CollatorConstructor: Init DateTimeFormat failed");
+        obj.release();
         return nullptr;
     }
     obj.release();
@@ -1029,6 +1032,7 @@ napi_value IntlAddon::PluralRulesConstructor(napi_env env, napi_callback_info in
     }
     if (!obj->InitPluralRulesContext(env, info, localeTags, map)) {
         HILOG_ERROR_I18N("PluralRulesConstructor: Init DateTimeFormat failed");
+        obj.release();
         return nullptr;
     }
     obj.release();

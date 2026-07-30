@@ -118,7 +118,9 @@ ani_object NumberFormatAddon::NumberFormat_Create(ani_env *env, [[maybe_unused]]
 
     static const char *className = "@ohos.intl.intl.NumberFormat";
     ani_object numberFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
-    obj.release();
+    if (numberFormatObject != nullptr) {
+        obj.release();
+    }
     return numberFormatObject;
 }
 
@@ -171,7 +173,9 @@ ani_object NumberFormatAddon::NumberFormat_CreateWithParam(ani_env *env, [[maybe
 
     static const char *className = "@ohos.intl.intl.NumberFormat";
     ani_object numberFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
-    obj.release();
+    if (numberFormatObject != nullptr) {
+        obj.release();
+    }
     return numberFormatObject;
 }
 

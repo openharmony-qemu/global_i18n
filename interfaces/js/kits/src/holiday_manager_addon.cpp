@@ -100,10 +100,12 @@ napi_value HolidayManagerAddon::HolidayManagerConstructor(napi_env env, napi_cal
     int32_t code = 0;
     std::string path = VariableConvertor::GetString(env, argv[0], code);
     if (code) {
+        obj.release();
         return nullptr;
     }
     if (!obj->InitHolidayManagerContext(env, info, path.c_str())) {
         HILOG_ERROR_I18N("Init HolidayManager failed");
+        obj.release();
         return nullptr;
     }
     obj.release();

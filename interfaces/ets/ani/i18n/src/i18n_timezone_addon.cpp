@@ -50,7 +50,9 @@ ani_object I18nTimeZoneAddon::GetTimeZone(ani_env *env, ani_string zoneID)
 
     static const char* className = "@ohos.i18n.i18n.TimeZone";
     ani_object timeZoneObject = VariableConverter::CreateAniObject(env, className, obj.get());
-    obj.release();
+    if (timeZoneObject != nullptr) {
+        obj.release();
+    }
     return timeZoneObject;
 }
 
@@ -181,7 +183,9 @@ ani_object I18nTimeZoneAddon::GetTimezoneFromCity(ani_env *env, [[maybe_unused]]
 
     static const char* className = "@ohos.i18n.i18n.TimeZone";
     ani_object timeZone_object = VariableConverter::CreateAniObject(env, className, obj.get());
-    obj.release();
+    if (timeZone_object != nullptr) {
+        obj.release();
+    }
     return timeZone_object;
 }
 
@@ -264,7 +268,9 @@ ani_object I18nTimeZoneAddon::GetAppDefaultTimeZone(ani_env *env, [[maybe_unused
 
     static const char* className = "@ohos.i18n.i18n.TimeZone";
     ani_object timeZone_object = VariableConverter::CreateAniObject(env, className, obj.get());
-    obj.release();
+    if (timeZone_object != nullptr) {
+        obj.release();
+    }
     return timeZone_object;
 }
 

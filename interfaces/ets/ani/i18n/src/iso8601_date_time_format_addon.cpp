@@ -126,7 +126,9 @@ ani_object ISO8601DateTimeFormatAddon::Create(ani_env *env, [[maybe_unused]] ani
 
     static const char* className = "@ohos.i18n.i18n.ISO8601DateTimeFormat";
     ani_object iso8601DateTimeFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
-    obj.release();
+    if (iso8601DateTimeFormatObject != nullptr) {
+        obj.release();
+    }
     return iso8601DateTimeFormatObject;
 }
 

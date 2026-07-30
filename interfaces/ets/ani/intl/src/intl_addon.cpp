@@ -210,7 +210,9 @@ ani_object IntlAddon::DateTimeFormat_Create(ani_env *env, [[maybe_unused]] ani_o
     obj->datefmt_ = DateTimeFormat::CreateInstance(localeTags, map);
     static const char *className = "@ohos.intl.intl.DateTimeFormat";
     ani_object dateTimeFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
-    obj.release();
+    if (dateTimeFormatObject != nullptr) {
+        obj.release();
+    }
     return dateTimeFormatObject;
 }
 
@@ -254,7 +256,9 @@ ani_object IntlAddon::DateTimeFormat_CreateWithParam(ani_env *env, [[maybe_unuse
 
     static const char *className = "@ohos.intl.intl.DateTimeFormat";
     ani_object dateTimeFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
-    obj.release();
+    if (dateTimeFormatObject != nullptr) {
+        obj.release();
+    }
     return dateTimeFormatObject;
 }
 
@@ -267,7 +271,9 @@ ani_object IntlAddon::Collator_Create(ani_env *env, [[maybe_unused]] ani_object 
 
     static const char *className = "@ohos.intl.intl.Collator";
     ani_object collatorObject = VariableConverter::CreateAniObject(env, className, obj.get());
-    obj.release();
+    if (collatorObject != nullptr) {
+        obj.release();
+    }
     return collatorObject;
 }
 
@@ -312,7 +318,9 @@ ani_object IntlAddon::Collator_CreateWithParam(ani_env *env, [[maybe_unused]] an
 
     static const char *className = "@ohos.intl.intl.Collator";
     ani_object collatorObject = VariableConverter::CreateAniObject(env, className, obj.get());
-    obj.release();
+    if (collatorObject != nullptr) {
+        obj.release();
+    }
     return collatorObject;
 }
 

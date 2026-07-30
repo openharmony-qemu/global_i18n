@@ -92,7 +92,9 @@ ani_object I18nStyledNumberFormatAddon::Create(ani_env *env, [[maybe_unused]] an
 
     static const char *className = "@ohos.i18n.i18n.StyledNumberFormat";
     ani_object styledNumberFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
-    obj.release();
+    if (styledNumberFormatObject != nullptr) {
+        obj.release();
+    }
     return styledNumberFormatObject;
 }
 

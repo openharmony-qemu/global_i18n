@@ -99,6 +99,7 @@ napi_value StyledDateTimeFormatAddon::Constructor(napi_env env, napi_callback_in
         return nullptr;
     }
     if (!obj->InitStyledFormatContext(env, argv[0], type, argv[1])) {
+        obj.release();
         return nullptr;
     }
     obj.release();

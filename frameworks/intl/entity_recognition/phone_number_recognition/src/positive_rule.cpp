@@ -173,6 +173,7 @@ std::vector<MatchedNumberInfo> PositiveRule::HandleBlank(PhoneNumberMatch* possi
     icu::UnicodeString number = possibleNumber->raw_string().c_str();
     icu::RegexMatcher* matcher = pattern->matcher(number, status);
     if (U_FAILURE(status) || matcher == nullptr) {
+        delete matcher;
         HILOG_ERROR_I18N("PositiveRule::HandleBlank: Pattern match failed.");
         return {};
     }
@@ -221,6 +222,8 @@ std::vector<MatchedNumberInfo> PositiveRule::HandleSlant(PhoneNumberMatch* possi
     icu::UnicodeString number = possibleNumber->raw_string().c_str();
     icu::RegexMatcher* matcher = pattern->matcher(number, status);
     if (U_FAILURE(status) || matcher == nullptr) {
+        delete pattern;
+        delete matcher;
         HILOG_ERROR_I18N("PositiveRule::HandleSlant: Pattern match failed.");
         return matchedNumberInfoList;
     }

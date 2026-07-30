@@ -80,7 +80,9 @@ ani_object I18nPhoneNumberFormatAddon::Create(ani_env *env, [[maybe_unused]] ani
 
     static const char *className = "@ohos.i18n.i18n.PhoneNumberFormat";
     ani_object phoneNumberFormatObject = VariableConverter::CreateAniObject(env, className, obj.get());
-    obj.release();
+    if (phoneNumberFormatObject != nullptr) {
+        obj.release();
+    }
     return phoneNumberFormatObject;
 }
 
@@ -138,7 +140,9 @@ ani_object I18nBreakIteratorAddon::GetLineInstance(ani_env *env, ani_string loca
 
     static const char* className = "@ohos.i18n.i18n.BreakIterator";
     ani_object breakIteratorObject = VariableConverter::CreateAniObject(env, className, obj.get());
-    obj.release();
+    if (breakIteratorObject != nullptr) {
+        obj.release();
+    }
     return breakIteratorObject;
 }
 
@@ -275,7 +279,9 @@ ani_object I18nIndexUtilAddon::GetInstance(ani_env *env, ani_string string)
 
     static const char* className = "@ohos.i18n.i18n.IndexUtil";
     ani_object indexUtilObject = VariableConverter::CreateAniObject(env, className, obj.get());
-    obj.release();
+    if (indexUtilObject != nullptr) {
+        obj.release();
+    }
     return indexUtilObject;
 }
 
@@ -364,7 +370,9 @@ ani_object I18nTransliteratorAddon::GetInstance(ani_env *env, [[maybe_unused]] a
     obj->transliterator_ = std::unique_ptr<icu::Transliterator>(trans);
     static const char* className = "@ohos.i18n.i18n.Transliterator";
     ani_object transliteratorObject = VariableConverter::CreateAniObject(env, className, obj.get());
-    obj.release();
+    if (transliteratorObject != nullptr) {
+        obj.release();
+    }
     return transliteratorObject;
 }
 
