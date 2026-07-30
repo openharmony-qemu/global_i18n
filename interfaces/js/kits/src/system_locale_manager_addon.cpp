@@ -264,13 +264,13 @@ bool SystemLocaleManagerAddon::SetTimeZoneCityItemAttribute(napi_env env,
     const TimeZoneCityItem &timezoneCityItem, napi_value& result)
 {
     napi_status status = napi_set_named_property(env, result, "latitude",
-        VariableConvertor::CreateDoubleValue(env, timezoneCityItem.lat));
+        VariableConvertor::CreateDoubleValue(env, timezoneCityItem.latitude));
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Failed to set element latitude.");
         return false;
     }
     status = napi_set_named_property(env, result, "longitude",
-        VariableConvertor::CreateDoubleValue(env, timezoneCityItem.lon));
+        VariableConvertor::CreateDoubleValue(env, timezoneCityItem.longitude));
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Failed to set element longitude.");
         return false;
