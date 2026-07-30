@@ -16,97 +16,145 @@
     <timezone>
         <city>Auckland</city>
         <id>Pacific/Auckland</id>
+        <lat>-36.88</lat>
+        <lon>174.75</lon>
     </timezone>
     <timezone>
         <city>Magadan</city>
         <id>Asia/Magadan</id>
+        <lat>59.56</lat>
+        <lon>150.81</lon>
     </timezone>
     <timezone>
         <city>Lord Howe Island</city>
         <id>Australia/Lord_Howe</id>
+        <lat>-31.55</lat>
+        <lon>159.08</lon>
     </timezone>
     <timezone>
         <city>Tokyo</city>
         <id>Asia/Tokyo</id>
+        <lat>35.68</lat>
+        <lon>139.75</lon>
     </timezone>
     <timezone>
         <city>Shanghai</city>
         <id>Asia/Shanghai</id>
+        <lat>31.24</lat>
+        <lon>121.50</lon>
     </timezone>
     <timezone>
         <city>Hovd</city>
         <id>Asia/Hovd</id>
+        <lat>48.00</lat>
+        <lon>91.64</lon>
     </timezone>
     <timezone>
         <city>Omsk</city>
         <id>Asia/Omsk</id>
+        <lat>54.98</lat>
+        <lon>73.37</lon>
     </timezone>
     <timezone>
         <city>Ashgabat</city>
         <id>Asia/Ashgabat</id>
+        <lat>37.96</lat>
+        <lon>58.32</lon>
     </timezone>
     <timezone>
         <city>Yerevan</city>
         <id>Asia/Yerevan</id>
+        <lat>40.18</lat>
+        <lon>44.51</lon>
     </timezone>
     <timezone>
         <city>Moscow</city>
         <id>Europe/Moscow</id>
+        <lat>55.75</lat>
+        <lon>37.62</lon>
     </timezone>
     <timezone>
         <city>Tel Aviv</city>
         <id>Asia/Jerusalem</id>
+        <lat>32.08</lat>
+        <lon>34.78</lon>
     </timezone>
     <timezone>
         <city>Dublin</city>
         <id>Europe/Dublin</id>
+        <lat>53.35</lat>
+        <lon>-6.27</lon>
     </timezone>
     <timezone>
         <city>London</city>
         <id>Europe/London</id>
+        <lat>51.51</lat>
+        <lon>-0.13</lon>
     </timezone>
     <timezone>
         <city>Praia</city>
         <id>Atlantic/Cape_Verde</id>
+        <lat>14.92</lat>
+        <lon>-23.51</lon>
     </timezone>
     <timezone>
         <city>Montevideo</city>
         <id>America/Montevideo</id>
+        <lat>-34.85</lat>
+        <lon>-56.20</lon>
     </timezone>
     <timezone>
         <city>Brasília</city>
         <id>America/Sao_Paulo</id>
+        <lat>-15.80</lat>
+        <lon>-47.89</lon>
     </timezone>
     <timezone>
         <city>Santiago</city>
         <id>America/Santiago</id>
+        <lat>-33.45</lat>
+        <lon>-70.66</lon>
     </timezone>
     <timezone>
         <city>Bogotá</city>
         <id>America/Bogota</id>
+        <lat>4.60</lat>
+        <lon>-74.08</lon>
     </timezone>
     <timezone>
         <city>Easter Island</city>
         <id>Pacific/Easter</id>
+        <lat>-27.12</lat>
+        <lon>-109.36</lon>
     </timezone>
     <timezone>
         <city>Salt Lake City</city>
         <id>America/Denver</id>
+        <lat>40.76</lat>
+        <lon>-111.90</lon>
     </timezone>
     <timezone>
         <city>Los Angeles</city>
         <id>America/Los_Angeles</id>
+        <lat>34.05</lat>
+        <lon>-118.25</lon>
     </timezone>
     <timezone>
         <city>Anchorage</city>
         <id>America/Anchorage</id>
+        <lat>61.22</lat>
+        <lon>-149.90</lon>
     </timezone>
     <timezone>
         <city>Adak</city>
         <id>America/Adak</id>
+        <lat>51.78</lat>
+        <lon>-176.64</lon>
     </timezone>
     <timezone>
         <city>Pago Pago</city>
         <id>Pacific/Pago_Pago</id>
+        <lat>-14.27</lat>
+        <lon>-170.70</lon>
     </timezone>
 </timezones>

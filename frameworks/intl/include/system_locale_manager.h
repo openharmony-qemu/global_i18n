@@ -80,6 +80,12 @@ struct TimeZoneCityItem {
 
     //the timezone raw offset for the city
     int32_t rawOffset;
+
+    // latitude of the city
+    double latitude;
+
+    // longitude of the city
+    double longitude;
 };
 
 class SystemLocaleManager {

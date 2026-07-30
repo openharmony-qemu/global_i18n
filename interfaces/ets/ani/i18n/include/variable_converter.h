@@ -36,6 +36,7 @@ public:
     static void SetNumberMember(ani_env *env, ani_object obj, const std::string &name, const std::string &value);
     static bool GetNumberMember(ani_env *env, ani_object options, const std::string &name, int& value);
     static void SetStringMember(ani_env *env, ani_object obj, const std::string &name, const std::string &value);
+    static void SetDoubleMember(ani_env *env, ani_object obj, const std::string &name, ani_double value);
     static bool GetStringMember(ani_env *env, ani_object options, const std::string &name, std::string &value);
     static bool GetEnumIndexMember(ani_env *env, ani_object options, const std::string &name, int32_t &value);
     static bool GetObjectMember(ani_env *env, ani_object options, const std::string &name, ani_object &value);

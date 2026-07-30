@@ -254,15 +254,36 @@ napi_value SystemLocaleManagerAddon::CreateTimeZoneCityItem(napi_env env, const 
         HILOG_ERROR_I18N("Failed to set element zoneDisplayName.");
         return nullptr;
     }
+    if (!SetTimeZoneCityItemAttribute(env, timezoneCityItem, result)) {
+        return nullptr;
+    }
+    return result;
+}
+
+bool SystemLocaleManagerAddon::SetTimeZoneCityItemAttribute(napi_env env,
+    const TimeZoneCityItem &timezoneCityItem, napi_value& result)
+{
+    napi_status status = napi_set_named_property(env, result, "lat",
+        VariableConvertor::CreateDoubleValue(env, timezoneCityItem.lat));
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("Failed to set element lat.");
+        return false;
+    }
+    status = napi_set_named_property(env, result, "lon",
+        VariableConvertor::CreateDoubleValue(env, timezoneCityItem.lon));
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("Failed to set element lon.");
+        return false;
+    }
     if (timezoneCityItem.rawOffset != 0) {
         status = napi_set_named_property(env, result, "rawOffset",
             VariableConvertor::CreateNumber(env, timezoneCityItem.rawOffset));
         if (status != napi_ok) {
             HILOG_ERROR_I18N("Failed to set element rawOffset.");
-            return nullptr;
+            return false;
         }
     }
-    return result;
+    return true;
 }
 
 void SystemLocaleManagerAddon::GetSortOptionsFromJsParam(napi_env env, napi_value &jsOptions, SortOptions &options,

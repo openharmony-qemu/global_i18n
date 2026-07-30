@@ -357,9 +357,10 @@ std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray()
             HILOG_ERROR_I18N("SystemLocaleManager::GetTimezoneCityInfoArray: Get time zone offset failed.");
             continue;
         }
+        std::pair<double, double> latLon = I18nTimeZone::GetLatLonByCityId(cityId);
         struct TimeZoneCityItem tzCityItem = {
             timezoneId, cityId, PseudoLocalizationProcessor(cityDisplayName), dstOffset + rawOffset,
-            PseudoLocalizationProcessor(""), rawOffset
+            PseudoLocalizationProcessor(""), rawOffset, latLon.first, latLon.second
         };
         result.push_back(tzCityItem);
     }

@@ -70,6 +70,7 @@ const char *I18nTimeZone::CITY_DISPLAYNAME_SECOND_ROOT_TAG = "display_name";
 std::set<std::string> I18nTimeZone::supportedLocales {};
 std::unordered_set<std::string> I18nTimeZone::availableZoneCityIDs {};
 std::unordered_map<std::string, std::string> I18nTimeZone::city2TimeZoneID {};
+std::unordered_map<std::string, std::pair<double, double>> I18nTimeZone::city2Latlon {};
 std::unordered_map<std::string, std::string> I18nTimeZone::cityDisplayNameCache {};
 std::string I18nTimeZone::cityDisplayNameCacheLocale = "";
 std::string I18nTimeZone::appDefaultTimeZoneID = "";
@@ -792,7 +793,7 @@ bool I18nTimeZone::ReadTimeZoneData(const char *xmlPath)
     cur = cur->xmlChildrenNode;
     while (cur != nullptr && !xmlStrcmp(cur->name, reinterpret_cast<const xmlChar *>(TIMEZONE_SECOND_ROOT_TAG))) {
         xmlNodePtr value = cur->xmlChildrenNode;
-        xmlChar *contents[ELEMENT_NUM] = { 0 }; // 2 represent cityid, zoneid;
+        xmlChar *contents[ELEMENT_NUM] = { 0 }; // 4 represent cityid, zoneid, latitude, longitude;
         bool xmlNodeIsNull = false;
         for (size_t i = 0; i < ELEMENT_NUM && value != nullptr; i++) {
             contents[i] = xmlNodeGetContent(value);
@@ -807,6 +808,13 @@ bool I18nTimeZone::ReadTimeZoneData(const char *xmlPath)
             const char* pairKey = reinterpret_cast<const char *>(contents[0]);
             const char* pairVal = reinterpret_cast<const char *>(contents[1]);
             city2TimeZoneID.insert(std::make_pair<std::string, std::string>(pairKey, pairVal));
+            double lat = 0.0;
+            double lon = 0.0;
+            if (contents[LAT_INDEX] != nullptr && contents[LON_INDEX] != nullptr) {
+                lat = atof(reinterpret_cast<const char *>(contents[LAT_INDEX]));
+                lon = atof(reinterpret_cast<const char *>(contents[LON_INDEX]));
+            }
+            city2Latlon.insert({pairKey, {lat, lon}});
         }
         for (size_t i = 0; i < ELEMENT_NUM; i++) {
             if (contents[i] != nullptr) {
@@ -1156,6 +1164,15 @@ std::string I18nTimeZone::GetTimezoneIdByCityId(const std::string &cityId)
         return "";
     }
     return city2TimeZoneID.at(cityId);
+}
+
+std::pair<double, double> I18nTimeZone::GetLatLonByCityId(const std::string &cityId)
+{
+    GetAvailableZoneCityIDs();
+    if (city2Latlon.find(cityId) == city2Latlon.end()) {
+        return {0.0, 0.0};
+    }
+    return city2Latlon.at(cityId);
 }
 
 std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, const double y)

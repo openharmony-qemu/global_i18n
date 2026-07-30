@@ -213,6 +213,13 @@ void VariableConverter::SetNumberMember(ani_env *env, ani_object obj, const std:
     }
 }
 
+void VariableConverter::SetDoubleMember(ani_env *env, ani_object obj, const std::string &name, ani_double value)
+{
+    if (ANI_OK != env->Object_SetPropertyByName_Double(obj, name.c_str(), value)) {
+        HILOG_ERROR_I18N("VariableConverter::SetDoubleMember: Set property '%{public}s' failed", name.c_str());
+    }
+}
+
 bool VariableConverter::GetNumberMember(ani_env *env, ani_object options, const std::string &name, int& value)
 {
     ani_ref ref;

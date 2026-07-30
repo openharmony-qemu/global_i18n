@@ -43,6 +43,8 @@ private:
 
     // convert c++ variable to napi variable
     static napi_value CreateTimeZoneCityItem(napi_env env, const TimeZoneCityItem &timezoneCityItem);
+    static bool SetTimeZoneCityItemAttribute(napi_env env,
+        const TimeZoneCityItem &timezoneCityItem, napi_value& result);
     static napi_value CreateLocaleItemArray(napi_env env, const std::vector<LocaleItem> &localeItemList);
     static napi_value CreateLocaleItem(napi_env env, const LocaleItem &localeItem);
     static napi_value CreateSuggestionType(napi_env env, SuggestionType suggestionType);
