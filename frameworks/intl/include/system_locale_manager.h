@@ -22,6 +22,7 @@
 #include "collator.h"
 #include "i18n_types.h"
 #include "taboo_utils.h"
+#include "unicode/timezone.h"
 
 namespace OHOS {
 namespace Global {
@@ -134,6 +135,7 @@ private:
         const std::string &localeTag);
     static std::string GetCityDisplayNameWithTaboo(const std::string &cityId, const std::string &localeBaseName,
         const std::string &cityDisplayName);
+    static void FreeTzMap(std::map<std::string, icu::TimeZone*> &tzMap);
     static const std::unordered_set<std::string> supportLocales;
     static std::unordered_map<std::string, std::string> custLanguageMap;
     static constexpr int CONFIG_LEN = 128;

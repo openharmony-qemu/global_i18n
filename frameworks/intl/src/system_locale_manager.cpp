@@ -18,7 +18,6 @@
 #include "locale_config.h"
 #include "system_locale_manager.h"
 #include "unicode/calendar.h"
-#include "unicode/timezone.h"
 #include "utils.h"
 #include "i18n_timezone.h"
 #include "unicode/localebuilder.h"
@@ -364,11 +363,16 @@ std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray()
         };
         result.push_back(tzCityItem);
     }
+    FreeTzMap(tzMap);
+    return result;
+}
+
+void SystemLocaleManager::FreeTzMap(std::map<std::string, icu::TimeZone*> &tzMap)
+{
     for (auto it = tzMap.begin(); it != tzMap.end(); ++it) {
         delete it->second;
         it->second = nullptr;
     }
-    return result;
 }
 
 void SystemLocaleManager::SortTimezoneCityItemList(const std::string &locale,
