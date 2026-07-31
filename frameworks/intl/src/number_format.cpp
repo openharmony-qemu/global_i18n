@@ -1582,9 +1582,6 @@ void NumberFormat::SetDefaultStyle()
 
 bool NumberFormat::ReadISO4217Datas()
 {
-    if (initISO4217) {
-        return true;
-    }
     std::lock_guard<std::mutex> readDataLock(numToCurrencyMutex);
     if (initISO4217) {
         return true;

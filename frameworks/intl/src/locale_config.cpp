@@ -715,9 +715,6 @@ bool LocaleConfig::IsSuggestedV15(const std::string &language, const std::string
 void LocaleConfig::ExtendWhiteLanguages()
 {
     static bool isLanguageWhitelistInit = false;
-    if (isLanguageWhitelistInit) {
-        return;
-    }
     std::lock_guard<std::mutex> languageWhitelistLock(languageWhitelistMutex);
     if (isLanguageWhitelistInit) {
         return;
@@ -1444,8 +1441,9 @@ bool LocaleConfig::Is24HourLocale(const std::string& systemLocale)
 {
     {
         std::shared_lock<std::shared_mutex> lock(is24HourLocaleMapMutex);
-        if (is24HourLocaleMap.find(systemLocale) != is24HourLocaleMap.end()) {
-            return is24HourLocaleMap[systemLocale];
+        auto iter = is24HourLocaleMap.find(systemLocale);
+        if (iter != is24HourLocaleMap.end()) {
+            return iter->second;
         }
     }
     std::unique_lock<std::shared_mutex> lock(is24HourLocaleMapMutex);

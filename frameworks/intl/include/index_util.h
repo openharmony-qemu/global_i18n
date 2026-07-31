@@ -15,6 +15,7 @@
 #ifndef GLOBAL_I18N_INDEX_UTIL_H
 #define GLOBAL_I18N_INDEX_UTIL_H
 
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -39,6 +40,7 @@ protected:
 
 private:
     std::unique_ptr<icu::AlphabeticIndex> index;
+    std::mutex indexMutex;
     bool createSuccess = false;
 };
 } // namespace I18n

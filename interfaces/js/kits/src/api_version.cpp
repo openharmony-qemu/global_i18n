@@ -25,7 +25,7 @@ namespace Global {
 namespace I18n {
 const int32_t ApiVersion::API_VERSION_MOD = 1000;
 std::mutex ApiVersion::initMutex;
-thread_local int32_t sysApiVersion = 0;
+static int32_t sysApiVersion = 0;
 std::unordered_map<std::string, int32_t> ApiVersion::versionMap {
     {"isSuggested", 18},
 };
@@ -48,9 +48,6 @@ ApiCompareResult ApiVersion::CheckApiTargetVersion(const std::string &apiName)
 
 int32_t ApiVersion::InitSystemApiVersion()
 {
-    if (sysApiVersion > 0) {
-        return sysApiVersion;
-    }
     std::lock_guard<std::mutex> systemApiLock(initMutex);
     if (sysApiVersion > 0) {
         return sysApiVersion;

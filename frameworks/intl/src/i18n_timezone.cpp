@@ -848,9 +848,6 @@ std::set<std::string> I18nTimeZone::GetAvailableIDs()
 
 std::unordered_set<std::string> I18nTimeZone::GetAvailableZoneCityIDs()
 {
-    if (initAvailableZoneInfo) {
-        return availableZoneCityIDs;
-    }
     std::lock_guard<std::mutex> lock(initZoneInfoMutex);
     if (initAvailableZoneInfo) {
         return availableZoneCityIDs;

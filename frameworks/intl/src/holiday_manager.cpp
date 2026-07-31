@@ -81,13 +81,13 @@ void HolidayManager::SetHolidayData(std::map<std::string, std::vector<HolidayInf
 bool HolidayManager::IsHoliday()
 {
     time_t timeStamp = time(NULL);
-    struct tm* timObj = localtime(&timeStamp);
-    if (timObj == nullptr) {
+    struct tm timeObj;
+    if (localtime_r(&timeStamp, &timeObj) == nullptr) {
         return false;
     }
-    int32_t year = timObj->tm_year + YEAR_START;
-    int32_t month = timObj->tm_mon + MONTH_GREATER_ONE;
-    return IsHoliday(year, month, timObj->tm_mday);
+    int32_t year = timeObj.tm_year + YEAR_START;
+    int32_t month = timeObj.tm_mon + MONTH_GREATER_ONE;
+    return IsHoliday(year, month, timeObj.tm_mday);
 }
 
 bool HolidayManager::IsHoliday(int32_t year, int32_t month, int32_t day)

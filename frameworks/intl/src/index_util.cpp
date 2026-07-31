@@ -54,6 +54,7 @@ std::vector<std::string> IndexUtil::GetIndexList()
 {
     UErrorCode status = U_ZERO_ERROR;
     std::vector<std::string> indexList;
+    std::lock_guard<std::mutex> indexLock(indexMutex);
     if (!IsCreateSuccess() || index == nullptr) {
         return indexList;
     }
@@ -73,6 +74,7 @@ void IndexUtil::AddLocale(const std::string &localeTag)
 {
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale locale(localeTag.c_str());
+    std::lock_guard<std::mutex> indexLock(indexMutex);
     if (createSuccess && index != nullptr) {
         index->addLabels(locale, status);
     }
@@ -80,6 +82,7 @@ void IndexUtil::AddLocale(const std::string &localeTag)
 
 std::string IndexUtil::GetIndex(const std::string &String)
 {
+    std::lock_guard<std::mutex> indexLock(indexMutex);
     if (!IsCreateSuccess() || index == nullptr) {
         return "";
     }
