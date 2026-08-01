@@ -364,7 +364,7 @@ int32_t I18nCalendar::GetFirstDayOfWeek(void)
     return UCAL_SUNDAY;
 }
 
-bool I18nCalendar::IsWeekend(int64_t date, UErrorCode &status)
+bool I18nCalendar::IsWeekend(double date, UErrorCode &status)
 {
     icu::Calendar* icuCalendar = GetIcuCalendar();
     if (icuCalendar != nullptr) {

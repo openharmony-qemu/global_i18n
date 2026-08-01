@@ -63,7 +63,7 @@ public:
     UDate GetTimeInMillis(void);
     int32_t GetMinimalDaysInFirstWeek(void);
     int32_t GetFirstDayOfWeek(void);
-    bool IsWeekend(int64_t date, UErrorCode &status);
+    bool IsWeekend(double date, UErrorCode &status);
     bool IsWeekend(void);
     std::string GetDisplayName(std::string &displayLocaleTag);
     int32_t CompareDays(UDate date);

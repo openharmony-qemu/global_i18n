@@ -1278,7 +1278,7 @@ string LocaleConfig::GetDisplayRegion(const string &region, const string &displa
         HILOG_ERROR_I18N("LocaleConfig::GetDisplayRegion: tabooUtils is nullptr.");
     }
     if (sentenceCase) {
-        char ch = static_cast<char>(toupper(result[0]));
+        char ch = static_cast<char>(toupper(static_cast<unsigned char>(result[0])));
         return PseudoLocalizationProcessor(result.replace(0, 1, 1, ch));
     }
     return PseudoLocalizationProcessor(result);
