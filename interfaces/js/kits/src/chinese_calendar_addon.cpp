@@ -408,8 +408,8 @@ napi_value ChineseCalendarAddon::SetFirstDayOfWeek(napi_env env, napi_callback_i
     ChineseCalendarAddon *obj = nullptr;
     status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->chineseCalendar_) {
-        HILOG_ERROR_I18N("ChineseCalendarAddon::SetTimeZone: unwrap failed");
-        return VariableConvertor::CreateNumber(env, 0);
+        HILOG_ERROR_I18N("ChineseCalendarAddon::SetFirstDayOfWeek: unwrap failed");
+        return nullptr;
     }
     obj->chineseCalendar_->SetFirstDayOfWeek(value);
     return nullptr;

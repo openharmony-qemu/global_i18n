@@ -211,10 +211,11 @@ std::unique_ptr<SimpleNumberFormat> SimpleNumberFormatAddon::InitSimpleNumberFor
         return std::make_unique<SimpleNumberFormat>(skeleton, localeInfo, errCode);
     }
 
-    if (VariableConvertor::GetLocaleType(env, locale) == LocaleType::BUILTINS_LOCALE) {
+    auto type = VariableConvertor::GetLocaleType(env, locale);
+    if (type == LocaleType::BUILTINS_LOCALE) {
         std::string localeTag = VariableConvertor::ParseBuiltinsLocale(env, locale);
         return std::make_unique<SimpleNumberFormat>(skeleton, localeTag, errCode);
-    } else if (VariableConvertor::GetLocaleType(env, locale) == LocaleType::LOCALE_INFO) {
+    } else if (type == LocaleType::LOCALE_INFO) {
         std::shared_ptr<LocaleInfo> localeInfo = VariableConvertor::ParseLocaleInfo(env, locale);
         return std::make_unique<SimpleNumberFormat>(skeleton, localeInfo, errCode);
     }

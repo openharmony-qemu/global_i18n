@@ -477,6 +477,9 @@ extern "C" {
 
 I18n_ErrorCode OH_i18n_GetTimeZoneRules(const char* timeZoneID, TimeZoneRules* rules)
 {
+    if (timeZoneID == nullptr) {
+        return ERROR_INVALID_PARAMETER;
+    }
     return ParseTimeZoneRule(timeZoneID, rules);
 }
 

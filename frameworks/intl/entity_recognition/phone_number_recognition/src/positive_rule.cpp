@@ -92,6 +92,10 @@ std::vector<MatchedNumberInfo> PositiveRule::Handle(PhoneNumberMatch* match, icu
     }
     UErrorCode status = U_ZERO_ERROR;
     icu::RegexMatcher* mat1 = pattern->matcher(str, status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("PositiveRule::Handle: match matcher failed.");
+        return {};
+    }
     if (mat1 != nullptr && mat1->find(status)) {
         std::vector<MatchedNumberInfo> infoList = this->HandleInner(match, message);
         delete mat1;
@@ -99,7 +103,12 @@ std::vector<MatchedNumberInfo> PositiveRule::Handle(PhoneNumberMatch* match, icu
         return infoList;
     }
     delete mat1;
+    status = U_ZERO_ERROR;
     icu::RegexMatcher* mat2 = pattern->matcher(message, status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("PositiveRule::Handle: message matcher failed.");
+        return {};
+    }
     if (mat2 != nullptr && mat2->find(status)) {
         std::vector<MatchedNumberInfo> infoList = this->HandleInner(match, message);
         delete mat2;

@@ -91,9 +91,6 @@ napi_value NumberFormatAddon::NumberFormatConstructor(napi_env env, napi_callbac
         JSUtils::GetNumberOptionValues(env, argv[1], map);
     }
     std::unique_ptr<NumberFormatAddon> obj = std::make_unique<NumberFormatAddon>();
-    if (obj == nullptr) {
-        return nullptr;
-    }
     status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj.get()), NumberFormatAddon::Destructor, nullptr,
         &TYPE_TAG, nullptr);
     if (status != napi_ok) {

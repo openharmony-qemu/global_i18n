@@ -113,7 +113,7 @@ PhoneNumberMatch* CodeRule::IsValidStart(PhoneNumberMatch* possibleNumber, icu::
     bool isTwo = true;
     int len = before.length();
     for (int i = 0; i < len; i++) {
-        char beforeChar = before[len - 1 - i];
+        UChar32 beforeChar = before[len - 1 - i];
         if (i == 0 && !u_isUUppercase(beforeChar)) {
             isTwo = false;
             break;
