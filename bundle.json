@@ -73,6 +73,7 @@
                 "libxml2",
                 "memmgr",
                 "napi",
+                "node",
                 "openssl",
                 "os_account",
                 "preferences",

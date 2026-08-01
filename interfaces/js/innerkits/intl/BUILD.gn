@@ -34,6 +34,7 @@ ohos_shared_library("intl_register") {
   external_deps = [
     "hilog:libhilog",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
   install_images = [ system_base_dir ]
   relative_install_dir = "platformsdk"
@@ -73,6 +74,7 @@ ohos_shared_library("intl_napi") {
     "icu:shared_icui18n",
     "libphonenumber:phonenumber_standard",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
   install_images = [ system_base_dir ]
   relative_install_dir = "platformsdk"
