@@ -76,7 +76,7 @@ std::vector<Point> TimeZoneLocation::GetPointVect(int32_t* points, size_t size)
 {
     std::vector<Point> result;
     size_t i = 0;
-    while (i < size - 1) {
+    while (i + 1 < size) {
         double lon = static_cast<double>(points[i]) / 1000000.0;
         double lat = static_cast<double>(points[i + 1]) / 1000000.0;
         result.push_back({lon, lat});

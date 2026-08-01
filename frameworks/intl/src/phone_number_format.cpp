@@ -257,7 +257,7 @@ std::string PhoneNumberFormat::FormatAllInputNumber(const std::string &originalN
     for (size_t i = 0; i < originalNumber.length(); i++) {
         char c = originalNumber.at(i);
         auto iter = VALID_PHONE_NUMBER_CHARS.find(c);
-        if (isdigit(c)) {
+        if (isdigit(static_cast<unsigned char>(c))) {
             formattedNumber = formatter->InputDigit(c, &result);
         } else if (iter != VALID_PHONE_NUMBER_CHARS.end()) {
             char replacedChar = VALID_PHONE_NUMBER_CHARS[c];
@@ -335,7 +335,7 @@ std::string PhoneNumberFormat::getLocationName(const std::string &number, const 
     // Process the city name
     std::string formattedNumber;
     util->Format(phoneNumber, PhoneNumberUtil::PhoneNumberFormat::E164, &formattedNumber);
-    return getCityName(locale, formattedNumber.substr(1), locName);
+    return formattedNumber.empty() ? "" : getCityName(locale, formattedNumber.substr(1), locName);
 }
 
 std::string PhoneNumberFormat::getPhoneLocationName(

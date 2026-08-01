@@ -942,7 +942,11 @@ icu::UnicodeString DateTimeFormat::GetPatternFromLocale(const std::string& local
         HILOG_ERROR_I18N("DateTimeFormat::GetPatternFromLocale: Create icuDateFormet failed.");
         return "";
     }
-    icu::SimpleDateFormat* icuSimpleDateFormat = reinterpret_cast<icu::SimpleDateFormat *>(icuDateFormet);
+    icu::SimpleDateFormat* icuSimpleDateFormat = dynamic_cast<icu::SimpleDateFormat *>(icuDateFormet);
+    if (icuSimpleDateFormat == nullptr) {
+        delete icuDateFormet;
+        return "";
+    }
     icu::UnicodeString result;
     icuSimpleDateFormat->toPattern(result);
     delete icuSimpleDateFormat;

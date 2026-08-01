@@ -298,7 +298,7 @@ I18nErrorCode PreferredLanguage::AddPreferredLanguage(const std::string &languag
 I18nErrorCode PreferredLanguage::RemovePreferredLanguage(int32_t index)
 {
     std::vector<std::string> preferredLanguages = GetPreferredLanguageList();
-    if (preferredLanguages.size() == 1) {
+    if (preferredLanguages.size() <= 1) {
         HILOG_ERROR_I18N("PreferredLanguage::RemovePreferredLanguage can't remove the only language.");
         return I18nErrorCode::REMOVE_PREFERRED_LANGUAGE_FAILED;
     }
