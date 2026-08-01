@@ -91,6 +91,7 @@ ohos_shared_library("cj_i18n_ffi") {
     defines += [ "SUPPORT_APP_PREFERRED_LANGUAGE" ]
   }
 
+  branch_protector_ret = "pac_ret"
   innerapi_tags = [ "platformsdk" ]
   subsystem_name = "global"
   part_name = "i18n"
