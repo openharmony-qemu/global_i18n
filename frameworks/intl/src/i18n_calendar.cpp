@@ -122,6 +122,7 @@ I18nCalendar::I18nCalendar(std::string localeTag, CalendarType type)
     UErrorCode status = U_ZERO_ERROR;
     icu::Locale tempLocale = icu::Locale::forLanguageTag(localeTag, status);
     if (U_FAILURE(status)) {
+        status = U_ZERO_ERROR;
         calendar_ = new icu::GregorianCalendar(status);
         if (!U_SUCCESS(status)) {
             if (calendar_ != nullptr) {

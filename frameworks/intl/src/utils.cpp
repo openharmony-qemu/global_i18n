@@ -206,7 +206,7 @@ std::string StrReplaceAll(const std::string& str,
 {
     std::string::size_type pos = 0;
     std::string result = str;
-    if (replace.empty() || target.compare(replace) == 0) {
+    if (replace.empty() || target.empty() || target.compare(replace) == 0) {
         return result;
     }
     while ((pos = result.find(target)) != std::string::npos) {
@@ -342,13 +342,21 @@ bool IsDirExist(const char *path)
 
 void ClearDir(const std::filesystem::path& dirPath)
 {
-    std::error_code errCode;
-    for (const auto& entry : std::filesystem::directory_iterator(dirPath)) {
-        std::filesystem::remove_all(entry.path(), errCode);
-        if (errCode) {
-            HILOG_ERROR_I18N("ClearDir: Error removing file: %{public}s, Error: %{public}s", entry.path().c_str(),
-                errCode.message().c_str());
+    try {
+        std::error_code errCode;
+        for (const auto& entry : std::filesystem::directory_iterator(dirPath)) {
+            std::filesystem::remove_all(entry.path(), errCode);
+            if (errCode) {
+                HILOG_ERROR_I18N("ClearDir: Error removing file: %{public}s, Error: %{public}s", entry.path().c_str(),
+                    errCode.message().c_str());
+            }
         }
+    } catch (const std::filesystem::filesystem_error &except) {
+        HILOG_ERROR_I18N("ClearDir: filesystem_error caught %{public}s.", except.what());
+    } catch (const std::bad_alloc &except) {
+        HILOG_ERROR_I18N("ClearDir: bad_alloc caught %{public}s.", except.what());
+    } catch (...) {
+        HILOG_ERROR_I18N("ClearDir: unknow error.");
     }
 }
 
@@ -442,8 +450,12 @@ bool RegexSearchNoExcept(const std::string& str, std::smatch& match, const std::
         return std::regex_search(str, match, regex);
     } catch (const std::regex_error &except) {
         HILOG_ERROR_I18N("RegexSearchNoExcept: regex_error caught %{public}s.", except.what());
-        return false;
+    } catch (const std::bad_alloc &except) {
+        HILOG_ERROR_I18N("RegexSearchNoExcept: bad_alloc caught %{public}s.", except.what());
+    } catch (...) {
+        HILOG_ERROR_I18N("RegexSearchNoExcept: unknow error");
     }
+    return false;
 }
 
 std::string LocaleEncode(const std::string& locale)

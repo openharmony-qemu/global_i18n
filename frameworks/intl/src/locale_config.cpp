@@ -2300,10 +2300,6 @@ void LocaleConfig::UpdateConfiguration(const std::string& locale, const std::str
     }
 
     auto appMgrClient = std::make_unique<AppExecFwk::AppMgrClient>();
-    if (appMgrClient == nullptr) {
-        HILOG_ERROR_I18N("LocaleConfig::UpdateConfiguration: Get appMgrClient failed.");
-        return;
-    }
 
     AppExecFwk::AppMgrResultCode status = appMgrClient->UpdateConfiguration(configuration, userId);
     if (status != AppExecFwk::AppMgrResultCode::RESULT_OK) {

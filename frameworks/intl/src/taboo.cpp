@@ -425,7 +425,7 @@ void Taboo::ReadResourceList()
 
 std::string Taboo::GetLanguageFromFileName(const std::string& fileName)
 {
-    if (fileName.length() == 3) { // 3 is the length of file 'xml'
+    if (fileName.length() < 6) { // 6 is the length of file
         return "en";
     }
     std::string language = fileName.substr(4);

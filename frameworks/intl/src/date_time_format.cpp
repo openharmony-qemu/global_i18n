@@ -1051,7 +1051,7 @@ bool DateTimeFormat::InitFormatter()
 
     dateIntvFormat =
         std::unique_ptr<DateIntervalFormat>(DateIntervalFormat::createInstance(pattern, locale, status));
-    if (U_FAILURE(status)) {
+    if (U_FAILURE(status) || dateIntvFormat == nullptr) {
         HILOG_ERROR_I18N("DateTimeFormat::InitFormatter: Create DateIntervalFormat failed.");
         return false;
     }

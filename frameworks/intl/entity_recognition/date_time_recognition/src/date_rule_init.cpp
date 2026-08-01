@@ -21,15 +21,8 @@ namespace I18n {
 DateRuleInit::DateRuleInit(std::string& locale)
 {
     dateTimeRule = new DateTimeRule(locale);
-    if (dateTimeRule == nullptr) {
-        HILOG_ERROR_I18N("DateTimeRule construct failed.");
-        return;
-    }
     this->locale = dateTimeRule->GetLocale();
     filter = new DateTimeFilter(this->locale, dateTimeRule);
-    if (filter == nullptr) {
-        HILOG_ERROR_I18N("DateTimeFilter construct failed.");
-    }
     Init();
 }
 

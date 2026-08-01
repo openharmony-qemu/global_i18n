@@ -244,10 +244,9 @@ ani_object I18nHolidayManagerAddon::GetHolidayInfoItemArray(ani_env *env, ani_ob
         }
         if (yearValue < 0) {
             ErrorUtil::AniThrow(env, I18N_NOT_VALID, "year", "a non-negative number");
-            itemList = obj->holidayManager_->GetHolidayInfoItemArray(-1);
-        } else {
-            itemList = obj->holidayManager_->GetHolidayInfoItemArray(yearValue);
+            return nullptr;
         }
+        itemList = obj->holidayManager_->GetHolidayInfoItemArray(yearValue);
     }
     return GetHolidayInfoItemResult(env, itemList);
 }
