@@ -111,7 +111,6 @@ napi_value CollatorAddon::CollatorConstructor(napi_env env, napi_callback_info i
     }
     if (!obj->InitCollatorContext(env, info, localeTags, map)) {
         HILOG_ERROR_I18N("CollatorConstructor: Init CollatorAddon failed");
-        delete obj;
         return nullptr;
     }
     return thisVar;

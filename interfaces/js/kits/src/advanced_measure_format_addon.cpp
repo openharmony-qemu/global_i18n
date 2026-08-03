@@ -147,6 +147,9 @@ AdvancedMeasureFormatOptions AdvancedMeasureFormatAddon::ParseOptions(napi_env e
         HILOG_ERROR_I18N("AdvancedMeasureFormatAddon::ParseOptions: Get type failed.");
         return options;
     }
+    if (type == napi_undefined) {
+        return options;
+    }
     if (type != napi_object) {
         ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "options", "AdvancedMeasureFormatOptions", true);
         return options;
