@@ -272,7 +272,7 @@ void SystemLocaleManagerAddon::GetSortOptionsFromJsParam(napi_env env, napi_valu
     std::string localeTag;
     bool isUseLocalName = true;
     bool isSuggestedFirst = true;
-    if (jsOptions == nullptr) {
+    if (jsOptions == nullptr || VariableConvertor::IsUndefined(env, jsOptions)) {
         localeTag = LocaleConfig::GetEffectiveLocale();
         if (isRegion) {
             isUseLocalName = false;
