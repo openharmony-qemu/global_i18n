@@ -20,6 +20,7 @@
 #include <unistd.h>
 #include <unordered_map>
 #include "securec.h"
+#include "utils.h"
 
 #ifdef TEL_CORE_SERVICE_ENABLE
 #include "core_service_client.h"

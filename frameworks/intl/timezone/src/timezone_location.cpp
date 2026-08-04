@@ -76,7 +76,7 @@ std::vector<Point> TimeZoneLocation::GetPointVect(int32_t* points, size_t size)
 {
     std::vector<Point> result;
     size_t i = 0;
-    while (i + 1 < size) {
+    while (i < size - 1) {
         double lon = static_cast<double>(points[i]) / 1000000.0;
         double lat = static_cast<double>(points[i + 1]) / 1000000.0;
         result.push_back({lon, lat});
@@ -229,7 +229,7 @@ bool TimeZoneLocation::MatchNextKey(char* str, int len, int& curPos,
 std::tuple<ParseJsonStrResult, std::string> TimeZoneLocation::GetJsonObjectFromPosition(
     const char* lookupStr, int pos, int len)
 {
-    if (pos + KEY_POS_O_OFFSET >= len) {
+    if (pos + JSONITEM_BEGIN_OFFSET >= len) {
         return std::make_tuple(ParseJsonStrResult::INVALID, "");
     }
     if (lookupStr[pos + JSONITEM_BEGIN_OFFSET] == '[') {
@@ -443,7 +443,7 @@ std::vector<std::string> TimeZoneLocation::GetTimezoneByLocation(
         return tzidList;
     }
     int32_t indexCount;
-    if (fread(&indexCount, sizeof(int32_t), 1, datFile->get()) != 1) {
+    if (fread(&indexCount,  sizeof(int32_t), 1, datFile->get()) != 1) {
         HILOG_ERROR_I18N("GetTimezoneByLocation: read indexCount failed");
         return tzidList;
     }
