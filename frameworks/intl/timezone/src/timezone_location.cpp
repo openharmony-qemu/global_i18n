@@ -14,18 +14,28 @@
  */
 #include "timezone_location.h"
 
-#include "i18n_hilog.h"
+#include <cctype>
 #include <cstdio>
 #include <unistd.h>
 #include <unordered_map>
 #include "utils.h"
 #include <chrono>
 #include "cJSON.h"
+#include <dlfcn.h>
+#include <iostream>
+#include <sys/stat.h>
+#include "locale_config.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
 const char *TimeZoneLocation::TIMEZONE_LOCATION_PATH = "/system/usr/ohos_timezone/timezone_location.dat";
+const char *TimeZoneLocation::DISTRO_TIMEZONE_LOCATION_PATH = "/system/etc/tzdata_distro/timezone_location.dat";
+const char *TimeZoneLocation::POLITICAL_DATA_PATH = "/system/usr/ohos_timezone/tz_political";
+const char *TimeZoneLocation::DISTRO_POLITICAL_DATA_PATH = "/system/etc/tzdata_distro/tz_political";
+const char *TimeZoneLocation::DLOPEN_SO_NAME = "libzone_util.z.so";
+const char *TimeZoneLocation::VENDOR_COUNTRY_KEY = "const.cust.region";
+
 const std::vector<OceanZone> TimeZoneLocation::OCEAN_ZONES {
     {"Etc/GMT-12", 172.5, 180 },
     {"Etc/GMT-11", 157.5, 172.5 },
@@ -66,7 +76,7 @@ std::vector<Point> TimeZoneLocation::GetPointVect(int32_t* points, size_t size)
 {
     std::vector<Point> result;
     size_t i = 0;
-    while (i < size - 1) {
+    while (i + 1 < size) {
         double lon = static_cast<double>(points[i]) / 1000000.0;
         double lat = static_cast<double>(points[i + 1]) / 1000000.0;
         result.push_back({lon, lat});
@@ -219,7 +229,7 @@ bool TimeZoneLocation::MatchNextKey(char* str, int len, int& curPos,
 std::tuple<ParseJsonStrResult, std::string> TimeZoneLocation::GetJsonObjectFromPosition(
     const char* lookupStr, int pos, int len)
 {
-    if (pos + JSONITEM_BEGIN_OFFSET >= len) {
+    if (pos + KEY_POS_O_OFFSET >= len) {
         return std::make_tuple(ParseJsonStrResult::INVALID, "");
     }
     if (lookupStr[pos + JSONITEM_BEGIN_OFFSET] == '[') {
@@ -317,17 +327,6 @@ std::vector<std::string> TimeZoneLocation::ReadPolygonData(double lon, double la
         tzidList = GetTimezoneAtSea(lon);
     }
     return tzidList;
-}
-
-void TimeZoneLocation::CloseFile(FILE* datFile)
-{
-    if (datFile == nullptr) {
-        HILOG_ERROR_I18N("CloseFile: datFile is nullptr");
-        return;
-    }
-    if (fclose(datFile) != 0) {
-        HILOG_ERROR_I18N("CloseFile: close datFile failed");
-    }
 }
 
 bool TimeZoneLocation::GetAllTimezoneId(std::vector<std::string>& tzidNames, FILE* datFile,
@@ -431,26 +430,177 @@ void TimeZoneLocation::ReadJsonArray(const std::string& jsonArrayStr,
 std::vector<std::string> TimeZoneLocation::GetTimezoneByLocation(
     const double lon, const double lat)
 {
+    std::vector<std::string> politicalTzids = GetPoliticalTimezone(lon, lat);
+    if (!politicalTzids.empty()) {
+        return politicalTzids;
+    }
     std::vector<std::string> tzidList;
-    FILE* datFile = fopen(TIMEZONE_LOCATION_PATH, "rb");
-    if (datFile == nullptr) {
+    const char* timezoneLocationPath = GetTimeZoneLocationDataPath();
+    std::unique_ptr<TzLocationDatFile> datFile =
+        std::make_unique<TzLocationDatFile>(timezoneLocationPath);
+    if (!datFile) {
         HILOG_ERROR_I18N("GetTimezoneByLocation: open dat file failed");
         return tzidList;
     }
     int32_t indexCount;
-    if (fread(&indexCount,  sizeof(int32_t), 1, datFile) != 1) {
+    if (fread(&indexCount, sizeof(int32_t), 1, datFile->get()) != 1) {
         HILOG_ERROR_I18N("GetTimezoneByLocation: read indexCount failed");
-        CloseFile(datFile);
         return tzidList;
     }
     std::vector<std::string> tzidNames;
-    if (!GetAllTimezoneId(tzidNames, datFile, indexCount)) {
-        CloseFile(datFile);
+    if (!GetAllTimezoneId(tzidNames, datFile->get(), indexCount)) {
         return tzidList;
     }
-    ReadDatFile(datFile, lon, lat, tzidNames, tzidList);
-    CloseFile(datFile);
+    ReadDatFile(datFile->get(), lon, lat, tzidNames, tzidList);
     return tzidList;
+}
+
+std::vector<std::string> TimeZoneLocation::GetPoliticalTimezone(const double lon, const double lat)
+{
+    std::string countryCode = GetCountryCode();
+    if (countryCode.empty()) {
+        return {};
+    }
+    const char* politicalDataPath = GetPoliticalDataPath();
+    std::string datPath = std::string(politicalDataPath) + "/" + countryCode + ".dat";
+    if (!FileExist(datPath)) {
+        return {};
+    }
+    std::vector<std::string> result = ReadPoliticalData(datPath, lon, lat);
+    if (!result.empty()) {
+        return result;
+    }
+    return {};
+}
+
+std::vector<std::string> TimeZoneLocation::ReadPoliticalData(const std::string& datPath,
+    const double lon, const double lat)
+{
+    std::string realDatPath = GetAbsoluteFilePath(datPath);
+    if (realDatPath.empty()) {
+        HILOG_ERROR_I18N("ReadPoliticalData: real dat path is empty");
+        return {};
+    }
+    std::unique_ptr<TzLocationDatFile> datFile =
+        std::make_unique<TzLocationDatFile>(realDatPath.c_str());
+    if (!datFile) {
+        HILOG_ERROR_I18N("ReadPoliticalData: open dat file failed");
+        return {};
+    }
+    int32_t indexCount;
+    if (fread(&indexCount, sizeof(int32_t), 1, datFile->get()) != 1) {
+        HILOG_ERROR_I18N("ReadPoliticalData: read indexCount failed");
+        return {};
+    }
+    std::vector<std::string> tzids;
+    if (!GetAllTimezoneId(tzids, datFile->get(), indexCount)) {
+        return {};
+    }
+    for (size_t k = 0; k < tzids.size(); k++) {
+        if (MatchPoliticalDataBlock(datFile->get(), lon, lat)) {
+            return { tzids[k] };
+        }
+    }
+    return {};
+}
+
+bool TimeZoneLocation::MatchPoliticalDataBlock(FILE* datFile,
+    const double lon, const double lat)
+{
+    int32_t polygonCount;
+    if (fread(&polygonCount, sizeof(int32_t), 1, datFile) != 1) {
+        HILOG_ERROR_I18N("ReadPoliticalData: read tz Index Length failed");
+        return false;
+    }
+    std::vector<int32_t> polygonPointsCountList;
+    for (int32_t i = 0; i < polygonCount; i++) {
+        int32_t polygonPointCount;
+        if (fread(&polygonPointCount, sizeof(int32_t), 1, datFile) != 1) {
+            HILOG_ERROR_I18N("ReadPoliticalData: read polygon point count failed");
+            return false;
+        }
+        polygonPointsCountList.push_back(polygonPointCount);
+    }
+    if (IsPointInMultiPolygon(polygonPointsCountList, lon, lat, datFile)) {
+        return true;
+    }
+    return false;
+}
+
+std::string TimeZoneLocation::GetCountryCode()
+{
+    std::string simCardCountryCode = GetISOCountryCode("GlobalI18nGetCountryCodeFromSimCard");
+    if (!simCardCountryCode.empty()) {
+        return simCardCountryCode;
+    }
+    std::string networkCountryCode = GetISOCountryCode("GlobalI18nGetCountryCodeFromNetwork");
+    if (!networkCountryCode.empty()) {
+        return networkCountryCode;
+    }
+    std::string vendorCountry = GetCountryCodeFromVendorCountry();
+    if (!vendorCountry.empty()) {
+        return vendorCountry;
+    }
+    std::string sysRegion = LocaleConfig::GetSystemRegion();
+    if (!sysRegion.empty()) {
+        return sysRegion;
+    }
+    return "";
+}
+
+std::string TimeZoneLocation::GetISOCountryCode(const char* symbol)
+{
+    void* handler = dlopen(DLOPEN_SO_NAME, RTLD_NOW);
+    if (handler == nullptr) {
+        HILOG_ERROR_I18N("open %{public}s failed", symbol);
+        return "";
+    }
+    GetCountryCodeFunc func = reinterpret_cast<GetCountryCodeFunc>(dlsym(handler, symbol));
+    if (!func) {
+        dlclose(handler);
+        HILOG_ERROR_I18N("find symbol %{public}s failed", symbol);
+        return "";
+    }
+    char res[RECV_CHAR_LENGTH] = { 0 };
+    int returnCode = func(res, RECV_CHAR_LENGTH);
+    if (returnCode != 0) {
+        dlclose(handler);
+        HILOG_ERROR_I18N("call %{public}s result:%{public}d", symbol, returnCode);
+        return "";
+    }
+    dlclose(handler);
+    std::string result(res);
+    return result;
+}
+
+std::string TimeZoneLocation::GetCountryCodeFromVendorCountry()
+{
+    std::string vendorCountry = ReadSystemParameter(VENDOR_COUNTRY_KEY, RECV_CHAR_LENGTH);
+    if (!vendorCountry.empty()) {
+        for (size_t i = 0; i < vendorCountry.length(); ++i) {
+            vendorCountry[i] = toupper(vendorCountry[i]);
+        }
+        return vendorCountry;
+    }
+    return "";
+}
+
+const char *TimeZoneLocation::GetPoliticalDataPath()
+{
+    struct stat s;
+    if (stat(DISTRO_POLITICAL_DATA_PATH, &s) == 0) {
+        return DISTRO_POLITICAL_DATA_PATH;
+    }
+    return POLITICAL_DATA_PATH;
+}
+
+const char *TimeZoneLocation::GetTimeZoneLocationDataPath()
+{
+    struct stat s;
+    if (stat(DISTRO_TIMEZONE_LOCATION_PATH, &s) == 0) {
+        return DISTRO_TIMEZONE_LOCATION_PATH;
+    }
+    return TIMEZONE_LOCATION_PATH;
 }
 } // namespace I18n
 } // namespace Global
