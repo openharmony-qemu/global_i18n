@@ -184,19 +184,19 @@ std::string VariableConvertor::GetString(napi_env env, napi_value value, int32_t
     return result;
 }
 
-bool VariableConvertor::GetStringArrayFromJsParam(napi_env env, napi_value &jsArray, const std::string& valueName,
-    std::vector<std::string> &strArray)
+bool VariableConvertor::GetStringArrayFromJsParamImpl(napi_env env, napi_value &jsArray,
+    const std::string& valueName, std::vector<std::string> &strArray, bool throwBusinessError)
 {
-    if (jsArray == nullptr) {
-        ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, valueName, true);
-        return false;
-    }
     bool isArray = false;
     napi_status status = napi_is_array(env, jsArray, &isArray);
     if (status != napi_ok) {
         return false;
     } else if (!isArray) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, valueName, "an Array", true);
+        if (throwBusinessError) {
+            ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, valueName, "an Array", true);
+        } else {
+            ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, valueName, "an Array", true);
+        }
         return false;
     }
     uint32_t arrayLength = 0;
@@ -219,6 +219,26 @@ bool VariableConvertor::GetStringArrayFromJsParam(napi_env env, napi_value &jsAr
         strArray.push_back(str);
     }
     return true;
+}
+
+bool VariableConvertor::GetStringArrayFromJsParam(napi_env env, napi_value &jsArray, const std::string& valueName,
+    std::vector<std::string> &strArray)
+{
+    if (jsArray == nullptr) {
+        ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, valueName, true);
+        return false;
+    }
+    return GetStringArrayFromJsParamImpl(env, jsArray, valueName, strArray, false);
+}
+
+bool VariableConvertor::GetStringArrayFromJsParamWithNewError(napi_env env, napi_value &jsArray,
+    const std::string& valueName, std::vector<std::string> &strArray)
+{
+    if (jsArray == nullptr) {
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, valueName, "", true);
+        return false;
+    }
+    return GetStringArrayFromJsParamImpl(env, jsArray, valueName, strArray, true);
 }
 
 napi_value VariableConvertor::CreateString(napi_env env, const std::string &str)
@@ -316,15 +336,17 @@ napi_status VariableConvertor::SetEnumValue(napi_env env, napi_value enumObj, co
     return napi_ok;
 }
 
-LocaleType VariableConvertor::GetLocaleType(napi_env env, napi_value locale)
+LocaleType VariableConvertor::GetLocaleTypeImpl(napi_env env, napi_value locale, bool throwOnError)
 {
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_status status = napi_typeof(env, locale, &valueType);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("VariableConvertor::GetLocaleType: Failed to get type of intlLocale.");
-        return LocaleType::INVALID;
+        return throwOnError ? LocaleType::INVALID : LocaleType::NAPI_ERROR;
     } else if (valueType != napi_valuetype::napi_object) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "Locale", true);
+        if (throwOnError) {
+            ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "Locale", true);
+        }
         return LocaleType::INVALID;
     }
     bool isBuiltinsLocale = VariableConvertor::IsBuiltinsLocale(env, locale);
@@ -335,8 +357,21 @@ LocaleType VariableConvertor::GetLocaleType(napi_env env, napi_value locale)
     if (isLocaleInfo) {
         return LocaleType::LOCALE_INFO;
     }
-    ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "Locale", true);
+    if (throwOnError) {
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "Locale", true);
+    }
     return LocaleType::INVALID;
+}
+
+LocaleType VariableConvertor::GetLocaleType(napi_env env, napi_value locale)
+{
+    return GetLocaleTypeImpl(env, locale, true);
+}
+
+
+LocaleType VariableConvertor::GetLocaleTypeNoThrow(napi_env env, napi_value locale)
+{
+    return GetLocaleTypeImpl(env, locale, false);
 }
 
 std::shared_ptr<LocaleInfo> VariableConvertor::ParseLocaleInfo(napi_env env, napi_value localeInfo)
@@ -479,7 +514,7 @@ bool VariableConvertor::IsBuiltinsLocale(napi_env env, napi_value locale)
     return isBuiltinsLocale;
 }
 
-bool VariableConvertor::GetDateTime(napi_env env, napi_value date, double& milliseconds)
+bool VariableConvertor::GetDateTimeImpl(napi_env env, napi_value date, double& milliseconds, bool throwBusinessError)
 {
     bool isDate = false;
     napi_status status = napi_is_date(env, date, &isDate);
@@ -487,7 +522,11 @@ bool VariableConvertor::GetDateTime(napi_env env, napi_value date, double& milli
         HILOG_ERROR_I18N("VariableConvertor::GetDateTime: Failed to call napi_is_date.");
         return false;
     } else if (!isDate) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "date", "Date", true);
+        if (throwBusinessError) {
+            ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "date", "Date", true);
+        } else {
+            ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "date", "Date", true);
+        }
         return false;
     }
 
@@ -511,6 +550,16 @@ bool VariableConvertor::GetDateTime(napi_env env, napi_value date, double& milli
         return false;
     }
     return true;
+}
+
+bool VariableConvertor::GetDateTime(napi_env env, napi_value date, double& milliseconds)
+{
+    return GetDateTimeImpl(env, date, milliseconds, false);
+}
+
+bool VariableConvertor::GetDateTimeWithNewError(napi_env env, napi_value date, double& milliseconds)
+{
+    return GetDateTimeImpl(env, date, milliseconds, true);
 }
 
 napi_value VariableConvertor::CreateStyledString(napi_env env, const std::string &content,

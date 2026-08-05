@@ -124,8 +124,8 @@ napi_value ChineseCalendarAddon::Constructor(napi_env env, napi_callback_info in
         return nullptr;
     }
 
-    if (argc > 0 && VariableConvertor::GetLocaleType(env, argv[0]) != LocaleType::BUILTINS_LOCALE) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "Intl.Locale", true);
+    if (argc > 0 && VariableConvertor::GetLocaleTypeNoThrow(env, argv[0]) != LocaleType::BUILTINS_LOCALE) {
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "locale", "Intl.Locale", true);
         return nullptr;
     }
     std::string localeTag = (argc > 0) ? VariableConvertor::ParseBuiltinsLocale(env, argv[0]) : "";
@@ -165,7 +165,7 @@ napi_value ChineseCalendarAddon::SetChineseCalendarTime(napi_env env, napi_callb
         return nullptr;
     }
     if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "chineseCalendarTime", "", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "chineseCalendarTime", "", true);
         return nullptr;
     }
     ChineseCalendarTime time = ParseChineseCalendarTime(env, argv[0]);
@@ -179,7 +179,8 @@ napi_value ChineseCalendarAddon::SetChineseCalendarTime(napi_env env, napi_callb
     I18nErrorCode errCode = I18nErrorCode::SUCCESS;
     obj->chineseCalendar_->SetChineseCalendarTime(time, errCode);
     if (errCode != I18nErrorCode::SUCCESS) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID_NEW, "gregorianYear or cyclicalYear", "a valid value", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_VALID_NEW,
+            "gregorianYear or cyclicalYear", "a valid value", true);
     }
     return nullptr;
 }
@@ -194,7 +195,8 @@ ChineseCalendarTime ChineseCalendarAddon::ParseChineseCalendarTime(napi_env env,
         return time;
     }
     if (type != napi_object) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "chineseCalendarTime", "a valid ChineseCalendarTime", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND,
+            "chineseCalendarTime", "a valid ChineseCalendarTime", true);
         return time;
     }
 
@@ -228,7 +230,7 @@ napi_value ChineseCalendarAddon::SetTime(napi_env env, napi_callback_info info)
         return nullptr;
     }
     if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "time or date", "", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "time or date", "", true);
         return nullptr;
     }
     ChineseCalendarAddon *obj = nullptr;
@@ -240,7 +242,7 @@ napi_value ChineseCalendarAddon::SetTime(napi_env env, napi_callback_info info)
 
     DateType type = VariableConvertor::GetDateType(env, argv[0]);
     if (type != DateType::DATE_OBJECT && type != DateType::NUMBER) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "time or date", "number or Date", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "time or date", "number or Date", true);
         return nullptr;
     }
 
@@ -267,7 +269,7 @@ napi_value ChineseCalendarAddon::Set(napi_env env, napi_callback_info info)
         return nullptr;
     }
     if (argc < 3) { // 3 mandatory parameters
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "date", "", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "date", "", true);
         return nullptr;
     }
 
@@ -322,7 +324,7 @@ napi_value ChineseCalendarAddon::SetTimeZone(napi_env env, napi_callback_info in
         return nullptr;
     }
     if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "timezone", "", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "timezone", "", true);
         return nullptr;
     }
 
@@ -333,7 +335,7 @@ napi_value ChineseCalendarAddon::SetTimeZone(napi_env env, napi_callback_info in
         return nullptr;
     }
     if (valueType != napi_valuetype::napi_string) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "timezone", "string", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "timezone", "string", true);
         return nullptr;
     }
 
@@ -384,7 +386,7 @@ napi_value ChineseCalendarAddon::SetFirstDayOfWeek(napi_env env, napi_callback_i
         return nullptr;
     }
     if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "value", "", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "value", "", true);
         return nullptr;
     }
 
@@ -395,7 +397,7 @@ napi_value ChineseCalendarAddon::SetFirstDayOfWeek(napi_env env, napi_callback_i
         return nullptr;
     }
     if (valueType != napi_valuetype::napi_number) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "value", "number", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "value", "number", true);
         return nullptr;
     }
 
@@ -444,7 +446,7 @@ napi_value ChineseCalendarAddon::SetMinimalDaysInFirstWeek(napi_env env, napi_ca
         return nullptr;
     }
     if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "value", "", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "value", "", true);
         return nullptr;
     }
 
@@ -455,7 +457,7 @@ napi_value ChineseCalendarAddon::SetMinimalDaysInFirstWeek(napi_env env, napi_ca
         return nullptr;
     }
     if (valueType != napi_valuetype::napi_number) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "value", "number", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "value", "number", true);
         return nullptr;
     }
 
@@ -485,7 +487,7 @@ napi_value ChineseCalendarAddon::Get(napi_env env, napi_callback_info info)
         return VariableConvertor::CreateNumber(env, 0);
     }
     if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "field", "", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "field", "", true);
         return VariableConvertor::CreateNumber(env, 0);
     }
 
@@ -496,7 +498,7 @@ napi_value ChineseCalendarAddon::Get(napi_env env, napi_callback_info info)
         return VariableConvertor::CreateNumber(env, 0);
     }
     if (valueType != napi_valuetype::napi_string) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "field", "string", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "field", "string", true);
         return VariableConvertor::CreateNumber(env, 0);
     }
 
@@ -530,7 +532,7 @@ napi_value ChineseCalendarAddon::Add(napi_env env, napi_callback_info info)
         return nullptr;
     }
     if (argc < 2) { // parameter number is 2
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "field or amount", "", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "field or amount", "", true);
         return nullptr;
     }
 
@@ -539,7 +541,7 @@ napi_value ChineseCalendarAddon::Add(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("ChineseCalendarAddon::Add: Get field type failed");
         return nullptr;
     } else if (valueType != napi_valuetype::napi_string) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "field", "string", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "field", "string", true);
         return nullptr;
     }
     int32_t code = 0;
@@ -552,7 +554,7 @@ napi_value ChineseCalendarAddon::Add(napi_env env, napi_callback_info info)
         HILOG_ERROR_I18N("ChineseCalendarAddon::Add: Get amount type failed");
         return nullptr;
     } else if (valueType != napi_valuetype::napi_number) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "amount", "number", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "amount", "number", true);
         return nullptr;
     }
     int32_t amount = 0;
@@ -584,7 +586,7 @@ napi_value ChineseCalendarAddon::GetDisplayName(napi_env env, napi_callback_info
         return VariableConvertor::CreateString(env, "");
     }
     if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "locale", "", true);
         return VariableConvertor::CreateString(env, "");
     }
 
@@ -594,7 +596,7 @@ napi_value ChineseCalendarAddon::GetDisplayName(napi_env env, napi_callback_info
         return VariableConvertor::CreateString(env, "");
     }
     if (valueType != napi_valuetype::napi_string) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "string", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "locale", "string", true);
         return VariableConvertor::CreateString(env, "");
     }
     int32_t code = 0;
@@ -646,7 +648,7 @@ napi_value ChineseCalendarAddon::IsWeekend(napi_env env, napi_callback_info info
     if (argc > 0) {
         DateType type = VariableConvertor::GetDateType(env, argv[0]);
         if (type != DateType::DATE_OBJECT) {
-            ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "date", "Date", true);
+            ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "date", "Date", true);
             return VariableConvertor::CreateBoolean(env, false);
         }
         if (!VariableConvertor::GetTimeFromDate(env, argv[0], type, milliseconds)) {
@@ -680,13 +682,13 @@ napi_value ChineseCalendarAddon::CompareDays(napi_env env, napi_callback_info in
         return VariableConvertor::CreateNumber(env, 0);
     }
     if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "date", "", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "date", "", true);
         return VariableConvertor::CreateNumber(env, 0);
     }
 
     DateType type = VariableConvertor::GetDateType(env, argv[0]);
     if (type != DateType::DATE_OBJECT) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "date", "Date", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "date", "Date", true);
         return VariableConvertor::CreateNumber(env, 0);
     }
     double milliseconds;
@@ -718,7 +720,7 @@ napi_value ChineseCalendarAddon::CheckLeapMonth(napi_env env, napi_callback_info
         return VariableConvertor::CreateBoolean(env, false);
     }
     if (argc < 3) { // parameter number is 3
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "gregorianYear, cyclicalYear or month", "", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "gregorianYear, cyclicalYear or month", "", true);
         return VariableConvertor::CreateBoolean(env, false);
     }
 
@@ -741,7 +743,8 @@ napi_value ChineseCalendarAddon::CheckLeapMonth(napi_env env, napi_callback_info
     I18nErrorCode errCode = I18nErrorCode::SUCCESS;
     bool isLeapMonth = ChineseCalendar::CheckLeapMonth(gregorianYear, cyclicalYear, month, errCode);
     if (errCode != I18nErrorCode::SUCCESS) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID_NEW, "gregorianYear or cyclicalYear", "a valid value", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_VALID_NEW,
+            "gregorianYear or cyclicalYear", "a valid value", true);
         return VariableConvertor::CreateBoolean(env, false);
     }
     return VariableConvertor::CreateBoolean(env, isLeapMonth);
