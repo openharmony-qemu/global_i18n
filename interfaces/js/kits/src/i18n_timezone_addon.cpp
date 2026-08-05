@@ -384,7 +384,8 @@ napi_value I18nTimeZoneAddon::SetAppDefaultTimeZoneById(napi_env env, napi_callb
     }
     I18nErrorCode err = I18nTimeZone::SetAppDefaultTimeZoneById(zoneID);
     if (err != I18nErrorCode::SUCCESS) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID_NEW, "zoneID", "a valid zoneID supported by the system", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_VALID_NEW,
+            "zoneID", "a valid zoneID supported by the system", true);
         return nullptr;
     }
     napi_value result = nullptr;
@@ -590,7 +591,7 @@ napi_value I18nTimeZoneAddon::IsDaylightSavingTime(napi_env env, napi_callback_i
         return VariableConvertor::CreateBoolean(env, false);
     }
     if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "date", "", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "date", "", true);
         return VariableConvertor::CreateBoolean(env, false);
     }
     bool isDate = false;
@@ -600,7 +601,7 @@ napi_value I18nTimeZoneAddon::IsDaylightSavingTime(napi_env env, napi_callback_i
         return VariableConvertor::CreateBoolean(env, false);
     }
     if (!isDate) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "date", "Date", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "date", "Date", true);
         return VariableConvertor::CreateBoolean(env, false);
     }
     double date = 0;
