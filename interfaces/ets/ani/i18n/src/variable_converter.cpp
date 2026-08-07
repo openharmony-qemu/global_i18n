@@ -213,7 +213,7 @@ void VariableConverter::SetNumberMember(ani_env *env, ani_object obj, const std:
     }
 }
 
-bool VariableConverter::SetDoubleMember(ani_env *env, ani_object obj, const std::string &name, ani_double value)
+bool VariableConverter::SetDoubleMember(ani_env *env, ani_object obj, const std::string &name, double value)
 {
     ani_double aniValue = static_cast<ani_double>(value);
     if (ANI_OK != env->Object_SetPropertyByName_Double(obj, name.c_str(), aniValue)) {
