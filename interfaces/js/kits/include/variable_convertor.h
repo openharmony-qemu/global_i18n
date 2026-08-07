@@ -39,6 +39,8 @@ public:
     static int32_t GetInt32(napi_env env, napi_value value, int32_t &code);
     static bool GetStringArrayFromJsParam(napi_env env, napi_value &jsArray, const std::string& valueName,
         std::vector<std::string> &strArray);
+    static bool GetStringArrayFromJsParamWithNewError(napi_env env, napi_value &jsArray, const std::string& valueName,
+            std::vector<std::string> &strArray);
 
     // Convert c++ variable to napi variable
     static napi_value CreateString(napi_env env, const std::string &str);
@@ -49,11 +51,13 @@ public:
     static void VerifyType(napi_env env, const std::string& valueName, napi_valuetype napiType, napi_value argv);
     static napi_status SetEnumValue(napi_env env, napi_value enumObj, const std::string& enumName, int32_t enumVal);
     static LocaleType GetLocaleType(napi_env env, napi_value locale);
+    static LocaleType GetLocaleTypeNoThrow(napi_env env, napi_value locale);
     static std::shared_ptr<LocaleInfo> ParseLocaleInfo(napi_env env, napi_value localeInfo);
     static std::string ParseBuiltinsLocale(napi_env env, napi_value intlLocale);
     static napi_value CreateBuiltinsLocaleObject(napi_env env, const std::string& locale);
     static napi_value CreateMap(napi_env env, std::unordered_map<std::string, std::string>& ump);
     static bool GetDateTime(napi_env env, napi_value date, double& milliseconds);
+    static bool GetDateTimeWithNewError(napi_env env, napi_value date, double& milliseconds);
     static napi_value CreateStyledString(napi_env env, const std::string& content, napi_value styleOption);
     static std::pair<uint8_t*, size_t> GetUint8Array(napi_env env, napi_value value, int32_t& code);
     static bool IsUndefined(napi_env env, napi_value value);
