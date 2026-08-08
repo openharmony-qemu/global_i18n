@@ -69,6 +69,10 @@ public:
 private:
     static napi_value GetBuiltinsLocaleConstructor(napi_env env);
     static bool IsBuiltinsLocale(napi_env env, napi_value locale);
+    static bool GetStringArrayFromJsParamImpl(napi_env env, napi_value &jsArray,
+        const std::string& valueName, std::vector<std::string> &strArray, bool throwBusinessError);
+    static LocaleType GetLocaleTypeImpl(napi_env env, napi_value locale, bool throwOnError);
+    static bool GetDateTimeImpl(napi_env env, napi_value date, double& milliseconds, bool throwBusinessError);
 
     static const std::map<napi_valuetype, std::string> NAPI_TYPE_MAP;
 };
