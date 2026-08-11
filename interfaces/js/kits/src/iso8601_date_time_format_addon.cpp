@@ -188,11 +188,11 @@ napi_value ISO8601DateTimeFormatAddon::Format(napi_env env, napi_callback_info i
         return VariableConvertor::CreateString(env, "");
     }
     if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "date", "", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "date", "", true);
         return VariableConvertor::CreateString(env, "");
     }
     double milliseconds = 0;
-    if (!VariableConvertor::GetDateTime(env, argv[0], milliseconds)) {
+    if (!VariableConvertor::GetDateTimeWithNewError(env, argv[0], milliseconds)) {
         HILOG_ERROR_I18N("ISO8601DateTimeFormatAddon::Format: get date time failed.");
         return VariableConvertor::CreateString(env, "");
     }

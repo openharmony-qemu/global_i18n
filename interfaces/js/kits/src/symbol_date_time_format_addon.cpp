@@ -101,8 +101,8 @@ napi_value SymbolDateTimeFormatAddon::Constructor(napi_env env, napi_callback_in
 
     std::vector<std::string> localeTags;
     if (argc >= 1 && !VariableConvertor::IsUndefined(env, argv[0])) {
-        if (VariableConvertor::GetLocaleType(env, argv[0]) != LocaleType::BUILTINS_LOCALE) {
-            ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "Locale", true);
+        if (VariableConvertor::GetLocaleTypeNoThrow(env, argv[0]) != LocaleType::BUILTINS_LOCALE) {
+            ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "locale", "Locale", true);
             return nullptr;
         }
         std::string localeTag = VariableConvertor::ParseBuiltinsLocale(env, argv[0]);
@@ -194,7 +194,7 @@ napi_value SymbolDateTimeFormatAddon::Format(napi_env env, napi_callback_info in
     if (argc >= 1) {
         type = VariableConvertor::GetDateType(env, argv[0]);
         if (type != DateType::DATE_OBJECT && type != DateType::NUMBER) {
-            ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "date", "Date or number", true);
+            ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "date", "Date or number", true);
             return nullptr;
         }
     }
@@ -231,7 +231,7 @@ napi_value SymbolDateTimeFormatAddon::FormatToParts(napi_env env, napi_callback_
     if (argc >= 1) {
         type = VariableConvertor::GetDateType(env, argv[0]);
         if (type != DateType::DATE_OBJECT && type != DateType::NUMBER) {
-            ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "date", "Date or number", true);
+            ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "date", "Date or number", true);
             return nullptr;
         }
     }
@@ -269,19 +269,19 @@ napi_value SymbolDateTimeFormatAddon::FormatRange(napi_env env, napi_callback_in
         return VariableConvertor::CreateString(env, "");
     }
     if (argc <= 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "startDate or endDate", "", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "startDate or endDate", "", true);
         return VariableConvertor::CreateString(env, "");
     }
     DateType startDateType = VariableConvertor::GetDateType(env, argv[0]);
     if (startDateType != DateType::DATE_OBJECT && startDateType != DateType::NUMBER &&
         startDateType != DateType::BIGINT) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "startDate", "Date, number or bigint", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "startDate", "Date, number or bigint", true);
         return nullptr;
     }
     DateType endDateType = VariableConvertor::GetDateType(env, argv[1]);
     if (endDateType != DateType::DATE_OBJECT && endDateType != DateType::NUMBER &&
         endDateType != DateType::BIGINT) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "endDate", "Date, number or bigint", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "endDate", "Date, number or bigint", true);
         return nullptr;
     }
     double startDate = 0;
@@ -318,19 +318,19 @@ napi_value SymbolDateTimeFormatAddon::FormatRangeToParts(napi_env env, napi_call
         return JSUtils::CreateEmptyArray(env);
     }
     if (argc <= 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "startDate or endDate", "", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "startDate or endDate", "", true);
         return JSUtils::CreateEmptyArray(env);
     }
     DateType startDateType = VariableConvertor::GetDateType(env, argv[0]);
     if (startDateType != DateType::DATE_OBJECT && startDateType != DateType::NUMBER &&
         startDateType != DateType::BIGINT) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "startDate", "Date, number or bigint", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "startDate", "Date, number or bigint", true);
         return nullptr;
     }
     DateType endDateType = VariableConvertor::GetDateType(env, argv[1]);
     if (endDateType != DateType::DATE_OBJECT && endDateType != DateType::NUMBER &&
         endDateType != DateType::BIGINT) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "endDate", "Date, number or bigint", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "endDate", "Date, number or bigint", true);
         return nullptr;
     }
     double startDate = 0;
@@ -395,7 +395,7 @@ void SymbolDateTimeFormatAddon::ParseAmPmSymbol(napi_env env, napi_value options
         return;
     }
     std::vector<std::string> symbol;
-    if (!VariableConvertor::GetStringArrayFromJsParam(env, propertyValue, "amPMSymbol", symbol)) {
+    if (!VariableConvertor::GetStringArrayFromJsParamWithNewError(env, propertyValue, "amPMSymbol", symbol)) {
         HILOG_ERROR_I18N("SymbolDateTimeFormatAddon::ParseAmPmSymbol: GetStringArrayFromJsParam failed.");
         return;
     }
@@ -487,7 +487,7 @@ bool SymbolDateTimeFormatAddon::GetParseParams(napi_env env, napi_callback_info 
         return false;
     }
     if (argc < PARSE_PARAM_COUNT) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "text or lenientMode", "", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "text or lenientMode", "", true);
         return false;
     }
     napi_valuetype valueType = napi_undefined;
@@ -497,7 +497,7 @@ bool SymbolDateTimeFormatAddon::GetParseParams(napi_env env, napi_callback_info 
         return false;
     }
     if (valueType != napi_string) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "text", "string", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "text", "string", true);
         return false;
     }
     int32_t code = 0;
@@ -512,7 +512,7 @@ bool SymbolDateTimeFormatAddon::GetParseParams(napi_env env, napi_callback_info 
         return false;
     }
     if (valueType != napi_boolean) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "lenientMode", "boolean", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "lenientMode", "boolean", true);
         return false;
     }
     status = napi_get_value_bool(env, argv[LENIENT_MODE_PARAM_INDEX], &lenientMode);
@@ -541,7 +541,7 @@ bool SymbolDateTimeFormatAddon::HandleParseResult(napi_env env, I18nErrorCode er
         return false;
     }
     if (errCode == I18nErrorCode::INVALID_PARAM) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID_NEW, "text", "a valid localized date string", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_VALID_NEW, "text", "a valid localized date string", true);
         return false;
     }
     return true;

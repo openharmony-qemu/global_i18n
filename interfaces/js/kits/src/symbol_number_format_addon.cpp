@@ -99,8 +99,8 @@ napi_value SymbolNumberFormatAddon::Constructor(napi_env env, napi_callback_info
 
     std::vector<std::string> localeTags;
     if (argc >= 1 && !VariableConvertor::IsUndefined(env, argv[0])) {
-        if (VariableConvertor::GetLocaleType(env, argv[0]) != LocaleType::BUILTINS_LOCALE) {
-            ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "Locale", true);
+        if (VariableConvertor::GetLocaleTypeNoThrow(env, argv[0]) != LocaleType::BUILTINS_LOCALE) {
+            ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "locale", "Locale", true);
             return nullptr;
         }
         std::string localeTag = VariableConvertor::ParseBuiltinsLocale(env, argv[0]);
@@ -191,7 +191,7 @@ napi_value SymbolNumberFormatAddon::Format(napi_env env, napi_callback_info info
         return VariableConvertor::CreateString(env, "");
     }
     if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "value", "", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "value", "", true);
         return VariableConvertor::CreateString(env, "");
     }
     NumberDataType type;
@@ -228,7 +228,7 @@ napi_value SymbolNumberFormatAddon::FormatToParts(napi_env env, napi_callback_in
         HILOG_ERROR_I18N("SymbolNumberFormatAddon::FormatToParts: get cb info failed.");
         return nullptr;
     }
-    
+
     SymbolNumberFormatAddon* obj = nullptr;
     status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->symbolNumberFormat_) {
@@ -266,7 +266,7 @@ napi_value SymbolNumberFormatAddon::FormatRange(napi_env env, napi_callback_info
         return nullptr;
     }
     if (argc <= 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "startRange or endRange", "", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "startRange or endRange", "", true);
         return VariableConvertor::CreateString(env, "");
     }
     NumberDataType startRangeType;
@@ -274,7 +274,7 @@ napi_value SymbolNumberFormatAddon::FormatRange(napi_env env, napi_callback_info
     NumberDataType endRangeType;
     NumberData endRangeData = ParseNumberData(env, argv[1], endRangeType);
     if (startRangeType != NumberDataType::NUMBER_TYPE || endRangeType != NumberDataType::NUMBER_TYPE) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "startRange or endRange", "number", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "startRange or endRange", "number", true);
         return VariableConvertor::CreateString(env, "");
     }
 
@@ -301,7 +301,7 @@ napi_value SymbolNumberFormatAddon::FormatRangeToParts(napi_env env, napi_callba
         return nullptr;
     }
     if (argc <= 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "startRange or endRange", "", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "startRange or endRange", "", true);
         return VariableConvertor::CreateString(env, "");
     }
     NumberDataType startRangeType;
@@ -309,7 +309,7 @@ napi_value SymbolNumberFormatAddon::FormatRangeToParts(napi_env env, napi_callba
     NumberDataType endRangeType;
     NumberData endRangeData = ParseNumberData(env, argv[1], endRangeType);
     if (startRangeType != NumberDataType::NUMBER_TYPE || endRangeType != NumberDataType::NUMBER_TYPE) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "startRange or endRange", "number", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "startRange or endRange", "number", true);
         return VariableConvertor::CreateString(env, "");
     }
 
@@ -482,10 +482,10 @@ bool SymbolNumberFormatAddon::GetParseParams(napi_env env, napi_callback_info in
         return false;
     }
     if (argc < MIN_PARSE_PARAMS) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "text or lenientMode", "", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "text or lenientMode", "", true);
         return false;
     }
-    
+
     napi_valuetype valueType = napi_undefined;
     status = napi_typeof(env, argv[0], &valueType);
     if (status != napi_ok) {
@@ -493,33 +493,33 @@ bool SymbolNumberFormatAddon::GetParseParams(napi_env env, napi_callback_info in
         return false;
     }
     if (valueType != napi_string) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "text", "string", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "text", "string", true);
         return false;
     }
-    
+
     int32_t code = 0;
     text = VariableConvertor::GetString(env, argv[0], code);
     if (code != 0) {
         HILOG_ERROR_I18N("GetParseParams: GetString failed, code: %{public}d", code);
         return false;
     }
-    
+
     status = napi_typeof(env, argv[1], &valueType);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("GetParseParams: napi_typeof lenientMode failed, status: %{public}d", status);
         return false;
     }
     if (valueType != napi_boolean) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "lenientMode", "boolean", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "lenientMode", "boolean", true);
         return false;
     }
-    
+
     status = napi_get_value_bool(env, argv[1], &lenientMode);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("GetParseParams: napi_get_value_bool failed, status: %{public}d", status);
         return false;
     }
-    
+
     return true;
 }
 
@@ -541,7 +541,7 @@ bool SymbolNumberFormatAddon::HandleParseResult(napi_env env, I18nErrorCode errC
         return false;
     }
     if (errCode == I18nErrorCode::INVALID_PARAM) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_VALID_NEW, "text", "a valid localized number string", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_VALID_NEW, "text", "a valid localized number string", true);
         return false;
     }
     return true;
@@ -552,23 +552,23 @@ napi_value SymbolNumberFormatAddon::Parse(napi_env env, napi_callback_info info)
     std::string text;
     bool lenientMode = false;
     napi_value thisVar = nullptr;
-    
+
     if (!GetParseParams(env, info, text, lenientMode, thisVar)) {
         return VariableConvertor::CreateDoubleValue(env, 0);
     }
-    
+
     SymbolNumberFormatAddon* obj = nullptr;
     if (!UnwrapParseObject(env, thisVar, obj)) {
         return VariableConvertor::CreateDoubleValue(env, 0);
     }
-    
+
     I18nErrorCode errCode = I18nErrorCode::SUCCESS;
     double result = obj->symbolNumberFormat_->Parse(text, lenientMode, errCode);
-    
+
     if (!HandleParseResult(env, errCode)) {
         return VariableConvertor::CreateDoubleValue(env, 0);
     }
-    
+
     return VariableConvertor::CreateDoubleValue(env, result);
 }
 } // namespace I18n

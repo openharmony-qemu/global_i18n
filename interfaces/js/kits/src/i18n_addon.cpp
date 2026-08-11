@@ -577,7 +577,7 @@ napi_value I18nAddon::ConvertCanonicalLocaleIdentifier(napi_env env, napi_callba
         return nullptr;
     }
     if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "locale", "", true);
         return nullptr;
     }
 
@@ -588,7 +588,7 @@ napi_value I18nAddon::ConvertCanonicalLocaleIdentifier(napi_env env, napi_callba
         return nullptr;
     }
     if (valueType != napi_valuetype::napi_string) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "string", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "locale", "string", true);
         return nullptr;
     }
 
@@ -941,7 +941,7 @@ napi_value I18nAddon::SetUnicodeWrappedBidiDirection(napi_env env, napi_callback
         return nullptr;
     }
     if (argc != ARGUMENT_SIZE) {
-        ErrorUtil::NapiNotFoundError(env, I18N_NOT_FOUND, "text or direction", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "text or direction", "", true);
         return nullptr;
     }
 
@@ -951,7 +951,7 @@ napi_value I18nAddon::SetUnicodeWrappedBidiDirection(napi_env env, napi_callback
         return nullptr;
     }
     if (firstValueType != napi_valuetype::napi_string) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "text", "string", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "text", "string", true);
         return nullptr;
     }
     napi_valuetype secondValueType = napi_valuetype::napi_undefined;
@@ -960,7 +960,7 @@ napi_value I18nAddon::SetUnicodeWrappedBidiDirection(napi_env env, napi_callback
         return nullptr;
     }
     if (secondValueType != napi_valuetype::napi_string) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "direction", "string", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "direction", "string", true);
         return nullptr;
     }
 

@@ -393,14 +393,14 @@ napi_value I18nUnicodeAddon::DetectEncodingAddon(napi_env env, napi_callback_inf
         return nullptr;
     }
     if (argc < 1) {
-        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "bytes", "", true);
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "bytes", "", true);
         return nullptr;
     }
     int32_t code = 0;
     std::pair<uint8_t*, size_t> uint8Array = VariableConvertor::GetUint8Array(env, argv[0], code);
     if (code != 0) {
         if (code == I18N_NOT_FOUND) {
-            ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "bytes", "Uint8Array", true);
+            ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "bytes", "Uint8Array", true);
         }
         return nullptr;
     }
