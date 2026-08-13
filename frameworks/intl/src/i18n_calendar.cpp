@@ -295,13 +295,15 @@ int32_t I18nCalendar::Get(UCalendarDateFields field)
 void I18nCalendar::Add(UCalendarDateFields field, int32_t amount)
 {
     icu::Calendar* icuCalendar = GetIcuCalendar();
-    if (icuCalendar != nullptr) {
-        UErrorCode status = U_ZERO_ERROR;
-        std::lock_guard<std::mutex> zoneLock(zoneMutex);
-        icuCalendar->add(field, amount, status);
-        if (U_FAILURE(status)) {
-            HILOG_ERROR_I18N("I18nCalendar::Add: icuCalendar add failed failed.");
-        }
+    if (icuCalendar == nullptr) {
+        HILOG_ERROR_I18N("I18nCalendar::Add: icuCalendar add is nullptr.");
+        return;
+    }
+    UErrorCode status = U_ZERO_ERROR;
+    std::lock_guard<std::mutex> zoneLock(zoneMutex);
+    icuCalendar->add(field, amount, status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("I18nCalendar::Add: icuCalendar add failed failed.");
     }
 }
 

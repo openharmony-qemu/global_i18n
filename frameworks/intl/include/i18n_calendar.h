@@ -70,6 +70,8 @@ public:
 
     static const std::unordered_map<std::string, UCalendarDateFields> FIELDS_MAP;
     static const std::unordered_set<std::string> FIELDS_IN_FUNCTION_ADD;
+    static const int32_t MIN_YEAR = -5000000;
+    static const int32_t MAX_YEAR = 5000000;
 
 protected:
     virtual icu::Calendar* GetIcuCalendar() const;
@@ -80,6 +82,7 @@ private:
     void InitCalendar(const icu::Locale &locale, CalendarType type);
     void InitCalendar2(const icu::Locale &locale, CalendarType type, UErrorCode &status);
     void InitFirstDayOfWeek(const std::string& localeTag);
+    bool CheckYearRange(int32_t year);
 };
 } // namespace I18n
 } // namespace Global
