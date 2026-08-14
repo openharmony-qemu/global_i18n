@@ -1157,18 +1157,18 @@ std::string I18nTimeZone::GetLocaleBaseName(std::string &localeStr)
     return GetFallBack(requestLocaleStr);
 }
 
+std::string I18nTimeZone::GetTimezoneIdByCityId(const std::string &cityId)
+{
+    GetAvailableZoneCityIDs();
+    if (city2TimeZoneID.find(cityId) == city2TimeZoneID.end()) {
+        return "";
+    }
+    return city2TimeZoneID.at(cityId);
+}
+
 std::unordered_map<std::string, std::pair<double, double>> I18nTimeZone::GetCityIdLatLonMap()
 {
     return city2Latlon;
-}
-
-std::pair<double, double> I18nTimeZone::GetLatLonByCityId(const std::string &cityId)
-{
-    GetAvailableZoneCityIDs();
-    if (city2Latlon.find(cityId) == city2Latlon.end()) {
-        return {0.0, 0.0};
-    }
-    return city2Latlon.at(cityId);
 }
 
 std::vector<std::string> I18nTimeZone::GetTimezoneIdByLocation(const double x, const double y)
