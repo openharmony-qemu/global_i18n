@@ -37,6 +37,7 @@ config("preferred_language_config") {
   ]
 }
 ohos_shared_library("preferred_language") {
+  branch_protector_ret = "pac_ret"
   public_configs = [ ":preferred_language_config" ]
   include_dirs = [ "include" ]
   sources = [ "src/preferred_language.cpp" ]

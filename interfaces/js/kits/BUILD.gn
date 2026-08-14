@@ -22,6 +22,7 @@ group("build_module") {
 }
 
 ohos_shared_library("intl") {
+  branch_protector_ret = "pac_ret"
   include_dirs = [
     "//base/global/i18n/frameworks/intl/include",
     "//base/global/i18n/interfaces/js/innerkits/intl/include",
@@ -36,6 +37,7 @@ ohos_shared_library("intl") {
 }
 
 ohos_shared_library("i18n") {
+  branch_protector_ret = "pac_ret"
   include_dirs = [
     "//base/global/i18n/frameworks/intl/include",
     "//base/global/i18n/interfaces/js/innerkits/intl/include",
