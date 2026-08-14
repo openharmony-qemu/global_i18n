@@ -136,6 +136,8 @@ private:
     static std::string GetCityDisplayNameWithTaboo(const std::string &cityId, const std::string &localeBaseName,
         const std::string &cityDisplayName);
     static void FreeTzMap(std::map<std::string, icu::TimeZone*> &tzMap);
+    static std::pair<double, double> GetLatLonByCityId(const std::string &cityId,
+        std::unordered_map<std::string, std::pair<double, double>>& latLonMap);
     static const std::unordered_set<std::string> supportLocales;
     static std::unordered_map<std::string, std::string> custLanguageMap;
     static constexpr int CONFIG_LEN = 128;
