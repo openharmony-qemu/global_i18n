@@ -18,7 +18,6 @@
 #include "locale_config.h"
 #include "system_locale_manager.h"
 #include "unicode/calendar.h"
-#include "unicode/timezone.h"
 #include "utils.h"
 #include "i18n_timezone.h"
 #include "unicode/localebuilder.h"
@@ -325,6 +324,7 @@ std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray()
     std::string locale = LocaleConfig::GetEffectiveLocale();
     std::string localeBaseName = I18nTimeZone::GetLocaleBaseName(locale);
     std::map<std::string, std::string> displayNameMap = I18nTimeZone::FindCityDisplayNameMap(localeBaseName);
+    std::unordered_map<std::string, std::pair<double, double>> latLonMap = I18nTimeZone::GetCityIdLatLonMap();
     std::map<std::string, icu::TimeZone*> tzMap;
     for (const auto& cityId : zoneCityIds) {
         if (displayNameMap.find(cityId) == displayNameMap.end()) {
@@ -357,17 +357,32 @@ std::vector<TimeZoneCityItem> SystemLocaleManager::GetTimezoneCityInfoArray()
             HILOG_ERROR_I18N("SystemLocaleManager::GetTimezoneCityInfoArray: Get time zone offset failed.");
             continue;
         }
+        std::pair<double, double> latLon = GetLatLonByCityId(cityId, latLonMap);
         struct TimeZoneCityItem tzCityItem = {
             timezoneId, cityId, PseudoLocalizationProcessor(cityDisplayName), dstOffset + rawOffset,
-            PseudoLocalizationProcessor(""), rawOffset
+            PseudoLocalizationProcessor(""), rawOffset, latLon.first, latLon.second
         };
         result.push_back(tzCityItem);
     }
+    FreeTzMap(tzMap);
+    return result;
+}
+
+std::pair<double, double> SystemLocaleManager::GetLatLonByCityId(const std::string &cityId,
+    std::unordered_map<std::string, std::pair<double, double>>& latLonMap)
+{
+    if (latLonMap.find(cityId) == latLonMap.end()) {
+        return {0.0, 0.0};
+    }
+    return latLonMap.at(cityId);
+}
+
+void SystemLocaleManager::FreeTzMap(std::map<std::string, icu::TimeZone*> &tzMap)
+{
     for (auto it = tzMap.begin(); it != tzMap.end(); ++it) {
         delete it->second;
         it->second = nullptr;
     }
-    return result;
 }
 
 void SystemLocaleManager::SortTimezoneCityItemList(const std::string &locale,

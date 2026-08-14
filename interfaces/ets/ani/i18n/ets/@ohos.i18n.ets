@@ -121,6 +121,8 @@ namespace i18n {
         cityDisplayName: string;
         offset: int;
         zoneDisplayName: string;
+        latitude: double;
+        longitude: double;
         rawOffset?: int;
     }
 
@@ -130,6 +132,8 @@ namespace i18n {
         cityDisplayName: string;
         offset: int;
         zoneDisplayName: string;
+        latitude: double;
+        longitude: double;
         rawOffset?: int;
     }
 

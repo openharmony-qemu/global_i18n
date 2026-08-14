@@ -54,6 +54,7 @@ public:
     static std::map<std::string, std::string> FindCityDisplayNameMap(std::string &locale);
     static std::string GetLocaleBaseName(std::string &locale);
     static std::string GetTimezoneIdByCityId(const std::string &cityId);
+    static std::unordered_map<std::string, std::pair<double, double>> GetCityIdLatLonMap();
     static I18nErrorCode SetAppDefaultTimeZoneById(const std::string& zoneID);
     static std::unique_ptr<I18nTimeZone> GetAppDefaultTimeZone();
     static std::string GetAppDefaultTimeZoneID();
@@ -76,7 +77,9 @@ private:
     static const char *TIMEZONE_SECOND_ROOT_TAG;
     static const char *CITY_DISPLAYNAME_ROOT_TAG;
     static const char *CITY_DISPLAYNAME_SECOND_ROOT_TAG;
-    static const uint32_t ELEMENT_NUM = 2;
+    static const uint32_t ELEMENT_NUM = 4;
+    static const uint32_t LAT_INDEX = 2;
+    static const uint32_t LON_INDEX = 3;
     static const uint32_t TZ_X_PLUS = 180;
     static const uint32_t TZ_HALF_OF_SIZE = 2;
     static const uint32_t TZ_MAX_PIXEL_VALUE = 255;
@@ -84,6 +87,7 @@ private:
     static std::set<std::string> supportedLocales;
     static std::unordered_set<std::string> availableZoneCityIDs;
     static std::unordered_map<std::string, std::string> city2TimeZoneID;
+    static std::unordered_map<std::string, std::pair<double, double>> city2Latlon;
     static std::unordered_map<std::string, std::string> cityDisplayNameCache;
     static std::map<int, std::string> categoryNum2TimezoneWN;
     static std::map<int, std::string> categoryNum2TimezoneEN;
@@ -102,7 +106,6 @@ private:
     static bool initAvailableZoneInfo;
     static bool initSupportedLocales;
     static bool ReadTimeZoneData(const char *xmlPath);
-    static std::string ComputeLocale(std::string &locale);
     icu::TimeZone* GetTimeZone();
     static std::string FindCityDisplayNameFromXml(std::string &cityID, std::string &locale);
     static std::string FindCityDisplayNameFromXmlInner(std::string &cityID, std::string &locale);

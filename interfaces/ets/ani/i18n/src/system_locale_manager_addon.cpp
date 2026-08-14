@@ -252,6 +252,12 @@ static ani_object CreateTimeZoneCityItem(ani_env *env, TimeZoneCityItem item)
     if (ANI_OK != env->Object_SetPropertyByName_Int(ret, "offset", item.offset)) {
         HILOG_ERROR_I18N("CreateTimeZoneCityItem: Set property 'offset' failed");
     }
+    if (!VariableConverter::SetDoubleMember(env, ret, "latitude", item.latitude)) {
+        return nullptr;
+    }
+    if (!VariableConverter::SetDoubleMember(env, ret, "longitude", item.longitude)) {
+        return nullptr;
+    }
     return ret;
 }
 
