@@ -54,7 +54,7 @@ public:
     static std::map<std::string, std::string> FindCityDisplayNameMap(std::string &locale);
     static std::string GetLocaleBaseName(std::string &locale);
     static std::string GetTimezoneIdByCityId(const std::string &cityId);
-    static std::pair<double, double> GetLatLonByCityId(const std::string &cityId);
+    static std::unordered_map<std::string, std::pair<double, double>> GetCityIdLatLonMap();
     static I18nErrorCode SetAppDefaultTimeZoneById(const std::string& zoneID);
     static std::unique_ptr<I18nTimeZone> GetAppDefaultTimeZone();
     static std::string GetAppDefaultTimeZoneID();
