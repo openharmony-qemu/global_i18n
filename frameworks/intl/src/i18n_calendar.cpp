@@ -260,6 +260,10 @@ std::string I18nCalendar::GetTimeZone(void)
 
 void I18nCalendar::Set(int32_t year, int32_t month, int32_t date)
 {
+    if (!CheckYearRange(year)) {
+        HILOG_ERROR_I18N("I18nCalendar::Set: The value of the year is out of range.");
+        return;
+    }
     icu::Calendar* icuCalendar = GetIcuCalendar();
     if (icuCalendar != nullptr) {
         std::lock_guard<std::mutex> zoneLock(zoneMutex);
@@ -269,6 +273,10 @@ void I18nCalendar::Set(int32_t year, int32_t month, int32_t date)
 
 void I18nCalendar::Set(UCalendarDateFields field, int32_t value)
 {
+    if (field == UCAL_YEAR && !CheckYearRange(value)) {
+        HILOG_ERROR_I18N("I18nCalendar::Set: The value of year is out of range.");
+        return;
+    }
     icu::Calendar* icuCalendar = GetIcuCalendar();
     if (icuCalendar != nullptr) {
         std::lock_guard<std::mutex> zoneLock(zoneMutex);
@@ -295,13 +303,26 @@ int32_t I18nCalendar::Get(UCalendarDateFields field)
 void I18nCalendar::Add(UCalendarDateFields field, int32_t amount)
 {
     icu::Calendar* icuCalendar = GetIcuCalendar();
-    if (icuCalendar != nullptr) {
-        UErrorCode status = U_ZERO_ERROR;
-        std::lock_guard<std::mutex> zoneLock(zoneMutex);
-        icuCalendar->add(field, amount, status);
+    if (icuCalendar == nullptr) {
+        HILOG_ERROR_I18N("I18nCalendar::Add: icuCalendar add is nullptr.");
+        return;
+    }
+    UErrorCode status = U_ZERO_ERROR;
+    std::lock_guard<std::mutex> zoneLock(zoneMutex);
+    if (field == UCAL_YEAR) {
+        int32_t originalVal = icuCalendar->get(UCAL_YEAR, status);
         if (U_FAILURE(status)) {
-            HILOG_ERROR_I18N("I18nCalendar::Add: icuCalendar add failed failed.");
+            HILOG_ERROR_I18N("I18nCalendar::Add: icuCalendar get value failed.");
+            return;
         }
+        if (!CheckYearRange(originalVal + amount)) {
+            HILOG_ERROR_I18N("I18nCalendar::Add: The value of year is out of range.");
+            return;
+        }
+    }
+    icuCalendar->add(field, amount, status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("I18nCalendar::Add: icuCalendar add value failed.");
     }
 }
 
@@ -454,6 +475,11 @@ void I18nCalendar::InitFirstDayOfWeek(const std::string& localeTag)
     if (WEEK_DAY_STR_TO_ICU.find(param) != WEEK_DAY_STR_TO_ICU.end()) {
         icuCalendar->setFirstDayOfWeek(WEEK_DAY_STR_TO_ICU[param]);
     }
+}
+
+bool I18nCalendar::CheckYearRange(int32_t year)
+{
+    return year >= MIN_YEAR && year <= MAX_YEAR;
 }
 } // namespace I18n
 } // namespace Global
