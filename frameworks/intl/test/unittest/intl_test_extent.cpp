@@ -204,26 +204,29 @@ HWTEST_F(IntlTest, IntlFuncTest0050, TestSize.Level1)
  */
 HWTEST_F(IntlTest, IntlFuncTest0051, TestSize.Level1)
 {
-    I18nCalendar *calendar = new I18nCalendar("zh-Hans-CN");
-    I18nCalendar *calendar2 = new I18nCalendar("zh-Hans-CN", CalendarType::CHINESE);
+    std::unique_ptr<I18nCalendar> calendar = std::make_unique<I18nCalendar>("zh-Hans-CN");
     calendar->SetTime(1684742124645);
     calendar->Set(1989, 5, 23);
     calendar->SetTimeZone("Asia/Shanghai");
     std::string tzId = calendar->GetTimeZone();
     EXPECT_EQ(tzId, "Asia/Shanghai");
+    calendar->Add(UCAL_YEAR, 5000001);
+    EXPECT_EQ(calendar->Get(UCAL_YEAR), 1989);
+    calendar->Set(UCAL_YEAR, 5000011);
+    EXPECT_EQ(calendar->Get(UCAL_YEAR), 1989);
+    calendar->Set(100762637, 0, 1);
+    EXPECT_EQ(calendar->Get(UCAL_YEAR), 1989);
     int32_t minimalDaysInFirstWeek = calendar->GetMinimalDaysInFirstWeek();
     EXPECT_EQ(minimalDaysInFirstWeek, 1);
     int32_t firstDayOfWeek = calendar->GetFirstDayOfWeek();
     EXPECT_EQ(firstDayOfWeek, 1);
-    calendar2->Set(2023, 5, 28);
-    bool isWeekend = calendar2->IsWeekend();
-    EXPECT_TRUE(isWeekend);
-    I18nCalendar *calendarFake = new I18nCalendar("123");
-    I18nCalendar *calendarInvalid = new I18nCalendar("123", CalendarType::CHINESE);
-    delete calendarFake;
-    delete calendarInvalid;
-    delete calendar;
-    delete calendar2;
+    std::unique_ptr<I18nCalendar> chineseCalendar =
+        std::make_unique<I18nCalendar>("zh-Hans-CN", CalendarType::CHINESE);
+    chineseCalendar->Set(2023, 5, 28);
+    EXPECT_TRUE(chineseCalendar->IsWeekend());
+    std::unique_ptr<I18nCalendar> calendarFake = std::make_unique<I18nCalendar>("123");
+    std::unique_ptr<I18nCalendar> calendarInvalid =
+        std::make_unique<I18nCalendar>("123", CalendarType::CHINESE);
 }
 
 /**
