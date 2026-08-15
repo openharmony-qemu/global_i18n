@@ -180,8 +180,7 @@ napi_value ChineseCalendarAddon::SetChineseCalendarTime(napi_env env, napi_callb
     I18nErrorCode errCode = I18nErrorCode::SUCCESS;
     obj->chineseCalendar_->SetChineseCalendarTime(time, errCode);
     if (errCode != I18nErrorCode::SUCCESS) {
-        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_VALID_NEW,
-            "gregorianYear or cyclicalYear", "a valid value", true);
+        HILOG_ERROR_I18N("SetChineseCalendarTime: set time failed.");
     }
     return nullptr;
 }

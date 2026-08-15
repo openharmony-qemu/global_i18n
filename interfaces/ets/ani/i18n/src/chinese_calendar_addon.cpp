@@ -108,7 +108,7 @@ void ChineseCalendarAddon::SetChineseCalendarTime(ani_env *env, ani_object objec
     I18nErrorCode errCode = I18nErrorCode::SUCCESS;
     obj->chineseCalendar_->SetChineseCalendarTime(time, errCode);
     if (errCode != I18nErrorCode::SUCCESS) {
-        ErrorUtil::AniThrow(env, I18N_NOT_VALID_NEW, "gregorianYear or cyclicalYear", "a valid value");
+        HILOG_ERROR_I18N("ChineseCalendarAddon::SetChineseCalendarTime: set time failed.");
     }
 }
 
