@@ -553,7 +553,7 @@ std::string TimeZoneLocation::GetCountryCode()
     return "";
 }
 
-std::string TimeZoneLocation::GetISOCountryCode(const char* symbol, const void* handler)
+std::string TimeZoneLocation::GetISOCountryCode(const char* symbol, void* handler)
 {
     GetCountryCodeFunc func = reinterpret_cast<GetCountryCodeFunc>(dlsym(handler, symbol));
     if (!func) {
