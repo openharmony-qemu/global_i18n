@@ -96,7 +96,7 @@ private:
         const std::vector<std::string>& tzidNames, std::vector<std::string>& tzidList);
     bool IsPointOnSegment(const Point& p, const Point& before, const Point& after);
     std::string GetCountryCode();
-    std::string GetISOCountryCode(const char* symbol, const void* handler);
+    std::string GetISOCountryCode(const char* symbol, void* handler);
     std::string GetCountryCodeFromVendorCountry();
     const char* GetPoliticalDataPath();
     const char* GetTimeZoneLocationDataPath();
