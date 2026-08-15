@@ -529,13 +529,18 @@ bool TimeZoneLocation::MatchPoliticalDataBlock(FILE* datFile,
 
 std::string TimeZoneLocation::GetCountryCode()
 {
-    std::string simCardCountryCode = GetISOCountryCode("GlobalI18nGetCountryCodeFromSimCard");
-    if (!simCardCountryCode.empty()) {
-        return simCardCountryCode;
-    }
-    std::string networkCountryCode = GetISOCountryCode("GlobalI18nGetCountryCodeFromNetwork");
-    if (!networkCountryCode.empty()) {
-        return networkCountryCode;
+    void* handler = dlopen(DLOPEN_SO_NAME, RTLD_NOW);
+    if (handler != nullptr) {
+        std::string simCardCountryCode = GetISOCountryCode("GlobalI18nGetCountryCodeFromSimCard", handler);
+        if (!simCardCountryCode.empty()) {
+            dlclose(handler);
+            return simCardCountryCode;
+        }
+        std::string networkCountryCode = GetISOCountryCode("GlobalI18nGetCountryCodeFromNetwork", handler);
+        dlclose(handler);
+        if (!networkCountryCode.empty()) {
+            return networkCountryCode;
+        }
     }
     std::string vendorCountry = GetCountryCodeFromVendorCountry();
     if (!vendorCountry.empty()) {
@@ -548,27 +553,19 @@ std::string TimeZoneLocation::GetCountryCode()
     return "";
 }
 
-std::string TimeZoneLocation::GetISOCountryCode(const char* symbol)
+std::string TimeZoneLocation::GetISOCountryCode(const char* symbol, const void* handler)
 {
-    void* handler = dlopen(DLOPEN_SO_NAME, RTLD_NOW);
-    if (handler == nullptr) {
-        HILOG_ERROR_I18N("open %{public}s failed", symbol);
-        return "";
-    }
     GetCountryCodeFunc func = reinterpret_cast<GetCountryCodeFunc>(dlsym(handler, symbol));
     if (!func) {
-        dlclose(handler);
         HILOG_ERROR_I18N("find symbol %{public}s failed", symbol);
         return "";
     }
     char res[RECV_CHAR_LENGTH] = { 0 };
     int returnCode = func(res, RECV_CHAR_LENGTH);
     if (returnCode != 0) {
-        dlclose(handler);
         HILOG_ERROR_I18N("call %{public}s result:%{public}d", symbol, returnCode);
         return "";
     }
-    dlclose(handler);
     std::string result(res);
     return result;
 }
