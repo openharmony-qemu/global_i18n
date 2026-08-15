@@ -30,7 +30,10 @@ ohos_shared_library("intl") {
 
   sources = [ "src/intl_module.cpp" ]
   deps = [ "//base/global/i18n/interfaces/js/innerkits/intl:intl_napi" ]
-  external_deps = [ "napi:ace_napi" ]
+  external_deps = [
+    "napi:ace_napi",
+    "node:node_header_notice",
+  ]
   relative_install_dir = "module"
   subsystem_name = "global"
   part_name = "i18n"
