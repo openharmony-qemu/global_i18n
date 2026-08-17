@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 class FfiI18nTransliterator : public OHOS::FFI::FFIData {
-    DECL_TYPE(FfiI18nTimeZone, FFIData)
+    DECL_TYPE(FfiI18nTransliterator, FFIData)
 public:
     explicit FfiI18nTransliterator(std::unique_ptr<icu::Transliterator> transliterator_);
     ~FfiI18nTransliterator() = default;
