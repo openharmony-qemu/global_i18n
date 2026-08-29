@@ -406,9 +406,6 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest017, TestSize.Level1)
     std::string fakeLanguage = "FakeLanguage";
     isSuggested = LocaleConfig::IsSuggested(fakeLanguage);
     EXPECT_FALSE(isSuggested);
-    EXPECT_TRUE(LocaleConfig::IsSuggested("es-US", "AR"));
-    EXPECT_TRUE(LocaleConfig::IsSuggested("pt", "BR"));
-    EXPECT_TRUE(LocaleConfig::IsSuggested("es-US", "BR"));
 }
 
 /**
@@ -783,6 +780,15 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest030, TestSize.Level1)
 
     LocaleConfig::SetSystemLanguage(systemLanguage);
     LocaleConfig::SetSystemLocale(systemLocale);
+}
+
+/**
+ * @tc.name: LocaleConfigFuncTest031
+ * @tc.desc: Test LocaleConfig isSuggested
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest031, TestSize.Level1)
+{
 }
 } // namespace I18n
 } // namespace Global

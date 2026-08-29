@@ -49,6 +49,7 @@ int LocaleConfigFuncTest027(void);
 int LocaleConfigFuncTest028(void);
 int LocaleConfigFuncTest029(void);
 int LocaleConfigFuncTest030(void);
+int LocaleConfigFuncTest031(void);
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
