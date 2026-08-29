@@ -110,6 +110,10 @@ napi_value ChineseCalendarAddon::GetChineseCalendar(napi_env env, napi_callback_
         HILOG_ERROR_I18N("GetChineseCalendar: napi_new_instance failed");
         return nullptr;
     }
+    if (result == nullptr) {
+        HILOG_ERROR_I18N("GetChineseCalendar: napi_new_instance returned nullptr");
+        return nullptr;
+    }
     return result;
 }
 
@@ -134,6 +138,10 @@ napi_value ChineseCalendarAddon::Constructor(napi_env env, napi_callback_info in
     }
 
     std::unique_ptr<ChineseCalendarAddon> obj = std::make_unique<ChineseCalendarAddon>();
+    if (thisVar == nullptr) {
+        HILOG_ERROR_I18N("ChineseCalendarAddon::Constructor: thisVar is nullptr");
+        return nullptr;
+    }
     status = napi_wrap_s(env, thisVar, reinterpret_cast<void *>(obj.get()),
         ChineseCalendarAddon::Destructor, nullptr, &TYPE_TAG, nullptr);
     if (status != napi_ok) {

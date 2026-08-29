@@ -251,7 +251,12 @@ bool VariableConverter::GetNumberMember(ani_env *env, ani_object options, const 
 
 void VariableConverter::SetStringMember(ani_env *env, ani_object obj, const std::string &name, const std::string &value)
 {
-    if (ANI_OK != env->Object_SetPropertyByName_Ref(obj, name.c_str(), VariableConverter::StringToAniStr(env, value))) {
+    ani_string aniValue = VariableConverter::StringToAniStr(env, value);
+    if (aniValue == nullptr) {
+        HILOG_ERROR_I18N("VariableConverter::SetStringMember: StringToAniStr failed for '%{public}s'", name.c_str());
+        return;
+    }
+    if (ANI_OK != env->Object_SetPropertyByName_Ref(obj, name.c_str(), aniValue)) {
         HILOG_ERROR_I18N("VariableConverter::SetStringMember: Set property '%{public}s' failed", name.c_str());
         return;
     }
@@ -573,6 +578,10 @@ ani_object VariableConverter::CreateAniMap(ani_env* env,
     for (auto iter = map.begin(); iter != map.end(); ++iter) {
         ani_string key = StringToAniStr(env, iter->first);
         ani_string val = StringToAniStr(env, iter->second);
+        if (key == nullptr || val == nullptr) {
+            HILOG_ERROR_I18N("CreateAniMap: StringToAniStr failed");
+            return nullptr;
+        }
         ani_object keyObj = static_cast<ani_object>(key);
         ani_object valObj = static_cast<ani_object>(val);
         if (ANI_OK != env->Object_CallMethodByName_Ref(obj, "set",

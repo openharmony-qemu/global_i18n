@@ -215,6 +215,7 @@ napi_value SymbolNumberFormatAddon::Format(napi_env env, napi_callback_info info
             break;
         default:
             HILOG_ERROR_I18N("SymbolNumberFormatAddon::Format: Invalid data.");
+            return VariableConvertor::CreateString(env, "");
     }
     return VariableConvertor::CreateString(env, result);
 }
@@ -252,6 +253,7 @@ napi_value SymbolNumberFormatAddon::FormatToParts(napi_env env, napi_callback_in
             break;
         default:
             HILOG_ERROR_I18N("SymbolNumberFormatAddon::FormatToParts: Invalid data.");
+            return nullptr;
     }
     return IntlDateTimeFormatAddon::CreateFormatPart(env, parts);
 }
@@ -348,7 +350,12 @@ napi_value SymbolNumberFormatAddon::ResolvedOptions(napi_env env, napi_callback_
 
     std::map<std::string, std::string> options;
     obj->symbolNumberFormat_->ResolvedOptions(options);
-    return CreateResolvedOptions(env, options);
+    napi_value result = CreateResolvedOptions(env, options);
+    if (result == nullptr) {
+        HILOG_ERROR_I18N("SymbolNumberFormatAddon::ResolvedOptions: CreateResolvedOptions failed.");
+        return nullptr;
+    }
+    return result;
 }
 
 NumberData SymbolNumberFormatAddon::ParseNumberData(napi_env env, napi_value value, NumberDataType& type)
