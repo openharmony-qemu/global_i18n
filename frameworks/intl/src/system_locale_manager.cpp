@@ -159,6 +159,7 @@ std::vector<LocaleItem> SystemLocaleManager::GetLanguageInfoArray(const std::vec
     }
 
     std::unordered_set<std::string> simRegions = GetCountryCodeFromSimCard();
+    std::string sysRegion = LocaleConfig::GetSystemRegion();
     for (auto it = languages.begin(); it != languages.end(); ++it) {
         std::string language = *it;
         if (custLanguageMap.find(language) != custLanguageMap.end()) {
@@ -169,7 +170,7 @@ std::vector<LocaleItem> SystemLocaleManager::GetLanguageInfoArray(const std::vec
         if (options.isUseLocalName) {
             languageNativeName = LocaleConfig::GetDisplayLanguage(language, language, true);
         }
-        bool isSuggestedWithSystemRegion = LocaleConfig::IsSuggested(*it, LocaleConfig::GetSystemRegion());
+        bool isSuggestedWithSystemRegion = LocaleConfig::IsSuggested(*it, sysRegion);
         SuggestionType suggestionType = SuggestionType::SUGGESTION_TYPE_NONE;
         if (isSuggestedWithSystemRegion) {
             suggestionType = SuggestionType::SUGGESTION_TYPE_RELATED;

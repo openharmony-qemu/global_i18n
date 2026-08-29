@@ -139,7 +139,15 @@ unordered_map<string, string> LocaleConfig::dialectMap {
     { "es-Latn-US", "es-Latn-419" },
     { "es-Latn-UY", "es-Latn-419" },
     { "es-Latn-VE", "es-Latn-419" },
-    { "pt-Latn-PT", "pt-Latn-PT" }
+    { "pt-Latn-PT", "pt-Latn-PT" },
+    { "pt-Latn-AO", "pt-Latn-PT" },
+    { "pt-Latn-GQ", "pt-Latn-PT" },
+    { "pt-Latn-TL", "pt-Latn-PT" },
+    { "pt-Latn-CV", "pt-Latn-PT" },
+    { "pt-Latn-GW", "pt-Latn-PT" },
+    { "pt-Latn-MZ", "pt-Latn-PT" },
+    { "pt-Latn-MO", "pt-Latn-PT" },
+    { "pt-Latn-ST", "pt-Latn-PT" }
 };
 
 unordered_map<string, string> LocaleConfig::dialectMapV15 {
