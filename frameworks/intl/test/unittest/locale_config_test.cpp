@@ -1291,8 +1291,8 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest041, TestSize.Level1)
     if (systemLanguages.find("pl") != systemLanguages.end()) {
         EXPECT_TRUE(LocaleConfig::IsSuggested("pl", "PL"));
     }
-    if (systemLanguages.find("pt") != systemLanguages.end()) {
-        EXPECT_TRUE(LocaleConfig::IsSuggested("pt", "BR"));
+    if (systemLanguages.find("pt-BR") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("pt-BR", "BR"));
     }
     if (systemLanguages.find("si") != systemLanguages.end()) {
         EXPECT_TRUE(LocaleConfig::IsSuggested("si", "LK"));
