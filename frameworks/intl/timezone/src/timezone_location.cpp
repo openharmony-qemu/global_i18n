@@ -553,6 +553,23 @@ std::string TimeZoneLocation::GetCountryCode()
     return "";
 }
 
+void TimeZoneLocation::GetSimAndNetworkCountries(std::unordered_set<std::string> &resultSet)
+{
+    void* handler = dlopen(DLOPEN_SO_NAME, RTLD_NOW);
+    if (handler == nullptr) {
+        return;
+    }
+    std::string simCardCountryCode = GetISOCountryCode("GlobalI18nGetCountryCodeFromSimCard", handler);
+    if (!simCardCountryCode.empty()) {
+        resultSet.insert(simCardCountryCode);
+    }
+    std::string networkCountryCode = GetISOCountryCode("GlobalI18nGetCountryCodeFromNetwork", handler);
+    if (!networkCountryCode.empty()) {
+        resultSet.insert(networkCountryCode);
+    }
+    dlclose(handler);
+}
+
 std::string TimeZoneLocation::GetISOCountryCode(const char* symbol, void* handler)
 {
     GetCountryCodeFunc func = reinterpret_cast<GetCountryCodeFunc>(dlsym(handler, symbol));

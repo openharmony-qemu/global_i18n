@@ -20,6 +20,7 @@
 #include "unicode/calendar.h"
 #include "utils.h"
 #include "i18n_timezone.h"
+#include "timezone_location.h"
 #include "unicode/localebuilder.h"
 #include "unicode/locid.h"
 
@@ -412,16 +413,9 @@ void SystemLocaleManager::SortTimezoneCityItemList(const std::string &locale,
 std::unordered_set<std::string> SystemLocaleManager::GetCountryCodeFromSimCard()
 {
     std::unordered_set<std::string> resultSet;
-    std::vector<size_t> soltIds = {0, 1};
-    for (size_t i = 0; i < soltIds.size(); i++) {
-        GetCountryCodeFromSimCardInner(resultSet, soltIds[i]);
-    }
+    std::unique_ptr<TimeZoneLocation> timezoneLocationPtr = std::make_unique<TimeZoneLocation>();
+    timezoneLocationPtr->GetSimAndNetworkCountries(resultSet);
     return resultSet;
-}
-
-void SystemLocaleManager::GetCountryCodeFromSimCardInner(std::unordered_set<std::string> &resultSet,
-    size_t soltId)
-{
 }
 
 std::string SystemLocaleManager::GetCityDisplayNameWithTaboo(const std::string &cityId,

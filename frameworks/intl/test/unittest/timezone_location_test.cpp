@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 #include <sys/stat.h>
 #include "i18n_timezone.h"
+#include "timezone_location.h"
 #include "timezone_location_test.h"
 
 using namespace OHOS::Global::I18n;
@@ -953,6 +954,21 @@ HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0006, TestSize.Level1)
     EXPECT_EQ(tzIdList[0], "Asia/Bishkek");
     tzIdList = I18nTimeZone::GetTimezoneIdByLocation(74.43203, 40.13523);
     EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
+}
+
+/**
+ * @tc.name: TimeZoneLocationTest0007
+ * @tc.desc: Test GetISOCountryCode
+ * @tc.type: FUNC
+ */
+HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0007, TestSize.Level1)
+{
+    std::unique_ptr<TimeZoneLocation> tzLocation = std::make_unique<TimeZoneLocation>();
+    std::string mccCode = tzLocation->GetISOCountryCode("GlobalI18nGetCountryCodeFromNetwork");
+    EXPECT_FALSE(mccCode.empty());
+    std::unordered_set<std::string> resultSet;
+    tzLocation->GetSimAndNetworkCountries(resultSet);
+    EXPECT_TRUE(resultSet.size() > 0);
 }
 } // namespace I18n
 } // namespace Global

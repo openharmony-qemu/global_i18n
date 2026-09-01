@@ -129,7 +129,6 @@ private:
     std::unordered_set<std::string> GetCountryCodeFromSimCard();
     bool IsLanguageSimRegionSuggest(const std::unordered_set<std::string> &simRegions,
         const std::string &language);
-    void GetCountryCodeFromSimCardInner(std::unordered_set<std::string> &resultSet, size_t soltId);
     bool IsSuggestRegion(const std::string &language, const std::string &region);
     LocaleItem GetLocaleItem(const std::string &region, SuggestionType &suggestionType,
         const std::string &localeTag);
