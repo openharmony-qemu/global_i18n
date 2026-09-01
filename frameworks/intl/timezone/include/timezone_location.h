@@ -19,6 +19,7 @@
 #include <tuple>
 #include <map>
 #include <vector>
+#include <unordered_set>
 #include "i18n_hilog.h"
 
 namespace OHOS {

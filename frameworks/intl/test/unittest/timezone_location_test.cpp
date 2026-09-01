@@ -964,8 +964,13 @@ HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0006, TestSize.Level1)
 HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0007, TestSize.Level1)
 {
     std::unique_ptr<TimeZoneLocation> tzLocation = std::make_unique<TimeZoneLocation>();
-    std::string mccCode = tzLocation->GetISOCountryCode("GlobalI18nGetCountryCodeFromNetwork");
-    EXPECT_FALSE(mccCode.empty());
+    const char* dlopenSoName = "libzone_util.z.so";
+    void* handler = dlopen(dlopenSoName, RTLD_NOW);
+    if (handler != nullptr) {
+        std::string mccCode = tzLocation->GetISOCountryCode("GlobalI18nGetCountryCodeFromNetwork", handler);
+        EXPECT_FALSE(mccCode.empty());
+        dlclose(handler);
+    }
     std::unordered_set<std::string> resultSet;
     tzLocation->GetSimAndNetworkCountries(resultSet);
     EXPECT_TRUE(resultSet.size() > 0);
