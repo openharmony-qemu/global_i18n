@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 #include <sys/stat.h>
+#include <dlfcn.h>
 #include "i18n_timezone.h"
 #include "timezone_location.h"
 #include "timezone_location_test.h"
