@@ -117,6 +117,7 @@ std::set<std::string> LocaleConfig::extendWhiteLanguageList;
 std::set<std::string> LocaleConfig::extendWhiteLanguageListV15;
 unordered_map<string, string> LocaleConfig::dialectMap {
     { "es-Latn-419", "es-Latn-419" },
+    { "es-Latn-AR", "es-Latn-419" },
     { "es-Latn-BO", "es-Latn-419" },
     { "es-Latn-BR", "es-Latn-419" },
     { "es-Latn-BZ", "es-Latn-419" },
@@ -138,7 +139,15 @@ unordered_map<string, string> LocaleConfig::dialectMap {
     { "es-Latn-US", "es-Latn-419" },
     { "es-Latn-UY", "es-Latn-419" },
     { "es-Latn-VE", "es-Latn-419" },
-    { "pt-Latn-PT", "pt-Latn-PT" }
+    { "pt-Latn-PT", "pt-Latn-PT" },
+    { "pt-Latn-AO", "pt-Latn-PT" },
+    { "pt-Latn-GQ", "pt-Latn-PT" },
+    { "pt-Latn-TL", "pt-Latn-PT" },
+    { "pt-Latn-CV", "pt-Latn-PT" },
+    { "pt-Latn-GW", "pt-Latn-PT" },
+    { "pt-Latn-MZ", "pt-Latn-PT" },
+    { "pt-Latn-MO", "pt-Latn-PT" },
+    { "pt-Latn-ST", "pt-Latn-PT" }
 };
 
 unordered_map<string, string> LocaleConfig::dialectMapV15 {
@@ -733,6 +742,9 @@ void LocaleConfig::ExtendWhiteLanguages()
             std::string baseNameStr(baseName);
             std::replace(baseNameStr.begin(), baseNameStr.end(), '_', '-');
             extendWhiteLanguageList.insert(baseNameStr);
+            if (dialectMap.find(baseNameStr) != dialectMap.end()) {
+                extendWhiteLanguageList.insert(dialectMap.at(baseNameStr));
+            }
             extendWhiteLanguageListV15.insert(baseNameStr);
         }
         const char* language = locale.getLanguage();

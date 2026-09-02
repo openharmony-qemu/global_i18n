@@ -781,6 +781,535 @@ HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest030, TestSize.Level1)
     LocaleConfig::SetSystemLanguage(systemLanguage);
     LocaleConfig::SetSystemLocale(systemLocale);
 }
+
+/**
+ * @tc.name: LocaleConfigFuncTest031
+ * @tc.desc: Test IsSuggested
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest031, TestSize.Level1)
+{
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "AL"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "AF"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "AE"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "IE"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "AI"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "AG"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "AT"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "AU"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "BB"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "PG"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "BS"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "PK"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "BM"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "MP"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "BE"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "IS"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "PR"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "BZ"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "BW"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "BI"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "DK"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "DE"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "DG"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "DM"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "ER"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "PH"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "FJ"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "FI"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "FK"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "GM"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "SX"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "GD"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "GG"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "GU"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "GY"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "NL"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "KI"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "CA"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "GH"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "ZW"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "CM"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "KY"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "CC"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "KE"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "CK"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "LS"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "LR"));
+}
+
+/**
+ * @tc.name: LocaleConfigFuncTest032
+ * @tc.desc: Test IsSuggested
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest032, TestSize.Level1)
+{
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "IM"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "MV"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "MT"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "MW"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "MY"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "MH"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "US"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "UM"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "AS"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "VI"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "MS"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "FM"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "NA"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "ZA"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "SS"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "NR"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "NG"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "NU"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "NF"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "PW"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "PN"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "SE"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "CH"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "WS"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "SL"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "CY"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "SC"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "SH"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "KN"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "LC"));
+}
+
+/**
+ * @tc.name: LocaleConfigFuncTest033
+ * @tc.desc: Test IsSuggested
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest033, TestSize.Level1)
+{
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "VC"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "SI"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "SZ"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "SD"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "SB"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "TJ"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "TZ"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "TO"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "TC"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "TT"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "TV"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "TM"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "TK"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "VU"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "UG"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "SG"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "NZ"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "JM"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "AM"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "IR"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "IL"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "IN"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "GB"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "VG"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "IO"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "ZM"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "JE"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "GI"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "MO"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "HK"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("en", "CX"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("zh-Hant", "MO"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("zh-Hant", "TW"));
+    EXPECT_TRUE(LocaleConfig::IsSuggested("zh-Hant", "HK"));
+}
+
+/**
+ * @tc.name: LocaleConfigFuncTest034
+ * @tc.desc: Test IsSuggested
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest034, TestSize.Level1)
+{
+    std::unordered_set<std::string> systemLanguages = LocaleConfig::GetSystemLanguages();
+    if (systemLanguages.find("fr") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "DZ"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "BJ"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "BE"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "BI"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "BF"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "GQ"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "TG"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "FR"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "PF"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "GF"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "MF"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "CG"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "CD"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "GP"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "HT"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "DJ"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "GN"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "CA"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "GA"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "CM"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "KM"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "CI"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "RE"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "LU"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "RW"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "MG"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "ML"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "MQ"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "YT"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "MU"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "MR"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "NE"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "MA"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "MC"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "BL"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "PM"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "WF"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "VU"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "TN"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "SN"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "SC"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "NC"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "SY"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "TD"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fr", "CF"));
+    }
+}
+
+/**
+ * @tc.name: LocaleConfigFuncTest035
+ * @tc.desc: Test IsSuggested
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest035, TestSize.Level1)
+{
+    std::unordered_set<std::string> systemLanguages = LocaleConfig::GetSystemLanguages();
+    if (systemLanguages.find("de") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("de", "AT"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("de", "BE"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("de", "DE"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("de", "LI"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("de", "LU"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("de", "CH"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("de", "IT"));
+    }
+    if (systemLanguages.find("pt-PT") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("pt-PT", "AO"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("pt-PT", "TL"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("pt-PT", "CV"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("pt-PT", "GW"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("pt-PT", "MZ"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("pt-PT", "PT"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("pt-PT", "ST"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("pt-PT", "GQ"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("pt-PT", "MO"));
+    }
+    if (systemLanguages.find("es") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("es", "GQ"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("es", "PH"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("es", "IC"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("es", "EA"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("es", "ES"));
+    }
+    if (systemLanguages.find("it") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("it", "SM"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("it", "VA"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("it", "CH"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("it", "IT"));
+    }
+    if (systemLanguages.find("ru") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ru", "BY"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ru", "RU"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ru", "KZ"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ru", "KG"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ru", "UA"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ru", "MD"));
+    }
+    if (systemLanguages.find("ko") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ko", "KR"));
+    }
+}
+
+/**
+ * @tc.name: LocaleConfigFuncTest036
+ * @tc.desc: Test IsSuggested
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest036, TestSize.Level1)
+{
+    std::unordered_set<std::string> systemLanguages = LocaleConfig::GetSystemLanguages();
+    if (systemLanguages.find("ar") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ar", "SA"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ar", "SD"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ar", "SO"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ar", "TN"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ar", "SY"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ar", "YE"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ar", "IQ"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ar", "LB"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ar", "IL"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ar", "JO"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ar", "TD"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ar", "SS"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ar", "MA"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ar", "MR"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ar", "DJ"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ar", "ER"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ar", "DZ"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ar", "AE"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ar", "OM"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ar", "EG"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ar", "PS"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ar", "BH"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ar", "LY"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ar", "QA"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ar", "KW"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ar", "KM"));
+    }
+}
+
+/**
+ * @tc.name: LocaleConfigFuncTest037
+ * @tc.desc: Test IsSuggested
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest037, TestSize.Level1)
+{
+    std::unordered_set<std::string> systemLanguages = LocaleConfig::GetSystemLanguages();
+    if (systemLanguages.find("ms") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ms", "MY"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ms", "SG"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ms", "BN"));
+    }
+    if (systemLanguages.find("my") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("my", "MM"));
+    }
+    if (systemLanguages.find("ja") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ja", "JP"));
+    }
+    if (systemLanguages.find("th") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("th", "TH"));
+    }
+    if (systemLanguages.find("tr") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("tr", "TR"));
+    }
+    if (systemLanguages.find("vi") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("vi", "VN"));
+    }
+    if (systemLanguages.find("id") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("id", "ID"));
+    }
+}
+
+/**
+ * @tc.name: LocaleConfigFuncTest038
+ * @tc.desc: Test IsSuggested
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest038, TestSize.Level1)
+{
+    std::unordered_set<std::string> systemLanguages = LocaleConfig::GetSystemLanguages();
+    if (systemLanguages.find("es-US") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("es-US", "PA"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("es-US", "BR"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("es-US", "PE"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("es-US", "PR"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("es-US", "DO"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("es-US", "EC"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("es-US", "CO"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("es-US", "CR"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("es-US", "HN"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("es-US", "CL"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("es-US", "US"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("es-US", "MX"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("es-US", "NI"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("es-US", "SV"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("es-US", "GT"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("es-US", "VE"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("es-US", "BO"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("es-US", "BZ"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("es-US", "AR"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("es-US", "PY"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("es-US", "UY"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("es-US", "CU"));
+    }
+    if (systemLanguages.find("ca") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ca", "FR"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ca", "IT"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ca", "AD"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ca", "ES"));
+    }
+    if (systemLanguages.find("nl") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("nl", "NL"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("nl", "BQ"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("nl", "SX"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("nl", "BE"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("nl", "CW"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("nl", "SR"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("nl", "AW"));
+    }
+    if (systemLanguages.find("sr-Latn") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("sr-Latn", "BA"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("sr-Latn", "ME"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("sr-Latn", "RS"));
+    }
+}
+
+/**
+ * @tc.name: LocaleConfigFuncTest039
+ * @tc.desc: Test IsSuggested
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest039, TestSize.Level1)
+{
+    std::unordered_set<std::string> systemLanguages = LocaleConfig::GetSystemLanguages();
+    if (systemLanguages.find("da") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("da", "DK"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("da", "GL"));
+    }
+    if (systemLanguages.find("ur") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ur", "PK"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ur", "IN"));
+    }
+    if (systemLanguages.find("sv") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("sv", "AX"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("sv", "FI"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("sv", "SE"));
+    }
+    if (systemLanguages.find("hr") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("hr", "BA"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("hr", "HR"));
+    }
+    if (systemLanguages.find("ro") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ro", "RO"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ro", "MD"));
+    }
+    if (systemLanguages.find("nb") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("nb", "NO"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("nb", "SJ"));
+    }
+    if (systemLanguages.find("ne") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ne", "IN"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ne", "NP"));
+    }
+    if (systemLanguages.find("bn") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("bn", "IN"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("bn", "BD"));
+    }
+    if (systemLanguages.find("fa") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fa", "AF"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fa", "IR"));
+    }
+    if (systemLanguages.find("az-Latn") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("az-Latn", "AZ"));
+    }
+    if (systemLanguages.find("be") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("be", "BY"));
+    }
+    if (systemLanguages.find("bg") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("bg", "BG"));
+    }
+}
+
+/**
+ * @tc.name: LocaleConfigFuncTest040
+ * @tc.desc: Test IsSuggested
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest040, TestSize.Level1)
+{
+    std::unordered_set<std::string> systemLanguages = LocaleConfig::GetSystemLanguages();
+    if (systemLanguages.find("bs-Latn") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("bs-Latn", "BA"));
+    }
+    if (systemLanguages.find("cs") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("cs", "CZ"));
+    }
+    if (systemLanguages.find("et") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("et", "EE"));
+    }
+    if (systemLanguages.find("eu") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("eu", "ES"));
+    }
+    if (systemLanguages.find("el") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("el", "GR"));
+        EXPECT_TRUE(LocaleConfig::IsSuggested("el", "CY"));
+    }
+    if (systemLanguages.find("fi") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fi", "FI"));
+    }
+    if (systemLanguages.find("fil") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("fil", "PH"));
+    }
+    if (systemLanguages.find("gl") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("gl", "ES"));
+    }
+    if (systemLanguages.find("he") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("he", "IL"));
+    }
+    if (systemLanguages.find("hi") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("hi", "IN"));
+    }
+    if (systemLanguages.find("hu") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("hu", "HU"));
+    }
+    if (systemLanguages.find("jv-Latn") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("jv-Latn", "ID"));
+    }
+    if (systemLanguages.find("ka") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("ka", "GE"));
+    }
+    if (systemLanguages.find("km") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("km", "KH"));
+    }
+    if (systemLanguages.find("kk") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("kk", "KZ"));
+    }
+}
+
+/**
+ * @tc.name: LocaleConfigFuncTest041
+ * @tc.desc: Test IsSuggested
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleConfigTest, LocaleConfigFuncTest041, TestSize.Level1)
+{
+    std::unordered_set<std::string> systemLanguages = LocaleConfig::GetSystemLanguages();
+    if (systemLanguages.find("lv") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("lv", "LV"));
+    }
+    if (systemLanguages.find("lo") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("lo", "LA"));
+    }
+    if (systemLanguages.find("lt") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("lt", "LT"));
+    }
+    if (systemLanguages.find("mk") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("mk", "MK"));
+    }
+    if (systemLanguages.find("pl") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("pl", "PL"));
+    }
+    if (systemLanguages.find("pt-BR") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("pt-BR", "BR"));
+    }
+    if (systemLanguages.find("si") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("si", "LK"));
+    }
+    if (systemLanguages.find("sk") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("sk", "SK"));
+    }
+    if (systemLanguages.find("sl") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("sl", "SI"));
+    }
+    if (systemLanguages.find("uk") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("uk", "UA"));
+    }
+    if (systemLanguages.find("uz-Latn") != systemLanguages.end()) {
+        EXPECT_TRUE(LocaleConfig::IsSuggested("uz-Latn", "UZ"));
+    }
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
