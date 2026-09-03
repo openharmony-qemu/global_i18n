@@ -161,13 +161,6 @@ napi_value EntityRecognizerAddon::GetEntityInfoItem(napi_env env, std::vector<st
         HILOG_ERROR_I18N("EntityRecognizerAddon::GetEntityInfoItem: Invalid entityInfo.");
         return nullptr;
     }
-    for (size_t t = 0; t < entityInfo.size(); t++) {
-        size_t minSize = 1 + ENTITY_INFO_LEN * static_cast<size_t>(entityInfo[t][0]);
-        if (entityInfo[t].size() < minSize) {
-            HILOG_ERROR_I18N("EntityRecognizerAddon::GetEntityInfoItem: entityInfo[%{public}zu] size too small.", t);
-            return nullptr;
-        }
-    }
     napi_status status = napi_create_array_with_length(env, entityInfo[0][0] + entityInfo[1][0], &result);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("create EntityInfo array failed.");
@@ -178,6 +171,10 @@ napi_value EntityRecognizerAddon::GetEntityInfoItem(napi_env env, std::vector<st
     for (std::string::size_type t = 0; t < types.size(); t++) {
         for (int i = 0; i < entityInfo[t][0]; i++) {
             size_t posBegin = ENTITY_INFO_LEN * static_cast<size_t>(i) + 1;
+            if (entityInfo[t].size() < posBegin) {
+                HILOG_ERROR_I18N("EntityRecognizerAddon::GetEntityInfoItem: entityInfo[%{public}zu] size too small.", t);
+                return nullptr;
+            }
             int begin = entityInfo[t][posBegin];
             int end = entityInfo[t][posBegin + 1];
             std::string type = types[t];

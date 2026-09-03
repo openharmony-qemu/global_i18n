@@ -282,10 +282,6 @@ ani_boolean ChineseCalendarAddon::IsWeekend(ani_env *env, ani_object object, ani
         return obj->chineseCalendar_->IsWeekend();
     }
     ani_long milliseconds = VariableConverter::GetDateValue(env, date, "valueOf");
-    if (milliseconds == -1) {
-        HILOG_ERROR_I18N("ChineseCalendarAddon::IsWeekend: Get date value failed");
-        return false;
-    }
     UErrorCode error = U_ZERO_ERROR;
     return obj->chineseCalendar_->IsWeekend(static_cast<double>(milliseconds), error);
 }
