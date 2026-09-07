@@ -557,6 +557,7 @@ void TimeZoneLocation::GetSimAndNetworkCountries(std::unordered_set<std::string>
 {
     void* handler = dlopen(DLOPEN_SO_NAME, RTLD_NOW);
     if (handler == nullptr) {
+        HILOG_ERROR_I18N("GetSimAndNetworkCountries: open %{public}s failed", DLOPEN_SO_NAME);
         return;
     }
     std::string simCardCountryCode = GetISOCountryCode("GlobalI18nGetCountryCodeFromSimCard", handler);
