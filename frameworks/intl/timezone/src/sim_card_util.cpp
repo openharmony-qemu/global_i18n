@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,79 +12,76 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "zone_rules.h"
-
-#include "i18n_hilog.h"
-#include "unicode/tzrule.h"
-#include "unicode/tztrans.h"
-#include "unicode/gregocal.h"
+#include "sim_card_util.h"
+#include <dlfcn.h>
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-ZoneRules::ZoneRules(const std::string &tzid)
-{
-    this->tzId = tzid;
-    InitBasicTimeZone();
-}
 
-ZoneRules::~ZoneRules()
+const char *SimCardUtil::DLOPEN_SO_NAME = "libzone_util.z.so";
+
+SimCardUtil::SimCardUtil()
 {
 }
 
-void ZoneRules::InitBasicTimeZone()
+SimCardUtil::~SimCardUtil()
 {
-    if (tzId.empty()) {
-        HILOG_ERROR_I18N("ZoneRules::InitBasicTimeZone: param tzid is empty.");
+}
+
+void SimCardUtil::GetSimCardAndNetworkCountries(std::unordered_set<std::string> &resultSet)
+{
+    void* handler = dlopen(DLOPEN_SO_NAME, RTLD_NOW);
+    if (handler == nullptr) {
+        HILOG_ERROR_I18N("GetSimAndNetworkCountries: open %{public}s failed", DLOPEN_SO_NAME);
         return;
     }
-    icu::UnicodeString unicodeZoneId(tzId.data(), tzId.length());
-    icu::TimeZone* icuTz = icu::TimeZone::createTimeZone(unicodeZoneId);
-    if (icuTz == nullptr) {
-        HILOG_ERROR_I18N("ZoneRules::InitBasicTimeZone: param tzid: %{public}s invalid.", tzId.c_str());
-        return;
+    std::string simCardCountryCode = GetISOCountryCode("GlobalI18nGetCountryCodeFromSimCard", handler);
+    if (!simCardCountryCode.empty()) {
+        resultSet.insert(simCardCountryCode);
     }
-    icu::BasicTimeZone* btzPtr = static_cast<icu::BasicTimeZone*>(icuTz);
-    if (btzPtr == nullptr) {
-        HILOG_ERROR_I18N("ZoneRules::InitBasicTimeZone: static_cast icu::TimeZone failed.");
-        return;
+    std::string networkCountryCode = GetISOCountryCode("GlobalI18nGetCountryCodeFromNetwork", handler);
+    if (!networkCountryCode.empty()) {
+        resultSet.insert(networkCountryCode);
     }
-    this->btz = std::unique_ptr<icu::BasicTimeZone>(btzPtr);
-    if (btz == nullptr) {
-        HILOG_ERROR_I18N("ZoneRules::InitBasicTimeZone: btz is nullptr.");
-    }
+    dlclose(handler);
 }
 
-std::unique_ptr<ZoneOffsetTransition> ZoneRules::NextTransition()
+std::string SimCardUtil::GetCountryCode()
 {
-    auto time = std::chrono::system_clock::now();
-    auto since_epoch = time.time_since_epoch();
-    auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(since_epoch);
-    UDate currentTime = static_cast<double>(millis.count());
-    return NextTransition(currentTime);
+    void* handler = dlopen(DLOPEN_SO_NAME, RTLD_NOW);
+    if (handler == nullptr) {
+        HILOG_ERROR_I18N("SimCardUtil::GetCountryCode: open %{public}s failed", DLOPEN_SO_NAME);
+        return "";
+    }
+    std::string simCardCountryCode = GetISOCountryCode("GlobalI18nGetCountryCodeFromSimCard", handler);
+    if (!simCardCountryCode.empty()) {
+        dlclose(handler);
+        return simCardCountryCode;
+    }
+    std::string networkCountryCode = GetISOCountryCode("GlobalI18nGetCountryCodeFromNetwork", handler);
+    dlclose(handler);
+    if (!networkCountryCode.empty()) {
+        return networkCountryCode;
+    }
+    return "";
 }
 
-std::unique_ptr<ZoneOffsetTransition> ZoneRules::NextTransition(double date)
+std::string SimCardUtil::GetISOCountryCode(const char* symbol, void* handler)
 {
-    if (btz == nullptr) {
-        HILOG_ERROR_I18N("ZoneRules::NextTransition: btz is nullptr.");
-        return std::make_unique<ZoneOffsetTransition>();
+    GetCountryCodeFunc func = reinterpret_cast<GetCountryCodeFunc>(dlsym(handler, symbol));
+    if (!func) {
+        HILOG_ERROR_I18N("GetISOCountryCode: find symbol %{public}s failed", symbol);
+        return "";
     }
-    icu::TimeZoneTransition trans;
-    if (!btz->getNextTransition(date, false, trans)) {
-        HILOG_ERROR_I18N("ZoneRules::nextTransition: get next transition after %{public}s failed.",
-            std::to_string(date).c_str());
-        return std::make_unique<ZoneOffsetTransition>();
+    char res[RECV_CHAR_LENGTH] = { 0 };
+    int returnCode = func(res, RECV_CHAR_LENGTH);
+    if (returnCode != 0) {
+        HILOG_ERROR_I18N("GetISOCountryCode: call %{public}s result:%{public}d", symbol, returnCode);
+        return "";
     }
-    const icu::TimeZoneRule* from = trans.getFrom();
-    const icu::TimeZoneRule* to = trans.getTo();
-    if (from == nullptr || to == nullptr) {
-        return std::make_unique<ZoneOffsetTransition>();
-    }
-    double time = trans.getTime();
-    int32_t offsetBefore = from->getRawOffset() + from->getDSTSavings();
-    int32_t offsetAfter = to->getRawOffset() + to->getDSTSavings();
-    return std::make_unique<ZoneOffsetTransition>(time, offsetBefore, offsetAfter);
+    std::string result(res);
+    return result;
 }
 } // namespace I18n
 } // namespace Global
