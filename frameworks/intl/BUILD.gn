@@ -158,6 +158,7 @@ ohos_shared_library("intl_util") {
       "src/taboo.cpp",
       "src/taboo_utils.cpp",
       "src/utils.cpp",
+      "timezone/src/sim_card_util.cpp",
       "timezone/src/timezone_location.cpp",
       "timezone/src/zone_offset_transition.cpp",
       "timezone/src/zone_rules.cpp",
