@@ -126,7 +126,7 @@ private:
     static void SortTimezoneCityItemList(const std::string &locale,
                                          std::vector<TimeZoneCityItem> &timezoneCityItemList);
     static std::vector<TimeZoneCityItem> GetTimezoneCityInfoArray();
-    std::unordered_set<std::string> GetCountryCode();
+    std::unordered_set<std::string> GetCountryCodeFromSimCard();
     bool IsLanguageSimRegionSuggest(const std::unordered_set<std::string> &simRegions,
         const std::string &language);
     bool IsSuggestRegion(const std::string &language, const std::string &region);
