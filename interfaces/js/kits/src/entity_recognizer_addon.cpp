@@ -171,6 +171,10 @@ napi_value EntityRecognizerAddon::GetEntityInfoItem(napi_env env, std::vector<st
     for (std::string::size_type t = 0; t < types.size(); t++) {
         for (int i = 0; i < entityInfo[t][0]; i++) {
             size_t posBegin = ENTITY_INFO_LEN * static_cast<size_t>(i) + 1;
+            if (entityInfo[t].size() <= posBegin + 1) {
+                HILOG_ERROR_I18N("EntityInfo[%{public}zu] size too small.", t);
+                return nullptr;
+            }
             int begin = entityInfo[t][posBegin];
             int end = entityInfo[t][posBegin + 1];
             std::string type = types[t];

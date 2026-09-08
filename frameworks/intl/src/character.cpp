@@ -109,6 +109,7 @@ std::pair<std::string, int32_t> DetectEncoding(const char* dataStream, size_t le
     UErrorCode status = U_ZERO_ERROR;
     UCharsetDetector* csdet = ucsdet_open(&status);
     if (U_FAILURE(status) || csdet == nullptr) {
+        ucsdet_close(csdet);
         HILOG_ERROR_I18N("DetectEncoding: Open csdet failed, code %{public}s.", u_errorName(status));
         return encodingInfo;
     }

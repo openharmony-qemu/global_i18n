@@ -266,7 +266,7 @@ std::vector<std::string> TimeZoneLocation::GetTimezoneIdList(double lon, double 
             HILOG_ERROR_I18N("GetTimezoneIdList: read tzid Index failed");
             return tzidVect;
         }
-        if (tzIndex > static_cast<int32_t>(tzidNames.size() - 1)) {
+        if (tzIndex < 0 || static_cast<size_t>(tzIndex) >= tzidNames.size()) {
             HILOG_ERROR_I18N("GetTimezoneIdList: tzIndex:%{public}d out of range", tzIndex);
             return tzidVect;
         }
@@ -416,7 +416,7 @@ void TimeZoneLocation::ReadJsonArray(const std::string& jsonArrayStr,
             return;
         }
         int32_t tzidIndex = item->valueint;
-        if (tzidIndex < 0 || tzidIndex > static_cast<int32_t>(tzidNames.size() - 1)) {
+        if (tzidIndex < 0 || static_cast<size_t>(tzidIndex) >= tzidNames.size()) {
             HILOG_ERROR_I18N("ReadJsonArray: tzidIndex: %{public}d out of range", tzidIndex);
             cJSON_Delete(jsonArray);
             return;
@@ -483,7 +483,7 @@ std::vector<std::string> TimeZoneLocation::ReadPoliticalData(const std::string& 
     }
     std::unique_ptr<TzLocationDatFile> datFile =
         std::make_unique<TzLocationDatFile>(realDatPath.c_str());
-    if (!datFile) {
+    if (!datFile || !datFile->get()) {
         HILOG_ERROR_I18N("ReadPoliticalData: open dat file failed");
         return {};
     }
