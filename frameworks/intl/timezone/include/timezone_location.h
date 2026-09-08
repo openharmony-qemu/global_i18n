@@ -72,7 +72,6 @@ private:
     static const char *DISTRO_TIMEZONE_LOCATION_PATH;
     static const char *POLITICAL_DATA_PATH;
     static const char *DISTRO_POLITICAL_DATA_PATH;
-    static const char *DLOPEN_SO_NAME;
     static const char *VENDOR_COUNTRY_KEY;
     static const std::vector<OceanZone> OCEAN_ZONES;
 
@@ -96,7 +95,6 @@ private:
         const std::vector<std::string>& tzidNames, std::vector<std::string>& tzidList);
     bool IsPointOnSegment(const Point& p, const Point& before, const Point& after);
     std::string GetCountryCode();
-    std::string GetISOCountryCode(const char* symbol, void* handler);
     std::string GetCountryCodeFromVendorCountry();
     const char* GetPoliticalDataPath();
     const char* GetTimeZoneLocationDataPath();

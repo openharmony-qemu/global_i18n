@@ -25,6 +25,7 @@
 #include <iostream>
 #include <sys/stat.h>
 #include "locale_config.h"
+#include "sim_card_util.h"
 
 namespace OHOS {
 namespace Global {
@@ -33,7 +34,6 @@ const char *TimeZoneLocation::TIMEZONE_LOCATION_PATH = "/system/usr/ohos_timezon
 const char *TimeZoneLocation::DISTRO_TIMEZONE_LOCATION_PATH = "/system/etc/tzdata_distro/timezone_location.dat";
 const char *TimeZoneLocation::POLITICAL_DATA_PATH = "/system/usr/ohos_timezone/tz_political";
 const char *TimeZoneLocation::DISTRO_POLITICAL_DATA_PATH = "/system/etc/tzdata_distro/tz_political";
-const char *TimeZoneLocation::DLOPEN_SO_NAME = "libzone_util.z.so";
 const char *TimeZoneLocation::VENDOR_COUNTRY_KEY = "const.cust.region";
 
 const std::vector<OceanZone> TimeZoneLocation::OCEAN_ZONES {
@@ -529,18 +529,10 @@ bool TimeZoneLocation::MatchPoliticalDataBlock(FILE* datFile,
 
 std::string TimeZoneLocation::GetCountryCode()
 {
-    void* handler = dlopen(DLOPEN_SO_NAME, RTLD_NOW);
-    if (handler != nullptr) {
-        std::string simCardCountryCode = GetISOCountryCode("GlobalI18nGetCountryCodeFromSimCard", handler);
-        if (!simCardCountryCode.empty()) {
-            dlclose(handler);
-            return simCardCountryCode;
-        }
-        std::string networkCountryCode = GetISOCountryCode("GlobalI18nGetCountryCodeFromNetwork", handler);
-        dlclose(handler);
-        if (!networkCountryCode.empty()) {
-            return networkCountryCode;
-        }
+    std::unique_ptr<SimCardUtil> simCardUtil = std::make_unique<SimCardUtil>();
+    std::string countryCode = simCardUtil->GetCountryCode();
+    if (!countryCode.empty()) {
+        return countryCode;
     }
     std::string vendorCountry = GetCountryCodeFromVendorCountry();
     if (!vendorCountry.empty()) {
@@ -551,23 +543,6 @@ std::string TimeZoneLocation::GetCountryCode()
         return sysRegion;
     }
     return "";
-}
-
-std::string TimeZoneLocation::GetISOCountryCode(const char* symbol, void* handler)
-{
-    GetCountryCodeFunc func = reinterpret_cast<GetCountryCodeFunc>(dlsym(handler, symbol));
-    if (!func) {
-        HILOG_ERROR_I18N("find symbol %{public}s failed", symbol);
-        return "";
-    }
-    char res[RECV_CHAR_LENGTH] = { 0 };
-    int returnCode = func(res, RECV_CHAR_LENGTH);
-    if (returnCode != 0) {
-        HILOG_ERROR_I18N("call %{public}s result:%{public}d", symbol, returnCode);
-        return "";
-    }
-    std::string result(res);
-    return result;
 }
 
 std::string TimeZoneLocation::GetCountryCodeFromVendorCountry()

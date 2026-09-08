@@ -15,8 +15,10 @@
 
 #include <gtest/gtest.h>
 #include <sys/stat.h>
+#include <dlfcn.h>
 #include "i18n_timezone.h"
 #include "timezone_location_test.h"
+#include "sim_card_util.h"
 
 using namespace OHOS::Global::I18n;
 using testing::ext::TestSize;
@@ -953,6 +955,26 @@ HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0006, TestSize.Level1)
     EXPECT_EQ(tzIdList[0], "Asia/Bishkek");
     tzIdList = I18nTimeZone::GetTimezoneIdByLocation(74.43203, 40.13523);
     EXPECT_EQ(tzIdList[0], "Asia/Shanghai");
+}
+
+/**
+ * @tc.name: TimeZoneLocationTest0007
+ * @tc.desc: Test GetISOCountryCode
+ * @tc.type: FUNC
+ */
+HWTEST_F(TimeZoneLocationTest, TimeZoneLocationTest0007, TestSize.Level1)
+{
+    std::unique_ptr<SimCardUtil> simCardUtil = std::make_unique<SimCardUtil>();
+    const char* dlopenSoName = "libzone_util.z.so";
+    void* handler = dlopen(dlopenSoName, RTLD_NOW);
+    if (handler != nullptr) {
+        std::string mccCode = simCardUtil->GetISOCountryCode("GlobalI18nGetCountryCodeFromNetwork", handler);
+        EXPECT_FALSE(mccCode.empty());
+        dlclose(handler);
+    }
+    std::unordered_set<std::string> resultSet;
+    simCardUtil->GetSimCardAndNetworkCountries(resultSet);
+    EXPECT_TRUE(resultSet.size() > 0);
 }
 } // namespace I18n
 } // namespace Global
