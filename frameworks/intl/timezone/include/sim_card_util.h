@@ -12,29 +12,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef GLOBAL_I18N_TIMEZONE_ZONE_RULES_H
-#define GLOBAL_I18N_TIMEZONE_ZONE_RULES_H
+#ifndef GLOBAL_I18N_SIM_CARD_UTIL_H
+#define GLOBAL_I18N_SIM_CARD_UTIL_H
 
-#include <cstring>
-#include "unicode/basictz.h"
-#include "zone_offset_transition.h"
+#include <string>
+#include <unordered_set>
+#include "i18n_hilog.h"
 
 namespace OHOS {
 namespace Global {
 namespace I18n {
-class ZoneRules {
+
+using GetCountryCodeFunc = int (*)(char*, int);
+
+class SimCardUtil {
 public:
-    ZoneRules(const std::string &tzid);
-    ~ZoneRules();
-    std::unique_ptr<ZoneOffsetTransition> NextTransition(double date);
-    std::unique_ptr<ZoneOffsetTransition> NextTransition();
+    SimCardUtil();
+    ~SimCardUtil();
+    void GetSimCardAndNetworkCountries(std::unordered_set<std::string> &resultSet);
+    std::string GetISOCountryCode(const char* symbol, void* handler);
+    std::string GetCountryCode();
 
 private:
-    std::string tzId;
-    std::unique_ptr<icu::BasicTimeZone> btz;
-    void InitBasicTimeZone();
+    static const int RECV_CHAR_LENGTH = 32;
+    static const char *DLOPEN_SO_NAME;
 };
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS
+
 #endif
