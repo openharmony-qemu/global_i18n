@@ -19,7 +19,6 @@
 #include <tuple>
 #include <map>
 #include <vector>
-#include <unordered_set>
 #include "i18n_hilog.h"
 
 namespace OHOS {
@@ -54,8 +53,6 @@ public:
     TimeZoneLocation();
     ~TimeZoneLocation();
     std::vector<std::string> GetTimezoneByLocation(const double lon, const double lat);
-    void GetSimAndNetworkCountries(std::unordered_set<std::string> &resultSet);
-    std::string GetISOCountryCode(const char* symbol, void* handler);
 
 private:
     static const size_t TIMEZONE_ID_LENGTH = 40;
@@ -75,7 +72,6 @@ private:
     static const char *DISTRO_TIMEZONE_LOCATION_PATH;
     static const char *POLITICAL_DATA_PATH;
     static const char *DISTRO_POLITICAL_DATA_PATH;
-    static const char *DLOPEN_SO_NAME;
     static const char *VENDOR_COUNTRY_KEY;
     static const std::vector<OceanZone> OCEAN_ZONES;
 
