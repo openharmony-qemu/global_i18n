@@ -52,7 +52,7 @@ enum class UnitUsage {
 };
 
 struct AdvancedMeasureFormatOptions {
-    UnitUsage unitUsage = DEFAULT;
+    UnitUsage unitUsage = UnitUsage::DEFAULT;
 };
 
 class AdvancedMeasureFormat {

@@ -46,6 +46,7 @@ namespace i18n {
     }
 
     export enum UnitUsage {
+        DEFAULT = 0,
         AREA_LAND_AGRICULT = 1,
         AREA_LAND_COMMERCL = 2,
         AREA_LAND_RESIDNTL = 3,
