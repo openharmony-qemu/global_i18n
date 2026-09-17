@@ -46,12 +46,12 @@ std::string ParseTimezone(napi_env env, napi_value timeZone)
         return "UTC";
     }
     napi_value getIDFunction = nullptr;
-    if (napi_get_named_property(env, timeZone, "getID", &getIDFunction) != napi_ok) {
+    if (napi_get_named_property(env, timeZone, "getID", &getIDFunction) != napi_ok || getIDFunction == nullptr) {
         HILOG_ERROR_I18N("ParseTimezone: Get function failed");
         return "UTC";
     }
     napi_value timeZoneID = nullptr;
-    if (napi_call_function(env, timeZone, getIDFunction, 0, nullptr, &timeZoneID) != napi_ok) {
+    if (napi_call_function(env, timeZone, getIDFunction, 0, nullptr, &timeZoneID) != napi_ok || timeZoneID == nullptr) {
         HILOG_ERROR_I18N("ParseTimezone: Call function failed");
         return "UTC";
     }

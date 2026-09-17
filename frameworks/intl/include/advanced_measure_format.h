@@ -25,6 +25,7 @@ namespace OHOS {
 namespace Global {
 namespace I18n {
 enum class UnitUsage {
+    DEFAULT = 0,
     AREA_LAND_AGRICULT = 1,
     AREA_LAND_COMMERCL = 2,
     AREA_LAND_RESIDNTL = 3,
@@ -51,7 +52,7 @@ enum class UnitUsage {
 };
 
 struct AdvancedMeasureFormatOptions {
-    UnitUsage unitUsage;
+    UnitUsage unitUsage = UnitUsage::DEFAULT;
 };
 
 class AdvancedMeasureFormat {

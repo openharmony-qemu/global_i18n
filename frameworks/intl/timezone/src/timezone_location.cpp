@@ -438,7 +438,7 @@ std::vector<std::string> TimeZoneLocation::GetTimezoneByLocation(
     const char* timezoneLocationPath = GetTimeZoneLocationDataPath();
     std::unique_ptr<TzLocationDatFile> datFile =
         std::make_unique<TzLocationDatFile>(timezoneLocationPath);
-    if (!datFile) {
+    if (!datFile || !datFile->get()) {
         HILOG_ERROR_I18N("GetTimezoneByLocation: open dat file failed");
         return tzidList;
     }
