@@ -525,12 +525,6 @@ ErrCode I18nServiceAbility::SetSystemNumericalDatePattern(const std::string& ide
 
 ErrCode I18nServiceAbility::GetLanguageFromUserId(int32_t userId, std::string& language)
 {
-    int pid = getpid();
-    StartTask(pid);
-#ifdef SUPPORT_MULTI_USER
-    language = MultiUsers::GetLanguageFromUserId(userId);
-#endif
-    FinishTask(pid);
     return ERR_OK;
 }
 
