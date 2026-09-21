@@ -16,10 +16,16 @@
       GlobalI18nGetCountryCodeFromNetwork;
       GlobalI18nGetCountryCodeFromSimCard;
       _ZN4OHOS6Global4I18n8ZoneUtil11GetZoneListERKNSt3__h12basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEERNS3_6vectorIS9_NS7_IS9_EEEE;
+      _ZN4OHOS6Global4I18n8ZoneUtil11GetZoneListERKNSt3__h12basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEEiRNS3_6vectorIS9_NS7_IS9_EEEE;
       _ZN4OHOS6Global4I18n8ZoneUtil14GetDefaultZoneERKNSt3__h12basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEE;
+      _ZN4OHOS6Global4I18n8ZoneUtil14GetDefaultZoneERKNSt3__h12basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEEi;
+      _ZN4OHOS6Global4I18n8ZoneUtil14GetDefaultZoneEi;
+      _ZN4OHOS6Global4I18n8ZoneUtil14GetDefaultZoneEii;
       _ZN4OHOS6Global4I18n8ZoneUtil30LookupTimezoneByCountryAndNITZERNSt3__h12basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEERNS1_8NITZDataE;
+      _ZN4OHOS6Global4I18n8ZoneUtil20LookupTimezoneByNITZERNS1_8NITZDataE;
+      _ZN4OHOS6Global4I18n8ZoneUtil23LookupTimezoneByCountryERNSt3__h12basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEEl;
       _ZTVN6icu_7414StringByteSinkINSt3__h12basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEEEE;
       __emutls_get_address;
     local:
       *;
-}; 
+};
