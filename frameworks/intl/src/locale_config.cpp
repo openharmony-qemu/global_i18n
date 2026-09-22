@@ -1105,7 +1105,11 @@ void LocaleConfig::ReadLangData(const char *langDataPath)
             // 0 represents langid index, 1 represents displayname index
             const char* key = reinterpret_cast<const char *>(langContents[0]);
             const char* value = reinterpret_cast<const char *>(langContents[1]);
-            locale2DisplayName.insert(std::make_pair<std::string, std::string>(key, value));
+            if (key == nullptr || value == nullptr) {
+                HILOG_ERROR_I18N("ReadLangData: key or value is null");
+            } else {
+                locale2DisplayName.insert(std::make_pair<std::string, std::string>(key, value));
+            }
         }
         for (size_t i = 0; i < ELEMENT_NUM; i++) {
             if (langContents[i] != nullptr) {
