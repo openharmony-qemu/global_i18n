@@ -23,6 +23,7 @@
       _ZN4OHOS6Global4I18n8ZoneUtil14GetDefaultZoneEii;
       _ZN4OHOS6Global4I18n8ZoneUtil20LookupTimezoneByNITZERNS1_8NITZDataE;
       _ZN4OHOS6Global4I18n8ZoneUtil23LookupTimezoneByCountryERNSt3__h12basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEEl;
+      _ZN4OHOS6Global4I18n8ZoneUtil23LookupTimezoneByCountryERNSt3__h12basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEEx;
       _ZN4OHOS6Global4I18n8ZoneUtil30LookupTimezoneByCountryAndNITZERNSt3__h12basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEERNS1_8NITZDataE;
       _ZTVN6icu_7414StringByteSinkINSt3__h12basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEEEE;
       __emutls_get_address;
