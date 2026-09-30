@@ -21,9 +21,6 @@ ohos_unittest("zone_util_test") {
   sources = [ "unittest/zone_util_test.cpp" ]
   include_dirs =
       [ "//base/global/i18n/interfaces/native/inner_api/zone/include" ]
-  shared_libs = [
-    "//base/global/i18n/frameworks/zone:zone_util",
-  ]
   deps = [
     "//base/global/i18n/frameworks/intl:intl_util",
     "//base/global/i18n/frameworks/zone:zone_util",
