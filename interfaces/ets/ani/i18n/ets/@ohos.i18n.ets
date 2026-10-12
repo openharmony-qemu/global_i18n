@@ -880,14 +880,14 @@ namespace i18n {
         }
         
         formatRange(startDate: Date | double, endDate: Date | double): string {
-            let startDateTime: double = (startDate instanceof Date) ? startDate.getTime() : startDate;
-            let endDateTime: double = (endDate instanceof Date) ? endDate.getTime() : endDate;
+            let startDateTime: double = (startDate instanceof Date) ? Long.toDouble(startDate.getTime()) : startDate;
+            let endDateTime: double = (endDate instanceof Date) ? Long.toDouble(endDate.getTime()) : endDate;
             return this.formatRangeImpl(startDateTime, endDateTime);
         }
 
         formatRangeToParts(startDate: Date | double, endDate: Date | double): Intl.DateTimeRangeFormatPart[] {
-            let startDateTime: double = (startDate instanceof Date) ? startDate.getTime() : startDate;
-            let endDateTime: double = (endDate instanceof Date) ? endDate.getTime() : endDate;
+            let startDateTime: double = (startDate instanceof Date) ? Long.toDouble(startDate.getTime()) : startDate;
+            let endDateTime: double = (endDate instanceof Date) ? Long.toDouble(endDate.getTime()) : endDate;
             return this.formatRangeToPartsImpl(startDateTime, endDateTime);
         }
 
