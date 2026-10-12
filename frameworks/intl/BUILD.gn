@@ -129,6 +129,7 @@ ohos_shared_library("intl_util") {
       "src/holiday_manager.cpp",
       "src/i18n_break_iterator.cpp",
       "src/i18n_calendar.cpp",
+      "src/i18n_currency.cpp",
       "src/i18n_normalizer.cpp",
       "src/i18n_timezone.cpp",
       "src/index_util.cpp",

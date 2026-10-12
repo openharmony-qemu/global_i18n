@@ -494,6 +494,20 @@ namespace i18n {
         native static getAppDefaultTimeZone(): TimeZone;
     }
 
+    export class Currency {
+        static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
+
+        private nativeCurrency: long = 0;
+
+        constructor(context: long) {
+            if (this.nativeCurrency == 0) {
+                this.nativeCurrency = context;
+            }
+        }
+
+        native getISO4217Code(): string;
+    }
+
     export class Transliterator {
         static { loadLibraryWithPermissionCheck("i18n_ani.z", "@ohos.i18n"); }
 
@@ -1054,6 +1068,7 @@ namespace i18n {
     export native function getLineInstance(locale: string): BreakIterator;
     export native function getInstance(locale?: string): IndexUtil;
     export native function getTimeZone(zoneID?: string): TimeZone;
+    export native function getCurrency(locale: Intl.Locale): Currency;
     export native function getSimpleDateTimeFormatByPattern(pattern: string,
         locale?: Intl.Locale): SimpleDateTimeFormat;
     export native function getSimpleDateTimeFormatBySkeleton(skeleton: string,

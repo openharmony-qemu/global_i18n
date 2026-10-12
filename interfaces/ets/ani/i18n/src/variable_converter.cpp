@@ -21,6 +21,7 @@
 #include "holiday_manager_addon.h"
 #include "i18n_addon.h"
 #include "i18n_calendar_addon.h"
+#include "i18n_currency_addon.h"
 #include "i18n_hilog.h"
 #include "i18n_normalizer_addon.h"
 #include "i18n_timezone_addon.h"
@@ -742,6 +743,7 @@ template ani_object VariableConverter::CreateAniObject<AdvancedMeasureFormatAddo
 template ani_object VariableConverter::CreateAniObject<I18nBreakIteratorAddon>(
     ani_env*, const char*, I18nBreakIteratorAddon*);
 template ani_object VariableConverter::CreateAniObject<I18nCalendarAddon>(ani_env*, const char*, I18nCalendarAddon*);
+template ani_object VariableConverter::CreateAniObject<I18nCurrencyAddon>(ani_env*, const char*, I18nCurrencyAddon*);
 template ani_object VariableConverter::CreateAniObject<I18nEntityRecognizerAddon>(
     ani_env*, const char*, I18nEntityRecognizerAddon*);
 template ani_object VariableConverter::CreateAniObject<I18nHolidayManagerAddon>(

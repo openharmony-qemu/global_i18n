@@ -22,6 +22,7 @@
 #include "error_util.h"
 #include "holiday_manager_addon.h"
 #include "i18n_calendar_addon.h"
+#include "i18n_currency_addon.h"
 #include "i18n_hilog.h"
 #include "i18n_normalizer_addon.h"
 #include "i18n_system_addon.h"
@@ -816,6 +817,8 @@ ani_status I18nAddon::BindContextNamespace(ani_env *env)
             reinterpret_cast<void *>(I18nBreakIteratorAddon::GetLineInstance) },
         ani_native_function { "getInstance", nullptr, reinterpret_cast<void *>(I18nIndexUtilAddon::GetInstance) },
         ani_native_function { "getTimeZone", nullptr, reinterpret_cast<void *>(I18nTimeZoneAddon::GetTimeZone) },
+        ani_native_function { "getCurrency", nullptr,
+            reinterpret_cast<void *>(I18nCurrencyAddon::GetCurrency) },
         ani_native_function { "getSimpleDateTimeFormatByPattern", nullptr,
             reinterpret_cast<void *>(I18nSimpleDateTimeFormatAddon::GetSimpleDateTimeFormatByPattern) },
         ani_native_function { "getSimpleDateTimeFormatBySkeleton", nullptr,
@@ -917,6 +920,11 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
     }
 
     status = I18nTimeZoneAddon::BindContextTimeZone(env);
+    if (status != ANI_OK) {
+        return status;
+    }
+
+    status = I18nCurrencyAddon::BindContextCurrency(env);
     if (status != ANI_OK) {
         return status;
     }
