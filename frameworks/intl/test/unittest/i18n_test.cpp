@@ -2024,17 +2024,14 @@ HWTEST_F(I18nTest, I18nFuncTest077, TestSize.Level1)
  */
 HWTEST_F(I18nTest, I18nFuncTest078, TestSize.Level1)
 {
+    Currency currencyJPY("zh-u-cu-jpy");
+    EXPECT_EQ(currencyJPY.GetISO4217Code(), "JPY");
+    
     Currency currencyLanguageOnly("zh");
-    std::string code = currencyLanguageOnly.GetISO4217Code();
-    EXPECT_FALSE(code.empty());
+    EXPECT_EQ(currencyLanguageOnly.GetISO4217Code(), "CNY");
 
-    Currency currencyEn("en");
-    std::string enCode = currencyEn.GetISO4217Code();
-    EXPECT_FALSE(enCode.empty());
-
-    Currency currencyEmpty("");
-    std::string emptyCode = currencyEmpty.GetISO4217Code();
-    EXPECT_TRUE(emptyCode.empty());
+    Currency currencyRegionOnly("US");
+    EXPECT_EQ(currencyRegionOnly.GetISO4217Code(), "");
 }
 } // namespace I18n
 } // namespace Global

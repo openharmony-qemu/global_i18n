@@ -36,7 +36,6 @@ void I18nCurrencyAddon::Destructor(napi_env env, void *nativeObject, void *hint)
         return;
     }
     delete reinterpret_cast<I18nCurrencyAddon *>(nativeObject);
-    nativeObject = nullptr;
 }
 
 napi_value I18nCurrencyAddon::InitI18nCurrency(napi_env env, napi_value exports)

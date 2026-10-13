@@ -23,11 +23,28 @@ namespace I18n {
 Currency::Currency(const std::string& localeTag)
 {
     UErrorCode status = U_ZERO_ERROR;
-    UChar currency[4] = { 0 };
-    ucurr_forLocale(localeTag.c_str(), currency, sizeof(currency), &status);
+    icu::Locale locale = icu::Locale::forLanguageTag(localeTag.c_str(), status);
     if (U_FAILURE(status)) {
-        HILOG_ERROR_I18N("Currency: ucurr_forLocale failed for %{public}s, "
-            "status: %{public}d", localeTag.c_str(), status);
+        HILOG_ERROR_I18N("Currency: Create icu::Locale failed for localeTag is %{public}s, code is %{public}s",
+            localeTag.c_str(), u_errorName(status));
+        return;
+    }
+    locale.addLikelySubtags(status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("Currency: addLikelySubtags failed, code is %{public}s", u_errorName(status));
+        return;
+    }
+    std::string fullLocale = locale.toLanguageTag<std::string>(status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("Currency: toLanguageTag failed, code is %{public}s", u_errorName(status));
+        return;
+    }
+
+    UChar currency[4] = { 0 };
+    ucurr_forLocale(fullLocale.c_str(), currency, sizeof(currency) / sizeof(UChar), &status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("Currency: ucurr_forLocale failed for %{public}s, code is %{public}s",
+            fullLocale.c_str(), u_errorName(status));
         return;
     }
     icu::UnicodeString ustr(currency);
@@ -36,7 +53,7 @@ Currency::Currency(const std::string& localeTag)
     isoCode_ = result;
 }
 
-std::string Currency::GetISO4217Code()
+std::string Currency::GetISO4217Code() const
 {
     return isoCode_;
 }

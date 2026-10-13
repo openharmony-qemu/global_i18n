@@ -28,7 +28,7 @@ class Currency {
 public:
     explicit Currency(const std::string& localeTag);
     ~Currency() = default;
-    std::string GetISO4217Code();
+    std::string GetISO4217Code() const;
 
 private:
     std::string isoCode_;
