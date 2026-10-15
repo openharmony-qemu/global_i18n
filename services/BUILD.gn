@@ -49,6 +49,7 @@ ohos_shared_library("i18n_sa_client") {
     "./src/i18n_service_ability_load_callback.cpp",
     "./src/i18n_service_ability_load_manager.cpp",
   ]
+  version_script = "libi18n_sa_client.map"
   output_values = get_target_outputs(":i18n_service_interface")
   sources += filter_include(output_values, [ "*_proxy.cpp" ])
   public_configs = [ ":I18n_service_public_config" ]
