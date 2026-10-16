@@ -34,6 +34,7 @@ ohos_shared_library("i18n_ani") {
     "./src/holiday_manager_addon.cpp",
     "./src/i18n_addon.cpp",
     "./src/i18n_calendar_addon.cpp",
+    "./src/i18n_currency_addon.cpp",
     "./src/i18n_normalizer_addon.cpp",
     "./src/i18n_system_addon.cpp",
     "./src/i18n_timezone_addon.cpp",

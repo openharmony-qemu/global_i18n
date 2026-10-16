@@ -17,6 +17,7 @@
 #include "entity_recognizer.h"
 #include "i18n_break_iterator.h"
 #include "i18n_calendar.h"
+#include "i18n_currency.h"
 #include "i18n_normalizer.h"
 #include "i18n_timezone_mock.h"
 #include "locale_config.h"
@@ -1991,6 +1992,46 @@ HWTEST_F(I18nTest, I18nFuncTest076, TestSize.Level1)
     EXPECT_EQ(canonicalLocale, "");
     canonicalLocale = ConvertCanonicalLocaleIdentifier("");
     EXPECT_EQ(canonicalLocale, "");
+}
+
+/**
+ * @tc.name: I18nFuncTest077
+ * @tc.desc: Test Currency GetISO4217Code with valid locales
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest077, TestSize.Level1)
+{
+    Currency currencyUS("en-US");
+    EXPECT_EQ(currencyUS.GetISO4217Code(), "USD");
+
+    Currency currencyCN("zh-CN");
+    EXPECT_EQ(currencyCN.GetISO4217Code(), "CNY");
+
+    Currency currencyJP("ja-JP");
+    EXPECT_EQ(currencyJP.GetISO4217Code(), "JPY");
+
+    Currency currencyGB("en-GB");
+    EXPECT_EQ(currencyGB.GetISO4217Code(), "GBP");
+
+    Currency currencyDE("de-DE");
+    EXPECT_EQ(currencyDE.GetISO4217Code(), "EUR");
+}
+
+/**
+ * @tc.name: I18nFuncTest078
+ * @tc.desc: Test Currency GetISO4217Code with edge cases
+ * @tc.type: FUNC
+ */
+HWTEST_F(I18nTest, I18nFuncTest078, TestSize.Level1)
+{
+    Currency currencyJPY("zh-u-cu-jpy");
+    EXPECT_EQ(currencyJPY.GetISO4217Code(), "JPY");
+    
+    Currency currencyLanguageOnly("zh");
+    EXPECT_EQ(currencyLanguageOnly.GetISO4217Code(), "CNY");
+
+    Currency currencyRegionOnly("US");
+    EXPECT_EQ(currencyRegionOnly.GetISO4217Code(), "");
 }
 } // namespace I18n
 } // namespace Global

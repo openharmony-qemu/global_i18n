@@ -18,6 +18,7 @@
 #include "advanced_measure_format_addon.h"
 #include "chinese_calendar_addon.h"
 #include "error_util.h"
+#include "i18n_currency_addon.h"
 #include "i18n_hilog.h"
 #include "holiday_manager_addon.h"
 #include "entity_recognizer_addon.h"
@@ -178,6 +179,7 @@ napi_value I18nAddon::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("is24HourClock", I18nSystemAddon::Is24HourClock),
         DECLARE_NAPI_FUNCTION("set24HourClock", I18nSystemAddon::Set24HourClock),
         DECLARE_NAPI_FUNCTION("getTimeZone", I18nTimeZoneAddon::GetI18nTimeZone),
+        DECLARE_NAPI_FUNCTION("getCurrency", I18nCurrencyAddon::GetCurrency),
         DECLARE_NAPI_PROPERTY("NormalizerMode", I18nNormalizerAddon::CreateI18NNormalizerModeEnum(env)),
         DECLARE_NAPI_PROPERTY("TemperatureType", CreateTemperatureTypeEnum(env)),
         DECLARE_NAPI_PROPERTY("WeekDay", CreateWeekDayEnum(env)),
@@ -2034,6 +2036,7 @@ napi_value Init(napi_env env, napi_value exports)
     val = I18nAddon::InitI18nIndexUtil(env, val);
     val = I18nAddon::InitI18nUtil(env, val);
     val = I18nTimeZoneAddon::InitI18nTimeZone(env, val);
+    val = I18nCurrencyAddon::InitI18nCurrency(env, val);
     val = I18nAddon::InitI18nTransliterator(env, val);
     val = I18nUnicodeAddon::InitCharacter(env, val);
     val = I18nUnicodeAddon::InitI18nUnicode(env, val);
