@@ -15,6 +15,7 @@
 #ifndef GLOBAL_I18N_INDEX_UTIL_H
 #define GLOBAL_I18N_INDEX_UTIL_H
 
+#include <cstdint>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -26,6 +27,12 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
+enum class BilingualIndexMode {
+    FULL = 0,
+    COMPRESSED_EN = 1,
+    COMPRESSED_LOCAL = 2,
+};
+
 class IndexUtil {
 public:
     explicit IndexUtil(const std::string &localeTag);
@@ -33,14 +40,26 @@ public:
     std::vector<std::string> GetIndexList();
     void AddLocale(const std::string &localeTag);
     std::string GetIndex(const std::string &String);
+    static bool IsBilingualIndexSupported(const std::string &localeTag);
+    std::vector<std::string> GetBilingualIndexList(BilingualIndexMode mode);
+    std::string GetBilingualIndex(const std::string &text);
 
 protected:
     virtual bool IsCreateSuccess();
     virtual bool IsStatusSuccess(UErrorCode status);
 
 private:
-    std::unique_ptr<icu::AlphabeticIndex> index;
+    bool InitLocalIndexList();
+
+    std::unique_ptr<icu::AlphabeticIndex> index = nullptr;
+    std::unique_ptr<icu::AlphabeticIndex> bilingualIndex = nullptr;
+    std::once_flag bucketNumberToLabelFlag;
+    std::unordered_map<int32_t, std::string> bucketNumberToLabel;
+    std::once_flag bilingualIndexListFlag;
+    std::unordered_map<BilingualIndexMode, std::vector<std::string>> bilingualIndexList;
+    std::vector<std::string> localIndexList;
     std::mutex indexMutex;
+    bool isBilingualIndexSupported = false;
     bool createSuccess = false;
 };
 } // namespace I18n
