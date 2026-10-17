@@ -1963,30 +1963,26 @@ napi_value I18nAddon::GetBilingualIndexList(napi_env env, napi_callback_info inf
         HILOG_ERROR_I18N("GetBilingualIndexList: get cb info failed");
         return nullptr;
     }
-    if (argc < 0) {
-        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "mode", "", true);
-        return nullptr;
-    }
-    napi_valuetype valueType = napi_valuetype::napi_undefined;
-    status = napi_typeof(env, argv[0], &valueType);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("GetBilingualIndexList: Get type failed.");
-        return nullptr;
-    }
-    if (valueType != napi_valuetype::napi_number) {
-        if (valueType == napi_valuetype::napi_undefined) {
-            ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "mode", "", true);
+    int32_t mode = 0;
+    if (argc > 0) {
+        napi_valuetype valueType = napi_valuetype::napi_undefined;
+        status = napi_typeof(env, argv[0], &valueType);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("GetBilingualIndexList: Get type failed.");
             return nullptr;
         }
-        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "mode", "BilingualIndexMode", true);
-        return nullptr;
+        if (valueType == napi_valuetype::napi_number) {
+            status = napi_get_value_int32(env, argv[0], &mode);
+            if (status != napi_ok) {
+                HILOG_ERROR_I18N("GetBilingualIndexList: get mode failed");
+                return nullptr;
+            }
+        } else if (valueType != napi_valuetype::napi_undefined) {
+            ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "mode", "BilingualIndexMode", true);
+            return nullptr;
+        }
     }
-    int32_t mode = 0;
-    status = napi_get_value_int32(env, argv[0], &mode);
-    if (status != napi_ok) {
-        HILOG_ERROR_I18N("GetBilingualIndexList: get mode failed");
-        return nullptr;
-    }
+
     I18nAddon *obj = nullptr;
     status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
     if (status != napi_ok || !obj || !obj->indexUtil_) {
