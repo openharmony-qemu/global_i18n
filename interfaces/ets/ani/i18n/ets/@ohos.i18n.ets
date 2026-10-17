@@ -71,6 +71,12 @@ namespace i18n {
         SIZE_SHORTFILE_BYTE = 23
     }
 
+    export enum BilingualIndexMode {
+        FULL = 0,
+        COMPRESSED_EN = 1,
+        COMPRESSED_LOCAL = 2
+    }
+
     export interface UnitInfo {
         unit: string;
         measureSystem: string;
@@ -408,6 +414,9 @@ namespace i18n {
         native getIndexList(): Array<string>;
         native addLocale(locale: string): void;
         native getIndex(text: string): string;
+        native static isBilingualIndexSupported(locale: Intl.Locale): boolean;
+        native getBilingualIndexList(mode?: BilingualIndexMode): Array<string>;
+        native getBilingualIndex(text: string): string;
     }
 
     export interface EncodingInfo {
