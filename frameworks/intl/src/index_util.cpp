@@ -24,30 +24,91 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
+namespace {
+constexpr const char* OVERFLOW_LABEL = "…";
+constexpr const char* NO_INDEX_LABEL = "#";
+constexpr const char* COMPRESSED_EN_LABEL = "Z";
+constexpr const char* ENGLISH_LOCALE = "en";
+std::vector<std::string> EN_INDEX_LABELS = {
+    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N",
+    "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
+};
+std::unordered_set<std::string> SUPPORTED_BILINGUA_INDEX_LANGUAGE = {
+    "am", "ar", "as", "sr", "be", "bg", "bn", "el", "fa", "gu", "hi", "he", "ja",
+    "ka", "kk", "km", "kn", "ko", "lo", "mai", "mk", "ml", "mn", "mr", "my", "ne",
+    "or", "pa", "ru", "si", "ta", "te", "th", "ug", "uk", "ur"
+};
+std::unordered_set<std::string> SUPPORTED_BILINGUA_INDEX_SCRIPT = {
+    "zh-Hant"
+};
+}
+
 IndexUtil::IndexUtil(const std::string &localeTag)
 {
+    std::string locale = localeTag.empty() ? LocaleConfig::GetEffectiveLocale() : localeTag;
+    locale = LocaleConfig::RemoveCustExtParam(locale);
     UErrorCode status = U_ZERO_ERROR;
-    if (localeTag.empty()) {
-        std::string sysLocale = LocaleConfig::GetEffectiveLocale();
-        sysLocale = LocaleConfig::RemoveCustExtParam(sysLocale);
-        if (sysLocale.empty()) {
-            HILOG_ERROR_I18N("IndexUtil::IndexUtil: get system locale failed.");
+    icu::Locale icuLocale = icu::Locale::forLanguageTag(locale.c_str(), status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("IndexUtil: Create icu::Locale failed, code is %{public}s", u_errorName(status));
+        return;
+    }
+
+    index = std::make_unique<icu::AlphabeticIndex>(icuLocale, status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("IndexUtil: Create index failed, code is %{public}s", u_errorName(status));
+        return;
+    }
+    bilingualIndex = std::make_unique<icu::AlphabeticIndex>(icuLocale, status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("IndexUtil: Create bilingualIndex failed, code is %{public}s", u_errorName(status));
+        return;
+    }
+    if (!InitLocalIndexList()) {
+        return;
+    }
+    isBilingualIndexSupported = IndexUtil::IsBilingualIndexSupported(locale);
+    if (isBilingualIndexSupported) {
+        icu::Locale enIcuLocale = icu::Locale::forLanguageTag(ENGLISH_LOCALE, status);
+        if (U_FAILURE(status)) {
+            HILOG_ERROR_I18N("IndexUtil: Create EN icu::Locale failed, code is %{public}s", u_errorName(status));
             return;
         }
-        icu::Locale locale(sysLocale.c_str());
-        index = std::make_unique<icu::AlphabeticIndex>(locale, status);
-    } else {
-        std::string curLocale = LocaleConfig::RemoveCustExtParam(localeTag);
-        icu::Locale locale(curLocale.c_str());
-        index = std::make_unique<icu::AlphabeticIndex>(locale, status);
+        bilingualIndex->addLabels(enIcuLocale, status);
+        if (U_FAILURE(status)) {
+            HILOG_ERROR_I18N("IndexUtil: addLabels failed, code is %{public}s", u_errorName(status));
+            return;
+        }
     }
-    if (U_SUCCESS(status) && index != nullptr) {
-        createSuccess = true;
-    }
+    createSuccess = true;
 }
 
 IndexUtil::~IndexUtil()
 {
+}
+
+bool IndexUtil::InitLocalIndexList()
+{
+    UErrorCode status = U_ZERO_ERROR;
+    bilingualIndex->resetBucketIterator(status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("InitLocalIndex: resetBucketIterator failed, code is %{public}s", u_errorName(status));
+        return false;
+    }
+    while (bilingualIndex->nextBucket(status)) {
+        if (U_FAILURE(status)) {
+            HILOG_ERROR_I18N("InitLocalIndex: nextBucket failed, code is %{public}s", u_errorName(status));
+            return false;
+        }
+        std::string label;
+        bilingualIndex->getBucketLabel().toUTF8String(label);
+        localIndexList.emplace_back(label);
+    }
+    localIndexList.erase(
+        std::remove_if(localIndexList.begin(), localIndexList.end(),
+            [](const std::string &s) { return s.empty() || s == OVERFLOW_LABEL; }),
+        localIndexList.end());
+    return true;
 }
 
 std::vector<std::string> IndexUtil::GetIndexList()
@@ -113,6 +174,105 @@ bool IndexUtil::IsCreateSuccess()
 bool IndexUtil::IsStatusSuccess(UErrorCode status)
 {
     return U_SUCCESS(status);
+}
+
+bool IndexUtil::IsBilingualIndexSupported(const std::string &localeTag)
+{
+    UErrorCode status = U_ZERO_ERROR;
+    std::string curLocale = LocaleConfig::RemoveCustExtParam(localeTag);
+    icu::Locale locale = icu::Locale::forLanguageTag(curLocale, status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("IsBilingualIndexSupported: forLanguageTag failed");
+        return false;
+    }
+    std::string language = locale.getLanguage();
+    if (SUPPORTED_BILINGUA_INDEX_LANGUAGE.find(language) != SUPPORTED_BILINGUA_INDEX_LANGUAGE.end()) {
+        return true;
+    }
+    std::string script = locale.getScript();
+    language += "-" + script;
+    return SUPPORTED_BILINGUA_INDEX_SCRIPT.find(language) != SUPPORTED_BILINGUA_INDEX_SCRIPT.end();
+}
+
+std::vector<std::string> IndexUtil::GetBilingualIndexList(BilingualIndexMode mode)
+{
+    if (!IsCreateSuccess()) {
+        HILOG_ERROR_I18N("GetBilingualIndexList: bilingualIndex init failed");
+        return {};
+    }
+    std::call_once(bilingualIndexListFlag, [this]() {
+            if (localIndexList.empty()) {
+                HILOG_ERROR_I18N("GetBilingualIndexList: Get local list failed");
+                return;
+            }
+            std::vector<std::string> fullList = { NO_INDEX_LABEL };
+            fullList.insert(fullList.end(), localIndexList.begin(), localIndexList.end());
+            if (!isBilingualIndexSupported) {
+                bilingualIndexList.insert(std::make_pair(BilingualIndexMode::FULL, fullList));
+                bilingualIndexList.insert(std::make_pair(BilingualIndexMode::COMPRESSED_EN, fullList));
+                bilingualIndexList.insert(std::make_pair(BilingualIndexMode::COMPRESSED_LOCAL, fullList));
+                return;
+            }
+            std::vector<std::string> compressedEnList = { NO_INDEX_LABEL };
+            std::vector<std::string> compressedLocalList { NO_INDEX_LABEL };
+            fullList.insert(fullList.end(), EN_INDEX_LABELS.begin(), EN_INDEX_LABELS.end());
+            compressedEnList.insert(compressedEnList.end(), localIndexList.begin(), localIndexList.end());
+            compressedEnList.emplace_back(COMPRESSED_EN_LABEL);
+            compressedLocalList.emplace_back(localIndexList[0]);
+            compressedLocalList.insert(compressedLocalList.end(), EN_INDEX_LABELS.begin(), EN_INDEX_LABELS.end());
+            bilingualIndexList.insert(std::make_pair(BilingualIndexMode::FULL, fullList));
+            bilingualIndexList.insert(std::make_pair(BilingualIndexMode::COMPRESSED_EN, compressedEnList));
+            bilingualIndexList.insert(std::make_pair(BilingualIndexMode::COMPRESSED_LOCAL, compressedLocalList));
+        });
+
+    auto iter = bilingualIndexList.find(mode);
+    if (iter == bilingualIndexList.end()) {
+        return {};
+    }
+    return iter->second;
+}
+
+std::string IndexUtil::GetBilingualIndex(const std::string &text)
+{
+    if (!IsCreateSuccess()) {
+        HILOG_ERROR_I18N("GetBilingualIndex: bilingualIndex init failed");
+        return NO_INDEX_LABEL;
+    }
+    if (text.empty()) {
+        return NO_INDEX_LABEL;
+    }
+    std::call_once(bucketNumberToLabelFlag, [this]() {
+            UErrorCode status = U_ZERO_ERROR;
+            bilingualIndex->resetBucketIterator(status);
+            if (U_FAILURE(status)) {
+                HILOG_ERROR_I18N("GetBilingualIndex: resetBucketIterator failed, code is %{public}s",
+                    u_errorName(status));
+                return;
+            }
+            int32_t bucketCount = 0;
+            while (bilingualIndex->nextBucket(status)) {
+                if (U_FAILURE(status)) {
+                    HILOG_ERROR_I18N("GetBilingualIndex: nextBucket failed, code is %{public}s", u_errorName(status));
+                    break;
+                }
+                std::string label;
+                bilingualIndex->getBucketLabel().toUTF8String(label);
+                bucketNumberToLabel.insert(std::make_pair(bucketCount++, label));
+            }
+        });
+
+    UErrorCode status = U_ZERO_ERROR;
+    int32_t bucketNumber = bilingualIndex->getBucketIndex(text.c_str(), status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("GetBilingualIndex: getBucketIndex failed, code is %{public}s", u_errorName(status));
+        return NO_INDEX_LABEL;
+    }
+    auto iter = bucketNumberToLabel.find(bucketNumber);
+    if (iter == bucketNumberToLabel.end() || iter->second == OVERFLOW_LABEL) {
+        HILOG_ERROR_I18N("GetBilingualIndex: Get label failed, bucketNumber is %{public}d", bucketNumber);
+        return NO_INDEX_LABEL;
+    }
+    return iter->second;
 }
 } // namespace I18n
 } // namespace Global
