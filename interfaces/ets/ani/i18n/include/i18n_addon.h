@@ -62,6 +62,9 @@ public:
     static ani_object GetIndexList(ani_env *env, ani_object object);
     static void AddLocale(ani_env *env, ani_object object, ani_string locale);
     static ani_object GetIndex(ani_env *env, ani_object object, ani_string text);
+    static ani_boolean IsBilingualIndexSupported(ani_env *env, ani_object object, ani_object locale);
+    static ani_object GetBilingualIndexList(ani_env *env, ani_object object, ani_enum_item mode);
+    static ani_object GetBilingualIndex(ani_env *env, ani_object object, ani_string text);
     static ani_status BindContextIndexUtil(ani_env *env);
 private:
     std::unique_ptr<IndexUtil> indexUtil_ = nullptr;
