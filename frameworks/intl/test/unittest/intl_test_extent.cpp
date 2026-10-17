@@ -2082,6 +2082,70 @@ HWTEST_F(IntlTest, IntlFuncTest00105, TestSize.Level1)
     res = LocaleConfig::SetUnicodeWrappedBidiDirection(text, direction);
     EXPECT_EQ(res, text);
 }
+
+/**
+ * @tc.name: IntlFuncTest00106
+ * @tc.desc: Test IsBilingualIndexSupported
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest00106, TestSize.Level1)
+{
+    EXPECT_TRUE(IndexUtil::IsBilingualIndexSupported("zh-Hant-TW"));
+    EXPECT_TRUE(IndexUtil::IsBilingualIndexSupported("ko-KR"));
+    EXPECT_TRUE(IndexUtil::IsBilingualIndexSupported("ar-SA"));
+    EXPECT_TRUE(IndexUtil::IsBilingualIndexSupported("ja-JP"));
+    EXPECT_FALSE(IndexUtil::IsBilingualIndexSupported("zh-CN"));
+}
+
+/**
+ * @tc.name: IntlFuncTest00107
+ * @tc.desc: Test GetBilingualIndexList
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest00107, TestSize.Level1)
+{
+    auto indexUtil = std::make_unique<IndexUtil>("zh-CN");
+    ASSERT_TRUE(indexUtil != nullptr);
+    std::vector<std::string> fullIndexList = indexUtil->GetBilingualIndexList(BilingualIndexMode::FULL);
+    std::vector<std::string> enIndexList = indexUtil->GetBilingualIndexList(BilingualIndexMode::COMPRESSED_EN);
+    std::vector<std::string> LocalIndexList = indexUtil->GetBilingualIndexList(BilingualIndexMode::COMPRESSED_LOCAL);
+    EXPECT_FALSE(fullIndexList.empty());
+    EXPECT_FALSE(enIndexList.empty());
+    EXPECT_FALSE(LocalIndexList.empty());
+    EXPECT_EQ(fullIndexList[0], "#");
+    EXPECT_EQ(enIndexList[0], "#");
+    EXPECT_EQ(LocalIndexList[0], "#");
+    EXPECT_EQ(fullIndexList.size(), 27);
+    EXPECT_EQ(enIndexList.size(), 27);
+    EXPECT_EQ(LocalIndexList.size(), 27);
+    EXPECT_EQ(indexUtil->GetBilingualIndex("中文"), "Z");
+    EXPECT_EQ(indexUtil->GetBilingualIndex("Chinese"), "C");
+}
+
+/**
+ * @tc.name: IntlFuncTest00108
+ * @tc.desc: Test GetBilingualIndexList
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntlTest, IntlFuncTest00108, TestSize.Level1)
+{
+    auto indexUtil = std::make_unique<IndexUtil>("ar-AE");
+    ASSERT_TRUE(indexUtil != nullptr);
+    std::vector<std::string> fullIndexList = indexUtil->GetBilingualIndexList(BilingualIndexMode::FULL);
+    std::vector<std::string> enIndexList = indexUtil->GetBilingualIndexList(BilingualIndexMode::COMPRESSED_EN);
+    std::vector<std::string> LocalIndexList = indexUtil->GetBilingualIndexList(BilingualIndexMode::COMPRESSED_LOCAL);
+    EXPECT_FALSE(fullIndexList.empty());
+    EXPECT_FALSE(enIndexList.empty());
+    EXPECT_FALSE(LocalIndexList.empty());
+    EXPECT_EQ(fullIndexList[0], "#");
+    EXPECT_EQ(enIndexList[0], "#");
+    EXPECT_EQ(LocalIndexList[0], "#");
+    EXPECT_EQ(fullIndexList.size(), 55);
+    EXPECT_EQ(enIndexList.size(), 30);
+    EXPECT_EQ(LocalIndexList.size(), 28);
+    EXPECT_EQ(indexUtil->GetBilingualIndex("الصينية"), "ا");
+    EXPECT_EQ(indexUtil->GetBilingualIndex("Chinese"), "C");
+}
 } // namespace I18n
 } // namespace Global
 } // namespace OHOS

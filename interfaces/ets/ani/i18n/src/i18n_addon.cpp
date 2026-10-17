@@ -319,6 +319,68 @@ ani_object I18nIndexUtilAddon::GetIndex(ani_env *env, ani_object object, ani_str
     return VariableConverter::StringToAniStr(env, index);
 }
 
+ani_boolean I18nIndexUtilAddon::IsBilingualIndexSupported(ani_env *env,
+    [[maybe_unused]] ani_object object, ani_object locale)
+{
+    ani_boolean isUndefined;
+    if (ANI_OK != env->Reference_IsUndefined(locale, &isUndefined)) {
+        HILOG_ERROR_I18N("IsBilingualIndexSupported: Check locale undefined failed");
+        return false;
+    }
+    if (isUndefined) {
+        ErrorUtil::AniThrow(env, I18N_NOT_FOUND, "locale", "");
+        return false;
+    }
+    std::string localeTag = VariableConverter::GetLocaleTagFromBuiltinLocale(env, locale);
+    return IndexUtil::IsBilingualIndexSupported(localeTag);
+}
+
+ani_object I18nIndexUtilAddon::GetBilingualIndexList(ani_env *env, ani_object object, ani_enum_item mode)
+{
+    ani_boolean isUndefined;
+    if (ANI_OK != env->Reference_IsUndefined(mode, &isUndefined)) {
+        HILOG_ERROR_I18N("GetBilingualIndexList: Check mode undefined failed");
+        return nullptr;
+    }
+    int32_t modeValue = 0;
+    if (!isUndefined) {
+        if (ANI_OK != env->EnumItem_GetValue_Int(mode, &modeValue)) {
+            HILOG_ERROR_I18N("GetBilingualIndexList: get enum value failed");
+            return nullptr;
+        }
+    }
+
+    I18nIndexUtilAddon* obj = UnwrapAddon(env, object);
+    if (obj == nullptr || obj->indexUtil_ == nullptr) {
+        HILOG_ERROR_I18N("GetBilingualIndexList: Get IndexUtil object failed");
+        return nullptr;
+    }
+    std::vector<std::string> indexList = obj->indexUtil_->GetBilingualIndexList(
+        static_cast<BilingualIndexMode>(modeValue));
+    return VariableConverter::CreateArray(env, indexList);
+}
+
+ani_object I18nIndexUtilAddon::GetBilingualIndex(ani_env *env, ani_object object, ani_string text)
+{
+    ani_boolean isUndefined;
+    if (ANI_OK != env->Reference_IsUndefined(text, &isUndefined)) {
+        HILOG_ERROR_I18N("GetBilingualIndexList: Check text undefined failed");
+        return nullptr;
+    }
+    if (isUndefined) {
+        ErrorUtil::AniThrow(env, I18N_NOT_FOUND, "text", "");
+        return nullptr;
+    }
+    I18nIndexUtilAddon* obj = UnwrapAddon(env, object);
+    if (obj == nullptr || obj->indexUtil_ == nullptr) {
+        HILOG_ERROR_I18N("GetBilingualIndex: Get IndexUtil object failed");
+        return nullptr;
+    }
+    std::string index = obj->indexUtil_->GetBilingualIndex(
+        VariableConverter::AniStrToString(env, text));
+    return VariableConverter::StringToAniStr(env, index);
+}
+
 I18nTransliteratorAddon* I18nTransliteratorAddon::UnwrapAddon(ani_env *env, ani_object object)
 {
     ani_long ptr;
@@ -729,12 +791,25 @@ ani_status I18nIndexUtilAddon::BindContextIndexUtil(ani_env *env)
         ani_native_function { "getIndexList", nullptr, reinterpret_cast<void *>(I18nIndexUtilAddon::GetIndexList) },
         ani_native_function { "addLocale", nullptr, reinterpret_cast<void *>(I18nIndexUtilAddon::AddLocale) },
         ani_native_function { "getIndex", nullptr, reinterpret_cast<void *>(I18nIndexUtilAddon::GetIndex) },
+        ani_native_function { "getBilingualIndexList", nullptr,
+            reinterpret_cast<void *>(I18nIndexUtilAddon::GetBilingualIndexList) },
+        ani_native_function { "getBilingualIndex", nullptr,
+            reinterpret_cast<void *>(I18nIndexUtilAddon::GetBilingualIndex) },
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
         HILOG_ERROR_I18N("BindContextIndexUtil: Cannot bind native methods to '%{public}s'", className);
         return ANI_ERROR;
     };
+
+    std::array staticMethods = {
+        ani_native_function { "isBilingualIndexSupported", nullptr,
+            reinterpret_cast<void *>(I18nIndexUtilAddon::IsBilingualIndexSupported) },
+    };
+    if (ANI_OK != env->Class_BindStaticNativeMethods(cls, staticMethods.data(), staticMethods.size())) {
+        HILOG_ERROR_I18N("BindContextIndexUtil: Cannot bind static native methods to '%{public}s'", className);
+        return ANI_ERROR;
+    }
 
     return ANI_OK;
 }

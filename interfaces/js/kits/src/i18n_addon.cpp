@@ -103,6 +103,12 @@ std::unordered_map<std::string, int32_t> I18nAddon::EnumUnitUsage {
     { "SIZE_SHORTFILE_BYTE", 23 }
 };
 
+std::unordered_map<std::string, int32_t> I18nAddon::EnumBilingualIndexMode {
+    { "FULL", static_cast<int32_t>(BilingualIndexMode::FULL) },
+    { "COMPRESSED_EN", static_cast<int32_t>(BilingualIndexMode::COMPRESSED_EN) },
+    { "COMPRESSED_LOCAL", static_cast<int32_t>(BilingualIndexMode::COMPRESSED_LOCAL) }
+};
+
 I18nAddon::I18nAddon() {}
 
 I18nAddon::~I18nAddon()
@@ -183,7 +189,8 @@ napi_value I18nAddon::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("NormalizerMode", I18nNormalizerAddon::CreateI18NNormalizerModeEnum(env)),
         DECLARE_NAPI_PROPERTY("TemperatureType", CreateTemperatureTypeEnum(env)),
         DECLARE_NAPI_PROPERTY("WeekDay", CreateWeekDayEnum(env)),
-        DECLARE_NAPI_PROPERTY("UnitUsage", CreateUnitUsageEnum(env))
+        DECLARE_NAPI_PROPERTY("UnitUsage", CreateUnitUsageEnum(env)),
+        DECLARE_NAPI_PROPERTY("BilingualIndexMode", CreateBilingualIndexModeEnum(env))
     };
     napi_status initStatus = napi_define_properties(env, exports, sizeof(properties) / sizeof(napi_property_descriptor),
         properties);
@@ -1220,7 +1227,9 @@ napi_value I18nAddon::InitI18nIndexUtil(napi_env env, napi_value exports)
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("getIndexList", GetIndexList),
         DECLARE_NAPI_FUNCTION("addLocale", AddLocale),
-        DECLARE_NAPI_FUNCTION("getIndex", GetIndex)
+        DECLARE_NAPI_FUNCTION("getIndex", GetIndex),
+        DECLARE_NAPI_FUNCTION("getBilingualIndexList", GetBilingualIndexList),
+        DECLARE_NAPI_FUNCTION("getBilingualIndex", GetBilingualIndex)
     };
 
     napi_value constructor = nullptr;
@@ -1246,7 +1255,9 @@ napi_value I18nAddon::InitIndexUtil(napi_env env, napi_value exports)
         return nullptr;
     }
 
-    napi_property_descriptor properties[] = {};
+    napi_property_descriptor properties[] = {
+        DECLARE_NAPI_STATIC_FUNCTION("isBilingualIndexSupported", IsBilingualIndexSupported)
+    };
     napi_value constructor = nullptr;
     napi_status status = napi_define_class(env, "I18nIndexUtil", NAPI_AUTO_LENGTH, JSUtils::DefaultConstructor,
         nullptr, sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
@@ -1917,6 +1928,117 @@ napi_value I18nAddon::GetIndex(napi_env env, napi_callback_info info)
     return result;
 }
 
+napi_value I18nAddon::IsBilingualIndexSupported(napi_env env, napi_callback_info info)
+{
+    size_t argc = 1;
+    napi_value argv[1] = { nullptr };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("IsBilingualIndexSupported: Get cb info failed");
+        return nullptr;
+    }
+    if (argc < 1 || VariableConvertor::IsUndefined(env, argv[0])) {
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "locale", "", true);
+        return nullptr;
+    }
+    if (VariableConvertor::GetLocaleTypeNoThrow(env, argv[0]) != LocaleType::BUILTINS_LOCALE) {
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "locale", "Intl.Locale", true);
+        return nullptr;
+    }
+    std::string localeTag = VariableConvertor::ParseBuiltinsLocale(env, argv[0]);
+    bool supported = IndexUtil::IsBilingualIndexSupported(localeTag);
+    return VariableConvertor::CreateBoolean(env, supported);
+}
+
+napi_value I18nAddon::GetBilingualIndexList(napi_env env, napi_callback_info info)
+{
+    size_t argc = 1;
+    napi_value argv[1] = { 0 };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("GetBilingualIndexList: get cb info failed");
+        return nullptr;
+    }
+    int32_t mode = 0;
+    if (argc > 0) {
+        napi_valuetype valueType = napi_valuetype::napi_undefined;
+        status = napi_typeof(env, argv[0], &valueType);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("GetBilingualIndexList: Get type failed.");
+            return nullptr;
+        }
+        if (valueType == napi_valuetype::napi_number) {
+            status = napi_get_value_int32(env, argv[0], &mode);
+            if (status != napi_ok) {
+                HILOG_ERROR_I18N("GetBilingualIndexList: get mode failed");
+                return nullptr;
+            }
+        } else if (valueType != napi_valuetype::napi_undefined) {
+            ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "mode", "BilingualIndexMode", true);
+            return nullptr;
+        }
+    }
+
+    I18nAddon *obj = nullptr;
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
+    if (status != napi_ok || !obj || !obj->indexUtil_) {
+        HILOG_ERROR_I18N("GetBilingualIndexList: Get IndexUtil object failed");
+        return nullptr;
+    }
+    std::vector<std::string> indexList = obj->indexUtil_->GetBilingualIndexList(
+        static_cast<BilingualIndexMode>(mode));
+    return JSUtils::CreateArray(env, indexList);
+}
+
+napi_value I18nAddon::GetBilingualIndex(napi_env env, napi_callback_info info)
+{
+    size_t argc = 1;
+    napi_value argv[1] = { 0 };
+    napi_value thisVar = nullptr;
+    void *data = nullptr;
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, &thisVar, &data);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("GetBilingualIndex: get cb info failed");
+        return nullptr;
+    }
+    if (argc < 0) {
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "text", "", true);
+        return nullptr;
+    }
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    status = napi_typeof(env, argv[0], &valueType);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("GetBilingualIndex: Get type failed");
+        return nullptr;
+    }
+    if (valueType != napi_valuetype::napi_string) {
+        if (valueType == napi_valuetype::napi_undefined) {
+            ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "text", "", true);
+            return nullptr;
+        }
+        ErrorUtil::NapiThrowBusinessError(env, I18N_NOT_FOUND, "text", "string", true);
+        return nullptr;
+    }
+    int32_t code = 0;
+    std::string text = VariableConvertor::GetString(env, argv[0], code);
+    if (code) {
+        HILOG_ERROR_I18N("GetBilingualIndex: GetString failed, code: %{public}d", code);
+        return nullptr;
+    }
+    I18nAddon *obj = nullptr;
+    status = napi_unwrap_s(env, thisVar, &TYPE_TAG, reinterpret_cast<void **>(&obj));
+    if (status != napi_ok || !obj || !obj->indexUtil_) {
+        HILOG_ERROR_I18N("GetBilingualIndex: Get IndexUtil object failed");
+        return nullptr;
+    }
+    std::string index = obj->indexUtil_->GetBilingualIndex(text);
+    return VariableConvertor::CreateString(env, index);
+}
+
 napi_value I18nAddon::ObjectConstructor(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
@@ -2024,6 +2146,27 @@ napi_value I18nAddon::CreateUnitUsageEnum(napi_env env)
         }
     }
     return unitUsage;
+}
+
+napi_value I18nAddon::CreateBilingualIndexModeEnum(napi_env env)
+{
+    napi_value bilingualIndexMode = nullptr;
+    napi_status status = napi_create_object(env, &bilingualIndexMode);
+    if (status != napi_ok) {
+        HILOG_ERROR_I18N("I18nAddon::CreateBilingualIndexModeEnum: Create bilingualIndexMode failed.");
+        return nullptr;
+    }
+    for (auto& nameToValue : EnumBilingualIndexMode) {
+        std::string name = nameToValue.first;
+        int32_t value = nameToValue.second;
+        status = VariableConvertor::SetEnumValue(env, bilingualIndexMode, name, value);
+        if (status != napi_ok) {
+            HILOG_ERROR_I18N("I18nAddon::CreateBilingualIndexModeEnum: set enum name"
+                " %{public}s failed.", name.c_str());
+            return nullptr;
+        }
+    }
+    return bilingualIndexMode;
 }
 
 napi_value Init(napi_env env, napi_value exports)

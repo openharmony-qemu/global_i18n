@@ -20,6 +20,10 @@
 namespace OHOS {
 namespace Global {
 namespace I18n {
+namespace {
+constexpr size_t CURRENCY_CACHE_LENGTH = 4;
+}
+
 Currency::Currency(const std::string& localeTag)
 {
     UErrorCode status = U_ZERO_ERROR;
@@ -40,7 +44,7 @@ Currency::Currency(const std::string& localeTag)
         return;
     }
 
-    UChar currency[4] = { 0 };
+    UChar currency[CURRENCY_CACHE_LENGTH] = { 0 };
     ucurr_forLocale(fullLocale.c_str(), currency, sizeof(currency) / sizeof(UChar), &status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("Currency: ucurr_forLocale failed for %{public}s, code is %{public}s",

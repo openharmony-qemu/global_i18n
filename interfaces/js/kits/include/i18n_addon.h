@@ -63,6 +63,7 @@ public:
     static napi_value System(napi_env env, napi_value exports);
     static napi_value GetUnicodeWrappedFilePath(napi_env env, napi_callback_info info);
     static napi_value SetUnicodeWrappedBidiDirection(napi_env env, napi_callback_info info);
+    static napi_value IsBilingualIndexSupported(napi_env env, napi_callback_info info);
 
 private:
     static napi_value PhoneNumberFormatConstructor(napi_env env, napi_callback_info info);
@@ -89,6 +90,8 @@ private:
     static napi_value GetIndexList(napi_env env, napi_callback_info info);
     static napi_value AddLocale(napi_env env, napi_callback_info info);
     static napi_value GetIndex(napi_env env, napi_callback_info info);
+    static napi_value GetBilingualIndexList(napi_env env, napi_callback_info info);
+    static napi_value GetBilingualIndex(napi_env env, napi_callback_info info);
     bool InitIndexUtilContext(napi_env env, napi_callback_info info, const std::string &localeTag);
 
     static napi_value Transform(napi_env env, napi_callback_info info);
@@ -109,10 +112,12 @@ private:
     static napi_value CreateTemperatureTypeEnum(napi_env env);
     static napi_value CreateWeekDayEnum(napi_env env);
     static napi_value CreateUnitUsageEnum(napi_env env);
+    static napi_value CreateBilingualIndexModeEnum(napi_env env);
 
     static std::unordered_map<std::string, int32_t> EnumTemperatureType;
     static std::unordered_map<std::string, int32_t> EnumWeekDay;
     static std::unordered_map<std::string, int32_t> EnumUnitUsage;
+    static std::unordered_map<std::string, int32_t> EnumBilingualIndexMode;
     static constexpr napi_type_tag TYPE_TAG = { 0xa99834c262b94a95, 0xa82b197a507861f8 };
     static const char PATH_SEPARATOR = '/';
 
