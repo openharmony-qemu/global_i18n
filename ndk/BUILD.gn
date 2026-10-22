@@ -29,6 +29,7 @@ ohos_shared_library("native_i18n") {
   remove_configs = [ "//build/config/compiler:no_rtti" ]
 
   sources = [ "src/timezone.cpp" ]
+  version_script = "libohi18n.map"
   deps = [ "//base/global/i18n/frameworks/intl:intl_util" ]
   external_deps = [ 
     "c_utils:utils",
