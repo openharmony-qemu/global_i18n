@@ -26,8 +26,6 @@
         OH_i18n_GetStartInYear;
         _init;
         _fini;
-        _Unwind_Resume;
-        _Unwind_RaiseException;
 
     local:
         *;
