@@ -16,6 +16,7 @@
 
 #include "i18n_hilog.h"
 #include "locale_config.h"
+#include "unicode/localebuilder.h"
 #include "unicode/locid.h"
 #include "string"
 #include "unicode/unistr.h"
@@ -29,6 +30,7 @@ constexpr const char* OVERFLOW_LABEL = "…";
 constexpr const char* NO_INDEX_LABEL = "#";
 constexpr const char* COMPRESSED_EN_LABEL = "Z";
 constexpr const char* ENGLISH_LOCALE = "en";
+constexpr int32_t EXT_PARAM_LENGTH = 64;
 std::vector<std::string> EN_INDEX_LABELS = {
     "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N",
     "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
@@ -59,7 +61,8 @@ IndexUtil::IndexUtil(const std::string &localeTag)
         HILOG_ERROR_I18N("IndexUtil: Create index failed, code is %{public}s", u_errorName(status));
         return;
     }
-    bilingualIndex = std::make_unique<icu::AlphabeticIndex>(icuLocale, status);
+    icu::Locale extendedLocale = DealWithExtParam(icuLocale);
+    bilingualIndex = std::make_unique<icu::AlphabeticIndex>(extendedLocale, status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("IndexUtil: Create bilingualIndex failed, code is %{public}s", u_errorName(status));
         return;
@@ -85,6 +88,37 @@ IndexUtil::IndexUtil(const std::string &localeTag)
 
 IndexUtil::~IndexUtil()
 {
+}
+
+icu::Locale IndexUtil::DealWithExtParam(const icu::Locale& locale)
+{
+    std::string language = locale.getLanguage();
+    std::string script = locale.getScript();
+    std::string region = locale.getCountry();
+    language += "-" + script;
+    if (language != "zh-Hant" || region == "MO" || region == "HK") {
+        return locale;
+    }
+    char value[64] = { 0 };
+    UErrorCode status = U_ZERO_ERROR;
+    locale.getKeywordValue("collation", value, sizeof(value) / sizeof(char), status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("DealWithExtParam: getKeywordValue failed, code is %{public}s", u_errorName(status));
+        return locale;
+    }
+    std::string collationParam(value);
+    if (!collationParam.empty()) {
+        return locale;
+    }
+    icu::LocaleBuilder builder;
+    builder.setLocale(locale);
+    builder.setUnicodeLocaleKeyword("co", "zhuyin");
+    icu::Locale extendedLocale = builder.build(status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("DealWithExtParam: Build extendedLocale failed, code is %{public}s", u_errorName(status));
+        return locale;
+    }
+    return extendedLocale;
 }
 
 bool IndexUtil::InitLocalIndexList()
@@ -183,6 +217,16 @@ bool IndexUtil::IsBilingualIndexSupported(const std::string &localeTag)
     icu::Locale locale = icu::Locale::forLanguageTag(curLocale, status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("IsBilingualIndexSupported: forLanguageTag failed");
+        return false;
+    }
+    char value[EXT_PARAM_LENGTH] = { 0 };
+    locale.getKeywordValue("collation", value, sizeof(value) / sizeof(char), status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("IsBilingualIndexSupported: getKeywordValue failed, code is %{public}s", u_errorName(status));
+        return false;
+    }
+    std::string collationParam(value);
+    if (collationParam.compare("pinyin") == 0) {
         return false;
     }
     std::string language = locale.getLanguage();
