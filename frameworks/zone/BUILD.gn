@@ -33,6 +33,7 @@ ohos_shared_library("zone_util") {
     "-Wall",
     "-fPIC",
   ]
+  version_script = "libzone_util.map"
   deps = [ "//base/global/i18n/frameworks/intl:intl_util" ]
   external_deps = [
     "bounds_checking_function:libsec_shared",
