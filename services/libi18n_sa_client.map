@@ -1,0 +1,45 @@
+# Copyright (c) 2026 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+ {
+    global:
+      extern "C++" {
+        OHOS::Global::I18n::I18nServiceAbilityClient::*;
+        OHOS::Global::I18n::I18nServiceAbilityProxy::*;
+        OHOS::Global::I18n::I18nServiceAbilityLoadManager::*;
+        OHOS::Global::I18n::I18nServiceAbilityLoadCallback::*;
+      };
+      _ZGVN4OHOS6Global4I18n23I18nServiceAbilityProxy10delegator_E;
+      _ZTCN4OHOS6Global4I18n23I18nServiceAbilityProxyE0_NS1_19II18nServiceAbilityE;
+      _ZTCN4OHOS6Global4I18n23I18nServiceAbilityProxyE0_NS_12IRemoteProxyINS1_19II18nServiceAbilityEEE;
+      _ZTCN4OHOS6Global4I18n23I18nServiceAbilityProxyE0_NS_13IRemoteBrokerE;
+      _ZTCN4OHOS6Global4I18n30I18nServiceAbilityLoadCallbackE0_NS_11IRemoteStubINS_26ISystemAbilityLoadCallbackEEE;
+      _ZTCN4OHOS6Global4I18n30I18nServiceAbilityLoadCallbackE0_NS_13IPCObjectStubE;
+      _ZTCN4OHOS6Global4I18n30I18nServiceAbilityLoadCallbackE0_NS_13IRemoteObjectE;
+      _ZTCN4OHOS6Global4I18n30I18nServiceAbilityLoadCallbackE0_NS_29SystemAbilityLoadCallbackStubE;
+      _ZTCN4OHOS6Global4I18n30I18nServiceAbilityLoadCallbackE120_NS_13IRemoteBrokerE;
+      _ZTCN4OHOS6Global4I18n30I18nServiceAbilityLoadCallbackE120_NS_26ISystemAbilityLoadCallbackE;
+      _ZTCN4OHOS6Global4I18n30I18nServiceAbilityLoadCallbackE128_NS_10ParcelableE;
+      _ZTTN4OHOS6Global4I18n23I18nServiceAbilityProxyE;
+      _ZTTN4OHOS6Global4I18n30I18nServiceAbilityLoadCallbackE;
+      _ZTVN4OHOS6Global4I18n23I18nServiceAbilityProxyE;
+      _ZTVN4OHOS6Global4I18n29I18nServiceAbilityLoadManagerE;
+      _ZTVN4OHOS6Global4I18n30I18nServiceAbilityLoadCallbackE;
+      _ZThn120_N4OHOS6Global4I18n30I18nServiceAbilityLoadCallback230nLoadSystemAbilityFailEi;
+      _ZThn120_N4OHOS6Global4I18n30I18nServiceAbilityLoadCallback260nLoadSystemAbilitySuccessEiRKNS_4sptrINS_13IRemoteObjectEEE;
+      __cfi_check;
+      _init;
+      _fini;
+    local:
+      *;
+ };
