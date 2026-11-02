@@ -49,7 +49,7 @@ protected:
     virtual bool IsStatusSuccess(UErrorCode status);
 
 private:
-    icu::Locale DealWithExtParam(const icu::Locale& locale);
+    icu::Locale DealWithExtParam(icu::Locale& locale);
     bool InitLocalIndexList();
 
     std::unique_ptr<icu::AlphabeticIndex> index = nullptr;
