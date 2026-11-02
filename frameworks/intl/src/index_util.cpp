@@ -92,6 +92,12 @@ IndexUtil::~IndexUtil()
 
 icu::Locale IndexUtil::DealWithExtParam(const icu::Locale& locale)
 {
+    UErrorCode status = U_ZERO_ERROR;
+    locale.addLikelySubtags(status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("DealWithExtParam: addLikelySubtags failed");
+        return locale;
+    }
     std::string language = locale.getLanguage();
     std::string script = locale.getScript();
     std::string region = locale.getCountry();
@@ -99,8 +105,7 @@ icu::Locale IndexUtil::DealWithExtParam(const icu::Locale& locale)
     if (language != "zh-Hant" || region == "MO" || region == "HK") {
         return locale;
     }
-    char value[64] = { 0 };
-    UErrorCode status = U_ZERO_ERROR;
+    char value[EXT_PARAM_LENGTH] = { 0 };
     locale.getKeywordValue("collation", value, sizeof(value) / sizeof(char), status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("DealWithExtParam: getKeywordValue failed, code is %{public}s", u_errorName(status));
@@ -227,6 +232,11 @@ bool IndexUtil::IsBilingualIndexSupported(const std::string &localeTag)
     }
     std::string collationParam(value);
     if (collationParam.compare("pinyin") == 0) {
+        return false;
+    }
+    locale.addLikelySubtags(status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("IsBilingualIndexSupported: addLikelySubtags failed");
         return false;
     }
     std::string language = locale.getLanguage();
