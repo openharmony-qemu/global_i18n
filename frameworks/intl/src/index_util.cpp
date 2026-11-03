@@ -90,7 +90,7 @@ IndexUtil::~IndexUtil()
 {
 }
 
-icu::Locale IndexUtil::DealWithExtParam(const icu::Locale& locale)
+icu::Locale IndexUtil::DealWithExtParam(icu::Locale& locale)
 {
     UErrorCode status = U_ZERO_ERROR;
     locale.addLikelySubtags(status);
