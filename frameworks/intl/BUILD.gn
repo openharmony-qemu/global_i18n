@@ -222,7 +222,8 @@ ohos_shared_library("intl_util") {
     if (is_asan) {
       defines += [ "SUPPORT_ASAN" ]
     }
-    if (target_platform == "pc" || target_platform == "phone") {
+    if (target_platform == "pc" || target_platform == "phone" || target_platform == "tablet" ||
+      target_platform == "2in1") {
       defines += [ "SUPPORT_MULTI_USER" ]
     }
   }
