@@ -94,7 +94,7 @@ ohos_shared_library("i18n_sa") {
     "../frameworks/intl:preferred_language",
   ]
   if (target_platform == "pc" || target_platform == "phone" || target_platform == "tablet" ||
-    || target_platform == "2in1") {
+    target_platform == "2in1") {
     defines = [ "SUPPORT_MULTI_USER" ]
   }
   external_deps = [
