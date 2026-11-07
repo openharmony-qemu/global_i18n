@@ -61,6 +61,7 @@ private:
     std::vector<std::string> localIndexList;
     std::mutex indexMutex;
     bool isBilingualIndexSupported = false;
+    bool isStroke = false;
     bool createSuccess = false;
 };
 } // namespace I18n
