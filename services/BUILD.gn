@@ -80,6 +80,7 @@ ohos_shared_library("i18n_sa") {
     "./src/i18n_service_ability.cpp",
     "./src/i18n_service_event.cpp",
   ]
+  version_script = "libi18n_sa.map"
   output_values = get_target_outputs(":i18n_service_interface")
   sources += filter_include(output_values, [ "*_stub.cpp" ])
   include_dirs = [
