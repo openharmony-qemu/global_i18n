@@ -35,8 +35,16 @@ std::vector<std::string> EN_INDEX_LABELS = {
     "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N",
     "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
 };
+std::vector<std::string> ZH_HK_INDEX_LABELS = {
+    "1劃", "2劃", "3劃", "4劃", "5劃", "6劃", "7劃", "8劃", "9劃", "10劃",
+    "11劃", "12劃", "13劃", "14劃", "15劃", "16劃", "17劃", "18劃", "19劃", "20劃",
+    "21劃", "22劃", "23劃", "24劃", "25劃", "26劃"
+};
+std::unordered_set<std::string> ZH_HK_EXTEND_INDEX_LABELS= {
+    "27劃", "28劃", "29劃", "30劃", "31劃", "32劃", "33劃", "35劃", "36劃", "39劃", "48劃"
+};
 std::unordered_set<std::string> SUPPORTED_BILINGUA_INDEX_LANGUAGE = {
-    "am", "ar", "as", "sr", "be", "bg", "bn", "el", "fa", "gu", "hi", "he", "ja",
+    "am", "ar", "as", "sr", "be", "bg", "bn", "bo", "el", "fa", "gu", "hi", "he", "ja",
     "ka", "kk", "km", "kn", "ko", "lo", "mai", "mk", "ml", "mn", "mr", "my", "ne",
     "or", "pa", "ru", "si", "ta", "te", "th", "ug", "uk", "ur"
 };
@@ -102,6 +110,7 @@ icu::Locale IndexUtil::DealWithExtParam(icu::Locale& locale)
     std::string script = locale.getScript();
     std::string region = locale.getCountry();
     language += "-" + script;
+    isStroke = (language == "zh-Hant" && (region == "MO" || region == "HK"));
     if (language != "zh-Hant" || region == "MO" || region == "HK") {
         return locale;
     }
@@ -128,6 +137,10 @@ icu::Locale IndexUtil::DealWithExtParam(icu::Locale& locale)
 
 bool IndexUtil::InitLocalIndexList()
 {
+    if (isStroke) {
+        localIndexList = ZH_HK_INDEX_LABELS;
+        return true;
+    }
     UErrorCode status = U_ZERO_ERROR;
     bilingualIndex->resetBucketIterator(status);
     if (U_FAILURE(status)) {
@@ -325,6 +338,9 @@ std::string IndexUtil::GetBilingualIndex(const std::string &text)
     if (iter == bucketNumberToLabel.end() || iter->second == OVERFLOW_LABEL) {
         HILOG_ERROR_I18N("GetBilingualIndex: Get label failed, bucketNumber is %{public}d", bucketNumber);
         return NO_INDEX_LABEL;
+    }
+    if (isStroke && ZH_HK_EXTEND_INDEX_LABELS.find(iter->second) != ZH_HK_EXTEND_INDEX_LABELS.end()) {
+        return "26劃";
     }
     return iter->second;
 }
