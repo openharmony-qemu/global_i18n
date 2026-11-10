@@ -110,10 +110,6 @@ icu::Locale IndexUtil::DealWithExtParam(icu::Locale& locale)
     std::string script = locale.getScript();
     std::string region = locale.getCountry();
     language += "-" + script;
-    isStroke = (language == "zh-Hant" && (region == "MO" || region == "HK"));
-    if (language != "zh-Hant" || region == "MO" || region == "HK") {
-        return locale;
-    }
     char value[EXT_PARAM_LENGTH] = { 0 };
     locale.getKeywordValue("collation", value, sizeof(value) / sizeof(char), status);
     if (U_FAILURE(status)) {
@@ -121,7 +117,9 @@ icu::Locale IndexUtil::DealWithExtParam(icu::Locale& locale)
         return locale;
     }
     std::string collationParam(value);
-    if (!collationParam.empty()) {
+    isStroke = ((language == "zh-Hant" && (region == "MO" || region == "HK") && collationParam.empty()) ||
+        collationParam == "stroke");
+    if (language != "zh-Hant" || region == "MO" || region == "HK" || !collationParam.empty()) {
         return locale;
     }
     icu::LocaleBuilder builder;
