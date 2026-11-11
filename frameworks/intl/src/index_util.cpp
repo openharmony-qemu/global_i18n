@@ -245,14 +245,14 @@ bool IndexUtil::IsBilingualIndexSupported(const std::string &localeTag)
     if (collationParam.compare("pinyin") == 0) {
         return false;
     }
+    std::string language = locale.getLanguage();
+    if (SUPPORTED_BILINGUA_INDEX_LANGUAGE.find(language) != SUPPORTED_BILINGUA_INDEX_LANGUAGE.end()) {
+        return true;
+    }
     locale.addLikelySubtags(status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("IsBilingualIndexSupported: addLikelySubtags failed");
         return false;
-    }
-    std::string language = locale.getLanguage();
-    if (SUPPORTED_BILINGUA_INDEX_LANGUAGE.find(language) != SUPPORTED_BILINGUA_INDEX_LANGUAGE.end()) {
-        return true;
     }
     std::string script = locale.getScript();
     language += "-" + script;
@@ -334,7 +334,6 @@ std::string IndexUtil::GetBilingualIndex(const std::string &text)
     }
     auto iter = bucketNumberToLabel.find(bucketNumber);
     if (iter == bucketNumberToLabel.end() || iter->second == OVERFLOW_LABEL) {
-        HILOG_ERROR_I18N("GetBilingualIndex: Get label failed, bucketNumber is %{public}d", bucketNumber);
         return NO_INDEX_LABEL;
     }
     if (isStroke && ZH_HK_EXTEND_INDEX_LABELS.find(iter->second) != ZH_HK_EXTEND_INDEX_LABELS.end()) {
