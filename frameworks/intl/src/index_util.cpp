@@ -40,7 +40,7 @@ std::vector<std::string> ZH_HK_INDEX_LABELS = {
     "11劃", "12劃", "13劃", "14劃", "15劃", "16劃", "17劃", "18劃", "19劃", "20劃",
     "21劃", "22劃", "23劃", "24劃", "25劃", "26劃"
 };
-std::unordered_set<std::string> ZH_HK_EXTEND_INDEX_LABELS= {
+std::unordered_set<std::string> ZH_HK_EXTEND_INDEX_LABELS = {
     "27劃", "28劃", "29劃", "30劃", "31劃", "32劃", "33劃", "35劃", "36劃", "39劃", "48劃"
 };
 std::unordered_set<std::string> SUPPORTED_BILINGUA_INDEX_LANGUAGE = {
