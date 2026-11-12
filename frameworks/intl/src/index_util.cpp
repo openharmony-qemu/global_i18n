@@ -16,6 +16,7 @@
 
 #include "i18n_hilog.h"
 #include "locale_config.h"
+#include "unicode/localebuilder.h"
 #include "unicode/locid.h"
 #include "string"
 #include "unicode/unistr.h"
@@ -29,12 +30,21 @@ constexpr const char* OVERFLOW_LABEL = "…";
 constexpr const char* NO_INDEX_LABEL = "#";
 constexpr const char* COMPRESSED_EN_LABEL = "Z";
 constexpr const char* ENGLISH_LOCALE = "en";
+constexpr int32_t EXT_PARAM_LENGTH = 64;
 std::vector<std::string> EN_INDEX_LABELS = {
     "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N",
     "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
 };
+std::vector<std::string> ZH_HK_INDEX_LABELS = {
+    "1劃", "2劃", "3劃", "4劃", "5劃", "6劃", "7劃", "8劃", "9劃", "10劃",
+    "11劃", "12劃", "13劃", "14劃", "15劃", "16劃", "17劃", "18劃", "19劃", "20劃",
+    "21劃", "22劃", "23劃", "24劃", "25劃", "26劃"
+};
+std::unordered_set<std::string> ZH_HK_EXTEND_INDEX_LABELS = {
+    "27劃", "28劃", "29劃", "30劃", "31劃", "32劃", "33劃", "35劃", "36劃", "39劃", "48劃"
+};
 std::unordered_set<std::string> SUPPORTED_BILINGUA_INDEX_LANGUAGE = {
-    "am", "ar", "as", "sr", "be", "bg", "bn", "el", "fa", "gu", "hi", "he", "ja",
+    "am", "ar", "as", "sr", "be", "bg", "bn", "bo", "el", "fa", "gu", "hi", "he", "ja",
     "ka", "kk", "km", "kn", "ko", "lo", "mai", "mk", "ml", "mn", "mr", "my", "ne",
     "or", "pa", "ru", "si", "ta", "te", "th", "ug", "uk", "ur"
 };
@@ -59,7 +69,8 @@ IndexUtil::IndexUtil(const std::string &localeTag)
         HILOG_ERROR_I18N("IndexUtil: Create index failed, code is %{public}s", u_errorName(status));
         return;
     }
-    bilingualIndex = std::make_unique<icu::AlphabeticIndex>(icuLocale, status);
+    icu::Locale extendedLocale = DealWithExtParam(icuLocale);
+    bilingualIndex = std::make_unique<icu::AlphabeticIndex>(extendedLocale, status);
     if (U_FAILURE(status)) {
         HILOG_ERROR_I18N("IndexUtil: Create bilingualIndex failed, code is %{public}s", u_errorName(status));
         return;
@@ -87,8 +98,47 @@ IndexUtil::~IndexUtil()
 {
 }
 
+icu::Locale IndexUtil::DealWithExtParam(icu::Locale& locale)
+{
+    UErrorCode status = U_ZERO_ERROR;
+    locale.addLikelySubtags(status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("DealWithExtParam: addLikelySubtags failed");
+        return locale;
+    }
+    std::string language = locale.getLanguage();
+    std::string script = locale.getScript();
+    std::string region = locale.getCountry();
+    language += "-" + script;
+    char value[EXT_PARAM_LENGTH] = { 0 };
+    locale.getKeywordValue("collation", value, sizeof(value) / sizeof(char), status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("DealWithExtParam: getKeywordValue failed, code is %{public}s", u_errorName(status));
+        return locale;
+    }
+    std::string collationParam(value);
+    isStroke = ((language == "zh-Hant" && (region == "MO" || region == "HK") && collationParam.empty()) ||
+        collationParam == "stroke");
+    if (language != "zh-Hant" || region == "MO" || region == "HK" || !collationParam.empty()) {
+        return locale;
+    }
+    icu::LocaleBuilder builder;
+    builder.setLocale(locale);
+    builder.setUnicodeLocaleKeyword("co", "zhuyin");
+    icu::Locale extendedLocale = builder.build(status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("DealWithExtParam: Build extendedLocale failed, code is %{public}s", u_errorName(status));
+        return locale;
+    }
+    return extendedLocale;
+}
+
 bool IndexUtil::InitLocalIndexList()
 {
+    if (isStroke) {
+        localIndexList = ZH_HK_INDEX_LABELS;
+        return true;
+    }
     UErrorCode status = U_ZERO_ERROR;
     bilingualIndex->resetBucketIterator(status);
     if (U_FAILURE(status)) {
@@ -185,9 +235,24 @@ bool IndexUtil::IsBilingualIndexSupported(const std::string &localeTag)
         HILOG_ERROR_I18N("IsBilingualIndexSupported: forLanguageTag failed");
         return false;
     }
+    char value[EXT_PARAM_LENGTH] = { 0 };
+    locale.getKeywordValue("collation", value, sizeof(value) / sizeof(char), status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("IsBilingualIndexSupported: getKeywordValue failed, code is %{public}s", u_errorName(status));
+        return false;
+    }
+    std::string collationParam(value);
+    if (collationParam.compare("pinyin") == 0) {
+        return false;
+    }
     std::string language = locale.getLanguage();
     if (SUPPORTED_BILINGUA_INDEX_LANGUAGE.find(language) != SUPPORTED_BILINGUA_INDEX_LANGUAGE.end()) {
         return true;
+    }
+    locale.addLikelySubtags(status);
+    if (U_FAILURE(status)) {
+        HILOG_ERROR_I18N("IsBilingualIndexSupported: addLikelySubtags failed");
+        return false;
     }
     std::string script = locale.getScript();
     language += "-" + script;
@@ -269,8 +334,10 @@ std::string IndexUtil::GetBilingualIndex(const std::string &text)
     }
     auto iter = bucketNumberToLabel.find(bucketNumber);
     if (iter == bucketNumberToLabel.end() || iter->second == OVERFLOW_LABEL) {
-        HILOG_ERROR_I18N("GetBilingualIndex: Get label failed, bucketNumber is %{public}d", bucketNumber);
         return NO_INDEX_LABEL;
+    }
+    if (isStroke && ZH_HK_EXTEND_INDEX_LABELS.find(iter->second) != ZH_HK_EXTEND_INDEX_LABELS.end()) {
+        return "26劃";
     }
     return iter->second;
 }
