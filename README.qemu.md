@@ -1,0 +1,1 @@
+Mirror bootstrap in progress. The source baseline will be merged from the complete official upstream history after its first synchronization. This automation does not replace or update QEMU development commits.

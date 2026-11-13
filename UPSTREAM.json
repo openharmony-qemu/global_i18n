@@ -1,0 +1,9 @@
+{
+  "url": "https://gitcode.com/openharmony/global_i18n.git",
+  "branches": [
+    "OpenHarmony-7.0-Release"
+  ],
+  "baseline_revision": "76e82e29f33b717b0346e2c549b8805c083ea2ad",
+  "qemu_branch": "OpenHarmony-7.0-Release-qemu",
+  "bootstrap_status": "awaiting_first_upstream_sync"
+}
