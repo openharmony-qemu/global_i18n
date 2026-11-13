@@ -640,6 +640,7 @@ napi_value I18nSystemAddon::SetSystemLanguageImpl(napi_env env, napi_callback_in
     std::string language = VariableConvertor::GetString(env, argv[0], code);
     if (code != 0) {
         HILOG_ERROR_I18N("SetSystemLanguageImpl: Get language failed.");
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "language", "string", throwError);
         return nullptr;
     }
     I18nErrorCode err = I18nServiceAbilityClient::SetSystemLanguage(language);
@@ -684,6 +685,7 @@ napi_value I18nSystemAddon::SetSystemRegionImpl(napi_env env, napi_callback_info
     std::string regionBuf = VariableConvertor::GetString(env, argv[0], code);
     if (code != 0) {
         HILOG_ERROR_I18N("SetSystemRegionImpl: Get argv[0] failed.");
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "region", "string", throwError);
         return nullptr;
     }
     I18nErrorCode err = I18nServiceAbilityClient::SetSystemRegion(regionBuf.data());
@@ -728,6 +730,7 @@ napi_value I18nSystemAddon::SetSystemLocaleImpl(napi_env env, napi_callback_info
     std::string localeBuf = VariableConvertor::GetString(env, argv[0], code);
     if (code != 0) {
         HILOG_ERROR_I18N("SetSystemLocaleImpl: Get argv[0] failed.");
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "locale", "string", throwError);
         return nullptr;
     }
     I18nErrorCode err = I18nServiceAbilityClient::SetSystemLocale(localeBuf.data());
@@ -773,6 +776,7 @@ napi_value I18nSystemAddon::Set24HourClockImpl(napi_env env, napi_callback_info 
     status = napi_get_value_bool(env, argv[0], &option);
     if (status != napi_ok) {
         HILOG_ERROR_I18N("Set24HourClockImpl: Failed to get boolean item");
+        ErrorUtil::NapiThrow(env, I18N_NOT_FOUND, "option", "boolean", throwError);
         return nullptr;
     }
     std::string optionStr = option ? "true" : "false";
