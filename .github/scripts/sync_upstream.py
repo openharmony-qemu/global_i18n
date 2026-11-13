@@ -46,6 +46,22 @@ def main():
             git(root, 'fetch', '--no-tags', 'upstream', revision)
         baseline = 'refs/heads/upstream/baseline-7.0'
         git(root, 'update-ref', baseline, revision)
+        if config.get('large_files') == 'git-lfs':
+            # GitHub rejects historical blobs larger than 100 MiB, even when
+            # they are absent from the release tree. Preserve their bytes in
+            # LFS and record original -> hosted commit identities explicitly.
+            mapping = root / 'upstream-commit-map.csv'
+            git(root, 'lfs', 'migrate', 'import', '--everything', '--skip-fetch',
+                '--above=99MB', '--yes', '--object-map=' + str(mapping))
+            converted = git(root, 'rev-parse', baseline, capture=True).stdout.strip()
+            git(root, 'config', 'user.name', 'OpenHarmony QEMU mirror')
+            git(root, 'config', 'user.email', 'mirror@openharmony-qemu.invalid')
+            git(root, 'notes', '--ref=qemu-upstream', 'add', '-f', '-m',
+                json.dumps({'upstream_url': upstream, 'upstream_revision': revision,
+                            'hosted_revision': converted, 'conversion': 'git-lfs above 99MB'},
+                           sort_keys=True), converted)
+            git(root, 'lfs', 'push', '--all', 'origin')
+            refspecs.append('+refs/notes/qemu-upstream:refs/notes/qemu-upstream')
         # All destination refs are explicitly inside upstream/. No mirror push,
         # ref deletion or force update of OpenHarmony-*-Release-qemu is allowed.
         git(root, 'push', '--atomic', 'origin', *refspecs, '+' + baseline + ':' + baseline)
